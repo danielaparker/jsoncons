@@ -19,7 +19,7 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(error_recovery_test_suite)
 
-class my_parse_error_handler : public parse_error_handler
+class relaxed_error_handler : public parse_error_handler
 {
 private:
 
@@ -36,16 +36,25 @@ private:
 
 BOOST_AUTO_TEST_CASE(test_array_extra_comma)
 {
-    my_parse_error_handler err_handler;
+    relaxed_error_handler err_handler;
 
+    json expected = json::parse("[1,2,3]");
     json val = json::parse("[1,2,3,]", err_handler);
 
-    std::cout << val << std::endl;
+    BOOST_CHECK_EQUAL(expected,val);
 }
 
 BOOST_AUTO_TEST_CASE(test_object_extra_comma)
 {
-    my_parse_error_handler err_handler;
+    relaxed_error_handler err_handler;
+
+    json expected = json::parse(R"(
+    {
+        "first" : 1,
+        "second" : 2
+    }
+    )", 
+    err_handler);
 
     json val = json::parse(R"(
     {
@@ -55,12 +64,12 @@ BOOST_AUTO_TEST_CASE(test_object_extra_comma)
     )", 
     err_handler);
 
-    std::cout << val << std::endl;
+    BOOST_CHECK_EQUAL(expected,val);
 }
 
 BOOST_AUTO_TEST_CASE(test_name_without_quotes)
 {
-    my_parse_error_handler err_handler;
+    relaxed_error_handler err_handler;
 
     /*json val = json::parse(R"(
     {

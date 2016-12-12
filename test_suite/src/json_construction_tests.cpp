@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_construction_in_code)
     obj["accept_waiver_of_liability"] = true;
 
     // An array value with four elements
-    json arr = json::make_array();
+    json arr = json::array();
     arr.add(null_val);
     arr.add(flag);
     arr.add(number);
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(test_another_object_iterator)
 
 BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 {
-    json arr = json::make_array();
+    json arr = json::array();
     arr.add("Montreal");
     arr.add("Toronto");
     arr.add("Ottawa");
@@ -166,9 +166,9 @@ BOOST_AUTO_TEST_CASE(test_another_array_iterator)
 
 BOOST_AUTO_TEST_CASE(test_integer_limits)
 {
-    const long long max_value = std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP();
+    const long long max_value = (std::numeric_limits<long long>::max)();
 
-    const unsigned long long max_uvalue = std::numeric_limits<unsigned long long>::max JSONCONS_NO_MACRO_EXP();
+    const unsigned long long max_uvalue = (std::numeric_limits<unsigned long long>::max)();
     {
         std::ostringstream os;
 
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
     //std::cout << "size json=" << sizeof(json) << std::endl;
     //std::cout << "size string=" << sizeof(std::string) << std::endl;
     //std::cout << "size array=" << sizeof(std::vector<json>) << std::endl;
-    //std::cout << "size map=" << sizeof(std::vector<json::member_type>) << std::endl;
+    //std::cout << "size map=" << sizeof(std::vector<json::kvp_type >) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_multiple)
@@ -223,21 +223,21 @@ BOOST_AUTO_TEST_CASE(test_multiple)
 
     std::istringstream is(in);
 
-    jsoncons::json_encoder<json> encoder;
-    json_reader reader(is,encoder);
+    jsoncons::json_decoder<json> decoder;
+    json_reader reader(is,decoder);
 
     if (!reader.eof())
     {
         reader.read_next();
         BOOST_CHECK(!reader.eof());
-        json val = encoder.get_result();
+        json val = decoder.get_result();
         BOOST_CHECK_EQUAL(1,val["a"].as<int>());
     }
     if (!reader.eof())
     {
         reader.read_next();
         BOOST_CHECK(!reader.eof());
-        json val = encoder.get_result();
+        json val = decoder.get_result();
         BOOST_CHECK_EQUAL(4,val["a"].as<int>());
     }
 

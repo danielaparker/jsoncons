@@ -471,90 +471,54 @@ vertical-align:1px;
 <div class="highlight highlight-source-c++"><pre>jsoncons::serialization_options
 
 <span class="pl-k">typedef</span> basic_serialization_options&lt;<span class="pl-k">char</span>&gt; serialization_options</pre></div>
-
 <p>The <code>serialization_options</code> class is an instantiation of the <code>basic_serialization_options</code> class template that uses <code>char</code> as the character type.</p>
-
-<p>The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A <code>precision</code> gives the maximum number of significant digits, the default precision is <code>16</code>. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, conversion to text becomes an issue for floating point numbers that do not have an exact representation, e.g. 1.1 read may become 1.1000000000000001 when written. </p>
-
+<p>The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A <code>precision</code> gives the maximum number of significant digits, the default precision is <code>15</code>. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, conversion to text becomes an issue for floating point numbers that do not have an exact representation, e.g. 1.1 read may become 1.1000000000000001 when written.</p>
 <p>When parsing text, the precision of the fractional number is retained, and used for subsequent serialization, to allow round-trip.</p>
-
 <h3>Header</h3>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/serialization_options.hpp<span class="pl-pds">&gt;</span></span></pre></div>
-
 <h3>Member constants</h3>
-
 <pre><code>default_precision
 </code></pre>
-
-<p>The default precision is 16</p>
-
+<p>The default precision is 15</p>
 <pre><code>default_indent
 </code></pre>
-
 <p>The default indent is 4</p>
-
 <h3>Constructors</h3>
-
 <pre><code>serialization_options()
 </code></pre>
-
-<p>Constructs an <code>serialization_options</code> with default values. </p>
-
+<p>Constructs an <code>serialization_options</code> with default values.</p>
 <h3>Accessors</h3>
-
 <pre><code>int indent() const
 </code></pre>
-
 <p>Returns the level of indentation, the default is 4</p>
-
 <pre><code>uint8_t precision() const 
 </code></pre>
-
 <p>Returns the maximum number of significant digits.</p>
-
 <pre><code>bool escape_all_non_ascii() const
 </code></pre>
-
 <p>The default is false</p>
-
 <pre><code>bool escape_solidus() const
 </code></pre>
-
 <p>The default is false</p>
-
 <pre><code>bool replace_nan() const
 </code></pre>
-
 <p>The defult is <code>true</code></p>
-
 <pre><code>bool replace_pos_inf() const
 </code></pre>
-
 <p>The defult is <code>true</code></p>
-
 <pre><code>bool replace_neg_inf() const
 </code></pre>
-
 <p>The defult is <code>true</code></p>
-
 <pre><code>std::string nan_replacement() const 
 </code></pre>
-
 <p>The default is "null"</p>
-
 <pre><code>std::string pos_inf_replacement() const 
 </code></pre>
-
 <p>The default is "null"</p>
-
 <pre><code>std::string neg_inf_replacement() const 
 </code></pre>
-
 <p>The default is "null"</p>
-
 <h3>Modifiers</h3>
-
 <pre><code>serialization_options&amp; indent(int value)
 
 serialization_options&amp; escape_all_non_ascii(bool value)
@@ -575,47 +539,31 @@ serialization_options&amp; pos_inf_replacement(const std::string&amp; replacemen
 
 serialization_options&amp; neg_inf_replacement(const std::string&amp; replacement)
 </code></pre>
-
 <p>Sets replacement text for negative infinity.</p>
-
 <pre><code>serialization_options&amp; precision(uint8_t prec)
 
 serialization_options&amp; object_object_split_lines(line_split_kind value)
 </code></pre>
-
 <p>For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is <a href="line_split_kind">line_split_kind::multi_line</a>.</p>
-
 <pre><code>serialization_options&amp; array_object_split_lines(line_split_kind value)
 </code></pre>
-
 <p>For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is <a href="line_split_kind">line_split_kind::multi_line</a>.</p>
-
 <pre><code>serialization_options&amp; object_array_split_lines(line_split_kind value)
 </code></pre>
-
 <p>For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is <a href="line_split_kind">line_split_kind::same_line</a>.</p>
-
 <pre><code>serialization_options&amp; array_array_split_lines(line_split_kind value)
 </code></pre>
-
 <p>For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is <a href="line_split_kind">line_split_kind::new_line</a>.</p>
-
 <h2>Examples</h2>
-
 <h3>Default NaN, inf and -inf replacement</h3>
-
 <div class="highlight highlight-source-c++"><pre>    json obj;
     obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = std::sqrt(-<span class="pl-c1">1.0</span>);
     obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
     obj[<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>] = -<span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
     std::cout &lt;&lt; obj &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>    {<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>}</pre></div>
-
 <h3>User specified <code>Nan</code>, <code>Inf</code> and <code>-Inf</code> replacement</h3>
-
 <div class="highlight highlight-source-c++"><pre>    json obj;
     obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = std::sqrt(-<span class="pl-c1">1.0</span>);
     obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
@@ -627,17 +575,13 @@ serialization_options&amp; object_object_split_lines(line_split_kind value)
     format.neg_inf_replacement(<span class="pl-s"><span class="pl-pds">"</span>-1e9999<span class="pl-pds">"</span></span>); <span class="pl-c">// default is "null"</span>
 
     std::cout &lt;&lt; pretty_print(obj,format) &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>    {
         <span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,
         <span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-c1">1e9999</span>,
         <span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>:<span class="pl-c1">-1e9999</span>
     }</pre></div>
-
 <h3>Object-array block formatting</h3>
-
 <div class="highlight highlight-source-c++"><pre>    json val;
 
     val[<span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>] = json::array{<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>};
@@ -656,19 +600,14 @@ serialization_options&amp; object_object_split_lines(line_split_kind value)
     serialization_options format2;
     format2.object_array_split_lines(line_split_kind::multi_line);
     std::cout &lt;&lt; pretty_print(val,format2) &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <p>Default (same line)</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>],
     <span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>: [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>],
     <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>]
 }</pre></div>
-
 <p>New line</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [
         <span class="pl-c1">1</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>
@@ -680,9 +619,7 @@ serialization_options&amp; object_object_split_lines(line_split_kind value)
         <span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>
     ]
 }</pre></div>
-
 <p>Multi line</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [
         <span class="pl-c1">1</span>,
@@ -701,9 +638,7 @@ serialization_options&amp; object_object_split_lines(line_split_kind value)
         <span class="pl-c1">3</span>
     ]
 }</pre></div>
-
 <h3>Array-array block formatting</h3>
-
 <div class="highlight highlight-source-c++"><pre>    json val;
     val[<span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>] = json::array{<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>,<span class="pl-c1">7</span>};
     val[<span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>item<span class="pl-pds">"</span></span>] = json::array{json::array{<span class="pl-c1">2</span>},
@@ -727,11 +662,8 @@ serialization_options&amp; object_object_split_lines(line_split_kind value)
     serialization_options format2;
     format2.array_array_split_lines(line_split_kind::multi_line);
     std::cout &lt;&lt; pretty_print(val, format2) &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <p>Default (new line)</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>: {
         <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: [<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>,<span class="pl-c1">7</span>],
@@ -747,18 +679,14 @@ serialization_options&amp; object_object_split_lines(line_split_kind value)
         ]
     }
 }</pre></div>
-
 <p>Same line</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>: {
         <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: [<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>,<span class="pl-c1">7</span>],
         <span class="pl-s"><span class="pl-pds">"</span>item<span class="pl-pds">"</span></span>: [[<span class="pl-c1">2</span>],[<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>],[<span class="pl-c1">4</span>],[<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>],[<span class="pl-c1">2</span>],[<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">3</span>],[<span class="pl-c1">2</span>],[<span class="pl-c1">4</span>,<span class="pl-c1">3</span>]]
     }
 }</pre></div>
-
 <p>Multi line</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>: {
         <span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>: [

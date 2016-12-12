@@ -17,7 +17,7 @@ template <class T>
 void add(T&& val)
 
 template <class T>
-void set(const string_type& name, T&& val)
+void set(const key_type& name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
@@ -179,9 +179,9 @@ namespace jsoncons
             return boost::gregorian::from_simple_string(s);
         }
 
-        static void assign(Json& lhs, boost::gregorian::date val)
+        static Json to_json(boost::gregorian::date val)
         {
-            lhs.assign_string(to_iso_extended_string(val));
+            return Json::make_string(to_iso_extended_string(val));
         }
     };
 }

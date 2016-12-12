@@ -16,6 +16,7 @@
 #include <limits> // std::numeric_limits
 #include <fstream>
 #include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 
@@ -24,6 +25,10 @@ namespace jsoncons {
 template<class CharT>
 class basic_json_serializer : public basic_json_output_handler<CharT>
 {
+public:
+    using typename basic_json_output_handler<CharT>::string_view_type                                 ;
+
+private:
     static const size_t default_buffer_length = 16384;
 
     struct stack_item
@@ -77,8 +82,12 @@ class basic_json_serializer : public basic_json_output_handler<CharT>
     std::vector<stack_item> stack_;
     int indent_;
     bool indenting_;
-    float_printer<CharT> fp_;
+    print_double<CharT> fp_;
     buffered_output<CharT> bos_;
+
+    // Noncopyable and nonmoveable
+    basic_json_serializer(const basic_json_serializer&) = delete;
+    basic_json_serializer& operator=(const basic_json_serializer&) = delete;
 public:
     basic_json_serializer(std::basic_ostream<CharT>& os)
        : indent_(0), 
@@ -258,7 +267,7 @@ private:
         end_value();
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type name) override
     {
         if (!stack_.empty())
         {
@@ -276,7 +285,7 @@ private:
         }
 
         bos_.put('\"');
-        escape_string<CharT>(name, length, format_, bos_);
+        escape_string<CharT>(name.data(), name.length(), format_, bos_);
         bos_.put('\"');
         bos_.put(':');
         if (indenting_)
@@ -298,7 +307,7 @@ private:
         end_value();
     }
 
-    void do_string_value(const CharT* value, size_t length) override
+    void do_string_value(string_view_type value) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -306,7 +315,7 @@ private:
         }
 
         bos_. put('\"');
-        escape_string<CharT>(value, length, format_, bos_);
+        escape_string<CharT>(value.data(), value.length(), format_, bos_);
         bos_. put('\"');
 
         end_value();
@@ -333,7 +342,7 @@ private:
         }
         else
         {
-            fp_.print(value,precision,bos_);
+            fp_(value,precision,bos_);
         }
 
         end_value();

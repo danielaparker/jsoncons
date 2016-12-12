@@ -4,6 +4,8 @@ jsoncons::csv::csv_reader
 
 The `csv_reader` class is an instantiation of the `basic_csv_reader` class template that uses `char` as the character type. It reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
 
+`csv_reader` is noncopyable and nonmoveable.
+
 ### Header
 ```c++
 #include <jsoncons_ext/csv/csv_reader.hpp>
@@ -50,7 +52,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 Returns `true` when there is no more data to be read from the stream, `false` otherwise
 
     void read()
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_input_handler](json_input_handler), such as a [json_encoder](json_encoder).
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_input_handler](json_input_handler), such as a [json_decoder](json_decoder).
 Throws [parse_exception](parse_exception) if parsing fails.
 
     size_t buffer_capacity() const
@@ -79,9 +81,9 @@ Note
 std::string in_file = "countries.csv";
 std::ifstream is(in_file);
 
-json_encoder<json> encoder;
+json_decoder<json> decoder;
 
-csv_reader reader(is,encoder);
+csv_reader reader(is,decoder);
 reader.read();
 json countries = encoder.get_result();
 
@@ -118,12 +120,12 @@ Note
 std::string in_file = "employees.txt";
 std::ifstream is(in_file);
 
-json_encoder<json> encoder;
+json_decoder<json> decoder;
 csv_parameters params;
 params.field_delimiter = '\t'
       .assume_header = true;
 
-csv_reader reader(is,encoder,params);
+csv_reader reader(is,decoder,params);
 reader.read();
 json employees = encoder.get_result();
 
@@ -176,13 +178,13 @@ Note
 std::string in_file = "countries.csv";
 std::ifstream is(in_file);
 
-json_encoder<json> encoder;
+json_decoder<json> decoder;
 
 csv_parameters params;
 params.column_names({"Country Code","Name"})
       .header_lines(1);
 
-csv_reader reader(is,encoder,params);
+csv_reader reader(is,decoder,params);
 reader.read();
 json countries = encoder.get_result();
 

@@ -1,3 +1,50 @@
+master
+------
+
+Breaking change (if you've implemented your own input and output handlers)
+
+In basic_json_input_handler, the virtual functions
+```c++
+virtual void do_name(const CharT* value, size_t length, 
+                     const basic_parsing_context<CharT>& context)
+
+virtual void do_string_value(const CharT* value, size_t length, 
+                             const basic_parsing_context<CharT>& context)
+```
+have been changed to
+```c++
+virtual void do_name(string_view_type val, 
+                     const basic_parsing_context<CharT>& context) 
+
+virtual void do_string_value(string_view_type val, 
+                             const basic_parsing_context<CharT>& context) 
+```
+
+In basic_json_output_handler, the virtual functions
+```c++
+virtual void do_name(const CharT* value, size_t length) 
+
+virtual void do_string_value(const CharT* value, size_t length) 
+```
+have been changed to
+```c++
+virtual void do_name(string_view_type val)
+
+virtual void do_string_value(string_view_type val)
+```
+
+Non-breaking changes
+
+- Support for stateful allocators
+- json function object_range() now returns a pair of RandomAccessIterator (previously BidirectionalIterator)
+- json operator [size_t i] applied to a json object now returns the ith object (previously threw) 
+
+0.99.5
+------
+
+- Validations added to utf8 and utf16 string parsing to pass all [JSONTestSuite](https://github.com/nst/JSONTestSuite) tests
+- The name `json_encoder` introduced in 0.99.4 has been changed to `json_decoder`. Rationale: consistencty with common usage (encoding and serialization, decoding and deserialization)
+
 0.99.4a
 -------
 

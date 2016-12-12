@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_member_type</title>
+<title>deprecated</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,19 +468,88 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json::member_type
+<h2>Deprecated Features</h2>
+<p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.</p>
+<p>In the table, <em>✓</em> indicates that the old name is still supported.</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Old name, now deprecated</th>
+<th><em>✓</em></th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>json</td>
+<td>add(size_t index, const json&amp; val)</td>
+<td><em>✓</em></td>
+<td>Use add(array_iterator pos, const json&amp; val)</td>
+</tr></tbody></table>
+<pre><code>|add(size_t index, json&amp;&amp; val)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use add(array_iterator pos, json&amp;&amp; val)
+|remove_range(size_t from_index, size_t to_index)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|erase(array_iterator first, array_iterator last)
+|remove(const std::string&amp; name)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use erase(const std::string&amp; name)
+|parse(std::istream&amp; is)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use parse_stream(std::istream&amp; is)
+|parse(std::istream&amp; is, parse_error_handler&amp; err_handler)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use parse_stream(std::istream&amp; is, parse_error_handler&amp; err_handler)
+|as_int() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `as&lt;int&gt;`
+|as_uint() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `as&lt;unsigned int&gt;`
+|as_long() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `as&lt;long&gt;`
+|as_ulong() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `as&lt;unsigned long&gt;`
+|as_longlong() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use as_integer or `as&lt;long long&gt;`
+|as_ulonglong() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use as_uinteger or `as&lt;unsigned long long&gt;`
+|is_longlong() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use is_integer() or is&lt;long long&gt;()
+|is_ulonglong() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use is_uinteger() or is&lt;unsigned long long&gt;()
+|is_numeric() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `is_number()`
+|remove_member(const std::string&amp; name)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use erase(const std::string&amp; name)
+|const json&amp; get(const std::string&amp; name) const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use const json get(const std::string&amp; name, T default_val) const with default `json::null_type()`
+|has_member(const std::string&amp; name) const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use has_name(const std::string&amp; name)
+|members()|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use object_range()
+|elements()|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use array_range()
+|begin_members()|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use object_range().begin()
+|end_members()|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use object_range().end()
+|begin_elements()|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use array_range().begin()
+|end_elements()|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use array_range().end()
+|is_empty() const|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `empty()`
+|parse_string(const std::string&amp; s)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|parse(const std::string&amp; s)
+|parse_string(const std::string&amp; s,parse_error_handler&amp; err_handler)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use parse(const std::string&amp; s,parse_error_handler&amp; err_handler)
+|resize_array(size_t n)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|resize(size_t n)
+|resize_array(size_t n, const json&amp; val)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use resize(size_t n, const json&amp; val)
+|to_stream|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use write
+|`json` initializer-list constructor||Construct from `json::array` with initializer-list
+|json_deserializer|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use json_decoder&lt;json&gt;`
+|wjson_deserializer|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `json_decoder&lt;wjson&gt;`
+|ojson_deserializer|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `json_decoder&lt;ojson&gt;`
+|wojson_deserializer|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `json_decoder&lt;wojson&gt;`
+|wojson|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use owjson`
+|member_type name()|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use key()
 </code></pre>
-
-<p><code>member_type</code> stores a name and a json value</p>
-
-<h3>Accessors</h3>
-
-<pre><code>const std::string&amp; name() const
-
-const json&amp; value() const
-
-json&amp; value()
-</code></pre>
+<p>json member types|any||<br>
+|member_type|<em>✓</em>|Use kvp_type<br>
+json member constants|null||Use static member function <code>json::null()</code><br>
+|an_object||Use the default constructor <code>json()</code> instead.<br>
+|an_array||Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.<br>
+json_decoder|json&amp; root()|<em>✓</em>|json get_result()<br>
+serialization|<code>output_format</code>|<em>✓</em>|Use <code>serialization_options</code><br>
+json_reader|max_depth() const|<em>✓</em>|Use max_nesting_depth() const<br>
+|max_depth(depth)|<em>✓</em>|Use max_nesting_depth() const<br>
+|json_input_handler&amp; parent()|<em>✓</em>|Use json_input_handler&amp; input_handler()<br>
+json_input_handler class|do_longlong_value(long long value, const parsing_context&amp; context)||Override do_integer_value(int64_t value, const parsing_context&amp; context)<br>
+|do_ulonglong_value(unsigned long long value, const parsing_context&amp; context)||Removed, override do_uinteger_value(uint64_t value, const parsing_context&amp; context)<br>
+|do_double_value(double value, const basic_parsing_context&amp; context)||Removed, override do_double_value(double value, uint8_t precision, const basic_parsing_context&amp; context)<br>
+json_output_handler class|do_longlong_value(long long value)||Removed, override do_integer_value(int64_t value)<br>
+|do_ulonglong_value(unsigned long long value)||Removed, override do_uinteger_value(uint64_t value)<br>
+|do_double_value(double value)||Removed, override do_double_value(double value, uint8_t precision)<br>
+basic_parsing_context|last_char()|<em>✓</em>|Use current_char()<br>
+json_filter|parent()|<em>✓</em>|Use downstream_handler()<br>
+|input_handler()|<em>✓</em>|Use downstream_handler()<br>
+csv_parameters|<code>header(std::string value)</code>|<em>✓</em>|Use <code>column_names(std::vector&lt;std::string&gt;&gt; value)</code><br>
+|<code>data_types()</code>|<em>✓</em>|Use <code>column_types()</code><br>
+|<code>data_types(std::string value)</code>|<em>✓</em>|Use <code>column_types(std::vector&lt;std::string&gt;&gt; value)</code><br>
+output_format|<code>array_array_block_option accessor and modifier</code> accessor and modifier|<em>✓</em>|Use <code>array_array_split_lines</code> accessor and modifier<br>
+|<code>array_object_block_option accessor and modifier</code>|<em>✓</em>|Use <code>array_object_split_lines</code> accessor and modifier<br>
+|<code>object_array_block_option accessor and modifier</code>|<em>✓</em>|Use <code>object_array_split_lines</code> accessor and modifier<br>
+|<code>object_object_block_option accessor and modifier</code>|<em>✓</em>|Use <code>object_object_split_lines</code> accessor and modifier</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>deprecated_list</title>
+<title>kvp_type</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,122 +468,15 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>Deprecated Features</p>
+<div class="highlight highlight-source-c++"><pre>jsoncons::json::kvp_type </pre></div>
+<p><code>kvp_type</code> stores a name (key) and a json value</p>
+<h3>Accessors</h3>
+<pre><code>const string_type&amp; key() const
 
-<h2>Category|Deprecation|Recommendation</h2>
+const json&amp; value() const
 
-<p>json class|void add(size_t index, const json&amp; val)|Use void add(array_iterator pos, const json&amp; val)<br>
-          |void add(size_t index, json&amp;&amp; val)|Use void add(array_iterator pos, json&amp;&amp; val)<br>
-    |void remove_range(size_t from_index, size_t to_index)|void erase(array_iterator first, array_iterator last)<br>
-    |void remove(const std::string&amp; name)|void erase(const std::string&amp; name)<br>
-    |static json parse(std::istream&amp; is)|static json parse_stream(std::istream&amp; is)<br>
-    |static json parse(std::istream&amp; is, parse_error_handler&amp; err_handler)|static json parse_stream(std::istream&amp; is, parse_error_handler&amp; err_handler)<br>
-Use <code>parse_stream</code> instead</p>
-
-<pre><code>long long as_longlong() const
+json&amp; value()
 </code></pre>
-
-<p>Use as_integer or as instead</p>
-
-<pre><code>unsigned long long as_ulonglong() const
-</code></pre>
-
-<p>Use as_uinteger or as instead</p>
-
-<pre><code>bool is_longlong() const
-</code></pre>
-
-<p>Use is_integer instead</p>
-
-<pre><code>bool is_ulonglong() const
-</code></pre>
-
-<p>Use is_uinteger instead</p>
-
-<pre><code>bool is_numeric() const
-</code></pre>
-
-<p>Use <code>is_number</code> instead</p>
-
-<pre><code>void remove_member(const std::string&amp; name)
-</code></pre>
-
-<p>Use <code>remove</code> instead</p>
-
-<pre><code>const json&amp; get(const std::string&amp; name) const
-</code></pre>
-
-<p>Use the version of <code>get</code> with two parameters and explicitly specify a json null default value </p>
-
-<pre><code>bool has_member(const std::string&amp; name) const
-</code></pre>
-
-<p>Use count(const std::string&amp; name) instead.</p>
-
-<pre><code>object_iterator begin_members()
-const_object_iterator begin_members() const
-</code></pre>
-
-<p>Use members().begin() instead.</p>
-
-<pre><code>object_iterator end_members()
-const_object_iterator end_members() const
-</code></pre>
-
-<p>Use members().end() instead.</p>
-
-<pre><code>array_iterator begin_elements()
-const_array_iterator begin_elements() const
-</code></pre>
-
-<p>Use elements().begin() instead.</p>
-
-<pre><code>array_iterator end_elements()
-const_array_iterator end_elements() const
-</code></pre>
-
-<p>Use elements().end() instead.</p>
-
-<pre><code>bool is_empty() const
-</code></pre>
-
-<p>Use <code>empty</code> instead</p>
-
-<pre><code>static json parse_string(const std::string&amp; s)
-static json parse_string(const std::string&amp; s, 
-                         parse_error_handler&amp; err_handler)
-</code></pre>
-
-<p>Use <code>parse</code> instead</p>
-
-<pre><code>void resize_array(size_t n)
-</code></pre>
-
-<p>Use <code>resize</code> instead. </p>
-
-<pre><code>void resize_array(size_t n, const json&amp; val)
-</code></pre>
-
-<p>Use <code>resize</code> instead. </p>
-
-<h3>Member constants</h3>
-
-<pre><code>null
-</code></pre>
-
-<p>Constant json null value. Use assignment to <code>jsoncons::null_type()</code> or <code>json::null_type()</code> instead.</p>
-
-<pre><code>an_object
-</code></pre>
-
-<p>Empty constant json array value. Use the default constructor <code>json()</code> instead.</p>
-
-<pre><code>an_array
-</code></pre>
-
-<p>Empty constant json array value.  Use assignment to <code>json::array()</code> or <code>json::make_array()</code> instead.</p>
-
-<p>Breaking Changes</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

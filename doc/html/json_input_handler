@@ -472,190 +472,140 @@ vertical-align:1px;
 
 typedef basic_json_input_handler&lt;char&gt; json_input_handler
 </code></pre>
-
 <p>The <code>json_input_handler</code> class is an instantiation of the <code>basic_json_input_handler</code> class template that uses <code>char</code> as the character type. It defines an interface for a listener to JSON events.</p>
-
 <h3>Header</h3>
-
 <pre><code>#include &lt;jsoncons/json_input_handler.hpp&gt;
 </code></pre>
-
+<h3>Member types</h3>
+<table>
+<thead>
+<tr>
+<th>Member type                         </th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>string_view_type</code></td>
+<td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <code>std:string_view</code> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise to a substitute.</td>
+</tr></tbody></table>
 <h3>Public interface methods</h3>
-
 <pre><code>void begin_json()
 </code></pre>
-
 <p>Send begin JSON document event. Uses <code>do_begin_json</code>.</p>
-
 <pre><code>void end_json()
 </code></pre>
-
 <p>Send end JSON document event. Uses <code>do_end_json</code>.</p>
-
 <pre><code>void begin_object(const parsing_context&amp; context)
 </code></pre>
-
 <p>Send begin JSON object event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_begin_object</code>.</p>
-
 <pre><code>void end_object(const parsing_context&amp; context)
 </code></pre>
-
 <p>Send end JSON object event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_end_object</code>.</p>
-
 <pre><code>void begin_array(const parsing_context&amp; context)
 </code></pre>
-
 <p>Send begin JSON array event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_begin_array</code>.</p>
-
 <pre><code>void end_array(const parsing_context&amp; context)
 </code></pre>
-
 <p>Send end JSON array event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_end_array</code>.</p>
-
 <pre><code>void name(const std::string&amp; value, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send name event for a name-value pair. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.  Uses <code>do_name</code>.</p>
-
 <pre><code>void name(const CharT* p, size_t length, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send name event for a name-value pair. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.  Uses <code>do_name</code>.</p>
-
 <pre><code>void value(const std::string&amp; value, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send character data event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_string_value</code>.</p>
-
 <pre><code>void value(const CharT* p, size_t length, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send character data event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_string_value</code>.</p>
-
 <pre><code>void value(const CharT* p, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send a null terminated string event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_string_value</code>.</p>
-
 <pre><code>void value(long long value, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send signed integer event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_integer_value</code>.</p>
-
 <pre><code>void value(unsigned long long value, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send non-negative integer event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_uinteger_value</code>.</p>
-
 <pre><code>void value(double value, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send floating point value event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_double_value</code>.</p>
-
 <pre><code>void value(bool value, const parsing_context&amp; context)
 </code></pre>
-
 <p>Send boolean value event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_bool_value</code>.</p>
-
 <pre><code>void value(const parsing_context&amp; context)
 </code></pre>
-
 <p>Send null value event. Contextual information including<br>
 line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. Uses <code>do_null_value</code>.</p>
-
 <h3>Private virtual implementation methods</h3>
-
 <pre><code>virtual void do_begin_json()
 </code></pre>
-
 <p>Receive begin JSON document event</p>
-
 <pre><code>virtual void do_end_json()
 </code></pre>
-
 <p>Receive end JSON document event</p>
-
 <pre><code>virtual void do_begin_object(const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive begin JSON object event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 <pre><code>virtual void do_end_object(const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive end JSON object event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 <pre><code>virtual void do_begin_array(const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive begin JSON array event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 <pre><code>virtual void do_end_array(const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive end JSON array event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
-<pre><code>virtual void do_name(const char* p, size_t length, 
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
+<pre><code>virtual void do_name(string_view_type name, 
                      const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive name event for name-value pair. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.  </p>
-
-<pre><code>virtual void do_string_value(const char* p, size_t length, 
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
+<pre><code>virtual void do_string_value(string_view_type val, 
                              const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive character data event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 <pre><code>virtual void do_integer_value(int64_t value, const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive signed integer value event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 <pre><code>virtual void do_uinteger_value(uint64_t value, 
                                const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive non-negative integer value event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 <pre><code>virtual void do_double_value(double value, uint8_t precision, const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive floating point value event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 <pre><code>virtual void do_bool_value(bool value, const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive boolean value event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
-
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 <pre><code>virtual void do_null_value(const parsing_context&amp; context)
 </code></pre>
-
 <p>Receive null value event. Contextual information including<br>
-line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter. </p>
+line and column information is provided in the <a href="parsing_context">parsing_context</a> parameter.</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

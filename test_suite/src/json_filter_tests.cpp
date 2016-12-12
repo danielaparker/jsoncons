@@ -38,22 +38,22 @@ public:
     }
 
 private:
-    void do_name(const char* p, size_t length,
+    void do_name(string_view_type name,
                  const parsing_context& context) override
     {
-        member_name_ = std::string(p, length);
+        member_name_ = name;
         if (member_name_ != "name")
         {
-            this->downstream_handler().name(p, length,context);
+            this->downstream_handler().name(name,context);
         }
     }
 
-    void do_string_value(const char* p, size_t length,
-                 const parsing_context& context) override
+    void do_string_value(string_view_type val,
+                         const parsing_context& context) override
     {
         if (member_name_ == "name")
         {
-            std::string value(p, length);
+            std::string value = val;
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
             this->downstream_handler().name("first-name",context);
@@ -74,7 +74,7 @@ private:
         }
         else
         {
-            this->downstream_handler().value(p, length,context);
+            this->downstream_handler().value(val,context);
         }
     }
 
@@ -143,27 +143,28 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
     {
         std::cout << e.what() << std::endl;
     }
+    BOOST_CHECK_CLOSE(31.96,j["store"]["book"][0]["price"].as<double>(),0.001);
 
-    std::cout << ("1\n") << pretty_print(j) << std::endl;
-
-    json_serializer serializer(std::cout, true);
-
+    std::stringstream ss;
+    json_serializer serializer(ss, false);
     rename_name_filter filter("price","price2",serializer);
     j.write(filter);
 
+    json j2 = json::parse_stream(ss);
+    BOOST_CHECK_CLOSE(31.96,j2["store"]["book"][0]["price2"].as<double>(),0.001);
 }
 
 BOOST_AUTO_TEST_CASE(test_chained_filters)
 {
     ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3,"fifth":4})");
 
-    json_encoder<ojson> encoder;
+    json_decoder<ojson> decoder;
 
-    rename_name_filter filter2("fifth", "fourth", encoder);
+    rename_name_filter filter2("fifth", "fourth", decoder);
     rename_name_filter filter1("fourth", "third", filter2);
 
     j.write(filter1);
-    ojson j2 = encoder.get_result();
+    ojson j2 = decoder.get_result();
     BOOST_CHECK(j2.size() == 4);
     BOOST_CHECK(j2["first"] == 1);
     BOOST_CHECK(j2["second"] == 2);

@@ -18,14 +18,14 @@ void read_csv_file1()
 
     std::istringstream is(text);
 
-    json_encoder<json> encoder;
+    json_decoder<json> decoder;
 
     csv_parameters params;
     params.assume_header(true)
           .column_types({ "string","string","string","float" });
-    csv_reader reader(is,encoder,params);
+    csv_reader reader(is,decoder,params);
     reader.read();
-    json val = encoder.get_result();
+    json val = decoder.get_result();
 
     std::cout << pretty_print(val) << std::endl;
 }
@@ -34,15 +34,15 @@ void read_write_csv_tasks()
 {
     std::ifstream is("input/tasks.csv");
 
-    json_encoder<ojson> encoder;
+    json_decoder<ojson> decoder;
     csv_parameters params;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types({"integer","string","string","string"});
-    csv_reader reader(is,encoder,params);
+    csv_reader reader(is,decoder,params);
     reader.read();
-    ojson tasks = encoder.get_result();
+    ojson tasks = decoder.get_result();
 
     std::cout << "(1)\n";
     std::cout << pretty_print(tasks) << "\n\n";

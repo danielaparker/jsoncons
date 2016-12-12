@@ -6,6 +6,8 @@ typedef basic_json_filter<char> json_filter
 
 The `json_filter` class is an instantiation of the `basic_json_filter` class template that uses `char` as the character type.
 
+`json_filter` is noncopyable and nonmoveable.
+
 ### Header
 
     #include <jsoncons/json_filter.hpp>
@@ -13,6 +15,12 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 ### Base classes
 
 [json_input_handler](json_input_handler)
+
+### Member types
+
+Member type                         |Definition
+------------------------------------|------------------------------
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise to a substitute.  
 
 ### Constructors
 
@@ -113,22 +121,22 @@ public:
     }
 
 private:
-    void do_name(const char* p, size_t length, 
+    void do_name(string_view_type name, 
                  const parsing_context& context) override
     {
-        member_name_ = std::string(p, length);
+        member_name_ = name;
         if (member_name_ != "name")
         {
-            this->downstream_handler().name(p, length, context);
+            this->downstream_handler().name(name, context);
         }
     }
 
-    void do_string_value(const char* p, size_t length, 
+    void do_string_value(string_view_type val, 
                          const parsing_context& context) override
     {
         if (member_name_ == "name")
         {
-            std::string value(p, length);
+            std::string value = val;
             size_t end_first = value.find_first_of(" \t");
             size_t start_last = value.find_first_not_of(" \t", end_first);
             this->downstream_handler().name("first-name", context);
@@ -149,7 +157,7 @@ private:
         }
         else
         {
-            this->downstream_handler().value(p, length, context);
+            this->downstream_handler().value(val, context);
         }
     }
 

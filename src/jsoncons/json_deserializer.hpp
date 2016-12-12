@@ -7,6 +7,6 @@
 #ifndef JSONCONS_JSON_DESERIALIZER_HPP
 #define JSONCONS_JSON_DESERIALIZER_HPP
 
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_decoder.hpp>
 
 #endif

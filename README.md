@@ -34,6 +34,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
+Results for [JSONTestSuite](https://github.com/nst/JSONTestSuite) and [JSON_checker](http://www.json.org/JSON_checker/) tests may be found [here](https://danielaparker.github.io/json_benchmarks/).
 
 ## Get jsoncons
 
@@ -105,7 +106,7 @@ For a quick guide, see the article [jsoncons: a C++ library for json constructio
 
 [CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
 ```
-    sudo apt-get install cmake
+sudo apt-get install cmake
 ```
 
 Instructions for building the test suite with CMake may be found in
@@ -128,11 +129,11 @@ The library includes four instantiations of `basic_json`:
 
 - [json](https://github.com/danielaparker/jsoncons/wiki/json) constructs a narrow character json value that sorts name-value members alphabetically
 
-- [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) constructs a narrow character json value that retains the original name-value insertion order
+- [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) constructs a narrow character json value that preserves the original name-value insertion order
 
 - [wjson](https://github.com/danielaparker/jsoncons/wiki/wjson) constructs a wide character json value that sorts name-value members alphabetically
 
-- [owjson](https://github.com/danielaparker/jsoncons/wiki/owjson) constructs a wide character json value that retains the original name-value insertion order
+- [owjson](https://github.com/danielaparker/jsoncons/wiki/owjson) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Features
 
@@ -152,19 +153,18 @@ Output:
 ```
 Extra comma at line 1 and column 10
 ```
-
-### Use range-based for loops with arrays
+### Range-based for loops with arrays
 
 ```c++
 json j = json::array{1,2,3,4};
 
-for (auto element : book.array_range())
+for (auto val : book.array_range())
 {
-    std::cout << element << std::endl;
+    std::cout << val << std::endl;
 }
 ```
 
-### Use range-based for loops with objects
+### Range-based for loops with objects
 
 ```c++
 json book = json::object{
@@ -173,14 +173,14 @@ json book = json::object{
     {"price", 25.17}
 };
 
-for (const auto& member : book.object_range())
+for (const auto& kvp : book.object_range())
 {
-    std::cout << member.key() << "=" 
-              << member.value() << std::endl;
+    std::cout << kvp.key() << "=" 
+              << kvp.value() << std::endl;
 }
 ```
 
-### Construct multi-dimensional json arrays
+### Multi-dimensional json arrays
 ```c++
 json a = json::make_array<3>(4, 3, 2, 0.0);
 double val = 1.0;
@@ -440,13 +440,13 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    json_encoder<json> encoder;
+    json_decoder<json> decoder;
     csv_parameters params;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types({"integer","string","string","string"});
-    csv_reader reader(is,encoder,params);
+    csv_reader reader(is,decoder,params);
     reader.read();
     ojson tasks = encoder.get_result();
 

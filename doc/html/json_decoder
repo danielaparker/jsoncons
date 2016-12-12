@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_encoder</title>
+<title>json_decoder</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,26 +468,19 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::json_encoder
+<div class="highlight highlight-source-c++"><pre>jsoncons::json_decoder
 
 <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
-json_encoder</pre></div>
-
+json_decoder</pre></div>
 <h3>Header</h3>
-
-<pre><code>#include &lt;jsoncons/json_encoder.hpp&gt;
-</code></pre>
-
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_decoder.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 <h3>Base classes</h3>
-
 <p><a href="json_input_handler">json_input_handler</a></p>
-
 <h3>Member types</h3>
-
 <table>
 <thead>
 <tr>
-<th>Member type</th>
+<th>Member type                         </th>
 <th>Definition</th>
 </tr>
 </thead>
@@ -499,30 +492,19 @@ json_encoder</pre></div>
 <tr>
 <td><code>allocator_type</code></td>
 <td>Json::allocator_type</td>
-</tr>
-</tbody>
-</table>
-
+</tr></tbody></table>
 <h3>Constructors</h3>
-
-<pre><code>json_encoder(const allocator_type allocator = allocator_type())
+<pre><code>json_decoder(const allocator_type allocator = allocator_type())
 </code></pre>
-
 <h3>Member functions</h3>
-
 <pre><code>allocator_type get_allocator() const
 </code></pre>
-
 <p>Returns the allocator associated with the json value.</p>
-
 <pre><code>bool is_valid() const
 </code></pre>
-
 <p>Checks if the <code>deserializer</code> contains a valid json_type value. The initial <code>is_valid()</code> is false, becomes <code>true</code> when a <code>do_end_json</code> event is received, and becomes false when <code>get_result()</code> is called.</p>
-
 <pre><code>json_type get_result()
 </code></pre>
-
 <p>Returns the json value <code>v</code> stored in the <code>deserializer</code> as <code>std::move(v)</code>. If before calling this function <code>is_valid()</code> is false, the behavior is undefined. After <code>get_result()</code> is called, 'is_valid()' becomes false.</p>
 </body>
 </html>

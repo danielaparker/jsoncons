@@ -76,6 +76,9 @@ void escape_string(const CharT* s,
 template<class CharT>
 class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
+public:
+    using typename basic_json_output_handler<CharT>::string_view_type                                 ;
+private:
     struct stack_item
     {
         stack_item(bool is_object)
@@ -98,7 +101,11 @@ class basic_csv_serializer : public basic_json_output_handler<CharT>
     std::basic_ostringstream<CharT> header_oss_;
     buffered_output<CharT> header_os_;
     std::map<std::basic_string<CharT>,size_t> column_name_pos_map_;
-    float_printer<CharT> fp_;
+    print_double<CharT> fp_;
+
+    // Noncopyable and nonmoveable
+    basic_csv_serializer(const basic_csv_serializer&) = delete;
+    basic_csv_serializer& operator=(const basic_csv_serializer&) = delete;
 public:
     basic_csv_serializer(std::basic_ostream<CharT>& os)
        :
@@ -202,7 +209,7 @@ private:
         end_value();
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type name) override
     {
         if (stack_.size() == 2)
         {
@@ -212,12 +219,12 @@ private:
                 {
                     os_.put(parameters_.field_delimiter());
                 }
-                write_string(name, length, os_);
+                write_string(name.data(), name.length(), os_);
                 column_name_pos_map_[name] = stack_.back().count_;
             }
             else
             {
-                auto it = column_name_pos_map_.find(std::basic_string<CharT>(name,length));
+                auto it = column_name_pos_map_.find(std::basic_string<CharT>(name));
                 if (it == column_name_pos_map_.end())
                 {
                     stack_.back().skip_ = true;
@@ -268,17 +275,17 @@ private:
         }
     }
 
-    void do_string_value(const CharT* val, size_t length) override
+    void do_string_value(string_view_type val) override
     {
         if (stack_.size() == 2 && !stack_.back().skip_)
         {
             if (stack_.back().is_object() && stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
-                value(val,length,header_os_);
+                value(val,header_os_);
             }
             else
             {
-                value(val,length,os_);
+                value(val,os_);
             }
         }
     }
@@ -345,10 +352,10 @@ private:
         }
     }
 
-    void value(const CharT* val, size_t length, buffered_output<CharT>& os)
+    void value(string_view_type value, buffered_output<CharT>& os)
     {
         begin_value(os);
-        write_string(val,length,os);
+        write_string(value.data(),value.length(),os);
         end_value();
     }
 
@@ -370,7 +377,7 @@ private:
         }
         else
         {
-            fp_.print(val,format_.precision(),os);
+            fp_(val,format_.precision(),os);
         }
 
         end_value();

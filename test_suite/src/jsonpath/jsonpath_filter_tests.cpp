@@ -94,8 +94,8 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
 BOOST_AUTO_TEST_CASE(test_jsonpath_index_expression)
 {
     json root = json::parse(jsonpath_filter_fixture::store_text());
-    std::cout << pretty_print(root) << std::endl;
-    std::cout << "$..book[(@.length-1)]" << std::endl;
+    //std::cout << pretty_print(root) << std::endl;
+    //std::cout << "$..book[(@.length-1)]" << std::endl;
 
     json result = json_query(root,"$..book[(@.length-1)]");
 
@@ -156,8 +156,8 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
     auto res = parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
     auto result1 = res.eval(parent);
 
-    std::cout << (int)result1.type_id() << std::endl;
-    std::cout << result1 << std::endl;
+    //std::cout << (int)result1.type_id() << std::endl;
+    //std::cout << result1 << std::endl;
     BOOST_CHECK(json(0) == 0);
     BOOST_CHECK(result1 == 0);
 

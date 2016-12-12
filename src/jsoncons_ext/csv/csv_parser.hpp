@@ -91,11 +91,12 @@ class basic_csv_parser : private basic_parsing_context<CharT>
 {
     static const int default_depth = 3;
 
+    basic_default_parse_error_handler<CharT> default_err_handler_;
     csv_states state_;
     int top_;
     std::vector<csv_modes> stack_;
-    basic_json_input_handler<CharT> *handler_;
-    basic_parse_error_handler<CharT> *err_handler_;
+    basic_json_input_handler<CharT>& handler_;
+    basic_parse_error_handler<CharT>& err_handler_;
     bool is_negative_;
     uint32_t cp_;
     size_t index_;
@@ -118,8 +119,8 @@ public:
     basic_csv_parser(basic_json_input_handler<CharT>& handler)
        : top_(-1),
          stack_(default_depth),
-         handler_(std::addressof(handler)),
-         err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
+         handler_(handler),
+         err_handler_(default_err_handler_),
          is_negative_(false),
          cp_(0),
          index_(0),
@@ -138,8 +139,8 @@ public:
                      basic_csv_parameters<CharT> params)
        : top_(-1),
          stack_(default_depth),
-         handler_(std::addressof(handler)),
-         err_handler_(std::addressof(basic_default_parse_error_handler<CharT>::instance())),
+         handler_(handler),
+         err_handler_(default_err_handler_),
          is_negative_(false),
          cp_(0),
          index_(0),
@@ -159,8 +160,8 @@ public:
                      basic_parse_error_handler<CharT>& err_handler)
        : top_(-1),
          stack_(default_depth),
-         handler_(std::addressof(handler)),
-         err_handler_(std::addressof(err_handler)),
+         handler_(handler),
+         err_handler_(err_handler),
          is_negative_(false),
          cp_(0),
          index_(0),
@@ -180,8 +181,8 @@ public:
                      basic_csv_parameters<CharT> params)
        : top_(-1),
          stack_(default_depth),
-         handler_(std::addressof(handler)),
-         err_handler_(std::addressof(err_handler)),
+         handler_(handler),
+         err_handler_(err_handler),
          is_negative_(false),
          cp_(0),
          index_(0),
@@ -228,10 +229,10 @@ public:
             switch (stack_[top_])
             {
             case csv_modes::array:
-                handler_->begin_array(*this);
+                handler_.begin_array(*this);
                 break;
             case csv_modes::object:
-                handler_->begin_object(*this);
+                handler_.begin_object(*this);
                 break;
             default:
                 break;
@@ -244,10 +245,10 @@ public:
         switch (stack_[top_])
         {
         case csv_modes::array:
-            handler_->end_array(*this);
+            handler_.end_array(*this);
             break;
         case csv_modes::object:
-            handler_->end_object(*this);
+            handler_.end_object(*this);
             break;
         case csv_modes::header:
             if (line_ >= parameters_.header_lines())
@@ -271,7 +272,7 @@ public:
     void begin_parse()
     {
         push(csv_modes::done);
-        handler_->begin_json();
+        handler_.begin_json();
 
         if (parameters_.column_names().size() > 0)
         {
@@ -379,7 +380,7 @@ public:
         {
             push(csv_modes::array);
         }
-        handler_->begin_array(*this);
+        handler_.begin_array(*this);
         state_ = csv_states::expect_value;
         column_index_ = 0;
         prev_char_ = 0;
@@ -505,7 +506,7 @@ all_csv_states:
                 }
                 break;
             default:
-                err_handler_->error(csv_parser_errc::invalid_state, *this);
+                err_handler_.error(csv_parser_errc::invalid_state, *this);
                 break;
             }
             if (line_ > parameters_.max_lines())
@@ -562,30 +563,30 @@ all_csv_states:
         case csv_modes::array:
             if (!pop(csv_modes::array))
             {
-                err_handler_->error(csv_parser_errc::unexpected_eof, *this);
+                err_handler_.error(csv_parser_errc::unexpected_eof, *this);
             }
             break;
         case csv_modes::object:
             if (!pop(csv_modes::object))
             {
-                err_handler_->error(csv_parser_errc::unexpected_eof, *this);
+                err_handler_.error(csv_parser_errc::unexpected_eof, *this);
             }
             break;
         case csv_modes::header:
             if (!pop(csv_modes::header))
             {
-                err_handler_->error(csv_parser_errc::unexpected_eof, *this);
+                err_handler_.error(csv_parser_errc::unexpected_eof, *this);
             }
             break;
         default:
             break;
         }
-        handler_->end_array(*this);
+        handler_.end_array(*this);
         if (!pop(csv_modes::done))
         {
-            err_handler_->error(csv_parser_errc::unexpected_eof, *this);
+            err_handler_.error(csv_parser_errc::unexpected_eof, *this);
         }
-        handler_->end_json();
+        handler_.end_json();
     }
 
     csv_states state() const
@@ -658,10 +659,10 @@ private:
             {
                 if (column_index_ < column_names_.size())
                 {
-                    handler_->name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
+                    handler_.name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
                     if (parameters_.unquoted_empty_value_is_null() && string_buffer_.length() == 0)
                     {
-                        handler_->value(jsoncons::null_type(),*this);
+                        handler_.value(jsoncons::null_type(),*this);
                     }
                     else
                     {
@@ -673,7 +674,7 @@ private:
         case csv_modes::array:
             if (parameters_.unquoted_empty_value_is_null() && string_buffer_.length() == 0)
             {
-                handler_->value(jsoncons::null_type(),*this);
+                handler_.value(jsoncons::null_type(),*this);
             }
             else
             {
@@ -681,7 +682,7 @@ private:
             }
             break;
         default:
-            err_handler_->error(csv_parser_errc::invalid_csv_text, *this);
+            err_handler_.error(csv_parser_errc::invalid_csv_text, *this);
             break;
         }
         state_ = csv_states::expect_value;
@@ -707,7 +708,7 @@ private:
             {
                 if (column_index_ < column_names_.size())
                 {
-                    handler_->name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
+                    handler_.name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
                     end_value();
                 }
             }
@@ -716,7 +717,7 @@ private:
             end_value();
             break;
         default:
-            err_handler_->error(csv_parser_errc::invalid_csv_text, *this);
+            err_handler_.error(csv_parser_errc::invalid_csv_text, *this);
             break;
         }
         state_ = csv_states::expect_value;
@@ -736,7 +737,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler_->value(val, *this);
+                        handler_.value(val, *this);
                     }
                     else
                     {
@@ -748,7 +749,7 @@ private:
                         }
                         else
                         {
-                            handler_->value(null_type(), *this);
+                            handler_.value(null_type(), *this);
                         }
                     }
                 }
@@ -760,7 +761,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler_->value(val, 0, *this);
+                        handler_.value(val, 0, *this);
                     }
                     else
                     {
@@ -772,7 +773,7 @@ private:
                         }
                         else
                         {
-                            handler_->value(null_type(), *this);
+                            handler_.value(null_type(), *this);
                         }
                     }
                 }
@@ -781,19 +782,19 @@ private:
                 {
                     if (string_buffer_.length() == 1 && string_buffer_[0] == '0')
                     {
-                        handler_->value(false, *this);
+                        handler_.value(false, *this);
                     }
                     else if (string_buffer_.length() == 1 && string_buffer_[0] == '1')
                     {
-                        handler_->value(true, *this);
+                        handler_.value(true, *this);
                     }
                     else if (string_buffer_.length() == 5 && ((string_buffer_[0] == 'f' || string_buffer_[0] == 'F') && (string_buffer_[1] == 'a' || string_buffer_[1] == 'A') && (string_buffer_[2] == 'l' || string_buffer_[2] == 'L') && (string_buffer_[3] == 's' || string_buffer_[3] == 'S') && (string_buffer_[4] == 'e' || string_buffer_[4] == 'E')))
                     {
-                        handler_->value(false, *this);
+                        handler_.value(false, *this);
                     }
                     else if (string_buffer_.length() == 4 && ((string_buffer_[0] == 't' || string_buffer_[0] == 'T') && (string_buffer_[1] == 'r' || string_buffer_[1] == 'R') && (string_buffer_[2] == 'u' || string_buffer_[2] == 'U') && (string_buffer_[3] == 'e' || string_buffer_[3] == 'E')))
                     {
-                        handler_->value(true, *this);
+                        handler_.value(true, *this);
                     }
                     else
                     {
@@ -805,7 +806,7 @@ private:
                         }
                         else
                         {
-                            handler_->value(null_type(), *this);
+                            handler_.value(null_type(), *this);
                         }
                     }
                 }
@@ -813,7 +814,7 @@ private:
             default:
                 if (string_buffer_.length() > 0)
                 {
-                    handler_->value(string_buffer_.data(), string_buffer_.length(), *this);
+                    handler_.value(string_buffer_.data(), string_buffer_.length(), *this);
                 }
                 else
                 {
@@ -825,7 +826,7 @@ private:
                     }
                     else
                     {
-                        handler_->value("", *this);
+                        handler_.value("", *this);
                     }
                 }
                 break;  
@@ -833,7 +834,7 @@ private:
         }
         else
         {
-            handler_->value(string_buffer_.data(), string_buffer_.length(), *this);
+            handler_.value(string_buffer_.data(), string_buffer_.length(), *this);
         }
     }
 

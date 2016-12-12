@@ -9,6 +9,11 @@
 
 #include <string>
 #include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
+
+#if defined(JSONCONS_HAS_STRING_VIEW)
+#include <string_view>
+#endif
 
 namespace jsoncons {
 
@@ -19,6 +24,15 @@ template <class CharT>
 class basic_json_input_handler
 {
 public:
+    typedef CharT char_type;
+    typedef std::char_traits<char_type> char_traits_type;
+
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+    typedef basic_string_view_<char_type,char_traits_type> string_view_type;
+#else
+    typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
+#endif
+
     virtual ~basic_json_input_handler() {}
 
     void begin_json()
@@ -51,29 +65,29 @@ public:
         do_end_array(context);
     }
 
-    void name(const std::basic_string<CharT>& name, const basic_parsing_context<CharT>& context)
+    void name(string_view_type name, const basic_parsing_context<CharT>& context)
     {
-        do_name(name.data(), name.length(), context);
+        do_name(name, context);
     }
 
     void name(const CharT* p, size_t length, const basic_parsing_context<CharT>& context) 
     {
-        do_name(p, length, context);
+        do_name(string_view_type(p, length), context);
     }
 
     void value(const std::basic_string<CharT>& value, const basic_parsing_context<CharT>& context) 
     {
-        do_string_value(value.data(), value.length(), context);
+        do_string_value(value, context);
     }
 
     void value(const CharT* p, size_t length, const basic_parsing_context<CharT>& context) 
     {
-        do_string_value(p, length, context);
+        do_string_value(string_view_type(p, length), context);
     }
 
-    void value(const CharT* p, const basic_parsing_context<CharT>& context) 
+    void value(const CharT* p, const basic_parsing_context<CharT>& context)
     {
-        do_string_value(p, std::char_traits<CharT>::length(p), context);
+        do_string_value(string_view_type(p), context);
     }
 
     void value(int value, const basic_parsing_context<CharT>& context) 
@@ -139,11 +153,11 @@ private:
 
     virtual void do_end_array(const basic_parsing_context<CharT>& context) = 0;
 
-    virtual void do_name(const CharT* name, size_t length, const basic_parsing_context<CharT>& context) = 0;
+    virtual void do_name(string_view_type name, const basic_parsing_context<CharT>& context) = 0;
 
     virtual void do_null_value(const basic_parsing_context<CharT>& context) = 0;
 
-    virtual void do_string_value(const CharT* value, size_t length, const basic_parsing_context<CharT>& context) = 0;
+    virtual void do_string_value(string_view_type value, const basic_parsing_context<CharT>& context) = 0;
 
     virtual void do_double_value(double value, uint8_t precision, const basic_parsing_context<CharT>& context) = 0;
 
@@ -158,11 +172,7 @@ template <class CharT>
 class basic_null_json_input_handler : public basic_json_input_handler<CharT>
 {
 public:
-    static basic_json_input_handler<CharT>& instance()
-    {
-        static basic_null_json_input_handler<CharT> instance;
-        return instance;
-    }
+    using typename basic_json_input_handler<CharT>::string_view_type                                 ;
 private:
     void do_begin_json() override
     {
@@ -188,20 +198,16 @@ private:
     {
     }
 
-    void do_name(const CharT* p, size_t length, const basic_parsing_context<CharT>&) override
+    void do_name(string_view_type, const basic_parsing_context<CharT>&) override
     {
-        (void)p;
-        (void)length;
     }
 
     void do_null_value(const basic_parsing_context<CharT>&) override
     {
     }
 
-    void do_string_value(const CharT* p, size_t length, const basic_parsing_context<CharT>&) override
+    void do_string_value(string_view_type, const basic_parsing_context<CharT>&) override
     {
-        (void)p;
-        (void)length;
     }
 
     void do_double_value(double, uint8_t, const basic_parsing_context<CharT>&) override

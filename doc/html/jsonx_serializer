@@ -474,6 +474,8 @@ vertical-align:1px;
 
 <p>The <code>jsonx_serializer</code> class is an instantiation of the <code>basic_jsonx_serializer</code> class template that uses <code>char</code> as the character type. It implements <a href="json_output_handler">json_output_handler</a> and supports formatting a JSON value as <a href="http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a> (XML).</p>
 
+<p><code>jsonx_serializer</code> is noncopyable and nonmoveable.</p>
+
 <h3>Header</h3>
 
 <pre><code>#include &lt;jsoncons/jsonx/jsonx_serializer.hpp&gt;
@@ -517,7 +519,7 @@ You must ensure that the output stream exists as long as does <code>jsonx_serial
 <h3>Examples</h3>
 
 <pre><code>#include &lt;jsoncons/json.hpp&gt;
-#include "jsoncons_ext/jsonx/jsonx_serializer.hpp"
+#include &lt;jsoncons_ext/jsonx/jsonx_serializer.hpp&gt;
 #include &lt;fstream&gt;
 
 using namespace jsoncons;

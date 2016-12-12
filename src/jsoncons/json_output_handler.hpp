@@ -9,6 +9,11 @@
 
 #include <string>
 #include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
+
+#if defined(JSONCONS_HAS_STRING_VIEW)
+#include <string_view>
+#endif
 
 namespace jsoncons {
 
@@ -52,6 +57,15 @@ template <class CharT>
 class basic_json_output_handler
 {
 public:
+    typedef CharT char_type;
+    typedef std::char_traits<char_type> char_traits_type;
+
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+    typedef basic_string_view_<char_type,char_traits_type> string_view_type;
+#else
+    typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
+#endif
+
     virtual ~basic_json_output_handler() {}
 
     // Overloaded methods
@@ -86,29 +100,29 @@ public:
         do_end_array();
     }
 
-    void name(const std::basic_string<CharT>& name)
+    void name(string_view_type name)
     {
-        do_name(name.data(), name.length());
+        do_name(name);
     }
 
     void name(const CharT* p, size_t length) 
     {
-        do_name(p, length);
+        do_name(string_view_type(p, length));
     }
 
-    void value(const std::basic_string<CharT>& value) 
+    void value(string_view_type value) 
     {
-        do_string_value(value.data(), value.length());
+        do_string_value(value);
     }
 
     void value(const CharT* p, size_t length) 
     {
-        do_string_value(p, length);
+        do_string_value(string_view_type(p, length));
     }
 
     void value(const CharT* p) 
     {
-        do_string_value(p, std::char_traits<CharT>::length(p));
+        do_string_value(string_view_type(p));
     }
 
     void value(int value) 
@@ -162,7 +176,7 @@ private:
 
     virtual void do_end_json() = 0;
 
-    virtual void do_name(const CharT* name, size_t length) = 0;
+    virtual void do_name(string_view_type name) = 0;
 
     virtual void do_begin_object() = 0;
 
@@ -174,7 +188,7 @@ private:
 
     virtual void do_null_value() = 0;
 
-    virtual void do_string_value(const CharT* value, size_t length) = 0;
+    virtual void do_string_value(string_view_type value) = 0;
 
     virtual void do_double_value(double value, uint8_t precision) = 0;
 
@@ -188,6 +202,8 @@ private:
 template <class CharT>
 class basic_null_json_output_handler : public basic_json_output_handler<CharT>
 {
+public:
+    using typename basic_json_output_handler<CharT>::string_view_type                                 ;
 private:
 
     void do_begin_json() override
@@ -198,10 +214,8 @@ private:
     {
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type) override
     {
-        (void)name;
-        (void)length;
     }
 
     void do_begin_object() override
@@ -224,10 +238,8 @@ private:
     {
     }
 
-    void do_string_value(const CharT* p, size_t length) override
+    void do_string_value(string_view_type) override
     {
-        (void)p;
-        (void)length;
     }
 
     void do_double_value(double, uint8_t) override

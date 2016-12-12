@@ -24,10 +24,14 @@
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_error_category.hpp>
+
+#if defined(JSONCONS_HAS_STRING_VIEW)
+#include <string_view>
+#endif
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -35,6 +39,8 @@
 #endif
 
 namespace jsoncons {
+
+
 
 template <typename IteratorT>
 class range 
@@ -57,31 +63,6 @@ public:
         return last_;
     }
 };
-
-template <class T, class Allocator, typename... Args>
-T* create_impl(const Allocator& allocator, Args&& ... args)
-{
-    typename std::allocator_traits<Allocator>:: template rebind_alloc<T> alloc(allocator);
-    T* storage = alloc.allocate(1);
-    try
-    {
-        std::allocator_traits<Allocator>:: template rebind_traits<T>::construct(alloc, storage, std::forward<Args>(args)...);
-    }
-    catch (...)
-    {
-        alloc.deallocate(storage,1);
-        throw;
-    }
-    return storage;
-}
-
-template <class T, class Allocator>
-void destroy_impl(const Allocator& allocator, T* p)
-{
-    typename std::allocator_traits<Allocator>:: template rebind_alloc<T> alloc(allocator);
-    std::allocator_traits<Allocator>:: template rebind_traits<T>::destroy(alloc, p);
-    alloc.deallocate(p,1);
-}
 
 enum class value_types : uint8_t 
 {
@@ -112,17 +93,39 @@ public:
 
     typedef CharT char_type;
     typedef typename json_traits_type::char_traits_type char_traits_type;
-    typedef typename json_traits_type::char_allocator char_allocator;
 
-    typedef std::basic_string<CharT,char_traits_type,char_allocator> string_type;
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+    typedef basic_string_view_<char_type,char_traits_type> string_view_type;
+#else
+    typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
+#endif
+
+    // char_allocator and string_type are for interface only, not storage 
+    typedef std::allocator<CharT> char_allocator;
+    typedef std::basic_string<CharT,char_traits_type> string_type;
+
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> key_allocator_type;
+    typedef std::basic_string<CharT,char_traits_type,key_allocator_type> key_type;
+
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
-    typedef name_value_pair<string_type,json_type> member_type;
+    typedef key_value_pair<key_type,json_type> kvp_type;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<json_type> array_allocator;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<member_type> object_allocator;
+#if !defined(JSONCONS_NO_DEPRECATED)
+    typedef kvp_type member_type;
+#endif
 
-    typedef json_array<json_type,array_allocator> array;
-    typedef json_object<string_type,json_type,json_traits_type::is_object_sorted,object_allocator> object;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
+    using base_array_type = typename json_traits_type::template base_array_type<json_type, val_allocator_type>;
+
+    typedef json_array<json_type> array;
+
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<kvp_type > kvp_allocator_type;
+
+    using base_object_type = typename json_traits_type::template base_object_type<kvp_type , kvp_allocator_type>;
+    typedef json_object<key_type,json_type,json_traits_type::preserve_order> object;
+
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
 
     typedef jsoncons::null_type null_type;
 
@@ -290,216 +293,300 @@ public:
 
         struct string_data : public base_data
         {
-            struct string_holder : public char_allocator
+            class Base_string_holder_
             {
-                const char_type* c_str() const { return p_; }
-                const char_type* data() const { return p_; }
-                size_t length() const { return length_; }
-                char_allocator get_allocator() const
-                {
-                    return *this;
-                }
+            public:
+                typedef CharT char_type;
+                typedef Allocator allocator_type;
 
-                bool operator==(const string_holder& rhs) const
-                {
-                    return length() == rhs.length() ? std::char_traits<char_type>::compare(data(), rhs.data(), length()) == 0 : false;
-                }
-
-                string_holder(const char_allocator& allocator)
-                    : char_allocator(allocator), length_(0), p_(nullptr)
+                Base_string_holder_(const allocator_type& allocator)
+                    : allocator_(allocator)
                 {
                 }
 
-                size_t length_;
-                char_type* p_;
-            private:
-                string_holder(const string_holder&);
-                string_holder& operator=(const string_holder&);
+                allocator_type get_self_allocator() const
+                {
+                    return allocator_;
+                }
+
+                allocator_type allocator_;
             };
 
-            struct string_holderA
+            class String_holder_ : public Base_string_holder_
             {
-                string_holder data;
-                char_type c[1];
+            public:
+                String_holder_(const Allocator& allocator)
+                    : Base_string_holder_(allocator)
+                {
+                }
+
+                ~String_holder_() JSONCONS_NOEXCEPT
+                {
+                }
+
+                size_t length;
+                char_type* data;
             };
 
-            typedef typename std::aligned_storage<sizeof(string_holderA), JSONCONS_ALIGNOF(string_holderA)>::type storage_type;
-
-            static size_t aligned_size(size_t n)
+            struct Wrap_string_holder_
             {
-                return sizeof(storage_type) + n;
+                String_holder_ holder;
+                CharT c[1];
+            };
+
+            typedef CharT char_type;
+            typedef Allocator allocator_type;
+
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char>
+                storage_alloc;
+            typedef typename std::allocator_traits<Allocator>:: template rebind_traits<char>
+                storage_traits;
+            typedef typename storage_traits::pointer pointer;
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_>
+                string_holder_alloc;
+
+            typedef typename std::aligned_storage<sizeof(Wrap_string_holder_), JSONCONS_ALIGNOF(Wrap_string_holder_)>::type storage_type;
+
+            static size_t calculate_needed(size_t length)
+            {
+                return sizeof(storage_type) + (length-1) * sizeof(char_type);
             }
 
-            string_holder* create_string_holder(const char_type* s, size_t length, const char_allocator& allocator)
+            static pointer create_string_holder(const char_type* data, size_t length, allocator_type allocator)
             {
-                size_t mem_size = aligned_size(length*sizeof(char_type));
+                size_t needed = calculate_needed(length+1);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(allocator);
+                typename storage_traits::pointer storage = storage_traits::allocate(alloc,needed);
+                String_holder_* pv = reinterpret_cast<String_holder_*>(to_plain_pointer(storage));
 
-                typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
+                string_holder_alloc a(allocator);
+                std::allocator_traits<string_holder_alloc>::construct(a,pv,allocator);
 
-                char* storage = alloc.allocate(mem_size);
-                string_holder* ps = new(storage)string_holder(allocator);
-                auto psa = reinterpret_cast<string_holderA*>(storage); 
-
-                ps->p_ = new(&psa->c)char_type[length + 1];
-                memcpy(ps->p_, s, length*sizeof(char_type));
-                ps->p_[length] = 0;
-                ps->length_ = length;
-                return ps;
+                auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(storage));
+                pv->data = new(&pwh->c)char_type[length + 1];
+                memcpy(pv->data, data, length * sizeof(char_type));
+                pv->data[length] = 0;
+                pv->length = length;
+                return storage;
             }
 
-            void destroy_string_holder(const char_allocator& allocator, string_holder* p)
+            static void destroy_string_holder(pointer p) JSONCONS_NOEXCEPT
             {
-                size_t mem_size = aligned_size(p->length_*sizeof(char_type));
-                typename std::allocator_traits<char_allocator>:: template rebind_alloc<char> alloc(allocator);
-                alloc.deallocate(reinterpret_cast<char*>(p),mem_size);
+                string_holder_alloc a(string_holder_cast(p)->get_self_allocator());
+                size_t needed = calculate_needed(string_holder_cast(p)->length + 1);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(string_holder_cast(p)->get_self_allocator());
+                std::allocator_traits<string_holder_alloc>::destroy(a,string_holder_cast(p));
+                storage_traits::deallocate(alloc, to_plain_pointer(p), needed);
             }
-            string_holder* holder_;
+            
+            pointer ptr_;
 
-            string_data(const char_type* s, size_t length, const char_allocator& alloc)
+            string_data(pointer ptr)
+                : base_data(value_types::string_t), ptr_(ptr)
+            {
+            }
+
+            string_data(const char_type* s,
+                size_t length,
+                const Allocator& alloc)
                 : base_data(value_types::string_t)
             {
-                holder_ = create_string_holder(s, length, alloc);
+                ptr_ = create_string_holder(s, length, alloc);
             }
 
             string_data(const string_data& val)
                 : base_data(value_types::string_t)
             {
-                holder_ = create_string_holder(val.holder_->p_, 
-                                             val.holder_->length_, 
-                                             val.holder_->get_allocator());
+                ptr_ = create_string_holder(val.data(),
+                    val.length(),
+                    val.get_self_allocator());
             }
 
-            string_data(const string_data& val, char_allocator allocator)
+            string_data(const string_data& val, const Allocator& allocator)
                 : base_data(value_types::string_t)
             {
-                holder_ = create_string_holder(val.holder_->p_, 
-                                               val.holder_->length_, 
-                                               allocator);
+                ptr_ = create_string_holder(val.data(),
+                    val.length(),
+                    allocator);
             }
             ~string_data()
             {
-                destroy_string_holder(holder_->get_allocator(), holder_);
+                destroy_string_holder(ptr_);
+            }
+
+            static String_holder_* string_holder_cast(pointer ptr) 
+            {
+                return reinterpret_cast<String_holder_*>(to_plain_pointer(ptr));
             }
 
             size_t length() const
             {
-                return holder_->length_;
+                return string_holder_cast(ptr_)->length;
             }
 
             const char_type* data() const
             {
-                return holder_->p_;
+                return string_holder_cast(ptr_)->data;
             }
 
             const char_type* c_str() const
             {
-                return holder_->p_;
+                return string_holder_cast(ptr_)->data;
             }
 
-            char_allocator get_allocator() const
+            Allocator get_self_allocator() const
             {
-                return holder_->get_allocator();
+                return string_holder_cast(ptr_)->get_self_allocator();
             }
         };
 
-
         struct object_data : public base_data
         {
-            object* data_;
+            typedef typename std::allocator_traits<object_allocator>::pointer pointer;
+            pointer ptr_;
+
+            template <typename... Args>
+            void create(Allocator allocator, Args&& ... args)
+            {
+                typename std::allocator_traits<object_allocator>:: template rebind_alloc<object> alloc(allocator);
+                ptr_ = alloc.allocate(1);
+                try
+                {
+                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                }
+                catch (...)
+                {
+                    alloc.deallocate(ptr_,1);
+                    throw;
+                }
+            }
 
             explicit object_data(const Allocator& a)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(a, object_allocator(a));
+                create(a,a);
+            }
+
+            explicit object_data(pointer ptr)
+                : base_data(value_types::object_t)
+            {
+                ptr_ = ptr;
             }
 
             explicit object_data(const object & val)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(val.get_allocator(), val);
+                create(val.get_self_allocator(), val);
             }
 
             explicit object_data(const object & val, const Allocator& a)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(a, val, object_allocator(a));
+                create(object_allocator(a), val, a);
             }
 
             explicit object_data(const object_data & val)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(val.data_->get_allocator(), *(val.data_));
+                create(val.ptr_->get_self_allocator(), *(val.ptr_));
             }
 
             explicit object_data(const object_data & val, const Allocator& a)
                 : base_data(value_types::object_t)
             {
-                data_ = create_impl<object>(a, *(val.data_), object_allocator(a));
+                create(object_allocator(a), *(val.ptr_), a);
             }
 
             ~object_data()
             {
-                destroy_impl(data_->get_allocator(), data_);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_self_allocator());
+                std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(ptr_));
+                alloc.deallocate(ptr_,1);
             }
 
             object& value()
             {
-                return *data_;
+                return *ptr_;
             }
 
             const object& value() const
             {
-                return *data_;
+                return *ptr_;
             }
         };
-
+    public:
         struct array_data : public base_data
         {
-            array* data_;
+            typedef typename std::allocator_traits<array_allocator>::pointer pointer;
+            pointer ptr_;
 
-            array_data(const array & val)
-                : base_data(value_types::array_t)
+            template <typename... Args>
+            void create(array_allocator allocator, Args&& ... args)
             {
-                data_ = create_impl<array>(val.get_allocator(), val);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<array> alloc(allocator);
+                ptr_ = alloc.allocate(1);
+                try
+                {
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                }
+                catch (...)
+                {
+                    alloc.deallocate(ptr_,1);
+                    throw;
+                }
             }
 
-            array_data(const array & val, const Allocator& a)
+            array_data(const array& val)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(a, val, array_allocator(a));
+                create(val.get_self_allocator(), val);
+            }
+
+            array_data(pointer ptr)
+                : base_data(value_types::array_t)
+            {
+                ptr_ = ptr;
+            }
+
+            array_data(const array& val, const Allocator& a)
+                : base_data(value_types::array_t)
+            {
+                create(array_allocator(a), val, a);
             }
 
             array_data(const array_data & val)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(val.data_->get_allocator(), *(val.data_));
+                create(val.ptr_->get_self_allocator(), *(val.ptr_));
             }
 
             array_data(const array_data & val, const Allocator& a)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(a, *(val.data_), array_allocator(a));
+                create(array_allocator(a), *(val.ptr_), a);
             }
 
             template<class InputIterator>
             array_data(InputIterator first, InputIterator last, const Allocator& a)
                 : base_data(value_types::array_t)
             {
-                data_ = create_impl<array>(a, first, last, array_allocator(a));
+                create(array_allocator(a), first, last, a);
             }
             ~array_data()
             {
-                destroy_impl(data_->get_allocator(), data_);
+                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_self_allocator());
+                std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(ptr_));
+                alloc.deallocate(ptr_,1);
             }
 
             array& value()
             {
-                return *data_;
+                return *ptr_;
             }
 
             const array& value() const
             {
-                return *data_;
+                return *ptr_;
             }
         };
 
@@ -599,10 +686,52 @@ public:
             }
         }
 
-        variant(variant&& val)
+        variant(variant&& val) JSONCONS_NOEXCEPT
         {
-            new(reinterpret_cast<void*>(&data_))null_data();
-            swap(val);
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+                new(reinterpret_cast<void*>(&data_))null_data();
+                break;
+            case value_types::empty_object_t:
+                new(reinterpret_cast<void*>(&data_))empty_object_data();
+                break;
+            case value_types::double_t:
+                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                break;
+            case value_types::integer_t:
+                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
+                break;
+            case value_types::uinteger_t:
+                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
+                break;
+            case value_types::bool_t:
+                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                break;
+            case value_types::small_string_t:
+                new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
+                break;
+            case value_types::string_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))string_data(val.string_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                }
+                break;
+            case value_types::object_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))object_data(val.object_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                }
+                break;
+            case value_types::array_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                }
+                break;
+            default:
+                break;
+            }
         }
 
         explicit variant(null_type)
@@ -652,6 +781,20 @@ public:
                 new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
             }
         }
+
+        variant(const char_type* s, const Allocator& alloc)
+        {
+            size_t length = std::char_traits<char_type>::length(s);
+            if (length <= small_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, alloc);
+            }
+        }
+
         variant(const char_type* s, size_t length, const Allocator& alloc)
         {
             if (length <= small_string_data::max_length)
@@ -660,7 +803,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator(alloc));
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, alloc);
             }
         }
         variant(const object& val)
@@ -675,14 +818,14 @@ public:
         {
             new(reinterpret_cast<void*>(&data_))array_data(val);
         }
+        variant(const array& val, const Allocator& alloc)
+        {
+            new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
+        }
         template<class InputIterator>
         variant(InputIterator first, InputIterator last, const Allocator& a)
         {
             new(reinterpret_cast<void*>(&data_))array_data(first, last, a);
-        }
-        variant(const array& val, const Allocator& alloc)
-        {
-            new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
         }
 
         ~variant()
@@ -834,6 +977,19 @@ public:
             return reinterpret_cast<const array_data*>(&data_);
         }
 
+        string_view_type as_string_view() const
+        {
+            switch (type_id())
+            {
+            case value_types::small_string_t:
+                return string_view_type(small_string_data_cast()->data(),small_string_data_cast()->length());
+            case value_types::string_t:
+                return string_view_type(string_data_cast()->data(),string_data_cast()->length());
+            default:
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
+            }
+        }
+
         bool operator==(const variant& rhs) const
         {
             if (this == &rhs)
@@ -861,11 +1017,8 @@ public:
                 case value_types::bool_t:
                     return bool_data_cast()->val_ == rhs.bool_data_cast()->val_;
                 case value_types::small_string_t:
-                    return small_string_data_cast()->length() == rhs.small_string_data_cast()->length() &&
-                           std::char_traits<char_type>::compare(small_string_data_cast()->data(),rhs.small_string_data_cast()->data(),small_string_data_cast()->length()) == 0;
                 case value_types::string_t:
-                    return string_data_cast()->length() == rhs.string_data_cast()->length() &&
-                           std::char_traits<char_type>::compare(string_data_cast()->data(),rhs.string_data_cast()->data(),string_data_cast()->length()) == 0;
+                    return as_string_view() == rhs.as_string_view();
                 case value_types::object_t:
                     return object_data_cast()->value() == rhs.object_data_cast()->value();
                 case value_types::array_t:
@@ -908,32 +1061,20 @@ public:
                 }
                 break;
             case value_types::empty_object_t:
-                if (rhs_id == value_types::object_t && rhs.object_data_cast()->data_->size() == 0)
+                if (rhs_id == value_types::object_t && rhs.object_data_cast()->ptr_->size() == 0)
                 {
                     return true;
                 }
                 break;
             case value_types::object_t:
-                if (rhs_id == value_types::empty_object_t && object_data_cast()->data_->size() == 0)
+                if (rhs_id == value_types::empty_object_t && object_data_cast()->ptr_->size() == 0)
                 {
                     return true;
                 }
                 break;
             case value_types::small_string_t:
-                if ((rhs_id == value_types::string_t) && 
-                    (small_string_data_cast()->length() == rhs.string_data_cast()->length()) &&
-                     std::char_traits<char_type>::compare(small_string_data_cast()->data(),rhs.string_data_cast()->data(),small_string_data_cast()->length()) == 0)
-                {
-                    return true;
-                }
-                break;
             case value_types::string_t:
-                if ((rhs_id == value_types::small_string_t) && 
-                    (string_data_cast()->length() == rhs.small_string_data_cast()->length()) &&
-                     std::char_traits<char_type>::compare(string_data_cast()->data(),rhs.small_string_data_cast()->data(),string_data_cast()->length()) == 0)
-                {
-                    return true;
-                }
+                return as_string_view() == rhs.as_string_view();
                 break;
             default:
                 break;
@@ -947,10 +1088,242 @@ public:
             return !(*this == rhs);
         }
 
-
-        void swap(variant& rhs)
+        void swap(variant& rhs) JSONCONS_NOEXCEPT
         {
-            std::swap(data_,rhs.data_);
+            if (this != &rhs)
+            {
+                switch (type_id())
+                {
+                case value_types::string_t:
+                    {
+                        auto ptr = string_data_cast()->ptr_;
+                        switch (rhs.type_id())
+                        {
+                        case value_types::object_t:
+                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                            break;
+                        case value_types::array_t:
+                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                            break;
+                        case value_types::string_t:
+                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                            break;
+                        case value_types::null_t:
+                            new(reinterpret_cast<void*>(&data_))null_data();
+                            break;
+                        case value_types::empty_object_t:
+                            new(reinterpret_cast<void*>(&data_))empty_object_data();
+                            break;
+                        case value_types::double_t:
+                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                            break;
+                        case value_types::integer_t:
+                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                            break;
+                        case value_types::uinteger_t:
+                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                            break;
+                        case value_types::bool_t:
+                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                            break;
+                        case value_types::small_string_t:
+                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                            break;
+                        default:
+                            break;
+                        }
+                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr,string_data_cast()->get_self_allocator());
+                    }
+                    break;
+                case value_types::object_t:
+                    {
+                        auto ptr = object_data_cast()->ptr_;
+                        switch (rhs.type_id())
+                        {
+                        case value_types::object_t:
+                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                            break;
+                        case value_types::array_t:
+                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                            break;
+                        case value_types::string_t:
+                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                            break;
+                        case value_types::null_t:
+                            new(reinterpret_cast<void*>(&data_))null_data();
+                            break;
+                        case value_types::empty_object_t:
+                            new(reinterpret_cast<void*>(&data_))empty_object_data();
+                            break;
+                        case value_types::double_t:
+                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                            break;
+                        case value_types::integer_t:
+                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                            break;
+                        case value_types::uinteger_t:
+                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                            break;
+                        case value_types::bool_t:
+                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                            break;
+                        case value_types::small_string_t:
+                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                            break;
+                        default:
+                            break;
+                        }
+                        new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    }
+                    break;
+                case value_types::array_t:
+                    {
+                        auto ptr = array_data_cast()->ptr_;
+                        switch (rhs.type_id())
+                        {
+                        case value_types::object_t:
+                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                            break;
+                        case value_types::array_t:
+                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                            break;
+                        case value_types::string_t:
+                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                            break;
+                        case value_types::null_t:
+                            new(reinterpret_cast<void*>(&data_))null_data();
+                            break;
+                        case value_types::empty_object_t:
+                            new(reinterpret_cast<void*>(&data_))empty_object_data();
+                            break;
+                        case value_types::double_t:
+                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                            break;
+                        case value_types::integer_t:
+                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                            break;
+                        case value_types::uinteger_t:
+                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                            break;
+                        case value_types::bool_t:
+                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                            break;
+                        case value_types::small_string_t:
+                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                            break;
+                        default:
+                            break;
+                        }
+                        new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    }
+                    break;
+                default:
+                    switch (rhs.type_id())
+                    {
+                    case value_types::string_t:
+                        {
+                            auto ptr = rhs.string_data_cast()->ptr_;
+                            switch (type_id())
+                            {
+                            case value_types::null_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
+                                break;
+                            case value_types::empty_object_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
+                                break;
+                            case value_types::double_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
+                                break;
+                            case value_types::integer_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
+                                break;
+                            case value_types::uinteger_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
+                                break;
+                            case value_types::bool_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
+                                break;
+                            case value_types::small_string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
+                                break;
+                            default:
+                                break;
+                            }
+                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                        }
+                        break;
+                    case value_types::object_t:
+                        {
+                            auto ptr = rhs.object_data_cast()->ptr_;
+                            switch (type_id())
+                            {
+                            case value_types::null_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
+                                break;
+                            case value_types::empty_object_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
+                                break;
+                            case value_types::double_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
+                                break;
+                            case value_types::integer_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
+                                break;
+                            case value_types::uinteger_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
+                                break;
+                            case value_types::bool_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
+                                break;
+                            case value_types::small_string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
+                                break;
+                            default:
+                                break;
+                            }
+                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                        }
+                        break;
+                    case value_types::array_t:
+                        {
+                            auto ptr = rhs.array_data_cast()->ptr_;
+                            switch (type_id())
+                            {
+                            case value_types::null_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
+                                break;
+                            case value_types::empty_object_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
+                                break;
+                            case value_types::double_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
+                                break;
+                            case value_types::integer_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
+                                break;
+                            case value_types::uinteger_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
+                                break;
+                            case value_types::bool_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
+                                break;
+                            case value_types::small_string_t:
+                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
+                                break;
+                            default:
+                                break;
+                            }
+                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                        }
+                        break;
+                    default:
+                        {
+                            std::swap(data_,rhs.data_);
+                        }
+                        break;
+                    }
+                }
+            }
         }
     };
 
@@ -961,55 +1334,55 @@ public:
         typedef json_proxy<ParentT> proxy_type;
 
         ParentT& parent_;
-        const string_type& name_;
+        key_type key_;
 
         json_proxy() = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
 
-        json_proxy(ParentT& parent, const string_type& name)
-            : parent_(parent), name_(name)
+        json_proxy(ParentT& parent, key_type&& name)
+            : parent_(parent), key_(std::forward<key_type&&>(name))
         {
         }
 
         json_type& evaluate() 
         {
-            return parent_.evaluate(name_);
+            return parent_.evaluate(key_);
         }
 
         const json_type& evaluate() const
         {
-            return parent_.evaluate(name_);
+            return parent_.evaluate(key_);
         }
 
         json_type& evaluate_with_default()
         {
             json_type& val = parent_.evaluate_with_default();
-            auto it = val.find(name_.data(),name_.length());
+            auto it = val.find(key_);
             if (it == val.object_range().end())
             {
-                it = val.set(val.object_range().begin(),name_,object(val.object_value().get_allocator()));            
+                it = val.set_(val.object_range().begin(),std::move(key_),object(val.object_value().get_self_allocator()));            
             }
             return it->value();
         }
 
         json_type& evaluate(size_t index)
         {
-            return parent_.evaluate(name_).at(index);
+            return parent_.evaluate(key_).at(index);
         }
 
         const json_type& evaluate(size_t index) const
         {
-            return parent_.evaluate(name_).at(index);
+            return parent_.evaluate(key_).at(index);
         }
 
-        json_type& evaluate(const string_type& index)
+        json_type& evaluate(const key_type& index)
         {
-            return parent_.evaluate(name_).at(index);
+            return parent_.evaluate(key_).at(index);
         }
 
-        const json_type& evaluate(const string_type& index) const
+        const json_type& evaluate(const key_type& index) const
         {
-            return parent_.evaluate(name_).at(index);
+            return parent_.evaluate(key_).at(index);
         }
     public:
 
@@ -1045,12 +1418,12 @@ public:
             return evaluate().type_id();
         }
 
-        size_t count(const string_type& name) const
+        size_t count(string_view_type name) const
         {
             return evaluate().count(name);
         }
 
-        bool has_key(const string_type& name) const
+        bool has_key(string_view_type name) const
         {
             return evaluate().has_key(name);
         }
@@ -1130,6 +1503,11 @@ public:
             return evaluate().is_double();
         }
 
+        string_view_type as_string_view() const 
+        {
+            return evaluate().as_string_view();
+        }
+
         string_type as_string() const JSONCONS_NOEXCEPT
         {
             return evaluate().as_string();
@@ -1158,7 +1536,8 @@ public:
         }
 
         template<class T>
-        typename std::enable_if<std::is_same<string_type,T>::value>::type as(const char_allocator& allocator) const
+        typename std::enable_if<std::is_same<string_type,T>::value>::type 
+            as(const char_allocator& allocator) const
         {
             return evaluate().template as<T>(allocator);
         }
@@ -1190,7 +1569,7 @@ public:
         template <class T>
         json_proxy& operator=(T&& val) 
         {
-            parent_.evaluate_with_default().set(name_, std::forward<T&&>(val));
+            parent_.evaluate_with_default().set_(std::move(key_), std::forward<T&&>(val));
             return *this;
         }
 
@@ -1214,22 +1593,22 @@ public:
             return evaluate().at(i);
         }
 
-        json_proxy<proxy_type> operator[](const string_type& name)
+        json_proxy<proxy_type> operator[](string_view_type name)
         {
-            return json_proxy<proxy_type>(*this,name);
+            return json_proxy<proxy_type>(*this,key_type(name.data(),name.length(),key_.get_allocator()));
         }
 
-        const json_proxy<proxy_type> operator[](const string_type& name) const
+        const json_type& operator[](string_view_type name) const
         {
-            return json_proxy<proxy_type>(*this,name);
+            return at(name);
         }
 
-        json_type& at(const string_type& name)
+        json_type& at(string_view_type name)
         {
             return evaluate().at(name);
         }
 
-        const json_type& at(const string_type& name) const
+        const json_type& at(string_view_type name) const
         {
             return evaluate().at(name);
         }
@@ -1244,49 +1623,29 @@ public:
             return evaluate().at(index);
         }
 
-        object_iterator find(const string_type& name)
+        object_iterator find(string_view_type name)
         {
             return evaluate().find(name);
         }
 
-        const_object_iterator find(const string_type& name) const
+        const_object_iterator find(string_view_type name) const
         {
             return evaluate().find(name);
-        }
-
-        object_iterator find(const char_type* name)
-        {
-            return evaluate().find(name);
-        }
-
-        const_object_iterator find(const char_type* name) const
-        {
-            return evaluate().find(name);
-        }
-
-        object_iterator find(const char_type* name, size_t length)
-        {
-            return evaluate().find(name,length);
-        }
-
-        const_object_iterator find(const char_type* name, size_t length) const
-        {
-            return evaluate().find(name,length);
         }
 
         template <class T>
-        json_type get(const string_type& name, T&& default_val) const
+        json_type get(const key_type& name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
 
         template <class T>
-        T get_with_default(const string_type& name, const T& default_val) const
+        T get_with_default(string_view_type name, const T& default_val) const
         {
             return evaluate().get_with_default(name,default_val);
         }
 
-        const CharT* get_with_default(const string_type& name, const CharT* default_val) const
+        const CharT* get_with_default(string_view_type name, const CharT* default_val) const
         {
             return evaluate().get_with_default(name,default_val);
         }
@@ -1313,7 +1672,7 @@ public:
             evaluate().erase(first, last);
         }
 
-        void erase(const string_type& name)
+        void erase(string_view_type name)
         {
             evaluate().erase(name);
         }
@@ -1321,29 +1680,27 @@ public:
        // Remove a member from an object 
 
         template <class T>
-        void set(const string_type& name, T&& value)
+        void set(string_view_type name, T&& value)
         {
             evaluate().set(name,std::forward<T&&>(value));
         }
 
         template <class T>
-        void set(string_type&& name, T&& value)
-
+        void set_(key_type&& name, T&& value)
         {
-            evaluate().set(std::forward<string_type&&>(name),std::forward<T&&>(value));
+            evaluate().set_(std::forward<key_type&&>(name),std::forward<T&&>(value));
         }
 
         template <class T>
-        object_iterator set(object_iterator hint, const string_type& name, T&& value)
+        object_iterator set(object_iterator hint, string_view_type name, T&& value)
         {
             return evaluate().set(hint, name, std::forward<T&&>(value));
         }
 
         template <class T>
-        object_iterator set(object_iterator hint, string_type&& name, T&& value)
-
+        object_iterator set_(object_iterator hint, key_type&& name, T&& value)
         {
-            return evaluate().set(hint, std::forward<string_type&&>(name),std::forward<T&&>(value));
+            return evaluate().set_(hint, std::forward<key_type&&>(name), std::forward<T&&>(value));
         }
 
         template <class T>
@@ -1491,7 +1848,7 @@ public:
             return evaluate().end_elements();
         }
 
-        const json_type& get(const string_type& name) const
+        const json_type& get(const key_type& name) const
         {
             return evaluate().get(name);
         }
@@ -1541,7 +1898,7 @@ public:
             evaluate_with_default().add(index, std::forward<json_type&&>(value));
         }
 
-        bool has_member(const string_type& name) const
+        bool has_member(const key_type& name) const
         {
             return evaluate().has_member(name);
         }
@@ -1552,11 +1909,11 @@ public:
             evaluate().remove_range(from_index, to_index);
         }
         // Remove a range of elements from an array 
-        void remove(const string_type& name)
+        void remove(string_view_type name)
         {
             evaluate().remove(name);
         }
-        void remove_member(const string_type& name)
+        void remove_member(string_view_type name)
         {
             evaluate().remove(name);
         }
@@ -1574,7 +1931,7 @@ public:
     static basic_json parse_stream(std::basic_istream<char_type>& is);
     static basic_json parse_stream(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler);
 
-    static basic_json parse(const string_type& s)
+    static basic_json parse(string_view_type s)
     {
         parse_error_handler_type err_handler;
         return parse(s,err_handler);
@@ -1586,9 +1943,9 @@ public:
         return parse(s,length,err_handler);
     }
 
-    static basic_json parse(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
+    static basic_json parse(string_view_type s, basic_parse_error_handler<char_type>& err_handler)
     {
-        json_encoder<json_type> handler;
+        json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.begin_parse();
         parser.parse(s.data(),0,s.length());
@@ -1603,7 +1960,7 @@ public:
 
     static basic_json parse(const char_type* s, size_t length, basic_parse_error_handler<char_type>& err_handler)
     {
-        json_encoder<json_type> handler;
+        json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.begin_parse();
         parser.parse(s,0,length);
@@ -1616,9 +1973,70 @@ public:
         return handler.get_result();
     }
 
-    static basic_json parse_file(const std::string& s);
+    static basic_json parse_file(const string_type& filename)
+    {
+        parse_error_handler_type err_handler;
+        return parse_file(filename,err_handler);
+    }
 
-    static basic_json parse_file(const std::string& s, basic_parse_error_handler<char_type>& err_handler);
+    static basic_json parse_file(const string_type filename, 
+                                 basic_parse_error_handler<char_type>& err_handler)
+    {
+        FILE* fp;
+
+    #if !defined(JSONCONS_HAS_FOPEN_S)
+        fp = std::fopen(filename.c_str(), "rb");
+        if (fp == nullptr)
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
+        }
+    #else
+        errno_t err = fopen_s(&fp, filename.c_str(), "rb");
+        if (err != 0) 
+        {
+            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
+        }
+    #endif
+
+        json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;
+        try
+        {
+            // obtain file size:
+            std::fseek (fp , 0 , SEEK_END);
+            long size = std::ftell (fp);
+            std::rewind(fp);
+
+            if (size > 0)
+            {
+                std::vector<char_type> buffer(size);
+
+                // copy the file into the buffer:
+                size_t result = std::fread (buffer.data(),1,size,fp);
+                if (result != static_cast<unsigned long long>(size))
+                {
+                    JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
+                }
+
+                basic_json_parser<char_type> parser(handler,err_handler);
+                parser.begin_parse();
+                parser.parse(buffer.data(),0,buffer.size());
+                parser.end_parse();
+                parser.check_done(buffer.data(),parser.index(),buffer.size());
+            }
+
+            std::fclose (fp);
+        }
+        catch (...)
+        {
+            std::fclose (fp);
+            throw;
+        }
+        if (!handler.is_valid())
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
+        }
+        return handler.get_result();
+    }
 
     static basic_json make_array()
     {
@@ -1640,13 +2058,13 @@ public:
         return array(std::move(init),allocator);
     }
 
-    static basic_json make_array(size_t n, const array_allocator& allocator = array_allocator())
+    static basic_json make_array(size_t n, const Allocator& allocator = Allocator())
     {
         return array(n,allocator);
     }
 
     template <class T>
-    static basic_json make_array(size_t n, const T& val, const array_allocator& allocator = array_allocator())
+    static basic_json make_array(size_t n, const T& val, const Allocator& allocator = Allocator())
     {
         return basic_json::array(n, val,allocator);
     }
@@ -1705,13 +2123,14 @@ public:
     {
     }
 
+
     basic_json(json_type&& other) JSONCONS_NOEXCEPT
         : var_(std::move(other.var_))
     {
     }
 
-    basic_json(json_type&& other, const Allocator& allocator)
-        : var_(std::move(other.var_),allocator)
+    basic_json(json_type&& other, const Allocator& allocator) JSONCONS_NOEXCEPT
+        : var_(std::move(other.var_) /*,allocator*/ )
     {
     }
 
@@ -1746,7 +2165,13 @@ public:
     }
 
     template <class ParentT>
-    basic_json(const json_proxy<ParentT>& proxy, const Allocator& allocator = Allocator())
+    basic_json(const json_proxy<ParentT>& proxy)
+        : var_(proxy.evaluate().var_)
+    {
+    }
+
+    template <class ParentT>
+    basic_json(const json_proxy<ParentT>& proxy, const Allocator& allocator)
         : var_(proxy.evaluate().var_,allocator)
     {
     }
@@ -1821,9 +2246,15 @@ public:
         return *this;
     }
 
-    bool operator!=(const json_type& rhs) const;
+    bool operator!=(const json_type& rhs) const
+    {
+        return !(*this == rhs);
+    }
 
-    bool operator==(const json_type& rhs) const;
+    bool operator==(const json_type& rhs) const
+    {
+        return var_ == rhs.var_;
+    }
 
     size_t size() const JSONCONS_NOEXCEPT
     {
@@ -1832,9 +2263,9 @@ public:
         case value_types::empty_object_t:
             return 0;
         case value_types::object_t:
-            return var_.object_data_cast()->value().size();
+            return object_value().size();
         case value_types::array_t:
-            return var_.array_data_cast()->value().size();
+            return array_value().size();
         default:
             return 0;
         }
@@ -1850,14 +2281,14 @@ public:
         return at(i);
     }
 
-    json_proxy<json_type> operator[](const string_type& name)
+    json_proxy<json_type> operator[](string_view_type name)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<json_type>(*this, name);
+            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),key_allocator_type(object_value().get_self_allocator())));
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -1865,7 +2296,7 @@ public:
         }
     }
 
-    const json_type& operator[](const string_type& name) const
+    const json_type& operator[](string_view_type name) const
     {
         return at(name);
     }
@@ -1898,10 +2329,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            handler.value(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-            break;
         case value_types::string_t:
-            handler.value(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+            handler.value(as_string_view());
             break;
         case value_types::double_t:
             handler.value(var_.double_data_cast()->value(), var_.double_data_cast()->precision());
@@ -1925,7 +2354,7 @@ public:
         case value_types::object_t:
             {
                 handler.begin_object();
-                const object& o = var_.object_data_cast()->value();
+                const object& o = object_value();
                 for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
                     handler.name((it->key()).data(),it->key().length());
@@ -1937,7 +2366,7 @@ public:
         case value_types::array_t:
             {
                 handler.begin_array();
-                const array& o = var_.array_data_cast()->value();
+                const array& o = array_value();
                 for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                 {
                     it->write_body(handler);
@@ -2005,13 +2434,13 @@ public:
         return var_.type_id() == value_types::null_t;
     }
 
-    bool has_key(const string_type& name) const
+    bool has_key(string_view_type name) const
     {
         switch (var_.type_id())
         {
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 return it != object_range().end();
             }
             break;
@@ -2020,13 +2449,13 @@ public:
         }
     }
 
-    size_t count(const string_type& name) const
+    size_t count(string_view_type name) const
     {
         switch (var_.type_id())
         {
         case value_types::object_t:
             {
-                auto it = var_.object_data_cast()->value().find(name.data(),name.length());
+                auto it = object_value().find(name.data(),name.length());
                 if (it == object_range().end())
                 {
                     return 0;
@@ -2074,7 +2503,7 @@ public:
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_types::integer_t || (var_.type_id() == value_types::uinteger_t && (as_uinteger() <= static_cast<unsigned long long>(std::numeric_limits<long long>::max JSONCONS_NO_MACRO_EXP())));
+        return var_.type_id() == value_types::integer_t || (var_.type_id() == value_types::uinteger_t && (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<long long>::max)())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
@@ -2101,11 +2530,11 @@ public:
         case value_types::string_t:
             return var_.string_data_cast()->length() == 0;
         case value_types::array_t:
-            return var_.array_data_cast()->value().size() == 0;
+            return array_value().size() == 0;
         case value_types::empty_object_t:
             return true;
         case value_types::object_t:
-            return var_.object_data_cast()->value().size() == 0;
+            return object_value().size() == 0;
         default:
             return false;
         }
@@ -2116,16 +2545,16 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            return var_.array_data_cast()->value().capacity();
+            return array_value().capacity();
         case value_types::object_t:
-            return var_.object_data_cast()->value().capacity();
+            return object_value().capacity();
         default:
             return 0;
         }
     }
 
     template<class U=Allocator,
-         typename std::enable_if<std::is_default_constructible<U>::value
+         typename std::enable_if<is_stateless<U>::value
             >::type* = nullptr>
     void create_object_implicitly()
     {
@@ -2133,7 +2562,7 @@ public:
     }
 
     template<class U=Allocator,
-         typename std::enable_if<!std::is_default_constructible<U>::value
+         typename std::enable_if<!is_stateless<U>::value
             >::type* = nullptr>
     void create_object_implicitly() const
     {
@@ -2145,17 +2574,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().reserve(n);
+            array_value().reserve(n);
             break;
         case value_types::empty_object_t:
         {
             create_object_implicitly();
-            var_.object_data_cast()->value().reserve(n);
+            object_value().reserve(n);
         }
         break;
         case value_types::object_t:
         {
-            var_.object_data_cast()->value().reserve(n);
+            object_value().reserve(n);
         }
             break;
         default:
@@ -2168,7 +2597,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().resize(n);
+            array_value().resize(n);
             break;
         default:
             break;
@@ -2181,7 +2610,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().resize(n, val);
+            array_value().resize(n, val);
             break;
         default:
             break;
@@ -2205,25 +2634,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            try
-            {
-                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-                return j.as_bool();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
-            }
         case value_types::string_t:
             try
             {
-                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
                 return j.as_bool();
             }
             catch (...)
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
             }
+            break;
         case value_types::bool_t:
             return var_.bool_data_cast()->value();
         case value_types::double_t:
@@ -2242,25 +2663,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            try
-            {
-                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-                return j.as<int64_t>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
-            }
         case value_types::string_t:
             try
             {
-                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
                 return j.as<int64_t>();
             }
             catch (...)
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
             }
+            break;
         case value_types::double_t:
             return static_cast<int64_t>(var_.double_data_cast()->value());
         case value_types::integer_t:
@@ -2279,25 +2692,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            try
-            {
-                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-                return j.as<uint64_t>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
-            }
         case value_types::string_t:
             try
             {
-                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
                 return j.as<uint64_t>();
             }
             catch (...)
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
             }
+            break;
         case value_types::double_t:
             return static_cast<uint64_t>(var_.double_data_cast()->value());
         case value_types::integer_t:
@@ -2327,25 +2732,17 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            try
-            {
-                json_type j = json_type::parse(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
-                return j.as<double>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
-            }
         case value_types::string_t:
             try
             {
-                json_type j = json_type::parse(var_.string_data_cast()->data(),var_.string_data_cast()->length());
+                json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
                 return j.as<double>();
             }
             catch (...)
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
             }
+            break;
         case value_types::double_t:
             return var_.double_data_cast()->value();
         case value_types::integer_t:
@@ -2359,14 +2756,18 @@ public:
         }
     }
 
+    string_view_type as_string_view() const
+    {
+        return var_.as_string_view();
+    }
+
     string_type as_string() const JSONCONS_NOEXCEPT
     {
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),var_.string_data_cast()->get_allocator());
+            return string_type(as_string_view().data(),as_string_view().length());
         default:
             return to_string();
         }
@@ -2377,9 +2778,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length(),allocator);
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),allocator);
+            return string_type(as_string_view().data(),as_string_view().length(),allocator);
         default:
             return to_string(allocator);
         }
@@ -2390,9 +2790,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length());
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),var_.string_data_cast()->get_allocator());
+            return string_type(as_string_view().data(),as_string_view().length());
         default:
             return to_string(format);
         }
@@ -2404,9 +2803,8 @@ public:
         switch (var_.type_id())
         {
         case value_types::small_string_t:
-            return string_type(var_.small_string_data_cast()->data(),var_.small_string_data_cast()->length(),allocator);
         case value_types::string_t:
-            return string_type(var_.string_data_cast()->data(),var_.string_data_cast()->length(),allocator);
+            return string_type(as_string_view().data(),as_string_view().length(),allocator);
         default:
             return to_string(format,allocator);
         }
@@ -2424,7 +2822,7 @@ public:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
         }
     }
-    json_type& at(const string_type& name)
+    json_type& at(string_view_type name)
     {
         switch (var_.type_id())
         {
@@ -2432,7 +2830,7 @@ public:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
-                auto it = var_.object_data_cast()->value().find(name.data(),name.length());
+                auto it = object_value().find(name.data(),name.length());
                 if (it == object_range().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
@@ -2472,17 +2870,17 @@ public:
         return at(i);
     }
 
-    json_type& evaluate(const string_type& name) 
+    json_type& evaluate(const key_type& name) 
     {
         return at(name);
     }
 
-    const json_type& evaluate(const string_type& name) const
+    const json_type& evaluate(const key_type& name) const
     {
         return at(name);
     }
 
-    const json_type& at(const string_type& name) const
+    const json_type& at(string_view_type name) const
     {
         switch (var_.type_id())
         {
@@ -2490,7 +2888,7 @@ public:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
-                auto it = var_.object_data_cast()->value().find(name.data(),name.length());
+                auto it = object_value().find(name.data(),name.length());
                 if (it == object_range().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
@@ -2510,13 +2908,13 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            if (i >= var_.array_data_cast()->value().size())
+            if (i >= array_value().size())
             {
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
-            return var_.array_data_cast()->value().operator[](i);
+            return array_value().operator[](i);
         case value_types::object_t:
-            return var_.object_data_cast()->value().at(i);
+            return object_value().at(i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
@@ -2527,26 +2925,26 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            if (i >= var_.array_data_cast()->value().size())
+            if (i >= array_value().size())
             {
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
-            return var_.array_data_cast()->value().operator[](i);
+            return array_value().operator[](i);
         case value_types::object_t:
-            return var_.object_data_cast()->value().at(i);
+            return object_value().at(i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
         }
     }
 
-    object_iterator find(const string_type& name)
+    object_iterator find(string_view_type name)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             return object_range().end();
         case value_types::object_t:
-            return var_.object_data_cast()->value().find(name.data(),name.length());
+            return object_value().find(name.data(),name.length());
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2554,74 +2952,14 @@ public:
         }
     }
 
-    const_object_iterator find(const string_type& name) const
+    const_object_iterator find(string_view_type name) const
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             return object_range().end();
         case value_types::object_t:
-            return var_.object_data_cast()->value().find(name.data(),name.length());
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
-    object_iterator find(const char_type* name)
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            return object_range().end();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().find(name, std::char_traits<char_type>::length(name));
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
-    const_object_iterator find(const char_type* name) const
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            return object_range().end();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().find(name, std::char_traits<char_type>::length(name));
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
-    object_iterator find(const char_type* name, size_t length)
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            return object_range().end();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().find(name, length);
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
-            }
-        }
-    }
-
-    const_object_iterator find(const char_type* name, size_t length) const
-    {
-        switch (var_.type_id())
-        {
-        case value_types::empty_object_t:
-            return object_range().end();
-        case value_types::object_t:
-            return var_.object_data_cast()->value().find(name, length);
+            return object_value().find(name.data(),name.length());
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -2630,7 +2968,7 @@ public:
     }
 
     template<class T>
-    json_type get(const string_type& name, T&& default_val) const
+    json_type get(const key_type& name, T&& default_val) const
     {
         switch (var_.type_id())
         {
@@ -2640,7 +2978,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 if (it != object_range().end())
                 {
                     return it->value();
@@ -2658,7 +2996,7 @@ public:
     }
 
     template<class T>
-    T get_with_default(const string_type& name, const T& default_val) const
+    T get_with_default(string_view_type name, const T& default_val) const
     {
         switch (var_.type_id())
         {
@@ -2668,7 +3006,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 if (it != object_range().end())
                 {
                     return it->value().template as<T>();
@@ -2685,7 +3023,7 @@ public:
         }
     }
 
-    const CharT* get_with_default(const string_type& name, const CharT* default_val) const
+    const CharT* get_with_default(string_view_type name, const CharT* default_val) const
     {
         switch (var_.type_id())
         {
@@ -2695,7 +3033,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 if (it != object_range().end())
                 {
                     return it->value().template as<const CharT*>();
@@ -2719,10 +3057,10 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().shrink_to_fit();
+            array_value().shrink_to_fit();
             break;
         case value_types::object_t:
-            var_.object_data_cast()->value().shrink_to_fit();
+            object_value().shrink_to_fit();
             break;
         default:
             break;
@@ -2734,10 +3072,10 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().clear();
+            array_value().clear();
             break;
         case value_types::object_t:
-            var_.object_data_cast()->value().clear();
+            object_value().clear();
             break;
         default:
             break;
@@ -2751,7 +3089,7 @@ public:
         case value_types::empty_object_t:
             break;
         case value_types::object_t:
-            var_.object_data_cast()->value().erase(first, last);
+            object_value().erase(first, last);
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -2764,7 +3102,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().erase(first, last);
+            array_value().erase(first, last);
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
@@ -2774,14 +3112,14 @@ public:
 
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void erase(const string_type& name)
+    void erase(string_view_type name)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             break;
         case value_types::object_t:
-            var_.object_data_cast()->value().erase(name.data(),name.length());
+            object_value().erase(name.data(),name.length());
             break;
         default:
             JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to erase %s on a value that is not an object", name);
@@ -2790,14 +3128,14 @@ public:
     }
 
     template <class T>
-    void set(const string_type& name, T&& value)
+    void set(string_view_type name, T&& value)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            var_.object_data_cast()->value().set(name, std::forward<T&&>(value));
+            object_value().set(name, std::forward<T&&>(value));
             break;
         default:
             {
@@ -2807,29 +3145,31 @@ public:
     }
 
     template <class T>
-    void set(string_type&& name, T&& value){
-        switch (var_.type_id()){
-        case value_types::empty_object_t:
-            create_object_implicitly();
-        case value_types::object_t:
-            var_.object_data_cast()->value().set(std::forward<string_type&&>(name),std::forward<T&&>(value));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
-            }
-        }
-    }
-
-    template <class T>
-    object_iterator set(object_iterator hint, const string_type& name, T&& value)
+    void set_(key_type&& name, T&& value)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, name, std::forward<T&&>(value));
+            object_value().set_(std::forward<key_type&&>(name), std::forward<T&&>(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name.c_str());
+            }
+        }
+    }
+
+    template <class T>
+    object_iterator set(object_iterator hint, string_view_type name, T&& value)
+    {
+        switch (var_.type_id())
+        {
+        case value_types::empty_object_t:
+            create_object_implicitly();
+        case value_types::object_t:
+            return object_value().set(hint, name, std::forward<T&&>(value));
             break;
         default:
             {
@@ -2839,16 +3179,18 @@ public:
     }
 
     template <class T>
-    object_iterator set(object_iterator hint, string_type&& name, T&& value){
-        switch (var_.type_id()){
+    object_iterator set_(object_iterator hint, key_type&& name, T&& value)
+    {
+        switch (var_.type_id())
+        {
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return var_.object_data_cast()->value().set(hint, std::forward<string_type&&>(name),std::forward<T&&>(value));
+            return object_value().set(hint, std::forward<key_type&&>(name), std::forward<T&&>(value));
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object",name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
             }
         }
     }
@@ -2859,7 +3201,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().add(std::forward<T&&>(value));
+            array_value().add(std::forward<T&&>(value));
             break;
         default:
             {
@@ -2874,7 +3216,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            return var_.array_data_cast()->value().add(pos, std::forward<T&&>(value));
+            return array_value().add(pos, std::forward<T&&>(value));
             break;
         default:
             {
@@ -2898,19 +3240,19 @@ public:
         a.swap(b);
     }
 
-    static json_type make_string(const string_type& s)
+    static json_type make_string(string_view_type s)
     {
         return json_type(variant(s.data(),s.length()));
-    }
-
-    static json_type make_string(const string_type& s, allocator_type allocator)
-    {
-        return json_type(variant(s.data(),s.length(),allocator));
     }
 
     static json_type make_string(const char_type* rhs, size_t length)
     {
         return json_type(variant(rhs,length));
+    }
+
+    static json_type make_string(string_view_type s, allocator_type allocator)
+    {
+        return json_type(variant(s.data(),s.length(),allocator));
     }
 
     static json_type make_integer(int64_t val)
@@ -3025,7 +3367,7 @@ public:
         return array_range().end();
     }
 
-    const json_type& get(const string_type& name) const
+    const json_type& get(const key_type& name) const
     {
         static const json_type a_null = null_type();
 
@@ -3035,7 +3377,7 @@ public:
             return a_null;
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 return it != object_range().end() ? it->value() : a_null;
             }
         default:
@@ -3138,7 +3480,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().add(index, value);
+            array_value().add(index, value);
             break;
         default:
             {
@@ -3150,7 +3492,7 @@ public:
     void add(size_t index, json_type&& value){
         switch (var_.type_id()){
         case value_types::array_t:
-            var_.array_data_cast()->value().add(index, std::forward<json_type&&>(value));
+            array_value().add(index, std::forward<json_type&&>(value));
             break;
         default:
             {
@@ -3159,13 +3501,13 @@ public:
         }
     }
 
-    bool has_member(const string_type& name) const
+    bool has_member(const key_type& name) const
     {
         switch (var_.type_id())
         {
         case value_types::object_t:
             {
-                const_object_iterator it = var_.object_data_cast()->value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name.data(),name.length());
                 return it != object_range().end();
             }
             break;
@@ -3179,7 +3521,7 @@ public:
         switch (var_.type_id())
         {
         case value_types::array_t:
-            var_.array_data_cast()->value().remove_range(from_index, to_index);
+            array_value().remove_range(from_index, to_index);
             break;
         default:
             break;
@@ -3187,11 +3529,11 @@ public:
     }
     // Removes all elements from an array value whose index is between from_index, inclusive, and to_index, exclusive.
 
-    void remove(const string_type& name)
+    void remove(string_view_type name)
     {
         erase(name.data(),name.length());
     }
-    void remove_member(const string_type& name)
+    void remove_member(string_view_type name)
     {
         erase(name.data(),name.length());
     }
@@ -3366,15 +3708,15 @@ public:
 
 private:
 
-    friend std::basic_ostream<typename string_type::value_type>& operator<<(std::basic_ostream<typename string_type::value_type>& os, const json_type& o)
+    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_type& o)
     {
         o.write(os);
         return os;
     }
 
-    friend std::basic_istream<typename string_type::value_type>& operator<<(std::basic_istream<typename string_type::value_type>& is, json_type& o)
+    friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, json_type& o)
     {
-        json_encoder<json_type> handler;
+        json_decoder<json_type> handler;
         basic_json_reader<char_type> reader(is, handler);
         reader.read_next();
         reader.check_done();
@@ -3388,21 +3730,9 @@ private:
 };
 
 template <class Json>
-void swap(typename Json::member_type& a, typename Json::member_type& b)
+void swap(typename Json::kvp_type & a, typename Json::kvp_type & b)
 {
     a.swap(b);
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-bool basic_json<CharT,JsonTraits,Allocator>::operator!=(const basic_json<CharT,JsonTraits,Allocator>& rhs) const
-{
-    return !(*this == rhs);
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-bool basic_json<CharT,JsonTraits,Allocator>::operator==(const basic_json<CharT,JsonTraits,Allocator>& rhs) const
-{
-    return var_ == rhs.var_;
 }
 
 template<class CharT,class JsonTraits,class Allocator>
@@ -3468,7 +3798,7 @@ template<class CharT,class JsonTraits,class Allocator>
 basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_stream(std::basic_istream<char_type>& is, 
                                                                                             basic_parse_error_handler<char_type>& err_handler)
 {
-    json_encoder<basic_json<CharT,JsonTraits,Allocator>> handler;
+    json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;
     basic_json_reader<char_type> reader(is, handler, err_handler);
     reader.read_next();
     reader.check_done();
@@ -3479,77 +3809,10 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
     return handler.get_result();
 }
 
-template<class CharT,class JsonTraits,class Allocator>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_file(const std::string& filename)
-{
-    parse_error_handler_type err_handler;
-    return parse_file(filename,err_handler);
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_file(const std::string& filename, 
-                                                                                          basic_parse_error_handler<char_type>& err_handler)
-{
-    FILE* fp;
-
-#if !defined(JSONCONS_HAS_FOPEN_S)
-    fp = std::fopen(filename.c_str(), "rb");
-    if (fp == nullptr)
-    {
-        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-    }
-#else
-    errno_t err = fopen_s(&fp, filename.c_str(), "rb");
-    if (err != 0) 
-    {
-        JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-    }
-#endif
-
-    json_encoder<basic_json<CharT,JsonTraits,Allocator>> handler;
-    try
-    {
-        // obtain file size:
-        std::fseek (fp , 0 , SEEK_END);
-        long size = std::ftell (fp);
-        std::rewind(fp);
-
-        if (size > 0)
-        {
-            std::vector<char_type> buffer(size);
-
-            // copy the file into the buffer:
-            size_t result = std::fread (buffer.data(),1,size,fp);
-            if (result != static_cast<unsigned long long>(size))
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
-            }
-
-            basic_json_parser<char_type> parser(handler,err_handler);
-            parser.begin_parse();
-            parser.parse(buffer.data(),0,buffer.size());
-            parser.end_parse();
-            parser.check_done(buffer.data(),parser.index(),buffer.size());
-        }
-
-        std::fclose (fp);
-    }
-    catch (...)
-    {
-        std::fclose (fp);
-        throw;
-    }
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
-    }
-    return handler.get_result();
-}
-
 template <class Json>
 std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<typename Json::char_type>& is, Json& o)
 {
-    json_encoder<Json> handler;
+    json_decoder<Json> handler;
     basic_json_reader<typename Json::char_type> reader(is, handler);
     reader.read_next();
     reader.check_done();
@@ -3627,15 +3890,15 @@ json_printable<Json> pretty_print(const Json& val,
 
 typedef basic_json<char,json_traits<char>,std::allocator<char>> json;
 typedef basic_json<wchar_t,json_traits<wchar_t>,std::allocator<wchar_t>> wjson;
-typedef basic_json<char, ojson_traits<char>, std::allocator<char>> ojson;
-typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> owjson;
+typedef basic_json<char, o_json_traits<char>, std::allocator<char>> ojson;
+typedef basic_json<wchar_t, o_json_traits<wchar_t>, std::allocator<wchar_t>> owjson;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_json<wchar_t, ojson_traits<wchar_t>, std::allocator<wchar_t>> wojson;
-typedef json_encoder<json> json_deserializer;
-typedef json_encoder<wjson> wjson_deserializer;
-typedef json_encoder<ojson> ojson_deserializer;
-typedef json_encoder<owjson> wojson_deserializer;
+typedef basic_json<wchar_t, o_json_traits<wchar_t>, std::allocator<wchar_t>> wojson;
+typedef json_decoder<json> json_deserializer;
+typedef json_decoder<wjson> wjson_deserializer;
+typedef json_decoder<ojson> ojson_deserializer;
+typedef json_decoder<owjson> wojson_deserializer;
 #endif
 
 }

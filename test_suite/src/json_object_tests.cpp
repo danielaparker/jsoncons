@@ -351,7 +351,7 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_1)
     BOOST_CHECK((*it).value() == json("value2"));
     BOOST_CHECK((*(--it)).value() == json("value1"));
 
-    json::member_type member = *it;
+    json::kvp_type  member = *it;
     BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 }
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_2)
 
     BOOST_CHECK((*(--it)).value() == json("value1"));
 
-    json::member_type member = *it;
+    json::kvp_type  member = *it;
     BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 }
@@ -412,11 +412,23 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
     BOOST_CHECK((*(--it)).value() == json("value1"));
     BOOST_CHECK(it == a.object_range().begin());
 
-    json::member_type member = *it;
+    json::kvp_type  member = *it;
     BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 
     //*it = member; // Don't want this to compile
+}
+
+BOOST_AUTO_TEST_CASE(test_object_key_proxy)
+{
+    json a;
+    a["key1"] = "value1";
+
+    json b;
+    b["key2"] = json();
+    b["key2"]["key3"] = std::move(a);
+
+    BOOST_CHECK(!(a.is_object() || a.is_array() || a.is_string()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                     {
                         boost::filesystem::ifstream is(dir_itr->path());
                         is >> document;
-                        std::cout << dir_itr->path().filename() << '\n';
+                        //std::cout << dir_itr->path().filename() << '\n';
                     }
                     catch (const jsoncons::parse_exception& e)
                     {
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                     }
                     s.append(buffer, is.gcount());
                     jsonpath_dictionary[dir_itr->path().stem()] = s;
-                    std::cout << ".jsonpath " << dir_itr->path().stem() << '\n';
+                    //std::cout << ".jsonpath " << dir_itr->path().stem() << '\n';
                 }
                 else if (dir_itr->path().extension() == ".json")
                 {
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                         boost::filesystem::ifstream is(dir_itr->path());
                         is >> j;
                         expected_dictionary[dir_itr->path().stem()] = j;
-                        std::cout << ".json " << dir_itr->path() << '\n';
+                        //std::cout << ".json " << dir_itr->path() << '\n';
                     }
                     catch (const jsoncons::parse_exception& e)
                     {
@@ -124,13 +124,13 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
             {
                 try
                 {
-                    std::cout << pair.second << '\n';
+                    //std::cout << pair.second << '\n';
                     ojson result = json_query(document, pair.second);
-                    if (it->second != result)
-                    {
-                        std::cout << pair.first << '\n';
+                    //if (it->second != result)
+                    //{
+                    //std::cout << pair.first << '\n';
                         BOOST_CHECK_EQUAL(it->second,result);
-                    }
+                    //}
                 }
                 catch (const jsoncons::parse_exception& e)
                 {
@@ -140,6 +140,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
             }
             else
             {
+                std::cout << "Expected value for " << pair.first << "not found \n";
                 std::cout << pair.second << '\n';
                 ojson result = json_query(document,pair.second);
                 std::cout << pretty_print(result) << std::endl;
@@ -165,7 +166,7 @@ BOOST_AUTO_TEST_CASE(test_path)
 
     BOOST_CHECK_EQUAL(expected,result);
 
-    //    std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book2)
@@ -211,7 +212,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_bicycle)
     expected.add(fixture.bicycle());
     BOOST_CHECK_EQUAL(expected,result);
 
-    //    std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_bicycle_unquoted)
@@ -227,7 +228,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_bicycle_unquoted)
     expected.add(fixture.bicycle());
     BOOST_CHECK_EQUAL(expected,result);
 
-    //    std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_union)
@@ -237,13 +238,15 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_union)
     json root = json::parse(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$['store']..['author','title']");
+    std::cout << "!!!test_jsonpath_store_book_union" << std::endl;
     std::cout << pretty_print(result) << std::endl;
+
     //json expected = json::array();
     //expected.add(fixture.book());
     //expected.add(fixture.bicycle());
     //BOOST_CHECK_EQUAL(expected,result);
 
-    //    std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_star)
@@ -255,7 +258,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_star)
     json result = json_query(root,"$['store']['book'][*]");
     json expected = fixture.book();
 
-    //    std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
     BOOST_CHECK_EQUAL(expected,result);
 }
 
@@ -503,10 +506,9 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_book_category)
     json root = json::parse(jsonpath_fixture::book_text());
 
     json result = json_query(root,"@.category");
-    for (size_t i = 0; i < result.size(); ++i)
-    {
-        std::cout << pretty_print(result[i]) << std::endl;
-    }
+
+    BOOST_CHECK_EQUAL(1,result.size());
+    BOOST_CHECK_EQUAL("reference",result[0].as<std::string>());
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_book_filter_false)
@@ -580,7 +582,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_authors)
 
     //json expected = fixture.book();
 
-    std::cout << pretty_print(result) << std::endl;
+    //std::cout << pretty_print(result) << std::endl;
 
     BOOST_CHECK_EQUAL(expected,result);
 }
@@ -1058,11 +1060,16 @@ BOOST_AUTO_TEST_CASE(test_replace)
         std::cout << e.what() << std::endl;
     }
 
-    std::cout << ("1\n") << pretty_print(j) << std::endl;
+    //std::cout << "!!!test_replace" << std::endl;
+    //std::cout << ("1\n") << pretty_print(j) << std::endl;
+
+    BOOST_CHECK_CLOSE(31.96,j["store"]["book"][0]["price"].as<double>(),0.001);
 
     json_replace(j,"$..book[?(@.price==31.96)].price", 30.9);
 
-    std::cout << ("2\n") << pretty_print(j) << std::endl;
+    BOOST_CHECK_CLOSE(30.9,j["store"]["book"][0]["price"].as<double>(),0.001);
+
+    //std::cout << ("2\n") << pretty_print(j) << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

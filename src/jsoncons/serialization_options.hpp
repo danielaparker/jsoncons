@@ -54,7 +54,7 @@ public:
     basic_serialization_options()
         :
         indent_(default_indent),
-        precision_(16),
+        precision_(std::numeric_limits<double>::digits10),
         replace_nan_(true),
         replace_pos_inf_(true),
         replace_neg_inf_(true),

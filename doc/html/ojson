@@ -471,52 +471,36 @@ vertical-align:1px;
 <div class="highlight highlight-source-c++"><pre>jsoncons::ojson
 
 <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
-                   JsonTraits = ojson_traits&lt;<span class="pl-k">char</span>&gt;,
+                   JsonTraits = o_json_traits&lt;<span class="pl-k">char</span>&gt;,
                    Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; ojson</pre></div>
-
-<p>The <code>ojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The supplied <code>JsonTraits</code> template parameter keeps object members in their original order. </p>
-
+<p>The <code>ojson</code> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type. The original insertion order of an object's name/value pairs is preserved.</p>
 <p>The <code>jsoncons</code> library will always rebind the supplied allocator from the template parameter to internal data structures.</p>
-
 <h3>Header</h3>
-
 <pre><code>#include &lt;jsoncons/json.hpp&gt;
 </code></pre>
-
 <h3>Interface</h3>
-
 <p>The interface is the same as <a href="json">json</a>, with these provisos:</p>
-
 <ul>
-<li>In <code>ojson</code>, <code>object_allocator</code> is a random access iterator, so object members can be accessed by position, e.g.</li>
+<li>
+<p><code>ojson</code>, like <code>json</code>, supports object member <code>set</code> methods that take an <code>object_iterator</code> as the first parameter. But while with <code>json</code> that parameter is just a hint that allows optimization, with <code>ojson</code> it is the actual location where to insert the member.</p>
+</li>
+<li>
+<p>In <code>ojson</code>, the <code>set</code> members that just take a name and a value always insert the member at the end.</p>
+</li>
 </ul>
-
-<pre><code>ojson o = ojson::parse(R"(
-{
-    "street_number" : "100",
-    "street_name" : "Queen St W"
-}
-)");
-
-ojson::member_type member = o.object_range().begin()[1];
-std::cout &lt;&lt; member.key() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; std::endl;
-</code></pre>
-
-<ul>
-<li><p><code>ojson</code>, like <code>json</code>, supports object member <code>set</code> methods that take an <code>object_iterator</code> as the first parameter. But while with <code>json</code> that parameter is just a hint that allows optimization, with <code>ojson</code> it is the actual location where to insert the member.</p></li>
-<li><p>In <code>ojson</code>, the <code>set</code> members that just take a name and a value always insert the member at the end.</p></li>
-</ul>
-
 <h3>See also</h3>
-
 <ul>
-<li><p><a href="json">json</a> constructs a json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p></li>
-<li><p><a href="owjson">owjson</a> constructs a wide character json value that retains the original name-value insertion order</p></li>
+<li>
+<p><a href="json">json</a> constructs a json value that sorts name-value members alphabetically</p>
+</li>
+<li>
+<p><a href="wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p>
+</li>
+<li>
+<p><a href="owjson">owjson</a> constructs a wide character json value that preserves the original insertion order of an object's name/value pairs</p>
+</li>
 </ul>
-
 <h2>Examples</h2>
-
 <div class="highlight highlight-source-c++"><pre>ojson o = ojson::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
 <span class="pl-s">    "street_number" : "100",</span>
@@ -527,24 +511,18 @@ std::cout &lt;&lt; member.key() &lt;&lt; "=" &lt;&lt; member.value() &lt;&lt; st
 <span class="pl-s"><span class="pl-pds">)"</span></span>);
 
 std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
     <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,
     <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,
     <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>
 }</pre></div>
-
 <p>Insert "postal_code" at end</p>
-
 <div class="highlight highlight-source-c++"><pre>o.set(<span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>);
 
 std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
     <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,
@@ -552,16 +530,12 @@ std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
     <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>,
     <span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>
 }</pre></div>
-
 <p>Insert "province" before "country"</p>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">auto</span> it = o.find(<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>);
 o.set(it,<span class="pl-s"><span class="pl-pds">"</span>province<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Ontario<span class="pl-pds">"</span></span>);
 
 std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
     <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,

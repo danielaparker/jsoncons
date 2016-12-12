@@ -470,13 +470,9 @@ vertical-align:1px;
 <body>
 <pre><code>jsoncons::jsonpath::json_replace
 </code></pre>
-
 <p>Searches for all values that match a JsonPath expression and replaces them with the specified value</p>
-
 <h3>Header</h3>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span></pre></div>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
 <span class="pl-k">void</span> <span class="pl-en">json_replace</span>(Json&amp; root, 
                   <span class="pl-k">const</span> <span class="pl-k">typename</span> Json::char_type* path, <span class="pl-c1">size_t</span> length, 
@@ -491,13 +487,9 @@ template&lt;class Json, class T&gt;
 void json_replace(Json&amp; root, 
                   <span class="pl-k">const</span> <span class="pl-k">typename</span> Json::char_type* path, 
                   T&amp;&amp; new_value)</pre></div>
-
 <h2>Examples</h2>
-
 <h3>Change the price of a book</h3>
-
 <p>Example file (store.json):</p>
-
 <div class="highlight highlight-source-json"><pre>{ <span class="pl-s"><span class="pl-pds">"</span>store<span class="pl-pds">"</span></span>: {
     <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [ 
       { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
@@ -519,9 +511,8 @@ void json_replace(Json&amp; root,
     ]
   }
 }</pre></div>
-
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">"</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::jsonpath<span class="pl-k">;</span>
@@ -537,9 +528,7 @@ void json_replace(Json&amp; root,
     std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(booklist) &lt;&lt; std::endl;
 
 }</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>{
     <span class="pl-s"><span class="pl-pds">"</span>store<span class="pl-pds">"</span></span>: {
         <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [

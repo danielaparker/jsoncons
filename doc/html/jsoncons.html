@@ -468,7 +468,854 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>An error occurred while processing GitHub Flavored Markdown.</p><p><strong>The underlying connection was closed: A connection that was expected to be kept alive was closed by the server.</strong></p><p>If the problem persists, please report the bug.</p>
+<h1>jsoncons: a C++ library for json construction</h1>
+
+<p><a href="#Preliminaries">Preliminaries</a></p>
+
+<p><a href="#ReadingJSONtextfromafile">Reading JSON text from a file</a></p>
+
+<p><a href="#ConstructingjsonvaluesinC++">Constructing json values in C++</a></p>
+
+<p><a href="#Convertingtoandfromstandardlibrarycontainers">Converting to and from standard library containers</a></p>
+
+<p><a href="#ConvertingCSVfilestojson">Converting CSV files to json</a></p>
+
+<p><a href="#Prettyprint">Pretty print</a></p>
+
+<p><a href="#Filters">Filters</a></p>
+
+<p><a href="#JsonPath">JsonPath</a></p>
+
+<p><a href="#Aboutjsonconsjson">About jsoncons::json</a></p>
+
+<p><a href="#Widecharactersupport">Wide character support</a></p>
+
+<p><a href="#ojsonandowjson">ojson and owjson</a></p>
+
+<p><a href="#Convertjsontofromuserdefinedtype">Convert json to/from user defined type</a></p>
+
+<h3>Preliminaries<a name="Preliminaries"></a>
+</h3>
+
+<p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>. </p>
+
+<p>jsoncons uses some features that are new to C++ 11, particularly <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported for that compiler.</p>
+
+<p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. </p>
+
+<p>To install the jsoncons library, download the zip file, extract the zipped files, look under <code>src</code> for the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well. </p>
+
+<p>The jsoncons classes and functions are in namespace <code>jsoncons</code>. You need to include the header file</p>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span></pre></div>
+
+<p>and, for convenience,</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> jsoncons::json;</pre></div>
+
+<h3>Reading JSON text from a file<a name="ReadingJSONtextfromafile"></a>
+</h3>
+
+<p>Example file (<code>books.json</code>):</p>
+
+<div class="highlight highlight-source-c++"><pre>[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span> : <span class="pl-c1">25.17</span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>Women: A Novel<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>Charles Bukowski<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span> : <span class="pl-c1">12.0</span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>Cutter's Way<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>Ivan Passer<span class="pl-pds">"</span></span>
+    }
+]</pre></div>
+
+<p>It consists of an array of book elements, each element is an object with members title, author, and price.</p>
+
+<p>Read the JSON text into a <code>json</code> value,</p>
+
+<div class="highlight highlight-source-c++"><pre>std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>books.json<span class="pl-pds">"</span></span>);
+json books;
+is &gt;&gt; books;</pre></div>
+
+<p>Loop through the book array elements, using a range-based for loop</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book : books.array_range())
+{
+    std::string author = book[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+    std::string title = book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+    std::cout &lt;&lt; author &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> &lt;&lt; title &lt;&lt; std::endl;
+}</pre></div>
+
+<p>or begin-end iterators</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">auto</span> it = books.array_range().begin(); 
+     it != books.array_range().end();
+     ++it)
+{
+    std::string author = (*it)[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+    std::string title = (*it)[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+    std::cout &lt;&lt; author &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> &lt;&lt; title &lt;&lt; std::endl;
+} </pre></div>
+
+<p>or a traditional for loop</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; books.size(); ++i)
+{
+    json&amp; book = books[i];
+    std::string author = book[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+    std::string title = book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;();
+    std::cout &lt;&lt; author &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> &lt;&lt; title &lt;&lt; std::endl;
+}</pre></div>
+
+<p>Output:</p>
+
+<pre><code>Haruki Murakami, Kafka on the Shore
+Charles Bukowski, Women: A Novel
+Ivan Passer, Cutter's Way
+</code></pre>
+
+<p>Loop through the members of the third book element, using a range-based for loop</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : books[<span class="pl-c1">2</span>].object_range())
+{
+    std::cout &lt;&lt; member.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
+              &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+}</pre></div>
+
+<p>or begin-end iterators:</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">for</span> (<span class="pl-k">auto</span> it = books[<span class="pl-c1">2</span>].object_range().begin(); 
+     it != books[<span class="pl-c1">2</span>].object_range().end();
+     ++it)
+{
+    std::cout &lt;&lt; (*it).<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
+              &lt;&lt; (*it).<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+} </pre></div>
+
+<p>Output:</p>
+
+<pre><code>author=Ivan Passer
+title=Cutter's Way
+</code></pre>
+
+<p>Note that the third book, Cutter's Way, is missing a price.</p>
+
+<p>You have a choice of object member accessors:</p>
+
+<ul>
+<li>
+<code>book["price"]</code> will throw <code>std::out_of_range</code> if there is no price</li>
+<li>
+<code>book.get_with_default("price","n/a")</code> will return the price converted to the default's data type, or "n/a" if there is no price.</li>
+</ul>
+
+<p>So if you want to show "n/a" for the missing price, you can use this accessor</p>
+
+<div class="highlight highlight-source-c++"><pre>std::string price = book.get_with_default(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>n/a<span class="pl-pds">"</span></span>);</pre></div>
+
+<p>Or you can check if book has a member "price" with the method <code>has_key</code>, and output accordingly,</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">if</span> (book.has_key(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>))
+{
+    <span class="pl-k">double</span> price = book[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;<span class="pl-k">double</span>&gt;();
+    std::cout &lt;&lt; price;
+}
+<span class="pl-k">else</span>
+{
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>n/a<span class="pl-pds">"</span></span>;
+}</pre></div>
+
+<h3>Constructing json values in C++<a name="ConstructingjsonvaluesinC++"></a>
+</h3>
+
+<p>The default <code>json</code> constructor produces an empty json object. For example </p>
+
+<div class="highlight highlight-source-c++"><pre>json image_sizing;
+std::cout &lt;&lt; image_sizing &lt;&lt; std::endl;</pre></div>
+
+<p>produces</p>
+
+<div class="highlight highlight-source-json"><pre>{}</pre></div>
+
+<p>To construct a json object with members, take an empty json object and set some name-value pairs</p>
+
+<div class="highlight highlight-source-c++"><pre>image_sizing.set(<span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>,<span class="pl-c1">true</span>);  <span class="pl-c">// a boolean </span>
+image_sizing.set(<span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>);  <span class="pl-c">// a string</span>
+image_sizing.set(<span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>);  <span class="pl-c">// a string</span>
+image_sizing.set(<span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>,<span class="pl-c1">9.84</span>);  <span class="pl-c">// a double</span>
+image_sizing.set(<span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span class="pl-pds">"</span></span>,json::null());  <span class="pl-c">// a null value</span></pre></div>
+
+<p>Or, use an object initializer-list:</p>
+
+<div class="highlight highlight-source-c++"><pre>json file_settings = json::object{
+    {<span class="pl-s"><span class="pl-pds">"</span>Image Format<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>},
+    {<span class="pl-s"><span class="pl-pds">"</span>Color Space<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>},
+    {<span class="pl-s"><span class="pl-pds">"</span>Limit File Size<span class="pl-pds">"</span></span>, <span class="pl-c1">true</span>},
+    {<span class="pl-s"><span class="pl-pds">"</span>Limit File Size To<span class="pl-pds">"</span></span>, <span class="pl-c1">10000</span>}
+};</pre></div>
+
+<p>To construct a json array, initialize with the array type </p>
+
+<div class="highlight highlight-source-c++"><pre>json color_spaces = json::array();</pre></div>
+
+<p>and add some elements</p>
+
+<div class="highlight highlight-source-c++"><pre>color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
+color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
+color_spaces.add(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);</pre></div>
+
+<p>Or, use an array initializer-list:</p>
+
+<div class="highlight highlight-source-c++"><pre>json image_formats = json::array{<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>};</pre></div>
+
+<p>The <code>operator[]</code> provides another way for setting name-value pairs.</p>
+
+<div class="highlight highlight-source-c++"><pre>json file_export;
+file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] = 
+    <span class="pl-en">std::move</span>(color_spaces);
+file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Image Formats<span class="pl-pds">"</span></span>] = 
+    <span class="pl-en">std::move</span>(image_formats);
+file_export[<span class="pl-s"><span class="pl-pds">"</span>File Settings<span class="pl-pds">"</span></span>] = std::move(file_settings);
+file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = std::move(image_sizing);</pre></div>
+
+<p>Note that if <code>file_export["File Format Options"]</code> doesn't exist, </p>
+
+<div class="highlight highlight-source-c++"><pre>file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] = 
+    <span class="pl-en">std::move</span>(color_spaces)</pre></div>
+
+<p>creates <code>"File Format Options"</code> as an object and puts <code>"Color Spaces"</code> in it.</p>
+
+<p>Serializing</p>
+
+<div class="highlight highlight-source-c++"><pre>std::cout &lt;&lt; pretty_print(file_export) &lt;&lt; std::endl;</pre></div>
+
+<p>produces</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>],
+        <span class="pl-s"><span class="pl-pds">"</span>Image Formats<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>PSD<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>TIFF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>DNG<span class="pl-pds">"</span></span>]
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>File Settings<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Color Space<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Image Format<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>JPEG<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Limit File Size<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Limit File Size To<span class="pl-pds">"</span></span>: <span class="pl-c1">10000</span>
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>: <span class="pl-c1">9.84</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Dimension 2<span class="pl-pds">"</span></span>: <span class="pl-c1">null</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>
+    }
+}</pre></div>
+
+<h3>Converting to and from standard library containers<a name="Convertingtoandfromstandardlibrarycontainers"></a>
+</h3>
+
+<p>The jsoncons library supports converting to and from the standard library sequence and associative containers.</p>
+
+<div class="highlight highlight-source-c++"><pre>std::vector&lt;<span class="pl-k">int</span>&gt; v = {<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};
+json <span class="pl-en">j</span>(v);
+std::cout &lt;&lt; j &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>[<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>]</pre></div>
+
+<div class="highlight highlight-source-c++"><pre>json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">true</span>,<span class="pl-s"><span class="pl-pds">"</span>last<span class="pl-pds">"</span></span>};
+<span class="pl-k">auto</span> d = j.as&lt;std::deque&lt;std::string&gt;&gt;();
+<span class="pl-k">for</span> (<span class="pl-k">auto</span> x : d)
+{
+    std::cout &lt;&lt; x &lt;&lt; std::endl;
+}</pre></div>
+
+<p>Output:</p>
+
+<pre><code>1
+true
+last
+</code></pre>
+
+<div class="highlight highlight-source-c++"><pre>std::map&lt;std::string,<span class="pl-k">int</span>&gt; m = {{<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>,<span class="pl-c1">1</span>},{<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>,<span class="pl-c1">2</span>},{<span class="pl-s"><span class="pl-pds">"</span>three<span class="pl-pds">"</span></span>,<span class="pl-c1">3</span>}};
+json <span class="pl-en">j</span>(m);
+std::cout &lt;&lt; j &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>three<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>}</pre></div>
+
+<div class="highlight highlight-source-c++"><pre>json j;
+j[<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>] = <span class="pl-c1">1</span>;
+j[<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
+j[<span class="pl-s"><span class="pl-pds">"</span>three<span class="pl-pds">"</span></span>] = <span class="pl-c1">3</span>;
+
+<span class="pl-k">auto</span> um = j.as&lt;std::unordered_map&lt;std::string,<span class="pl-k">int</span>&gt;&gt;();
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; x : um)
+{
+    std::cout &lt;&lt; x.<span class="pl-smi">first</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; x.<span class="pl-smi">second</span> &lt;&lt; std::endl;
+}</pre></div>
+
+<p>Output:</p>
+
+<pre><code>one=1
+three=3
+two=2
+</code></pre>
+
+<h3>Converting CSV files to json<a name="ConvertingCSVfilestojson"></a>
+</h3>
+
+<p>Example CSV file (tasks.csv):</p>
+
+<pre><code>project_id, task_name, task_start, task_finish
+4001,task1,01/01/2003,01/31/2003
+4001,task2,02/01/2003,02/28/2003
+4001,task3,03/01/2003,03/31/2003
+4002,task1,04/01/2003,04/30/2003
+4002,task2,05/01/2003,
+</code></pre>
+
+<p>You can read the <code>CSV</code> file into a <code>json</code> value with the <code>csv_reader</code>.</p>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> jsoncons::csv::csv_parameters;
+<span class="pl-k">using</span> jsoncons::csv::csv_reader;
+<span class="pl-k">using</span> jsoncons::json_decoder;
+
+std::fstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>tasks.csv<span class="pl-pds">"</span></span>);
+
+json_decoder&lt;json&gt; decoder;
+
+csv_parameters params;
+params.assume_header(<span class="pl-c1">true</span>)
+      .trim(<span class="pl-c1">true</span>)
+      .ignore_empty_values(<span class="pl-c1">true</span>)
+      .column_types({<span class="pl-s"><span class="pl-pds">"</span>integer<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>});
+
+csv_reader <span class="pl-en">reader</span>(is,decoder,params);
+reader.read();
+json val = encoder.get_result();
+
+std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>:<span class="pl-c1">4001</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_finish<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>01/31/2003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>task1<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>01/01/2003<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>:<span class="pl-c1">4001</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_finish<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>02/28/2003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>task2<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>02/01/2003<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>:<span class="pl-c1">4001</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_finish<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>03/31/2003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>task3<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>03/01/2003<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>:<span class="pl-c1">4002</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_finish<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>04/30/2003<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>task1<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>04/01/2003<span class="pl-pds">"</span></span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>project_id<span class="pl-pds">"</span></span>:<span class="pl-c1">4002</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>task2<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>05/01/2003<span class="pl-pds">"</span></span>
+    }
+]</pre></div>
+
+<p>There are a few things to note about the effect of the parameter settings.</p>
+
+<ul>
+<li>
+<code>assume_header</code> <code>true</code> tells the csv parser to parse the first line of the file for column names, which become object member names.</li>
+<li>
+<code>trim</code> <code>true</code> tells the parser to trim leading and trailing whitespace, in particular, to remove the leading whitespace in the column names.</li>
+<li>
+<code>ignore_empty_values</code> <code>true</code> causes the empty last value in the <code>task_finish</code> column to be omitted.</li>
+<li>The <code>column_types</code> setting specifies that column one ("project_id") contains integers and the remaining columns strings.</li>
+</ul>
+
+<h3>Pretty print<a name="Prettyprint"></a>
+</h3>
+
+<p>The <code>pretty_print</code> function applies stylistic formatting to JSON text. For example</p>
+
+<div class="highlight highlight-source-c++"><pre>    json val;
+
+    val[<span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>] = json::array{<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>};
+    val[<span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>] = json::array{<span class="pl-c1">1</span>, <span class="pl-c1">0</span>, <span class="pl-c1">1</span>};
+    val[<span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>] = json::array{<span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">1</span>, <span class="pl-c1">1</span>};
+
+    std::cout &lt;&lt; pretty_print(val) &lt;&lt; std::endl;</pre></div>
+
+<p>produces</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>],
+    <span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>: [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>],
+    <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>]
+}</pre></div>
+
+<p>By default, within objects, arrays of scalar values are displayed on the same line.</p>
+
+<p>The <code>pretty_print</code> function takes an optional second parameter, <a href="https://github.com/danielaparker/jsoncons/wiki/serialization_options">serialization_options</a>, that allows custom formatting of output.<br>
+To display the array scalar values on a new line, set the <code>object_array_split_lines</code> property to <code>line_split_kind::new_line</code>. The code</p>
+
+<div class="highlight highlight-source-c++"><pre>serialization_options format;
+format.object_array_split_lines(line_split_kind::new_line);
+std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
+
+<p>produces</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">1</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">1</span>
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>
+    ]
+}</pre></div>
+
+<p>To display the elements of array values on multiple lines, set the <code>object_array_split_lines</code> property to <code>line_split_kind::multi_line</code>. The code</p>
+
+<div class="highlight highlight-source-c++"><pre>serialization_options format;
+format.object_array_split_lines(line_split_kind::multi_line);
+std::cout &lt;&lt; pretty_print(val,format) &lt;&lt; std::endl;</pre></div>
+
+<p>produces</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>normals<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">1</span>,
+        <span class="pl-c1">0</span>,
+        <span class="pl-c1">1</span>
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>uvs<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">0</span>,
+        <span class="pl-c1">0</span>,
+        <span class="pl-c1">1</span>,
+        <span class="pl-c1">1</span>
+    ],
+    <span class="pl-s"><span class="pl-pds">"</span>verts<span class="pl-pds">"</span></span>: [
+        <span class="pl-c1">1</span>,
+        <span class="pl-c1">2</span>,
+        <span class="pl-c1">3</span>
+    ]
+}</pre></div>
+
+<h3>Filters<a name="Filters"></a>
+</h3>
+
+<p>You can rename object member names with the built in filter <a href="https://github.com/danielaparker/jsoncons/wiki/rename_name_filter">rename_name_filter</a></p>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sstream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_filter.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::string s = <span class="pl-s"><span class="pl-pds">R"(</span>{"first":1,"second":2,"fourth":3,"fifth":4}<span class="pl-pds">)"</span></span>;    
+
+    json_serializer <span class="pl-smi">serializer</span>(std::cout);
+
+    <span class="pl-c">// Filters can be chained</span>
+    rename_name_filter <span class="pl-smi">filter2</span>(<span class="pl-s"><span class="pl-pds">"</span>fifth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, serializer);
+    rename_name_filter <span class="pl-smi">filter1</span>(<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>, filter2);
+
+    <span class="pl-c">// A filter can be passed to any function that takes</span>
+    <span class="pl-c">// a json_input_handler ...</span>
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span>;
+    std::istringstream <span class="pl-smi">is</span>(s);
+    json_reader <span class="pl-smi">reader</span>(is, filter1);
+    reader.<span class="pl-c1">read</span>();
+    std::cout &lt;&lt; std::endl;
+
+    <span class="pl-c">// or a json_output_handler    </span>
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span>;
+    ojson j = <span class="pl-c1">ojson::parse</span>(s);
+    j.<span class="pl-c1">write</span>(filter1);
+    std::cout &lt;&lt; std::endl;
+}</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}
+(<span class="pl-c1">2</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}</pre></div>
+
+<p>Or define and use your own filters. See <a href="https://github.com/danielaparker/jsoncons/wiki/json_filter">json_filter</a> for details.</p>
+
+<h3>JsonPath<a name="JsonPath"></a>
+</h3>
+
+<p><a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> is an XPATH inspired query language for selecting parts of a JSON structure.</p>
+
+<p>Example JSON file (store.json):</p>
+
+<div class="highlight highlight-source-json"><pre>{ <span class="pl-s"><span class="pl-pds">"</span>store<span class="pl-pds">"</span></span>: {
+    <span class="pl-s"><span class="pl-pds">"</span>book<span class="pl-pds">"</span></span>: [ 
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>
+      },
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>
+      },
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0-553-21311-3<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.99</span>
+      },
+      { <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>J. R. R. Tolkien<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0-395-19395-8<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">22.99</span>
+      }
+    ]
+  }
+}</pre></div>
+
+<p>JsonPath examples:</p>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> jsoncons::jsonpath::json_query;
+
+json root = json::parse_file(<span class="pl-s"><span class="pl-pds">"</span>store.json<span class="pl-pds">"</span></span>);
+
+<span class="pl-c">// The authors of books that are cheaper than $10</span>
+json result1 = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.price &lt; 10)].author<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; result1 &lt;&lt; std::endl;
+
+<span class="pl-c">// The number of books</span>
+json result2 = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..book.length<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; result2 &lt;&lt; std::endl;
+
+<span class="pl-c">// The third book</span>
+json result3 = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..book[2]<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; pretty_print(result3) &lt;&lt; std::endl;
+
+<span class="pl-c">// All books whose author's name starts with Evelyn</span>
+json result4 = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.author =~ /Evelyn.*?/)]<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; pretty_print(result4) &lt;&lt; std::endl;
+
+<span class="pl-c">// The titles of all books that have isbn number</span>
+json result5 = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..book[?(@.isbn)].title<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; result5 &lt;&lt; std::endl;
+
+<span class="pl-c">// All authors and titles of books</span>
+json result6 = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$['store']['book']..['author','title']<span class="pl-pds">"</span></span>);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; pretty_print(result6) &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) [<span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">2</span>) [<span class="pl-c1">4</span>]
+(<span class="pl-c1">3</span>)
+[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>isbn<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>0-553-21311-3<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.99</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>
+    }
+]
+(<span class="pl-c1">4</span>)
+[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>
+    }
+]
+(<span class="pl-c1">5</span>) [<span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>]
+(<span class="pl-c1">6</span>)
+[
+    <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>Moby Dick<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>J. R. R. Tolkien<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>
+]</pre></div>
+
+<h3>About jsoncons::json<a name="Aboutjsonconsjson"></a>
+</h3>
+
+<p>The <a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> as the character type<br>
+and sorts object members in alphabetically order.</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
+                   JsonTraits = json_traits&lt;<span class="pl-k">char</span>&gt;,
+                   Allocator = std::allocator&lt;<span class="pl-k">char</span>&gt;&gt; json;</pre></div>
+
+<p>If you prefer to retain the original insertion order, use <a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> instead.</p>
+
+<p>The library includes an instantiation for wide characters as well, <a href="https://github.com/danielaparker/jsoncons/wiki/wjson">wjson</a></p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">typedef</span> basic_json&lt;<span class="pl-c1">wchar_t</span>,
+                   JsonTraits = json_traits&lt;<span class="pl-c1">wchar_t</span>&gt;,
+                   Allocator = std::allocator&lt;<span class="pl-c1">wchar_t</span>&gt;&gt; wjson;</pre></div>
+
+<p>If you prefer to retain the original insertion order, use <a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a> instead.</p>
+
+<p>Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost <a href="http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html">fast_pool_allocator</a>:</p>
+
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/pool/pool_alloc.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">typedef</span> jsoncons::basic_json&lt;<span class="pl-k">char</span>, boost::fast_pool_allocator&lt;<span class="pl-k">char</span>&gt;&gt; myjson;
+
+myjson o;
+
+o.set(<span class="pl-s"><span class="pl-pds">"</span>FirstName<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Joe<span class="pl-pds">"</span></span>);
+o.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Smith<span class="pl-pds">"</span></span>);</pre></div>
+
+<p>This results in a json value being constucted with all memory being allocated from the boost memory pool. (In this particular case there is no improvement in performance over <code>std::allocator</code>.)</p>
+
+<p>Note that the underlying memory pool used by the <code>boost::fast_pool_allocator</code> is never freed. </p>
+
+<h3>Wide character support<a name="Widecharactersupport"></a>
+</h3>
+
+<p>jsoncons supports wide character strings and streams with <code>wjson</code> and <code>wjson_reader</code>. It supports <code>UTF16</code> encoding if <code>wchar_t</code> has size 2 (Windows) and <code>UTF32</code> encoding if <code>wchar_t</code> has size 4. You can construct a <code>wjson</code> value in exactly the same way as a <code>json</code> value, for instance:</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> jsoncons::wjson;
+
+wjson root;
+root[<span class="pl-s"><span class="pl-pds">L"</span>field1<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">L"</span>test<span class="pl-pds">"</span></span>;
+root[<span class="pl-s"><span class="pl-pds">L"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">3.9</span>;
+root[<span class="pl-s"><span class="pl-pds">L"</span>field3<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
+
+std::wcout &lt;&lt; root &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
+
+<p>which prints</p>
+
+<div class="highlight highlight-source-c++"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-c1">3.9</span>,<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>}</pre></div>
+
+<h3>ojson and owjson<a name="ojsonandowjson"></a>
+</h3>
+
+<p>The <a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> (<a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a>) class is an instantiation of the <code>basic_json</code> class template that uses <code>char</code> (<code>wchar_t</code>) as the character type and keeps object members in their original order. </p>
+
+<div class="highlight highlight-source-c++"><pre>ojson o = ojson::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "street_number" : "100",</span>
+<span class="pl-s">    "street_name" : "Queen St W",</span>
+<span class="pl-s">    "city" : "Toronto",</span>
+<span class="pl-s">    "country" : "Canada"</span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
+
+std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<p>Insert "postal_code" at end</p>
+
+<div class="highlight highlight-source-c++"><pre>o.set(<span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>);
+
+std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<p>Insert "province" before "country"</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">auto</span> it = o.find(<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>);
+o.set(it,<span class="pl-s"><span class="pl-pds">"</span>province<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Ontario<span class="pl-pds">"</span></span>);
+
+std::cout &lt;&lt; pretty_print(o) &lt;&lt; std::endl;</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>street_number<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>street_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Queen St W<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>province<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Ontario<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>postal_code<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>M5H 2N2<span class="pl-pds">"</span></span>
+}</pre></div>
+
+<h3>Convert <code>json</code> to/from user defined type<a name="Convertjsontofromuserdefinedtype"></a>
+</h3>
+
+<p>In the json class, constructors, accessors and modifiers are templated, for example,</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+<span class="pl-en">json</span>(<span class="pl-k">const</span> T&amp; val)
+
+template&lt;class T&gt;
+bool is() <span class="pl-k">const</span>
+
+template&lt;class T&gt;
+T as() <span class="pl-k">const</span>
+
+template &lt;class T&gt;
+basic_json&amp; operator=(<span class="pl-k">const</span> T&amp; val)
+
+template &lt;class T&gt;
+void add(<span class="pl-k">const</span> T&amp; val)</pre></div>
+
+<p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
+
+<p>This <code>json_type_traits</code> template is extensible, you, the user, can extend <code>json_type_traits</code> in the <code>jsoncons</code> namespace with your own types. <br>
+For example, you can provide a specialization of <code>json_type_traits</code> for a <code>book</code> class, and then transfer book objects or<br>
+standard library collections of book objects to and from <code>json</code> values.</p>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">struct</span> <span class="pl-en">book</span>
+{
+    std::string author;
+    std::string title;
+    <span class="pl-k">double</span> price;
+};
+
+<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>
+{
+    <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
+    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json, book&gt;
+    {
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; rhs) <span class="pl-k">noexcept</span>
+        {
+            <span class="pl-k">return</span> rhs.<span class="pl-c1">is_object</span>() &amp;&amp;
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>) &amp;&amp; 
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>) &amp;&amp; 
+                   rhs.<span class="pl-c1">has_key</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>);
+        }
+        <span class="pl-k">static</span> book <span class="pl-en">as</span>(<span class="pl-k">const</span> Json&amp; rhs)
+        {
+            book val;
+            val.<span class="pl-smi">author</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>]. <span class="pl-k">template </span>as&lt;std::string&gt;();
+            val.<span class="pl-smi">title</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>]. <span class="pl-k">template </span>as&lt;std::string&gt;();
+            val.<span class="pl-smi">price</span> = rhs[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>]. <span class="pl-k">template </span>as&lt;<span class="pl-k">double</span>&gt;();
+            <span class="pl-k">return</span> val;
+        }
+        <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> book&amp; val)
+        {
+            Json j;
+            j[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">author</span>;
+            j[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">title</span>;
+            j[<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>] = val.<span class="pl-smi">price</span>;
+            <span class="pl-k">return</span> j;
+        }
+    };
+};
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    book book1{<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>, <span class="pl-c1">25.17</span>};
+
+    json j = book1;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha &lt;&lt; j.<span class="pl-smi">is</span>&lt;book&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(j) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    book temp = j.<span class="pl-smi">as</span>&lt;book&gt;();
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; temp.<span class="pl-smi">author</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> 
+                        &lt;&lt; temp.<span class="pl-smi">title</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span> 
+                        &lt;&lt; temp.<span class="pl-smi">price</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    book book2{<span class="pl-s"><span class="pl-pds">"</span>Charles Bukowski<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Women: A Novel<span class="pl-pds">"</span></span>, <span class="pl-c1">12.0</span>};
+
+    std::vector&lt;book&gt; book_array{book1, book2};
+
+    json ja = book_array;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; std::boolalpha 
+                        &lt;&lt; ja.<span class="pl-smi">is</span>&lt;std::vector&lt;book&gt;&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(ja) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    <span class="pl-k">auto</span> book_list = ja.<span class="pl-smi">as</span>&lt;std::list&lt;book&gt;&gt;();
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6)<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
+    <span class="pl-k">for</span> (<span class="pl-k">auto</span> b : book_list)
+    {
+        std::cout &lt;&lt; b.<span class="pl-smi">author</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> 
+                  &lt;&lt; b.<span class="pl-smi">title</span> &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>, <span class="pl-pds">"</span></span> 
+                  &lt;&lt; b.<span class="pl-smi">price</span> &lt;&lt; std::endl;
+    }
+}</pre></div>
+
+<p>Output:</p>
+
+<pre><code>(1) true
+
+(2) {
+    "author": "Haruki Murakami",
+    "price": 25.17,
+    "title": "Kafka on the Shore"
+}
+
+(3) Haruki Murakami,Kafka on the Shore,25.17
+
+(4) true
+
+(5)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 12.0,
+        "title": "Women: A Novel"
+    }
+]
+
+(6)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Women: A Novel, 12
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

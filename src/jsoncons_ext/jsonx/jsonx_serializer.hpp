@@ -235,6 +235,9 @@ void escape_value(const CharT* s,
 template<class CharT>
 class basic_jsonx_serializer : public basic_json_output_handler<CharT>
 {
+public:
+    using typename basic_json_output_handler<CharT>::string_view_type                                 ;
+private:
     struct stack_item
     {
         stack_item(bool is_object)
@@ -254,9 +257,13 @@ class basic_jsonx_serializer : public basic_json_output_handler<CharT>
     std::vector<stack_item> stack_;
     std::streamsize original_precision_;
     std::ios_base::fmtflags original_format_flags_;
-    float_printer<CharT> fp_;
+    print_double<CharT> fp_;
     bool indenting_;
     int indent_;
+
+    // Noncopyable and nonmoveable
+    basic_jsonx_serializer(const basic_jsonx_serializer&) = delete;
+    basic_jsonx_serializer& operator=(const basic_jsonx_serializer&) = delete;
 public:
     basic_jsonx_serializer(std::basic_ostream<CharT>& os)
        :
@@ -432,10 +439,10 @@ private:
         stack_.pop_back();
     }
 
-    void do_name(const CharT* name, size_t length) override
+    void do_name(string_view_type name) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        stack_.back().name_ = std::basic_string<CharT>(name,length);
+        stack_.back().name_ = name;
     }
 
     void do_null_value() override
@@ -467,7 +474,7 @@ private:
                    jsonx_char_traits<CharT>::end_null_element_literal().length());
     }
 
-    void do_string_value(const CharT* val, size_t length) override
+    void do_string_value(string_view_type value) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -490,7 +497,7 @@ private:
             bos_.write(jsonx_char_traits<CharT>::string_element_literal().data(),
                        jsonx_char_traits<CharT>::string_element_literal().length());
         }
-        escape_value(val,length,options_,bos_);
+        escape_value(value.data(),value.length(),options_,bos_);
         bos_.write(jsonx_char_traits<CharT>::end_string_element_literal().data(),
                    jsonx_char_traits<CharT>::end_string_element_literal().length());
     }
@@ -532,7 +539,7 @@ private:
         }
         else
         {
-            fp_.print(value,precision,bos_);
+            fp_(value,precision,bos_);
         }
         bos_.write(jsonx_char_traits<CharT>::end_number_element_literal().data(),
                    jsonx_char_traits<CharT>::end_number_element_literal().length());

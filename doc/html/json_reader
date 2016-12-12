@@ -474,6 +474,8 @@ vertical-align:1px;
 
 <p>A <code>json_reader</code> can read a sequence of JSON texts from a stream.</p>
 
+<p><code>json_reader</code> is noncopyable and nonmoveable.</p>
+
 <h3>Header</h3>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_reader.hpp<span class="pl-pds">&gt;</span></span></pre></div>
@@ -502,10 +504,17 @@ You must ensure that the input stream and input handler exist as long as does <c
 
 <p>Returns <code>true</code> when there are no more JSON texts to be read from the stream, <code>false</code> otherwise</p>
 
+<pre><code>void read()
+</code></pre>
+
+<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
+Throws if there are any unconsumed non-whitespace characters left in the input.<br>
+Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
+
 <pre><code>void read_next()
 </code></pre>
 
-<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_encoder">json_encoder</a>.<br>
+<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>void check_done()
@@ -561,8 +570,8 @@ size_t max_nesting_depth() const
     <span class="pl-k">throw</span> <span class="pl-smi">std::runtime_error</span>(<span class="pl-s"><span class="pl-pds">"</span>Cannot open file<span class="pl-pds">"</span></span>);
 }
 
-json_encoder&lt;json&gt; encoder;
-json_reader <span class="pl-en">reader</span>(is,encoder);
+json_decoder&lt;json&gt; decoder;
+json_reader <span class="pl-en">reader</span>(is,decoder);
 
 <span class="pl-k">while</span> (!reader.eof())
 {

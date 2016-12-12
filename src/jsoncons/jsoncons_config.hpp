@@ -22,12 +22,14 @@
 // Uncomment the following line to suppress deprecated names (recommended for new code)
 //#define JSONCONS_NO_DEPRECATED
 
-#define JSONCONS_NO_MACRO_EXP
-
 namespace jsoncons
 {
 
-// Follow boost
+//#define JSONCONS_HAS_STRING_VIEW
+
+#if defined(ANDROID) || defined(__ANDROID__)
+#define JSONCONS_HAS_STRTOD_L
+#endif
 
 #if defined (__clang__)
 #if defined(_GLIBCXX_USE_NOEXCEPT)
@@ -48,7 +50,7 @@ namespace jsoncons
 #endif
 
 #if defined(_MSC_VER)
-#define JSONCONS_HAS__ECVT_S
+//#define JSONCONS_HAS__ECVT_S
 #define JSONCONS_HAS_FOPEN_S
 #define JSONCONS_HAS_WCSTOMBS_S
 #if _MSC_VER >= 1900

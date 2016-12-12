@@ -469,11 +469,8 @@ vertical-align:1px;
 </head>
 <body>
 <h2>Examples</h2>
-
 <p>The examples below illustrate the use of the <a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> class and <a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a> function.</p>
-
 <h3>json construction</h3>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-c">// For convenience</span>
@@ -561,11 +558,11 @@ std::cout &lt;&lt; book1 &lt;&lt; <span class="pl-s"><span class="pl-pds">"</spa
 json&amp; book = booklist[<span class="pl-c1">1</span>];
 
 <span class="pl-c">//Loop through the book's name-value pairs using a range-based for loop    </span>
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.object_range())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; kvp : book.object_range())
 {
-    std::cout &lt;&lt; member.<span class="pl-c1">key</span>()
+    std::cout &lt;&lt; kvp.<span class="pl-c1">key</span>()
               &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>
-              &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+              &lt;&lt; kvp.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 }
 
 <span class="pl-k">auto</span> it = book.find(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>);
@@ -598,13 +595,10 @@ book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds"
 <span class="pl-c">// Delete one-star ratings</span>
 book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds">"</span></span>].erase(<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>);
 </pre></div>
-
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-c">// Serialize the booklist to a file</span>
     std::ofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist.json<span class="pl-pds">"</span></span>);
     os &lt;&lt; pretty_print(booklist);</pre></div>
-
 <p>The JSON output <code>booklist.json</code></p>
-
 <div class="highlight highlight-source-json"><pre>[
     {
         <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,
@@ -643,9 +637,7 @@ book[<span class="pl-s"><span class="pl-pds">"</span>ratings<span class="pl-pds"
         <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>
     }
 ]</pre></div>
-
 <h3>json query</h3>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
@@ -684,9 +676,7 @@ std::cout &lt;&lt; result &lt;&lt; std::endl;
 <span class="pl-c">// (6) All authors and titles of books</span>
 result = json_query(booklist, <span class="pl-s"><span class="pl-pds">"</span>$..['author','title']<span class="pl-pds">"</span></span>);
 std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;</pre></div>
-
 <p>Result:</p>
-
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) [<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>]
 (<span class="pl-c1">2</span>) [<span class="pl-c1">4</span>]
 (<span class="pl-c1">3</span>)
@@ -713,11 +703,8 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;</pre></div>
     <span class="pl-s"><span class="pl-pds">"</span>J. R. R. Tolkien<span class="pl-pds">"</span></span>,
     <span class="pl-s"><span class="pl-pds">"</span>The Lord of the Rings<span class="pl-pds">"</span></span>
 ]</pre></div>
-
 <h2>Once again, this time with wide characters</h2>
-
 <h3>wjson construction</h3>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-c">// For convenience</span>
@@ -804,11 +791,11 @@ std::wcout &lt;&lt; book1 &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</s
 wjson&amp; book = booklist[<span class="pl-c1">1</span>];
 
 <span class="pl-c">//Loop through the book's name-value pairs using a range-based for loop    </span>
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; member : book.object_range())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; kvp : book.object_range())
 {
-    std::wcout &lt;&lt; member.<span class="pl-c1">key</span>()
+    std::wcout &lt;&lt; kvp.<span class="pl-c1">key</span>()
                &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span>,<span class="pl-pds">"</span></span>
-               &lt;&lt; member.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+               &lt;&lt; kvp.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 }
 
 <span class="pl-k">auto</span> it = book.find(<span class="pl-s"><span class="pl-pds">L"</span>author<span class="pl-pds">"</span></span>);
@@ -841,13 +828,10 @@ book[<span class="pl-s"><span class="pl-pds">L"</span>ratings<span class="pl-pds
 <span class="pl-c">// Delete one-star ratings</span>
 book[<span class="pl-s"><span class="pl-pds">L"</span>ratings<span class="pl-pds">"</span></span>].erase(<span class="pl-s"><span class="pl-pds">L"</span>*<span class="pl-pds">"</span></span>);
 </pre></div>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-c">// Serialize the booklist to a file</span>
 std::wofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
 os &lt;&lt; pretty_print(booklist);</pre></div>
-
 <h3>wjson query</h3>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-c">// Deserialize the booklist</span>
 std::wifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>booklist2.json<span class="pl-pds">"</span></span>);
 wjson booklist;
@@ -878,9 +862,7 @@ std::wcout &lt;&lt; result &lt;&lt; std::endl;
 <span class="pl-c">// (6) All authors and titles of books</span>
 result = json_query(booklist, <span class="pl-s"><span class="pl-pds">L"</span>$..['author','title']<span class="pl-pds">"</span></span>);
 std::wcout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;</pre></div>
-
 <p>Result:</p>
-
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) [<span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>]
 (<span class="pl-c1">2</span>) [<span class="pl-c1">4</span>]
 (<span class="pl-c1">3</span>)

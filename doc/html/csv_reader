@@ -472,6 +472,8 @@ vertical-align:1px;
 
 <p>The <code>csv_reader</code> class is an instantiation of the <code>basic_csv_reader</code> class template that uses <code>char</code> as the character type. It reads a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a> and produces JSON parse events.</p>
 
+<p><code>csv_reader</code> is noncopyable and nonmoveable.</p>
+
 <h3>Header</h3>
 
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">&gt;</span></span></pre></div>
@@ -530,7 +532,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 <pre><code>void read()
 </code></pre>
 
-<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_encoder">json_encoder</a>.<br>
+<p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
 
 <pre><code>size_t buffer_capacity() const
@@ -563,9 +565,9 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_encoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; decoder;
 
-csv_reader <span class="pl-en">reader</span>(is,encoder);
+csv_reader <span class="pl-en">reader</span>(is,decoder);
 reader.read();
 json countries = encoder.get_result();
 
@@ -605,12 +607,12 @@ Dependable, trustworthy"
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>employees.txt<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_encoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; decoder;
 csv_parameters params;
 params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\t</span><span class="pl-pds">'</span></span>
       .assume_header = <span class="pl-c1">true</span>;
 
-csv_reader <span class="pl-en">reader</span>(is,encoder,params);
+csv_reader <span class="pl-en">reader</span>(is,decoder,params);
 reader.read();
 json employees = encoder.get_result();
 
@@ -662,13 +664,13 @@ std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;</pre></div>
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_encoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; decoder;
 
 csv_parameters params;
 params.column_names({<span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>})
       .header_lines(<span class="pl-c1">1</span>);
 
-csv_reader <span class="pl-en">reader</span>(is,encoder,params);
+csv_reader <span class="pl-en">reader</span>(is,decoder,params);
 reader.read();
 json countries = encoder.get_result();
 

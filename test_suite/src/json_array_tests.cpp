@@ -71,7 +71,16 @@ BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list3)
     val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
     val["data"]["item"] = json::array{json::object{{"first",1},{"second",2}}};
 
-    std::cout << val << std::endl;
+    json expected_id = json::parse(R"(
+[0,1,2,3,4,5,6,7]
+    )");
+
+    json expected_item = json::parse(R"(
+    [{"first":1,"second":2}]
+    )");
+
+    BOOST_CHECK(expected_id == val["data"]["id"]);
+    BOOST_CHECK(expected_item == val["data"]["item"]);
 }
 
 BOOST_AUTO_TEST_CASE(test_assign_initializer_list_of_object)
@@ -116,7 +125,7 @@ BOOST_AUTO_TEST_CASE(test_array_constructor)
 
 BOOST_AUTO_TEST_CASE(test_make_array)
 {
-    json arr = json::make_array();
+    json arr = json::array();
     BOOST_CHECK(arr.size() == 0);
     arr.resize(10,10.0);
     BOOST_CHECK(arr.is_array());
@@ -127,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test_make_array)
 
 BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 {
-    json arr = json::make_array();
+    json arr = json::array();
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
@@ -143,7 +152,7 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 
 BOOST_AUTO_TEST_CASE(test_array_add_pos)
 {
-    json arr = json::make_array();
+    json arr = json::array();
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
@@ -159,7 +168,7 @@ BOOST_AUTO_TEST_CASE(test_array_add_pos)
 
 BOOST_AUTO_TEST_CASE(test_array_erase_range)
 {
-    json arr = json::make_array();
+    json arr = json::array();
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.is<json::array>());
     arr.add("Toronto");
@@ -194,7 +203,7 @@ BOOST_AUTO_TEST_CASE(test_object_erase_range)
 
 BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 {
-    json cities = json::make_array();
+    json cities = json::array();
     BOOST_CHECK(cities.is_array());
     BOOST_CHECK(cities.is<json::array>());
     cities.reserve(10);  // storage is allocated

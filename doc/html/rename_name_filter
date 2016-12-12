@@ -468,7 +468,43 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>An error occurred while processing GitHub Flavored Markdown.</p><p><strong>The underlying connection was closed: A connection that was expected to be kept alive was closed by the server.</strong></p><p>If the problem persists, please report the bug.</p>
+<pre><code>jsoncons::rename_name_filter
+
+typedef basic_rename_name_filter&lt;char&gt; rename_name_filter;
+</code></pre>
+<p>The <code>rename_name_filter</code> class is an instantiation of the <code>basic_rename_name_filter</code> class template that uses <code>char</code> as the character type.</p>
+<p>Renames object member names.</p>
+<h3>Header</h3>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_filter.hpp<span class="pl-pds">&gt;</span></span></pre></div>
+<h3>Base classes</h3>
+<p><a href="json_filter">json_filter</a></p>
+<h3>Constructors</h3>
+<pre><code>rename_name_filter(const std::string&amp; name,
+                   const std::string&amp; new_name,
+                   json_output_handler&amp; handler)
+
+rename_name_filter(const std::string&amp; name,
+                   const std::string&amp; new_name,
+                   json_input_handler&amp; handler)
+</code></pre>
+<h2>Examples</h2>
+<h3>Rename object member names</h3>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_filter.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    ojson j = <span class="pl-c1">ojson::parse</span>(<span class="pl-s"><span class="pl-pds">R"(</span>{"first":1,"second":2,"fourth":3}<span class="pl-pds">)"</span></span>);
+
+    json_serializer <span class="pl-smi">serializer</span>(std::cout);
+
+    rename_name_filter <span class="pl-smi">filter</span>(<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>,serializer);
+    j.<span class="pl-c1">write</span>(filter);
+}</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>}</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

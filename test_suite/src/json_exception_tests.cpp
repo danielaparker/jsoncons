@@ -53,11 +53,6 @@ BOOST_AUTO_TEST_CASE(test_array_at)
     a.resize(3);
     BOOST_REQUIRE_THROW(a.at(3), std::out_of_range);
     BOOST_REQUIRE_THROW(static_cast<const json&>(a).at(3), std::out_of_range);
-
-    json b;
-    b["key1"] = "value1";
-    BOOST_REQUIRE_THROW(b.at(0), std::runtime_error);
-    BOOST_REQUIRE_THROW(static_cast<const json&>(b).at(0), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_object_set)
@@ -81,13 +76,6 @@ BOOST_AUTO_TEST_CASE(test_object_index)
 
     b["key1"] = "value1";
     BOOST_REQUIRE_THROW(b["key2"].as<std::string>(), std::out_of_range);
-}
-
-BOOST_AUTO_TEST_CASE(test_array_index)
-{
-    json b;
-    b["key1"] = "value1";
-    BOOST_REQUIRE_THROW(b[0], std::runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

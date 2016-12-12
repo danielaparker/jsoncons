@@ -2,7 +2,7 @@
 
 - Enhanced support for stateful allocators
 
-- Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) 
+- Add extensions for reading from and serializing to [MessagePack](http://msgpack.org/index.html) binary format 
 
-- Revisit error codes, parsing_context, and opportunities for error recovery. Attempt to support [json 5](http://json5.org/) behaviour through an parse_error_handler and a json_filter.
+- Revisit error codes, parsing_context, and opportunities for error recovery. 
 

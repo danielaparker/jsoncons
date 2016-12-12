@@ -472,9 +472,11 @@ vertical-align:1px;
 
 <p>The <code>csv_serializer</code> class is an instantiation of the <code>basic_csv_serializer</code> class template that uses <code>char</code> as the character type.  It implements <a href="json_output_handler">json_output_handler</a> and supports formatting a JSON value as a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a>.</p>
 
+<p><code>csv_serializer</code> is noncopyable and nonmoveable.</p>
+
 <h3>Header</h3>
 
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons_ext/csv/csv_serializer.hpp<span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_serializer.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 
 <h3>Constructors</h3>
 
@@ -525,9 +527,9 @@ You must ensure that the output stream exists as long as does <code>csv_serializ
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>input/countries.json<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_encoder&lt;json&gt; encoder;
-json_reader <span class="pl-en">reader</span>(is,encoder);
-reader.read_next();
+json_decoder&lt;json&gt; decoder;
+json_reader <span class="pl-en">reader</span>(is,decoder);
+reader.read();
 json countries = encoder.get_result();
 
 csv_serializer <span class="pl-en">serializer</span>(std::cout);
@@ -590,12 +592,12 @@ WLF,WALLIS &amp; FUTUNA ISLANDS
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>input/employees.json<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
-json_encoder&lt;json&gt; encoder;
+json_decoder&lt;json&gt; decoder;
 csv_parameters params;
 params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\t</span><span class="pl-pds">'</span></span>;
 
-json_reader <span class="pl-en">reader</span>(is,encoder);
-reader.read_next();
+json_reader <span class="pl-en">reader</span>(is,decoder);
+reader.read();
 json employees = encoder.get_result();
 
 csv_serializer <span class="pl-en">serializer</span>(std::cout,params);

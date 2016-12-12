@@ -54,7 +54,7 @@ private:
     void dealloc(void* storage) {free(storage);} 
 public: 
     pool(size_t size)
-        : offset_(0), size_(size) 
+        : offset_(0), size_(size), allocate_count_(0), deallocate_count_(0), construct_count_(0)  
     { 
         head_ = curr_ = add_node(); 
     } 
@@ -87,6 +87,10 @@ public:
         offset_ += mem_size; 
         return pv; 
     }
+
+    size_t allocate_count_;
+    size_t deallocate_count_;
+    size_t construct_count_;
 }; 
 
 template<class T> 
@@ -105,11 +109,12 @@ public:
     {
         typedef pool_allocator<U> other;
     }; 
-    pool_allocator(pool* pp) throw() : pool_ptr_(pp) 
+    pool_allocator(pool* pp) throw() 
+        : pool_ptr_(pp)
     {
     } 
     pool_allocator(const pool_allocator& s) throw() 
-        : pool_ptr_(s.pool_ptr_) 
+        : pool_ptr_(s.pool_ptr_)
     {
     } 
     template<typename U> 
@@ -130,19 +135,22 @@ public:
     } 
     pointer allocate(size_type n, const void* = 0) 
     {
+        ++pool_ptr_->allocate_count_;
         return static_cast<T*>(pool_ptr_->allocate(n * sizeof(T)));
     } 
     void deallocate(pointer, size_type) 
     {
+        ++pool_ptr_->deallocate_count_;
     }
     size_type max_size() const throw() 
     {
         return size_t(-1) / sizeof(T);
     } 
-    void construct(pointer p, const T& val) 
+    /*void construct(pointer p, Args&&... args) 
     {
-        ::new(p) T(val);
-    } 
+        ::new(p) T(std::forward<Args>(args)...);
+        pool_ptr_->construct_count_;
+    }*/
     void destroy(pointer p) 
     {
         p->~T();
@@ -161,31 +169,18 @@ bool operator!=(const pool_allocator<T> &s0, const pool_allocator<T> &s1)
     return s0.pool_ptr_ != s1.pool_ptr_;
 }
 
-BOOST_AUTO_TEST_CASE(test_allocator)
+BOOST_AUTO_TEST_CASE(test_string_allocation)
 {
     pool a_pool(1024);
-    pool_allocator<json> a_pool_allocator(&a_pool); 
+    pool_allocator<json> allocator(&a_pool); 
 
     typedef basic_json<char,json_traits<char>,pool_allocator<json>> myjson;
-    myjson::array an_array = myjson::array(a_pool_allocator);
-    myjson::object an_object = myjson::object(a_pool_allocator);
 
-    myjson root = an_object;
-    root.reserve(1);
-
-    /*root.set("field1", 10.0);
-    root.set("field2", 20.0);
-
-    auto it = root.find("field1");
-
-    std::cout << it->key() << std::endl;
-    if (it != root.object_range().end())
     {
-        myjson& val = it->value();
-    }*/
-   
-    //BOOST_CHECK_EQUAL(10.0,root["field1"]);
-    //BOOST_CHECK_EQUAL(20.0,root.get("field1",0));
-    //std::cout << root << std::endl; 
+        myjson j("String too long for short string", allocator);
+        std::cout << "Allocate count = " << a_pool.allocate_count_ << ", construct count = " << a_pool.construct_count_ << std::endl;
+    }
+    std::cout << "Deallocate count = " << a_pool.deallocate_count_ << std::endl;
+
 }
 BOOST_AUTO_TEST_SUITE_END()

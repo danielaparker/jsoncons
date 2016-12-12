@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_ENCODER_HPP
-#define JSONCONS_JSON_ENCODER_HPP
+#ifndef JSONCONS_JSON_DECODER_HPP
+#define JSONCONS_JSON_DECODER_HPP
 
 #include <string>
 #include <sstream>
@@ -19,14 +19,18 @@
 namespace jsoncons {
 
 template <class Json>
-class json_encoder : public basic_json_input_handler<typename Json::char_type>
+class json_decoder : public basic_json_input_handler<typename Json::char_type>
 {
+public:
+    typedef typename Json::char_type char_type;
+    using typename basic_json_input_handler<char_type>::string_view_type                                 ;
+
     static const int default_stack_size = 1000;
 
     typedef Json json_type;
-    typedef typename Json::char_type char_type;
-    typedef typename Json::member_type member_type;
+    typedef typename Json::kvp_type  kvp_type ;
     typedef typename Json::string_type string_type;
+    typedef typename Json::key_type key_type;
     typedef typename string_type::allocator_type char_allocator;
     typedef typename Json::allocator_type allocator_type;
     typedef typename Json::array array;
@@ -43,26 +47,26 @@ class json_encoder : public basic_json_input_handler<typename Json::char_type>
 
     struct stack_item
     {
-        string_type name_;
+        key_type name_;
         Json value_;
     };
     std::vector<stack_item> stack_;
-    std::vector<size_t> stack2_;
+    std::vector<size_t> stack_offsets_;
     bool is_valid_;
 
 public:
-    json_encoder(const char_allocator& sa = char_allocator(),
+    json_decoder(const char_allocator& sa = char_allocator(),
                             const allocator_type& allocator = allocator_type())
         : sa_(sa),
           oa_(allocator),
           aa_(allocator),
           top_(0),
           stack_(default_stack_size),
-          stack2_(),
+          stack_offsets_(),
           is_valid_(false) 
 
     {
-        stack2_.reserve(100);
+        stack_offsets_.reserve(100);
     }
 
     bool is_valid() const
@@ -103,7 +107,7 @@ private:
 
     void push_object()
     {
-        stack2_.push_back(top_);
+        stack_offsets_.push_back(top_);
         stack_[top_].value_ = object(oa_);
         if (++top_ >= stack_.size())
         {
@@ -113,13 +117,13 @@ private:
 
     void pop_object()
     {
-        stack2_.pop_back();
+        stack_offsets_.pop_back();
         JSONCONS_ASSERT(top_ > 0);
     }
 
     void push_array()
     {
-        stack2_.push_back(top_);
+        stack_offsets_.push_back(top_);
         stack_[top_].value_ = array(aa_);
         if (++top_ >= stack_.size())
         {
@@ -129,7 +133,7 @@ private:
 
     void pop_array()
     {
-        stack2_.pop_back();
+        stack_offsets_.pop_back();
         JSONCONS_ASSERT(top_ > 0);
     }
 
@@ -167,49 +171,54 @@ private:
         pop_array();
     }
 
-    static member_type move_pair(stack_item&& val)
-    {
-        return member_type(std::move(val.name_),std::move(val.value_));
-    }
-
     void end_structure() 
     {
-        JSONCONS_ASSERT(stack2_.size() > 0);
-        if (stack_[stack2_.back()].value_.is_object())
+        JSONCONS_ASSERT(stack_offsets_.size() > 0);
+        if (stack_[stack_offsets_.back()].value_.is_object())
         {
-            size_t count = top_ - (stack2_.back() + 1);
-            auto s = stack_.begin() + (stack2_.back()+1);
-            auto send = s + count;
-            stack_[stack2_.back()].value_.object_value().insert(
-                std::make_move_iterator(s),
-                std::make_move_iterator(send),
-                move_pair);
-            top_ -= count;
+            auto& j = stack_[stack_offsets_.back()].value_;
+            auto& o = j.object_value();
+
+            auto it = stack_.begin() + (stack_offsets_.back()+1);
+            auto end = stack_.begin() + top_;
+            size_t count = end - it;
+            o.reserve(count);
+            while (it < end)
+            {
+                o.bulk_insert(std::move(it->name_),
+                              std::move(it->value_));
+                ++it;
+            }
+            o.end_bulk_insert();
+
+            top_ -= count; 
         }
         else
         {
-            size_t count = top_ - (stack2_.back() + 1);
-            stack_[stack2_.back()].value_.resize(count);
+            auto& j = stack_[stack_offsets_.back()].value_;
 
-            auto s = stack_.begin() + (stack2_.back()+1);
-            auto dend = stack_[stack2_.back()].value_.array_range().end();
-            for (auto it = stack_[stack2_.back()].value_.array_range().begin();
-                 it != dend; ++it, ++s)
+            auto it = stack_.begin() + (stack_offsets_.back()+1);
+            auto end = stack_.begin() + top_;
+            size_t count = end - it;
+            j.reserve(count);
+
+            while (it != end)
             {
-                *it = std::move(s->value_);
+                j.add(std::move(it->value_));
+                ++it;
             }
             top_ -= count;
         }
     }
 
-    void do_name(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
+    void do_name(string_view_type name, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].name_ = string_type(p,length,sa_);
+        stack_[top_].name_ = key_type(name.data(),name.length(),sa_);
     }
 
-    void do_string_value(const char_type* p, size_t length, const basic_parsing_context<char_type>&) override
+    void do_string_value(string_view_type val, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value_ = Json(p,length,sa_);
+        stack_[top_].value_ = Json(val.data(),val.length(),sa_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);

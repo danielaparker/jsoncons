@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <deque>
 #include <exception>
 #include <cstdlib>
 #include <cstring>
@@ -19,77 +20,104 @@
 #include <utility>
 #include <initializer_list>
 #include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
 
-template <class Json, class Allocator>
+template <class Json>
 class json_array
 {
 public:
-    typedef Allocator allocator_type;
+    typedef typename Json::allocator_type allocator_type;
     typedef Json value_type;
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<Json> vector_allocator_type;
-    typedef typename std::vector<Json,Allocator>::reference reference;
-    typedef typename std::vector<Json,Allocator>::const_reference const_reference;
-    typedef typename std::vector<Json,Allocator>::iterator iterator;
-    typedef typename std::vector<Json,Allocator>::const_iterator const_iterator;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_array> self_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> val_allocator_type;
+
+    typedef typename Json::base_array_type base_array_type;
+
+    typedef typename base_array_type::iterator iterator;
+    typedef typename base_array_type::const_iterator const_iterator;
+
+    typedef typename std::iterator_traits<iterator>::reference reference;
+    typedef typename std::iterator_traits<const_iterator>::reference const_reference;
 
     json_array()
-        : elements_()
+        : self_allocator_(), 
+          elements_()
     {
     }
 
-    explicit json_array(const Allocator& allocator)
-        : elements_(allocator)
+    explicit json_array(const allocator_type& allocator)
+        : self_allocator_(allocator), 
+          elements_(val_allocator_type(allocator))
     {
     }
 
-    explicit json_array(size_t n, const Allocator& allocator = Allocator())
-        : elements_(n,Json(),allocator)
+    explicit json_array(size_t n, 
+                        const allocator_type& allocator = allocator_type())
+        : self_allocator_(allocator), 
+          elements_(n,Json(),val_allocator_type(allocator))
     {
     }
 
-    explicit json_array(size_t n, const Json& value, const Allocator& allocator = Allocator())
-        : elements_(n,value,allocator)
+    explicit json_array(size_t n, 
+                        const Json& value, 
+                        const allocator_type& allocator = allocator_type())
+        : self_allocator_(allocator), 
+          elements_(n,value,val_allocator_type(allocator))
     {
     }
 
     template <class InputIterator>
-    json_array(InputIterator begin, InputIterator end, const Allocator& allocator = Allocator())
-        : elements_(begin,end,allocator)
+    json_array(InputIterator begin, InputIterator end, const allocator_type& allocator = allocator_type())
+        : self_allocator_(allocator), 
+          elements_(begin,end,val_allocator_type(allocator))
     {
     }
-
     json_array(const json_array& val)
-        : elements_(val.elements_)
+        : self_allocator_(val.get_self_allocator()),
+          elements_(val.elements_)
+    {
+    }
+    json_array(const json_array& val, const allocator_type& allocator)
+        : self_allocator_(allocator), 
+          elements_(val.elements_,val_allocator_type(allocator))
     {
     }
 
-    json_array(const json_array& val, const Allocator& allocator)
-        : elements_(val.elements_,allocator)
-    {
-    }
     json_array(json_array&& val) JSONCONS_NOEXCEPT
-        : elements_(std::move(val.elements_))
+        : self_allocator_(val.get_self_allocator()), 
+          elements_(std::move(val.elements_))
     {
     }
-    json_array(json_array&& val, const Allocator& allocator)
-        : elements_(std::move(val.elements_),allocator)
+    json_array(json_array&& val, const allocator_type& allocator)
+        : self_allocator_(allocator), 
+          elements_(std::move(val.elements_),val_allocator_type(allocator))
+    {
+    }
+
+    json_array(std::initializer_list<Json> init)
+        : self_allocator_(), 
+          elements_(std::move(init))
     {
     }
 
     json_array(std::initializer_list<Json> init, 
-               const Allocator& allocator = Allocator())
-        : elements_(std::move(init),allocator)
+               const allocator_type& allocator)
+        : self_allocator_(allocator), 
+          elements_(std::move(init),val_allocator_type(allocator))
+    {
+    }
+    ~json_array()
     {
     }
 
-    Allocator get_allocator() const
+    self_allocator_type get_self_allocator() const
     {
-        return elements_.get_allocator();
+        return self_allocator_;
     }
 
-    void swap(json_array<Json,Allocator>& val)
+    void swap(json_array<Json>& val)
     {
         elements_.swap(val.elements_);
     }
@@ -131,37 +159,37 @@ public:
 
     const Json& operator[](size_t i) const {return elements_[i];}
 
-    template <class T>
+    template <class T, class U=allocator_type,
+             typename std::enable_if<is_stateless<U>::value
+                >::type* = nullptr>
     void add(T&& value)
     {
-        elements_.emplace_back(std::forward<T&&>(value));
+        elements_.emplace_back(Json(std::forward<T&&>(value)));
     }
 
-    void add(size_t index, const Json& value)
+    template <class T, class U=allocator_type,
+             typename std::enable_if<!is_stateless<U>::value
+                >::type* = nullptr>
+    void add(T&& value)
     {
-        auto position = index < elements_.size() ? elements_.begin() + index : elements_.end();
-        elements_.insert(position, value);
-    }
-
-    void add(size_t index, Json&& value)
-    {
-        auto it = index < elements_.size() ? elements_.begin() + index : elements_.end();
-        elements_.insert(it, std::forward<Json&&>(value));
+        elements_.emplace_back(std::forward<T&&>(value),get_self_allocator());
     }
 
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
-    template <class T>
-    iterator add(const_iterator pos, T&& value)
+    template <class T, class U=allocator_type>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.emplace(it, std::forward<T&&>(value));
+        return elements_.emplace(it, Json(std::forward<T&&>(value)));
     }
 #else
-    template <class T>
-    iterator add(const_iterator pos, T&& value)
+    template <class T, class U=allocator_type>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    add(const_iterator pos, T&& value)
     {
-        return elements_.emplace(pos, std::forward<T&&>(value));
+        return elements_.emplace(pos, Json(std::forward<T&&>(value)));
     }
 #endif
 
@@ -173,7 +201,7 @@ public:
 
     const_iterator end() const {return elements_.end();}
 
-    bool operator==(const json_array<Json,Allocator>& rhs) const
+    bool operator==(const json_array<Json>& rhs) const
     {
         if (size() != rhs.size())
         {
@@ -189,8 +217,10 @@ public:
         return true;
     }
 private:
-    json_array& operator=(const json_array<Json,Allocator>&);
-    std::vector<Json,Allocator> elements_;
+    self_allocator_type self_allocator_;
+    base_array_type elements_;
+
+    json_array& operator=(const json_array<Json>&) = delete;
 };
 
 }
