@@ -23,7 +23,10 @@ template <class CharT>
 struct json_traits
 {
     template <class T,class Allocator>
-    using base_container_type = std::vector<T,Allocator>;
+    using base_object_type = std::vector<T,Allocator>;
+
+    template <class T,class Allocator>
+    using base_array_type = std::vector<T,Allocator>;
 
     typedef typename std::char_traits<CharT> char_traits_type;
 
@@ -36,7 +39,10 @@ template <class CharT>
 struct o_json_traits 
 {
     template <class T,class Allocator>
-    using base_container_type = std::vector<T,Allocator>;
+    using base_object_type = std::vector<T,Allocator>;
+
+    template <class T,class Allocator>
+    using base_array_type = std::vector<T,Allocator>;
 
     typedef typename std::char_traits<CharT> char_traits_type;
 

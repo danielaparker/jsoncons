@@ -177,15 +177,20 @@ private:
         if (stack_[stack_offsets_.back()].value_.is_object())
         {
             auto& j = stack_[stack_offsets_.back()].value_;
+            auto& o = j.object_value();
 
-            size_t count = top_ - (stack_offsets_.back()+1);
-            for (size_t i = stack_offsets_.back()+1; i < top_; ++i)
+            auto it = stack_.begin() + (stack_offsets_.back()+1);
+            auto end = stack_.begin() + top_;
+            size_t count = end - it;
+            o.reserve(count);
+            while (it < end)
             {
-                j.object_value().bulk_insert(std::move(stack_[i].name_),
-                                             std::move(stack_[i].value_));
+                o.bulk_insert(std::move(it->name_),
+                              std::move(it->value_));
+                ++it;
             }
-            j.object_value().end_bulk_insert();
-            
+            o.end_bulk_insert();
+
             top_ -= count; 
         }
         else

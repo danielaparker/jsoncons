@@ -33,10 +33,10 @@ public:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_array> self_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> val_allocator_type;
 
-    typedef typename Json::base_array_container_type base_array_container_type;
+    typedef typename Json::base_array_type base_array_type;
 
-    typedef typename base_array_container_type::iterator iterator;
-    typedef typename base_array_container_type::const_iterator const_iterator;
+    typedef typename base_array_type::iterator iterator;
+    typedef typename base_array_type::const_iterator const_iterator;
 
     typedef typename std::iterator_traits<iterator>::reference reference;
     typedef typename std::iterator_traits<const_iterator>::reference const_reference;
@@ -218,7 +218,7 @@ public:
     }
 private:
     self_allocator_type self_allocator_;
-    base_array_container_type elements_;
+    base_array_type elements_;
 
     json_array& operator=(const json_array<Json>&) = delete;
 };
