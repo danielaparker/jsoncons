@@ -47,7 +47,7 @@ public:
 
     struct stack_item
     {
-        string_type name_;
+        key_type name_;
         Json value_;
     };
     std::vector<stack_item> stack_;
@@ -171,11 +171,6 @@ private:
         pop_array();
     }
 
-    static kvp_type  move_pair(stack_item&& val)
-    {
-        return kvp_type (std::move(val.name_),std::move(val.value_));
-    }
-
     void end_structure() 
     {
         JSONCONS_ASSERT(stack_offsets_.size() > 0);
@@ -183,16 +178,15 @@ private:
         {
             auto& j = stack_[stack_offsets_.back()].value_;
 
-            auto it = stack_.begin() + (stack_offsets_.back()+1);
-            auto end = stack_.begin() + top_;
-            size_t count = end - it;
-
-            j.object_value().insert(
-                std::make_move_iterator(it),
-                std::make_move_iterator(end),
-                move_pair);
-
-            top_ -= count;
+            size_t count = top_ - (stack_offsets_.back()+1);
+            for (size_t i = stack_offsets_.back()+1; i < top_; ++i)
+            {
+                j.object_value().bulk_insert(std::move(stack_[i].name_),
+                                             std::move(stack_[i].value_));
+            }
+            j.object_value().end_bulk_insert();
+            
+            top_ -= count; 
         }
         else
         {

@@ -510,17 +510,14 @@ public:
         }
     }
 
-    template<class InputIt, class UnaryPredicate>
-    void insert(InputIt first, InputIt last, UnaryPredicate pred)
+    template <class T>
+    void bulk_insert(key_type&& name, T&& value)
     {
-        size_t count = std::distance(first,last);
-        size_t pos = members_.size();
-        members_.resize(pos+count);
-        auto d = members_.begin()+pos;
-        for (auto s = first; s != last; ++s, ++d)
-        {
-            *d = pred(*s);
-        }
+        members_.emplace_back(std::forward<key_type&&>(name), 
+                              std::forward<T&&>(value));
+    }
+    void end_bulk_insert()
+    {
         std::stable_sort(members_.begin(),members_.end(),member_lt_member<value_type>());
         auto it = std::unique(members_.rbegin(), members_.rend(),
                               [](const value_type& a, const value_type& b){ return !(a.key().compare(b.key()));});
@@ -963,17 +960,14 @@ public:
         }
     }
 
-    template<class InputIt, class UnaryPredicate>
-    void insert(InputIt first, InputIt last, UnaryPredicate pred)
+    template <class T> inline
+    void bulk_insert(key_type&& name, T&& value)
     {
-        size_t count = std::distance(first,last);
-        size_t pos = members_.size();
-        members_.resize(pos+count);
-        auto d = members_.begin()+pos;
-        for (auto s = first; s != last; ++s, ++d)
-        {
-            *d = pred(*s);
-        }
+        members_.emplace_back(std::forward<key_type&&>(name), 
+                              std::forward<T&&>(value));
+    }
+    void end_bulk_insert()
+    {
         auto it = unique_unsorted(members_.begin(), members_.end(),
                                   member_lt_member<value_type>(),
                               [](const value_type& a, const value_type& b){ return !(a.key().compare(b.key()));});
