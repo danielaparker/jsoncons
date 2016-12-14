@@ -19,8 +19,7 @@
 #include <jsoncons_ext/json_binary/json_binary_util.hpp>
 
 namespace jsoncons { namespace json_binary {
-
-
+  
 // encode_message_pack
 template<class StringView>
 void encode_string(StringView sv,
@@ -273,227 +272,265 @@ std::vector<uint8_t> encode_message_pack(const Json& jval)
 // decode_message_pack
 
 template<class Json>
-Json Decode_message_pack_(std::vector<uint8_t>::const_iterator& it, std::vector<uint8_t>::const_iterator& end)
+struct Decode_message_pack_
 {
-    // store && increment index
-    std::vector<uint8_t>::const_iterator current_it = it++;
+    std::vector<uint8_t>::const_iterator begin_;
+    std::vector<uint8_t>::const_iterator end_;
+    std::vector<uint8_t>::const_iterator it_;
 
-    if (*current_it <= 0xbf)
+    Decode_message_pack_(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
+        : begin_(begin), end_(end), it_(begin)
     {
-        if (*current_it <= 0x7f) // positive fixint
-        {
-            return Json(*current_it);
-        }
-        else if (*current_it <= 0x8f) // fixmap
-        {
-            Json result;
-            const size_t len = *current_it & 0x0f;
-            for (size_t i = 0; i < len; ++i)
-            {
-                auto j = Decode_message_pack_<Json>(it, end);
-                result.set(j.as_string_view(),Decode_message_pack_<Json>(it, end));
-            }
-            return result;
-        }
-        else if (*current_it <= 0x9f) // fixarray
-        {
-            Json result = typename Json::array();
-            const size_t len = *current_it & 0x0f;
-            for (size_t i = 0; i < len; ++i)
-            {
-                result.add(Decode_message_pack_<Json>(it, end));
-            }
-            return result;
-        }
-        else // fixstr
-        {
-            const size_t len = *current_it & 0x1f;
-            auto offset = &(*(current_it + 1));
-            it += len; // skip content bytes
-            return Json(reinterpret_cast<const typename Json::char_type*>(offset), len);
-        }
     }
-    else if (*current_it >= 0xe0) // negative fixint
+
+    Json decode()
     {
-        return static_cast<int8_t>(*current_it);
-    }
-    else
-    {
-        switch (*current_it)
+        // store && increment index
+        std::vector<uint8_t>::const_iterator pos = it_++;
+
+        if (*pos <= 0xbf)
         {
-            case 0xc0: // nil
+            if (*pos <= 0x7f) 
             {
-                return Json::null();
+                // positive fixint
+                return Json(*pos);
             }
-
-            case 0xc2: // false
+            else if (*pos <= 0x8f) 
             {
-                return Json(false);
-            }
-
-            case 0xc3: // true
-            {
-                return Json(true);
-            }
-
-            case 0xca: // float 32
-            {
-                // copy bytes in reverse order into the double variable
-                float res;
-                for (size_t byte = 0; byte < sizeof(float); ++byte)
+                // fixmap
+                Json result;
+                const size_t len = *pos & 0x0f;
+                for (size_t i = 0; i < len; ++i)
                 {
-                    reinterpret_cast<uint8_t*>(&res)[sizeof(float) - byte - 1] = *(current_it + 1 + byte);
+                    auto j = decode();
+                    result.set(j.as_string_view(),decode());
                 }
-                it += sizeof(float); // skip content bytes
-                return res;
+                return result;
             }
-
-            case 0xcb: // float 64
+            else if (*pos <= 0x9f) 
             {
-                // copy bytes in reverse order into the double variable
-                double res;
-                for (size_t byte = 0; byte < sizeof(double); ++byte)
-                {
-                    reinterpret_cast<uint8_t*>(&res)[sizeof(double) - byte - 1] = *(current_it + 1 + byte);
-                }
-                it += sizeof(double); // skip content bytes
-                return res;
-            }
-
-            case 0xcc: // uint 8
-            {
-                it += 1; // skip content byte
-                return from_big_endian<uint8_t>(current_it,end);
-            }
-
-            case 0xcd: // uint 16
-            {
-                it += 2; // skip 2 content bytes
-                return from_big_endian<uint16_t>(current_it,end);
-            }
-
-            case 0xce: // uint 32
-            {
-                it += 4; // skip 4 content bytes
-                return from_big_endian<uint32_t>(current_it,end);
-            }
-
-            case 0xcf: // uint 64
-            {
-                it += 8; // skip 8 content bytes
-                return from_big_endian<uint64_t>(current_it,end);
-            }
-
-            case 0xd0: // int 8
-            {
-                it += 1; // skip content byte
-                return from_big_endian<int8_t>(current_it,end);
-            }
-
-            case 0xd1: // int 16
-            {
-                it += 2; // skip 2 content bytes
-                return from_big_endian<int16_t>(current_it,end);
-            }
-
-            case 0xd2: // int 32
-            {
-                it += 4; // skip 4 content bytes
-                return from_big_endian<int32_t>(current_it,end);
-            }
-
-            case 0xd3: // int 64
-            {
-                it += 8; // skip 8 content bytes
-                return from_big_endian<int64_t>(current_it,end);
-            }
-
-            case 0xd9: // str 8
-            {
-                const auto len = from_big_endian<uint8_t>(current_it,end);
-                auto offset = &(*(current_it + 2));
-                it += len + 1; // skip size byte + content bytes
-                return std::string(reinterpret_cast<const char*>(offset), len);
-            }
-
-            case 0xda: // str 16
-            {
-                const auto len = from_big_endian<uint16_t>(current_it,end);
-                auto offset = &(*(current_it + 3));
-                it += len + 2; // skip 2 size bytes + content bytes
-                return std::string(reinterpret_cast<const char*>(offset), len);
-            }
-
-            case 0xdb: // str 32
-            {
-                const auto len = from_big_endian<uint32_t>(current_it,end);
-                auto offset = &(*(current_it + 5));
-                it += len + 4; // skip 4 size bytes + content bytes
-                return std::string(reinterpret_cast<const char*>(offset), len);
-            }
-
-            case 0xdc: // array 16
-            {
+                // fixarray
                 Json result = typename Json::array();
-                const auto len = from_big_endian<uint16_t>(current_it,end);
-                it += 2; // skip 2 size bytes
+                const size_t len = *pos & 0x0f;
                 for (size_t i = 0; i < len; ++i)
                 {
-                    result.add(Decode_message_pack_<Json>(it, end));
+                    result.add(decode());
                 }
                 return result;
             }
-
-            case 0xdd: // array 32
+            else 
             {
-                Json result = typename Json::array();
-                const auto len = from_big_endian<uint32_t>(current_it,end);
-                it += 4; // skip 4 size bytes
-                for (size_t i = 0; i < len; ++i)
-                {
-                    result.add(Decode_message_pack_<Json>(it, end));
-                }
-                return result;
+                // fixstr
+                const size_t len = *pos & 0x1f;
+                auto offset = &(*(pos + 1));
+                it_ += len; // skip content bytes
+                return Json(reinterpret_cast<const typename Json::char_type*>(offset), len);
             }
-
-            case 0xde: // map 16
+        }
+        else if (*pos >= 0xe0) 
+        {
+            // negative fixint
+            return static_cast<int8_t>(*pos);
+        }
+        else
+        {
+            switch (*pos)
             {
-                Json result = typename Json::object();
-                const auto len = from_big_endian<uint16_t>(current_it,end);
-                it += 2; // skip 2 size bytes
-                for (size_t i = 0; i < len; ++i)
+                case 0xc0: 
                 {
-                    auto j = Decode_message_pack_<Json>(it, end);
-                    result.set(j.as_string_view(),Decode_message_pack_<Json>(it, end));
+                    // nil
+                    return Json::null();
                 }
-                return result;
-            }
 
-            case 0xdf: // map 32
-            {
-                Json result = typename Json::object();
-                const auto len = from_big_endian<uint32_t>(current_it,end);
-                it += 4; // skip 4 size bytes
-                for (size_t i = 0; i < len; ++i)
+                case 0xc2: 
                 {
-                    auto key = Decode_message_pack_<Json>(it, end).as_string_view();
-                    result.set(key,Decode_message_pack_<Json>(it, end));
+                    // false
+                    return Json(false);
                 }
-                return result;
-            }
 
-            default:
-            {
-                throw std::invalid_argument("error parsing a msgpack @ "); // +std::to_string(current_it));
+                case 0xc3: 
+                {
+                    // true
+                    return Json(true);
+                }
+
+                case 0xca: 
+                {
+                    // float 32
+                    // copy bytes in reverse order into the double variable
+                    float res;
+                    for (size_t byte = 0; byte < sizeof(float); ++byte)
+                    {
+                        reinterpret_cast<uint8_t*>(&res)[sizeof(float) - byte - 1] = *(pos + 1 + byte);
+                    }
+                    it_ += sizeof(float); // skip content bytes
+                    return res;
+                }
+
+                case 0xcb: 
+                {
+                    // float 64
+                    // copy bytes in reverse order into the double variable
+                    double res;
+                    for (size_t byte = 0; byte < sizeof(double); ++byte)
+                    {
+                        reinterpret_cast<uint8_t*>(&res)[sizeof(double) - byte - 1] = *(pos + 1 + byte);
+                    }
+                    it_ += sizeof(double); // skip content bytes
+                    return res;
+                }
+
+                case 0xcc: 
+                {
+                    // uint 8
+                    it_ += 1; // skip content byte
+                    return from_big_endian<uint8_t>(pos,end_);
+                }
+
+                case 0xcd: 
+                {
+                    // uint 16
+                    it_ += 2; // skip 2 content bytes
+                    return from_big_endian<uint16_t>(pos,end_);
+                }
+
+                case 0xce: 
+                {
+                    // uint 32
+                    it_ += 4; // skip 4 content bytes
+                    return from_big_endian<uint32_t>(pos,end_);
+                }
+
+                case 0xcf: 
+                {
+                    // uint 64
+                    it_ += 8; // skip 8 content bytes
+                    return from_big_endian<uint64_t>(pos,end_);
+                }
+
+                case 0xd0: 
+                {
+                    // int 8
+                    it_ += 1; // skip content byte
+                    return from_big_endian<int8_t>(pos,end_);
+                }
+
+                case 0xd1: 
+                {
+                    // int 16
+                    it_ += 2; // skip 2 content bytes
+                    return from_big_endian<int16_t>(pos,end_);
+                }
+
+                case 0xd2: 
+                {
+                    // int 32
+                    it_ += 4; // skip 4 content bytes
+                    return from_big_endian<int32_t>(pos,end_);
+                }
+
+                case 0xd3: 
+                {
+                    // int 64
+                    it_ += 8; // skip 8 content bytes
+                    return from_big_endian<int64_t>(pos,end_);
+                }
+
+                case 0xd9: 
+                {
+                    // str 8
+                    const auto len = from_big_endian<uint8_t>(pos,end_);
+                    auto offset = &(*(pos + 2));
+                    it_ += len + 1; // skip size byte + content bytes
+                    return std::string(reinterpret_cast<const char*>(offset), len);
+                }
+
+                case 0xda: 
+                {
+                    // str 16
+                    const auto len = from_big_endian<uint16_t>(pos,end_);
+                    auto offset = &(*(pos + 3));
+                    it_ += len + 2; // skip 2 size bytes + content bytes
+                    return std::string(reinterpret_cast<const char*>(offset), len);
+                }
+
+                case 0xdb: 
+                {
+                    // str 32
+                    const auto len = from_big_endian<uint32_t>(pos,end_);
+                    auto offset = &(*(pos + 5));
+                    it_ += len + 4; // skip 4 size bytes + content bytes
+                    return std::string(reinterpret_cast<const char*>(offset), len);
+                }
+
+                case 0xdc: 
+                {
+                    // array 16
+                    Json result = typename Json::array();
+                    const auto len = from_big_endian<uint16_t>(pos,end_);
+                    it_ += 2; // skip 2 size bytes
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        result.add(decode());
+                    }
+                    return result;
+                }
+
+                case 0xdd: 
+                {
+                    // array 32
+                    Json result = typename Json::array();
+                    const auto len = from_big_endian<uint32_t>(pos,end_);
+                    it_ += 4; // skip 4 size bytes
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        result.add(decode());
+                    }
+                    return result;
+                }
+
+                case 0xde: 
+                {
+                    // map 16
+                    Json result = typename Json::object();
+                    const auto len = from_big_endian<uint16_t>(pos,end_);
+                    it_ += 2; // skip 2 size bytes
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        auto j = decode();
+                        result.set(j.as_string_view(),decode());
+                    }
+                    return result;
+                }
+
+                case 0xdf: 
+                {
+                    // map 32
+                    Json result = typename Json::object();
+                    const auto len = from_big_endian<uint32_t>(pos,end_);
+                    it_ += 4; // skip 4 size bytes
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        auto key = decode().as_string_view();
+                        result.set(key,decode());
+                    }
+                    return result;
+                }
+
+                default:
+                {
+                    throw std::invalid_argument("Error decoding a message pack at position " + std::to_string(end_-pos));
+                }
             }
         }
     }
-}
+};
 
 template<class Json>
 Json decode_message_pack(const std::vector<uint8_t>& v)
 {
-    return Decode_message_pack_<Json>(v.begin(),v.end());
+    Decode_message_pack_<Json> decoder(v.begin(),v.end());
+    return decoder.decode();
 }
 
 }}
