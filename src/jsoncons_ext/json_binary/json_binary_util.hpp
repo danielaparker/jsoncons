@@ -72,6 +72,15 @@ struct to_big_endian<T, 8>
 };
 
 template<>
+struct to_big_endian<float, 4>
+{
+    inline void operator()(float val, std::vector<uint8_t>& v)
+    {
+        to_big_endian<uint64_t, sizeof(uint32_t)>()(*(uint32_t*)&val, v);
+    }
+};
+
+template<>
 struct to_big_endian<double, 8>
 {
     inline void operator()(double val, std::vector<uint8_t>& v)
@@ -80,12 +89,12 @@ struct to_big_endian<double, 8>
     }
 };
 
-template<typename T>
-static T from_big_endian(std::vector<uint8_t>::const_iterator& it, std::vector<uint8_t>::const_iterator& end)
+template<class T,class Iterator>
+static T from_big_endian(Iterator& it, Iterator& end)
 {
-    if (it+ sizeof(T) + 1 > end)
+    if (it + sizeof(T) + 1 > end)
     {
-        throw std::out_of_range("cannot read " + std::to_string(sizeof(T)) + " bytes from vector");
+        throw std::out_of_range("Failed attempting to read " + std::to_string(sizeof(T)) + " bytes from vector");
     }
 
     T result;
