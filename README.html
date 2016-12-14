@@ -475,7 +475,10 @@ vertical-align:1px;
 <p>Features:</p>
 <ul>
 <li>Uses the standard C++ input/output streams library</li>
-<li>Supports converting to and from the standard library sequence and associative containers</li>
+<li>Supports conversion from and to the standard library sequence and associative containers</li>
+<li>Supports conversion from and to user defined types</li>
+<li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a></li>
+<li>Returns the expected results for all tests from <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a></li>
 <li>Supports object members sorted alphabetically by name or in original order</li>
 <li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li>
 <li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
@@ -487,9 +490,7 @@ vertical-align:1px;
 <li>Supports Nan, Inf and -Inf replacement</li>
 <li>Supports reading a sequence of JSON texts from a stream</li>
 <li>Supports optional escaping of non-ascii UTF-8 octets</li>
-<li>Allows extensions to the types accepted by the json class constructors, accessors and modifiers</li>
-<li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a></li>
-<li>Returns the expected results for all tests from <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a></li>
+<li>Supports conversion from and to user defined types</li>
 <li>Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired</li>
 </ul>
 <p>Extensions:</p>

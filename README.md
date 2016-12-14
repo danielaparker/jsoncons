@@ -9,7 +9,10 @@ The [code repository](https://github.com/danielaparker/jsoncons) and [releases](
 Features:
 
 - Uses the standard C++ input/output streams library
-- Supports converting to and from the standard library sequence and associative containers
+- Supports conversion from and to the standard library sequence and associative containers
+- Supports conversion from and to user defined types
+- Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
+- Returns the expected results for all tests from [JSONTestSuite](https://github.com/nst/JSONTestSuite)
 - Supports object members sorted alphabetically by name or in original order
 - Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
 - Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
@@ -21,9 +24,7 @@ Features:
 - Supports Nan, Inf and -Inf replacement
 - Supports reading a sequence of JSON texts from a stream
 - Supports optional escaping of non-ascii UTF-8 octets
-- Allows extensions to the types accepted by the json class constructors, accessors and modifiers
-- Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
-- Returns the expected results for all tests from [JSONTestSuite](https://github.com/nst/JSONTestSuite)
+- Supports conversion from and to user defined types
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 
 Extensions:
