@@ -3,10 +3,10 @@
 
 #include <string>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/json_binary/message_pack.hpp>
+#include <jsoncons_ext/binary/message_pack.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::json_binary;
+using namespace jsoncons::binary;
 
 void message_pack_example()
 {
@@ -45,9 +45,9 @@ void message_pack_example()
     std::cout << std::endl;
 }
 
-void json_binary_examples()
+void binary_examples()
 {
-    std::cout << "\njson_binary examples\n\n";
+    std::cout << "\nbinary examples\n\n";
     message_pack_example();
     std::cout << std::endl;
 }

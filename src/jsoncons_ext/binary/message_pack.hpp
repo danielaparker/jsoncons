@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MESSAGE_PACK_MESSAGE_PACK_HPP
-#define JSONCONS_MESSAGE_PACK_MESSAGE_PACK_HPP
+#ifndef JSONCONS_BINARY_MESSAGE_PACK_HPP
+#define JSONCONS_BINARY_MESSAGE_PACK_HPP
 
 #include <string>
 #include <sstream>
@@ -16,9 +16,9 @@
 #include <limits>
 #include <cassert>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/json_binary/json_binary_util.hpp>
+#include <jsoncons_ext/binary/binary_util.hpp>
 
-namespace jsoncons { namespace json_binary {
+namespace jsoncons { namespace binary {
   
 
 template<class Json>

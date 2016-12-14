@@ -20,7 +20,7 @@ void csv_examples();
 void jsonpath_examples();
 void jsonx_examples();
 void json_is_as_examples();
-void json_binary_examples();
+void binary_examples();
 
 void first_example_a()
 {
@@ -273,7 +273,7 @@ int main()
 
         jsonx_examples();
 
-        json_binary_examples();
+        binary_examples();
 
     }
     catch (const std::exception& e)

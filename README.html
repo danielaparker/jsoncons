@@ -497,7 +497,7 @@ vertical-align:1px;
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="https://github.com/danielaparker/jsoncons/wiki/jsonx_serializer">jsonx</a> extension supports serializing JSON values to <a href="http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a> (XML)</li>
 <li>The <a href="#user-content-ext_jsonpath">jsonpath</a> extension supports search using <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>.  It also supports search and replace using JsonPath expressions.</li>
-<li>The <a href="#user-content-ext_json_binary">json_binary</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
+<li>The <a href="#user-content-ext_binary">binary</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
 <p>As the <code>jsoncons</code> library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the <a href="https://github.com/danielaparker/jsoncons/wiki/deprecated">deprecated list</a> for the status of old names. The deprecated names can be suppressed by defining macro <code>JSONCONS_NO_DEPRECATED</code>, which is recommended for new code.</p>
 <h2>Benchmarks</h2>
@@ -739,15 +739,15 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 (<span class="pl-c1">2</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}</pre></div>
 <p>Or define and use your own filters. See <a href="https://github.com/danielaparker/jsoncons/wiki/json_filter">json_filter</a> for details.</p>
 <h2>Extensions</h2>
-<div id="user-content-ext_json_binary">
-<h3>json_binary</h3>
-<p>The <code>json_binary</code> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
+<div id="user-content-ext_binary">
+<h3>binary</h3>
+<p>The <code>binary</code> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
 <h2>MessagePack example</h2>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/json_binary/message_pack.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/binary/message_pack.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::json_binary<span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::binary<span class="pl-k">;</span>
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {

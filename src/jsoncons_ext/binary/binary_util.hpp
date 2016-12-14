@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_BINARY_JSON_BINARY_UTIL_HPP
-#define JSONCONS_JSON_BINARY_JSON_BINARY_UTIL_HPP
+#ifndef JSONCONS_BINARY_BINARY_UTIL_HPP
+#define JSONCONS_BINARY_BINARY_UTIL_HPP
 
 #include <string>
 #include <sstream>
@@ -15,7 +15,7 @@
 #include <memory>
 #include <limits>
 
-namespace jsoncons { namespace json_binary {
+namespace jsoncons { namespace binary {
 
 // to_big_endian
 
