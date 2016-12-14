@@ -6,7 +6,7 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 
 The [code repository](https://github.com/danielaparker/jsoncons) and [releases](https://github.com/danielaparker/jsoncons/releases) are on github. It is distributed under the [Boost Software License](http://www.boost.org/users/license.html)
 
-The library has a number of features, which are listed below:
+Some features of the library are:
 
 - Uses the standard C++ input/output streams library
 - Supports converting to and from the standard library sequence and associative containers
@@ -22,12 +22,16 @@ The library has a number of features, which are listed below:
 - Supports reading a sequence of JSON texts from a stream
 - Supports optional escaping of non-ascii UTF-8 octets
 - Allows extensions to the types accepted by the json class constructors, accessors and modifiers
-- Supports reading (writing) JSON values from (to) CSV files
-- Supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
+- Returns the expected results for all tests from [JSONTestSuite](https://github.com/nst/JSONTestSuite)
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
-- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/)
-- Supports search (by JsonPath) and replace
+
+The library has a number of extensions:
+
+- The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
+- The [jsonx](https://github.com/danielaparker/jsoncons/wiki/jsonx_serializer) extension supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
+- The [jsonpath](#user-content-ext_jsonpath) extension supports querying using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath) expressions.
+- The [json_binary](#user-content-ext_json_binary) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
@@ -326,6 +330,88 @@ Or define and use your own filters. See [json_filter](https://github.com/daniela
 
 ## Extensions
 
+<div id="ext_json_binary"/>
+
+### json_binary
+
+The `json_binary` extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+
+## MessagePack example
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/json_binary/message_pack.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::json_binary;
+
+int main()
+{
+    ojson j1;
+    j1["zero"] = 0;
+    j1["one"] = 1;
+    j1["two"] = 2;
+    j1["null"] = null_type();
+    j1["true"] = true;
+    j1["false"] = false;
+    j1["max int64_t"] = (std::numeric_limits<int64_t>::max)();
+    j1["max uint64_t"] = (std::numeric_limits<uint64_t>::max)();
+    j1["min int64_t"] = (std::numeric_limits<int64_t>::min)();
+    j1["max int32_t"] = (std::numeric_limits<int32_t>::max)();
+    j1["max uint32_t"] = (std::numeric_limits<uint32_t>::max)();
+    j1["min int32_t"] = (std::numeric_limits<int32_t>::min)();
+    j1["max int16_t"] = (std::numeric_limits<int16_t>::max)();
+    j1["max uint16_t"] = (std::numeric_limits<uint16_t>::max)();
+    j1["min int16_t"] = (std::numeric_limits<int16_t>::min)();
+    j1["max int8_t"] = (std::numeric_limits<int8_t>::max)();
+    j1["max uint8_t"] = (std::numeric_limits<uint8_t>::max)();
+    j1["min int8_t"] = (std::numeric_limits<int8_t>::min)();
+    j1["max double"] = (std::numeric_limits<double>::max)();
+    j1["min double"] = -(std::numeric_limits<double>::max)();
+    j1["max float"] = (std::numeric_limits<float>::max)();
+    j1["zero float"] = 0.0;
+    j1["min float"] = -(std::numeric_limits<float>::max)();
+    j1["Key too long for small string optimization"] = "String too long for small string optimization";
+
+    std::vector<uint8_t> v = encode_message_pack(j1);
+
+    ojson j2 = decode_message_pack<ojson>(v);
+
+    std::cout << pretty_print(j2) << std::endl;
+}
+```
+Output:
+```json
+{
+    "zero": 0,
+    "one": 1,
+    "two": 2,
+    "null": null,
+    "true": true,
+    "false": false,
+    "max int64_t": 9223372036854775807,
+    "max uint64_t": 18446744073709551615,
+    "min int64_t": -9223372036854775808,
+    "max int32_t": 2147483647,
+    "max uint32_t": 4294967295,
+    "min int32_t": -2147483648,
+    "max int16_t": 32767,
+    "max uint16_t": 65535,
+    "min int16_t": -32768,
+    "max int8_t": 127,
+    "max uint8_t": 255,
+    "min int8_t": -128,
+    "max double": 1.79769313486232e+308,
+    "min double": -1.79769313486232e+308,
+    "max float": 3.40282346638529e+038,
+    "zero float": 0.0,
+    "min float": -3.40282346638529e+038,
+    "Key too long for small string optimization": "String too long for small string optimization"
+}
+```
+
+<div id="ext_jsonpath"/>
+
 ### jsonpath
 
 Example file (store.json):
@@ -415,6 +501,8 @@ Output:
 ```
 
 See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query), [json_replace](https://github.com/danielaparker/jsoncons/wiki/json_replace), and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
+
+<div id="ext_csv"/>
 
 ### csv
 Example file (tasks.csv)

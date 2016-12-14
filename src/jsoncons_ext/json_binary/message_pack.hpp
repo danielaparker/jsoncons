@@ -29,6 +29,7 @@ public:
     std::vector<uint8_t> encode(const Json& jval)
     {
         encode_(jval);
+        v_.shrink_to_fit();
         return std::move(v_);
     }
 private:
