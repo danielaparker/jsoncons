@@ -20,264 +20,272 @@
 
 namespace jsoncons { namespace json_binary {
   
-// encode_message_pack
-template<class StringView>
-void encode_string(StringView sv,
-                   std::vector<uint8_t>& v)
-{
-    const size_t length = sv.size();
-    if (length <= 31)
-    {
-        // fixstr stores a byte array whose length is upto 31 bytes
-        v.push_back(static_cast<uint8_t>(0xa0 | length));
-    }
-    else if (length <= 255)
-    {
-        // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-        v.push_back(0xd9);
-        v.push_back(static_cast<uint8_t>(length));
-    }
-    else if (length <= 65535)
-    {
-        // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-        v.push_back(0xda);
-        to_big_endian<size_t, sizeof(uint16_t)>()(length, v);
-    }
-    else if (length <= 4294967295)
-    {
-        // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-        v.push_back(0xdb);
-        to_big_endian<size_t, sizeof(uint32_t)>()(length,v);
-    }
-
-    for (size_t i = 0; i < length; ++i)
-    {
-        v.push_back(sv.data()[i]);
-    }
-}
 
 template<class Json>
-void Encode_message_pack_(const Json& jval, std::vector<uint8_t>& v)
+class Encode_message_pack_
 {
-    switch (jval.type_id())
+    std::vector<uint8_t> v_;
+public:
+    std::vector<uint8_t> encode(const Json& jval)
     {
-        case value_types::null_t:
+        encode_(jval);
+        return std::move(v_);
+    }
+private:
+    void encode_(const Json& jval)
+    {
+        switch (jval.type_id())
         {
-            // nil
-            v.push_back(0xc0);
-            break;
-        }
-
-        case value_types::bool_t:
-        {
-            // true and false
-            v.push_back(jval.as_bool() ? 0xc3 : 0xc2);
-            break;
-        }
-
-        case value_types::integer_t:
-        {
-            int64_t ival = jval.as_integer();
-            if (ival >= 0)
+            case value_types::null_t:
             {
-                if (ival < 128)
+                // nil
+                v_.push_back(0xc0);
+                break;
+            }
+
+            case value_types::bool_t:
+            {
+                // true and false
+                v_.push_back(jval.as_bool() ? 0xc3 : 0xc2);
+                break;
+            }
+
+            case value_types::integer_t:
+            {
+                int64_t ival = jval.as_integer();
+                if (ival >= 0)
+                {
+                    if (ival < 128)
+                    {
+                        // positive fixnum stores 7-bit positive integer
+                        to_big_endian<int64_t, sizeof(int8_t)>()(ival,v_);
+                    }
+                    else if (ival <= (std::numeric_limits<int8_t>::max)())
+                    {
+                        // uint 8 stores a 8-bit unsigned integer
+                        v_.push_back(0xcc);
+                        to_big_endian<int64_t, sizeof(uint8_t)>()(ival,v_);
+                    }
+                    else if (ival <= (std::numeric_limits<uint16_t>::max)())
+                    {
+                        // uint 16 stores a 16-bit big-endian unsigned integer
+                        v_.push_back(0xcd);
+                        to_big_endian<int64_t, sizeof(uint16_t)>()(ival,v_);
+                    }
+                    else if (ival <= (std::numeric_limits<uint32_t>::max)())
+                    {
+                        // uint 32 stores a 32-bit big-endian unsigned integer
+                        v_.push_back(0xce);
+                        to_big_endian<int64_t, sizeof(uint32_t)>()(ival,v_);
+                    }
+                    else if (ival <= (std::numeric_limits<int64_t>::max)())
+                    {
+                        // uint 64 stores a 64-bit big-endian unsigned integer
+                        v_.push_back(0xcf);
+                        to_big_endian<int64_t, sizeof(uint64_t)>()(ival,v_);
+                    }
+                }
+                else
+                {
+                    if (ival >= -32)
+                    {
+                        // negative fixnum stores 5-bit negative integer
+                        v_.push_back(static_cast<uint8_t>((ival)));
+                    }
+                    else if (ival >= (std::numeric_limits<int8_t>::min)() && ival <= (std::numeric_limits<int8_t>::max)())
+                    {
+                        // int 8 stores a 8-bit signed integer
+                        v_.push_back(0xd0);
+                        to_big_endian<uint64_t, sizeof(uint8_t)>()(ival,v_);
+                    }
+                    else if (ival >= (std::numeric_limits<int16_t>::min)() && ival <= (std::numeric_limits<int16_t>::max)())
+                    {
+                        // int 16 stores a 16-bit big-endian signed integer
+                        v_.push_back(0xd1);
+                        to_big_endian<int64_t, sizeof(uint16_t)>()(ival,v_);
+                    }
+                    else if (ival >= (std::numeric_limits<int32_t>::min)() && ival <= INT32_MAX)
+                    {
+                        // int 32 stores a 32-bit big-endian signed integer
+                        v_.push_back(0xd2);
+                        to_big_endian<int64_t, sizeof(uint32_t)>()(ival,v_);
+                    }
+                    else if (ival >= (std::numeric_limits<int64_t>::min)() && ival <= (std::numeric_limits<int64_t>::max)())
+                    {
+                        // int 64 stores a 64-bit big-endian signed integer
+                        v_.push_back(0xd3);
+                        to_big_endian<int64_t, sizeof(uint64_t)>()(ival,v_);
+                    }
+                }
+                break;
+            }
+
+        case value_types::uinteger_t:
+            {
+                uint64_t ival = jval.as_uinteger();
+                if (ival < (std::numeric_limits<int8_t>::max)())
                 {
                     // positive fixnum stores 7-bit positive integer
-                    to_big_endian<int64_t, sizeof(int8_t)>()(ival,v);
+                    v_.push_back(static_cast<uint8_t>((ival)));
                 }
-                else if (ival <= (std::numeric_limits<int8_t>::max)())
+                else if (ival <= (std::numeric_limits<uint8_t>::max)())
                 {
                     // uint 8 stores a 8-bit unsigned integer
-                    v.push_back(0xcc);
-                    to_big_endian<int64_t, sizeof(uint8_t)>()(ival,v);
+                    v_.push_back(0xcc);
+                    v_.push_back(static_cast<uint8_t>((ival)));
                 }
                 else if (ival <= (std::numeric_limits<uint16_t>::max)())
                 {
                     // uint 16 stores a 16-bit big-endian unsigned integer
-                    v.push_back(0xcd);
-                    to_big_endian<int64_t, sizeof(uint16_t)>()(ival,v);
+                    v_.push_back(0xcd);
+                    to_big_endian<uint64_t, sizeof(uint16_t)>()(ival,v_);
                 }
                 else if (ival <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // uint 32 stores a 32-bit big-endian unsigned integer
-                    v.push_back(0xce);
-                    to_big_endian<int64_t, sizeof(uint32_t)>()(ival,v);
+                    v_.push_back(0xce);
+                    to_big_endian<uint64_t, sizeof(uint32_t)>()(ival,v_);
                 }
-                else if (ival <= (std::numeric_limits<int64_t>::max)())
+                else if (ival <= (std::numeric_limits<uint64_t>::max)())
                 {
                     // uint 64 stores a 64-bit big-endian unsigned integer
-                    v.push_back(0xcf);
-                    to_big_endian<int64_t, sizeof(uint64_t)>()(ival,v);
+                    v_.push_back(0xcf);
+                    to_big_endian<uint64_t, sizeof(uint64_t)>()(ival,v_);
                 }
+                break;
             }
-            else
+
+            case value_types::double_t:
             {
-                if (ival >= -32)
+                // float 64
+                v_.push_back(0xcb);
+                to_big_endian<double,sizeof(double)>()(jval.as_double(),v_);
+                break;
+            }
+
+            case value_types::small_string_t:
+            case value_types::string_t:
+            {
+                encode_string(jval.as_string_view());
+                break;
+            }
+
+            case value_types::array_t:
+            {
+                const auto length = jval.array_value().size();
+                if (length <= 15)
                 {
-                    // negative fixnum stores 5-bit negative integer
-                    v.push_back(static_cast<uint8_t>((ival)));
+                    // fixarray
+                    v_.push_back(static_cast<uint8_t>(0x90 | length));
                 }
-                else if (ival >= (std::numeric_limits<int8_t>::min)() && ival <= (std::numeric_limits<int8_t>::max)())
+                else if (length <= 0xffff)
                 {
-                    // int 8 stores a 8-bit signed integer
-                    v.push_back(0xd0);
-                    to_big_endian<uint64_t, sizeof(uint8_t)>()(ival,v);
+                    // array 16
+                    v_.push_back(0xdc);
+                    to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
                 }
-                else if (ival >= (std::numeric_limits<int16_t>::min)() && ival <= (std::numeric_limits<int16_t>::max)())
+                else if (length <= 0xffffffff)
                 {
-                    // int 16 stores a 16-bit big-endian signed integer
-                    v.push_back(0xd1);
-                    to_big_endian<int64_t, sizeof(uint16_t)>()(ival,v);
+                    // array 32
+                    v_.push_back(0xdd);
+                    to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
                 }
-                else if (ival >= (std::numeric_limits<int32_t>::min)() && ival <= INT32_MAX)
+
+                // append each element
+                for (const auto& el : jval.array_range())
                 {
-                    // int 32 stores a 32-bit big-endian signed integer
-                    v.push_back(0xd2);
-                    to_big_endian<int64_t, sizeof(uint32_t)>()(ival,v);
+                    encode_(el);
                 }
-                else if (ival >= (std::numeric_limits<int64_t>::min)() && ival <= (std::numeric_limits<int64_t>::max)())
+                break;
+            }
+
+            case value_types::object_t:
+            {
+                const auto length = jval.object_value().size();
+                if (length <= 15)
                 {
-                    // int 64 stores a 64-bit big-endian signed integer
-                    v.push_back(0xd3);
-                    to_big_endian<int64_t, sizeof(uint64_t)>()(ival,v);
+                    // fixmap
+                    v_.push_back(static_cast<uint8_t>(0x80 | (length & 0xf)));
                 }
-            }
-            break;
-        }
+                else if (length <= 65535)
+                {
+                    // map 16
+                    v_.push_back(0xde);
+                    to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
+                }
+                else if (length <= 4294967295)
+                {
+                    // map 32
+                    v_.push_back(0xdf);
+                    to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
+                }
 
-    case value_types::uinteger_t:
-        {
-            uint64_t ival = jval.as_uinteger();
-            if (ival < (std::numeric_limits<int8_t>::max)())
-            {
-                // positive fixnum stores 7-bit positive integer
-                v.push_back(static_cast<uint8_t>((ival)));
-            }
-            else if (ival <= (std::numeric_limits<uint8_t>::max)())
-            {
-                // uint 8 stores a 8-bit unsigned integer
-                v.push_back(0xcc);
-                v.push_back(static_cast<uint8_t>((ival)));
-            }
-            else if (ival <= (std::numeric_limits<uint16_t>::max)())
-            {
-                // uint 16 stores a 16-bit big-endian unsigned integer
-                v.push_back(0xcd);
-                to_big_endian<uint64_t, sizeof(uint16_t)>()(ival,v);
-            }
-            else if (ival <= (std::numeric_limits<uint32_t>::max)())
-            {
-                // uint 32 stores a 32-bit big-endian unsigned integer
-                v.push_back(0xce);
-                to_big_endian<uint64_t, sizeof(uint32_t)>()(ival,v);
-            }
-            else if (ival <= (std::numeric_limits<uint64_t>::max)())
-            {
-                // uint 64 stores a 64-bit big-endian unsigned integer
-                v.push_back(0xcf);
-                to_big_endian<uint64_t, sizeof(uint64_t)>()(ival,v);
-            }
-            break;
-        }
-
-        case value_types::double_t:
-        {
-            // float 64
-            v.push_back(0xcb);
-            to_big_endian<double,sizeof(double)>()(jval.as_double(),v);
-            break;
-        }
-
-        case value_types::small_string_t:
-        case value_types::string_t:
-        {
-            encode_string(jval.as_string_view(),v);
-            break;
-        }
-
-        case value_types::array_t:
-        {
-            const auto length = jval.array_value().size();
-            if (length <= 15)
-            {
-                // fixarray
-                v.push_back(static_cast<uint8_t>(0x90 | length));
-            }
-            else if (length <= 0xffff)
-            {
-                // array 16
-                v.push_back(0xdc);
-                to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v);
-            }
-            else if (length <= 0xffffffff)
-            {
-                // array 32
-                v.push_back(0xdd);
-                to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v);
+                // append each element
+                for (const auto& kvp: jval.object_range())
+                {
+                    encode_string(kvp.key());
+                    encode_(kvp.value());
+                }
+                break;
             }
 
-            // append each element
-            for (const auto& el : jval.array_range())
+            default:
             {
-                Encode_message_pack_(el, v);
+                break;
             }
-            break;
-        }
-
-        case value_types::object_t:
-        {
-            const auto length = jval.object_value().size();
-            if (length <= 15)
-            {
-                // fixmap
-                v.push_back(static_cast<uint8_t>(0x80 | (length & 0xf)));
-            }
-            else if (length <= 65535)
-            {
-                // map 16
-                v.push_back(0xde);
-                to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v);
-            }
-            else if (length <= 4294967295)
-            {
-                // map 32
-                v.push_back(0xdf);
-                to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v);
-            }
-
-            // append each element
-            for (const auto& kvp: jval.object_range())
-            {
-                encode_string(kvp.key(),v);
-                Encode_message_pack_(kvp.value(), v);
-            }
-            break;
-        }
-
-        default:
-        {
-            break;
         }
     }
-}
+
+    void encode_string(typename Json::string_view_type sv)
+    {
+        const size_t length = sv.length();
+        if (length <= 31)
+        {
+            // fixstr stores a byte array whose length is upto 31 bytes
+            v_.push_back(static_cast<uint8_t>(0xa0 | length));
+        }
+        else if (length <= 255)
+        {
+            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
+            v_.push_back(0xd9);
+            v_.push_back(static_cast<uint8_t>(length));
+        }
+        else if (length <= 65535)
+        {
+            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
+            v_.push_back(0xda);
+            to_big_endian<size_t, sizeof(uint16_t)>()(length, v_);
+        }
+        else if (length <= 4294967295)
+        {
+            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
+            v_.push_back(0xdb);
+            to_big_endian<size_t, sizeof(uint32_t)>()(length,v_);
+        }
+
+        for (size_t i = 0; i < length; ++i)
+        {
+            v_.push_back(sv.data()[i]);
+        }
+    }
+};
 
 template<class Json>
 std::vector<uint8_t> encode_message_pack(const Json& jval)
 {
-    std::vector<uint8_t> v;
-    Encode_message_pack_(jval,v);
-    return v;
+    Encode_message_pack_<Json> encoder;
+    return encoder.encode(jval);
 }
 
 // decode_message_pack
 
 template<class Json>
-struct Decode_message_pack_
+class Decode_message_pack_
 {
     std::vector<uint8_t>::const_iterator begin_;
     std::vector<uint8_t>::const_iterator end_;
     std::vector<uint8_t>::const_iterator it_;
-
+public:
     Decode_message_pack_(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
         : begin_(begin), end_(end), it_(begin)
     {
