@@ -94,7 +94,7 @@ static T from_big_endian(Iterator& it, Iterator& end)
 {
     if (it + sizeof(T) + 1 > end)
     {
-        throw std::out_of_range("Failed attempting to read " + std::to_string(sizeof(T)) + " bytes from vector");
+        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
     }
 
     T result;

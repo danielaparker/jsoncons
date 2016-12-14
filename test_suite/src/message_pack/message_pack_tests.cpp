@@ -22,6 +22,7 @@ BOOST_AUTO_TEST_SUITE(message_pack_test_suite)
 BOOST_AUTO_TEST_CASE(message_pack_test)
 {
     json j1;
+    j1["zero"] = 0;
     j1["one"] = 1;
     j1["two"] = 2;
     j1["null"] = null_type();
@@ -41,7 +42,38 @@ BOOST_AUTO_TEST_CASE(message_pack_test)
     j1["min int8_t"] = (std::numeric_limits<int8_t>::min)();
     j1["max double"] = (std::numeric_limits<double>::max)();
     j1["min double"] = -(std::numeric_limits<double>::max)();
+    j1["max float"] = (std::numeric_limits<float>::max)();
+    j1["zero float"] = 0.0;
+    j1["min float"] = -(std::numeric_limits<float>::max)();
     j1["String too long for small string optimization"] = "String too long for small string optimization";
+
+    json ja = json::array();
+    ja.add(0);
+    ja.add(1);
+    ja.add(2);
+    ja.add(null_type());
+    ja.add(true);
+    ja.add(false);
+    ja.add((std::numeric_limits<int64_t>::max)());
+    ja.add((std::numeric_limits<uint64_t>::max)());
+    ja.add((std::numeric_limits<int64_t>::min)());
+    ja.add((std::numeric_limits<int32_t>::max)());
+    ja.add((std::numeric_limits<uint32_t>::max)());
+    ja.add((std::numeric_limits<int32_t>::min)());
+    ja.add((std::numeric_limits<int16_t>::max)());
+    ja.add((std::numeric_limits<uint16_t>::max)());
+    ja.add((std::numeric_limits<int16_t>::min)());
+    ja.add((std::numeric_limits<int8_t>::max)());
+    ja.add((std::numeric_limits<uint8_t>::max)());
+    ja.add((std::numeric_limits<int8_t>::min)());
+    ja.add((std::numeric_limits<double>::max)());
+    ja.add(-(std::numeric_limits<double>::max)());
+    ja.add((std::numeric_limits<float>::max)());
+    ja.add(0.0);
+    ja.add(-(std::numeric_limits<float>::max)());
+    ja.add("String too long for small string optimization");
+
+    j1["An array"] = ja;
 
     std::vector<uint8_t> v = encode_message_pack(j1);
 

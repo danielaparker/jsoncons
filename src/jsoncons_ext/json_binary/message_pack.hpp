@@ -52,69 +52,69 @@ private:
 
             case value_types::integer_t:
             {
-                int64_t ival = jval.as_integer();
-                if (ival >= 0)
+                int64_t val = jval.as_integer();
+                if (val >= 0)
                 {
-                    if (ival < 128)
+                    if (val < 128)
                     {
                         // positive fixnum stores 7-bit positive integer
-                        to_big_endian<int64_t, sizeof(int8_t)>()(ival,v_);
+                        to_big_endian<int64_t, sizeof(int8_t)>()(val,v_);
                     }
-                    else if (ival <= (std::numeric_limits<int8_t>::max)())
+                    else if (val <= (std::numeric_limits<int8_t>::max)())
                     {
                         // uint 8 stores a 8-bit unsigned integer
                         v_.push_back(0xcc);
-                        to_big_endian<int64_t, sizeof(uint8_t)>()(ival,v_);
+                        to_big_endian<int64_t, sizeof(uint8_t)>()(val,v_);
                     }
-                    else if (ival <= (std::numeric_limits<uint16_t>::max)())
+                    else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
                         // uint 16 stores a 16-bit big-endian unsigned integer
                         v_.push_back(0xcd);
-                        to_big_endian<int64_t, sizeof(uint16_t)>()(ival,v_);
+                        to_big_endian<int64_t, sizeof(uint16_t)>()(val,v_);
                     }
-                    else if (ival <= (std::numeric_limits<uint32_t>::max)())
+                    else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
                         // uint 32 stores a 32-bit big-endian unsigned integer
                         v_.push_back(0xce);
-                        to_big_endian<int64_t, sizeof(uint32_t)>()(ival,v_);
+                        to_big_endian<int64_t, sizeof(uint32_t)>()(val,v_);
                     }
-                    else if (ival <= (std::numeric_limits<int64_t>::max)())
+                    else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
                         // uint 64 stores a 64-bit big-endian unsigned integer
                         v_.push_back(0xcf);
-                        to_big_endian<int64_t, sizeof(uint64_t)>()(ival,v_);
+                        to_big_endian<int64_t, sizeof(uint64_t)>()(val,v_);
                     }
                 }
                 else
                 {
-                    if (ival >= -32)
+                    if (val >= -32)
                     {
                         // negative fixnum stores 5-bit negative integer
-                        v_.push_back(static_cast<uint8_t>((ival)));
+                        v_.push_back(static_cast<uint8_t>((val)));
                     }
-                    else if (ival >= (std::numeric_limits<int8_t>::min)() && ival <= (std::numeric_limits<int8_t>::max)())
+                    else if (val >= (std::numeric_limits<int8_t>::min)() && val <= (std::numeric_limits<int8_t>::max)())
                     {
                         // int 8 stores a 8-bit signed integer
                         v_.push_back(0xd0);
-                        to_big_endian<uint64_t, sizeof(uint8_t)>()(ival,v_);
+                        to_big_endian<uint64_t, sizeof(uint8_t)>()(val,v_);
                     }
-                    else if (ival >= (std::numeric_limits<int16_t>::min)() && ival <= (std::numeric_limits<int16_t>::max)())
+                    else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
                     {
                         // int 16 stores a 16-bit big-endian signed integer
                         v_.push_back(0xd1);
-                        to_big_endian<int64_t, sizeof(uint16_t)>()(ival,v_);
+                        to_big_endian<int64_t, sizeof(uint16_t)>()(val,v_);
                     }
-                    else if (ival >= (std::numeric_limits<int32_t>::min)() && ival <= INT32_MAX)
+                    else if (val >= (std::numeric_limits<int32_t>::min)() && val <= INT32_MAX)
                     {
                         // int 32 stores a 32-bit big-endian signed integer
                         v_.push_back(0xd2);
-                        to_big_endian<int64_t, sizeof(uint32_t)>()(ival,v_);
+                        to_big_endian<int64_t, sizeof(uint32_t)>()(val,v_);
                     }
-                    else if (ival >= (std::numeric_limits<int64_t>::min)() && ival <= (std::numeric_limits<int64_t>::max)())
+                    else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
                     {
                         // int 64 stores a 64-bit big-endian signed integer
                         v_.push_back(0xd3);
-                        to_big_endian<int64_t, sizeof(uint64_t)>()(ival,v_);
+                        to_big_endian<int64_t, sizeof(uint64_t)>()(val,v_);
                     }
                 }
                 break;
@@ -122,35 +122,35 @@ private:
 
         case value_types::uinteger_t:
             {
-                uint64_t ival = jval.as_uinteger();
-                if (ival < (std::numeric_limits<int8_t>::max)())
+                uint64_t val = jval.as_uinteger();
+                if (val < (std::numeric_limits<int8_t>::max)())
                 {
                     // positive fixnum stores 7-bit positive integer
-                    v_.push_back(static_cast<uint8_t>((ival)));
+                    v_.push_back(static_cast<uint8_t>((val)));
                 }
-                else if (ival <= (std::numeric_limits<uint8_t>::max)())
+                else if (val <= (std::numeric_limits<uint8_t>::max)())
                 {
                     // uint 8 stores a 8-bit unsigned integer
                     v_.push_back(0xcc);
-                    v_.push_back(static_cast<uint8_t>((ival)));
+                    v_.push_back(static_cast<uint8_t>((val)));
                 }
-                else if (ival <= (std::numeric_limits<uint16_t>::max)())
+                else if (val <= (std::numeric_limits<uint16_t>::max)())
                 {
                     // uint 16 stores a 16-bit big-endian unsigned integer
                     v_.push_back(0xcd);
-                    to_big_endian<uint64_t, sizeof(uint16_t)>()(ival,v_);
+                    to_big_endian<uint64_t, sizeof(uint16_t)>()(val,v_);
                 }
-                else if (ival <= (std::numeric_limits<uint32_t>::max)())
+                else if (val <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // uint 32 stores a 32-bit big-endian unsigned integer
                     v_.push_back(0xce);
-                    to_big_endian<uint64_t, sizeof(uint32_t)>()(ival,v_);
+                    to_big_endian<uint64_t, sizeof(uint32_t)>()(val,v_);
                 }
-                else if (ival <= (std::numeric_limits<uint64_t>::max)())
+                else if (val <= (std::numeric_limits<uint64_t>::max)())
                 {
                     // uint 64 stores a 64-bit big-endian unsigned integer
                     v_.push_back(0xcf);
-                    to_big_endian<uint64_t, sizeof(uint64_t)>()(ival,v_);
+                    to_big_endian<uint64_t, sizeof(uint64_t)>()(val,v_);
                 }
                 break;
             }
@@ -158,8 +158,17 @@ private:
             case value_types::double_t:
             {
                 // float 64
-                v_.push_back(0xcb);
-                to_big_endian<double,sizeof(double)>()(jval.as_double(),v_);
+                double val = jval.as_double();
+                if (val >= -(std::numeric_limits<float>::max)() && val <= (std::numeric_limits<float>::max)())
+                {
+                    v_.push_back(0xca);
+                    to_big_endian<float,sizeof(float)>()((float)jval.as_double(),v_);
+                }
+                else
+                {
+                    v_.push_back(0xcb);
+                    to_big_endian<double,sizeof(double)>()(jval.as_double(),v_);
+                }
                 break;
             }
 
@@ -331,7 +340,7 @@ public:
                 // fixstr
                 const size_t len = *pos & 0x1f;
                 auto offset = &(*(pos + 1));
-                it_ += len; // skip content bytes
+                it_ += len; 
                 return Json(reinterpret_cast<const typename Json::char_type*>(offset), len);
             }
         }
@@ -371,76 +380,76 @@ public:
                     {
                         reinterpret_cast<uint8_t*>(&res)[sizeof(float) - byte - 1] = *(pos + 1 + byte);
                     }
-                    it_ += sizeof(float); // skip content bytes
+                    it_ += sizeof(float); 
                     return res;
                 }
 
                 case 0xcb: 
                 {
                     // float 64
-                    // copy bytes in reverse order into the double variable
+                    // reverse byte order
                     double res;
                     for (size_t byte = 0; byte < sizeof(double); ++byte)
                     {
                         reinterpret_cast<uint8_t*>(&res)[sizeof(double) - byte - 1] = *(pos + 1 + byte);
                     }
-                    it_ += sizeof(double); // skip content bytes
+                    it_ += sizeof(double); 
                     return res;
                 }
 
                 case 0xcc: 
                 {
                     // uint 8
-                    it_ += 1; // skip content byte
+                    it_ += 1; 
                     return from_big_endian<uint8_t>(pos,end_);
                 }
 
                 case 0xcd: 
                 {
                     // uint 16
-                    it_ += 2; // skip 2 content bytes
+                    it_ += 2; 
                     return from_big_endian<uint16_t>(pos,end_);
                 }
 
                 case 0xce: 
                 {
                     // uint 32
-                    it_ += 4; // skip 4 content bytes
+                    it_ += 4; 
                     return from_big_endian<uint32_t>(pos,end_);
                 }
 
                 case 0xcf: 
                 {
                     // uint 64
-                    it_ += 8; // skip 8 content bytes
+                    it_ += 8; 
                     return from_big_endian<uint64_t>(pos,end_);
                 }
 
                 case 0xd0: 
                 {
                     // int 8
-                    it_ += 1; // skip content byte
+                    it_ += 1; 
                     return from_big_endian<int8_t>(pos,end_);
                 }
 
                 case 0xd1: 
                 {
                     // int 16
-                    it_ += 2; // skip 2 content bytes
+                    it_ += 2; 
                     return from_big_endian<int16_t>(pos,end_);
                 }
 
                 case 0xd2: 
                 {
                     // int 32
-                    it_ += 4; // skip 4 content bytes
+                    it_ += 4; 
                     return from_big_endian<int32_t>(pos,end_);
                 }
 
                 case 0xd3: 
                 {
                     // int 64
-                    it_ += 8; // skip 8 content bytes
+                    it_ += 8; 
                     return from_big_endian<int64_t>(pos,end_);
                 }
 
@@ -449,7 +458,7 @@ public:
                     // str 8
                     const auto len = from_big_endian<uint8_t>(pos,end_);
                     auto offset = &(*(pos + 2));
-                    it_ += len + 1; // skip size byte + content bytes
+                    it_ += len + 1; 
                     return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
@@ -458,7 +467,7 @@ public:
                     // str 16
                     const auto len = from_big_endian<uint16_t>(pos,end_);
                     auto offset = &(*(pos + 3));
-                    it_ += len + 2; // skip 2 size bytes + content bytes
+                    it_ += len + 2; 
                     return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
@@ -467,7 +476,7 @@ public:
                     // str 32
                     const auto len = from_big_endian<uint32_t>(pos,end_);
                     auto offset = &(*(pos + 5));
-                    it_ += len + 4; // skip 4 size bytes + content bytes
+                    it_ += len + 4; 
                     return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
@@ -476,7 +485,7 @@ public:
                     // array 16
                     Json result = typename Json::array();
                     const auto len = from_big_endian<uint16_t>(pos,end_);
-                    it_ += 2; // skip 2 size bytes
+                    it_ += 2; 
                     for (size_t i = 0; i < len; ++i)
                     {
                         result.add(decode());
@@ -489,7 +498,7 @@ public:
                     // array 32
                     Json result = typename Json::array();
                     const auto len = from_big_endian<uint32_t>(pos,end_);
-                    it_ += 4; // skip 4 size bytes
+                    it_ += 4; 
                     for (size_t i = 0; i < len; ++i)
                     {
                         result.add(decode());
@@ -502,7 +511,7 @@ public:
                     // map 16
                     Json result = typename Json::object();
                     const auto len = from_big_endian<uint16_t>(pos,end_);
-                    it_ += 2; // skip 2 size bytes
+                    it_ += 2; 
                     for (size_t i = 0; i < len; ++i)
                     {
                         auto j = decode();
@@ -516,7 +525,7 @@ public:
                     // map 32
                     Json result = typename Json::object();
                     const auto len = from_big_endian<uint32_t>(pos,end_);
-                    it_ += 4; // skip 4 size bytes
+                    it_ += 4; 
                     for (size_t i = 0; i < len; ++i)
                     {
                         auto key = decode().as_string_view();
@@ -527,7 +536,7 @@ public:
 
                 default:
                 {
-                    throw std::invalid_argument("Error decoding a message pack at position " + std::to_string(end_-pos));
+                    JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a message pack at position %s", std::to_string(end_-pos));
                 }
             }
         }
