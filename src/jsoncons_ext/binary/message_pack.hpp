@@ -20,6 +20,29 @@
 
 namespace jsoncons { namespace binary {
   
+namespace msgpack_format
+{
+    const uint8_t nil_cd = 0xc0;
+    const uint8_t false_cd = 0xc2;
+    const uint8_t true_cd = 0x03;
+    const uint8_t float32_cd = 0xca;
+    const uint8_t float64_cd = 0xcb;
+    const uint8_t uint8_cd = 0xcc;
+    const uint8_t uint16_cd = 0xcd;
+    const uint8_t uint32_cd = 0xce;
+    const uint8_t uint64_cd = 0xcf;
+    const uint8_t int8_cd = 0xd0;
+    const uint8_t int16_cd = 0xd1;
+    const uint8_t int32_cd = 0xd2;
+    const uint8_t int64_cd = 0xd3;
+    const uint8_t str8_cd = 0xd9;
+    const uint8_t str16_cd = 0xda;
+    const uint8_t str32_cd = 0xdb;
+    const uint8_t array16_cd = 0xdc;
+    const uint8_t array32_cd = 0xdd;
+    const uint8_t map16_cd = 0xde;
+    const uint8_t map32_cd = 0xdf;
+}
 
 template<class Json>
 class Encode_message_pack_
@@ -40,14 +63,14 @@ private:
             case value_types::null_t:
             {
                 // nil
-                v_.push_back(0xc0);
+                v_.push_back(msgpack_format::nil_cd);
                 break;
             }
 
             case value_types::bool_t:
             {
                 // true and false
-                v_.push_back(jval.as_bool() ? 0xc3 : 0xc2);
+                v_.push_back(jval.as_bool() ? msgpack_format::true_cd : msgpack_format::false_cd );
                 break;
             }
 
@@ -64,25 +87,25 @@ private:
                     else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
                         // uint 8 stores a 8-bit unsigned integer
-                        v_.push_back(0xcc);
+                        v_.push_back(msgpack_format::uint8_cd);
                         to_big_endian<int64_t, sizeof(uint8_t)>()(val,v_);
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
                         // uint 16 stores a 16-bit big-endian unsigned integer
-                        v_.push_back(0xcd);
+                        v_.push_back(msgpack_format::uint16_cd);
                         to_big_endian<int64_t, sizeof(uint16_t)>()(val,v_);
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
                         // uint 32 stores a 32-bit big-endian unsigned integer
-                        v_.push_back(0xce);
+                        v_.push_back(msgpack_format::uint32_cd);
                         to_big_endian<int64_t, sizeof(uint32_t)>()(val,v_);
                     }
                     else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
                         // uint 64 stores a 64-bit big-endian unsigned integer
-                        v_.push_back(0xcf);
+                        v_.push_back(msgpack_format::uint64_cd);
                         to_big_endian<int64_t, sizeof(uint64_t)>()(val,v_);
                     }
                 }
@@ -96,25 +119,25 @@ private:
                     else if (val >= (std::numeric_limits<int8_t>::min)() && val <= (std::numeric_limits<int8_t>::max)())
                     {
                         // int 8 stores a 8-bit signed integer
-                        v_.push_back(0xd0);
+                        v_.push_back(msgpack_format::int8_cd);
                         to_big_endian<uint64_t, sizeof(uint8_t)>()(val,v_);
                     }
                     else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
                     {
                         // int 16 stores a 16-bit big-endian signed integer
-                        v_.push_back(0xd1);
+                        v_.push_back(msgpack_format::int16_cd);
                         to_big_endian<int64_t, sizeof(uint16_t)>()(val,v_);
                     }
                     else if (val >= (std::numeric_limits<int32_t>::min)() && val <= INT32_MAX)
                     {
                         // int 32 stores a 32-bit big-endian signed integer
-                        v_.push_back(0xd2);
+                        v_.push_back(msgpack_format::int32_cd);
                         to_big_endian<int64_t, sizeof(uint32_t)>()(val,v_);
                     }
                     else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
                     {
                         // int 64 stores a 64-bit big-endian signed integer
-                        v_.push_back(0xd3);
+                        v_.push_back(msgpack_format::int64_cd);
                         to_big_endian<int64_t, sizeof(uint64_t)>()(val,v_);
                     }
                 }
@@ -132,25 +155,25 @@ private:
                 else if (val <= (std::numeric_limits<uint8_t>::max)())
                 {
                     // uint 8 stores a 8-bit unsigned integer
-                    v_.push_back(0xcc);
+                    v_.push_back(msgpack_format::uint8_cd);
                     v_.push_back(static_cast<uint8_t>((val)));
                 }
                 else if (val <= (std::numeric_limits<uint16_t>::max)())
                 {
                     // uint 16 stores a 16-bit big-endian unsigned integer
-                    v_.push_back(0xcd);
+                    v_.push_back(msgpack_format::uint16_cd);
                     to_big_endian<uint64_t, sizeof(uint16_t)>()(val,v_);
                 }
                 else if (val <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // uint 32 stores a 32-bit big-endian unsigned integer
-                    v_.push_back(0xce);
+                    v_.push_back(msgpack_format::uint32_cd);
                     to_big_endian<uint64_t, sizeof(uint32_t)>()(val,v_);
                 }
                 else if (val <= (std::numeric_limits<uint64_t>::max)())
                 {
                     // uint 64 stores a 64-bit big-endian unsigned integer
-                    v_.push_back(0xcf);
+                    v_.push_back(msgpack_format::uint64_cd);
                     to_big_endian<uint64_t, sizeof(uint64_t)>()(val,v_);
                 }
                 break;
@@ -162,12 +185,12 @@ private:
                 double val = jval.as_double();
                 if (val >= -(std::numeric_limits<float>::max)() && val <= (std::numeric_limits<float>::max)())
                 {
-                    v_.push_back(0xca);
+                    v_.push_back(msgpack_format::float32_cd );
                     to_big_endian<float,sizeof(float)>()((float)jval.as_double(),v_);
                 }
                 else
                 {
-                    v_.push_back(0xcb);
+                    v_.push_back(msgpack_format::float64_cd);
                     to_big_endian<double,sizeof(double)>()(jval.as_double(),v_);
                 }
                 break;
@@ -191,13 +214,13 @@ private:
                 else if (length <= 0xffff)
                 {
                     // array 16
-                    v_.push_back(0xdc);
+                    v_.push_back(msgpack_format::array16_cd);
                     to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= 0xffffffff)
                 {
                     // array 32
-                    v_.push_back(0xdd);
+                    v_.push_back(msgpack_format::array32_cd);
                     to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
                 }
 
@@ -220,13 +243,13 @@ private:
                 else if (length <= 65535)
                 {
                     // map 16
-                    v_.push_back(0xde);
+                    v_.push_back(msgpack_format::map16_cd );
                     to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= 4294967295)
                 {
                     // map 32
-                    v_.push_back(0xdf);
+                    v_.push_back(msgpack_format::map32_cd );
                     to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
                 }
 
@@ -257,19 +280,19 @@ private:
         else if (length <= 255)
         {
             // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            v_.push_back(0xd9);
+            v_.push_back(msgpack_format::str8_cd);
             v_.push_back(static_cast<uint8_t>(length));
         }
         else if (length <= 65535)
         {
             // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            v_.push_back(0xda);
+            v_.push_back(msgpack_format::str16_cd);
             to_big_endian<size_t, sizeof(uint16_t)>()(length, v_);
         }
         else if (length <= 4294967295)
         {
             // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            v_.push_back(0xdb);
+            v_.push_back(msgpack_format::str32_cd);
             to_big_endian<size_t, sizeof(uint32_t)>()(length,v_);
         }
 
@@ -354,28 +377,25 @@ public:
         {
             switch (*pos)
             {
-                case 0xc0: 
+                case msgpack_format::nil_cd: 
                 {
-                    // nil
                     return Json::null();
                 }
 
-                case 0xc2: 
+                case msgpack_format::false_cd: 
                 {
-                    // false
                     return Json(false);
                 }
 
-                case 0xc3: 
+                case msgpack_format::true_cd: 
                 {
-                    // true
+                    // false
                     return Json(true);
                 }
 
-                case 0xca: 
+                case msgpack_format::float32_cd: 
                 {
-                    // float 32
-                    // copy bytes in reverse order into the double variable
+                    // reverse byte order
                     float res;
                     for (size_t byte = 0; byte < sizeof(float); ++byte)
                     {
@@ -385,9 +405,8 @@ public:
                     return res;
                 }
 
-                case 0xcb: 
+                case msgpack_format::float64_cd: 
                 {
-                    // float 64
                     // reverse byte order
                     double res;
                     for (size_t byte = 0; byte < sizeof(double); ++byte)
@@ -398,92 +417,80 @@ public:
                     return res;
                 }
 
-                case 0xcc: 
+                case msgpack_format::uint8_cd: 
                 {
-                    // uint 8
                     it_ += 1; 
                     return from_big_endian<uint8_t>(pos,end_);
                 }
 
-                case 0xcd: 
+                case msgpack_format::uint16_cd: 
                 {
-                    // uint 16
                     it_ += 2; 
                     return from_big_endian<uint16_t>(pos,end_);
                 }
 
-                case 0xce: 
+                case msgpack_format::uint32_cd: 
                 {
-                    // uint 32
                     it_ += 4; 
                     return from_big_endian<uint32_t>(pos,end_);
                 }
 
-                case 0xcf: 
+                case msgpack_format::uint64_cd: 
                 {
-                    // uint 64
                     it_ += 8; 
                     return from_big_endian<uint64_t>(pos,end_);
                 }
 
-                case 0xd0: 
+                case msgpack_format::int8_cd: 
                 {
-                    // int 8
                     it_ += 1; 
                     return from_big_endian<int8_t>(pos,end_);
                 }
 
-                case 0xd1: 
+                case msgpack_format::int16_cd: 
                 {
-                    // int 16
                     it_ += 2; 
                     return from_big_endian<int16_t>(pos,end_);
                 }
 
-                case 0xd2: 
+                case msgpack_format::int32_cd: 
                 {
-                    // int 32
                     it_ += 4; 
                     return from_big_endian<int32_t>(pos,end_);
                 }
 
-                case 0xd3: 
+                case msgpack_format::int64_cd: 
                 {
-                    // int 64
                     it_ += 8; 
                     return from_big_endian<int64_t>(pos,end_);
                 }
 
-                case 0xd9: 
+                case msgpack_format::str8_cd: 
                 {
-                    // str 8
                     const auto len = from_big_endian<uint8_t>(pos,end_);
                     auto offset = &(*(pos + 2));
                     it_ += len + 1; 
                     return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
-                case 0xda: 
+                case msgpack_format::str16_cd: 
                 {
-                    // str 16
                     const auto len = from_big_endian<uint16_t>(pos,end_);
                     auto offset = &(*(pos + 3));
                     it_ += len + 2; 
                     return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
-                case 0xdb: 
+                case msgpack_format::str32_cd: 
                 {
-                    // str 32
                     const auto len = from_big_endian<uint32_t>(pos,end_);
                     auto offset = &(*(pos + 5));
                     it_ += len + 4; 
                     return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
-                case 0xdc: 
+                case msgpack_format::array16_cd: 
                 {
-                    // array 16
                     Json result = typename Json::array();
                     const auto len = from_big_endian<uint16_t>(pos,end_);
                     it_ += 2; 
@@ -494,9 +501,8 @@ public:
                     return result;
                 }
 
-                case 0xdd: 
+                case msgpack_format::array32_cd: 
                 {
-                    // array 32
                     Json result = typename Json::array();
                     const auto len = from_big_endian<uint32_t>(pos,end_);
                     it_ += 4; 
@@ -507,9 +513,8 @@ public:
                     return result;
                 }
 
-                case 0xde: 
+                case msgpack_format::map16_cd : 
                 {
-                    // map 16
                     Json result = typename Json::object();
                     const auto len = from_big_endian<uint16_t>(pos,end_);
                     it_ += 2; 
@@ -521,9 +526,8 @@ public:
                     return result;
                 }
 
-                case 0xdf: 
+                case msgpack_format::map32_cd : 
                 {
-                    // map 32
                     Json result = typename Json::object();
                     const auto len = from_big_endian<uint32_t>(pos,end_);
                     it_ += 4; 
