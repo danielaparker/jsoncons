@@ -6,7 +6,7 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 
 The [code repository](https://github.com/danielaparker/jsoncons) and [releases](https://github.com/danielaparker/jsoncons/releases) are on github. It is distributed under the [Boost Software License](http://www.boost.org/users/license.html)
 
-Some features of the library are:
+Features:
 
 - Uses the standard C++ input/output streams library
 - Supports converting to and from the standard library sequence and associative containers
@@ -26,7 +26,7 @@ Some features of the library are:
 - Returns the expected results for all tests from [JSONTestSuite](https://github.com/nst/JSONTestSuite)
 - Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 
-The library has a number of extensions:
+Extensions:
 
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [jsonx](https://github.com/danielaparker/jsoncons/wiki/jsonx_serializer) extension supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)

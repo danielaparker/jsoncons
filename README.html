@@ -472,7 +472,7 @@ vertical-align:1px;
 <p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world.</p>
 <p>jsoncons uses some features that are new to C++ 11, including <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported for that compiler.</p>
 <p>The <a href="https://github.com/danielaparker/jsoncons">code repository</a> and <a href="https://github.com/danielaparker/jsoncons/releases">releases</a> are on github. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
-<p>Some features of the library are:</p>
+<p>Features:</p>
 <ul>
 <li>Uses the standard C++ input/output streams library</li>
 <li>Supports converting to and from the standard library sequence and associative containers</li>
@@ -492,7 +492,7 @@ vertical-align:1px;
 <li>Returns the expected results for all tests from <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a></li>
 <li>Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired</li>
 </ul>
-<p>The library has a number of extensions:</p>
+<p>Extensions:</p>
 <ul>
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="https://github.com/danielaparker/jsoncons/wiki/jsonx_serializer">jsonx</a> extension supports serializing JSON values to <a href="http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a> (XML)</li>
