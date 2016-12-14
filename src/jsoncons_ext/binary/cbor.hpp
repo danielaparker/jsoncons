@@ -1,11 +1,11 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2016 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BINARY_MESSAGE_PACK_HPP
-#define JSONCONS_BINARY_MESSAGE_PACK_HPP
+#ifndef JSONCONS_BINARY_CBOR_HPP
+#define JSONCONS_BINARY_CBOR_HPP
 
 #include <string>
 #include <sstream>
@@ -20,9 +20,8 @@
 
 namespace jsoncons { namespace binary {
   
-
 template<class Json>
-class Encode_message_pack_
+class Encode_cbor_
 {
     std::vector<uint8_t> v_;
 public:
@@ -40,14 +39,14 @@ private:
             case value_types::null_t:
             {
                 // nil
-                v_.push_back(0xc0);
+                v_.push_back(0xf6);
                 break;
             }
 
             case value_types::bool_t:
             {
                 // true and false
-                v_.push_back(jval.as_bool() ? 0xc3 : 0xc2);
+                v_.push_back(jval.as_bool() ? 0xf5 : 0xf4);
                 break;
             }
 
@@ -56,7 +55,7 @@ private:
                 int64_t val = jval.as_integer();
                 if (val >= 0)
                 {
-                    if (val < (std::numeric_limits<int8_t>::max)())
+                    if (val < 0x17)
                     {
                         // positive fixnum stores 7-bit positive integer
                         to_big_endian<int64_t, sizeof(int8_t)>()(val,v_);
@@ -64,25 +63,25 @@ private:
                     else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
                         // uint 8 stores a 8-bit unsigned integer
-                        v_.push_back(0xcc);
+                        v_.push_back(0x18);
                         to_big_endian<int64_t, sizeof(uint8_t)>()(val,v_);
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
                         // uint 16 stores a 16-bit big-endian unsigned integer
-                        v_.push_back(0xcd);
+                        v_.push_back(0x19);
                         to_big_endian<int64_t, sizeof(uint16_t)>()(val,v_);
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
                         // uint 32 stores a 32-bit big-endian unsigned integer
-                        v_.push_back(0xce);
+                        v_.push_back(0x1a);
                         to_big_endian<int64_t, sizeof(uint32_t)>()(val,v_);
                     }
                     else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
                         // uint 64 stores a 64-bit big-endian unsigned integer
-                        v_.push_back(0xcf);
+                        v_.push_back(0x1b);
                         to_big_endian<int64_t, sizeof(uint64_t)>()(val,v_);
                     }
                 }
@@ -281,22 +280,22 @@ private:
 };
 
 template<class Json>
-std::vector<uint8_t> encode_message_pack(const Json& jval)
+std::vector<uint8_t> encode_cbor(const Json& jval)
 {
-    Encode_message_pack_<Json> encoder;
+    Encode_cbor_<Json> encoder;
     return encoder.encode(jval);
 }
 
-// decode_message_pack
+// decode_cbor
 
 template<class Json>
-class Decode_message_pack_
+class Decode_cbor_
 {
     std::vector<uint8_t>::const_iterator begin_;
     std::vector<uint8_t>::const_iterator end_;
     std::vector<uint8_t>::const_iterator it_;
 public:
-    Decode_message_pack_(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
+    Decode_cbor_(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
         : begin_(begin), end_(end), it_(begin)
     {
     }
@@ -545,9 +544,9 @@ public:
 };
 
 template<class Json>
-Json decode_message_pack(const std::vector<uint8_t>& v)
+Json decode_cbor(const std::vector<uint8_t>& v)
 {
-    Decode_message_pack_<Json> decoder(v.begin(),v.end());
+    Decode_cbor_<Json> decoder(v.begin(),v.end());
     return decoder.decode();
 }
 
