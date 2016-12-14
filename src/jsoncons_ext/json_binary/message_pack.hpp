@@ -463,8 +463,8 @@ Json Decode_message_pack_(std::vector<uint8_t>::const_iterator& it, std::vector<
                 it += 2; // skip 2 size bytes
                 for (size_t i = 0; i < len; ++i)
                 {
-                    auto key = Decode_message_pack_<Json>(it, end).as_string_view();
-                    result.set(key,Decode_message_pack_<Json>(it, end));
+                    auto j = Decode_message_pack_<Json>(it, end);
+                    result.set(j.as_string_view(),Decode_message_pack_<Json>(it, end));
                 }
                 return result;
             }
