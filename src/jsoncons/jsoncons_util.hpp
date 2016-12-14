@@ -90,6 +90,11 @@ public:
         return length_;
     }
 
+    size_t size() const
+    {
+        return length_;
+    }
+
     int compare(const basic_string_view_& x) const 
     {
         const int cmp = Traits::compare(data_, x.data_, (std::min)(length_, x.length_));

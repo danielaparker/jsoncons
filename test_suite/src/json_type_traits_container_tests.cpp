@@ -2,7 +2,6 @@
 // Distributed under Boost license
 
 #include <boost/test/unit_test.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
@@ -20,7 +19,6 @@
 #include <array>
 
 using namespace jsoncons;
-using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_SUITE(json_type_traits_stl_suite)
 

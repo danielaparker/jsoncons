@@ -6,7 +6,6 @@
 #endif
 
 #include <boost/test/unit_test.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
@@ -15,8 +14,6 @@
 #include <ctime>
 
 using namespace jsoncons;
-using boost::numeric::ublas::matrix;
-
 
 BOOST_AUTO_TEST_SUITE(json_accessor_test_suite)
 
