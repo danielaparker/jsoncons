@@ -165,10 +165,10 @@ public:
         return Basic_string_view_(data_ + pos, n);
     }
 
-    int compare(Basic_string_view_ x) const 
+    int compare(Basic_string_view_ s) const 
     {
-        const int rc = Traits::compare(data_, x.data_, (std::min)(length_, x.length_));
-        return rc != 0 ? rc : (length_ == x.length_ ? 0 : length_ < x.length_ ? -1 : 1);
+        const int rc = Traits::compare(data_, s.data_, (std::min)(length_, s.length_));
+        return rc != 0 ? rc : (length_ == s.length_ ? 0 : length_ < s.length_ ? -1 : 1);
     }
 
     int compare(const CharT* data) const 
@@ -188,9 +188,13 @@ public:
     size_type find(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
     {
         if (pos > length())
+        {
             return npos;
+        }
         if (s.length_ == 0)
+        {
             return pos;
+        }
         const_iterator iter = std::search(cbegin() + pos, cend(),
                                           s.cbegin (), s.cend (), Traits::eq);
         return iter == cend () ? npos : std::distance(cbegin (), iter);
@@ -250,7 +254,9 @@ public:
     size_type find_first_of(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
     {
         if (pos >= length_ || s.length_ == 0)
+        {
             return npos;
+        }
         const_iterator iter = std::find_first_of
             (cbegin () + pos, cend (), s.cbegin (), s.cend (), Traits::eq);
         return iter == cend () ? npos : std::distance ( cbegin (), iter );
@@ -271,13 +277,19 @@ public:
     size_type find_last_of(Basic_string_view_ s, size_type pos = npos) const JSONCONS_NOEXCEPT 
     {
         if (s.length_ == 0)
+        {
             return npos;
+        }
         if (pos >= length_)
+        {
             pos = 0;
+        }
         else
+        {
             pos = length_ - (pos+1);
+        }
         const_reverse_iterator iter = std::find_first_of
-            ( crbegin () + pos, crend (), s.cbegin (), s.cend (), Traits::eq );
+            (crbegin () + pos, crend (), s.cbegin (), s.cend (), Traits::eq);
         return iter == crend () ? npos : reverse_distance ( crbegin (), iter);
     }
     size_type find_last_of(CharT ch, size_type pos = npos) const JSONCONS_NOEXCEPT
@@ -327,9 +339,13 @@ public:
     size_type find_last_not_of(Basic_string_view_ s, size_type pos = npos) const JSONCONS_NOEXCEPT 
     {
         if (pos >= length_)
+        {
             pos = length_ - 1;
+        }
         if (s.length_ == 0)
+        {
             return pos;
+        }
         pos = length_ - (pos+1);
 
         const_iterator iter = crend();
