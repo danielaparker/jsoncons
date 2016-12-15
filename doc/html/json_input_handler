@@ -484,7 +484,7 @@ vertical-align:1px;
 <tbody>
 <tr>
 <td><code>string_view_type</code></td>
-<td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <code>std:string_view</code> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise proxied.</td>
+<td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <a href="http://en.cppreference.com/w/cpp/string/basic_string_view">string view</a> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise proxied.</td>
 </tr></tbody></table>
 <h3>Public interface methods</h3>
 <pre><code>void begin_json()
