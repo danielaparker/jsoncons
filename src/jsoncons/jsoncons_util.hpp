@@ -54,6 +54,13 @@ private:
     const CharT* data_;
     size_t length_;
 public:
+    typedef CharT value_type;
+    typedef Traits traits_type;
+    typedef std::size_t size_type;
+    static const size_type npos = size_type(-1);
+    typedef const CharT* const_iterator;
+    typedef const CharT* iterator;
+
     basic_string_view_()
         : data_(nullptr), length_(0)
     {
@@ -90,6 +97,16 @@ public:
         return length_;
     }
 
+    const_iterator begin() const JSONCONS_NOEXCEPT
+    {
+        return data_;
+    }
+
+    const_iterator end() const JSONCONS_NOEXCEPT
+    {
+        return data_ + length_;
+    }
+
     size_t size() const
     {
         return length_;
@@ -113,6 +130,19 @@ public:
     {
         const int cmp = Traits::compare(data_, s.data(), (std::min)(length_, s.length()));
         return cmp != 0 ? cmp : (length_ == s.length() ? 0 : length_ < s.length() ? -1 : 1);
+    }
+
+    basic_string_view_ substr(size_type pos, size_type n=npos) const 
+    {
+        if ( pos > size())
+        {
+            JSONCONS_THROW_EXCEPTION(std::out_of_range, "pos exceeds size");
+        }
+        if (n == npos || pos + n > size())
+        {
+            n = size () - pos;
+        }
+        return basic_string_view_(data() + pos, n);
     }
 
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_string_view_& sv)
