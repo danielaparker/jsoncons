@@ -131,7 +131,7 @@ private:
         }
     }
 
-    void do_string_value(string_view_type val, 
+    void do_string_value(string_view_type s, 
                          const parsing_context& context) override
     {
         if (member_name_ == "name")
@@ -149,14 +149,14 @@ private:
             }
             else
             {
-                std::cerr << "Incomplete name \"" << val
+                std::cerr << "Incomplete name \"" << s
                    << "\" at line " << context.line_number()
                    << " and column " << context.column_number() << std::endl;
             }
         }
         else
         {
-            this->downstream_handler().value(val, context);
+            this->downstream_handler().value(s, context);
         }
     }
 

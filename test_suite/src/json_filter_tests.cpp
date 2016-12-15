@@ -48,32 +48,32 @@ private:
         }
     }
 
-    void do_string_value(string_view_type val,
+    void do_string_value(string_view_type s,
                          const parsing_context& context) override
     {
         if (member_name_ == "name")
         {
-            size_t end_first = val.find_first_of(" \t");
-            size_t start_last = val.find_first_not_of(" \t", end_first);
+            size_t end_first = s.find_first_of(" \t");
+            size_t start_last = s.find_first_not_of(" \t", end_first);
             this->downstream_handler().name("first-name", context);
-            string_view_type first = val.substr(0, end_first);
+            string_view_type first = s.substr(0, end_first);
             this->downstream_handler().value(first, context);
             if (start_last != string_view_type::npos)
             {
                 this->downstream_handler().name("last-name", context);
-                string_view_type last = val.substr(start_last);
+                string_view_type last = s.substr(start_last);
                 this->downstream_handler().value(last, context);
             }
             else
             {
-                warnings.push_back(warning{val,
+                warnings.push_back(warning{s,
                                    context.line_number(),
                                    context.column_number()});
             }
         }
         else
         {
-            this->downstream_handler().value(val,context);
+            this->downstream_handler().value(s,context);
         }
     }
 

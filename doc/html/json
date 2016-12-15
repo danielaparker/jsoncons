@@ -481,7 +481,7 @@ vertical-align:1px;
 <table>
 <thead>
 <tr>
-<th>Member type                         </th>
+<th>Member type</th>
 <th>Definition</th>
 </tr>
 </thead>
@@ -512,7 +512,7 @@ vertical-align:1px;
 </tr>
 <tr>
 <td><code>string_view_type</code></td>
-<td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <code>std:string_view</code> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise to a substitute.</td>
+<td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <code>std:string_view</code> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise proxied.</td>
 </tr>
 <tr>
 <td><code>kvp_type</code></td>
