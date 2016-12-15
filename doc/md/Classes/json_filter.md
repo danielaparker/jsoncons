@@ -20,7 +20,7 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise to a substitute.  
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
 
 ### Constructors
 
@@ -136,21 +136,20 @@ private:
     {
         if (member_name_ == "name")
         {
-            std::string value = val;
-            size_t end_first = value.find_first_of(" \t");
-            size_t start_last = value.find_first_not_of(" \t", end_first);
+            size_t end_first = val.find_first_of(" \t");
+            size_t start_last = val.find_first_not_of(" \t", end_first);
             this->downstream_handler().name("first-name", context);
-            std::string first = value.substr(0, end_first);
+            string_view_type first = val.substr(0, end_first);
             this->downstream_handler().value(first, context);
-            if (start_last != std::string::npos)
+            if (start_last != string_view_type::npos)
             {
                 this->downstream_handler().name("last-name", context);
-                std::string last = value.substr(start_last);
+                string_view_type last = val.substr(start_last);
                 this->downstream_handler().value(last, context);
             }
             else
             {
-                std::cerr << "Incomplete name \"" << value
+                std::cerr << "Incomplete name \"" << val
                    << "\" at line " << context.line_number()
                    << " and column " << context.column_number() << std::endl;
             }

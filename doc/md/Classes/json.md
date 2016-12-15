@@ -24,7 +24,7 @@ Member type                         |Definition
 `array_allocator`|Array allocator type
 `object_allocator`|Object allocator 
 `string_type`|Default `string_type` is `std::string`
-`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise to a substitute.  
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
 `kvp_type `|[kvp_type ](kvp_type ) is a class that stores a name and a json value
 `null_type`|An alias for `jsoncons::null_type`
 `object`|json object type

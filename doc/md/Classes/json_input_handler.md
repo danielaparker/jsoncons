@@ -13,7 +13,7 @@ The `json_input_handler` class is an instantiation of the `basic_json_input_hand
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise to a substitute.  
+`string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 `std:string_view` if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
 
 ### Public interface methods
 

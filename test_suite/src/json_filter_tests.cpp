@@ -53,23 +53,22 @@ private:
     {
         if (member_name_ == "name")
         {
-            std::string value = val;
-            size_t end_first = value.find_first_of(" \t");
-            size_t start_last = value.find_first_not_of(" \t", end_first);
-            this->downstream_handler().name("first-name",context);
-            std::string first = value.substr(0, end_first);
-            this->downstream_handler().value(first,context);
-            if (start_last != std::string::npos)
+            size_t end_first = val.find_first_of(" \t");
+            size_t start_last = val.find_first_not_of(" \t", end_first);
+            this->downstream_handler().name("first-name", context);
+            string_view_type first = val.substr(0, end_first);
+            this->downstream_handler().value(first, context);
+            if (start_last != string_view_type::npos)
             {
-                this->downstream_handler().name("last-name",context);
-                std::string last = value.substr(start_last);
-                this->downstream_handler().value(last,context);
+                this->downstream_handler().name("last-name", context);
+                string_view_type last = val.substr(start_last);
+                this->downstream_handler().value(last, context);
             }
             else
             {
-                warnings.push_back(warning{value,
-                                           context.line_number(),
-                                           context.column_number()});
+                warnings.push_back(warning{val,
+                                   context.line_number(),
+                                   context.column_number()});
             }
         }
         else

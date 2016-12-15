@@ -35,12 +35,12 @@ private:
             size_t end_first = val.find_first_of(" \t");
             size_t start_last = val.find_first_not_of(" \t", end_first);
             this->downstream_handler().name("first-name", context);
-            std::string first = val.substr(0, end_first);
+            string_view_type first = val.substr(0, end_first);
             this->downstream_handler().value(first, context);
-            if (start_last != std::string::npos)
+            if (start_last != string_view_type::npos)
             {
                 this->downstream_handler().name("last-name", context);
-                std::string last = val.substr(start_last);
+                string_view_type last = val.substr(start_last);
                 this->downstream_handler().value(last, context);
             }
             else
