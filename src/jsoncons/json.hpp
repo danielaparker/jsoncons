@@ -95,7 +95,7 @@ public:
     typedef typename json_traits_type::char_traits_type char_traits_type;
 
 #if !defined(JSONCONS_HAS_STRING_VIEW)
-    typedef basic_string_view_<char_type,char_traits_type> string_view_type;
+    typedef Basic_string_view_<char_type,char_traits_type> string_view_type;
 #else
     typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
 #endif

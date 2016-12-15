@@ -32,21 +32,20 @@ private:
     {
         if (member_name_ == "name")
         {
-            std::string value = val;
-            size_t end_first = value.find_first_of(" \t");
-            size_t start_last = value.find_first_not_of(" \t", end_first);
+            size_t end_first = val.find_first_of(" \t");
+            size_t start_last = val.find_first_not_of(" \t", end_first);
             this->downstream_handler().name("first-name", context);
-            std::string first = value.substr(0, end_first);
+            std::string first = val.substr(0, end_first);
             this->downstream_handler().value(first, context);
             if (start_last != std::string::npos)
             {
                 this->downstream_handler().name("last-name", context);
-                std::string last = value.substr(start_last);
+                std::string last = val.substr(start_last);
                 this->downstream_handler().value(last, context);
             }
             else
             {
-                std::cerr << "Incomplete name \"" << value
+                std::cerr << "Incomplete name \"" << val
                    << "\" at line " << context.line_number()
                    << " and column " << context.column_number() << std::endl;
             }

@@ -25,6 +25,11 @@
 namespace jsoncons
 {
 
+#if _MSC_VER > 1800 // _MSC_VER == 1800 -> MS Visual Studio 2013
+#else
+#define JSONCONS_NO_CONSTEXPR
+#endif
+
 //#define JSONCONS_HAS_STRING_VIEW
 
 #if defined(ANDROID) || defined(__ANDROID__)
