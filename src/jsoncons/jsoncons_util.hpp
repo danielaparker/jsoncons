@@ -160,9 +160,9 @@ public:
         }
         if (n == npos || pos + n > size())
         {
-            n = size () - pos;
+            n = length() - pos;
         }
-        return Basic_string_view_(data() + pos, n);
+        return Basic_string_view_(data_ + pos, n);
     }
 
     int compare(Basic_string_view_ x) const 
@@ -187,13 +187,13 @@ public:
 
     size_type find(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
     {
-        if (pos > size())
-          return npos;
-        if (s.empty())
-          return pos;
-        const_iterator iter = std::search(this->cbegin() + pos, this->cend(),
-                                           s.cbegin (), s.cend (), Traits::eq);
-        return iter == this->cend () ? npos : std::distance(this->cbegin (), iter);
+        if (pos > length())
+            return npos;
+        if (s.length_ == 0)
+            return pos;
+        const_iterator iter = std::search(cbegin() + pos, cend(),
+                                          s.cbegin (), s.cend (), Traits::eq);
+        return iter == cend () ? npos : std::distance(cbegin (), iter);
     }
     size_type find(CharT ch, size_type pos = 0) const JSONCONS_NOEXCEPT
     { 
@@ -211,17 +211,27 @@ public:
     size_type rfind(Basic_string_view_ s, size_type pos = npos) const JSONCONS_NOEXCEPT 
     {
         if (length_ < s.length_)
-          return npos;
+        {
+            return npos;
+        }
         if (pos > length_ - s.length_)
-          pos = length_ - s.length_;
-        if (s.length_ == 0)     // an empty string is always found
-          return pos;
-        for (const CharT* p = data_ + pos; ; --p) 
+        {
+            pos = length_ - s.length_;
+        }
+        if (s.length_ == 0) 
+        {
+            return pos;
+        }
+        for (const CharT* p = data_ + pos; true; --p) 
         {
             if (Traits::compare(p, s.data_, s.length_) == 0)
-              return p - data_;
+            {
+                return p - data_;
+            }
             if (p == data_)
-              return npos;
+            {
+                return npos;
+            }
          };
     }
     size_type rfind(CharT ch, size_type pos = npos) const JSONCONS_NOEXCEPT
@@ -240,10 +250,10 @@ public:
     size_type find_first_of(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
     {
         if (pos >= length_ || s.length_ == 0)
-          return npos;
+            return npos;
         const_iterator iter = std::find_first_of
-            (this->cbegin () + pos, this->cend (), s.cbegin (), s.cend (), Traits::eq);
-        return iter == this->cend () ? npos : std::distance ( this->cbegin (), iter );
+            (cbegin () + pos, cend (), s.cbegin (), s.cend (), Traits::eq);
+        return iter == cend () ? npos : std::distance ( cbegin (), iter );
     }
     size_type find_first_of(CharT ch, size_type pos = 0) const JSONCONS_NOEXCEPT
     {
@@ -261,14 +271,14 @@ public:
     size_type find_last_of(Basic_string_view_ s, size_type pos = npos) const JSONCONS_NOEXCEPT 
     {
         if (s.length_ == 0)
-          return npos;
+            return npos;
         if (pos >= length_)
-          pos = 0;
+            pos = 0;
         else
-          pos = length_ - (pos+1);
+            pos = length_ - (pos+1);
         const_reverse_iterator iter = std::find_first_of
-            ( this->crbegin () + pos, this->crend (), s.cbegin (), s.cend (), Traits::eq );
-        return iter == this->crend () ? npos : reverse_distance ( this->crbegin (), iter);
+            ( crbegin () + pos, crend (), s.cbegin (), s.cend (), Traits::eq );
+        return iter == crend () ? npos : reverse_distance ( crbegin (), iter);
     }
     size_type find_last_of(CharT ch, size_type pos = npos) const JSONCONS_NOEXCEPT
     { 
@@ -286,11 +296,20 @@ public:
     size_type find_first_not_of(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
     {
         if (pos >= length_)
-          return npos;
+            return npos;
         if (s.length_ == 0)
-          return pos;
-        const_iterator iter = find_not_of ( this->cbegin () + pos, this->cend (), s );
-        return iter == this->cend () ? npos : std::distance ( this->cbegin (), iter );
+            return pos;
+
+        const_iterator iter = crend();
+        for (auto p = crbegin()+pos; p != crend () ; ++p)
+        {
+            if (Traits::find(s.data_, s.length_, *p) == 0)
+            {
+                iter = p;
+                break;
+            }
+        }
+        return iter == cend () ? npos : std::distance ( cbegin (), iter );
     }
     size_type find_first_not_of(CharT ch, size_type pos = 0) const JSONCONS_NOEXCEPT
     { 
@@ -308,12 +327,21 @@ public:
     size_type find_last_not_of(Basic_string_view_ s, size_type pos = npos) const JSONCONS_NOEXCEPT 
     {
         if (pos >= length_)
-          pos = length_ - 1;
+            pos = length_ - 1;
         if (s.length_ == 0)
-          return pos;
+            return pos;
         pos = length_ - (pos+1);
-        const_reverse_iterator iter = find_not_of ( this->crbegin () + pos, this->crend (), s );
-        return iter == this->crend () ? npos : reverse_distance ( this->crbegin (), iter );
+
+        const_iterator iter = crend();
+        for (auto p = crbegin()+pos; p != crend () ; ++p)
+        {
+            if (Traits::find(s.data_, s.length_, *p) == 0)
+            {
+                iter = p;
+                break;
+            }
+        }
+        return iter == crend () ? npos : reverse_distance ( crbegin (), iter );
     }
     size_type find_last_not_of(CharT ch, size_type pos = npos) const JSONCONS_NOEXCEPT
     { 
@@ -333,17 +361,6 @@ public:
         os.write(sv.data_,sv.length_);
         return os;
     }
-private:
-
-    template <typename Iterator>
-    Iterator find_not_of(Iterator first, Iterator last, Basic_string_view_ s) const JSONCONS_NOEXCEPT 
-    {
-        for (; first != last ; ++first)
-            if ( 0 == Traits::find(s.data_, s.length_, *first))
-                return first;
-        return last;
-    }
-
 };
 
 // ==
