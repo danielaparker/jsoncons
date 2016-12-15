@@ -57,6 +57,7 @@ private:
     size_t length_;
 public:
     typedef CharT value_type;
+    typedef const CharT& const_reference;
     typedef Traits traits_type;
     typedef std::size_t size_type;
     static const size_type npos = size_type(-1);
@@ -145,6 +146,30 @@ public:
     }
 
     // element access
+
+    const_reference operator[](size_type pos) const 
+    { 
+        return data_[pos]; 
+    }
+
+    const_reference at(size_t pos) const 
+    {
+        if (pos >= length_)
+        {
+            JSONCONS_THROW_EXCEPTION(std::out_of_range, "pos exceeds length");
+        }
+        return data_[pos];
+    }
+
+    const_reference front() const                
+    { 
+        return data_[0]; 
+    }
+    const_reference back()  const                
+    { 
+        return data_[length_-1]; 
+    }
+
     const CharT* data() const
     {
         return data_;
@@ -160,7 +185,7 @@ public:
         }
         if (n == npos || pos + n > size())
         {
-            n = length() - pos;
+            n = length_ - pos;
         }
         return Basic_string_view_(data_ + pos, n);
     }
@@ -187,7 +212,7 @@ public:
 
     size_type find(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
     {
-        if (pos > length())
+        if (pos > length_)
         {
             return npos;
         }
@@ -312,8 +337,8 @@ public:
         if (s.length_ == 0)
             return pos;
 
-        const_iterator iter = crend();
-        for (auto p = crbegin()+pos; p != crend () ; ++p)
+        const_iterator iter = cend();
+        for (auto p = cbegin()+pos; p != cend () ; ++p)
         {
             if (Traits::find(s.data_, s.length_, *p) == 0)
             {
@@ -321,7 +346,7 @@ public:
                 break;
             }
         }
-        return iter == cend () ? npos : std::distance ( cbegin (), iter );
+        return iter == cend () ? npos : std::distance (cbegin(), iter);
     }
     size_type find_first_not_of(CharT ch, size_type pos = 0) const JSONCONS_NOEXCEPT
     { 
