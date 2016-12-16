@@ -39,32 +39,34 @@ struct compare_pointer
     }
 };
 
-template <class ForwardIt,class Compare,class BinaryPredicate>
-ForwardIt unique_unsorted(ForwardIt first, ForwardIt last, Compare comp, BinaryPredicate predicate)
+
+template <class BidirectionalIt,class BinaryPredicate>
+BidirectionalIt last_wins_unique_sequence(BidirectionalIt first, BidirectionalIt last, BinaryPredicate compare)
 {
+    
     if (first == last)
     {
         return last;
     }
-    std::vector<typename ForwardIt::pointer> dups;
-    {
-        typedef typename ForwardIt::pointer pointer;
 
+    typedef typename BidirectionalIt::value_type value_type;
+    typedef typename BidirectionalIt::pointer pointer;
+    std::vector<value_type> dups;
+    {
         std::vector<pointer> v(std::distance(first,last));
         auto p = v.begin();
         for (auto it = first; it != last; ++it)
         {
             *p++ = &(*it);
         }
-        compare_pointer<pointer,Compare> c(comp);
-        std::sort(v.begin(), v.end(), c);
+        std::sort(v.begin(), v.end(), [&](pointer a, pointer b){return compare(*a,*b)<0;});
         auto it = v.begin();
         auto end = v.end();
         for (auto begin = it+1; begin != end; ++it, ++begin)
         {
-            if (predicate(*(*it),*(*begin)))
+            if (compare(*(*it),*(*begin)) == 0)
             {
-                dups.push_back(*it);
+                dups.push_back(*(*it));
             }
         }
     }
@@ -72,16 +74,16 @@ ForwardIt unique_unsorted(ForwardIt first, ForwardIt last, Compare comp, BinaryP
     {
         return last;
     }
-
-    auto it = first;
-    for (auto p = first; p != last; ++p)
+    
+    auto it = last;
+    for (auto p = first; p != last && p != it; )
     {
         bool no_dup = true;
         if (dups.size() > 0)
         {
             for (auto q = dups.begin(); no_dup && q != dups.end();)
             {
-                if (predicate(*p,*(*q)))
+                if (compare(*p,*q) == 0)
                 {
                     dups.erase(q);
                     no_dup = false;
@@ -92,10 +94,17 @@ ForwardIt unique_unsorted(ForwardIt first, ForwardIt last, Compare comp, BinaryP
                 }
             }
         }
-        if (no_dup && it != p)
+        if (!no_dup)
         {
-            *it = std::move(*p);
-            ++it;
+            --it;
+            for (auto r = p; r != it; ++r)
+            {
+                *r = std::move(*(r+1));
+            }
+        }
+        else
+        {
+            ++p;
         }
     }
     
@@ -968,9 +977,8 @@ public:
     }
     void end_bulk_insert()
     {
-        auto it = unique_unsorted(members_.begin(), members_.end(),
-                                  member_lt_member<value_type>(),
-                              [](const value_type& a, const value_type& b){ return !(a.key().compare(b.key()));});
+        auto it = last_wins_unique_sequence(members_.begin(), members_.end(),
+                              [](const value_type& a, const value_type& b){ return a.key().compare(b.key());});
         members_.erase(it,members_.end());
     }
 

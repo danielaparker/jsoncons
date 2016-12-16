@@ -183,24 +183,6 @@ BOOST_AUTO_TEST_CASE(test_array_erase_range)
     BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
 }
 
-BOOST_AUTO_TEST_CASE(test_object_erase_range)
-{
-    json o;
-    o["key1"] = "value1";
-    o["key2"] = "value2";
-    o["key3"] = "value3";
-    o["key4"] = "value4";
-
-    auto first = o.find("key2");
-    auto last = o.find("key4");
-
-    o.erase(first,last);
-    
-    BOOST_CHECK_EQUAL(2,o.size());
-    BOOST_CHECK_EQUAL(1,o.count("key1"));
-    BOOST_CHECK_EQUAL(1,o.count("key4"));
-}
-
 BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
 {
     json cities = json::array();
