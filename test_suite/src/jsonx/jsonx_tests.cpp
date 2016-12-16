@@ -18,7 +18,7 @@ using namespace jsoncons;
 using namespace jsoncons::jsonx;
 
 BOOST_AUTO_TEST_SUITE(jsonx_test_suite)
-
+#if 0
 BOOST_AUTO_TEST_CASE(serialize_jsonx)
 {
     json person = json::parse(R"(
@@ -63,6 +63,7 @@ BOOST_AUTO_TEST_CASE(serialize_special_characters)
 
     special_chars.write(serializer);
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
 

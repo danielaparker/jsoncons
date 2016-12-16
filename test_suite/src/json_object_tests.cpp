@@ -791,5 +791,64 @@ BOOST_AUTO_TEST_CASE(test_as_vector_of_int_on_proxy)
     BOOST_CHECK(v[3]==3);
 }
 
+BOOST_AUTO_TEST_CASE(test_defaults)
+{
+    json obj;
+
+    obj["field1"] = 1;
+    obj["field3"] = "Toronto";
+
+    double x1 = obj.count("field1") ? obj["field1"].as<double>() : 10.0;
+    double x2 = obj.count("field2") ? obj["field2"].as<double>() : 20.0;
+
+    std::cout << "x1=" << x1 << std::endl;
+    std::cout << "x2=" << x2 << std::endl;
+
+    std::string s1 = obj.get_with_default("field3", "Montreal");
+    std::string s2 = obj.get_with_default("field4", "San Francisco");
+
+    BOOST_CHECK_EQUAL(s1,"Toronto");
+    BOOST_CHECK_EQUAL(s2,"San Francisco");
+}
+
+BOOST_AUTO_TEST_CASE(test_accessing)
+{
+    json obj;
+    obj["first_name"] = "Jane";
+    obj["last_name"] = "Roe";
+    obj["events_attended"] = 10;
+    obj["accept_waiver_of_liability"] = true;
+
+    std::string first_name = obj["first_name"].as<std::string>();
+    std::string last_name = obj.at("last_name").as<std::string>();
+    int events_attended = obj["events_attended"].as<int>();
+    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as<bool>();
+
+    std::cout << first_name << " " << last_name << ", " << events_attended << ", " << accept_waiver_of_liability << std::endl;
+
+}
+
+BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
+{
+    json obj;
+    obj["first_name"] = "Jane";
+    obj["last_name"] = "Roe";
+
+    try
+    {
+        std::string experience = obj["outdoor_experience"].as<std::string>();
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
+
+    bool first_aid_certification = obj.get_with_default("first_aid_certification",false);
+
+    std::cout << "experience=" << experience << ", first_aid_certification=" << first_aid_certification << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

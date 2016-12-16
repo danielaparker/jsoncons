@@ -294,5 +294,39 @@ BOOST_AUTO_TEST_CASE(test_assign_vector_of_bool)
 
 }
 
+BOOST_AUTO_TEST_CASE(test_add_null)
+{
+    json a = json::array();
+    a.add(jsoncons::null_type());
+    a.add(json::null());
+    BOOST_CHECK(a[0].is_null());
+    BOOST_CHECK(a[1].is_null());
+}
+
+BOOST_AUTO_TEST_CASE(test_from_container)
+{
+    std::vector<int> vec;
+    vec.push_back(10);
+    vec.push_back(20);
+    vec.push_back(30);
+
+    json val1(vec.begin(), vec.end());
+    BOOST_REQUIRE(vec.size() == 3);
+    BOOST_CHECK(vec[0] == 10);
+    BOOST_CHECK(vec[1] == 20);
+    BOOST_CHECK(vec[2] == 30);
+
+    std::list<double> list;
+    list.push_back(10.5);
+    list.push_back(20.5);
+    list.push_back(30.5);
+
+    json val2(list.begin(), list.end());
+    BOOST_REQUIRE(val2.size() == 3);
+    BOOST_CHECK_CLOSE(val2[0].as<double>(),10.5,0.000001);
+    BOOST_CHECK_CLOSE(val2[1].as<double>(),20.5,0.000001);
+    BOOST_CHECK_CLOSE(val2[2].as<double>(),30.5,0.000001);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

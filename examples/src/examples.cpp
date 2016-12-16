@@ -160,6 +160,40 @@ void second_example_a()
     }
 }
 
+void construction_in_code()
+{
+    // A null value
+    json null_val = json::null();
+
+    // A boolean value
+    json flag(true);
+
+    // A numeric value
+    json number(10.5);
+
+    // An object value with four members
+    json obj;
+    obj["first_name"] = "Jane";
+    obj["last_name"] = "Roe";
+    obj["events_attended"] = 10;
+    obj["accept_waiver_of_liability"] = true;
+
+    std::string first_name = obj["first_name"].as<std::string>();
+    std::string last_name = obj.at("last_name").as<std::string>();
+    int events_attended = obj["events_attended"].as<int>();
+    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as<bool>();
+
+    // An array value with four elements
+    json arr = json::array();
+    arr.add(null_val);
+    arr.add(flag);
+    arr.add(number);
+    arr.add(obj);
+
+    serialization_options format;
+    std::cout << pretty_print(arr) << std::endl;
+}
+
 void mulitple_json_objects()
 {
     std::ifstream is("input/multiple-json-objects.json");
@@ -248,6 +282,8 @@ int main()
         first_example_d();
 
         second_example_a();
+
+        construction_in_code();
 
         array_examples();
         container_examples();

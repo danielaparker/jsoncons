@@ -118,7 +118,6 @@ BOOST_AUTO_TEST_CASE(test_parse_empty_structures)
 
 BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)
 {
-    json val;
     test_error_code("null {}", jsoncons::json_parser_errc::extra_character);
     test_error_code("n ", jsoncons::json_parser_errc::invalid_value);
     test_error_code("nu ", jsoncons::json_parser_errc::invalid_value);
@@ -133,6 +132,32 @@ BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)
     test_error_code("1e0-1", jsoncons::json_parser_errc::invalid_number);
     test_error_code("\"string\"{}", jsoncons::json_parser_errc::extra_character);
     test_error_code("\"string\"[]", jsoncons::json_parser_errc::extra_character);
+}
+
+BOOST_AUTO_TEST_CASE(test_multiple)
+{
+    std::string in="{\"a\":1,\"b\":2,\"c\":3}{\"a\":4,\"b\":5,\"c\":6}";
+    std::cout << in << std::endl;
+
+    std::istringstream is(in);
+
+    jsoncons::json_decoder<json> decoder;
+    json_reader reader(is,decoder);
+
+    if (!reader.eof())
+    {
+        reader.read_next();
+        BOOST_CHECK(!reader.eof());
+        json val = decoder.get_result();
+        BOOST_CHECK_EQUAL(1,val["a"].as<int>());
+    }
+    if (!reader.eof())
+    {
+        reader.read_next();
+        BOOST_CHECK(!reader.eof());
+        json val = decoder.get_result();
+        BOOST_CHECK_EQUAL(4,val["a"].as<int>());
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
