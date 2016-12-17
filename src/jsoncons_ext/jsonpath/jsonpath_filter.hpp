@@ -261,7 +261,7 @@ bool lt(const Json& lhs, const Json& rhs)
     }
     else if (lhs.is_string() && rhs.is_string())
     {
-        result = lhs.as_string() < rhs.as_string();
+        result = lhs.as_string_view() < rhs.as_string_view();
     }
     return result;
 }
