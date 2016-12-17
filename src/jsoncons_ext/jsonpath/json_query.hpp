@@ -255,7 +255,7 @@ private:
             else if (context.is_string())
             {
                 size_t pos = 0;
-                string_type s = context.as_string();
+                string_view_type s = context.as_string_view();
                 if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start_))
                 {
                     size_t index = positive_start_ ? pos : s.size() - pos;
@@ -960,7 +960,7 @@ public:
         }
         else if (context.is_string())
         {
-            string_type s = context.as_string();
+            string_view_type s = context.as_string_view();
             size_t pos = 0;
             if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
             {
