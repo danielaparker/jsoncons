@@ -105,7 +105,7 @@ Output:
 (3) Dimension 2 = n/a
 ```
 
-For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). The [documentation](doc/md/Home.md) explains how to use it. 
+For a quick guide, see the article [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). Consult the [wiki](https://github.com/danielaparker/jsoncons/wiki) for the latest documentation, tutorials and roadmap. 
 
 ## Building the test suite and examples with CMake
 

@@ -108,11 +108,11 @@ int c99_snprintf(char *str, size_t size, const char *format, ...)
 }
 #else
 inline bool is_nan(double x)
-{ return std::isnan( x ); }
+{ return (std::isnan)( x ); }
 inline bool is_pos_inf(double x)
-{return std::isinf(x) && x > 0;}
+{return (x == std::numeric_limits<double>::infinity();}
 inline bool is_neg_inf(double x)
-{return  std::isinf(x) && x > 0;}
+{return (x == -std::numeric_limits<double>::infinity();}
 
 #if __cplusplus >= 201103L
 #define c99_snprintf snprintf
