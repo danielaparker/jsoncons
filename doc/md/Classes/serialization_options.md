@@ -16,7 +16,7 @@ When parsing text, the precision of the fractional number is retained, and used 
 ### Member constants
 
     default_precision
-The default precision is 16
+The default precision is 15
 
     default_indent
 The default indent is 4
@@ -40,15 +40,6 @@ The default is false
     bool escape_solidus() const
 The default is false
 
-    bool replace_nan() const
-The defult is `true`
-
-    bool replace_pos_inf() const
-The defult is `true`
-
-    bool replace_neg_inf() const
-The defult is `true`
-
     std::string nan_replacement() const 
 The default is "null"
 
@@ -65,14 +56,6 @@ The default is "null"
     serialization_options& escape_all_non_ascii(bool value)
 
     serialization_options& escape_solidus(bool value)
-
-    serialization_options& replace_nan(bool replace)
-
-    serialization_options& replace_inf(bool replace)
-
-    serialization_options& replace_pos_inf(bool replace)
-
-    serialization_options& replace_neg_inf(bool replace)
 
     serialization_options& nan_replacement(const std::string& replacement)
 

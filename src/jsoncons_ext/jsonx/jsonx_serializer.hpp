@@ -525,15 +525,15 @@ private:
             bos_.write(jsonx_char_traits<CharT>::number_element_literal().data(),
                        jsonx_char_traits<CharT>::number_element_literal().length());
         }
-        if (is_nan(value) && options_.replace_nan())
+        if ((std::isnan)(value))
         {
             bos_.write(options_.nan_replacement());
         }
-        else if (is_pos_inf(value) && options_.replace_pos_inf())
+        else if (value == std::numeric_limits<double>::infinity())
         {
             bos_.write(options_.pos_inf_replacement());
         }
-        else if (is_neg_inf(value) && options_.replace_neg_inf())
+        else if (!(std::isfinite)(value))
         {
             bos_.write(options_.neg_inf_replacement());
         }

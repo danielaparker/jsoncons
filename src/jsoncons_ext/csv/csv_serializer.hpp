@@ -363,15 +363,15 @@ private:
     {
         begin_value(os);
 
-        if (is_nan(val) && format_.replace_nan())
+        if ((std::isnan)(val))
         {
             os.write(format_.nan_replacement());
         }
-        else if (is_pos_inf(val) && format_.replace_pos_inf())
+        else if (val == std::numeric_limits<double>::infinity())
         {
             os.write(format_.pos_inf_replacement());
         }
-        else if (is_neg_inf(val) && format_.replace_neg_inf())
+        else if (!(std::isfinite)(val))
         {
             os.write(format_.neg_inf_replacement());
         }

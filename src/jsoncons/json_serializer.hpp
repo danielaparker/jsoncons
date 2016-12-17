@@ -328,15 +328,15 @@ private:
             begin_scalar_value();
         }
 
-        if (is_nan(value) && format_.replace_nan())
+        if ((std::isnan)(value))
         {
             bos_.write(format_.nan_replacement());
         }
-        else if (is_pos_inf(value) && format_.replace_pos_inf())
+        else if (value == std::numeric_limits<double>::infinity())
         {
             bos_.write(format_.pos_inf_replacement());
         }
-        else if (is_neg_inf(value) && format_.replace_neg_inf())
+        else if (!(std::isfinite)(value))
         {
             bos_.write(format_.neg_inf_replacement());
         }
