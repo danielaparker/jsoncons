@@ -69,6 +69,14 @@ namespace jsoncons
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4290 )
+
+inline bool is_nan(double x)
+{ return (std::isnan)( x ); }
+inline bool is_pos_inf(double x)
+{return (x == std::numeric_limits<double>::infinity());}
+inline bool is_neg_inf(double x)
+{return !(std::isfinite)(x) /*&& (x != std::numeric_limits<double>::infinity()) && !(std::isnan)( x )*/;}
+/*
 inline bool is_nan(double x) { return _isnan(x) != 0; }
 inline bool is_inf(double x)
 {
@@ -82,7 +90,7 @@ inline bool is_neg_inf(double x)
 {
     return is_inf(x) && x < 0;
 }
-
+*/
 inline
 int c99_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
@@ -107,12 +115,18 @@ int c99_snprintf(char *str, size_t size, const char *format, ...)
     return count;
 }
 #else
-inline bool is_nan(double x)
-{ return (std::isnan)( x ); }
-inline bool is_pos_inf(double x)
-{return (x == std::numeric_limits<double>::infinity();}
-inline bool is_neg_inf(double x)
-{return !(std::isfinite)(x) /*&& (x != std::numeric_limits<double>::infinity()) && !(std::isnan)( x )*/;}
+    inline bool is_nan(double x)
+    {
+        return (std::isnan)(x);
+    }
+    inline bool is_pos_inf(double x)
+    {
+        return (x == std::numeric_limits<double>::infinity());
+    }
+    inline bool is_neg_inf(double x)
+    {
+        return !(std::isfinite)(x) /*&& (x != std::numeric_limits<double>::infinity()) && !(std::isnan)( x )*/;
+    }
 
 #if __cplusplus >= 201103L
 #define c99_snprintf snprintf
