@@ -190,7 +190,7 @@ private:
             }
             else if (index.is_string())
             {
-                name_selector selector(index.as_string(),true);
+                name_selector selector(index.as_string_view(),true);
                 selector.select(context, nodes, temp_json_values);
             }
         }
@@ -227,7 +227,7 @@ private:
         key_type name_;
         bool positive_start_;
     public:
-        name_selector(const key_type& name, bool positive_start)
+        name_selector(string_view_type name, bool positive_start)
             : name_(name), positive_start_(positive_start)
         {
         }
