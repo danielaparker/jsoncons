@@ -112,7 +112,7 @@ inline bool is_nan(double x)
 inline bool is_pos_inf(double x)
 {return (x == std::numeric_limits<double>::infinity();}
 inline bool is_neg_inf(double x)
-{return !std::isfinite(x) && (x != std::numeric_limits<double>::infinity()) && !(std::isnan)( x );}
+{return !(std::isfinite)(x) /*&& (x != std::numeric_limits<double>::infinity()) && !(std::isnan)( x )*/;}
 
 #if __cplusplus >= 201103L
 #define c99_snprintf snprintf
