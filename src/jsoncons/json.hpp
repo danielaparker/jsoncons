@@ -1715,8 +1715,8 @@ public:
             return evaluate_with_default().add(pos, std::forward<T&&>(value));
         }
 
-        template <class StringAllocator>
-        void dump(std::basic_string<char_type,char_traits_type,StringAllocator>& s) const
+        template <class SAllocator>
+        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
         {
             evaluate().dump(s);
         }
@@ -2307,10 +2307,10 @@ public:
         return at(name);
     }
 
-    template <class StringAllocator>
-    void dump(std::basic_string<char_type,char_traits_type,StringAllocator>& s) const
+    template <class SAllocator>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
-        std::basic_ostringstream<char_type,char_traits_type,StringAllocator> os;
+        std::basic_ostringstream<char_type,char_traits_type,SAllocator> os;
         {
             basic_json_serializer<char_type> serializer(os);
             write_body(serializer);
