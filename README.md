@@ -30,7 +30,6 @@ Features:
 Extensions:
 
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
-- The [jsonx](https://github.com/danielaparker/jsoncons/wiki/jsonx_serializer) extension supports serializing JSON values to [JSONx](http://www.ibm.com/support/knowledgecenter/SS9H2Y_7.5.0/com.ibm.dp.doc/json_jsonx.html) (XML)
 - The [jsonpath](#user-content-ext_jsonpath) extension supports search using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
 - The [binary](#user-content-ext_binary) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 

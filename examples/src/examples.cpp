@@ -18,7 +18,6 @@ void ojson_examples();
 void unicode_examples();
 void csv_examples();
 void jsonpath_examples();
-void jsonx_examples();
 void json_is_as_examples();
 void binary_examples();
 
@@ -306,8 +305,6 @@ int main()
         json_filter_examples();
 
         jsonpath_examples();
-
-        jsonx_examples();
 
         binary_examples();
 

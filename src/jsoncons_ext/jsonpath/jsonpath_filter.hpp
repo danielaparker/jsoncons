@@ -441,19 +441,16 @@ class regex_term : public term<Json>
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
-    string_type pattern_;
-    std::regex::flag_type flags_;
+    const std::basic_regex<char_type> pattern_;
 public:
     regex_term(const string_type& pattern, std::regex::flag_type flags)
-        : pattern_(pattern), flags_(flags)
+        : pattern_(pattern,flags)
     {
     }
 
     bool regex2(const string_type& subject) const override
     {
-        std::basic_regex<char_type> pattern(pattern_,
-                                       flags_);
-        return std::regex_match(subject, pattern);
+        return std::regex_match(subject, pattern_);
     }
 };
 

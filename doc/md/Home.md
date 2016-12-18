@@ -54,7 +54,3 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [decode_message_pack](decode_message_pack)
 
-#### jsonx
-
-[jsonx_serializer](jsonx_serializer)
-

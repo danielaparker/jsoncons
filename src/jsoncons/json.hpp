@@ -1715,6 +1715,12 @@ public:
             return evaluate_with_default().add(pos, std::forward<T&&>(value));
         }
 
+        template <class StringAllocator>
+        void dump(std::basic_string<char_type,char_traits_type,StringAllocator>& s) const
+        {
+            evaluate().dump(s);
+        }
+
         string_type to_string(const char_allocator& allocator = char_allocator()) const JSONCONS_NOEXCEPT
         {
             return evaluate().to_string(allocator);
@@ -2299,6 +2305,17 @@ public:
     const json_type& operator[](string_view_type name) const
     {
         return at(name);
+    }
+
+    template <class StringAllocator>
+    void dump(std::basic_string<char_type,char_traits_type,StringAllocator>& s) const
+    {
+        std::basic_ostringstream<char_type,char_traits_type,StringAllocator> os;
+        {
+            basic_json_serializer<char_type> serializer(os);
+            write_body(serializer);
+        }
+        s = os.str();
     }
 
     string_type to_string(const char_allocator& allocator=char_allocator()) const JSONCONS_NOEXCEPT

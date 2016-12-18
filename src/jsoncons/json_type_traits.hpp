@@ -630,7 +630,16 @@ struct json_type_traits<Json, T,
 
     static T as(const Json& rhs)
     {
-        return rhs.as_string();
+        if (rhs.is_string())
+        {
+            return rhs.as_string_view();
+        }
+        else
+        {
+            T s;
+            rhs.dump(s);
+            return s;
+        }
     }
 
     static Json to_json(const T& rhs)

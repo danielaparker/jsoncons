@@ -238,15 +238,19 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_union)
     json root = json::parse(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$['store']..['author','title']");
-    std::cout << "!!!test_jsonpath_store_book_union" << std::endl;
-    std::cout << pretty_print(result) << std::endl;
 
-    //json expected = json::array();
-    //expected.add(fixture.book());
-    //expected.add(fixture.bicycle());
-    //BOOST_CHECK_EQUAL(expected,result);
-
-    //std::cout << pretty_print(result) << std::endl;
+    json expected = json::parse(R"(
+[
+    "Nigel Rees",
+    "Sayings of the Century",
+    "Evelyn Waugh",
+    "Sword of Honour",
+    "Herman Melville",
+    "Moby Dick",
+    "J. R. R. Tolkien",
+    "The Lord of the Rings"
+]
+    )");
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_star)

@@ -1,6 +1,10 @@
 0.99.6
 ------
 
+Removed features:
+
+- The jsonx extension has been removed 
+
 New feature
 
 - The new binary extension supports encoding to and decoding from the MessagePack binary serialization format.
