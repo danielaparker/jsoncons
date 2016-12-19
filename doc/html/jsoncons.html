@@ -481,7 +481,6 @@ vertical-align:1px;
 <p><a href="#A10">Wide character support</a></p>
 <p><a href="#A11">ojson and owjson</a></p>
 <p><a href="#A12">Convert json to/from user defined type</a></p>
-<p><a href="#A13">Stateful allocators</a></p>
 <div id="user-content-A1">
 ### Preliminaries
 <p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest <a href="https://github.com/danielaparker/jsoncons/wiki">documentation and tutorials</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a>.</p>
@@ -1151,60 +1150,7 @@ standard library collections of book objects to and from <code>json</code> value
 (6)
 Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12
-</code></pre>
-<div id="user-content-A13">
-### Stateful allocators
-<p>This example shows how to create <code>json</code> values in a shared memory segment with a name identifier, so other processes can find and use them.</p>
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/managed_shared_memory.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-
-<span class="pl-k">typedef</span> boost::interprocess::allocator&lt;<span class="pl-k">int</span>,
-        boost::interprocess::managed_shared_memory::segment_manager&gt; shmem_allocator;
-<span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,json_traits&lt;<span class="pl-k">char</span>&gt;,shmem_allocator&gt; shm_json;
-
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
-
-<span class="pl-k">int</span> <span class="pl-en">main</span>()
-{
-    <span class="pl-k">struct</span> <span class="pl-en">shm_remove</span>
-    {
-        <span class="pl-en">shm_remove</span>() { <span class="pl-c1">boost::interprocess::shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
-        <span class="pl-en">~shm_remove</span>(){ <span class="pl-c1">boost::interprocess::shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
-    } remover;
-
-    <span class="pl-c">//Create a new segment with given name and size</span>
-    boost::interprocess::managed_shared_memory <span class="pl-smi">segment</span>(boost::interprocess::create_only,
-            <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>, <span class="pl-c1">65536</span>);
-
-    <span class="pl-c">//Initialize shared memory STL-compatible allocator</span>
-    <span class="pl-k">const</span> shmem_allocator <span class="pl-smi">allocator</span>(segment.<span class="pl-c1">get_segment_manager</span>());
-
-    <span class="pl-c">// Create json value with all dynamic allocations in shared memory</span>
-
-    shm_json* j = segment.<span class="pl-smi">construct</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>)(<span class="pl-c1">shm_json::array</span>(allocator));
-
-    shm_json <span class="pl-smi">o</span>(allocator);
-    o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>);
-    o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>);
-    o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>);
-    o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">8.95</span>);
-
-    j-&gt;<span class="pl-c1">add</span>(o);
-
-    std::pair&lt;shm_json*, boost::interprocess::managed_shared_memory::size_type&gt; res;
-    res = segment.<span class="pl-smi">find</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>);
-
-    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(*(res.<span class="pl-smi">first</span>)) &lt;&lt; std::endl;
-}</pre></div>
-<p>Output:</p>
-<div class="highlight highlight-source-json"><pre>[
-    {
-        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>,
-        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>
-    }
-]</pre></div></div></div></div></div></div></div></div></div></div></div></div></div></div>
+</code></pre></div></div></div></div></div></div></div></div></div></div></div></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
