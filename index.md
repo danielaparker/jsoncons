@@ -1,5 +1,7 @@
 # jsoncons: a C++ library for json construction
 
+# jsoncons: a C++ library for json construction
+
 [Preliminaries](#A1)
 
 [Reading JSON text from a file](#A2)
@@ -415,9 +417,9 @@ By default, within objects, arrays of scalar values are displayed on the same li
 The `pretty_print` function takes an optional second parameter, [serialization_options](https://github.com/danielaparker/jsoncons/wiki/serialization_options), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
 ```c++
-serialization_options format;
+serialization_options options;
 format.object_array_split_lines(line_split_kind::new_line);
-std::cout << pretty_print(val,format) << std::endl;
+std::cout << pretty_print(val,options) << std::endl;
 ```
 produces
 ```json
@@ -435,9 +437,9 @@ produces
 ```
 To display the elements of array values on multiple lines, set the `object_array_split_lines` property to `line_split_kind::multi_line`. The code
 ```c++
-serialization_options format;
+serialization_options options;
 format.object_array_split_lines(line_split_kind::multi_line);
-std::cout << pretty_print(val,format) << std::endl;
+std::cout << pretty_print(val,options) << std::endl;
 ```
 produces
 ```json
@@ -913,3 +915,4 @@ Output:
     }
 ]
 ```
+
