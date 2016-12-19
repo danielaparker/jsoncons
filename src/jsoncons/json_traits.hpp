@@ -22,6 +22,8 @@ namespace jsoncons {
 template <class CharT>
 struct json_traits
 {
+    static const bool preserve_order = false;
+
     template <class T,class Allocator>
     using base_object_type = std::vector<T,Allocator>;
 
@@ -30,7 +32,8 @@ struct json_traits
 
     typedef typename std::char_traits<CharT> char_traits_type;
 
-    static const bool preserve_order = false;
+    template <class Allocator>
+    using key_type = std::basic_string<CharT,char_traits_type,Allocator>;
 
     typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
 };
@@ -38,6 +41,8 @@ struct json_traits
 template <class CharT>
 struct o_json_traits 
 {
+    static const bool preserve_order = true;
+
     template <class T,class Allocator>
     using base_object_type = std::vector<T,Allocator>;
 
@@ -46,7 +51,8 @@ struct o_json_traits
 
     typedef typename std::char_traits<CharT> char_traits_type;
 
-    static const bool preserve_order = true;
+    template <class Allocator>
+    using key_type = std::basic_string<CharT,char_traits_type,Allocator>;
 
     typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
 };

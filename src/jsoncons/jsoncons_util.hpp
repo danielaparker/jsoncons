@@ -27,6 +27,10 @@
 #include <iterator>
 #include <exception>
 
+#if defined(JSONCONS_HAS_STRING_VIEW)
+#include <string_view>
+#endif
+
 namespace jsoncons
 {
 template <typename T>

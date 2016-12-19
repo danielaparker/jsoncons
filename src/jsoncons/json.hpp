@@ -29,18 +29,12 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_error_category.hpp>
 
-#if defined(JSONCONS_HAS_STRING_VIEW)
-#include <string_view>
-#endif
-
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
 namespace jsoncons {
-
-
 
 template <typename IteratorT>
 class range 
@@ -99,13 +93,12 @@ public:
 #else
     typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
 #endif
-
-    // char_allocator and string_type are for interface only, not storage 
-    typedef std::allocator<CharT> char_allocator;
+    // string_type is for interface only, not storage 
     typedef std::basic_string<CharT,char_traits_type> string_type;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> key_allocator_type;
-    typedef std::basic_string<CharT,char_traits_type,key_allocator_type> key_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+
+    using key_type = typename json_traits_type::template key_type<char_allocator_type>;
 
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef key_value_pair<key_type,json_type> kvp_type;
@@ -766,7 +759,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator_type());
             }
         }
         variant(const char_type* s)
@@ -778,7 +771,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator());
+                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator_type());
             }
         }
 
@@ -1513,7 +1506,8 @@ public:
             return evaluate().as_string();
         }
 
-        string_type as_string(const char_allocator& allocator) const JSONCONS_NOEXCEPT
+        template <class SAllocator>
+        string_type as_string(const SAllocator& allocator) const JSONCONS_NOEXCEPT
         {
             return evaluate().as_string(allocator);
         }
@@ -1523,8 +1517,9 @@ public:
             return evaluate().as_string(options);
         }
 
+        template <class SAllocator>
         string_type as_string(const basic_serialization_options<char_type>& options,
-                              const char_allocator& allocator) const
+                              const SAllocator& allocator) const
         {
             return evaluate().as_string(options,allocator);
         }
@@ -1537,7 +1532,7 @@ public:
 
         template<class T>
         typename std::enable_if<std::is_same<string_type,T>::value>::type 
-            as(const char_allocator& allocator) const
+            as(const char_allocator_type& allocator) const
         {
             return evaluate().template as<T>(allocator);
         }
@@ -1748,7 +1743,7 @@ public:
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-        string_type to_string(const char_allocator& allocator = char_allocator()) const JSONCONS_NOEXCEPT
+        string_type to_string(const char_allocator_type& allocator = char_allocator_type()) const JSONCONS_NOEXCEPT
         {
             return evaluate().to_string(allocator);
         }
@@ -1772,7 +1767,7 @@ public:
             evaluate().write(os,options,indenting);
         }
 
-        string_type to_string(const basic_serialization_options<char_type>& options, char_allocator& allocator = char_allocator()) const
+        string_type to_string(const basic_serialization_options<char_type>& options, char_allocator_type& allocator = char_allocator_type()) const
         {
             return evaluate().to_string(options,allocator);
         }
@@ -2320,7 +2315,7 @@ public:
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),key_allocator_type(object_value().get_self_allocator())));
+            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),char_allocator_type(object_value().get_self_allocator())));
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -2437,10 +2432,10 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    string_type to_string(const char_allocator& allocator=char_allocator()) const JSONCONS_NOEXCEPT
+    string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const JSONCONS_NOEXCEPT
     {
         string_type s(allocator);
-        std::basic_ostringstream<char_type,char_traits_type,char_allocator> os(s);
+        std::basic_ostringstream<char_type,char_traits_type,char_allocator_type> os(s);
         {
             basic_json_serializer<char_type> serializer(os);
             dump_body(serializer);
@@ -2449,7 +2444,7 @@ public:
     }
 
     string_type to_string(const basic_serialization_options<char_type>& options,
-                          const char_allocator& allocator=char_allocator()) const
+                          const char_allocator_type& allocator=char_allocator_type()) const
     {
         string_type s(allocator);
         std::basic_ostringstream<char_type> os(s);
@@ -2704,7 +2699,7 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<std::is_same<string_type,T>::value>::type as(const char_allocator& allocator) const
+    typename std::enable_if<std::is_same<string_type,T>::value>::type as(const char_allocator_type& allocator) const
     {
         return json_type_traits<json_type,T>::as(*this,allocator);
     }
@@ -2853,7 +2848,8 @@ public:
         }
     }
 
-    string_type as_string(const char_allocator& allocator) const JSONCONS_NOEXCEPT
+    template <class SAllocator>
+    string_type as_string(const SAllocator& allocator) const JSONCONS_NOEXCEPT
     {
         switch (var_.type_id())
         {
@@ -2877,8 +2873,9 @@ public:
         }
     }
 
+    template <class SAllocator>
     string_type as_string(const basic_serialization_options<char_type>& options,
-                          const char_allocator& allocator) const 
+                          const SAllocator& allocator) const 
     {
         switch (var_.type_id())
         {

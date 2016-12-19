@@ -11,10 +11,6 @@
 #include <jsoncons/json_text_traits.hpp>
 #include <jsoncons/jsoncons_util.hpp>
 
-#if defined(JSONCONS_HAS_STRING_VIEW)
-#include <string_view>
-#endif
-
 namespace jsoncons {
 
 template <class CharT>

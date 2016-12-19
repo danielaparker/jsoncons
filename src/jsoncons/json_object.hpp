@@ -340,7 +340,7 @@ public:
     typedef typename Json::allocator_type allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
-    typedef typename Json::key_allocator_type key_allocator_type;
+    typedef typename Json::char_allocator_type char_allocator_type;
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
@@ -788,7 +788,7 @@ public:
     typedef typename Json::allocator_type allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_object> self_allocator_type;
     typedef typename Json::char_type char_type;
-    typedef typename Json::key_allocator_type key_allocator_type;
+    typedef typename Json::char_allocator_type char_allocator_type;
     typedef KeyT key_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
