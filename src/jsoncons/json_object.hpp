@@ -385,6 +385,11 @@ public:
     {
         members_.swap(val.members_);
     }
+
+    self_allocator_type get_self_allocator() const
+    {
+        return this->self_allocator_;
+    }
 };
 
 template <class KeyT,class Json,bool PreserveOrder>
@@ -408,6 +413,7 @@ public:
     using typename Json_object_<KeyT,Json>::base_object_type;
     using typename Json_object_<KeyT,Json>::iterator;
     using typename Json_object_<KeyT,Json>::const_iterator;
+    using Json_object_<KeyT,Json>::get_self_allocator;
 
     json_object()
         : Json_object_<KeyT,Json>()
@@ -471,11 +477,6 @@ public:
         {
             set(element[0].as_string_view(), std::move(element[1]));
         }
-    }
-
-    self_allocator_type get_self_allocator() const
-    {
-        return this->self_allocator_;
     }
 
     void swap(json_object& val)
@@ -845,6 +846,7 @@ public:
     using typename Json_object_<KeyT,Json>::base_object_type;
     using typename Json_object_<KeyT,Json>::iterator;
     using typename Json_object_<KeyT,Json>::const_iterator;
+    using Json_object_<KeyT,Json>::get_self_allocator;
 
     json_object()
         : Json_object_<KeyT,Json>()

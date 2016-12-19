@@ -192,26 +192,24 @@ private:
                 if (length <= 15)
                 {
                     // fixarray
-                    v_.push_back(static_cast<uint8_t>(0x90 | length));
+                    n += sizeof(uint8_t);
                 }
                 else if (length <= 0xffff)
                 {
                     // array 16
-                    v_.push_back(msgpack_format::array16_cd);
-                    to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
+                    n += 1 + sizeof(uint16_t);
                 }
                 else if (length <= 0xffffffff)
                 {
                     // array 32
-                    //v_.push_back(msgpack_format::array32_cd);
-                    //to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
+                    n += 1 + sizeof(uint32_t);
                 }
 
-                // append each element
-                //for (const auto& el : jval.array_range())
-                //{
-                //    encode_(el);
-                //}
+                append each element
+                for (const auto& el : jval.array_range())
+                {
+                    n += calculate_size(el);
+                }
                 break;
             }
 
@@ -221,26 +219,24 @@ private:
                 if (length <= 15)
                 {
                     // fixmap
-                    //v_.push_back(static_cast<uint8_t>(0x80 | (length & 0xf)));
+                    n += sizeof(uint8_t);
                 }
                 else if (length <= 65535)
                 {
                     // map 16
-                    //v_.push_back(msgpack_format::map16_cd );
-                    //to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
+                    n += 1 + sizeof(uint16_t);
                 }
                 else if (length <= 4294967295)
                 {
                     // map 32
-                    //v_.push_back(msgpack_format::map32_cd );
-                    //to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
+                    n += 1 + sizeof(uint32_t);
                 }
 
                 // append each element
                 for (const auto& kvp: jval.object_range())
                 {
                     //encode_string(kvp.key());
-                    //encode_(kvp.value());
+                    n += calculate_size(kvp.value());
                 }
                 break;
             }
@@ -418,7 +414,7 @@ private:
                 {
                     // array 32
                     v_.push_back(msgpack_format::array32_cd);
-                    to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
+                    to_big_endian<uint64_t, sizeof(uint32_t)>()(length,v_);
                 }
 
                 // append each element
@@ -447,7 +443,7 @@ private:
                 {
                     // map 32
                     v_.push_back(msgpack_format::map32_cd );
-                    to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
+                    to_big_endian<uint64_t, sizeof(uint32_t)>()(length,v_);
                 }
 
                 // append each element
