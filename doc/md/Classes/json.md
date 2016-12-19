@@ -342,22 +342,25 @@ Returns `true` if two json objects do not compare equal, `false` otherwise.
 
 ### Serialization
 
-    string_type to_string(const char_allocator& allocator = char_allocator()) const noexcept
-Inserts json value into string.
+    template <class SAllocator>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
+Inserts json value into string using default serialization_options.
 
-    string_type to_string(const serialization_options& format, const char_allocator& allocator = char_allocator()) const
+    template <class SAllocator>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+              const serialization_options& format) const
 Inserts json value into string using specified [serialization_options](serialization_options).
 
-    void write(basic_json_output_handler<char_type>& output_handler) const
+    void dump(basic_json_output_handler<char_type>& output_handler) const
 Calls `begin_json()` on `output_handler`, emits json value to `output_handler`, and calls `end_json()` on `output_handler`.
 
-    write write(std::ostream& os) const
+    void dump(std::ostream& os) const
 Inserts json value into stream with default serialization options.
 
-    write write(std::ostream<CharT> os, const serialization_options& format) const
+    void dump(std::ostream<CharT> os, const serialization_options& format) const
 Inserts json value into stream using specified [serialization_options](serialization_options).
 
-    void write_body(json_output_handler& handler) const
+    void dump_body(json_output_handler& handler) const
 Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
 
 ### Non member functions

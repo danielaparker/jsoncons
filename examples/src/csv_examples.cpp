@@ -49,7 +49,7 @@ void read_write_csv_tasks()
 
     std::cout << "(2)\n";
     csv_serializer serializer(std::cout);
-    tasks.write(serializer);
+    tasks.dump(serializer);
 }
 
 void serialize_array_of_arrays_to_comma_delimited()
@@ -61,7 +61,7 @@ void serialize_array_of_arrays_to_comma_delimited()
     is >> countries;
 
     csv_serializer serializer(std::cout);
-    countries.write(serializer);
+    countries.dump(serializer);
 }
 
 void serialize_to_tab_delimited_file()
@@ -76,7 +76,7 @@ void serialize_to_tab_delimited_file()
     params.field_delimiter('\t');
     csv_serializer serializer(std::cout,params);
 
-    employees.write(serializer);
+    employees.dump(serializer);
 }
 
 void csv_examples()

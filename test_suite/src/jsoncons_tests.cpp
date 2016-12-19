@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     std::ostringstream os;
     serialization_options format;
     format.escape_all_non_ascii(true);
-    arr.write(os, format);
+    arr.dump(os, format);
     std::string outputStr = os.str();
 
     json arr2 = json::parse(outputStr);

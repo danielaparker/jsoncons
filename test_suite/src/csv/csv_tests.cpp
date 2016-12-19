@@ -657,7 +657,7 @@ BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
 
     std::stringstream ss;
     csv_serializer serializer(ss,params);
-    countries1.write(serializer);
+    countries1.dump(serializer);
 
     json_decoder<ojson> encoder2;
     csv_reader reader2(ss,encoder2,params);
@@ -705,7 +705,7 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     std::stringstream ss;
     csv_serializer serializer(ss,params);
-    employees1.write(serializer);
+    employees1.dump(serializer);
 
     json_decoder<ojson> encoder2;
     csv_reader reader2(ss,encoder2,params);

@@ -84,7 +84,7 @@ void name_fix_up_example2()
 
     json_serializer serializer(os, true);
     name_fix_up_filter filter(serializer);
-    j.write(filter);
+    j.dump(filter);
 }
 
 void change_member_name_example()
@@ -108,7 +108,7 @@ void change_member_name_example()
     // or a json_output_handler    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
-    j.write(filter1);
+    j.dump(filter1);
     std::cout << std::endl;
 }
 

@@ -1721,14 +1721,36 @@ public:
             evaluate().dump(s);
         }
 
+        template <class SAllocator>
+        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+                  const basic_serialization_options<char_type>& options) const
+        {
+            evaluate().dump(s,options);
+        }
+        void dump(basic_json_output_handler<char_type>& handler) const
+        {
+            evaluate().dump(handler);
+        }
+
+        void dump(std::basic_ostream<char_type>& os) const
+        {
+            evaluate().dump(os);
+        }
+
+        void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format) const
+        {
+            evaluate().dump(os,format);
+        }
+
+        void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format, bool indenting) const
+        {
+            evaluate().dump(os,format,indenting);
+        }
+#if !defined(JSONCONS_NO_DEPRECATED)
+
         string_type to_string(const char_allocator& allocator = char_allocator()) const JSONCONS_NOEXCEPT
         {
             return evaluate().to_string(allocator);
-        }
-
-        string_type to_string(const basic_serialization_options<char_type>& format, char_allocator& allocator = char_allocator()) const
-        {
-            return evaluate().to_string(format,allocator);
         }
         void write(basic_json_output_handler<char_type>& handler) const
         {
@@ -1749,7 +1771,11 @@ public:
         {
             evaluate().write(os,format,indenting);
         }
-#if !defined(JSONCONS_NO_DEPRECATED)
+
+        string_type to_string(const basic_serialization_options<char_type>& format, char_allocator& allocator = char_allocator()) const
+        {
+            return evaluate().to_string(format,allocator);
+        }
 
         range<object_iterator> members()
         {
@@ -1797,7 +1823,7 @@ public:
 
         friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_proxy& o)
         {
-            o.write(os);
+            o.dump(os);
             return os;
         }
 
@@ -2313,35 +2339,24 @@ public:
         std::basic_ostringstream<char_type,char_traits_type,SAllocator> os;
         {
             basic_json_serializer<char_type> serializer(os);
-            write_body(serializer);
+            dump_body(serializer);
         }
         s = os.str();
     }
 
-    string_type to_string(const char_allocator& allocator=char_allocator()) const JSONCONS_NOEXCEPT
+    template <class SAllocator>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+              const basic_serialization_options<char_type>& options) const
     {
-        string_type s(allocator);
-        std::basic_ostringstream<char_type,char_traits_type,char_allocator> os(s);
+        std::basic_ostringstream<char_type,char_traits_type,SAllocator> os;
         {
-            basic_json_serializer<char_type> serializer(os);
-            write_body(serializer);
+            basic_json_serializer<char_type> serializer(os,options);
+            dump_body(serializer);
         }
-        return os.str();
+        s = os.str();
     }
 
-    string_type to_string(const basic_serialization_options<char_type>& format,
-                          const char_allocator& allocator=char_allocator()) const
-    {
-        string_type s(allocator);
-        std::basic_ostringstream<char_type> os(s);
-        {
-            basic_json_serializer<char_type> serializer(os, format);
-            write_body(serializer);
-        }
-        return os.str();
-    }
-
-    void write_body(basic_json_output_handler<char_type>& handler) const
+    void dump_body(basic_json_output_handler<char_type>& handler) const
     {
         switch (var_.type_id())
         {
@@ -2375,7 +2390,7 @@ public:
                 for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
                     handler.name((it->key()).data(),it->key().length());
-                    it->value().write_body(handler);
+                    it->value().dump_body(handler);
                 }
                 handler.end_object();
             }
@@ -2386,7 +2401,7 @@ public:
                 const array& o = array_value();
                 for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                 {
-                    it->write_body(handler);
+                    it->dump_body(handler);
                 }
                 handler.end_array();
             }
@@ -2395,36 +2410,84 @@ public:
             break;
         }
     }
-    void write(basic_json_output_handler<char_type>& handler) const
+    void dump(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        write_body(handler);
+        dump_body(handler);
         handler.end_json();
+    }
+
+    void dump(std::basic_ostream<char_type>& os) const
+    {
+        basic_json_serializer<char_type> serializer(os);
+        dump(serializer);
+    }
+
+    void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format) const
+    {
+        basic_json_serializer<char_type> serializer(os, format);
+        dump(serializer);
+    }
+
+    void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format, bool indenting) const
+    {
+        basic_json_serializer<char_type> serializer(os, format, indenting);
+        dump(serializer);
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    string_type to_string(const char_allocator& allocator=char_allocator()) const JSONCONS_NOEXCEPT
+    {
+        string_type s(allocator);
+        std::basic_ostringstream<char_type,char_traits_type,char_allocator> os(s);
+        {
+            basic_json_serializer<char_type> serializer(os);
+            dump_body(serializer);
+        }
+        return os.str();
+    }
+
+    string_type to_string(const basic_serialization_options<char_type>& format,
+                          const char_allocator& allocator=char_allocator()) const
+    {
+        string_type s(allocator);
+        std::basic_ostringstream<char_type> os(s);
+        {
+            basic_json_serializer<char_type> serializer(os, format);
+            dump_body(serializer);
+        }
+        return os.str();
+    }
+
+    void write_body(basic_json_output_handler<char_type>& handler) const
+    {
+        dump(handler);
+    }
+    void write(basic_json_output_handler<char_type>& handler) const
+    {
+        dump(handler);
     }
 
     void write(std::basic_ostream<char_type>& os) const
     {
-        basic_json_serializer<char_type> serializer(os);
-        write(serializer);
+        dump(os);
     }
 
     void write(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format) const
     {
-        basic_json_serializer<char_type> serializer(os, format);
-        write(serializer);
+        dump(os,format);
     }
 
     void write(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& format, bool indenting) const
     {
-        basic_json_serializer<char_type> serializer(os, format, indenting);
-        write(serializer);
+        dump(os,format,indenting);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
     void to_stream(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        write_body(handler);
+        dump_body(handler);
         handler.end_json();
     }
 
@@ -3727,7 +3790,7 @@ private:
 
     friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_type& o)
     {
-        o.write(os);
+        o.dump(os);
         return os;
     }
 
@@ -3861,14 +3924,14 @@ public:
         ;
     }
 
-    void write(std::basic_ostream<char_type>& os) const
+    void dump(std::basic_ostream<char_type>& os) const
     {
-        o_->write(os, format_, is_pretty_print_);
+        o_->dump(os, format_, is_pretty_print_);
     }
 
     friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json>& o)
     {
-        o.write(os);
+        o.dump(os);
         return os;
     }
 

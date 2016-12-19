@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
     std::stringstream ss;
     json_serializer serializer(ss, false);
     rename_name_filter filter("price","price2",serializer);
-    j.write(filter);
+    j.dump(filter);
 
     json j2 = json::parse_stream(ss);
     BOOST_CHECK_CLOSE(31.96,j2["store"]["book"][0]["price2"].as<double>(),0.001);
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(test_chained_filters)
     rename_name_filter filter2("fifth", "fourth", decoder);
     rename_name_filter filter1("fourth", "third", filter2);
 
-    j.write(filter1);
+    j.dump(filter1);
     ojson j2 = decoder.get_result();
     BOOST_CHECK(j2.size() == 4);
     BOOST_CHECK(j2["first"] == 1);
