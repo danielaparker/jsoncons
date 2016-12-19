@@ -238,8 +238,6 @@ If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cp
     uint64_t as_uinteger() const
     double as_double() const
     string_view_type as_string_view() const
-    string_type as_string() const noexcept
-    string_type as_string(const char_allocator& allocator) const noexcept
     unsigned int as<unsigned int> const 
 Non-generic versions of `as` methods
 

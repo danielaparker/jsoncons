@@ -740,8 +740,6 @@ int64_t as_integer() const
 uint64_t as_uinteger() const
 double as_double() const
 string_view_type as_string_view() const
-string_type as_string() const noexcept
-string_type as_string(const char_allocator&amp; allocator) const noexcept
 unsigned int as&lt;unsigned int&gt; const 
 </code></pre>
 <p>Non-generic versions of <code>as</code> methods</p>
