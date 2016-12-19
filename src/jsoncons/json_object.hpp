@@ -444,7 +444,7 @@ public:
     }
 
     json_object(std::initializer_list<typename Json::array> init)
-        : Json_object_()
+        : Json_object_<KeyT,Json>()
     {
         for (const auto& element : init)
         {
@@ -462,7 +462,7 @@ public:
 
     json_object(std::initializer_list<typename Json::array> init, 
                 const allocator_type& allocator)
-        : Json_object_(allocator)
+        : Json_object_<KeyT,Json>(allocator)
     {
         for (const auto& element : init)
         {
@@ -876,7 +876,7 @@ public:
     }
 
     json_object(std::initializer_list<typename Json::array> init)
-        : Json_object_()
+        : Json_object_<KeyT,Json>()
     {
         for (const auto& element : init)
         {
@@ -894,7 +894,7 @@ public:
 
     json_object(std::initializer_list<typename Json::array> init, 
                 const allocator_type& allocator)
-        : Json_object_(allocator)
+        : Json_object_<KeyT,Json>(allocator)
     {
         for (const auto& element : init)
         {
