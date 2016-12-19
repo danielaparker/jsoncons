@@ -56,6 +56,203 @@ public:
         return std::move(v_);
     }
 private:
+    size_t calculate_size(const Json& jval)
+    {
+        size_t n = 0;
+        switch (jval.type_id())
+        {
+            case value_types::null_t:
+            {
+                ++n;
+                break;
+            }
+
+            case value_types::bool_t:
+            {
+                ++n;
+                break;
+            }
+
+            case value_types::integer_t:
+            {
+                int64_t val = jval.as_integer();
+                if (val >= 0)
+                {
+                    if (val < (std::numeric_limits<int8_t>::max)())
+                    {
+                        ++n;
+                    }
+                    else if (val <= (std::numeric_limits<uint8_t>::max)())
+                    {
+                        // uint 8 stores a 8-bit unsigned integer
+                        n += (1 + sizeof(uint8_t));
+                    }
+                    else if (val <= (std::numeric_limits<uint16_t>::max)())
+                    {
+                        // uint 16 stores a 16-bit big-endian unsigned integer
+                        n += (1 + sizeof(uint16_t));
+                    }
+                    else if (val <= (std::numeric_limits<uint32_t>::max)())
+                    {
+                        // uint 32 stores a 32-bit big-endian unsigned integer
+                        n += (1 + sizeof(uint32_t));
+                    }
+                    else if (val <= (std::numeric_limits<int64_t>::max)())
+                    {
+                        // uint 64 stores a 64-bit big-endian unsigned integer
+                        n += (1 + sizeof(uint64_t));
+                    }
+                }
+                else
+                {
+                    if (val >= -32)
+                    {
+                        // negative fixnum stores 5-bit negative integer
+                        ++n;
+                    }
+                    else if (val >= (std::numeric_limits<int8_t>::min)() && val <= (std::numeric_limits<int8_t>::max)())
+                    {
+                        // int 8 stores a 8-bit signed integer
+                        n += (1 + sizeof(uint8_t));
+                    }
+                    else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
+                    {
+                        // int 16 stores a 16-bit big-endian signed integer
+                        n += (1 + sizeof(uint16_t));
+                    }
+                    else if (val >= (std::numeric_limits<int32_t>::min)() && val <= INT32_MAX)
+                    {
+                        // int 32 stores a 32-bit big-endian signed integer
+                        n += (1 + sizeof(uint32_t));
+                    }
+                    else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
+                    {
+                        // int 64 stores a 64-bit big-endian signed integer
+                        n += (1 + sizeof(uint64_t));
+                    }
+                }
+                break;
+            }
+
+        case value_types::uinteger_t:
+            {
+                uint64_t val = jval.as_uinteger();
+                if (val < (std::numeric_limits<int8_t>::max)())
+                {
+                    // positive fixnum stores 7-bit positive integer
+                    ++n;
+                }
+                else if (val <= (std::numeric_limits<uint8_t>::max)())
+                {
+                    n += (1 + sizeof(uint8_t));
+                }
+                else if (val <= (std::numeric_limits<uint16_t>::max)())
+                {
+                    // uint 16 stores a 16-bit big-endian unsigned integer
+                    n += (1 + sizeof(uint16_t));
+                }
+                else if (val <= (std::numeric_limits<uint32_t>::max)())
+                {
+                    // uint 32 stores a 32-bit big-endian unsigned integer
+                    n += (1 + sizeof(uint32_t));
+                }
+                else if (val <= (std::numeric_limits<uint64_t>::max)())
+                {
+                    // uint 64 stores a 64-bit big-endian unsigned integer
+                    n += (1 + sizeof(uint64_t));
+                }
+                break;
+            }
+
+            case value_types::double_t:
+            {
+                // float 64
+                double val = jval.as_double();
+                if (val >= -(std::numeric_limits<float>::max)() && val <= (std::numeric_limits<float>::max)())
+                {
+                    n += (1 + sizeof(float));
+                }
+                else
+                {
+                    n += (1 + sizeof(double));
+                }
+                break;
+            }
+
+            case value_types::small_string_t:
+            case value_types::string_t:
+            {
+                //encode_string(jval.as_string_view());
+                break;
+            }
+
+            case value_types::array_t:
+            {
+                const auto length = jval.array_value().size();
+                if (length <= 15)
+                {
+                    // fixarray
+                    v_.push_back(static_cast<uint8_t>(0x90 | length));
+                }
+                else if (length <= 0xffff)
+                {
+                    // array 16
+                    v_.push_back(msgpack_format::array16_cd);
+                    to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
+                }
+                else if (length <= 0xffffffff)
+                {
+                    // array 32
+                    //v_.push_back(msgpack_format::array32_cd);
+                    //to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
+                }
+
+                // append each element
+                //for (const auto& el : jval.array_range())
+                //{
+                //    encode_(el);
+                //}
+                break;
+            }
+
+            case value_types::object_t:
+            {
+                const auto length = jval.object_value().size();
+                if (length <= 15)
+                {
+                    // fixmap
+                    //v_.push_back(static_cast<uint8_t>(0x80 | (length & 0xf)));
+                }
+                else if (length <= 65535)
+                {
+                    // map 16
+                    //v_.push_back(msgpack_format::map16_cd );
+                    //to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
+                }
+                else if (length <= 4294967295)
+                {
+                    // map 32
+                    //v_.push_back(msgpack_format::map32_cd );
+                    //to_big_endian<uint64_t, sizeof(uint16_t)>()(length,v_);
+                }
+
+                // append each element
+                for (const auto& kvp: jval.object_range())
+                {
+                    //encode_string(kvp.key());
+                    //encode_(kvp.value());
+                }
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+        return n;
+    }
+
     void encode_(const Json& jval)
     {
         switch (jval.type_id())

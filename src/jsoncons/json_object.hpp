@@ -381,11 +381,6 @@ public:
     {
     }
 
-    self_allocator_type get_self_allocator() const
-    {
-        return self_allocator_;
-    }
-
     void swap(Json_object_& val)
     {
         members_.swap(val.members_);
@@ -476,6 +471,11 @@ public:
         {
             set(element[0].as_string_view(), std::move(element[1]));
         }
+    }
+
+    self_allocator_type get_self_allocator() const
+    {
+        return this->self_allocator_;
     }
 
     void swap(json_object& val)
@@ -908,6 +908,11 @@ public:
         {
             set(element[0].as_string_view(), std::move(element[1]));
         }
+    }
+
+    self_allocator_type get_self_allocator() const
+    {
+        return this->self_allocator_;
     }
 
     void swap(json_object& val)
