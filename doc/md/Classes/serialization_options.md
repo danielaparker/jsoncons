@@ -100,12 +100,12 @@ Output:
     obj["field2"] = 1.79e308*1000;
     obj["field3"] = -1.79e308*1000;
 
-    serialization_options format;
+    serialization_options options;
     format.nan_replacement("null");        // default is "null"
     format.pos_inf_replacement("1e9999");  // default is "null"
     format.neg_inf_replacement("-1e9999"); // default is "null"
 
-    std::cout << pretty_print(obj,format) << std::endl;
+    std::cout << pretty_print(obj,options) << std::endl;
 ```
 
 Output:

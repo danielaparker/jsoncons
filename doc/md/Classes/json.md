@@ -225,7 +225,7 @@ Otherwise throws `std::runtime_exception`
 
     string_type as<string_type>() const noexcept
     string_type as<string_type>(const char_allocator& allocator) const noexcept
-If value is string, returns value, otherwise returns result of `to_string`.
+If value is string, returns value, otherwise returns result of `dump`.
 
     as<X<T>>()
 If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `as<X<T>>()` returns the `json` value as an `X<T>` if the `json` value is an array and each element is convertible to type `T`, otherwise throws.
@@ -348,7 +348,7 @@ Inserts json value into string using default serialization_options.
 
     template <class SAllocator>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-              const serialization_options& format) const
+              const serialization_options& options) const
 Inserts json value into string using specified [serialization_options](serialization_options).
 
     void dump(basic_json_output_handler<char_type>& output_handler) const
@@ -357,7 +357,7 @@ Calls `begin_json()` on `output_handler`, emits json value to `output_handler`, 
     void dump(std::ostream& os) const
 Inserts json value into stream with default serialization options.
 
-    void dump(std::ostream<CharT> os, const serialization_options& format) const
+    void dump(std::ostream<CharT> os, const serialization_options& options) const
 Inserts json value into stream using specified [serialization_options](serialization_options).
 
     void dump_body(json_output_handler& handler) const
@@ -372,11 +372,11 @@ Reads a `json` value from a stream.
 Inserts json value into stream.
 
     std::ostream& print(const json& val)  
-    std::ostream& print(const json& val, const serialization_options<CharT>& format)  
+    std::ostream& print(const json& val, const serialization_options<CharT>& options)  
 Inserts json value into stream using the specified [serialization_options](serialization_options) if supplied.
 
     std::ostream& pretty_print(const json& val)  
-    std::ostream& pretty_print(const json& val, const serialization_options<CharT>& format)  
+    std::ostream& pretty_print(const json& val, const serialization_options<CharT>& options)  
 Inserts json value into stream using the specified [serialization_options](serialization_options) if supplied.
 
     void swap(json& a, json& b)

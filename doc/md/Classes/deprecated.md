@@ -35,7 +35,8 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
     |parse_string(const std::string& s,parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse(const std::string& s,parse_error_handler& err_handler)
     |resize_array(size_t n)|<em>&#x2713;</em>|resize(size_t n)
     |resize_array(size_t n, const json& val)|<em>&#x2713;</em>|Use resize(size_t n, const json& val)
-    |to_stream|<em>&#x2713;</em>|Use write
+    |to_stream|<em>&#x2713;</em>|Use dump
+    |write|<em>&#x2713;</em>|Use dump
     |`json` initializer-list constructor||Construct from `json::array` with initializer-list
     |json_deserializer|<em>&#x2713;</em>|Use json_decoder<json>`
     |wjson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wjson>`

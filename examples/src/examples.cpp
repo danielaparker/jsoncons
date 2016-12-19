@@ -68,7 +68,6 @@ void first_example_c()
     json books = json::parse_file("input/books.json");
 
     serialization_options format;
-    //format.floatfield(std::ios::fixed);
     format.precision(2);
 
     for (size_t i = 0; i < books.size(); ++i)
@@ -78,7 +77,8 @@ void first_example_c()
             json& book = books[i];
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
-            std::string price = book.get("price", "N/A").to_string(format);
+            std::string price;
+            book.get("price", "N/A").dump(price,format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
         catch (const std::exception& e)

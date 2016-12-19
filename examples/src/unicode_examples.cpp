@@ -13,7 +13,8 @@ void read_and_write_escaped_unicode()
     json value = json::parse(input);
     serialization_options format;
     format.escape_all_non_ascii(true);
-    std::string output = value.to_string(format);
+    std::string output;
+    value.dump(output,format);
 
     std::cout << "Input:" << std::endl;
     std::cout << input << std::endl;

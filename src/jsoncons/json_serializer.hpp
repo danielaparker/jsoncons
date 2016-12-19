@@ -105,16 +105,16 @@ public:
     {
     }
 
-    basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& format)
-       : format_(format), 
+    basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options)
+       : format_(options), 
          indent_(0), 
          indenting_(false),  
          fp_(format_.precision()),
          bos_(os)
     {
     }
-    basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& format, bool indenting)
-       : format_(format), 
+    basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options, bool indenting)
+       : format_(options), 
          indent_(0), 
          indenting_(indenting),  
          fp_(format_.precision()),

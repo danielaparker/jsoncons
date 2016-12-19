@@ -23,7 +23,8 @@ BOOST_AUTO_TEST_CASE( test_surrogate_pair )
     json value = json::parse(input);
     serialization_options format;
     format.escape_all_non_ascii(true);
-    std::string output = value.to_string(format);
+    std::string output;
+    value.dump(output,format);
 
     BOOST_CHECK_EQUAL(input,output);
 }
@@ -50,7 +51,8 @@ BOOST_AUTO_TEST_CASE(test_wide_surrogate_pair)
     wjson value = wjson::parse(input);
     wserialization_options format;
     format.escape_all_non_ascii(true);
-    std::wstring output = value.to_string(format);
+    std::wstring output;
+    value.dump(output,format);
 
     BOOST_CHECK(input == output);
 }

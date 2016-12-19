@@ -241,7 +241,7 @@ public:
 template<class CharT>
 void escape_string(const CharT* s,
                    size_t length,
-                   const basic_serialization_options<CharT>& format,
+                   const basic_serialization_options<CharT>& options,
                    buffered_output<CharT>& os)
 {
     const CharT* begin = s;
@@ -280,12 +280,12 @@ void escape_string(const CharT* s,
             os.put('t');
             break;
         default:
-            if (format.escape_solidus() && c == '/')
+            if (options.escape_solidus() && c == '/')
             {
                 os.put('\\');
                 os.put('/');
             }
-            else if (json_text_traits<CharT>::is_control_character(c) || format.escape_all_non_ascii())
+            else if (json_text_traits<CharT>::is_control_character(c) || options.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
                 const CharT* stop = nullptr;

@@ -1,16 +1,13 @@
 0.99.6
 ------
 
-Removed features:
-
-- The jsonx extension has been removed 
-
 New feature
 
 - The new binary extension supports encoding to and decoding from the MessagePack binary serialization format.
 
 Non-breaking changes
 
+- The `json` `write` functions have been renamed to `dump`. The old names have been deprecated but still work.
 - Support for stateful allocators
 - json function object_range() now returns a pair of RandomAccessIterator (previously BidirectionalIterator)
 - json operator [size_t i] applied to a json object now returns the ith object (previously threw) 
@@ -46,6 +43,10 @@ virtual void do_name(string_view_type val)
 
 virtual void do_string_value(string_view_type val)
 ```
+
+Removed features:
+
+- The jsonx extension has been removed 
 
 0.99.5
 ------
