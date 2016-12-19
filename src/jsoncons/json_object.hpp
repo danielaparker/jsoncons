@@ -438,7 +438,7 @@ public:
     {
     }
 
-    json_object(json_object&& val,const allocator_type& allocator) :
+    json_object(json_object&& val,const allocator_type& allocator)
         : Json_object_<KeyT,Json>(std::forward<json_object&&>(val),allocator)
     {
     }
@@ -870,7 +870,7 @@ public:
     {
     }
 
-    json_object(json_object&& val,const allocator_type& allocator) :
+    json_object(json_object&& val,const allocator_type& allocator) 
         : Json_object_<KeyT,Json>(std::forward<json_object&&>(val),allocator)
     {
     }
