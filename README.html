@@ -499,6 +499,9 @@ vertical-align:1px;
 <li>The <a href="#user-content-ext_jsonpath">jsonpath</a> extension supports search using <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>.  It also supports search and replace using JsonPath expressions.</li>
 <li>The <a href="#user-content-ext_binary">binary</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
+<h2>Get jsoncons</h2>
+<p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
+<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
 <h2>How to use it</h2>
 <ul>
 <li>For a quick guide, see <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a>.</li>
@@ -508,9 +511,6 @@ vertical-align:1px;
 <h2>Benchmarks</h2>
 <p><a href="https://github.com/danielaparker/json_benchmarks">json_benchmarks</a> provides some measurements about how <code>jsoncons</code> compares to other <code>json</code> libraries.<br>
 Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and <a href="http://www.json.org/JSON_checker/">JSON_checker</a> tests may be found <a href="https://danielaparker.github.io/json_benchmarks/">here</a>.</p>
-<h2>Get jsoncons</h2>
-<p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
-<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
 <h2>A simple program using jsoncons</h2>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
