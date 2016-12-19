@@ -75,11 +75,14 @@ BOOST_AUTO_TEST_CASE(message_pack_test)
 
     j1["An array"] = ja;
 
+    size_t calculated_size = Encode_message_pack_<json>::calculate_size(j1);
     std::vector<uint8_t> v = encode_message_pack(j1);
+    BOOST_CHECK(calculated_size == v.size());
+    BOOST_CHECK(calculated_size == v.capacity());
 
     json j2 = decode_message_pack<json>(v);
 
-    //BOOST_CHECK_EQUAL(j1,j2);
+    BOOST_CHECK_EQUAL(j1,j2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

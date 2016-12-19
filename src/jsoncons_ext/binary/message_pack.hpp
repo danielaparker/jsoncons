@@ -51,15 +51,12 @@ class Encode_message_pack_
 public:
     std::vector<uint8_t> encode(const Json& jval)
     {
-        std::cout << "size estimate = " << calculate_size(jval) << std::endl;
         v_.reserve(calculate_size(jval));
         encode_(jval);
-        std::cout << "actual size = " << v_.size() << " and capacity= " << v_.capacity() << std::endl;
-        //v_.shrink_to_fit();
         return std::move(v_);
     }
 
-    size_t calculate_size(const Json& jval)
+    static size_t calculate_size(const Json& jval)
     {
         size_t n = 0;
         switch (jval.type_id())
@@ -185,7 +182,7 @@ public:
             case value_types::small_string_t:
             case value_types::string_t:
             {
-                n += string_size(jval.as_string_view());
+                n += calculate_string_size(jval.as_string_view());
                 break;
             }
 
@@ -238,7 +235,7 @@ public:
                 // calculate size for each member
                 for (const auto& kvp: jval.object_range())
                 {
-                    n += string_size(kvp.key());
+                    n += calculate_string_size(kvp.key());
                     n += calculate_size(kvp.value());
                 }
                 break;
@@ -252,7 +249,7 @@ public:
         return n;
     }
 
-    size_t string_size(typename Json::string_view_type sv)
+    static size_t calculate_string_size(typename Json::string_view_type sv)
     {
         size_t n = 0;
 
