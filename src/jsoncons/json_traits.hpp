@@ -24,18 +24,20 @@ struct json_traits
 {
     static const bool preserve_order = false;
 
+    typedef CharT char_type;
+
     template <class T,class Allocator>
     using base_object_type = std::vector<T,Allocator>;
 
     template <class T,class Allocator>
     using base_array_type = std::vector<T,Allocator>;
 
-    typedef typename std::char_traits<CharT> char_traits_type;
+    typedef typename std::char_traits<char_type> char_traits_type;
 
     template <class Allocator>
-    using key_type = std::basic_string<CharT,char_traits_type,Allocator>;
+    using key_type = std::basic_string<char_type,char_traits_type,Allocator>;
 
-    typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
+    typedef basic_default_parse_error_handler<char_type> parse_error_handler_type;
 };
 
 template <class CharT>
@@ -43,18 +45,20 @@ struct o_json_traits
 {
     static const bool preserve_order = true;
 
+    typedef CharT char_type;
+
     template <class T,class Allocator>
     using base_object_type = std::vector<T,Allocator>;
 
     template <class T,class Allocator>
     using base_array_type = std::vector<T,Allocator>;
 
-    typedef typename std::char_traits<CharT> char_traits_type;
+    typedef typename std::char_traits<char_type> char_traits_type;
 
     template <class Allocator>
-    using key_type = std::basic_string<CharT,char_traits_type,Allocator>;
+    using key_type = std::basic_string<char_type,char_traits_type,Allocator>;
 
-    typedef basic_default_parse_error_handler<CharT> parse_error_handler_type;
+    typedef basic_default_parse_error_handler<char_type> parse_error_handler_type;
 };
 
 }
