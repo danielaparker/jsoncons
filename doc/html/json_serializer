@@ -471,56 +471,35 @@ vertical-align:1px;
 <div class="highlight highlight-source-c++"><pre>jsoncons::json_serializer
 
 <span class="pl-k">typedef</span> basic_json_serializer&lt;<span class="pl-k">char</span>&gt; json_serializer</pre></div>
-
 <p>The <code>json_serializer</code> class is an instantiation of the <code>basic_json_serializer</code> class template that uses <code>char</code> as the character type. It implements <a href="json_output_handler">json_output_handler</a> and supports pretty print serialization.</p>
-
 <p><code>json_serializer</code> is noncopyable and nonmoveable.</p>
-
 <h3>Header</h3>
-
 <pre><code>#include &lt;jsoncons/json_serializer.hpp&gt;
 </code></pre>
-
 <h3>Implemented interfaces</h3>
-
 <p><a href="json_output_handler">json_output_handler</a></p>
-
 <h3>Constructors</h3>
-
 <pre><code>json_serializer(std::ostream&amp; os)
 </code></pre>
-
 <p>Constructs a new serializer that writes to the specified output stream.<br>
 You must ensure that the output stream exists as long as does <code>json_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
-
 <pre><code>json_serializer(std::ostream&amp; os, bool indenting)
 </code></pre>
-
 <p>Constructs a new serializer that writes to the specified output stream.<br>
 You must ensure that the output stream exists as long as does <code>json_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
-
-<pre><code>json_serializer(std::ostream&amp; os, const serialization_options&amp; format)
+<pre><code>json_serializer(std::ostream&amp; os, const serialization_options&amp; options)
 </code></pre>
-
 <p>Constructs a new serializer that writes to the specified output stream using the specified <a href="serialization_options">serialization_options</a>.<br>
 You must ensure that the output stream exists as long as does <code>json_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
-
-<pre><code>json_serializer(std::ostream&amp; os, const serialization_options&amp; format, bool indenting)
+<pre><code>json_serializer(std::ostream&amp; os, const serialization_options&amp; options, bool indenting)
 </code></pre>
-
 <p>Constructs a new serializer that writes to the specified output stream using the specified <a href="serialization_options">serialization_options</a>.<br>
 You must ensure that the output stream exists as long as does <code>json_serializer</code>, as <code>json_serializer</code> holds a pointer to but does not own this object.</p>
-
 <h3>Destructor</h3>
-
 <pre><code>virtual ~json_serializer()
 </code></pre>
-
 <h3>Examples</h3>
-
-<h3>Feeding json events directly to a <code>json_serializer</code>
-</h3>
-
+<h3>Feeding json events directly to a <code>json_serializer</code></h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/numeric/ublas/matrix.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_serializer.hpp<span class="pl-pds">&gt;</span></span>
@@ -536,8 +515,8 @@ You must ensure that the output stream exists as long as does <code>json_seriali
     <span class="pl-c1">A</span>(<span class="pl-c1">1</span>, <span class="pl-c1">0</span>) = <span class="pl-c1">3</span>;
     <span class="pl-c1">A</span>(<span class="pl-c1">1</span>, <span class="pl-c1">1</span>) = <span class="pl-c1">4</span>;
 
-    serialization_options format;
-    json_serializer <span class="pl-smi">os</span>(std::cout, format, <span class="pl-c1">true</span>); <span class="pl-c">// pretty printing</span>
+    serialization_options options;
+    json_serializer <span class="pl-smi">os</span>(std::cout, options, <span class="pl-c1">true</span>); <span class="pl-c">// pretty printing</span>
     os.<span class="pl-c1">begin_array</span>();
     <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; A.<span class="pl-c1">size1</span>(); ++i)
     {
@@ -552,9 +531,7 @@ You must ensure that the output stream exists as long as does <code>json_seriali
 
     <span class="pl-k">return</span> <span class="pl-c1">0</span>;
 }</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>[
     [<span class="pl-c1">1</span>,<span class="pl-c1">2</span>],
     [<span class="pl-c1">3</span>,<span class="pl-c1">4</span>]

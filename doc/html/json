@@ -728,7 +728,7 @@ Otherwise throws <code>std::runtime_exception</code></p>
 <pre><code>string_type as&lt;string_type&gt;() const noexcept
 string_type as&lt;string_type&gt;(const char_allocator&amp; allocator) const noexcept
 </code></pre>
-<p>If value is string, returns value, otherwise returns result of <code>to_string</code>.</p>
+<p>If value is string, returns value, otherwise returns result of <code>dump</code>.</p>
 <pre><code>as&lt;X&lt;T&gt;&gt;()
 </code></pre>
 <p>If the type <code>X</code> is not <code>std::basic_string</code> but otherwise satisfies <a href="http://en.cppreference.com/w/cpp/concept/SequenceContainer">SequenceContainer</a>, <code>as&lt;X&lt;T&gt;&gt;()</code> returns the <code>json</code> value as an <code>X&lt;T&gt;</code> if the <code>json</code> value is an array and each element is convertible to type <code>T</code>, otherwise throws.</p>
@@ -841,22 +841,25 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 </code></pre>
 <p>Returns <code>true</code> if two json objects do not compare equal, <code>false</code> otherwise.</p>
 <h3>Serialization</h3>
-<pre><code>string_type to_string(const char_allocator&amp; allocator = char_allocator()) const noexcept
+<pre><code>template &lt;class SAllocator&gt;
+void dump(std::basic_string&lt;char_type,char_traits_type,SAllocator&gt;&amp; s) const
 </code></pre>
-<p>Inserts json value into string.</p>
-<pre><code>string_type to_string(const serialization_options&amp; format, const char_allocator&amp; allocator = char_allocator()) const
+<p>Inserts json value into string using default serialization_options.</p>
+<pre><code>template &lt;class SAllocator&gt;
+void dump(std::basic_string&lt;char_type,char_traits_type,SAllocator&gt;&amp; s, 
+          const serialization_options&amp; options) const
 </code></pre>
 <p>Inserts json value into string using specified <a href="serialization_options">serialization_options</a>.</p>
-<pre><code>void write(basic_json_output_handler&lt;char_type&gt;&amp; output_handler) const
+<pre><code>void dump(basic_json_output_handler&lt;char_type&gt;&amp; output_handler) const
 </code></pre>
 <p>Calls <code>begin_json()</code> on <code>output_handler</code>, emits json value to <code>output_handler</code>, and calls <code>end_json()</code> on <code>output_handler</code>.</p>
-<pre><code>write write(std::ostream&amp; os) const
+<pre><code>void dump(std::ostream&amp; os) const
 </code></pre>
 <p>Inserts json value into stream with default serialization options.</p>
-<pre><code>write write(std::ostream&lt;CharT&gt; os, const serialization_options&amp; format) const
+<pre><code>void dump(std::ostream&lt;CharT&gt; os, const serialization_options&amp; options) const
 </code></pre>
 <p>Inserts json value into stream using specified <a href="serialization_options">serialization_options</a>.</p>
-<pre><code>void write_body(json_output_handler&amp; handler) const
+<pre><code>void dump_body(json_output_handler&amp; handler) const
 </code></pre>
 <p>Emits JSON events for JSON objects, arrays, object members and array elements to a <a href="json_output_handler">json_output_handler</a>, such as a <a href="json_serializer">json_serializer</a>.</p>
 <h3>Non member functions</h3>
@@ -867,11 +870,11 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 </code></pre>
 <p>Inserts json value into stream.</p>
 <pre><code>std::ostream&amp; print(const json&amp; val)  
-std::ostream&amp; print(const json&amp; val, const serialization_options&lt;CharT&gt;&amp; format)  
+std::ostream&amp; print(const json&amp; val, const serialization_options&lt;CharT&gt;&amp; options)  
 </code></pre>
 <p>Inserts json value into stream using the specified <a href="serialization_options">serialization_options</a> if supplied.</p>
 <pre><code>std::ostream&amp; pretty_print(const json&amp; val)  
-std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&lt;CharT&gt;&amp; format)  
+std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&lt;CharT&gt;&amp; options)  
 </code></pre>
 <p>Inserts json value into stream using the specified <a href="serialization_options">serialization_options</a> if supplied.</p>
 <pre><code>void swap(json&amp; a, json&amp; b)

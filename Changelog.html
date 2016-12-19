@@ -469,16 +469,13 @@ vertical-align:1px;
 </head>
 <body>
 <h2>0.99.6</h2>
-<p>Removed features:</p>
-<ul>
-<li>The jsonx extension has been removed</li>
-</ul>
 <p>New feature</p>
 <ul>
 <li>The new binary extension supports encoding to and decoding from the MessagePack binary serialization format.</li>
 </ul>
 <p>Non-breaking changes</p>
 <ul>
+<li>The <code>json</code> <code>write</code> functions have been renamed to <code>dump</code>. The old names have been deprecated but still work.</li>
 <li>Support for stateful allocators</li>
 <li>json function object_range() now returns a pair of RandomAccessIterator (previously BidirectionalIterator)</li>
 <li>json operator [size_t i] applied to a json object now returns the ith object (previously threw)</li>
@@ -504,6 +501,10 @@ virtual void do_string_value(<span class="pl-k">const</span> CharT* value, <span
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">virtual</span> <span class="pl-k">void</span> <span class="pl-en">do_name</span>(string_view_type val)
 
 virtual void do_string_value(string_view_type val)</pre></div>
+<p>Removed features:</p>
+<ul>
+<li>The jsonx extension has been removed</li>
+</ul>
 <h2>0.99.5</h2>
 <ul>
 <li>Validations added to utf8 and utf16 string parsing to pass all <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> tests</li>

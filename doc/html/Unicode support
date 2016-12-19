@@ -469,19 +469,12 @@ vertical-align:1px;
 </head>
 <body>
 <h3>Narrow character support for UTF8 encoding</h3>
-
 <p>In the Linux and web worlds, <code>UTF-8</code> is the dominant character encoding.</p>
-
-<p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard </p>
-
+<p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard</p>
 <div class="highlight highlight-source-c++"><pre>std::fstream <span class="pl-en">fs</span>(<span class="pl-k">const</span> <span class="pl-k">char</span>* filename)</pre></div>
-
 <p>Instead you need to use the non standard Microsoft extension</p>
-
 <div class="highlight highlight-source-c++"><pre>std::fstream <span class="pl-en">fs</span>(<span class="pl-k">const</span> <span class="pl-c1">wchar_t</span>* filename)</pre></div>
-
 <h4>Unicode escaping</h4>
-
 <div class="highlight highlight-source-c++"><pre>string <span class="pl-en">inputStr</span>(<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"\\</span>u0040<span class="pl-cce">\\</span>u0040<span class="pl-cce">\\</span>u0000<span class="pl-cce">\\</span>u0011<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>);
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Input:    <span class="pl-pds">"</span></span> &lt;&lt; inputStr &lt;&lt; std::endl;
 
@@ -502,18 +495,13 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class=
 std::ostringstream os;
 os &lt;&lt; arr;
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Output:   <span class="pl-pds">"</span></span> &lt;&lt; os.str() &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <pre><code>Input:    ["\u0040\u0040\u0000\u0011"]
 Hex dump: [0x40 0x40 0x00 0x11]
 Output:   ["@@\u0000\u0011"]
 </code></pre>
-
 <p>Note that just the two control characters are escaped on output.</p>
-
 <h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode</h4>
-
 <div class="highlight highlight-source-c++"><pre>string <span class="pl-en">inputStr</span>(<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"\\</span>u007F<span class="pl-cce">\\</span>u07FF<span class="pl-cce">\\</span>u0800<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>);
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Input:    <span class="pl-pds">"</span></span> &lt;&lt; inputStr &lt;&lt; std::endl;
 
@@ -530,9 +518,9 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hex dump: [<s
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
 
 std::ostringstream os;
-serialization_options format;
+serialization_options options;
 format.escape_all_non_ascii(<span class="pl-c1">true</span>);
-os &lt;&lt; print(arr,format);
+os &lt;&lt; print(arr,options);
 std::string outputStr = os.str();
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Output:   <span class="pl-pds">"</span></span> &lt;&lt; os.str() &lt;&lt; std::endl;
 
@@ -547,60 +535,44 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hex dump: [<s
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>0x<span class="pl-pds">"</span></span>  &lt;&lt; std::hex&lt;&lt; <span class="pl-c1">std::setfill</span>(<span class="pl-s"><span class="pl-pds">'</span>0<span class="pl-pds">'</span></span>) &lt;&lt; <span class="pl-c1">std::setw</span>(<span class="pl-c1">2</span>) &lt;&lt; u;
 }
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class="pl-pds">"</span></span> &lt;&lt; std::endl;</pre></div>
-
 <p>Output:</p>
-
 <pre><code>Input:    ["\u007F\u07FF\u0800"]
 Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
 Output:   ["\u007F\u07FF\u0800"]
 Hex dump: [0x7f 0xdf 0xbf 0xe0 0xa0 0x80]
 </code></pre>
-
 <p>Since the escaped unicode consists of a control character (0x7f) and non-ascii, we get back the same text as what we started with.</p>
-
 <h4>Reading escaped unicode into utf8 encodings and writing back escaped unicode (with continuations)</h4>
-
 <div class="highlight highlight-source-c++"><pre>string input = <span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-cce">\"\\</span>u8A73<span class="pl-cce">\\</span>u7D30<span class="pl-cce">\\</span>u95B2<span class="pl-cce">\\</span>u89A7<span class="pl-cce">\\</span>uD800<span class="pl-cce">\\</span>uDC01<span class="pl-cce">\\</span>u4E00<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>;
 json value = json::parse(input);
-serialization_options format;
+serialization_options options;
 format.escape_all_non_ascii(<span class="pl-c1">true</span>);
-string output = value.to_string(format);
+string output;
+value.dump(output,options);
 
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Input:<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
 std::cout &lt;&lt; input &lt;&lt; std::endl;
 std::cout &lt;&lt; std::endl;
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Output:<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
 std::cout &lt;&lt; output &lt;&lt; std::endl;</pre></div>
-
 <p>Since all of the escaped unicode is non-ascii, we get back the same text as what we started with.</p>
-
 <pre><code>Input:
 ["\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00"]
 
 Output:
 ["\u8A73\u7D30\u95B2\u89A7\uD800\uDC01\u4E00"]
 </code></pre>
-
 <h3>Wide character support for UTF16 and UTF32 encodings</h3>
-
 <p>jsoncons supports wide character strings and streams with <code>wjson</code> and <code>wjson_reader</code>. It assumes <code>UTF16</code> encoding if <code>wchar_t</code> has size 2 (Windows) and <code>UTF32</code> encoding if <code>wchar_t</code> has size 4.</p>
-
-<p>It is necessary to deal with UTF-16 character encoding in the Windows world because of lack of UTF-8 support in the Windows system API. </p>
-
+<p>It is necessary to deal with UTF-16 character encoding in the Windows world because of lack of UTF-8 support in the Windows system API.</p>
 <p>Even if you choose to use wide character streams and strings to interact with the Windows API, you can still read and write to files in the more widely supported, endiness independent, UTF-8 format. To handle that you need to imbue your streams with the facet <code>std::codecvt_utf8_utf16</code>, which encapsulates the conversion between <code>UTF-8</code> and <code>UTF-16</code>.</p>
-
-<p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard </p>
-
+<p>Note that (at least in MSVS) you cannot open a Windows file with a Unicode name using the standard</p>
 <pre><code>std::wfstream fs(const char* filename)
 </code></pre>
-
 <p>Instead you need to use the non standard Microsoft extension</p>
-
 <pre><code>std::wfstream fs(const wchar_t* filename)
 </code></pre>
-
 <h4>Constructing a wjson value</h4>
-
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> jsoncons::wjson;
 
 wjson root;
@@ -608,14 +580,10 @@ root[<span class="pl-s"><span class="pl-pds">L"</span>field1<span class="pl-pds"
 root[<span class="pl-s"><span class="pl-pds">L"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">3.9</span>;
 root[<span class="pl-s"><span class="pl-pds">L"</span>field3<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
 std::wcout &lt;&lt; root &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
-
 <p>Output:</p>
-
 <pre><code>{"field1":"test","field2":3.9,"field3":true}
 </code></pre>
-
 <h4>Escaped unicode</h4>
-
 <div class="highlight highlight-source-c++"><pre>wstring input = <span class="pl-s"><span class="pl-pds">L"</span>[<span class="pl-cce">\"\\</span>u007F<span class="pl-cce">\\</span>u07FF<span class="pl-cce">\\</span>u0800<span class="pl-cce">\"</span>]<span class="pl-pds">"</span></span>;
 std::wistringstream <span class="pl-en">is</span>(input);
 
@@ -636,19 +604,15 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>]<span class=
 std::wofstream <span class="pl-en">os</span>(<span class="pl-s"><span class="pl-pds">"</span>output/xxx.txt<span class="pl-pds">"</span></span>);
 os.imbue(std::locale(os.getloc(), <span class="pl-k">new</span> std::codecvt_utf8_utf16&lt;<span class="pl-c1">wchar_t</span>&gt;));
 
-wserialization_options format;
+wserialization_options options;
 format.escape_all_non_ascii(<span class="pl-c1">true</span>);
 
-os &lt;&lt; pretty_print(val,format) &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
-
+os &lt;&lt; pretty_print(val,options) &lt;&lt; <span class="pl-s"><span class="pl-pds">L"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
 <p>Output:</p>
-
 <pre><code>length=3
 Hex dump: [0x7f 0x7ff 0x800]
 </code></pre>
-
 <p>and the file <code>xxx.txt</code> contains</p>
-
 <pre><code>["\u007F\u07FF\u0800"]    
 </code></pre>
 </body>

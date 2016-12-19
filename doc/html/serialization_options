@@ -500,15 +500,6 @@ vertical-align:1px;
 <pre><code>bool escape_solidus() const
 </code></pre>
 <p>The default is false</p>
-<pre><code>bool replace_nan() const
-</code></pre>
-<p>The defult is <code>true</code></p>
-<pre><code>bool replace_pos_inf() const
-</code></pre>
-<p>The defult is <code>true</code></p>
-<pre><code>bool replace_neg_inf() const
-</code></pre>
-<p>The defult is <code>true</code></p>
 <pre><code>std::string nan_replacement() const 
 </code></pre>
 <p>The default is "null"</p>
@@ -524,14 +515,6 @@ vertical-align:1px;
 serialization_options&amp; escape_all_non_ascii(bool value)
 
 serialization_options&amp; escape_solidus(bool value)
-
-serialization_options&amp; replace_nan(bool replace)
-
-serialization_options&amp; replace_inf(bool replace)
-
-serialization_options&amp; replace_pos_inf(bool replace)
-
-serialization_options&amp; replace_neg_inf(bool replace)
 
 serialization_options&amp; nan_replacement(const std::string&amp; replacement)
 
@@ -569,12 +552,12 @@ serialization_options&amp; object_object_split_lines(line_split_kind value)
     obj[<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>] = <span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
     obj[<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>] = -<span class="pl-c1">1.79e308</span>*<span class="pl-c1">1000</span>;
 
-    serialization_options format;
+    serialization_options options;
     format.nan_replacement(<span class="pl-s"><span class="pl-pds">"</span>null<span class="pl-pds">"</span></span>);        <span class="pl-c">// default is "null"</span>
     format.pos_inf_replacement(<span class="pl-s"><span class="pl-pds">"</span>1e9999<span class="pl-pds">"</span></span>);  <span class="pl-c">// default is "null"</span>
     format.neg_inf_replacement(<span class="pl-s"><span class="pl-pds">"</span>-1e9999<span class="pl-pds">"</span></span>); <span class="pl-c">// default is "null"</span>
 
-    std::cout &lt;&lt; pretty_print(obj,format) &lt;&lt; std::endl;</pre></div>
+    std::cout &lt;&lt; pretty_print(obj,options) &lt;&lt; std::endl;</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>    {
         <span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>,
