@@ -51,11 +51,14 @@ class Encode_message_pack_
 public:
     std::vector<uint8_t> encode(const Json& jval)
     {
+        std::cout << "size estimate = " << calculate_size(jval) << std::endl;
+        v_.reserve(calculate_size(jval));
         encode_(jval);
-        v_.shrink_to_fit();
+        std::cout << "actual size = " << v_.size() << " and capacity= " << v_.capacity() << std::endl;
+        //v_.shrink_to_fit();
         return std::move(v_);
     }
-private:
+
     size_t calculate_size(const Json& jval)
     {
         size_t n = 0;
@@ -182,7 +185,7 @@ private:
             case value_types::small_string_t:
             case value_types::string_t:
             {
-                //encode_string(jval.as_string_view());
+                n += string_size(jval.as_string_view());
                 break;
             }
 
@@ -205,7 +208,7 @@ private:
                     n += 1 + sizeof(uint32_t);
                 }
 
-                append each element
+                // calculate size for each element
                 for (const auto& el : jval.array_range())
                 {
                     n += calculate_size(el);
@@ -232,10 +235,10 @@ private:
                     n += 1 + sizeof(uint32_t);
                 }
 
-                // append each element
+                // calculate size for each member
                 for (const auto& kvp: jval.object_range())
                 {
-                    //encode_string(kvp.key());
+                    n += string_size(kvp.key());
                     n += calculate_size(kvp.value());
                 }
                 break;
@@ -246,6 +249,37 @@ private:
                 break;
             }
         }
+        return n;
+    }
+
+    size_t string_size(typename Json::string_view_type sv)
+    {
+        size_t n = 0;
+
+        const size_t length = sv.length();
+        if (length <= 31)
+        {
+            // fixstr stores a byte array whose length is upto 31 bytes
+            n += sizeof(uint8_t);
+        }
+        else if (length <= 255)
+        {
+            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
+            n += 1 + sizeof(uint8_t);
+        }
+        else if (length <= 65535)
+        {
+            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
+            n += 1 + sizeof(uint16_t);
+        }
+        else if (length <= 4294967295)
+        {
+            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
+            n += 1 + sizeof(uint32_t);
+        }
+
+        n += length;
+
         return n;
     }
 
