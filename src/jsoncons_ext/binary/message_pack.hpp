@@ -400,7 +400,6 @@ public:
             case value_types::double_t:
             {
                 // float 64
-                double val = jval.as_double();
                 v_.push_back(msgpack_format::float64_cd);
                 to_big_endian<double,sizeof(double)>()(jval.as_double(),v_);
                 break;
