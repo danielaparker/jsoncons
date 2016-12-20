@@ -593,7 +593,7 @@ public:
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.data(),name.length()), 
+            this->members_.emplace_back(key_type(name.begin(),name.end()), 
                                   std::forward<T&&>(value));
         }
         else if (it->key() == name)
@@ -603,7 +603,7 @@ public:
         else
         {
             this->members_.emplace(it,
-                             key_type(name.data(),name.length()),
+                             key_type(name.begin(),name.end()),
                              std::forward<T&&>(value));
         }
     }
@@ -616,7 +616,7 @@ public:
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.data(),name.length(), get_self_allocator()),
+            this->members_.emplace_back(key_type(name.begin(),name.end(), get_self_allocator()),
                                   std::forward<T&&>(value),get_self_allocator() );
         }
         else if (it->key() == name)
@@ -626,7 +626,7 @@ public:
         else
         {
             this->members_.emplace(it,
-                             key_type(name.data(),name.length(), get_self_allocator()),
+                             key_type(name.begin(),name.end(), get_self_allocator()),
                              std::forward<T&&>(value),get_self_allocator() );
         }
     }
@@ -693,7 +693,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.data(),name.length()), 
+            this->members_.emplace_back(key_type(name.begin(),name.end()), 
                                   std::forward<T&&>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -704,7 +704,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  key_type(name.data(),name.length()),
+                                  key_type(name.begin(),name.end()),
                                   std::forward<T&&>(value));
         }
         return it;
@@ -726,7 +726,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.data(),name.length(), get_self_allocator()), 
+            this->members_.emplace_back(key_type(name.begin(),name.end(), get_self_allocator()), 
                                   std::forward<T&&>(value),get_self_allocator() );
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -737,7 +737,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  key_type(name.data(),name.length(), get_self_allocator()),
+                                  key_type(name.begin(),name.end(), get_self_allocator()),
                                   std::forward<T&&>(value),get_self_allocator() );
         }
         return it;
@@ -1030,7 +1030,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.data(),name.length()), 
+            this->members_.emplace_back(key_type(name.begin(),name.end()), 
                                   std::forward<T&&>(value));
         }
         else
@@ -1049,7 +1049,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.data(),name.length(), get_self_allocator()), 
+            this->members_.emplace_back(key_type(name.begin(),name.end(), get_self_allocator()), 
                                   std::forward<T&&>(value),get_self_allocator());
         }
         else
@@ -1104,7 +1104,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.data(),name.length(), get_self_allocator()), 
+            this->members_.emplace_back(key_type(name.begin(),name.end(), get_self_allocator()), 
                                   std::forward<T&&>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -1115,7 +1115,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  key_type(name.data(),name.length()),
+                                  key_type(name.begin(),name.end()),
                                   std::forward<T&&>(value));
         }
         return it;
@@ -1129,7 +1129,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.data(),name.length(),get_self_allocator()), 
+            this->members_.emplace_back(key_type(name.begin(),name.end(),get_self_allocator()), 
                                   std::forward<T&&>(value),get_self_allocator());
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -1140,7 +1140,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  key_type(name.data(),name.length(),get_self_allocator()),
+                                  key_type(name.begin(),name.end(),get_self_allocator()),
                                   std::forward<T&&>(value),get_self_allocator());
         }
         return it;

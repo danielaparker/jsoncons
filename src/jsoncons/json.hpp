@@ -1590,7 +1590,7 @@ public:
 
         json_proxy<proxy_type> operator[](string_view_type name)
         {
-            return json_proxy<proxy_type>(*this,key_type(name.data(),name.length(),key_.get_allocator()));
+            return json_proxy<proxy_type>(*this,key_type(name.begin(),name.end(),key_.get_allocator()));
         }
 
         const json_type& operator[](string_view_type name) const
@@ -2315,7 +2315,7 @@ public:
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<json_type>(*this, key_type(name.data(),name.length(),char_allocator_type(object_value().get_self_allocator())));
+            return json_proxy<json_type>(*this, key_type(name.begin(),name.end(),char_allocator_type(object_value().get_self_allocator())));
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");

@@ -213,7 +213,7 @@ private:
 
     void do_name(string_view_type name, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].name_ = key_type(name.data(),name.length(),sa_);
+        stack_[top_].name_ = key_type(name.begin(),name.end(),sa_);
     }
 
     void do_string_value(string_view_type val, const basic_parsing_context<char_type>&) override
