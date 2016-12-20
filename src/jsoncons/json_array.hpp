@@ -25,6 +25,94 @@
 namespace jsoncons {
 
 template <class Json>
+class Json_string_
+{
+public:
+    typedef typename Json::char_type char_type;
+    typedef typename Json::allocator_type allocator_type;
+    typedef typename Json::char_allocator_type char_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<Json_string_> self_allocator_type;
+
+    typedef typename Json::base_string_type base_string_type;
+    typedef typename base_string_type::iterator iterator;
+    typedef typename base_string_type::const_iterator const_iterator;
+
+    Json_string_()
+        : self_allocator_(), 
+          string_('\0')
+    {
+    }
+    Json_string_(const Json_string_& val)
+        : self_allocator_(val.get_self_allocator()),
+          string_(val.string_)
+    {
+    }
+    Json_string_(const Json_string_& val, const allocator_type& allocator)
+        : self_allocator_(allocator), 
+          string_(val.string_,char_allocator_type(allocator))
+    {
+    }
+
+    Json_string_(Json_string_&& val) JSONCONS_NOEXCEPT
+        : self_allocator_(val.get_self_allocator()), 
+          string_(std::move(val.string_))
+    {
+    }
+    Json_string_(Json_string_&& val, const allocator_type& allocator)
+        : self_allocator_(allocator), 
+          string_(std::move(val.string_),char_allocator_type(allocator))
+    {
+    }
+
+    explicit Json_string_(const allocator_type& allocator)
+        : self_allocator_(allocator), 
+          string_(char_allocator_type(allocator))
+    {
+    }
+
+    Json_string_(const char_type* data, size_t length)
+        : string_()
+    {
+        string_.reserve(length+1);
+        string_.assign(data,data+length);
+        string_.push_back(0);
+    }
+
+    Json_string_(const char_type* data, size_t length, allocator_type allocator)
+        : self_allocator_(allocator), string_(char_allocator_type(allocator))
+    {
+        string_.reserve(length+1);
+        string_.assign(data,data+length);
+        string_.push_back(0);
+    }
+
+    self_allocator_type get_self_allocator() const
+    {
+        return self_allocator_;
+    }
+
+    const char_type* data() const
+    {
+        return string_.data();
+    }
+
+    const char_type* c_str() const
+    {
+        return string_.data();
+    }
+
+    size_t length() const
+    {
+        return string_.size()-1;
+    }
+private:
+    self_allocator_type self_allocator_;
+    base_string_type string_;
+
+    Json_string_& operator=(const Json_string_<Json>&) = delete;
+};
+
+template <class Json>
 class json_array
 {
 public:

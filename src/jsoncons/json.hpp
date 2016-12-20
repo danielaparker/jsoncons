@@ -100,6 +100,8 @@ public:
 
     using key_type = typename json_traits_type::template key_type<char_allocator_type>;
 
+    using base_string_type = typename json_traits_type::template base_string_type<char_allocator_type>;
+
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef key_value_pair<key_type,json_type> kvp_type;
 
@@ -117,6 +119,9 @@ public:
     using base_object_type = typename json_traits_type::template base_object_type<kvp_type , kvp_allocator_type>;
     typedef json_object<key_type,json_type,json_traits_type::preserve_order> object;
 
+    typedef Json_string_<json_type> jstring;
+
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<jstring> jstring_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
 
@@ -283,7 +288,7 @@ public:
                 return data_;
             }
         };
-
+/*
         struct string_data : public base_data
         {
             class Base_string_holder_
@@ -430,6 +435,107 @@ public:
             Allocator get_self_allocator() const
             {
                 return string_holder_cast(ptr_)->get_self_allocator();
+            }
+        };
+*/
+        struct string_data : public base_data
+        {
+            typedef typename std::allocator_traits<jstring_allocator>::pointer pointer;
+            pointer ptr_;
+
+            template <typename... Args>
+            void create(jstring_allocator allocator, Args&& ... args)
+            {
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<jstring> alloc(allocator);
+                ptr_ = alloc.allocate(1);
+                try
+                {
+                    std::allocator_traits<jstring_allocator>:: template rebind_traits<jstring>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                }
+                catch (...)
+                {
+                    alloc.deallocate(ptr_,1);
+                    throw;
+                }
+            }
+
+            string_data(const jstring& val)
+                : base_data(value_types::string_t)
+            {
+                create(val.get_self_allocator(), val);
+            }
+
+            string_data(pointer ptr)
+                : base_data(value_types::string_t)
+            {
+                ptr_ = ptr;
+            }
+
+            string_data(const jstring& val, const Allocator& a)
+                : base_data(value_types::string_t)
+            {
+                create(jstring_allocator(a), val, a);
+            }
+
+            string_data(const string_data & val)
+                : base_data(value_types::string_t)
+            {
+                create(val.ptr_->get_self_allocator(), *(val.ptr_));
+            }
+
+            string_data(const string_data & val, const Allocator& a)
+                : base_data(value_types::string_t)
+            {
+                create(jstring_allocator(a), *(val.ptr_), a);
+            }
+
+            template<class InputIterator>
+            string_data(InputIterator first, InputIterator last, const Allocator& a)
+                : base_data(value_types::string_t)
+            {
+                create(jstring_allocator(a), first, last, a);
+            }
+
+            string_data(const char_type* data, size_t length, const Allocator& a)
+                : base_data(value_types::string_t)
+            {
+                create(jstring_allocator(a), data, length, a);
+            }
+            ~string_data()
+            {
+                typename std::allocator_traits<jstring_allocator>:: template rebind_alloc<jstring> alloc(ptr_->get_self_allocator());
+                std::allocator_traits<jstring_allocator>:: template rebind_traits<jstring>::destroy(alloc, to_plain_pointer(ptr_));
+                alloc.deallocate(ptr_,1);
+            }
+
+            const char_type* data() const
+            {
+                return ptr_->data();
+            }
+
+            const char_type* c_str() const
+            {
+                return ptr_->c_str();
+            }
+
+            size_t length() const
+            {
+                return ptr_->length();
+            }
+
+            Allocator get_self_allocator() const
+            {
+                return ptr_->get_self_allocator();
+            }
+
+            jstring& value()
+            {
+                return *ptr_;
+            }
+
+            const jstring& value() const
+            {
+                return *ptr_;
             }
         };
 

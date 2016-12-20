@@ -37,6 +37,9 @@ struct json_traits
     template <class Allocator>
     using key_type = std::basic_string<char_type,char_traits_type,Allocator>;
 
+    template <class Allocator>
+    using base_string_type = std::vector<char_type,Allocator>;
+
     typedef basic_default_parse_error_handler<char_type> parse_error_handler_type;
 };
 
@@ -57,6 +60,9 @@ struct o_json_traits
 
     template <class Allocator>
     using key_type = std::basic_string<char_type,char_traits_type,Allocator>;
+
+    template <class Allocator>
+    using base_string_type = std::vector<char_type,Allocator>;
 
     typedef basic_default_parse_error_handler<char_type> parse_error_handler_type;
 };
