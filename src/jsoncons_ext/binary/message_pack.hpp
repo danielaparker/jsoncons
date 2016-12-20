@@ -194,12 +194,12 @@ public:
                     // fixarray
                     n += sizeof(uint8_t);
                 }
-                else if (length <= 0xffff)
+                else if (length <= (std::numeric_limits<uint16_t>::max)())
                 {
                     // array 16
                     n += 1 + sizeof(uint16_t);
                 }
-                else if (length <= 0xffffffff)
+                else if (length <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // array 32
                     n += 1 + sizeof(uint32_t);
@@ -259,17 +259,17 @@ public:
             // fixstr stores a byte array whose length is upto 31 bytes
             n += sizeof(uint8_t);
         }
-        else if (length <= 255)
+        else if (length <= (std::numeric_limits<uint8_t>::max)())
         {
             // str 8 stores a byte array whose length is upto (2^8)-1 bytes
             n += 1 + sizeof(uint8_t);
         }
-        else if (length <= 65535)
+        else if (length <= (std::numeric_limits<uint16_t>::max)())
         {
             // str 16 stores a byte array whose length is upto (2^16)-1 bytes
             n += 1 + sizeof(uint16_t);
         }
-        else if (length <= 4294967295)
+        else if (length <= (std::numeric_limits<uint32_t>::max)())
         {
             // str 32 stores a byte array whose length is upto (2^32)-1 bytes
             n += 1 + sizeof(uint32_t);
@@ -435,13 +435,13 @@ public:
                     // fixarray
                     v_.push_back(static_cast<uint8_t>(0x90 | length));
                 }
-                else if (length <= 0xffff)
+                else if (length <= (std::numeric_limits<uint16_t>::max)())
                 {
                     // array 16
                     v_.push_back(msgpack_format::array16_cd);
                     to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
                 }
-                else if (length <= 0xffffffff)
+                else if (length <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // array 32
                     v_.push_back(msgpack_format::array32_cd);
@@ -501,19 +501,19 @@ public:
             // fixstr stores a byte array whose length is upto 31 bytes
             v_.push_back(static_cast<uint8_t>(0xa0 | length));
         }
-        else if (length <= 255)
+        else if (length <= (std::numeric_limits<uint8_t>::max)())
         {
             // str 8 stores a byte array whose length is upto (2^8)-1 bytes
             v_.push_back(msgpack_format::str8_cd);
             v_.push_back(static_cast<uint8_t>(length));
         }
-        else if (length <= 65535)
+        else if (length <= (std::numeric_limits<uint16_t>::max)())
         {
             // str 16 stores a byte array whose length is upto (2^16)-1 bytes
             v_.push_back(msgpack_format::str16_cd);
             to_big_endian<size_t, sizeof(uint16_t)>()(length, v_);
         }
-        else if (length <= 4294967295)
+        else if (length <= (std::numeric_limits<uint32_t>::max)())
         {
             // str 32 stores a byte array whose length is upto (2^32)-1 bytes
             v_.push_back(msgpack_format::str32_cd);
