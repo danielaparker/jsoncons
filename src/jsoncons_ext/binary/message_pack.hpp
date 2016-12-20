@@ -553,7 +553,19 @@ public:
         // store && increment index
         std::vector<uint8_t>::const_iterator pos = it_++;
 
-        if (*pos <= 0xbf)
+        if (*pos == msgpack_format::nil_cd)
+        {
+            return Json(null_type());
+        }
+        else if (*pos == msgpack_format::true_cd)
+        {
+            return Json(true);
+        }
+        else if (*pos == msgpack_format::false_cd)
+        {
+            return Json(false);
+        }
+        else if (*pos <= 0xbf)
         {
             if (*pos <= 0x7f) 
             {
@@ -601,22 +613,6 @@ public:
         {
             switch (*pos)
             {
-                case msgpack_format::nil_cd: 
-                {
-                    return Json::null();
-                }
-
-                case msgpack_format::false_cd: 
-                {
-                    return Json(false);
-                }
-
-                case msgpack_format::true_cd: 
-                {
-                    // false
-                    return Json(true);
-                }
-
                 case msgpack_format::float32_cd: 
                 {
                     // reverse byte order
