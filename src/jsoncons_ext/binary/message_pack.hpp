@@ -24,7 +24,7 @@ namespace msgpack_format
 {
     const uint8_t nil_cd = 0xc0;
     const uint8_t false_cd = 0xc2;
-    const uint8_t true_cd = 0x03;
+    const uint8_t true_cd = 0xc3;
     const uint8_t float32_cd = 0xca;
     const uint8_t float64_cd = 0xcb;
     const uint8_t uint8_cd = 0xcc;
@@ -553,19 +553,7 @@ public:
         // store && increment index
         std::vector<uint8_t>::const_iterator pos = it_++;
 
-        if (*pos == msgpack_format::nil_cd)
-        {
-            return Json(null_type());
-        }
-        else if (*pos == msgpack_format::true_cd)
-        {
-            return Json(true);
-        }
-        else if (*pos == msgpack_format::false_cd)
-        {
-            return Json(false);
-        }
-        else if (*pos <= 0xbf)
+        if (*pos <= 0xbf)
         {
             if (*pos <= 0x7f) 
             {
@@ -613,6 +601,18 @@ public:
         {
             switch (*pos)
             {
+                case msgpack_format::nil_cd: 
+                {
+                    return Json(null_type());
+                }
+                case msgpack_format::true_cd:
+                {
+                    return Json(true);
+                }
+                case msgpack_format::false_cd:
+                {
+                    return Json(false);
+                }
                 case msgpack_format::float32_cd: 
                 {
                     // reverse byte order
