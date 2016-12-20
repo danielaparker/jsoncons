@@ -2039,13 +2039,13 @@ public:
         return handler.get_result();
     }
 
-    static basic_json parse_file(const string_type& filename)
+    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)
     {
         parse_error_handler_type err_handler;
         return parse_file(filename,err_handler);
     }
 
-    static basic_json parse_file(const string_type filename, 
+    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
                                  basic_parse_error_handler<char_type>& err_handler)
     {
         FILE* fp;

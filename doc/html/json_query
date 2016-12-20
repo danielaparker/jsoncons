@@ -468,16 +468,14 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::jsonpath::json_query
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>jsoncons::jsonpath::json_query</pre></div>
 <p>Returns a <code>json</code> array of <code>json</code> values selected from a root <code>json</code> structure.</p>
 <h3>Header</h3>
-<pre><code>#include &lt;jsoncons/jsonpath/json_query.hpp&gt;
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
 
-template&lt;Json&gt;
-Json json_query(const Json&amp; root, 
-                const typename Json::string_type&amp; path);
-</code></pre>
+<span class="pl-k">template</span>&lt;Json&gt;
+Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&amp; root, 
+                <span class="pl-k">typename</span> Json::string_view_type path);</pre></div>
 <p><a href="http://goessner.net/articles/JsonPath/">JsonPath</a> is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document.</p>
 <p>Stefan Goessner's javascript implemention returns <code>false</code> in case of no match, but in a note he suggests an alternative is to return an empty array. The <code>jsoncons</code> implementation takes that alternative and returns an empty array in case of no match.</p>
 <h3>Stefan Goessner's JsonPath</h3>
@@ -499,48 +497,48 @@ Json json_query(const Json&amp; root,
 <thead>
 <tr>
 <th>JSONPath</th>
-<th>       Description</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>$</code></td>
-<td>    The root object or array</td>
+<td>The root object or array</td>
 </tr>
 <tr>
 <td><code>@</code></td>
-<td>    the current object</td>
+<td>the current object</td>
 </tr>
 <tr>
 <td><code>.</code> or <code>[]</code></td>
-<td>    Child operator</td>
+<td>Child operator</td>
 </tr>
 <tr>
-<td><code>..</code>    </td>
+<td><code>..</code></td>
 <td>Recursive descent. JSONPath borrows this syntax from E4X.</td>
 </tr>
 <tr>
-<td><code>*</code> </td>
-<td>   Wildcard. All objects/elements regardless their names.</td>
+<td><code>*</code></td>
+<td>Wildcard. All objects/elements regardless their names.</td>
 </tr>
 <tr>
-<td><code>[]</code>    </td>
+<td><code>[]</code></td>
 <td>Subscript operator. In JSON it is the native array operator.</td>
 </tr>
 <tr>
-<td><code>[,]</code>   </td>
+<td><code>[,]</code></td>
 <td>JSONPath allows alternate names or array indices as a set.</td>
 </tr>
 <tr>
-<td><code>[start:end:step]</code>      </td>
+<td><code>[start:end:step]</code></td>
 <td>Array slice operator borrowed from <a href="http://wiki.ecmascript.org/doku.php?id=proposals:slice_syntax&amp;s=array+slice">ES4</a>.</td>
 </tr>
 <tr>
-<td><code>()</code>    </td>
+<td><code>()</code></td>
 <td>Filter expression.</td>
 </tr>
 <tr>
-<td><code>?()</code>   </td>
+<td><code>?()</code></td>
 <td>Applies a filter expression.</td>
 </tr></tbody></table>
 <h3>jsoncons filter expressions</h3>
@@ -549,48 +547,48 @@ Json json_query(const Json&amp; root,
 <thead>
 <tr>
 <th>Operator</th>
-<th>       Description</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>+</code>     </td>
+<td><code>+</code></td>
 <td>Left plus right</td>
 </tr>
 <tr>
-<td><code>-</code>     </td>
+<td><code>-</code></td>
 <td>Left minus right</td>
 </tr>
 <tr>
-<td><code>&amp;&amp;</code>    </td>
+<td><code>&amp;&amp;</code></td>
 <td>Left and right</td>
 </tr>
 <tr>
-<td><code>||</code>    </td>
+<td><code>||</code></td>
 <td>Left or right</td>
 </tr>
 <tr>
-<td><code>==</code>    </td>
+<td><code>==</code></td>
 <td>Left is equal to right</td>
 </tr>
 <tr>
-<td><code>!=</code>    </td>
+<td><code>!=</code></td>
 <td>Left is not equal to right</td>
 </tr>
 <tr>
-<td><code>&lt;</code>     </td>
+<td><code>&lt;</code></td>
 <td>Left is less than right</td>
 </tr>
 <tr>
-<td><code>&lt;=</code>    </td>
+<td><code>&lt;=</code></td>
 <td>Left is less or equal to right</td>
 </tr>
 <tr>
-<td><code>&gt;</code>     </td>
+<td><code>&gt;</code></td>
 <td>Left is greater than right</td>
 </tr>
 <tr>
-<td><code>&gt;=</code>    </td>
+<td><code>&gt;=</code></td>
 <td>Left is greater than or equal to right</td>
 </tr>
 <tr>
@@ -602,12 +600,12 @@ Json json_query(const Json&amp; root,
 <thead>
 <tr>
 <th>Operator</th>
-<th>       Description</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>!       </td>
+<td>!</td>
 <td>Not right</td>
 </tr></tbody></table>
 <ul>
@@ -670,94 +668,94 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <table>
 <thead>
 <tr>
-<th>JSONPath </th>
+<th>JSONPath</th>
 <th>Result</th>
 <th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>$..book.length</code>        </td>
+<td><code>$..book.length</code></td>
 <td>The number of books</td>
 <td><code>length</code> is a property of an array</td>
 </tr>
 <tr>
-<td><code>$.store.*</code>                 </td>
+<td><code>$.store.*</code></td>
 <td>Everything in the store, including books and a bicycle.</td>
 <td><code>*</code> is a wildcard symbol</td>
 </tr>
 <tr>
-<td><code>$..author</code>                 </td>
+<td><code>$..author</code></td>
 <td>All authors</td>
 <td>Recursive descent starting from root ($) to find all authors</td>
 </tr>
 <tr>
-<td><code>$.store.book[*].author</code>        </td>
+<td><code>$.store.book[*].author</code></td>
 <td>All authors of books in the store</td>
 <td></td>
 </tr>
 <tr>
-<td><code>$.store..price</code>                </td>
+<td><code>$.store..price</code></td>
 <td>The prices of everything in the store.</td>
 <td></td>
 </tr>
 <tr>
-<td><code>$..book[2]</code>                </td>
+<td><code>$..book[2]</code></td>
 <td>The third book</td>
 <td>Indices start at <code>0</code></td>
 </tr>
 <tr>
-<td><code>$..book.2</code>                 </td>
+<td><code>$..book.2</code></td>
 <td>The third book</td>
 <td>Using the dot notation</td>
 </tr>
 <tr>
-<td><code>$..book[(@.length-1)]</code>         </td>
+<td><code>$..book[(@.length-1)]</code></td>
 <td>The last book in order.</td>
 <td>Expressions () can be used as an alternative to explicit names or indices</td>
 </tr>
 <tr>
-<td><code>$..book[-1:]</code>          </td>
+<td><code>$..book[-1:]</code></td>
 <td>The last book in order.</td>
 <td>A negative <code>start</code> becomes <code>start</code> + <code>length</code>. A missing <code>end</code> defaults to <code>length</code>.</td>
 </tr>
 <tr>
-<td><code>$..book[0,1]</code>            </td>
+<td><code>$..book[0,1]</code></td>
 <td>The first two books</td>
 <td></td>
 </tr>
 <tr>
-<td><code>$..book[:2]</code>               </td>
+<td><code>$..book[:2]</code></td>
 <td>All books from index 0 (inclusive) to index 2 (exclusive)</td>
 <td><code>start</code> defaults to 0</td>
 </tr>
 <tr>
-<td><code>$..book[1:2]</code>              </td>
+<td><code>$..book[1:2]</code></td>
 <td>All books from index 1 (inclusive) to index 2 (exclusive)</td>
 <td></td>
 </tr>
 <tr>
-<td><code>$..book[-2:]</code>  </td>
+<td><code>$..book[-2:]</code></td>
 <td>Last two books</td>
 <td>The start index <code>-2</code> becomes <code>-2+4=2</code>, <code>end</code> defaults to <code>length</code> (<code>4</code>).</td>
 </tr>
 <tr>
-<td><code>$..book[2:]</code>   </td>
+<td><code>$..book[2:]</code></td>
 <td>Last two books</td>
 <td><code>end</code> defaults to <code>length</code></td>
 </tr>
 <tr>
-<td><code>$..book[?(@.isbn)]</code>        </td>
+<td><code>$..book[?(@.isbn)]</code></td>
 <td>All books that have isbn number</td>
 <td></td>
 </tr>
 <tr>
-<td><code>$..book[?(@.price&lt;10)]</code>        </td>
+<td><code>$..book[?(@.price&lt;10)]</code></td>
 <td>All books that are cheaper than $10</td>
 <td></td>
 </tr>
 <tr>
-<td><code>$..*</code>                  </td>
+<td><code>$..*</code></td>
 <td>Everything in the store.</td>
 <td></td>
 </tr>

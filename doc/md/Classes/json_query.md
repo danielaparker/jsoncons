@@ -9,7 +9,7 @@ Returns a `json` array of `json` values selected from a root `json` structure.
 
 template<Json>
 Json json_query(const Json& root, 
-                const typename Json::string_type& path);
+                typename Json::string_view_type path);
 ```
 [JsonPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 

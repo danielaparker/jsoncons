@@ -96,31 +96,19 @@ namespace jsoncons { namespace jsonpath {
 // here
 
 template<class Json>
-Json json_query(const Json& root, const typename Json::char_type* path, size_t length)
-{
-    jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
-    evaluator.evaluate(root,path,length);
-    return evaluator.get_values();
-}
-
-template<class Json>
 Json json_query(const Json& root, typename Json::string_view_type path)
 {
-    return json_query(root,path.data(),path.length());
-}
-
-template<class Json, class T>
-void json_replace(Json& root, const typename Json::char_type* path, size_t length, T&& new_value)
-{
-    jsonpath_evaluator<Json,Json&,Json*> evaluator;
-    evaluator.evaluate(root,path,length);
-    evaluator.replace(std::forward<T&&>(new_value));
+    jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
+    evaluator.evaluate(root,path.data(),path.length());
+    return evaluator.get_values();
 }
 
 template<class Json, class T>
 void json_replace(Json& root, typename Json::string_view_type path, T&& new_value)
 {
-    json_replace(root, path.data(), path.length(), std::forward<T&&>(new_value));
+    jsonpath_evaluator<Json,Json&,Json*> evaluator;
+    evaluator.evaluate(root,path.data(),path.length());
+    evaluator.replace(std::forward<T&&>(new_value));
 }
 
 enum class states 

@@ -11,17 +11,7 @@ jsoncons::jsonpath::json_replace
 ```c++
 template<class Json, class T>
 void json_replace(Json& root, 
-                  const typename Json::char_type* path, size_t length, 
-                  T&& new_value)
-
-template<class Json, class T>
-void json_replace(Json& root, 
-                  const typename Json::string_type& path, 
-                  T&& new_value)
-
-template<class Json, class T>
-void json_replace(Json& root, 
-                  const typename Json::char_type* path, 
+                  typename Json::string_view_type path, 
                   T&& new_value)
 ```
 

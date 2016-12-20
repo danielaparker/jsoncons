@@ -507,10 +507,6 @@ vertical-align:1px;
 <td>Object allocator</td>
 </tr>
 <tr>
-<td><code>string_type</code></td>
-<td>Default <code>string_type</code> is <code>std::string</code></td>
-</tr>
-<tr>
 <td><code>string_view_type</code></td>
 <td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <a href="http://en.cppreference.com/w/cpp/string/basic_string_view">string view</a> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise proxied.</td>
 </tr>
@@ -559,8 +555,8 @@ static json parse_stream(std::istream&amp; is,
 </code></pre>
 <p>Parses an input stream of JSON text and returns a json object or array value.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
-<pre><code>static json parse_file(const string_type&amp; filename)
-static json parse_file(const string_type&amp; filename, 
+<pre><code>static json parse_file(const std::string&amp; filename)
+static json parse_file(const std::string&amp; filename, 
                        parse_error_handler&amp; err_handler)
 </code></pre>
 <p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.<br>
@@ -680,7 +676,7 @@ bool is() const noexcept
 </code></pre>
 <p>Type <code>X</code> is integral: returns <code>true</code> if the json value is integral and within the range of the type <code>X</code>, <code>false</code> otherwise.<br>
 Type <code>X</code> is floating point: returns <code>true</code> if the json value is floating point and within the range of the type <code>X</code>, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;string_type&gt; const noexcept 
+<pre><code>bool is&lt;std::string&gt; const noexcept 
 </code></pre>
 <p>Returns <code>true</code> if the json value is of string type, <code>false</code> otherwise.</p>
 <pre><code>bool is&lt;bool&gt; const noexcept 
@@ -698,7 +694,7 @@ Type <code>X</code> is floating point: returns <code>true</code> if the json val
 <pre><code>bool is&lt;X&lt;T&gt;&gt; const noexcept
 </code></pre>
 <p>If the type <code>X</code> is not <code>std::basic_string</code> but otherwise satisfies <a href="http://en.cppreference.com/w/cpp/concept/SequenceContainer">SequenceContainer</a>, <code>is&lt;X&lt;T&gt;&gt;()</code> returns <code>true</code> if the json value is an array and each element is the "same as" type <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;X&lt;string_type,T&gt;&gt; const noexcept
+<pre><code>bool is&lt;X&lt;std::string,T&gt;&gt; const noexcept
 </code></pre>
 <p>If the type 'X' satisfies <a href="http://en.cppreference.com/w/cpp/concept/AssociativeContainer">AssociativeContainer</a> or <a href="http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer">UnorderedAssociativeContainer</a>, <code>is&lt;X&lt;T&gt;&gt;()</code> returns <code>true</code> if the json value is an object and each mapped value is the "same as" <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.</p>
 <pre><code>bool is_null() const noexcept
@@ -725,16 +721,16 @@ Type X is floating point: returns value cast to X if value is integral, returns 
 <p>Returns <code>true</code> if value is <code>bool</code> and <code>true</code>, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as <code>true</code>.<br>
 Returns <code>false</code> if value is <code>bool</code> and <code>false</code>, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as <code>false</code>.<br>
 Otherwise throws <code>std::runtime_exception</code></p>
-<pre><code>string_type as&lt;string_type&gt;() const noexcept
-string_type as&lt;string_type&gt;(const char_allocator&amp; allocator) const noexcept
+<pre><code>std::string as&lt;std::string&gt;() const noexcept
+std::string as&lt;std::string&gt;(const char_allocator&amp; allocator) const noexcept
 </code></pre>
 <p>If value is string, returns value, otherwise returns result of <code>dump</code>.</p>
 <pre><code>as&lt;X&lt;T&gt;&gt;()
 </code></pre>
 <p>If the type <code>X</code> is not <code>std::basic_string</code> but otherwise satisfies <a href="http://en.cppreference.com/w/cpp/concept/SequenceContainer">SequenceContainer</a>, <code>as&lt;X&lt;T&gt;&gt;()</code> returns the <code>json</code> value as an <code>X&lt;T&gt;</code> if the <code>json</code> value is an array and each element is convertible to type <code>T</code>, otherwise throws.</p>
-<pre><code>as&lt;X&lt;string_type,T&gt;&gt;()
+<pre><code>as&lt;X&lt;std::string,T&gt;&gt;()
 </code></pre>
-<p>If the type 'X' satisfies <a href="http://en.cppreference.com/w/cpp/concept/AssociativeContainer">AssociativeContainer</a> or <a href="http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer">UnorderedAssociativeContainer</a>, <code>as&lt;X&lt;string_type,T&gt;&gt;()</code> returns the <code>json</code> value as an <code>X&lt;string_type,T&gt;</code> if the <code>json</code> value is an object and if each member value is convertible to type <code>T</code>, otherwise throws.</p>
+<p>If the type 'X' satisfies <a href="http://en.cppreference.com/w/cpp/concept/AssociativeContainer">AssociativeContainer</a> or <a href="http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer">UnorderedAssociativeContainer</a>, <code>as&lt;X&lt;std::string,T&gt;&gt;()</code> returns the <code>json</code> value as an <code>X&lt;std::string,T&gt;</code> if the <code>json</code> value is an object and if each member value is convertible to type <code>T</code>, otherwise throws.</p>
 <pre><code>bool as_bool() const
 int64_t as_integer() const
 uint64_t as_uinteger() const
@@ -986,7 +982,7 @@ json booklist = json::array{book1, book2, book3};
 
 <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book: booklist.array_range())
 {
-    std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::end;
+    std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::end;
 } 
    
 ### Accessors <span class="pl-k">and</span> defaults
@@ -1045,7 +1041,7 @@ obj[<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">
 
 <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = obj.object_range().begin(); it != obj.object_range().end(); ++it)
 {
-    std::cout &lt;&lt; it-&gt;<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string_type&gt;() &lt;&lt; std::endl;
+    std::cout &lt;&lt; it-&gt;<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::endl;
 }</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-c++"><pre>city=Toronto
@@ -1056,7 +1052,7 @@ province=Ontario</pre></div>
 
 <span class="pl-k">for</span> (<span class="pl-k">auto</span> it = arr.array_range().begin(); it != arr.array_range().end(); ++it)
 {
-    std::cout &lt;&lt; it-&gt;as&lt;string_type&gt;() &lt;&lt; std::endl;
+    std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
 }</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>Toronto

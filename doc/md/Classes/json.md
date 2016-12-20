@@ -23,7 +23,6 @@ Member type                         |Definition
 `char_allocator`|String allocator type
 `array_allocator`|Array allocator type
 `object_allocator`|Object allocator 
-`string_type`|Default `string_type` is `std::string`
 `string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
 `kvp_type `|[kvp_type ](kvp_type ) is a class that stores a name and a json value
 `null_type`|An alias for `jsoncons::null_type`
@@ -48,8 +47,8 @@ Throws [parse_exception](parse_exception) if parsing fails.
 Parses an input stream of JSON text and returns a json object or array value. 
 Throws [parse_exception](parse_exception) if parsing fails.
 
-    static json parse_file(const string_type& filename)
-    static json parse_file(const string_type& filename, 
+    static json parse_file(const std::string& filename)
+    static json parse_file(const std::string& filename, 
                            parse_error_handler& err_handler)
 Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
 Throws [parse_exception](parse_exception) if parsing fails.
@@ -178,7 +177,7 @@ Returns `true` if the json value is the same as type `T` according to [json_type
 Type `X` is integral: returns `true` if the json value is integral and within the range of the type `X`, `false` otherwise.  
 Type `X` is floating point: returns `true` if the json value is floating point and within the range of the type `X`, `false` otherwise.  
 
-    bool is<string_type> const noexcept 
+    bool is<std::string> const noexcept 
 Returns `true` if the json value is of string type, `false` otherwise.  
 
     bool is<bool> const noexcept 
@@ -196,7 +195,7 @@ Returns `true` if the json value is an array, `false` otherwise.
     bool is<X<T>> const noexcept
 If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `is<X<T>>()` returns `true` if the json value is an array and each element is the "same as" type `T` according to [json_type_traits](json_type_traits), `false` otherwise.
 
-    bool is<X<string_type,T>> const noexcept
+    bool is<X<std::string,T>> const noexcept
 If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `is<X<T>>()` returns `true` if the json value is an object and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits), `false` otherwise.
 
     bool is_null() const noexcept
@@ -223,15 +222,15 @@ Returns `true` if value is `bool` and `true`, or if value is integral and non-ze
 Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
 Otherwise throws `std::runtime_exception`
 
-    string_type as<string_type>() const noexcept
-    string_type as<string_type>(const char_allocator& allocator) const noexcept
+    std::string as<std::string>() const noexcept
+    std::string as<std::string>(const char_allocator& allocator) const noexcept
 If value is string, returns value, otherwise returns result of `dump`.
 
     as<X<T>>()
 If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `as<X<T>>()` returns the `json` value as an `X<T>` if the `json` value is an array and each element is convertible to type `T`, otherwise throws.
 
-    as<X<string_type,T>>()
-If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<string_type,T>>()` returns the `json` value as an `X<string_type,T>` if the `json` value is an object and if each member value is convertible to type `T`, otherwise throws.
+    as<X<std::string,T>>()
+If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<std::string,T>>()` returns the `json` value as an `X<std::string,T>` if the `json` value is an object and if each member value is convertible to type `T`, otherwise throws.
 
     bool as_bool() const
     int64_t as_integer() const
@@ -494,7 +493,7 @@ json booklist = json::array{book1, book2, book3};
 
 for (const auto& book: booklist.array_range())
 {
-    std::cout << book["title"].as<string_type>() << std::end;
+    std::cout << book["title"].as<std::string>() << std::end;
 } 
    
 ### Accessors and defaults
@@ -569,7 +568,7 @@ obj["country"] = "Canada";
 
 for (auto it = obj.object_range().begin(); it != obj.object_range().end(); ++it)
 {
-    std::cout << it->key() << "=" << it->value().as<string_type>() << std::endl;
+    std::cout << it->key() << "=" << it->value().as<std::string>() << std::endl;
 }
 ```
 Output:
@@ -584,7 +583,7 @@ json arr = json::array{"Toronto", "Vancouver", "Montreal"};
 
 for (auto it = arr.array_range().begin(); it != arr.array_range().end(); ++it)
 {
-    std::cout << it->as<string_type>() << std::endl;
+    std::cout << it->as<std::string>() << std::endl;
 }
 ```
 Output:

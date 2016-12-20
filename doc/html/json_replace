@@ -468,24 +468,13 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::jsonpath::json_replace
-</code></pre>
+<div class="highlight highlight-source-c++"><pre>jsoncons::jsonpath::json_replace</pre></div>
 <p>Searches for all values that match a JsonPath expression and replaces them with the specified value</p>
 <h3>Header</h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span></pre></div>
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
 <span class="pl-k">void</span> <span class="pl-en">json_replace</span>(Json&amp; root, 
-                  <span class="pl-k">const</span> <span class="pl-k">typename</span> Json::char_type* path, <span class="pl-c1">size_t</span> length, 
-                  T&amp;&amp; new_value)
-
-template&lt;class Json, class T&gt;
-void json_replace(Json&amp; root, 
-                  <span class="pl-k">const</span> <span class="pl-k">typename</span> Json::string_type&amp; path, 
-                  T&amp;&amp; new_value)
-
-template&lt;class Json, class T&gt;
-void json_replace(Json&amp; root, 
-                  <span class="pl-k">const</span> <span class="pl-k">typename</span> Json::char_type* path, 
+                  <span class="pl-k">typename</span> Json::string_view_type path, 
                   T&amp;&amp; new_value)</pre></div>
 <h2>Examples</h2>
 <h3>Change the price of a book</h3>
@@ -523,7 +512,7 @@ void json_replace(Json&amp; root,
     json booklist;
     is &gt;&gt; booklist;
 
-    <span class="pl-c">// Change the price of "Moby Dick"</span>
+    <span class="pl-c"><span class="pl-c">//</span> Change the price of "Moby Dick"</span>
     <span class="pl-c1">json_replace</span>(booklist,<span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.isbn == '0-553-21311-3')].price<span class="pl-pds">"</span></span>,<span class="pl-c1">10.0</span>);
     std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(booklist) &lt;&lt; std::endl;
 
