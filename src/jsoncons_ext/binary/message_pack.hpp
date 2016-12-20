@@ -565,6 +565,7 @@ public:
                 // fixmap
                 Json result;
                 const size_t len = *pos & 0x0f;
+                result.reserve(len);
                 for (size_t i = 0; i < len; ++i)
                 {
                     auto j = decode();
@@ -577,6 +578,7 @@ public:
                 // fixarray
                 Json result = typename Json::array();
                 const size_t len = *pos & 0x0f;
+                result.reserve(len);
                 for (size_t i = 0; i < len; ++i)
                 {
                     result.add(decode());
@@ -714,6 +716,7 @@ public:
                     Json result = typename Json::array();
                     const auto len = from_big_endian<uint16_t>(pos,end_);
                     it_ += 2; 
+                    result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
                         result.add(decode());
@@ -726,6 +729,7 @@ public:
                     Json result = typename Json::array();
                     const auto len = from_big_endian<uint32_t>(pos,end_);
                     it_ += 4; 
+                    result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
                         result.add(decode());
@@ -738,6 +742,7 @@ public:
                     Json result = typename Json::object();
                     const auto len = from_big_endian<uint16_t>(pos,end_);
                     it_ += 2; 
+                    result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
                         auto j = decode();
@@ -751,6 +756,7 @@ public:
                     Json result = typename Json::object();
                     const auto len = from_big_endian<uint32_t>(pos,end_);
                     it_ += 4; 
+                    result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
                         auto key = decode().as_string_view();
