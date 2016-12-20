@@ -80,7 +80,7 @@ public:
                 int64_t val = jval.as_integer();
                 if (val >= 0)
                 {
-                    if (val < (std::numeric_limits<int8_t>::max)())
+                    if (val <= (std::numeric_limits<int8_t>::max)())
                     {
                         ++n;
                     }
@@ -139,7 +139,7 @@ public:
         case value_types::uinteger_t:
             {
                 uint64_t val = jval.as_uinteger();
-                if (val < (std::numeric_limits<int8_t>::max)())
+                if (val <= (std::numeric_limits<int8_t>::max)())
                 {
                     // positive fixnum stores 7-bit positive integer
                     ++n;
@@ -297,7 +297,7 @@ public:
                 int64_t val = jval.as_integer();
                 if (val >= 0)
                 {
-                    if (val < (std::numeric_limits<int8_t>::max)())
+                    if (val <= (std::numeric_limits<int8_t>::max)())
                     {
                         // positive fixnum stores 7-bit positive integer
                         to_big_endian<int64_t, sizeof(int8_t)>()(val,v_);
@@ -365,7 +365,7 @@ public:
         case value_types::uinteger_t:
             {
                 uint64_t val = jval.as_uinteger();
-                if (val < (std::numeric_limits<int8_t>::max)())
+                if (val <= (std::numeric_limits<int8_t>::max)())
                 {
                     // positive fixnum stores 7-bit positive integer
                     v_.push_back(static_cast<uint8_t>((val)));
