@@ -126,7 +126,7 @@ namespace jsoncons
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
-BOOST_AUTO_TEST_SUITE(json_extensibility_test_suite)
+BOOST_AUTO_TEST_SUITE(json_extensibility_tests)
 
 BOOST_AUTO_TEST_CASE(test_add_extensibility)
 {

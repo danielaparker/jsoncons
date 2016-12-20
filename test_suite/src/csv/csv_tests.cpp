@@ -18,7 +18,7 @@
 using namespace jsoncons;
 using namespace jsoncons::csv;
 
-BOOST_AUTO_TEST_SUITE(csv_test_suite)
+BOOST_AUTO_TEST_SUITE(csv_tests)
 
 BOOST_AUTO_TEST_CASE(csv_test_empty_values)
 {

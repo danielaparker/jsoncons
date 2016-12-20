@@ -18,7 +18,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_filter_test_suite)
+BOOST_AUTO_TEST_SUITE(json_filter_tests)
 
 struct warning
 {

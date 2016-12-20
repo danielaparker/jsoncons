@@ -15,7 +15,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(unicode_test_suite)
+BOOST_AUTO_TEST_SUITE(unicode_tests)
 
 BOOST_AUTO_TEST_CASE( test_surrogate_pair )
 {

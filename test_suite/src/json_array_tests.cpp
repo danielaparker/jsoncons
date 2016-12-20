@@ -15,7 +15,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_array_test_suite)
+BOOST_AUTO_TEST_SUITE(json_array_tests)
 
 BOOST_AUTO_TEST_CASE(test_initializer_list_of_integers)
 {

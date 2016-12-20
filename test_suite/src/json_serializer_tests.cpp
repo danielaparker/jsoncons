@@ -13,7 +13,7 @@
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
-BOOST_AUTO_TEST_SUITE(json_serializer_test_suite)
+BOOST_AUTO_TEST_SUITE(json_serializer_tests)
 
 BOOST_AUTO_TEST_CASE(test_direct_serialization)
 {

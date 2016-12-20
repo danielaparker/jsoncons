@@ -17,7 +17,7 @@
 using namespace jsoncons;
 using namespace jsoncons::binary;
 
-BOOST_AUTO_TEST_SUITE(message_pack_test_suite)
+BOOST_AUTO_TEST_SUITE(message_pack_tests)
 
 BOOST_AUTO_TEST_CASE(message_pack_test)
 {

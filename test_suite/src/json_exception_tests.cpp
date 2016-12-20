@@ -17,7 +17,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_exception_test_suite)
+BOOST_AUTO_TEST_SUITE(json_exception_tests)
 
 BOOST_AUTO_TEST_CASE(test_object_at)
 {

@@ -17,7 +17,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(ojson_test_suite)
+BOOST_AUTO_TEST_SUITE(ojson_tests)
 
 BOOST_AUTO_TEST_CASE(test_index)
 {

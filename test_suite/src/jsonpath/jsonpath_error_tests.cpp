@@ -17,7 +17,7 @@
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
-BOOST_AUTO_TEST_SUITE(jsonpath_error_test_suite)
+BOOST_AUTO_TEST_SUITE(jsonpath_error_tests)
 
 struct jsonpath_fixture
 {

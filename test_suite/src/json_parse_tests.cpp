@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_parse_test_suite)
+BOOST_AUTO_TEST_SUITE(json_parse_tests)
 
 void test_error_code(const std::string& text, std::error_code ec)
 {

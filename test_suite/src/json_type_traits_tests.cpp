@@ -14,7 +14,7 @@
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
-BOOST_AUTO_TEST_SUITE(json_type_traits_test_suite)
+BOOST_AUTO_TEST_SUITE(json_type_traits_tests)
 
 BOOST_AUTO_TEST_CASE(test_trait_type_erasure)
 {

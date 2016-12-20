@@ -15,7 +15,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(double_to_string_test_suite)
+BOOST_AUTO_TEST_SUITE(double_to_string_tests)
 
 template<class CharT>
 std::basic_string<CharT> float_to_string(double val, uint8_t precision)

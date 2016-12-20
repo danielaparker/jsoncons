@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(wjson_test_suite)
+BOOST_AUTO_TEST_SUITE(wjson_tests)
 
 BOOST_AUTO_TEST_CASE(test_wjson )
 {

@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(parse_string_test_suite)
+BOOST_AUTO_TEST_SUITE(parse_string_tests)
 
 struct jsonpath_filter_fixture
 {

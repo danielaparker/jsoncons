@@ -6,10 +6,9 @@
 *.vcxproj.filters
 **/x64/Debug/
 **/x64/Release/
-**/.vcxproj
+**/*.vcxproj
 **/vs2015
 **/vs2013
-**/more_examples/shared_memory
 
 test_suite/build/cmake/build_vc140x64
 test_suite/build/vs2015

@@ -17,7 +17,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(error_recovery_test_suite)
+BOOST_AUTO_TEST_SUITE(error_recovery_tests)
 
 class relaxed_error_handler : public parse_error_handler
 {

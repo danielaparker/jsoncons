@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(double_round_trip_test_suite)
+BOOST_AUTO_TEST_SUITE(double_round_trip_tests)
 
 BOOST_AUTO_TEST_CASE(test_precision)
 {

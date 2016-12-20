@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_reader_exception_test_suite)
+BOOST_AUTO_TEST_SUITE(json_reader_exception_tests)
 
 BOOST_AUTO_TEST_CASE(test_filename_invalid)
 {

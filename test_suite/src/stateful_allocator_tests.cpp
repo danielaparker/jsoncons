@@ -18,7 +18,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(allocator_test_suite)
+BOOST_AUTO_TEST_SUITE(allocator_tests)
 
 class pool 
 { 

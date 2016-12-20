@@ -20,7 +20,7 @@ using namespace jsoncons;
 
 using namespace boost::filesystem;
 
-BOOST_AUTO_TEST_SUITE(json_checker_test_suite)
+BOOST_AUTO_TEST_SUITE(json_checker_tests)
 #if 0
 BOOST_AUTO_TEST_CASE(test_fail1)
 {

@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_object_test_suite)
+BOOST_AUTO_TEST_SUITE(json_object_tests)
 
 BOOST_AUTO_TEST_CASE(test_last_wins_unique_sequence_1)
 {

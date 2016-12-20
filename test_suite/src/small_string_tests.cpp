@@ -18,7 +18,7 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(small_string_test_suite)
+BOOST_AUTO_TEST_SUITE(small_string_tests)
 
 BOOST_AUTO_TEST_CASE(test_small_string)
 {
