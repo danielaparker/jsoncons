@@ -226,6 +226,7 @@ public:
     typedef KeyT key_type;
     typedef typename KeyT::value_type char_type;
     typedef typename KeyT::allocator_type allocator_type;
+    typedef typename ValueT::string_view_type string_view_type;
 
     key_value_pair()
     {
@@ -260,9 +261,9 @@ public:
     {
     }
 
-    const key_type& key() const
+    string_view_type key() const
     {
-        return key_;
+        return string_view_type(key_.data(),key_.size());
     }
 
     ValueT& value()
