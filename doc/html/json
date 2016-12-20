@@ -857,7 +857,7 @@ void dump(std::basic_string&lt;char_type,char_traits_type,SAllocator&gt;&amp; s,
 <pre><code>void dump(std::ostream&lt;CharT&gt; os, const serialization_options&amp; options) const
 </code></pre>
 <p>Inserts json value into stream using specified <a href="serialization_options">serialization_options</a>.</p>
-<pre><code>void dump_fragment(json_output_handler&amp; handler) const
+<pre><code>void dump_body(json_output_handler&amp; handler) const
 </code></pre>
 <p>Emits JSON events for JSON objects, arrays, object members and array elements to a <a href="json_output_handler">json_output_handler</a>, such as a <a href="json_serializer">json_serializer</a>.</p>
 <h3>Non member functions</h3>

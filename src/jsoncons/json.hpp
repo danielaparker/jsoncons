@@ -98,9 +98,9 @@ public:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
 
-    using key_type = typename json_traits_type::template key_type<char_allocator_type>;
+    using key_type = typename json_traits_type::template key_container<char_allocator_type>;
 
-    using base_string_type = typename json_traits_type::template base_string_type<char_allocator_type>;
+    using base_string_type = typename json_traits_type::template string_container<char_allocator_type>;
 
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef key_value_pair<key_type,json_type> kvp_type;
@@ -110,18 +110,16 @@ public:
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
-    using base_array_type = typename json_traits_type::template base_array_type<json_type, val_allocator_type>;
+    using base_array_type = typename json_traits_type::template array_container<json_type, val_allocator_type>;
 
     typedef json_array<json_type> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<kvp_type > kvp_allocator_type;
 
-    using base_object_type = typename json_traits_type::template base_object_type<kvp_type , kvp_allocator_type>;
+    using base_object_type = typename json_traits_type::template object_container<kvp_type , kvp_allocator_type>;
     typedef json_object<key_type,json_type,json_traits_type::preserve_order> object;
 
-    typedef Json_string_<json_type> jstring;
 
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<jstring> jstring_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
 
@@ -288,169 +286,104 @@ public:
                 return data_;
             }
         };
-/*
         struct string_data : public base_data
         {
-            class Base_string_holder_
+            class String_holder_
             {
             public:
-                typedef CharT char_type;
-                typedef Allocator allocator_type;
+                typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<String_holder_> self_allocator_type;
 
-                Base_string_holder_(const allocator_type& allocator)
-                    : allocator_(allocator)
+                typedef typename base_string_type::iterator iterator;
+                typedef typename base_string_type::const_iterator const_iterator;
+
+                String_holder_()
+                    : self_allocator_(), 
+                      string_('\0')
+                {
+                }
+                String_holder_(const String_holder_& val)
+                    : self_allocator_(val.get_self_allocator()),
+                      string_(val.string_)
+                {
+                }
+                String_holder_(const String_holder_& val, const allocator_type& allocator)
+                    : self_allocator_(allocator), 
+                      string_(val.string_,char_allocator_type(allocator))
                 {
                 }
 
-                allocator_type get_self_allocator() const
+                String_holder_(String_holder_&& val) JSONCONS_NOEXCEPT
+                    : self_allocator_(val.get_self_allocator()), 
+                      string_(std::move(val.string_))
                 {
-                    return allocator_;
+                }
+                String_holder_(String_holder_&& val, const allocator_type& allocator)
+                    : self_allocator_(allocator), 
+                      string_(std::move(val.string_),char_allocator_type(allocator))
+                {
                 }
 
-                allocator_type allocator_;
+                explicit String_holder_(const allocator_type& allocator)
+                    : self_allocator_(allocator), 
+                      string_(char_allocator_type(allocator))
+                {
+                }
+
+                String_holder_(const char_type* data, size_t length)
+                    : string_()
+                {
+                    string_.reserve(length+1);
+                    string_.assign(data,data+length);
+                    string_.push_back(0);
+                }
+
+                String_holder_(const char_type* data, size_t length, allocator_type allocator)
+                    : self_allocator_(allocator), string_(char_allocator_type(allocator))
+                {
+                    string_.reserve(length+1);
+                    string_.assign(data,data+length);
+                    string_.push_back(0);
+                }
+
+                self_allocator_type get_self_allocator() const
+                {
+                    return self_allocator_;
+                }
+
+                const char_type* data() const
+                {
+                    return string_.data();
+                }
+
+                const char_type* c_str() const
+                {
+                    return string_.data();
+                }
+
+                size_t length() const
+                {
+                    return string_.size()-1;
+                }
+            private:
+                self_allocator_type self_allocator_;
+                base_string_type string_;
+
+                String_holder_& operator=(const String_holder_&) = delete;
             };
 
-            class String_holder_ : public Base_string_holder_
-            {
-            public:
-                String_holder_(const Allocator& allocator)
-                    : Base_string_holder_(allocator)
-                {
-                }
-
-                ~String_holder_() JSONCONS_NOEXCEPT
-                {
-                }
-
-                size_t length;
-                char_type* data;
-            };
-
-            struct Wrap_string_holder_
-            {
-                String_holder_ holder;
-                CharT c[1];
-            };
-
-            typedef CharT char_type;
-            typedef Allocator allocator_type;
-
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char>
-                storage_alloc;
-            typedef typename std::allocator_traits<Allocator>:: template rebind_traits<char>
-                storage_traits;
-            typedef typename storage_traits::pointer pointer;
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_>
-                string_holder_alloc;
-
-            typedef typename std::aligned_storage<sizeof(Wrap_string_holder_), JSONCONS_ALIGNOF(Wrap_string_holder_)>::type storage_type;
-
-            static size_t calculate_needed(size_t length)
-            {
-                return sizeof(storage_type) + (length-1) * sizeof(char_type);
-            }
-
-            static pointer create_string_holder(const char_type* data, size_t length, allocator_type allocator)
-            {
-                size_t needed = calculate_needed(length+1);
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(allocator);
-                typename storage_traits::pointer storage = storage_traits::allocate(alloc,needed);
-                String_holder_* pv = reinterpret_cast<String_holder_*>(to_plain_pointer(storage));
-
-                string_holder_alloc a(allocator);
-                std::allocator_traits<string_holder_alloc>::construct(a,pv,allocator);
-
-                auto pwh = reinterpret_cast<Wrap_string_holder_*>(to_plain_pointer(storage));
-                pv->data = new(&pwh->c)char_type[length + 1];
-                memcpy(pv->data, data, length * sizeof(char_type));
-                pv->data[length] = 0;
-                pv->length = length;
-                return storage;
-            }
-
-            static void destroy_string_holder(pointer p) JSONCONS_NOEXCEPT
-            {
-                string_holder_alloc a(string_holder_cast(p)->get_self_allocator());
-                size_t needed = calculate_needed(string_holder_cast(p)->length + 1);
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<char> alloc(string_holder_cast(p)->get_self_allocator());
-                std::allocator_traits<string_holder_alloc>::destroy(a,string_holder_cast(p));
-                storage_traits::deallocate(alloc, to_plain_pointer(p), needed);
-            }
-            
-            pointer ptr_;
-
-            string_data(pointer ptr)
-                : base_data(value_types::string_t), ptr_(ptr)
-            {
-            }
-
-            string_data(const char_type* s,
-                size_t length,
-                const Allocator& alloc)
-                : base_data(value_types::string_t)
-            {
-                ptr_ = create_string_holder(s, length, alloc);
-            }
-
-            string_data(const string_data& val)
-                : base_data(value_types::string_t)
-            {
-                ptr_ = create_string_holder(val.data(),
-                    val.length(),
-                    val.get_self_allocator());
-            }
-
-            string_data(const string_data& val, const Allocator& allocator)
-                : base_data(value_types::string_t)
-            {
-                ptr_ = create_string_holder(val.data(),
-                    val.length(),
-                    allocator);
-            }
-            ~string_data()
-            {
-                destroy_string_holder(ptr_);
-            }
-
-            static String_holder_* string_holder_cast(pointer ptr) 
-            {
-                return reinterpret_cast<String_holder_*>(to_plain_pointer(ptr));
-            }
-
-            size_t length() const
-            {
-                return string_holder_cast(ptr_)->length;
-            }
-
-            const char_type* data() const
-            {
-                return string_holder_cast(ptr_)->data;
-            }
-
-            const char_type* c_str() const
-            {
-                return string_holder_cast(ptr_)->data;
-            }
-
-            Allocator get_self_allocator() const
-            {
-                return string_holder_cast(ptr_)->get_self_allocator();
-            }
-        };
-*/
-        struct string_data : public base_data
-        {
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_> jstring_allocator;
             typedef typename std::allocator_traits<jstring_allocator>::pointer pointer;
+
             pointer ptr_;
 
             template <typename... Args>
             void create(jstring_allocator allocator, Args&& ... args)
             {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<jstring> alloc(allocator);
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_> alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<jstring_allocator>:: template rebind_traits<jstring>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<jstring_allocator>:: template rebind_traits<String_holder_>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -459,7 +392,7 @@ public:
                 }
             }
 
-            string_data(const jstring& val)
+            string_data(const String_holder_& val)
                 : base_data(value_types::string_t)
             {
                 create(val.get_self_allocator(), val);
@@ -471,7 +404,7 @@ public:
                 ptr_ = ptr;
             }
 
-            string_data(const jstring& val, const Allocator& a)
+            string_data(const String_holder_& val, const Allocator& a)
                 : base_data(value_types::string_t)
             {
                 create(jstring_allocator(a), val, a);
@@ -503,8 +436,8 @@ public:
             }
             ~string_data()
             {
-                typename std::allocator_traits<jstring_allocator>:: template rebind_alloc<jstring> alloc(ptr_->get_self_allocator());
-                std::allocator_traits<jstring_allocator>:: template rebind_traits<jstring>::destroy(alloc, to_plain_pointer(ptr_));
+                typename std::allocator_traits<jstring_allocator>:: template rebind_alloc<String_holder_> alloc(ptr_->get_self_allocator());
+                std::allocator_traits<jstring_allocator>:: template rebind_traits<String_holder_>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
 
@@ -528,12 +461,12 @@ public:
                 return ptr_->get_self_allocator();
             }
 
-            jstring& value()
+            String_holder_& value()
             {
                 return *ptr_;
             }
 
-            const jstring& value() const
+            const String_holder_& value() const
             {
                 return *ptr_;
             }
@@ -2438,6 +2371,7 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
         std::basic_ostringstream<char_type,char_traits_type,SAllocator> os;
+        os.imbue(std::locale::classic());
         {
             basic_json_serializer<char_type> serializer(os);
             dump(serializer);
@@ -2450,6 +2384,7 @@ public:
               const basic_serialization_options<char_type>& options) const
     {
         std::basic_ostringstream<char_type,char_traits_type,SAllocator> os;
+        os.imbue(std::locale::classic());
         {
             basic_json_serializer<char_type> serializer(os,options);
             dump(serializer);
@@ -2457,7 +2392,7 @@ public:
         s = os.str();
     }
 
-    void dump_fragment(basic_json_output_handler<char_type>& handler) const
+    void dump_body(basic_json_output_handler<char_type>& handler) const
     {
         switch (var_.type_id())
         {
@@ -2491,7 +2426,7 @@ public:
                 for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
                     handler.name((it->key()).data(),it->key().length());
-                    it->value().dump_fragment(handler);
+                    it->value().dump_body(handler);
                 }
                 handler.end_object();
             }
@@ -2502,7 +2437,7 @@ public:
                 const array& o = array_value();
                 for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                 {
-                    it->dump_fragment(handler);
+                    it->dump_body(handler);
                 }
                 handler.end_array();
             }
@@ -2514,7 +2449,7 @@ public:
     void dump(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        dump_fragment(handler);
+        dump_body(handler);
         handler.end_json();
     }
 
@@ -2542,9 +2477,10 @@ public:
     {
         string_type s(allocator);
         std::basic_ostringstream<char_type,char_traits_type,char_allocator_type> os(s);
+        os.imbue(std::locale::classic());
         {
             basic_json_serializer<char_type> serializer(os);
-            dump_fragment(serializer);
+            dump_body(serializer);
         }
         return os.str();
     }
@@ -2554,9 +2490,10 @@ public:
     {
         string_type s(allocator);
         std::basic_ostringstream<char_type> os(s);
+        os.imbue(std::locale::classic());
         {
             basic_json_serializer<char_type> serializer(os, options);
-            dump_fragment(serializer);
+            dump_body(serializer);
         }
         return os.str();
     }
@@ -2588,7 +2525,7 @@ public:
     void to_stream(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        dump_fragment(handler);
+        dump_body(handler);
         handler.end_json();
     }
 
