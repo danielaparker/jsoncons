@@ -49,6 +49,8 @@ class Encode_message_pack_
 {
     std::vector<uint8_t> v_;
 public:
+    typedef typename Json::string_view_type string_view_type;
+
     std::vector<uint8_t> encode(const Json& jval)
     {
         v_.reserve(calculate_size(jval));
@@ -167,15 +169,7 @@ public:
             case value_types::double_t:
             {
                 // float 64
-                double val = jval.as_double();
-                if (val >= -(std::numeric_limits<float>::max)() && val <= (std::numeric_limits<float>::max)())
-                {
-                    n += (1 + sizeof(float));
-                }
-                else
-                {
-                    n += (1 + sizeof(double));
-                }
+                n += (1 + sizeof(double));
                 break;
             }
 
@@ -249,7 +243,7 @@ public:
         return n;
     }
 
-    static size_t calculate_string_size(typename Json::string_view_type sv)
+    static size_t calculate_string_size(string_view_type sv)
     {
         size_t n = 0;
 
@@ -407,16 +401,8 @@ public:
             {
                 // float 64
                 double val = jval.as_double();
-                if (val >= -(std::numeric_limits<float>::max)() && val <= (std::numeric_limits<float>::max)())
-                {
-                    v_.push_back(msgpack_format::float32_cd );
-                    to_big_endian<float,sizeof(float)>()((float)jval.as_double(),v_);
-                }
-                else
-                {
-                    v_.push_back(msgpack_format::float64_cd);
-                    to_big_endian<double,sizeof(double)>()(jval.as_double(),v_);
-                }
+                v_.push_back(msgpack_format::float64_cd);
+                to_big_endian<double,sizeof(double)>()(jval.as_double(),v_);
                 break;
             }
 

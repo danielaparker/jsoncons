@@ -515,7 +515,7 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
-<span class="pl-c">// For convenience</span>
+<span class="pl-c"><span class="pl-c">//</span> For convenience</span>
 <span class="pl-k">using</span> jsoncons::json;
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
@@ -525,15 +525,15 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
     color_spaces.<span class="pl-c1">add</span>(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
     color_spaces.<span class="pl-c1">add</span>(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);
 
-    json image_sizing; <span class="pl-c">// empty object</span>
-    image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>; <span class="pl-c">// a boolean </span>
-    image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>; <span class="pl-c">// a string</span>
-    image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>; <span class="pl-c">// a string</span>
-    image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.84</span>; <span class="pl-c">// a double</span>
+    json image_sizing; <span class="pl-c"><span class="pl-c">//</span> empty object</span>
+    image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>; <span class="pl-c"><span class="pl-c">//</span> a boolean </span>
+    image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize Unit<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>pixels<span class="pl-pds">"</span></span>; <span class="pl-c"><span class="pl-c">//</span> a string</span>
+    image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize What<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>long_edge<span class="pl-pds">"</span></span>; <span class="pl-c"><span class="pl-c">//</span> a string</span>
+    image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Dimension 1<span class="pl-pds">"</span></span>] = <span class="pl-c1">9.84</span>; <span class="pl-c"><span class="pl-c">//</span> a double</span>
     
     json file_export;
 
-    <span class="pl-c">// create "File Format Options" as an object and put "Color Spaces" in it</span>
+    <span class="pl-c"><span class="pl-c">//</span> create "File Format Options" as an object and put "Color Spaces" in it</span>
     file_export[<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>][<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>] = <span class="pl-c1">std::move</span>(color_spaces); 
 
     file_export[<span class="pl-s"><span class="pl-pds">"</span>Image Sizing<span class="pl-pds">"</span></span>] = <span class="pl-c1">std::move</span>(image_sizing);
@@ -693,7 +693,7 @@ std::unordered_map&lt;std::string,<span class="pl-k">int</span>&gt; um = j.as&lt
     <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
     <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json, book&gt;
     {
-        <span class="pl-c">// Implement static functions is, as and to_json </span>
+        <span class="pl-c"><span class="pl-c">//</span> Implement static functions is, as and to_json </span>
     };
 }        
 
@@ -720,19 +720,19 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 
     json_serializer <span class="pl-smi">serializer</span>(std::cout);
 
-    <span class="pl-c">// Filters can be chained</span>
+    <span class="pl-c"><span class="pl-c">//</span> Filters can be chained</span>
     rename_name_filter <span class="pl-smi">filter2</span>(<span class="pl-s"><span class="pl-pds">"</span>fifth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, serializer);
     rename_name_filter <span class="pl-smi">filter1</span>(<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>, filter2);
 
-    <span class="pl-c">// A filter can be passed to any function that takes</span>
-    <span class="pl-c">// a json_input_handler ...</span>
+    <span class="pl-c"><span class="pl-c">//</span> A filter can be passed to any function that takes</span>
+    <span class="pl-c"><span class="pl-c">//</span> a json_input_handler ...</span>
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span>;
     std::istringstream <span class="pl-smi">is</span>(s);
     json_reader <span class="pl-smi">reader</span>(is, filter1);
     reader.<span class="pl-c1">read</span>();
     std::cout &lt;&lt; std::endl;
 
-    <span class="pl-c">// or a json_output_handler    </span>
+    <span class="pl-c"><span class="pl-c">//</span> or a json_output_handler    </span>
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span>;
     ojson j = <span class="pl-c1">ojson::parse</span>(s);
     j.<span class="pl-c1">write</span>(filter1);
@@ -747,6 +747,21 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 <h3>binary</h3>
 <p>The <code>binary</code> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
 <h2>MessagePack example</h2>
+<p>Example file (book.json):</p>
+<div class="highlight highlight-source-json"><pre>[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>
+    }
+]</pre></div>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/binary/message_pack.hpp<span class="pl-pds">&gt;</span></span>
 
@@ -755,31 +770,9 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {
+    std::ifstream <span class="pl-smi">is</span>(<span class="pl-s"><span class="pl-pds">"</span>input/book.json<span class="pl-pds">"</span></span>);
     ojson <span class="pl-c1">j1</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>zero<span class="pl-pds">"</span></span>] = <span class="pl-c1">0</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>] = <span class="pl-c1">1</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>null<span class="pl-pds">"</span></span>] = <span class="pl-c1">null_type</span>();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>true<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>false<span class="pl-pds">"</span></span>] = <span class="pl-c1">false</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max int64_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int64_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max uint64_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">uint64_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min int64_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int64_t</span>&gt;::min)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max int32_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int32_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max uint32_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">uint32_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min int32_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int32_t</span>&gt;::min)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max int16_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int16_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max uint16_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">uint16_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min int16_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int16_t</span>&gt;::min)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max int8_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int8_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max uint8_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">uint8_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min int8_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int8_t</span>&gt;::min)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max double<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-k">double</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min double<span class="pl-pds">"</span></span>] = -(std::numeric_limits&lt;<span class="pl-k">double</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max float<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-k">float</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>zero float<span class="pl-pds">"</span></span>] = <span class="pl-c1">0.0</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min float<span class="pl-pds">"</span></span>] = -(std::numeric_limits&lt;<span class="pl-k">float</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>Key too long for small string optimization<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>String too long for small string optimization<span class="pl-pds">"</span></span>;
+    is &gt;&gt; <span class="pl-c1">j1</span>;
 
     std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; v = <span class="pl-c1">encode_message_pack</span>(<span class="pl-c1">j1</span>);
 
@@ -788,32 +781,20 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(j2) &lt;&lt; std::endl;
 }</pre></div>
 <p>Output:</p>
-<div class="highlight highlight-source-json"><pre>{
-    <span class="pl-s"><span class="pl-pds">"</span>zero<span class="pl-pds">"</span></span>: <span class="pl-c1">0</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>: <span class="pl-c1">1</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>: <span class="pl-c1">2</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>null<span class="pl-pds">"</span></span>: <span class="pl-c1">null</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>true<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>false<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max int64_t<span class="pl-pds">"</span></span>: <span class="pl-c1">9223372036854775807</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max uint64_t<span class="pl-pds">"</span></span>: <span class="pl-c1">18446744073709551615</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min int64_t<span class="pl-pds">"</span></span>: <span class="pl-c1">-9223372036854775808</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max int32_t<span class="pl-pds">"</span></span>: <span class="pl-c1">2147483647</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max uint32_t<span class="pl-pds">"</span></span>: <span class="pl-c1">4294967295</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min int32_t<span class="pl-pds">"</span></span>: <span class="pl-c1">-2147483648</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max int16_t<span class="pl-pds">"</span></span>: <span class="pl-c1">32767</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max uint16_t<span class="pl-pds">"</span></span>: <span class="pl-c1">65535</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min int16_t<span class="pl-pds">"</span></span>: <span class="pl-c1">-32768</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max int8_t<span class="pl-pds">"</span></span>: <span class="pl-c1">127</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max uint8_t<span class="pl-pds">"</span></span>: <span class="pl-c1">255</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min int8_t<span class="pl-pds">"</span></span>: <span class="pl-c1">-128</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max double<span class="pl-pds">"</span></span>: <span class="pl-c1">1.79769313486232e+308</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min double<span class="pl-pds">"</span></span>: <span class="pl-c1">-1.79769313486232e+308</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max float<span class="pl-pds">"</span></span>: <span class="pl-c1">3.40282346638529e+038</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>zero float<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min float<span class="pl-pds">"</span></span>: <span class="pl-c1">-3.40282346638529e+038</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>Key too long for small string optimization<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>String too long for small string optimization<span class="pl-pds">"</span></span>
-}</pre></div>
+<div class="highlight highlight-source-json"><pre>[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>fiction<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Evelyn Waugh<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sword of Honour<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>
+    }
+]</pre></div>
 <div id="user-content-ext_jsonpath">
 <h3>jsonpath</h3>
 <p>Example file (store.json):</p>
@@ -850,11 +831,11 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     json booklist;
     is &gt;&gt; booklist;
 
-    <span class="pl-c">// All books whose author's name starts with Evelyn</span>
+    <span class="pl-c"><span class="pl-c">//</span> All books whose author's name starts with Evelyn</span>
     json result1 = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.author =~ /Evelyn.*?/)]<span class="pl-pds">"</span></span>);
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(result1) &lt;&lt; std::endl;
 
-    <span class="pl-c">// Change the price of "Moby Dick"</span>
+    <span class="pl-c"><span class="pl-c">//</span> Change the price of "Moby Dick"</span>
     <span class="pl-c1">json_replace</span>(booklist,<span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.isbn == '0-553-21311-3')].price<span class="pl-pds">"</span></span>,<span class="pl-c1">10.0</span>);
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(booklist) &lt;&lt; std::endl;
 

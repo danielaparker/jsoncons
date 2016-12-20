@@ -8,7 +8,33 @@
 using namespace jsoncons;
 using namespace jsoncons::binary;
 
-void message_pack_example()
+void message_pack_example1()
+{
+ojson j1 = ojson::parse(R"(
+[
+  { "category": "reference",
+    "author": "Nigel Rees",
+    "title": "Sayings of the Century",
+    "price": 8.95
+  },
+  { "category": "fiction",
+    "author": "Evelyn Waugh",
+    "title": "Sword of Honour",
+    "price": 12.99
+  }
+]
+)");
+
+    std::vector<uint8_t> v = jsoncons::binary::encode_message_pack(j1);
+
+    ojson j2 = decode_message_pack<ojson>(v);
+
+    std::cout << pretty_print(j2) << std::endl;
+
+    std::cout << std::endl;
+}
+
+void message_pack_example2()
 {
     ojson j1;
     j1["zero"] = 0;
@@ -48,7 +74,8 @@ void message_pack_example()
 void binary_examples()
 {
     std::cout << "\nbinary examples\n\n";
-    message_pack_example();
+    message_pack_example1();
+    message_pack_example2();
     std::cout << std::endl;
 }
 
