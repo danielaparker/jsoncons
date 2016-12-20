@@ -358,7 +358,7 @@ Inserts json value into stream with default serialization options.
     void dump(std::ostream<CharT> os, const serialization_options& options) const
 Inserts json value into stream using specified [serialization_options](serialization_options).
 
-    void dump_body(json_output_handler& handler) const
+    void dump_fragment(json_output_handler& handler) const
 Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
 
 ### Non member functions
