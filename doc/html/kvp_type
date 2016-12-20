@@ -469,9 +469,22 @@ vertical-align:1px;
 </head>
 <body>
 <div class="highlight highlight-source-c++"><pre>jsoncons::json::kvp_type </pre></div>
-<p><code>kvp_type</code> stores a name (key) and a json value</p>
+<p><code>kvp_type</code> stores a key (name) and a json value</p>
+<h3>Member types</h3>
+<table>
+<thead>
+<tr>
+<th>Member type</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>string_view_type</code></td>
+<td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <a href="http://en.cppreference.com/w/cpp/string/basic_string_view">string view</a> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise proxied.</td>
+</tr></tbody></table>
 <h3>Accessors</h3>
-<pre><code>const string_type&amp; key() const
+<pre><code>string_view_type key() const
 
 const json&amp; value() const
 
