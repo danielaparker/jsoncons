@@ -346,7 +346,7 @@ public:
                         v_.push_back(msgpack_format::int16_cd);
                         to_big_endian<int64_t, sizeof(uint16_t)>()(val,v_);
                     }
-                    else if (val >= (std::numeric_limits<int32_t>::min)() && val <= INT32_MAX)
+                    else if (val >= (std::numeric_limits<int32_t>::min)() && val <= (std::numeric_limits<int32_t>::max)())
                     {
                         // int 32 stores a 32-bit big-endian signed integer
                         v_.push_back(msgpack_format::int32_cd);
