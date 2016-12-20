@@ -857,7 +857,7 @@ void dump(std::basic_string&lt;char_type,char_traits_type,SAllocator&gt;&amp; s,
 <pre><code>void dump(std::ostream&lt;CharT&gt; os, const serialization_options&amp; options) const
 </code></pre>
 <p>Inserts json value into stream using specified <a href="serialization_options">serialization_options</a>.</p>
-<pre><code>void dump_body(json_output_handler&amp; handler) const
+<pre><code>void dump_fragment(json_output_handler&amp; handler) const
 </code></pre>
 <p>Emits JSON events for JSON objects, arrays, object members and array elements to a <a href="json_output_handler">json_output_handler</a>, such as a <a href="json_serializer">json_serializer</a>.</p>
 <h3>Non member functions</h3>
@@ -981,7 +981,7 @@ book3[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pd
 book3[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>;
 book3[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
 
-<span class="pl-c">// Constructing a json array with an initializer-list </span>
+<span class="pl-c"><span class="pl-c">//</span> Constructing a json array with an initializer-list </span>
 json booklist = json::array{book1, book2, book3};    
 
 <span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book: booklist.array_range())
