@@ -20,48 +20,45 @@ BOOST_AUTO_TEST_SUITE(json_integer_tests)
 
 BOOST_AUTO_TEST_CASE(test_integer_limits)
 {
-    const long long max_value = (std::numeric_limits<long long>::max)();
-
-    const unsigned long long max_uvalue = (std::numeric_limits<unsigned long long>::max)();
     {
         std::ostringstream os;
 
-        //os << max_value;
-
-        os << "{\"max_longlong\":-" << max_value << "}";
+        os << "{\"max int64_t\":" << (std::numeric_limits<int64_t>::max)() << "}";
         json val = json::parse(os.str());
-        std::cout << val << std::endl;
-        BOOST_CHECK(val["max_longlong"].is_integer());
+        BOOST_REQUIRE(val["max int64_t"].is_integer());
+        BOOST_CHECK(val["max int64_t"].as<int64_t>() == (std::numeric_limits<int64_t>::max)());
     }
     {
         std::ostringstream os;
 
-        //os << max_value;
-
-        std::cout << "TEST LIMITS" << std::endl;
-        os << "{\"max_longlong_overflow\":-" << max_value << "0}";
-        std::cout << os.str() << std::endl;
-
-
+        os << "{\"min int64_t\":" << (std::numeric_limits<int64_t>::min)() << "}";
         json val = json::parse(os.str());
-        std::cout << val << std::endl;
-        BOOST_CHECK(val["max_longlong_overflow"].is_double());
+        BOOST_REQUIRE(val["min int64_t"].is_integer());
+        BOOST_CHECK(val["min int64_t"].as<int64_t>() == (std::numeric_limits<int64_t>::min)());
+    }
+
+    // test overflow
+    {
+        std::ostringstream os;
+
+        os << "{\"int overflow\":-" << (std::numeric_limits<int64_t>::max)() << "0}";
+        json val = json::parse(os.str());
+        BOOST_REQUIRE(val["int overflow"].is_double());
     }
     {
         std::ostringstream os;
 
-        os << "{\"max_ulonglong\":" << max_uvalue << "}";
+        os << "{\"max uint64_t\":" << (std::numeric_limits<uint64_t>::max)() << "}";
         json val = json::parse(os.str());
-        std::cout << val << std::endl;
-        BOOST_CHECK(val["max_ulonglong"].is_uinteger());
+        BOOST_REQUIRE(val["max uint64_t"].is_uinteger());
+        BOOST_CHECK(val["max uint64_t"].as<uint64_t>() == (std::numeric_limits<uint64_t>::max)());
     }
     {
         std::ostringstream os;
 
-        os << "{\"max_ulonglong_overflow\":" << max_uvalue << "0}";
+        os << "{\"uint overflow\":" << (std::numeric_limits<uint64_t>::max)() << "0}";
         json val = json::parse(os.str());
-        std::cout << val << std::endl;
-        BOOST_CHECK(val["max_ulonglong_overflow"].is_double());
+        BOOST_REQUIRE(val["uint overflow"].is_double());
     }
 }
 

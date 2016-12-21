@@ -50,28 +50,56 @@ bool try_string_to_uinteger(const CharT *s, size_t length, uint64_t& result)
 template<class CharT> inline
 bool try_string_to_integer(bool has_neg, const CharT *s, size_t length, int64_t& result)
 {
-    static const int64_t max_value = (std::numeric_limits<int64_t>::max)();
-    static const int64_t max_value_div_10 = max_value / 10;
-
-    int64_t n = 0;
-    const CharT* end = s+length; 
-    for (const CharT* p = s; p < end; ++p)
+    if (has_neg)
     {
-        int64_t x = *p - '0';
-        if (n > max_value_div_10)
-        {
-            return false;
-        }
-        n = n * 10;
-        if (n > max_value - x)
-        {
-            return false;
-        }
+        static const int64_t min_value = (std::numeric_limits<int64_t>::min)();
+        static const int64_t min_value_div_10 = min_value / 10;
 
-        n += x;
+        int64_t n = 0;
+        const CharT* end = s+length; 
+        for (const CharT* p = s; p < end; ++p)
+        {
+            int64_t x = *p - '0';
+            if (n < min_value_div_10)
+            {
+                return false;
+            }
+            n = n * 10;
+            if (n < min_value + x)
+            {
+                return false;
+            }
+
+            n -= x;
+        }
+        result = n;
+        return true;
     }
-    result = has_neg ? -n : n;
-    return true;
+    else
+    {
+        static const int64_t max_value = (std::numeric_limits<int64_t>::max)();
+        static const int64_t max_value_div_10 = max_value / 10;
+
+        int64_t n = 0;
+        const CharT* end = s+length; 
+        for (const CharT* p = s; p < end; ++p)
+        {
+            int64_t x = *p - '0';
+            if (n > max_value_div_10)
+            {
+                return false;
+            }
+            n = n * 10;
+            if (n > max_value - x)
+            {
+                return false;
+            }
+
+            n += x;
+        }
+        result = n;
+        return true;
+    }
 }
 
 enum class string_states
