@@ -305,15 +305,13 @@ public:
                 {
                     return self_allocator_;
                 }
-
+            private:
                 allocator_type self_allocator_;
             };
 
             class String_holder_ : public String_holder_base_
             {
             public:
-                typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<String_holder_> self_allocator_type;
-
                 typedef typename base_string_type::iterator iterator;
                 typedef typename base_string_type::const_iterator const_iterator;
                 using String_holder_base_::get_self_allocator;
@@ -470,21 +468,6 @@ public:
             size_t length() const
             {
                 return ptr_->length();
-            }
-
-            Allocator get_self_allocator() const
-            {
-                return ptr_->get_self_allocator();
-            }
-
-            String_holder_& value()
-            {
-                return *ptr_;
-            }
-
-            const String_holder_& value() const
-            {
-                return *ptr_;
             }
         };
 
@@ -1180,7 +1163,7 @@ public:
                         default:
                             break;
                         }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr,string_data_cast()->get_self_allocator());
+                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
                     }
                     break;
                 case value_types::object_t:

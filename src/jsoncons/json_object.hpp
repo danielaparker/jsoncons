@@ -333,7 +333,6 @@ class Json_object_
 {
 public:
     typedef typename Json::allocator_type allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<Json_object_> self_allocator_type;
     typedef typename Json::char_type char_type;
     typedef typename Json::char_allocator_type char_allocator_type;
     typedef KeyT key_type;
@@ -347,7 +346,7 @@ public:
     typedef typename base_object_type::const_iterator const_iterator;
 
 protected:
-    self_allocator_type self_allocator_;
+    allocator_type self_allocator_;
     base_object_type members_;
 public:
     Json_object_()
@@ -387,7 +386,7 @@ public:
         members_.swap(val.members_);
     }
 
-    self_allocator_type get_self_allocator() const
+    allocator_type get_self_allocator() const
     {
         return this->self_allocator_;
     }
@@ -404,7 +403,6 @@ class json_object<KeyT,Json,false> : public Json_object_<KeyT,Json>
 {
 public:
     using typename Json_object_<KeyT,Json>::allocator_type;
-    using typename Json_object_<KeyT,Json>::self_allocator_type;
     using typename Json_object_<KeyT,Json>::char_type;
     using typename Json_object_<KeyT,Json>::char_allocator_type;
     using typename Json_object_<KeyT,Json>::key_type;
@@ -837,7 +835,6 @@ class json_object<KeyT,Json,true> : public Json_object_<KeyT,Json>
 {
 public:
     using typename Json_object_<KeyT,Json>::allocator_type;
-    using typename Json_object_<KeyT,Json>::self_allocator_type;
     using typename Json_object_<KeyT,Json>::char_type;
     using typename Json_object_<KeyT,Json>::char_allocator_type;
     using typename Json_object_<KeyT,Json>::key_type;
@@ -911,11 +908,6 @@ public:
         {
             set(element[0].as_string_view(), std::move(element[1]));
         }
-    }
-
-    self_allocator_type get_self_allocator() const
-    {
-        return this->self_allocator_;
     }
 
     void swap(json_object& val)
