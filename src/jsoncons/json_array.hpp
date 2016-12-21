@@ -67,20 +67,20 @@ public:
     using Json_array_base_<Json>::get_self_allocator;
 
     json_array()
-        : Json_array_base_(), 
+        : Json_array_base_<Json>(), 
           elements_()
     {
     }
 
     explicit json_array(const allocator_type& allocator)
-        : Json_array_base_(allocator), 
+        : Json_array_base_<Json>(allocator), 
           elements_(val_allocator_type(allocator))
     {
     }
 
     explicit json_array(size_t n, 
                         const allocator_type& allocator = allocator_type())
-        : Json_array_base_(allocator), 
+        : Json_array_base_<Json>(allocator), 
           elements_(n,Json(),val_allocator_type(allocator))
     {
     }
@@ -88,48 +88,48 @@ public:
     explicit json_array(size_t n, 
                         const Json& value, 
                         const allocator_type& allocator = allocator_type())
-        : Json_array_base_(allocator), 
+        : Json_array_base_<Json>(allocator), 
           elements_(n,value,val_allocator_type(allocator))
     {
     }
 
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end, const allocator_type& allocator = allocator_type())
-        : Json_array_base_(allocator), 
+        : Json_array_base_<Json>(allocator), 
           elements_(begin,end,val_allocator_type(allocator))
     {
     }
     json_array(const json_array& val)
-        : Json_array_base_(val.get_self_allocator()),
+        : Json_array_base_<Json>(val.get_self_allocator()),
           elements_(val.elements_)
     {
     }
     json_array(const json_array& val, const allocator_type& allocator)
-        : Json_array_base_(allocator), 
+        : Json_array_base_<Json>(allocator), 
           elements_(val.elements_,val_allocator_type(allocator))
     {
     }
 
     json_array(json_array&& val) JSONCONS_NOEXCEPT
-        : Json_array_base_(val.get_self_allocator()), 
+        : Json_array_base_<Json>(val.get_self_allocator()), 
           elements_(std::move(val.elements_))
     {
     }
     json_array(json_array&& val, const allocator_type& allocator)
-        : Json_array_base_(allocator), 
+        : Json_array_base_<Json>(allocator), 
           elements_(std::move(val.elements_),val_allocator_type(allocator))
     {
     }
 
     json_array(std::initializer_list<Json> init)
-        : Json_array_base_(), 
+        : Json_array_base_<Json>(), 
           elements_(std::move(init))
     {
     }
 
     json_array(std::initializer_list<Json> init, 
                const allocator_type& allocator)
-        : Json_array_base_(allocator), 
+        : Json_array_base_<Json>(allocator), 
           elements_(std::move(init),val_allocator_type(allocator))
     {
     }
