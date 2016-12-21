@@ -288,49 +288,71 @@ public:
         };
         struct string_data : public base_data
         {
-            class String_holder_
+
+            class String_holder_base_
+            {
+            public:
+                String_holder_base_()
+                    : self_allocator_()
+                {
+                }
+                String_holder_base_(const allocator_type& allocator)
+                    : self_allocator_(allocator)
+                {
+                }
+
+                allocator_type get_self_allocator() const
+                {
+                    return self_allocator_;
+                }
+
+                allocator_type self_allocator_;
+            };
+
+            class String_holder_ : public String_holder_base_
             {
             public:
                 typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<String_holder_> self_allocator_type;
 
                 typedef typename base_string_type::iterator iterator;
                 typedef typename base_string_type::const_iterator const_iterator;
+                using String_holder_base_::get_self_allocator;
 
                 String_holder_()
-                    : self_allocator_(), 
+                    : String_holder_base_(), 
                       string_('\0')
                 {
                 }
                 String_holder_(const String_holder_& val)
-                    : self_allocator_(val.get_self_allocator()),
+                    : String_holder_base_(val.get_self_allocator()),
                       string_(val.string_)
                 {
                 }
                 String_holder_(const String_holder_& val, const allocator_type& allocator)
-                    : self_allocator_(allocator), 
+                    : String_holder_base_(allocator), 
                       string_(val.string_,char_allocator_type(allocator))
                 {
                 }
 
                 String_holder_(String_holder_&& val) JSONCONS_NOEXCEPT
-                    : self_allocator_(val.get_self_allocator()), 
+                    : String_holder_base_(val.get_self_allocator()), 
                       string_(std::move(val.string_))
                 {
                 }
                 String_holder_(String_holder_&& val, const allocator_type& allocator)
-                    : self_allocator_(allocator), 
+                    : String_holder_base_(allocator), 
                       string_(std::move(val.string_),char_allocator_type(allocator))
                 {
                 }
 
                 explicit String_holder_(const allocator_type& allocator)
-                    : self_allocator_(allocator), 
+                    : String_holder_base_(allocator), 
                       string_(char_allocator_type(allocator))
                 {
                 }
 
                 String_holder_(const char_type* data, size_t length)
-                    : string_()
+                    : String_holder_base_(), string_()
                 {
                     string_.reserve(length+1);
                     string_.assign(data,data+length);
@@ -338,16 +360,11 @@ public:
                 }
 
                 String_holder_(const char_type* data, size_t length, allocator_type allocator)
-                    : self_allocator_(allocator), string_(char_allocator_type(allocator))
+                    : String_holder_base_(allocator), string_(char_allocator_type(allocator))
                 {
                     string_.reserve(length+1);
                     string_.assign(data,data+length);
                     string_.push_back(0);
-                }
-
-                self_allocator_type get_self_allocator() const
-                {
-                    return self_allocator_;
                 }
 
                 const char_type* data() const
@@ -365,25 +382,24 @@ public:
                     return string_.size()-1;
                 }
             private:
-                self_allocator_type self_allocator_;
                 base_string_type string_;
 
                 String_holder_& operator=(const String_holder_&) = delete;
             };
 
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_> jstring_allocator;
-            typedef typename std::allocator_traits<jstring_allocator>::pointer pointer;
+            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_> string_holder_allocator_type;
+            typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
 
             pointer ptr_;
 
             template <typename... Args>
-            void create(jstring_allocator allocator, Args&& ... args)
+            void create(string_holder_allocator_type allocator, Args&& ... args)
             {
                 typename std::allocator_traits<Allocator>:: template rebind_alloc<String_holder_> alloc(allocator);
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<jstring_allocator>:: template rebind_traits<String_holder_>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<String_holder_>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -407,7 +423,7 @@ public:
             string_data(const String_holder_& val, const Allocator& a)
                 : base_data(value_types::string_t)
             {
-                create(jstring_allocator(a), val, a);
+                create(string_holder_allocator_type(a), val, a);
             }
 
             string_data(const string_data & val)
@@ -419,25 +435,25 @@ public:
             string_data(const string_data & val, const Allocator& a)
                 : base_data(value_types::string_t)
             {
-                create(jstring_allocator(a), *(val.ptr_), a);
+                create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
 
             template<class InputIterator>
             string_data(InputIterator first, InputIterator last, const Allocator& a)
                 : base_data(value_types::string_t)
             {
-                create(jstring_allocator(a), first, last, a);
+                create(string_holder_allocator_type(a), first, last, a);
             }
 
             string_data(const char_type* data, size_t length, const Allocator& a)
                 : base_data(value_types::string_t)
             {
-                create(jstring_allocator(a), data, length, a);
+                create(string_holder_allocator_type(a), data, length, a);
             }
             ~string_data()
             {
-                typename std::allocator_traits<jstring_allocator>:: template rebind_alloc<String_holder_> alloc(ptr_->get_self_allocator());
-                std::allocator_traits<jstring_allocator>:: template rebind_traits<String_holder_>::destroy(alloc, to_plain_pointer(ptr_));
+                typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<String_holder_> alloc(ptr_->get_self_allocator());
+                std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<String_holder_>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
 

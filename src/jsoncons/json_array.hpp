@@ -25,12 +25,35 @@
 namespace jsoncons {
 
 template <class Json>
-class json_array
+class Json_array_base_
+{
+public:
+    typedef typename Json::allocator_type allocator_type;
+
+public:
+    Json_array_base_()
+        : self_allocator_()
+    {
+    }
+    Json_array_base_(const allocator_type& allocator)
+        : self_allocator_(allocator)
+    {
+    }
+
+    allocator_type get_self_allocator() const
+    {
+        return self_allocator_;
+    }
+
+    allocator_type self_allocator_;
+};
+
+template <class Json>
+class json_array : public Json_array_base_<Json>
 {
 public:
     typedef typename Json::allocator_type allocator_type;
     typedef Json value_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_array> self_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> val_allocator_type;
 
     typedef typename Json::base_array_type base_array_type;
@@ -41,21 +64,23 @@ public:
     typedef typename std::iterator_traits<iterator>::reference reference;
     typedef typename std::iterator_traits<const_iterator>::reference const_reference;
 
+    using Json_array_base_<Json>::get_self_allocator;
+
     json_array()
-        : self_allocator_(), 
+        : Json_array_base_(), 
           elements_()
     {
     }
 
     explicit json_array(const allocator_type& allocator)
-        : self_allocator_(allocator), 
+        : Json_array_base_(allocator), 
           elements_(val_allocator_type(allocator))
     {
     }
 
     explicit json_array(size_t n, 
                         const allocator_type& allocator = allocator_type())
-        : self_allocator_(allocator), 
+        : Json_array_base_(allocator), 
           elements_(n,Json(),val_allocator_type(allocator))
     {
     }
@@ -63,58 +88,53 @@ public:
     explicit json_array(size_t n, 
                         const Json& value, 
                         const allocator_type& allocator = allocator_type())
-        : self_allocator_(allocator), 
+        : Json_array_base_(allocator), 
           elements_(n,value,val_allocator_type(allocator))
     {
     }
 
     template <class InputIterator>
     json_array(InputIterator begin, InputIterator end, const allocator_type& allocator = allocator_type())
-        : self_allocator_(allocator), 
+        : Json_array_base_(allocator), 
           elements_(begin,end,val_allocator_type(allocator))
     {
     }
     json_array(const json_array& val)
-        : self_allocator_(val.get_self_allocator()),
+        : Json_array_base_(val.get_self_allocator()),
           elements_(val.elements_)
     {
     }
     json_array(const json_array& val, const allocator_type& allocator)
-        : self_allocator_(allocator), 
+        : Json_array_base_(allocator), 
           elements_(val.elements_,val_allocator_type(allocator))
     {
     }
 
     json_array(json_array&& val) JSONCONS_NOEXCEPT
-        : self_allocator_(val.get_self_allocator()), 
+        : Json_array_base_(val.get_self_allocator()), 
           elements_(std::move(val.elements_))
     {
     }
     json_array(json_array&& val, const allocator_type& allocator)
-        : self_allocator_(allocator), 
+        : Json_array_base_(allocator), 
           elements_(std::move(val.elements_),val_allocator_type(allocator))
     {
     }
 
     json_array(std::initializer_list<Json> init)
-        : self_allocator_(), 
+        : Json_array_base_(), 
           elements_(std::move(init))
     {
     }
 
     json_array(std::initializer_list<Json> init, 
                const allocator_type& allocator)
-        : self_allocator_(allocator), 
+        : Json_array_base_(allocator), 
           elements_(std::move(init),val_allocator_type(allocator))
     {
     }
     ~json_array()
     {
-    }
-
-    self_allocator_type get_self_allocator() const
-    {
-        return self_allocator_;
     }
 
     void swap(json_array<Json>& val)
@@ -217,7 +237,6 @@ public:
         return true;
     }
 private:
-    self_allocator_type self_allocator_;
     base_array_type elements_;
 
     json_array& operator=(const json_array<Json>&) = delete;
