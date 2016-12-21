@@ -7,4 +7,8 @@
 **/x64/Debug/
 **/x64/Release/
 **/build/
+**/examples/
+**/more_examples/
+**/test_suite/
+**/build/
 
