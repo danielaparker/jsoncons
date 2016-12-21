@@ -801,8 +801,9 @@ BOOST_AUTO_TEST_CASE(test_defaults)
     double x1 = obj.count("field1") ? obj["field1"].as<double>() : 10.0;
     double x2 = obj.count("field2") ? obj["field2"].as<double>() : 20.0;
 
-    std::cout << "x1=" << x1 << std::endl;
-    std::cout << "x2=" << x2 << std::endl;
+
+    BOOST_CHECK(x1 == 1.0);
+    BOOST_CHECK(x2 == 20.0);
 
     std::string s1 = obj.get_with_default("field3", "Montreal");
     std::string s2 = obj.get_with_default("field4", "San Francisco");
@@ -819,13 +820,10 @@ BOOST_AUTO_TEST_CASE(test_accessing)
     obj["events_attended"] = 10;
     obj["accept_waiver_of_liability"] = true;
 
-    std::string first_name = obj["first_name"].as<std::string>();
-    std::string last_name = obj.at("last_name").as<std::string>();
-    int events_attended = obj["events_attended"].as<int>();
-    bool accept_waiver_of_liability = obj["accept_waiver_of_liability"].as<bool>();
-
-    std::cout << first_name << " " << last_name << ", " << events_attended << ", " << accept_waiver_of_liability << std::endl;
-
+    BOOST_CHECK(obj["first_name"].as<std::string>() == "Jane");
+    BOOST_CHECK(obj.at("last_name").as<std::string>() == "Roe");
+    BOOST_CHECK(obj["events_attended"].as<int>() == 10);
+    BOOST_CHECK(obj["accept_waiver_of_liability"].as<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
@@ -834,20 +832,17 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
 
-    try
-    {
-        std::string experience = obj["outdoor_experience"].as<std::string>();
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+    BOOST_CHECK_EXCEPTION(obj["outdoor_experience"].as<std::string>(),
+                          std::out_of_range,
+                          [](const std::exception& ex ) { return ex.what() == std::string("outdoor_experience not found"); });
 
     std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
 
-    bool first_aid_certification = obj.get_with_default("first_aid_certification",false);
+    BOOST_CHECK(experience == "");
 
-    std::cout << "experience=" << experience << ", first_aid_certification=" << first_aid_certification << std::endl;
+    BOOST_CHECK_EXCEPTION(obj["first_aid_certification"].as<std::string>(),
+                          std::out_of_range,
+                          [](const std::exception& ex ) { return ex.what() == std::string("first_aid_certification not found"); });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
