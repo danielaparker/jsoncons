@@ -534,6 +534,7 @@ vertical-align:1px;
       std::pair&lt;shm_json*,managed_shared_memory::size_type&gt; res;
       res = segment.<span class="pl-smi">find</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>);
 
+      std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Parent:<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
       std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(*(res.<span class="pl-smi">first</span>)) &lt;&lt; std::endl;
 
       <span class="pl-c"><span class="pl-c">//</span>Launch child process</span>
@@ -555,6 +556,7 @@ vertical-align:1px;
 
       <span class="pl-k">if</span> (res.<span class="pl-smi">first</span> != <span class="pl-c1">nullptr</span>)
       {
+          std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Child:<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
           std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(*(res.<span class="pl-smi">first</span>)) &lt;&lt; std::endl;
       }
       <span class="pl-k">else</span>
@@ -567,6 +569,27 @@ vertical-align:1px;
    }
    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
 }</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>Parent:
+[
+    <span class="pl-c1">10</span>,
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>
+    }
+]
+Child:
+[
+    <span class="pl-c1">10</span>,
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>
+    }
+]</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

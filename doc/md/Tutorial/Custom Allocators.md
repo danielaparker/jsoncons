@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
       std::pair<shm_json*,managed_shared_memory::size_type> res;
       res = segment.find<shm_json>("my json");
 
+      std::cout << "Parent:" << std::endl;
       std::cout << pretty_print(*(res.first)) << std::endl;
 
       //Launch child process
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
 
       if (res.first != nullptr)
       {
+          std::cout << "Child:" << std::endl;
           std::cout << pretty_print(*(res.first)) << std::endl;
       }
       else
@@ -100,4 +102,27 @@ int main(int argc, char *argv[])
    }
    return 0;
 }
+```
+Output:
+```json
+Parent:
+[
+    10,
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    }
+]
+Child:
+[
+    10,
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    }
+]
 ```
