@@ -1,6 +1,6 @@
 ## Examples
 
-### Using `json` with stateless boost `fast_pool_allocator`
+### Using `json` with boost stateless `fast_pool_allocator`
 ```c++
 #include <boost/pool/pool_alloc.hpp>
 #include "jsoncons/json.hpp"

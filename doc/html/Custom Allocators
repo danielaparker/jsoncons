@@ -469,7 +469,7 @@ vertical-align:1px;
 </head>
 <body>
 <h2>Examples</h2>
-<h3>Using <code>json</code> with stateless boost <code>fast_pool_allocator</code></h3>
+<h3>Using <code>json</code> with boost stateless <code>fast_pool_allocator</code></h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/pool/pool_alloc.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>jsoncons/json.hpp<span class="pl-pds">"</span></span>
 
