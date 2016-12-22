@@ -98,26 +98,26 @@ public:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
 
-    using key_type = typename json_traits_type::template key_container<char_allocator_type>;
+    using key_storage_type = typename json_traits_type::template key_storage<char_allocator_type>;
 
-    using base_string_type = typename json_traits_type::template string_container<char_allocator_type>;
+    using string_storage_type = typename json_traits_type::template string_storage<char_allocator_type>;
 
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
-    typedef key_value_pair<key_type,json_type> kvp_type;
+    typedef key_value_pair<key_storage_type,json_type> kvp_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     typedef kvp_type member_type;
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
-    using base_array_type = typename json_traits_type::template array_container<json_type, val_allocator_type>;
+    using array_storage_type = typename json_traits_type::template array_storage<json_type, val_allocator_type>;
 
     typedef json_array<json_type> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<kvp_type > kvp_allocator_type;
 
-    using base_object_type = typename json_traits_type::template object_container<kvp_type , kvp_allocator_type>;
-    typedef json_object<key_type,json_type,json_traits_type::preserve_order> object;
+    using object_storage_type = typename json_traits_type::template object_storage<kvp_type , kvp_allocator_type>;
+    typedef json_object<key_storage_type,json_type,json_traits_type::preserve_order> object;
 
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
@@ -312,8 +312,8 @@ public:
             class String_holder_ : public String_holder_base_
             {
             public:
-                typedef typename base_string_type::iterator iterator;
-                typedef typename base_string_type::const_iterator const_iterator;
+                typedef typename string_storage_type::iterator iterator;
+                typedef typename string_storage_type::const_iterator const_iterator;
                 using String_holder_base_::get_self_allocator;
 
                 String_holder_()
@@ -380,7 +380,7 @@ public:
                     return string_.size()-1;
                 }
             private:
-                base_string_type string_;
+                string_storage_type string_;
 
                 String_holder_& operator=(const String_holder_&) = delete;
             };
@@ -1365,13 +1365,13 @@ public:
         typedef json_proxy<ParentT> proxy_type;
 
         ParentT& parent_;
-        key_type key_;
+        key_storage_type key_;
 
         json_proxy() = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
 
-        json_proxy(ParentT& parent, key_type&& name)
-            : parent_(parent), key_(std::forward<key_type&&>(name))
+        json_proxy(ParentT& parent, key_storage_type&& name)
+            : parent_(parent), key_(std::forward<key_storage_type&&>(name))
         {
         }
 
@@ -1406,12 +1406,12 @@ public:
             return parent_.evaluate(key_).at(index);
         }
 
-        json_type& evaluate(const key_type& index)
+        json_type& evaluate(const key_storage_type& index)
         {
             return parent_.evaluate(key_).at(index);
         }
 
-        const json_type& evaluate(const key_type& index) const
+        const json_type& evaluate(const key_storage_type& index) const
         {
             return parent_.evaluate(key_).at(index);
         }
@@ -1628,7 +1628,7 @@ public:
 
         json_proxy<proxy_type> operator[](string_view_type name)
         {
-            return json_proxy<proxy_type>(*this,key_type(name.begin(),name.end(),key_.get_allocator()));
+            return json_proxy<proxy_type>(*this,key_storage_type(name.begin(),name.end(),key_.get_allocator()));
         }
 
         const json_type& operator[](string_view_type name) const
@@ -1667,7 +1667,7 @@ public:
         }
 
         template <class T>
-        json_type get(const key_type& name, T&& default_val) const
+        json_type get(const key_storage_type& name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
@@ -1719,9 +1719,9 @@ public:
         }
 
         template <class T>
-        void set_(key_type&& name, T&& value)
+        void set_(key_storage_type&& name, T&& value)
         {
-            evaluate().set_(std::forward<key_type&&>(name),std::forward<T&&>(value));
+            evaluate().set_(std::forward<key_storage_type&&>(name),std::forward<T&&>(value));
         }
 
         template <class T>
@@ -1731,9 +1731,9 @@ public:
         }
 
         template <class T>
-        object_iterator set_(object_iterator hint, key_type&& name, T&& value)
+        object_iterator set_(object_iterator hint, key_storage_type&& name, T&& value)
         {
-            return evaluate().set_(hint, std::forward<key_type&&>(name), std::forward<T&&>(value));
+            return evaluate().set_(hint, std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
         }
 
         template <class T>
@@ -1913,7 +1913,7 @@ public:
             return evaluate().end_elements();
         }
 
-        const json_type& get(const key_type& name) const
+        const json_type& get(const key_storage_type& name) const
         {
             return evaluate().get(name);
         }
@@ -1963,7 +1963,7 @@ public:
             evaluate_with_default().add(index, std::forward<json_type&&>(value));
         }
 
-        bool has_member(const key_type& name) const
+        bool has_member(const key_storage_type& name) const
         {
             return evaluate().has_member(name);
         }
@@ -2353,7 +2353,7 @@ public:
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<json_type>(*this, key_type(name.begin(),name.end(),char_allocator_type(object_value().get_self_allocator())));
+            return json_proxy<json_type>(*this, key_storage_type(name.begin(),name.end(),char_allocator_type(object_value().get_self_allocator())));
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -2989,12 +2989,12 @@ public:
         return at(i);
     }
 
-    json_type& evaluate(const key_type& name) 
+    json_type& evaluate(const key_storage_type& name) 
     {
         return at(name);
     }
 
-    const json_type& evaluate(const key_type& name) const
+    const json_type& evaluate(const key_storage_type& name) const
     {
         return at(name);
     }
@@ -3087,7 +3087,7 @@ public:
     }
 
     template<class T>
-    json_type get(const key_type& name, T&& default_val) const
+    json_type get(const key_storage_type& name, T&& default_val) const
     {
         switch (var_.type_id())
         {
@@ -3264,14 +3264,14 @@ public:
     }
 
     template <class T>
-    void set_(key_type&& name, T&& value)
+    void set_(key_storage_type&& name, T&& value)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            object_value().set_(std::forward<key_type&&>(name), std::forward<T&&>(value));
+            object_value().set_(std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
             break;
         default:
             {
@@ -3298,14 +3298,14 @@ public:
     }
 
     template <class T>
-    object_iterator set_(object_iterator hint, key_type&& name, T&& value)
+    object_iterator set_(object_iterator hint, key_storage_type&& name, T&& value)
     {
         switch (var_.type_id())
         {
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return object_value().set(hint, std::forward<key_type&&>(name), std::forward<T&&>(value));
+            return object_value().set(hint, std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
             break;
         default:
             {
@@ -3486,7 +3486,7 @@ public:
         return array_range().end();
     }
 
-    const json_type& get(const key_type& name) const
+    const json_type& get(const key_storage_type& name) const
     {
         static const json_type a_null = null_type();
 
@@ -3620,7 +3620,7 @@ public:
         }
     }
 
-    bool has_member(const key_type& name) const
+    bool has_member(const key_storage_type& name) const
     {
         switch (var_.type_id())
         {

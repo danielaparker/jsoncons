@@ -27,18 +27,18 @@ struct json_traits
     typedef CharT char_type;
 
     template <class T,class Allocator>
-    using object_container = std::vector<T,Allocator>;
+    using object_storage = std::vector<T,Allocator>;
 
     template <class T,class Allocator>
-    using array_container = std::vector<T,Allocator>;
+    using array_storage = std::vector<T,Allocator>;
 
     typedef typename std::char_traits<char_type> char_traits_type;
 
     template <class Allocator>
-    using key_container = std::basic_string<char_type,char_traits_type,Allocator>;
+    using key_storage = std::basic_string<char_type,char_traits_type,Allocator>;
 
     template <class Allocator>
-    using string_container = std::vector<char_type,Allocator>;
+    using string_storage = std::vector<char_type,Allocator>;
 
     typedef basic_default_parse_error_handler<char_type> parse_error_handler_type;
 };
@@ -51,18 +51,18 @@ struct o_json_traits
     typedef CharT char_type;
 
     template <class T,class Allocator>
-    using object_container = std::vector<T,Allocator>;
+    using object_storage = std::vector<T,Allocator>;
 
     template <class T,class Allocator>
-    using array_container = std::vector<T,Allocator>;
+    using array_storage = std::vector<T,Allocator>;
 
     typedef typename std::char_traits<char_type> char_traits_type;
 
     template <class Allocator>
-    using key_container = std::basic_string<char_type,char_traits_type,Allocator>;
+    using key_storage = std::basic_string<char_type,char_traits_type,Allocator>;
 
     template <class Allocator>
-    using string_container = std::vector<char_type,Allocator>;
+    using string_storage = std::vector<char_type,Allocator>;
 
     typedef basic_default_parse_error_handler<char_type> parse_error_handler_type;
 };

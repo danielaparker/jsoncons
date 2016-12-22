@@ -30,7 +30,7 @@ public:
     typedef Json json_type;
     typedef typename Json::kvp_type  kvp_type ;
     typedef typename Json::string_type string_type;
-    typedef typename Json::key_type key_type;
+    typedef typename Json::key_storage_type key_storage_type;
     typedef typename string_type::allocator_type char_allocator;
     typedef typename Json::allocator_type allocator_type;
     typedef typename Json::array array;
@@ -47,7 +47,7 @@ public:
 
     struct stack_item
     {
-        key_type name_;
+        key_storage_type name_;
         Json value_;
     };
     std::vector<stack_item> stack_;
@@ -213,7 +213,7 @@ private:
 
     void do_name(string_view_type name, const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].name_ = key_type(name.begin(),name.end(),sa_);
+        stack_[top_].name_ = key_storage_type(name.begin(),name.end(),sa_);
     }
 
     void do_string_value(string_view_type val, const basic_parsing_context<char_type>&) override

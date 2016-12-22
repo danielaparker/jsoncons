@@ -1,3 +1,21 @@
+## Examples
+
+### Using `json` with boost stateless `fast_pool_allocator`
+```c++
+#include <boost/pool/pool_alloc.hpp>
+#include "jsoncons/json.hpp"
+
+typedef jsoncons::basic_json<char, boost::fast_pool_allocator<void>> bfp_json;
+
+bfp_json j;
+
+j.set("FirstName","Joe");
+j.set("LastName","Smith");
+```
+
+### Using `json` with stateful Boost.Interprocess allocators
+
+```c++
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
@@ -97,4 +115,27 @@ int main(int argc, char *argv[])
    }
    return 0;
 }
-
+```
+Output:
+```json
+Parent:
+[
+    10,
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    }
+]
+Child:
+[
+    10,
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    }
+]
+```
