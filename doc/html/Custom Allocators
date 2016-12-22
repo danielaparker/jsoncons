@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Home</title>
+<title>Custom Allocators</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,39 +468,105 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>All core jsoncons classes and functions are in namespace <code>jsoncons</code>.</p>
-<h3>Roadmap</h3>
-<p><a href="Roadmap">Roadmap</a></p>
-<h3>Tutorials</h3>
-<p><a href="Basics">Basics</a></p>
-<p><a href="Arrays">Arrays</a></p>
-<p><a href="Type%20Extensibility">Type Extensibility</a></p>
-<p><a href="Custom%20Allocators">Custom Allocators</a></p>
-<p><a href="Unicode%20support">Unicode support</a></p>
-<h3>Classes</h3>
-<p><a href="json">json</a><br>
-<a href="json_serializer">json_serializer</a><br>
-<a href="serialization_options">serialization_options</a><br>
-<a href="json_reader">json_reader</a></p>
-<p><a href="json_decoder">json_decoder</a><br>
-<a href="json_filter">json_filter</a><br>
-<a href="rename_name_filter">rename_name_filter</a></p>
-<p><a href="wjson">wjson</a><br>
-<a href="wjson_serializer">wjson_serializer</a><br>
-<a href="wserialization_options">wserialization_options</a><br>
-<a href="wjson_reader">wjson_reader</a></p>
-<p><a href="ojson">ojson</a></p>
-<p><a href="owjson">owjson</a></p>
-<h3>Extensions</h3>
-<h4>csv</h4>
-<p><a href="csv_reader">csv_reader</a></p>
-<p><a href="csv_serializer">csv_serializer</a></p>
-<h4>jsonpath</h4>
-<p><a href="json_query">json_query</a></p>
-<p><a href="json_replace">json_replace</a></p>
-<h4>binary</h4>
-<p><a href="encode_message_pack">encode_message_pack</a></p>
-<p><a href="decode_message_pack">decode_message_pack</a></p>
+<h2>Examples</h2>
+<h3>Using <code>json</code> with boost Boost.Interprocess allocators</h3>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/managed_shared_memory.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/containers/vector.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/allocators/allocator.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>cstdlib<span class="pl-pds">&gt;</span></span> <span class="pl-c"><span class="pl-c">//</span>std::system</span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">boost</span>::interprocess<span class="pl-k">;</span>
+
+<span class="pl-k">typedef</span> boost::interprocess::allocator&lt;<span class="pl-k">int</span>,
+        boost::interprocess::managed_shared_memory::segment_manager&gt; shmem_allocator;
+
+<span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">CharT</span>&gt;
+<span class="pl-k">struct</span> <span class="pl-en">b_json_traits</span> : <span class="pl-k">public</span> <span class="pl-en">json_traits</span>&lt;<span class="pl-k">char</span>&gt;
+{
+   <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>,<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
+   <span class="pl-k">using</span> object_container = boost::interprocess::vector&lt;T,Allocator&gt;;
+
+   <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
+   <span class="pl-k">using</span> array_container = boost::interprocess::vector&lt;T,Allocator&gt;;
+
+   <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
+   <span class="pl-k">using</span> key_container = boost::interprocess::vector&lt;CharT,Allocator&gt;;
+
+   <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
+   <span class="pl-k">using</span> string_container = boost::interprocess::vector&lt;CharT, Allocator&gt;;
+};
+
+<span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,b_json_traits&lt;<span class="pl-k">char</span>&gt;,shmem_allocator&gt; shm_json;
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>(<span class="pl-k">int</span> argc, <span class="pl-k">char</span> *argv[])
+{
+   <span class="pl-k">typedef</span> std::pair&lt;<span class="pl-k">double</span>, <span class="pl-k">int</span>&gt; MyType;
+
+   <span class="pl-k">if</span>(argc == <span class="pl-c1">1</span>){  <span class="pl-c"><span class="pl-c">//</span>Parent process</span>
+      <span class="pl-c"><span class="pl-c">//</span>Remove shared memory on construction and destruction</span>
+      <span class="pl-k">struct</span> <span class="pl-en">shm_remove</span>
+      {
+         <span class="pl-en">shm_remove</span>() { <span class="pl-c1">shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
+         <span class="pl-en">~shm_remove</span>(){ <span class="pl-c1">shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
+      } remover;
+
+      <span class="pl-c"><span class="pl-c">//</span>Construct managed shared memory</span>
+      managed_shared_memory <span class="pl-smi">segment</span>(create_only, <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>, <span class="pl-c1">65536</span>);
+
+      <span class="pl-c"><span class="pl-c">//</span>Initialize shared memory STL-compatible allocator</span>
+      <span class="pl-k">const</span> shmem_allocator <span class="pl-smi">allocator</span>(segment.<span class="pl-c1">get_segment_manager</span>());
+
+      <span class="pl-c"><span class="pl-c">//</span> Create json value with all dynamic allocations in shared memory</span>
+
+      shm_json* j = segment.<span class="pl-smi">construct</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>)(<span class="pl-c1">shm_json::array</span>(allocator));
+      j-&gt;<span class="pl-c1">add</span>(<span class="pl-c1">10</span>);
+
+      shm_json <span class="pl-smi">o</span>(allocator);
+      o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>);
+      o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>);
+      o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>);
+      o.<span class="pl-c1">set</span>(<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">8.95</span>);
+
+      j-&gt;<span class="pl-c1">add</span>(o);
+
+      std::pair&lt;shm_json*,managed_shared_memory::size_type&gt; res;
+      res = segment.<span class="pl-smi">find</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>);
+
+      std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(*(res.<span class="pl-smi">first</span>)) &lt;&lt; std::endl;
+
+      <span class="pl-c"><span class="pl-c">//</span>Launch child process</span>
+      std::string <span class="pl-smi">s</span>(argv[<span class="pl-c1">0</span>]); s += <span class="pl-s"><span class="pl-pds">"</span> child <span class="pl-pds">"</span></span>;
+      <span class="pl-k">if</span>(<span class="pl-c1">0</span> != <span class="pl-c1">std::system</span>(s.<span class="pl-c1">c_str</span>()))
+         <span class="pl-k">return</span> <span class="pl-c1">1</span>;
+
+
+      <span class="pl-c"><span class="pl-c">//</span>Check child has destroyed all objects</span>
+      <span class="pl-k">if</span>(segment.<span class="pl-smi">find</span>&lt;MyType&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>).<span class="pl-smi">first</span>)
+         <span class="pl-k">return</span> <span class="pl-c1">1</span>;
+   }
+   <span class="pl-k">else</span>{
+      <span class="pl-c"><span class="pl-c">//</span>Open managed shared memory</span>
+      managed_shared_memory <span class="pl-smi">segment</span>(open_only, <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>);
+
+      std::pair&lt;shm_json*,managed_shared_memory::size_type&gt; res;
+      res = segment.<span class="pl-smi">find</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>);
+
+      <span class="pl-k">if</span> (res.<span class="pl-smi">first</span> != <span class="pl-c1">nullptr</span>)
+      {
+          std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(*(res.<span class="pl-smi">first</span>)) &lt;&lt; std::endl;
+      }
+      <span class="pl-k">else</span>
+      {
+          std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Result is null<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
+      }
+
+      <span class="pl-c"><span class="pl-c">//</span>We're done, delete all the objects</span>
+      segment.<span class="pl-smi">destroy</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>);
+   }
+   <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+}</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

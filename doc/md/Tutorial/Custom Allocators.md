@@ -1,3 +1,8 @@
+## Examples
+
+### Using `json` with boost Boost.Interprocess allocators
+
+```c++
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
@@ -95,4 +100,4 @@ int main(int argc, char *argv[])
    }
    return 0;
 }
-
+```
