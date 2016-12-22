@@ -153,6 +153,7 @@ public:
     }*/
     void destroy(pointer p) 
     {
+        (void)p;
         p->~T();
     } 
     pool* pool_ptr_; 
