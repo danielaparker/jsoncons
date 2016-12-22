@@ -14,16 +14,16 @@ template<class CharT>
 struct b_json_traits : public json_traits<char>
 {
    template <class T,class Allocator>
-   using object_container = boost::interprocess::vector<T,Allocator>;
+   using object_storage = boost::interprocess::vector<T,Allocator>;
 
    template <class T, class Allocator>
-   using array_container = boost::interprocess::vector<T,Allocator>;
+   using array_storage = boost::interprocess::vector<T,Allocator>;
 
    template <class Allocator>
-   using key_container = boost::interprocess::vector<CharT,Allocator>;
+   using key_storage = boost::interprocess::vector<CharT,Allocator>;
 
    template <class Allocator>
-   using string_container = boost::interprocess::vector<CharT, Allocator>;
+   using string_storage = boost::interprocess::vector<CharT, Allocator>;
 };
 
 typedef basic_json<char,b_json_traits<char>,shmem_allocator> shm_json;

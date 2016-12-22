@@ -98,9 +98,9 @@ public:
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
 
-    using key_type = typename json_traits_type::template key_container<char_allocator_type>;
+    using key_type = typename json_traits_type::template key_storage<char_allocator_type>;
 
-    using base_string_type = typename json_traits_type::template string_container<char_allocator_type>;
+    using base_string_type = typename json_traits_type::template string_storage<char_allocator_type>;
 
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef key_value_pair<key_type,json_type> kvp_type;
@@ -110,13 +110,13 @@ public:
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
-    using base_array_type = typename json_traits_type::template array_container<json_type, val_allocator_type>;
+    using base_array_type = typename json_traits_type::template array_storage<json_type, val_allocator_type>;
 
     typedef json_array<json_type> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<kvp_type > kvp_allocator_type;
 
-    using base_object_type = typename json_traits_type::template object_container<kvp_type , kvp_allocator_type>;
+    using base_object_type = typename json_traits_type::template object_storage<kvp_type , kvp_allocator_type>;
     typedef json_object<key_type,json_type,json_traits_type::preserve_order> object;
 
 

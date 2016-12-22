@@ -486,16 +486,16 @@ vertical-align:1px;
 <span class="pl-k">struct</span> <span class="pl-en">b_json_traits</span> : <span class="pl-k">public</span> <span class="pl-en">json_traits</span>&lt;<span class="pl-k">char</span>&gt;
 {
    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>,<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
-   <span class="pl-k">using</span> object_container = boost::interprocess::vector&lt;T,Allocator&gt;;
+   <span class="pl-k">using</span> object_storage = boost::interprocess::vector&lt;T,Allocator&gt;;
 
    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
-   <span class="pl-k">using</span> array_container = boost::interprocess::vector&lt;T,Allocator&gt;;
+   <span class="pl-k">using</span> array_storage = boost::interprocess::vector&lt;T,Allocator&gt;;
 
    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
-   <span class="pl-k">using</span> key_container = boost::interprocess::vector&lt;CharT,Allocator&gt;;
+   <span class="pl-k">using</span> key_storage = boost::interprocess::vector&lt;CharT,Allocator&gt;;
 
    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
-   <span class="pl-k">using</span> string_container = boost::interprocess::vector&lt;CharT, Allocator&gt;;
+   <span class="pl-k">using</span> string_storage = boost::interprocess::vector&lt;CharT, Allocator&gt;;
 };
 
 <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,b_json_traits&lt;<span class="pl-k">char</span>&gt;,shmem_allocator&gt; shm_json;
