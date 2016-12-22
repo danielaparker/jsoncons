@@ -1,6 +1,19 @@
 ## Examples
 
-### Using `json` with boost Boost.Interprocess allocators
+### Using `json` with stateless boost `fast_pool_allocator`
+```c++
+#include <boost/pool/pool_alloc.hpp>
+#include "jsoncons/json.hpp"
+
+typedef jsoncons::basic_json<char, boost::fast_pool_allocator<void>> bfp_json;
+
+bfp_json j;
+
+j.set("FirstName","Joe");
+j.set("LastName","Smith");
+```
+
+### Using `json` with stateful Boost.Interprocess allocators
 
 ```c++
 #include <boost/interprocess/managed_shared_memory.hpp>
