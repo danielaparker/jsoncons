@@ -658,7 +658,6 @@ struct json_type_traits<Json, T,
                         typename std::enable_if<is_compatible_object_type<Json,T>::value>::type
 >
 {
-    typedef typename T::key_type key_type;
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
     typedef typename Json::allocator_type allocator_type;

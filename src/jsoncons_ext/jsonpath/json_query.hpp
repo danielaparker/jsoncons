@@ -140,7 +140,7 @@ private:
     typedef typename Json::char_type char_type;
     typedef typename Json::char_traits_type char_traits_type;
     typedef std::basic_string<char_type,char_traits_type> string_type;
-    typedef typename Json::key_type key_type;
+    typedef typename Json::key_storage_type key_storage_type;
     typedef typename Json::string_view_type string_view_type;
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
@@ -212,7 +212,7 @@ private:
     class name_selector : public selector
     {
     private:
-        key_type name_;
+        key_storage_type name_;
         bool positive_start_;
     public:
         name_selector(string_view_type name, bool positive_start)
@@ -887,7 +887,7 @@ public:
         start_ = 0;
     }
 
-    void apply_unquoted_string(const key_type& name)
+    void apply_unquoted_string(const key_storage_type& name)
     {
         if (name.length() > 0)
         {
@@ -899,7 +899,7 @@ public:
         buffer_.clear();
     }
 
-    void apply_unquoted_string(json_reference context, const key_type& name)
+    void apply_unquoted_string(json_reference context, const key_storage_type& name)
     {
         if (context.is_object())
         {

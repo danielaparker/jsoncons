@@ -223,7 +223,7 @@ template <class KeyT, class ValueT>
 class key_value_pair
 {
 public:
-    typedef KeyT key_type;
+    typedef KeyT key_storage_type;
     typedef typename KeyT::value_type char_type;
     typedef typename KeyT::allocator_type allocator_type;
     typedef typename ValueT::string_view_type string_view_type;
@@ -232,13 +232,13 @@ public:
     {
     }
 
-    key_value_pair(const key_type& name, const ValueT& val)
+    key_value_pair(const key_storage_type& name, const ValueT& val)
         : key_(name), value_(val)
     {
     }
 
-    key_value_pair(key_type&& name, ValueT&& val)
-        : key_(std::forward<key_type&&>(name)), 
+    key_value_pair(key_storage_type&& name, ValueT&& val)
+        : key_(std::forward<key_storage_type&&>(name)), 
           value_(std::forward<ValueT&&>(val))
     {
     }
@@ -254,10 +254,10 @@ public:
     }
 
     template <class T>
-    key_value_pair(key_type&& name, 
+    key_value_pair(key_storage_type&& name, 
                    T&& val, 
                    const allocator_type& allocator)
-        : key_(std::forward<key_type&&>(name)), value_(std::forward<T&&>(val), allocator)
+        : key_(std::forward<key_storage_type&&>(name)), value_(std::forward<T&&>(val), allocator)
     {
     }
 
@@ -318,13 +318,13 @@ public:
         value_.shrink_to_fit();
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
-    const key_type& name() const
+    const key_storage_type& name() const
     {
         return key_;
     }
 #endif
 private:
-    key_type key_;
+    key_storage_type key_;
     ValueT value_;
 };
 
@@ -335,19 +335,19 @@ public:
     typedef typename Json::allocator_type allocator_type;
     typedef typename Json::char_type char_type;
     typedef typename Json::char_allocator_type char_allocator_type;
-    typedef KeyT key_type;
+    typedef KeyT key_storage_type;
     typedef typename Json::string_view_type string_view_type;
     typedef key_value_pair<KeyT,Json> value_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> kvp_allocator_type;
-    typedef typename Json::base_object_type base_object_type;
+    typedef typename Json::object_storage_type object_storage_type;
 
-    typedef typename base_object_type::iterator iterator;
-    typedef typename base_object_type::const_iterator const_iterator;
+    typedef typename object_storage_type::iterator iterator;
+    typedef typename object_storage_type::const_iterator const_iterator;
 
 protected:
     allocator_type self_allocator_;
-    base_object_type members_;
+    object_storage_type members_;
 public:
     Json_object_()
         : self_allocator_(), members_()
@@ -405,11 +405,11 @@ public:
     using typename Json_object_<KeyT,Json>::allocator_type;
     using typename Json_object_<KeyT,Json>::char_type;
     using typename Json_object_<KeyT,Json>::char_allocator_type;
-    using typename Json_object_<KeyT,Json>::key_type;
+    using typename Json_object_<KeyT,Json>::key_storage_type;
     using typename Json_object_<KeyT,Json>::string_view_type;
     using typename Json_object_<KeyT,Json>::value_type;
     using typename Json_object_<KeyT,Json>::kvp_allocator_type;
-    using typename Json_object_<KeyT,Json>::base_object_type;
+    using typename Json_object_<KeyT,Json>::object_storage_type;
     using typename Json_object_<KeyT,Json>::iterator;
     using typename Json_object_<KeyT,Json>::const_iterator;
     using Json_object_<KeyT,Json>::get_self_allocator;
@@ -570,9 +570,9 @@ public:
     }
 
     template <class T>
-    void bulk_insert(key_type&& name, T&& value)
+    void bulk_insert(key_storage_type&& name, T&& value)
     {
-        this->members_.emplace_back(std::forward<key_type&&>(name), 
+        this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                               std::forward<T&&>(value));
     }
     void end_bulk_insert()
@@ -591,7 +591,7 @@ public:
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.begin(),name.end()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
                                   std::forward<T&&>(value));
         }
         else if (it->key() == name)
@@ -601,7 +601,7 @@ public:
         else
         {
             this->members_.emplace(it,
-                             key_type(name.begin(),name.end()),
+                             key_storage_type(name.begin(),name.end()),
                              std::forward<T&&>(value));
         }
     }
@@ -614,7 +614,7 @@ public:
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.begin(),name.end(), get_self_allocator()),
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_self_allocator()),
                                   std::forward<T&&>(value),get_self_allocator() );
         }
         else if (it->key() == name)
@@ -624,7 +624,7 @@ public:
         else
         {
             this->members_.emplace(it,
-                             key_type(name.begin(),name.end(), get_self_allocator()),
+                             key_storage_type(name.begin(),name.end(), get_self_allocator()),
                              std::forward<T&&>(value),get_self_allocator() );
         }
     }
@@ -632,12 +632,12 @@ public:
     template <class T, class U=allocator_type,
         typename std::enable_if<is_stateless<U>::value
            >::type* = nullptr>
-    void set_(key_type&& name, T&& value)
+    void set_(key_storage_type&& name, T&& value)
     {
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_type&&>(name), 
+            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                                   std::forward<T&&>(value));
         }
         else if (it->key() == name)
@@ -647,7 +647,7 @@ public:
         else
         {
             this->members_.emplace(it,
-                             std::forward<key_type&&>(name),
+                             std::forward<key_storage_type&&>(name),
                              std::forward<T&&>(value));
         }
     }
@@ -655,12 +655,12 @@ public:
     template <class T, class U=allocator_type,
         typename std::enable_if<!is_stateless<U>::value
            >::type* = nullptr>
-    void set_(key_type&& name, T&& value)
+    void set_(key_storage_type&& name, T&& value)
     {
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(),name.data(),member_lt_string<value_type,char_type>(name.length()));
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_type&&>(name), 
+            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                                   std::forward<T&&>(value),get_self_allocator() );
         }
         else if (it->key() == name)
@@ -670,7 +670,7 @@ public:
         else
         {
             this->members_.emplace(it,
-                             std::forward<key_type&&>(name),
+                             std::forward<key_storage_type&&>(name),
                              std::forward<T&&>(value),get_self_allocator() );
         }
     }
@@ -691,7 +691,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.begin(),name.end()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
                                   std::forward<T&&>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -702,7 +702,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  key_type(name.begin(),name.end()),
+                                  key_storage_type(name.begin(),name.end()),
                                   std::forward<T&&>(value));
         }
         return it;
@@ -724,7 +724,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.begin(),name.end(), get_self_allocator()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_self_allocator()), 
                                   std::forward<T&&>(value),get_self_allocator() );
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -735,7 +735,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  key_type(name.begin(),name.end(), get_self_allocator()),
+                                  key_storage_type(name.begin(),name.end(), get_self_allocator()),
                                   std::forward<T&&>(value),get_self_allocator() );
         }
         return it;
@@ -743,7 +743,7 @@ public:
 
     template <class T, class U=allocator_type>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
-    set_(iterator hint, key_type&& name, T&& value)
+    set_(iterator hint, key_storage_type&& name, T&& value)
     {
         iterator it;
         if (hint != this->members_.end() && hint->key() <= name)
@@ -757,7 +757,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_type&&>(name), 
+            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                                   std::forward<T&&>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -768,7 +768,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  std::forward<key_type&&>(name),
+                                  std::forward<key_storage_type&&>(name),
                                   std::forward<T&&>(value));
         }
         return it;
@@ -776,7 +776,7 @@ public:
 
     template <class T, class U=allocator_type>
         typename std::enable_if<!is_stateless<U>::value,iterator>::type 
-    set_(iterator hint, key_type&& name, T&& value)
+    set_(iterator hint, key_storage_type&& name, T&& value)
     {
         iterator it;
         if (hint != this->members_.end() && hint->key() <= name)
@@ -790,7 +790,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_type&&>(name), 
+            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                                   std::forward<T&&>(value),get_self_allocator() );
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -801,7 +801,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  std::forward<key_type&&>(name),
+                                  std::forward<key_storage_type&&>(name),
                                   std::forward<T&&>(value),get_self_allocator() );
         }
         return it;
@@ -837,11 +837,11 @@ public:
     using typename Json_object_<KeyT,Json>::allocator_type;
     using typename Json_object_<KeyT,Json>::char_type;
     using typename Json_object_<KeyT,Json>::char_allocator_type;
-    using typename Json_object_<KeyT,Json>::key_type;
+    using typename Json_object_<KeyT,Json>::key_storage_type;
     using typename Json_object_<KeyT,Json>::string_view_type;
     using typename Json_object_<KeyT,Json>::value_type;
     using typename Json_object_<KeyT,Json>::kvp_allocator_type;
-    using typename Json_object_<KeyT,Json>::base_object_type;
+    using typename Json_object_<KeyT,Json>::object_storage_type;
     using typename Json_object_<KeyT,Json>::iterator;
     using typename Json_object_<KeyT,Json>::const_iterator;
     using Json_object_<KeyT,Json>::get_self_allocator;
@@ -1000,9 +1000,9 @@ public:
     }
 
     template <class T> inline
-    void bulk_insert(key_type&& name, T&& value)
+    void bulk_insert(key_storage_type&& name, T&& value)
     {
-        this->members_.emplace_back(std::forward<key_type&&>(name), 
+        this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                               std::forward<T&&>(value));
     }
     void end_bulk_insert()
@@ -1022,7 +1022,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.begin(),name.end()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
                                   std::forward<T&&>(value));
         }
         else
@@ -1041,7 +1041,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.begin(),name.end(), get_self_allocator()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_self_allocator()), 
                                   std::forward<T&&>(value),get_self_allocator());
         }
         else
@@ -1053,14 +1053,14 @@ public:
     template <class T, class U=allocator_type,
         typename std::enable_if<is_stateless<U>::value
            >::type* = nullptr>
-    void set_(key_type&& name, T&& value)
+    void set_(key_storage_type&& name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(this->members_.begin(),this->members_.end(), comp);
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_type&&>(name), 
+            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                                   std::forward<T&&>(value));
         }
         else
@@ -1072,14 +1072,14 @@ public:
     template <class T, class U=allocator_type,
         typename std::enable_if<!is_stateless<U>::value
            >::type* = nullptr>
-    void set_(key_type&& name, T&& value)
+    void set_(key_storage_type&& name, T&& value)
     {
         equals_pred<value_type,char_type> comp(name.data(), name.length());
         auto it = std::find_if(this->members_.begin(),this->members_.end(), comp);
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_type&&>(name), 
+            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                                   std::forward<T&&>(value),get_self_allocator());
         }
         else
@@ -1096,7 +1096,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.begin(),name.end(), get_self_allocator()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_self_allocator()), 
                                   std::forward<T&&>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -1107,7 +1107,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  key_type(name.begin(),name.end()),
+                                  key_storage_type(name.begin(),name.end()),
                                   std::forward<T&&>(value));
         }
         return it;
@@ -1121,7 +1121,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_type(name.begin(),name.end(),get_self_allocator()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(),get_self_allocator()), 
                                   std::forward<T&&>(value),get_self_allocator());
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -1132,7 +1132,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  key_type(name.begin(),name.end(),get_self_allocator()),
+                                  key_storage_type(name.begin(),name.end(),get_self_allocator()),
                                   std::forward<T&&>(value),get_self_allocator());
         }
         return it;
@@ -1140,13 +1140,13 @@ public:
 
     template <class T, class U=allocator_type>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
-    set_(iterator hint, key_type&& name, T&& value)
+    set_(iterator hint, key_storage_type&& name, T&& value)
     {
         iterator it = hint;
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_type&&>(name), 
+            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                                   std::forward<T&&>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -1157,7 +1157,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  std::forward<key_type&&>(name),
+                                  std::forward<key_storage_type&&>(name),
                                   std::forward<T&&>(value));
         }
         return it;
@@ -1165,13 +1165,13 @@ public:
 
     template <class T, class U=allocator_type>
         typename std::enable_if<!is_stateless<U>::value,iterator>::type 
-    set_(iterator hint, key_type&& name, T&& value)
+    set_(iterator hint, key_storage_type&& name, T&& value)
     {
         iterator it = hint;
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_type&&>(name), 
+            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
                                   std::forward<T&&>(value), get_self_allocator());
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -1182,7 +1182,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                  std::forward<key_type&&>(name),
+                                  std::forward<key_storage_type&&>(name),
                                   std::forward<T&&>(value), get_self_allocator());
         }
         return it;

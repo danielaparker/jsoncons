@@ -485,7 +485,7 @@ template &lt;class T&gt;
 void add(T&amp;&amp; val)
 
 template &lt;class T&gt;
-void set(<span class="pl-k">const</span> key_type&amp; name, T&amp;&amp; val)</pre></div>
+void set(string_view_type name, T&amp;&amp; val)</pre></div>
 <p>The implementations of these functions and operators make use of the class template <code>json_type_traits</code></p>
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Enable</span>=<span class="pl-k">void</span>&gt;
 <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>;</pre></div>
