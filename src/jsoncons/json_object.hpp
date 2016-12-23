@@ -24,22 +24,6 @@
 
 namespace jsoncons {
 
-template <class Pointer,class Compare>
-struct compare_pointer
-{
-    Compare c_;
-
-    compare_pointer(Compare c)
-        : c_(c)
-    {
-    }
-    bool operator()(Pointer a, Pointer b)
-    {
-        return c_(*a,*b);
-    }
-};
-
-
 template <class BidirectionalIt,class BinaryPredicate>
 BidirectionalIt last_wins_unique_sequence(BidirectionalIt first, BidirectionalIt last, BinaryPredicate compare)
 {
@@ -110,114 +94,6 @@ BidirectionalIt last_wins_unique_sequence(BidirectionalIt first, BidirectionalIt
     
     return it;
 }
-
-template <class ValueT,class CharT>
-class member_lt_string
-{
-    size_t length_;
-public:
-    member_lt_string(size_t length)
-        : length_(length)
-    {
-    }
-
-    bool operator()(const ValueT& a, const CharT* b) const
-    {
-        size_t len = (std::min)(a.key().length(),length_);
-        int result = std::char_traits<CharT>::compare(a.key().data(),b,len);
-        if (result != 0)
-        {
-            return result < 0;
-        }
-
-        return a.key().length() < length_;
-    }
-};
-
-template <class CharT,class ValueT>
-class string_lt_member
-{
-    size_t length_;
-public:
-    string_lt_member(size_t length)
-        : length_(length)
-    {
-    }
-
-    bool operator()(const CharT* a, const ValueT& b) const
-    {
-        size_t len = (std::min)(b.key().length(),length_);
-        int result = std::char_traits<CharT>::compare(a, b.key().data(),len);
-        if (result != 0)
-        {
-            return result < 0;
-        }
-
-        return length_ < b.key().length();
-    }
-};
-
-template <class StringT,class CharT>
-bool name_le_string(const StringT& a, const CharT* b, size_t length)
-{
-    size_t min_len = (std::min)(a.length(),length);
-    int result = std::char_traits<CharT>::compare(a.data(),b, min_len);
-    if (result != 0)
-    {
-        return result < 0;
-    }
-
-    return a.length() <= length;
-}
-
-template <class StringT,class CharT>
-bool name_eq_string(const StringT& a, const CharT* b, size_t length)
-{
-    return a.length() == length && std::char_traits<CharT>::compare(a.data(),b,length) == 0;
-}
-
-template <class ValueT>
-class member_lt_member
-{
-    typedef typename ValueT::char_type char_type;
-public:
-    bool operator()(const ValueT& a, const ValueT& b) const
-    {
-        if (a.key().length() == b.key().length())
-        {
-            return std::char_traits<char_type>::compare(a.key().data(),b.key().data(),a.key().length()) < 0;
-        }
-
-        size_t len = (std::min)(a.key().length(),b.key().length());
-        int result = std::char_traits<char_type>::compare(a.key().data(),b.key().data(),len);
-        if (result != 0)
-        {
-            return result < 0;
-        }
-
-        return a.key().length() < b.key().length();
-    }
-};
-
-template <class ValueT,class CharT>
-class equals_pred
-{
-    const CharT* b_;
-    size_t length_;
-public:
-    equals_pred(const CharT* b, size_t length)
-        : b_(b), length_(length)
-    {
-    }
-
-    bool operator()(const ValueT& a) const
-    {
-        size_t len = (std::min)(a.key().length(),length_);
-        int result = std::char_traits<CharT>::compare(a.key().data(),b_,len);
-
-        return result == 0 && a.key().length() == length_;
-    }
-};
 
 template <class KeyT, class ValueT>
 class key_value_pair
@@ -578,7 +454,8 @@ public:
     }
     void end_bulk_insert()
     {
-        std::stable_sort(this->members_.begin(),this->members_.end(),member_lt_member<value_type>());
+        std::stable_sort(this->members_.begin(),this->members_.end(),
+                         [](const value_type& a, const value_type& b){return a.key().compare(b.key()) < 0;});
         auto it = std::unique(this->members_.rbegin(), this->members_.rend(),
                               [](const value_type& a, const value_type& b){ return !(a.key().compare(b.key()));});
         this->members_.erase(this->members_.begin(),it.base());
@@ -833,8 +710,9 @@ public:
         for (auto it = this->members_.begin(); it != this->members_.end(); ++it)
         {
 
-            auto rhs_it = std::lower_bound(rhs.begin(), rhs.end(), *it, member_lt_member<value_type>());
-            // member_lt_member only compares keys, so we need to check the value separately
+            auto rhs_it = std::lower_bound(rhs.begin(), rhs.end(), *it, 
+                                           [](const value_type& a, const value_type& b){return a.key().compare(b.key()) < 0;});
+            // This only compares keys, so we need to check the value separately
             if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
             {
                 return false;
@@ -1032,8 +910,8 @@ public:
            >::type* = nullptr>
     void set(string_view_type name, T&& value)
     {
-        equals_pred<value_type,char_type> comp(name.data(), name.length());
-        auto it = std::find_if(this->members_.begin(),this->members_.end(), comp);
+        auto it = std::find_if(this->members_.begin(),this->members_.end(), 
+                               [name](const value_type& a){return a.key() == name;});
 
         if (it == this->members_.end())
         {
@@ -1051,8 +929,8 @@ public:
            >::type* = nullptr>
     void set(string_view_type name, T&& value)
     {
-        equals_pred<value_type,char_type> comp(name.data(), name.length());
-        auto it = std::find_if(this->members_.begin(),this->members_.end(), comp);
+        auto it = std::find_if(this->members_.begin(),this->members_.end(), 
+                               [name](const value_type& a){return a.key() == name;});
 
         if (it == this->members_.end())
         {
@@ -1070,8 +948,9 @@ public:
            >::type* = nullptr>
     void set_(key_storage_type&& name, T&& value)
     {
-        equals_pred<value_type,char_type> comp(name.data(), name.length());
-        auto it = std::find_if(this->members_.begin(),this->members_.end(), comp);
+        string_view_type s(name.data(),name.size());
+        auto it = std::find_if(this->members_.begin(),this->members_.end(), 
+                               [s](const value_type& a){return a.key().compare(s);});
 
         if (it == this->members_.end())
         {
@@ -1089,8 +968,9 @@ public:
            >::type* = nullptr>
     void set_(key_storage_type&& name, T&& value)
     {
-        equals_pred<value_type,char_type> comp(name.data(), name.length());
-        auto it = std::find_if(this->members_.begin(),this->members_.end(), comp);
+        string_view_type s(name.data(),name.size());
+        auto it = std::find_if(this->members_.begin(),this->members_.end(), 
+                               [s](const value_type& a){return a.key().compare(s);});
 
         if (it == this->members_.end())
         {
@@ -1211,8 +1091,8 @@ public:
         }
         for (auto it = this->members_.begin(); it != this->members_.end(); ++it)
         {
-            equals_pred<value_type,char_type> comp(it->key().data(), it->key().length());
-            auto rhs_it = std::find_if(rhs.begin(),rhs.end(), comp);
+            auto rhs_it = std::find_if(rhs.begin(),rhs.end(), 
+                                       [it](const value_type& a){return a.key() == it->key();});
             if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
             {
                 return false;
