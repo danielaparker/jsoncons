@@ -273,7 +273,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     static Json to_json(const char_type* val, 
                         const allocator_type& allocator)
     {
-        return Json(typename Json::variant(rh,allocator));
+        return Json(typename Json::variant(val,allocator));
     }
 };
 
