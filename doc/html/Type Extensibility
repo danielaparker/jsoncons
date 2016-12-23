@@ -679,7 +679,10 @@ Observation dates:
 
 <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span> 
 {
-        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) <span class="pl-k">noexcept</span>
+    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>,<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+    <span class="pl-k">struct</span> <span class="pl-en">json_type_traits</span>&lt;Json,boost::numeric::ublas::matrix&lt;T&gt;&gt;
+    {
+        <span class="pl-k">static</span> <span class="pl-k">bool</span> <span class="pl-en">is</span>(<span class="pl-k">const</span> Json&amp; val) JSONCONS_NOEXCEPT
         {
             <span class="pl-k">if</span> (!val.<span class="pl-c1">is_array</span>())
             {
@@ -740,7 +743,7 @@ Observation dates:
 
         <span class="pl-k">static</span> Json <span class="pl-en">to_json</span>(<span class="pl-k">const</span> boost::numeric::ublas::matrix&lt;T&gt;&amp; val)
         {
-            Json a = Json::make_array&lt;<span class="pl-c1">2</span>&gt;(val.<span class="pl-c1">size1</span>(), val.<span class="pl-c1">size2</span>(),<span class="pl-c1">T</span>());
+            Json a = Json::<span class="pl-k">template </span>make_array&lt;<span class="pl-c1">2</span>&gt;(val.<span class="pl-c1">size1</span>(), val.<span class="pl-c1">size2</span>(), <span class="pl-c1">T</span>());
             <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; val.<span class="pl-c1">size1</span>(); ++i)
             {
                 <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> j = <span class="pl-c1">0</span>; j &lt; val.<span class="pl-c1">size1</span>(); ++j)

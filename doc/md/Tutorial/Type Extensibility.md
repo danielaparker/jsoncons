@@ -233,7 +233,10 @@ Observation dates:
 
 namespace jsoncons 
 {
-        static bool is(const Json& val) noexcept
+    template <class Json,class T>
+    struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
+    {
+        static bool is(const Json& val) JSONCONS_NOEXCEPT
         {
             if (!val.is_array())
             {
@@ -294,7 +297,7 @@ namespace jsoncons
 
         static Json to_json(const boost::numeric::ublas::matrix<T>& val)
         {
-            Json a = Json::make_array<2>(val.size1(), val.size2(),T());
+            Json a = Json::template make_array<2>(val.size1(), val.size2(), T());
             for (size_t i = 0; i < val.size1(); ++i)
             {
                 for (size_t j = 0; j < val.size1(); ++j)
