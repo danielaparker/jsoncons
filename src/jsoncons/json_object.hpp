@@ -712,7 +712,6 @@ public:
 
             auto rhs_it = std::lower_bound(rhs.begin(), rhs.end(), *it, 
                                            [](const value_type& a, const value_type& b){return a.key().compare(b.key()) < 0;});
-            // This only compares keys, so we need to check the value separately
             if (rhs_it == rhs.end() || rhs_it->key() != it->key() || rhs_it->value() != it->value())
             {
                 return false;
