@@ -21,8 +21,9 @@ BOOST_AUTO_TEST_CASE(test_wjson )
     root[L"field2"] = 3.9;
     root[L"field3"] = true;
 
-    std::wcout << "Wide character test" << std::endl;
-    std::wcout << root << std::endl;
+    BOOST_CHECK(root[L"field1"].as<std::wstring>() == L"test");
+    BOOST_CHECK(root[L"field2"].as<double>() == 3.9);
+    BOOST_CHECK(root[L"field3"].as<bool>() == true);
 
     std::wstring s1 = root[L"field1"].as<std::wstring>();
     BOOST_CHECK_EQUAL( s1.c_str(),  L"test");

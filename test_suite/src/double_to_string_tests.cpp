@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(test_locale)
 
     double x = 123456789.0123;
     std::wstring s = float_to_string<wchar_t>(x, 13);
-    std::wcout << std::setprecision(13) << x << L": " << s << std::endl;
+    //std::wcout << std::setprecision(13) << x << L": " << s << std::endl;
     BOOST_CHECK(std::wstring(L"123456789.0123") == s);
     _wsetlocale(LC_ALL, L"C");
 }

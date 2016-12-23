@@ -54,7 +54,7 @@ private:
     void dealloc(void* storage) {free(storage);} 
 public: 
     pool(size_t size)
-        : offset_(0), size_(size), allocate_count_(0), deallocate_count_(0), construct_count_(0)  
+        : offset_(0), size_(size), allocate_count_(0), deallocate_count_(0), construct_count_(0), destroy_count_(0)  
     { 
         head_ = curr_ = add_node(); 
     } 
@@ -91,6 +91,7 @@ public:
     size_t allocate_count_;
     size_t deallocate_count_;
     size_t construct_count_;
+    size_t destroy_count_;
 }; 
 
 template<class T> 
@@ -146,15 +147,17 @@ public:
     {
         return size_t(-1) / sizeof(T);
     } 
-    /*void construct(pointer p, Args&&... args) 
+    template <typename... Args>
+    void construct(pointer p, Args&&... args)
     {
         ::new(p) T(std::forward<Args>(args)...);
-        pool_ptr_->construct_count_;
-    }*/
+        ++pool_ptr_->construct_count_;
+    }
     void destroy(pointer p) 
     {
         (void)p;
         p->~T();
+        ++pool_ptr_->destroy_count_;
     } 
     pool* pool_ptr_; 
 }; 
@@ -179,9 +182,13 @@ BOOST_AUTO_TEST_CASE(test_string_allocation)
 
     {
         myjson j("String too long for short string", allocator);
-        std::cout << "Allocate count = " << a_pool.allocate_count_ << ", construct count = " << a_pool.construct_count_ << std::endl;
     }
-    std::cout << "Deallocate count = " << a_pool.deallocate_count_ << std::endl;
+    std::cout << "Allocate count = " << a_pool.allocate_count_ 
+              << ", construct count = " << a_pool.construct_count_ 
+              << ", destroy count = " << a_pool.destroy_count_ 
+              << ", deallocate count = " << a_pool.deallocate_count_ << std::endl;
+    BOOST_CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
+    BOOST_CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
 
 }
 BOOST_AUTO_TEST_SUITE_END()

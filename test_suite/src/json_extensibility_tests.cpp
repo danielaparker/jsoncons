@@ -150,7 +150,9 @@ BOOST_AUTO_TEST_CASE(test_add_extensibility)
     observation_dates.add(boost::gregorian::date(2013,10,21));
     observation_dates.add(boost::gregorian::date(2013,10,28));
     deal["observation_dates"] = std::move(observation_dates);
-    std::cout << pretty_print(deal) << std::endl;
+
+
+    //std::cout << pretty_print(deal) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_set_extensibility)
@@ -186,21 +188,14 @@ BOOST_AUTO_TEST_CASE(test_example)
         deal["ObservationDates"] = std::move(observation_dates);
 
         date maturity = deal["Maturity"].as<date>();
-        std::cout << "Maturity: " << maturity << std::endl << std::endl;
 
-        std::cout << "Observation dates: " << std::endl << std::endl;
-        json::array_iterator it = deal["ObservationDates"].array_range().begin();
-        json::array_iterator end = deal["ObservationDates"].array_range().end();
+        BOOST_CHECK(deal["Maturity"].as<date>() == date(2014,10,14));
+        BOOST_REQUIRE(deal["ObservationDates"].is_array());
+        BOOST_REQUIRE(deal["ObservationDates"].size() == 2);
+        BOOST_CHECK(deal["ObservationDates"][0].as<date>() == date(2014,2,14));
+        BOOST_CHECK(deal["ObservationDates"][1].as<date>() == date(2014,2,21));
 
-        while (it != end)
-        {
-            date d = it->as<date>();
-            std::cout << d << std::endl;
-            ++it;
-        }
-        std::cout << std::endl;
-
-        std::cout << pretty_print(deal) << std::endl;
+        //std::cout << pretty_print(deal) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_boost_matrix)
@@ -213,14 +208,6 @@ BOOST_AUTO_TEST_CASE(test_boost_matrix)
 
     json a = A;
 
-    std::cout << "(1) " << std::boolalpha << a.is<matrix<double>>() << "\n\n";
-
-    std::cout << "(2) " << std::boolalpha << a.is<matrix<int>>() << "\n\n";
-
-    std::cout << "(3) \n\n";
-
-    std::cout << pretty_print(a) << "\n\n";
-
     BOOST_CHECK(a.is<matrix<double>>());
     BOOST_CHECK(!a.is<matrix<int>>());
 
@@ -230,21 +217,6 @@ BOOST_AUTO_TEST_CASE(test_boost_matrix)
     BOOST_CHECK_EQUAL(a[1][1].as<double>(),A(1,1));
 
     matrix<double> B = a.as<matrix<double>>();
-
-    std::cout << "(4) \n\n";
-    for (size_t i = 0; i < B.size1(); ++i)
-    {
-        for (size_t j = 0; j < B.size2(); ++j)
-        {
-            if (j > 0)
-            {
-                std::cout << ",";
-            }
-            std::cout << B(i, j);
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n\n";
 
     BOOST_CHECK_EQUAL(B.size1(),a.size());
     BOOST_CHECK_EQUAL(B.size2(),a[0].size());

@@ -24,7 +24,11 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     A(1, 1) = 4;
 
     serialization_options format;
-    json_serializer os(std::cout, format, true); // pretty printing
+
+    std::ostringstream os1;
+
+    json_serializer os(os1, format, true); // pretty printing
+    os.begin_json();
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
     {
@@ -36,6 +40,13 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
         os.end_array();
     }
     os.end_array();
+    os.end_json();
+
+    std::string expected1 = R"([
+    [1.0,2.0],
+    [3.0,4.0]
+])";
+    BOOST_CHECK_EQUAL(expected1,os1.str());
 }
 
 BOOST_AUTO_TEST_CASE(test_serialization_1)

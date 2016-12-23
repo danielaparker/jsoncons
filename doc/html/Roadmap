@@ -469,10 +469,12 @@ vertical-align:1px;
 </head>
 <body>
 <ul>
-<li><p>Support <a href="https://raw.githubusercontent.com/arineng/jcr/07/draft-newton-json-content-rules.txt">JSON Content Rules v07</a> for schema validation in <code>jsoncons_ext</code></p></li>
-<li><p>Enhanced support for stateful allocators</p></li>
-<li><p>Add extensions for reading from and serializing to binary formats (bson,bjson,ubjson) </p></li>
-<li><p>Revisit error codes, parsing_context, and opportunities for error recovery. Attempt to support <a href="http://json5.org/">json 5</a> behaviour through an parse_error_handler and a json_filter.</p></li>
+<li>
+<p>Support <a href="https://raw.githubusercontent.com/arineng/jcr/07/draft-newton-json-content-rules.txt">JSON Content Rules v07</a> for schema validation in <code>jsoncons_ext</code></p>
+</li>
+<li>
+<p>Revisit error codes, parsing_context, and opportunities for error recovery.</p>
+</li>
 </ul>
 </body>
 </html>
