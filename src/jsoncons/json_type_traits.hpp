@@ -266,16 +266,14 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     {
         return rhs.as_cstring();
     }
-    static Json to_json(const char_type* rhs)
+    static Json to_json(const char_type* val)
     {
-        size_t length = std::char_traits<char_type>::length(rhs);
-        return Json::make_string(rhs,length);
+        return Json(typename Json::variant(val));
     }
-    static Json to_json(const char_type* rhs, 
+    static Json to_json(const char_type* val, 
                         const allocator_type& allocator)
     {
-        size_t length = std::char_traits<char_type>::length(rhs);
-        return Json::make_string(rhs,length,allocator);
+        return Json(typename Json::variant(rh,allocator));
     }
 };
 
@@ -289,16 +287,14 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     {
         return rhs.is_string();
     }
-    static Json to_json(const char_type *rhs)
+    static Json to_json(const char_type *val)
     {
-        size_t length = std::char_traits<char_type>::length(rhs);
-        return Json::make_string(rhs,length);
+        return Json(typename Json::variant(val));
     }
-    static Json to_json(const char_type *rhs, 
+    static Json to_json(const char_type *val, 
                         const allocator_type& allocator)
     {
-        size_t length = std::char_traits<char_type>::length(rhs);
-        return Json::make_string(rhs,length,allocator);
+        return Json(typename Json::variant(val,allocator));
     }
 };
 
@@ -332,13 +328,13 @@ struct json_type_traits<Json, T,
     {
         return static_cast<T>(rhs.as_integer());
     }
-    static Json to_json(T rhs)
+    static Json to_json(T val)
     {
-        return Json::make_integer(rhs);
+        return Json(typename Json::variant(static_cast<int64_t>(val)));
     }
-    static Json to_json(T rhs, allocator_type)
+    static Json to_json(T val, allocator_type)
     {
-        return Json::make_integer(rhs);
+        return Json(typename Json::variant(static_cast<int64_t>(val)));
     }
 };
 
@@ -373,12 +369,12 @@ struct json_type_traits<Json, T,
 
     static Json to_json(T val)
     {
-        return Json::make_uinteger(val);
+        return Json(typename Json::variant(static_cast<uint64_t>(val)));
     }
 
     static Json to_json(T val, allocator_type)
     {
-        return Json::make_uinteger(val);
+        return Json(typename Json::variant(static_cast<uint64_t>(val)));
     }
 };
 
@@ -399,11 +395,11 @@ struct json_type_traits<Json, T,
     }
     static Json to_json(T val)
     {
-        return Json::make_double(val);
+        return Json(typename Json::variant(static_cast<double>(val)));
     }
     static Json to_json(T val, const allocator_type&)
     {
-        return Json::make_double(val);
+        return Json(typename Json::variant(static_cast<double>(val)));
     }
 };
 
@@ -416,14 +412,14 @@ struct json_type_traits<Json, typename Json::object>
     {
         return rhs.is_object();
     }
-    static Json to_json(const typename Json::object& rhs)
+    static Json to_json(const typename Json::object& val)
     {
-        return Json::make_object(rhs);
+        return Json(typename Json::variant(val));
     }
-    static Json to_json(const typename Json::object& rhs, 
+    static Json to_json(const typename Json::object& val, 
                         const allocator_type& allocator)
     {
-        return Json::make_object(rhs, allocator);
+        return Json(typename Json::variant(val,allocator));
     }
 };
 
@@ -436,14 +432,14 @@ struct json_type_traits<Json, typename Json::array>
     {
         return rhs.is_array();
     }
-    static Json to_json(const typename Json::array& rhs)
+    static Json to_json(const typename Json::array& val)
     {
-        return Json::make_array(rhs);
+        return Json(typename Json::variant(val));
     }
-    static Json to_json(const typename Json::array& rhs, 
+    static Json to_json(const typename Json::array& val, 
                         const allocator_type& allocator)
     {
-        return Json::make_array(rhs, allocator);
+        return Json(typename Json::variant(val,allocator));
     }
 };
 
@@ -460,13 +456,13 @@ struct json_type_traits<Json, Json>
     {
         return rhs;
     }
-    static Json to_json(const Json& rhs)
+    static Json to_json(const Json& val)
     {
-        return rhs;
+        return val;
     }
-    static Json to_json(const Json& rhs, allocator_type)
+    static Json to_json(const Json& val, allocator_type)
     {
-        return rhs;
+        return val;
     }
 };
 
@@ -507,13 +503,13 @@ struct json_type_traits<Json, bool>
     {
         return rhs.as_bool();
     }
-    static Json to_json(bool rhs)
+    static Json to_json(bool val)
     {
-        return Json::make_bool(rhs);
+        return Json(typename Json::variant(val));
     }
-    static Json to_json(bool rhs, allocator_type)
+    static Json to_json(bool val, allocator_type)
     {
-        return Json::make_bool(rhs);
+        return Json(typename Json::variant(val));
     }
 };
 
@@ -533,13 +529,13 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     {
         return rhs.as_bool();
     }
-    static Json to_json(bool rhs)
+    static Json to_json(bool val)
     {
-        return Json::make_bool(rhs);
+        return Json(typename Json::variant(val));
     }
-    static Json to_json(bool rhs, allocator_type)
+    static Json to_json(bool val, allocator_type)
     {
-        return Json::make_bool(rhs);
+        return Json(typename Json::variant(val));
     }
 };
 
@@ -556,14 +552,14 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     {
         return rhs.as_bool();
     }
-    static Json to_json(std::vector<bool>::reference rhs)
+    static Json to_json(std::vector<bool>::reference val)
     {
-        return Json::make_bool(rhs);
+        return Json(typename Json::variant(val));
     }
-    static Json to_json(std::vector<bool>::reference rhs, 
+    static Json to_json(std::vector<bool>::reference val, 
                         allocator_type)
     {
-        return Json::make_bool(rhs);
+        return Json(typename Json::variant(val));
     }
 };
 
@@ -605,14 +601,14 @@ struct json_type_traits<Json, T,
         }
     }
 
-    static Json to_json(const T& rhs)
+    static Json to_json(const T& val)
     {
-        return Json(std::begin(rhs), std::end(rhs));
+        return Json(std::begin(val), std::end(val));
     }
 
-    static Json to_json(const T& rhs, const allocator_type& allocator)
+    static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json(std::begin(rhs), std::end(rhs), allocator);
+        return Json(std::begin(val), std::end(val), allocator);
     }
 };
 
@@ -642,14 +638,14 @@ struct json_type_traits<Json, T,
         }
     }
 
-    static Json to_json(const T& rhs)
+    static Json to_json(const T& val)
     {
-        return Json::make_string(rhs);
+        return Json(typename Json::variant(val.data(), val.size()));
     }
 
-    static Json to_json(const T& rhs, const allocator_type& allocator)
+    static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json::make_string(rhs,allocator);
+        return Json(typename Json::variant(val.data(),val.size(),allocator));
     }
 };
 
@@ -682,26 +678,26 @@ struct json_type_traits<Json, T,
         return v;
     }
 
-    static Json to_json(const T& rhs)
+    static Json to_json(const T& val)
     {
-        Json val;
-        val.reserve(rhs.size());
-        for (auto p: rhs)
+        Json j;
+        j.reserve(val.size());
+        for (auto p: val)
         {
-            val.set(p.first, p.second);
+            j.set(p.first, p.second);
         }
-        return val;
+        return j;
     }
 
-    static Json to_json(const T& rhs, const allocator_type& allocator)
+    static Json to_json(const T& val, const allocator_type& allocator)
     {
-        Json val(allocator);
-        val.reserve(rhs.size());
-        for (auto p: rhs)
+        Json j(allocator);
+        j.reserve(val.size());
+        for (auto p: val)
         {
-            val.set(p.first, p.second);
+            j.set(p.first, p.second);
         }
-        return val;
+        return j;
     }
 };
 
@@ -740,15 +736,15 @@ struct json_type_traits<Json, std::array<E, N>>
         return buff;
     }
 
-    static Json to_json(const std::array<E, N>& value)
+    static Json to_json(const std::array<E, N>& val)
     {
-        return Json(value.begin(), value.end());
+        return Json(val.begin(), val.end());
     }
 
-    static Json to_json(const std::array<E, N>& value, 
+    static Json to_json(const std::array<E, N>& val, 
                         const allocator_type& allocator)
     {
-        return Json(value.begin(), value.end(), allocator);
+        return Json(val.begin(), val.end(), allocator);
     }
 };
 

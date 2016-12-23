@@ -2306,8 +2306,7 @@ public:
 
     json_type& operator=(const char_type* s)
     {
-        size_t length = char_traits_type::length(s);
-        var_ = make_string(s,length).var_;
+        var_ = variant(s);
         return *this;
     }
 
