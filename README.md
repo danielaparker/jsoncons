@@ -339,7 +339,7 @@ Or define and use your own filters. See [json_filter](https://github.com/daniela
 
 The `binary` extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
-## MessagePack example
+#### MessagePack example
 
 Example file (book.json):
 ```json
