@@ -802,7 +802,7 @@ public:
         }
         variant(const char_type* s)
         {
-            size_t length = std::char_traits<char_type>::length(s);
+            size_t length = char_traits_type::length(s);
             if (length <= small_string_data::max_length)
             {
                 new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
@@ -815,7 +815,7 @@ public:
 
         variant(const char_type* s, const Allocator& alloc)
         {
-            size_t length = std::char_traits<char_type>::length(s);
+            size_t length = char_traits_type::length(s);
             if (length <= small_string_data::max_length)
             {
                 new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
@@ -2306,7 +2306,7 @@ public:
 
     json_type& operator=(const char_type* s)
     {
-        size_t length = std::char_traits<char_type>::length(s);
+        size_t length = char_traits_type::length(s);
         var_ = make_string(s,length).var_;
         return *this;
     }
