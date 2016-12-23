@@ -35,7 +35,8 @@ struct json_traits
     typedef typename std::char_traits<char_type> char_traits_type;
 
     template <class Allocator>
-    using key_storage = std::basic_string<char_type,char_traits_type,Allocator>;
+    //using key_storage = std::basic_string<char_type,char_traits_type,Allocator>;
+    using key_storage = std::vector<char_type,Allocator>;
 
     template <class Allocator>
     using string_storage = std::vector<char_type,Allocator>;

@@ -1377,18 +1377,18 @@ public:
 
         json_type& evaluate() 
         {
-            return parent_.evaluate(key_);
+            return parent_.evaluate(string_view_type(key_.data(),key_.size()));
         }
 
         const json_type& evaluate() const
         {
-            return parent_.evaluate(key_);
+            return parent_.evaluate(string_view_type(key_.data(),key_.size()));
         }
 
         json_type& evaluate_with_default()
         {
             json_type& val = parent_.evaluate_with_default();
-            auto it = val.find(key_);
+            auto it = val.find(string_view_type(key_.data(),key_.size()));
             if (it == val.object_range().end())
             {
                 it = val.set_(val.object_range().begin(),std::move(key_),object(val.object_value().get_self_allocator()));            
@@ -1398,22 +1398,22 @@ public:
 
         json_type& evaluate(size_t index)
         {
-            return parent_.evaluate(key_).at(index);
+            return evaluate().at(index);
         }
 
         const json_type& evaluate(size_t index) const
         {
-            return parent_.evaluate(key_).at(index);
+            return evaluate().at(index);
         }
 
-        json_type& evaluate(const key_storage_type& index)
+        json_type& evaluate(string_view_type index)
         {
-            return parent_.evaluate(key_).at(index);
+            return evaluate().at(index);
         }
 
-        const json_type& evaluate(const key_storage_type& index) const
+        const json_type& evaluate(string_view_type index) const
         {
-            return parent_.evaluate(key_).at(index);
+            return evaluate().at(index);
         }
     public:
 
@@ -1667,7 +1667,7 @@ public:
         }
 
         template <class T>
-        json_type get(const key_storage_type& name, T&& default_val) const
+        json_type get(string_view_type name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
@@ -1913,7 +1913,7 @@ public:
             return evaluate().end_elements();
         }
 
-        const json_type& get(const key_storage_type& name) const
+        const json_type& get(string_view_type name) const
         {
             return evaluate().get(name);
         }
@@ -2557,7 +2557,7 @@ public:
         {
         case value_types::object_t:
             {
-                const_object_iterator it = object_value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name);
                 return it != object_range().end();
             }
             break;
@@ -2572,7 +2572,7 @@ public:
         {
         case value_types::object_t:
             {
-                auto it = object_value().find(name.data(),name.length());
+                auto it = object_value().find(name);
                 if (it == object_range().end())
                 {
                     return 0;
@@ -2949,7 +2949,7 @@ public:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
-                auto it = object_value().find(name.data(),name.length());
+                auto it = object_value().find(name);
                 if (it == object_range().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
@@ -2978,23 +2978,12 @@ public:
     {
         return *this;
     }
-
-    json_type& evaluate(size_t i) 
-    {
-        return at(i);
-    }
-
-    const json_type& evaluate(size_t i) const
-    {
-        return at(i);
-    }
-
-    json_type& evaluate(const key_storage_type& name) 
+    json_type& evaluate(string_view_type name) 
     {
         return at(name);
     }
 
-    const json_type& evaluate(const key_storage_type& name) const
+    const json_type& evaluate(string_view_type name) const
     {
         return at(name);
     }
@@ -3007,7 +2996,7 @@ public:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
         case value_types::object_t:
             {
-                auto it = object_value().find(name.data(),name.length());
+                auto it = object_value().find(name);
                 if (it == object_range().end())
                 {
                     JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
@@ -3063,7 +3052,7 @@ public:
         case value_types::empty_object_t:
             return object_range().end();
         case value_types::object_t:
-            return object_value().find(name.data(),name.length());
+            return object_value().find(name);
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -3078,7 +3067,7 @@ public:
         case value_types::empty_object_t:
             return object_range().end();
         case value_types::object_t:
-            return object_value().find(name.data(),name.length());
+            return object_value().find(name);
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
@@ -3087,7 +3076,7 @@ public:
     }
 
     template<class T>
-    json_type get(const key_storage_type& name, T&& default_val) const
+    json_type get(string_view_type name, T&& default_val) const
     {
         switch (var_.type_id())
         {
@@ -3097,7 +3086,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = object_value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
                     return it->value();
@@ -3125,7 +3114,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = object_value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
                     return it->value().template as<T>();
@@ -3152,7 +3141,7 @@ public:
             }
         case value_types::object_t:
             {
-                const_object_iterator it = object_value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
                     return it->value().template as<const CharT*>();
@@ -3238,7 +3227,7 @@ public:
         case value_types::empty_object_t:
             break;
         case value_types::object_t:
-            object_value().erase(name.data(),name.length());
+            object_value().erase(name);
             break;
         default:
             JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to erase %s on a value that is not an object", name);
@@ -3275,7 +3264,7 @@ public:
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name.c_str());
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to call set on a value that is not an object");
             }
         }
     }
@@ -3305,11 +3294,11 @@ public:
         case value_types::empty_object_t:
             create_object_implicitly();
         case value_types::object_t:
-            return object_value().set(hint, std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
+            return object_value().set_(hint, std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to set on a value that is not an object");
             }
         }
     }
@@ -3486,7 +3475,7 @@ public:
         return array_range().end();
     }
 
-    const json_type& get(const key_storage_type& name) const
+    const json_type& get(string_view_type name) const
     {
         static const json_type a_null = null_type();
 
@@ -3496,7 +3485,7 @@ public:
             return a_null;
         case value_types::object_t:
             {
-                const_object_iterator it = object_value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name);
                 return it != object_range().end() ? it->value() : a_null;
             }
         default:
@@ -3626,7 +3615,7 @@ public:
         {
         case value_types::object_t:
             {
-                const_object_iterator it = object_value().find(name.data(),name.length());
+                const_object_iterator it = object_value().find(name);
                 return it != object_range().end();
             }
             break;

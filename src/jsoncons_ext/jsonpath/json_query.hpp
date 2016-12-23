@@ -212,7 +212,7 @@ private:
     class name_selector : public selector
     {
     private:
-        key_storage_type name_;
+        string_type name_;
         bool positive_start_;
     public:
         name_selector(string_view_type name, bool positive_start)
@@ -887,7 +887,7 @@ public:
         start_ = 0;
     }
 
-    void apply_unquoted_string(const key_storage_type& name)
+    void apply_unquoted_string(string_view_type name)
     {
         if (name.length() > 0)
         {
@@ -899,7 +899,7 @@ public:
         buffer_.clear();
     }
 
-    void apply_unquoted_string(json_reference context, const key_storage_type& name)
+    void apply_unquoted_string(json_reference context, string_view_type name)
     {
         if (context.is_object())
         {
