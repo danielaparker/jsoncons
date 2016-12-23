@@ -243,18 +243,12 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
 
 BOOST_AUTO_TEST_CASE(test_exception)
 {
-    try
-    {
-        std::string input("{\"field1\":\n\"value}");
-        std::cout << input << std::endl;
-        json obj = json::parse(input);
-    }
-    catch (const parse_exception& e)
-    {
-        BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
-        BOOST_CHECK_EQUAL(2,e.line_number());
-        BOOST_CHECK_EQUAL(9,e.column_number());
-    }
+    std::string input("{\"field1\":\n\"value}");
+    BOOST_CHECK_EXCEPTION(json::parse(input),
+                          parse_exception,
+                          [](const parse_exception& e)
+                            {return e.code() == json_parser_errc::unexpected_eof && e.line_number() == 2 && e.column_number() == 9;}
+                         );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

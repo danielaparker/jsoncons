@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(test_double_to_wstring)
 {
     double x = 1.0e100;
     std::wstring s = float_to_string<wchar_t>(x, format.precision());
-    std::wcout << x << L":" << s << std::endl;
+    //std::wcout << x << L":" << s << std::endl;
     BOOST_CHECK(s == std::wstring(L"1.0e+100") || s == std::wstring(L"1.0e100"));
 
     x = 1.0e-100;

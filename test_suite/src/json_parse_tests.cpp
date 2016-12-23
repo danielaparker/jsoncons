@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)
 BOOST_AUTO_TEST_CASE(test_multiple)
 {
     std::string in="{\"a\":1,\"b\":2,\"c\":3}{\"a\":4,\"b\":5,\"c\":6}";
-    std::cout << in << std::endl;
+    //std::cout << in << std::endl;
 
     std::istringstream is(in);
 
