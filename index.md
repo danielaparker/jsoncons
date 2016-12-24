@@ -25,7 +25,6 @@
 [Convert json to/from user defined type](#A12)
 
 <div id="A1"/>
-
 ### Preliminaries
 
 jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
@@ -46,7 +45,6 @@ using jsoncons::json;
 ```
 
 <div id="A2"/>
-
 ### Reading JSON text from a file
 
 Example file (`books.json`):
@@ -164,7 +162,6 @@ else
 }
 ```
 <div id="A3"/>
-
 ### Constructing json values in C++
 
 The default `json` constructor produces an empty json object. For example 
@@ -255,7 +252,6 @@ produces
 }
 ```
 <div id="A4"/>
-
 ### Converting to and from standard library containers
 
 The jsoncons library supports converting to and from the standard library sequence and associative containers.
@@ -285,13 +281,11 @@ true
 last
 ```
 
-{% raw %}
 ```c++
 std::map<std::string,int> m = {{"one",1},{"two",2},{"three",3}};
 json j(m);
 std::cout << j << std::endl;
 ```
-{% endraw %}
 Output:
 ```json
 {"one":1,"three":3,"two":2}
@@ -316,7 +310,6 @@ three=3
 two=2
 ```
 <div id="A5"/>
-
 ### Converting CSV files to json
 
 Example CSV file (tasks.csv):
@@ -393,7 +386,6 @@ There are a few things to note about the effect of the parameter settings.
 - The `column_types` setting specifies that column one ("project_id") contains integers and the remaining columns strings.
 
 <div id="A6"/>
-
 ### Pretty print
 
 The `pretty_print` function applies stylistic formatting to JSON text. For example
@@ -467,7 +459,6 @@ produces
 }
 ```
 <div id="A7"/>
-
 ### Filters
 
 You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/wiki/rename_name_filter)
@@ -500,7 +491,7 @@ int main()
     // or a json_output_handler    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
-    j.write(filter1);
+    j.dump(filter1);
     std::cout << std::endl;
 }
 ```
@@ -511,7 +502,6 @@ Output:
 ```
 Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/wiki/json_filter) for details.
 <div id="A8"/>
-
 ### JsonPath
 
 [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
@@ -615,7 +605,6 @@ Output:
 ]
 ```
 <div id="A9"/>
-
 ### About jsoncons::json
 
 The [json](https://github.com/danielaparker/jsoncons/wiki/json) class is an instantiation of the `basic_json` class template that uses `char` as the character type
@@ -652,7 +641,6 @@ This results in a json value being constucted with all memory being allocated fr
 Note that the underlying memory pool used by the `boost::fast_pool_allocator` is never freed. 
 
 <div id="A10"/>
-
 ### Wide character support
 
 jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
@@ -671,7 +659,6 @@ which prints
 {"field1":"test","field2":3.9,"field3":true}
 ```
 <div id="A11"/>
-
 ### ojson and owjson
 
 The [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) ([owjson](https://github.com/danielaparker/jsoncons/wiki/owjson)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
@@ -732,7 +719,6 @@ Output:
 ```
 
 <div id="A12"/>
-
 ### Convert `json` to/from user defined type
 
 In the json class, constructors, accessors and modifiers are templated, for example,
