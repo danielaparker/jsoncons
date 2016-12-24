@@ -59,7 +59,7 @@ json countries = encoder.get_result();
 
 csv_serializer serializer(std::cout);
 
-countries.write(serializer);
+countries.dump(serializer);
 ```
 #### Output 
 ```
@@ -124,7 +124,7 @@ json employees = encoder.get_result();
 
 csv_serializer serializer(std::cout,params);
 
-employees.write(serializer);
+employees.dump(serializer);
 ```
 #### Tab delimited output file
 ```

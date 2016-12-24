@@ -72,7 +72,7 @@ int main()
     // or a json_output_handler    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
-    j.write(filter1);
+    j.dump(filter1);
     std::cout << std::endl;
 }
 ```
@@ -182,7 +182,7 @@ or read into a json value and write to the filter
 std::cout << "(2) ";
 json j;
 is >> j;
-j.write(filter);
+j.dump(filter);
 std:: << "\n";
 ```
 Output:

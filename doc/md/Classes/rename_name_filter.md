@@ -1,4 +1,4 @@
-```
+```c++
 jsoncons::rename_name_filter
 
 typedef basic_rename_name_filter<char> rename_name_filter;
@@ -43,7 +43,7 @@ int main()
     json_serializer serializer(std::cout);
 
     rename_name_filter filter("fourth","third",serializer);
-    j.write(filter);
+    j.dump(filter);
 }
 ```
 Output:

@@ -491,7 +491,7 @@ int main()
     // or a json_output_handler    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
-    j.write(filter1);
+    j.dump(filter1);
     std::cout << std::endl;
 }
 ```

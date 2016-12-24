@@ -735,7 +735,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     <span class="pl-c"><span class="pl-c">//</span> or a json_output_handler    </span>
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span>;
     ojson j = <span class="pl-c1">ojson::parse</span>(s);
-    j.<span class="pl-c1">write</span>(filter1);
+    j.<span class="pl-c1">dump</span>(filter1);
     std::cout &lt;&lt; std::endl;
 }</pre></div>
 <p>Output:</p>
@@ -913,7 +913,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
     csv_serializer <span class="pl-smi">serializer</span>(std::cout);
-    tasks.<span class="pl-c1">write</span>(serializer);
+    tasks.<span class="pl-c1">dump</span>(serializer);
 }</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>)

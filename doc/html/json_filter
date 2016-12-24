@@ -521,22 +521,22 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
 
     json_serializer <span class="pl-smi">serializer</span>(std::cout);
 
-    <span class="pl-c">// Filters can be chained</span>
+    <span class="pl-c"><span class="pl-c">//</span> Filters can be chained</span>
     rename_name_filter <span class="pl-smi">filter2</span>(<span class="pl-s"><span class="pl-pds">"</span>fifth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, serializer);
     rename_name_filter <span class="pl-smi">filter1</span>(<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>, filter2);
 
-    <span class="pl-c">// A filter can be passed to any function that takes</span>
-    <span class="pl-c">// a json_input_handler ...</span>
+    <span class="pl-c"><span class="pl-c">//</span> A filter can be passed to any function that takes</span>
+    <span class="pl-c"><span class="pl-c">//</span> a json_input_handler ...</span>
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span>;
     std::istringstream <span class="pl-smi">is</span>(s);
     json_reader <span class="pl-smi">reader</span>(is, filter1);
     reader.<span class="pl-c1">read</span>();
     std::cout &lt;&lt; std::endl;
 
-    <span class="pl-c">// or a json_output_handler    </span>
+    <span class="pl-c"><span class="pl-c">//</span> or a json_output_handler    </span>
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span>;
     ojson j = <span class="pl-c1">ojson::parse</span>(s);
-    j.<span class="pl-c1">write</span>(filter1);
+    j.<span class="pl-c1">dump</span>(filter1);
     std::cout &lt;&lt; std::endl;
 }</pre></div>
 <p>Output:</p>
@@ -581,7 +581,7 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
         member_name_ = name;
         <span class="pl-k">if</span> (member_name_ != <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>)
         {
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(name, context);
+            <span class="pl-c1">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(name, context);
         }
     }
 
@@ -592,14 +592,14 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
         {
             <span class="pl-c1">size_t</span> end_first = val.<span class="pl-c1">find_first_of</span>(<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-cce">\t</span><span class="pl-pds">"</span></span>);
             <span class="pl-c1">size_t</span> start_last = val.<span class="pl-c1">find_first_not_of</span>(<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-cce">\t</span><span class="pl-pds">"</span></span>, end_first);
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>first-name<span class="pl-pds">"</span></span>, context);
+            <span class="pl-c1">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>first-name<span class="pl-pds">"</span></span>, context);
             string_view_type first = val.<span class="pl-c1">substr</span>(<span class="pl-c1">0</span>, end_first);
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">value</span>(first, context);
+            <span class="pl-c1">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">value</span>(first, context);
             <span class="pl-k">if</span> (start_last != string_view_type::npos)
             {
-                <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>last-name<span class="pl-pds">"</span></span>, context);
+                <span class="pl-c1">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>last-name<span class="pl-pds">"</span></span>, context);
                 string_view_type last = val.<span class="pl-c1">substr</span>(start_last);
-                <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">value</span>(last, context);
+                <span class="pl-c1">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">value</span>(last, context);
             }
             <span class="pl-k">else</span>
             {
@@ -610,7 +610,7 @@ You must ensure that the <code>handler</code> exists as long as does <code>json_
         }
         <span class="pl-k">else</span>
         {
-            <span class="pl-v">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">value</span>(s, context);
+            <span class="pl-c1">this</span>-&gt;<span class="pl-c1">downstream_handler</span>().<span class="pl-c1">value</span>(s, context);
         }
     }
 
@@ -630,7 +630,7 @@ std:: &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-c
 <div class="highlight highlight-source-c++"><pre>std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span>;
 json j;
 is &gt;&gt; j;
-j.write(filter);
+j.dump(filter);
 std:: &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
 <p>Output:</p>
 <pre><code>(1) Incomplete name "John" at line 9 and column 26 
