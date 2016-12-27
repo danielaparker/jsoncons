@@ -6,7 +6,6 @@
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
-using namespace boost::interprocess;
 
 typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
@@ -39,12 +38,13 @@ int main(int argc, char *argv[])
       //Remove shared memory on construction and destruction
       struct shm_remove
       {
-         shm_remove() { shared_memory_object::remove("MySharedMemory"); }
-         ~shm_remove(){ shared_memory_object::remove("MySharedMemory"); }
+         shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+         ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
       } remover;
 
       //Construct managed shared memory
-      managed_shared_memory segment(create_only, "MySharedMemory", 65536);
+      boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only, 
+                                                         "MySharedMemory", 65536);
 
       //Initialize shared memory STL-compatible allocator
       const shmem_allocator allocator(segment.get_segment_manager());
@@ -62,12 +62,12 @@ int main(int argc, char *argv[])
 
       j->add(o);
 
-      shm_json a = shm_json::array(10,shm_json::object(allocator),allocator);
+      shm_json a = shm_json::array(2,shm_json::object(allocator),allocator);
       a[0]["first"] = 1;
 
       j->add(a);
 
-      std::pair<shm_json*,managed_shared_memory::size_type> res;
+      std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
       res = segment.find<shm_json>("my json");
 
       std::cout << "Parent:" << std::endl;
@@ -85,9 +85,10 @@ int main(int argc, char *argv[])
    }
    else{
       //Open managed shared memory
-      managed_shared_memory segment(open_only, "MySharedMemory");
+      boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, 
+                                                         "MySharedMemory");
 
-      std::pair<shm_json*,managed_shared_memory::size_type> res;
+      std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
       res = segment.find<shm_json>("my json");
 
       if (res.first != nullptr)

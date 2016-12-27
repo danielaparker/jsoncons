@@ -19,29 +19,31 @@ j.set("LastName","Smith");
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
+#include <boost/interprocess/containers/string.hpp>
 #include <cstdlib> //std::system
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
-using namespace boost::interprocess;
 
 typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
 template<class CharT>
-struct b_json_traits : public json_traits<char>
+struct b_json_traits : public json_traits<CharT>
 {
-   template <class T,class Allocator>
-   using object_storage = boost::interprocess::vector<T,Allocator>;
+    using typename json_traits<CharT>::char_traits_type;
 
-   template <class T, class Allocator>
-   using array_storage = boost::interprocess::vector<T,Allocator>;
+    template <class T,class Allocator>
+    using object_storage = boost::interprocess::vector<T,Allocator>;
 
-   template <class Allocator>
-   using key_storage = boost::interprocess::vector<CharT,Allocator>;
+    template <class T, class Allocator>
+    using array_storage = boost::interprocess::vector<T,Allocator>;
 
-   template <class Allocator>
-   using string_storage = boost::interprocess::vector<CharT, Allocator>;
+    template <class Allocator>
+    using key_storage = boost::interprocess::basic_string<CharT, char_traits_type, Allocator>;
+
+    template <class Allocator>
+    using string_storage = boost::interprocess::basic_string<CharT, char_traits_type, Allocator>;
 };
 
 typedef basic_json<char,b_json_traits<char>,shmem_allocator> shm_json;
@@ -54,12 +56,13 @@ int main(int argc, char *argv[])
       //Remove shared memory on construction and destruction
       struct shm_remove
       {
-         shm_remove() { shared_memory_object::remove("MySharedMemory"); }
-         ~shm_remove(){ shared_memory_object::remove("MySharedMemory"); }
+         shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+         ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
       } remover;
 
       //Construct managed shared memory
-      managed_shared_memory segment(create_only, "MySharedMemory", 65536);
+      boost::interprocess::managed_shared_memory segment(boost::interprocess::create_only, 
+                                                         "MySharedMemory", 65536);
 
       //Initialize shared memory STL-compatible allocator
       const shmem_allocator allocator(segment.get_segment_manager());
@@ -77,7 +80,12 @@ int main(int argc, char *argv[])
 
       j->add(o);
 
-      std::pair<shm_json*,managed_shared_memory::size_type> res;
+      shm_json a = shm_json::array(2,shm_json::object(allocator),allocator);
+      a[0]["first"] = 1;
+
+      j->add(a);
+
+      std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
       res = segment.find<shm_json>("my json");
 
       std::cout << "Parent:" << std::endl;
@@ -95,9 +103,10 @@ int main(int argc, char *argv[])
    }
    else{
       //Open managed shared memory
-      managed_shared_memory segment(open_only, "MySharedMemory");
+      boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, 
+                                                         "MySharedMemory");
 
-      std::pair<shm_json*,managed_shared_memory::size_type> res;
+      std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
       res = segment.find<shm_json>("my json");
 
       if (res.first != nullptr)
@@ -115,27 +124,4 @@ int main(int argc, char *argv[])
    }
    return 0;
 }
-```
-Output:
-```json
-Parent:
-[
-    10,
-    {
-        "author": "Nigel Rees",
-        "category": "reference",
-        "price": 8.95,
-        "title": "Sayings of the Century"
-    }
-]
-Child:
-[
-    10,
-    {
-        "author": "Nigel Rees",
-        "category": "reference",
-        "price": 8.95,
-        "title": "Sayings of the Century"
-    }
-]
 ```

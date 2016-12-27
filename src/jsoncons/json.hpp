@@ -355,7 +355,7 @@ public:
                 }
 
                 String_holder_(const char_type* data, size_t length, allocator_type allocator)
-                    : String_holder_base_(allocator), string_(data, length, char_allocator_type(allocator))
+                    : String_holder_base_(allocator), string_(data, length, allocator)
                 {
                 }
 

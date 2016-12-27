@@ -174,9 +174,12 @@ bool operator!=(const pool_allocator<T> &s0, const pool_allocator<T> &s1)
 
 BOOST_AUTO_TEST_CASE(test_string_allocation)
 {
+
     pool a_pool(1024);
     pool_allocator<json> allocator(&a_pool); 
 
+    std::basic_string<char,std::char_traits<char>, pool_allocator<json>> s(allocator);
+/*
     typedef basic_json<char,json_traits<char>,pool_allocator<json>> myjson;
 
     {
@@ -188,6 +191,6 @@ BOOST_AUTO_TEST_CASE(test_string_allocation)
               << ", deallocate count = " << a_pool.deallocate_count_ << std::endl;
     BOOST_CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
     BOOST_CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
-
+*/
 }
 BOOST_AUTO_TEST_SUITE_END()
