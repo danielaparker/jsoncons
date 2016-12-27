@@ -1,6 +1,7 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
+#include <boost/interprocess/containers/string.hpp>
 #include <cstdlib> //std::system
 #include <jsoncons/json.hpp>
 
@@ -11,19 +12,21 @@ typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
 template<class CharT>
-struct b_json_traits : public json_traits<char>
+struct b_json_traits : public json_traits<CharT>
 {
-   template <class T,class Allocator>
-   using object_storage = boost::interprocess::vector<T,Allocator>;
+    using typename json_traits<CharT>::char_traits_type;
 
-   template <class T, class Allocator>
-   using array_storage = boost::interprocess::vector<T,Allocator>;
+    template <class T,class Allocator>
+    using object_storage = boost::interprocess::vector<T,Allocator>;
 
-   template <class Allocator>
-   using key_storage = boost::interprocess::vector<CharT,Allocator>;
+    template <class T, class Allocator>
+    using array_storage = boost::interprocess::vector<T,Allocator>;
 
-   template <class Allocator>
-   using string_storage = boost::interprocess::vector<CharT, Allocator>;
+    template <class Allocator>
+    using key_storage = boost::interprocess::basic_string<CharT, char_traits_type, Allocator>;
+
+    template <class Allocator>
+    using string_storage = boost::interprocess::basic_string<CharT, char_traits_type, Allocator>;
 };
 
 typedef basic_json<char,b_json_traits<char>,shmem_allocator> shm_json;
@@ -58,6 +61,11 @@ int main(int argc, char *argv[])
       o.set("price", 8.95);
 
       j->add(o);
+
+      shm_json a = shm_json::array(10,shm_json::object(allocator),allocator);
+      a[0]["first"] = 1;
+
+      j->add(a);
 
       std::pair<shm_json*,managed_shared_memory::size_type> res;
       res = segment.find<shm_json>("my json");

@@ -318,7 +318,7 @@ public:
 
                 String_holder_()
                     : String_holder_base_(), 
-                      string_('\0')
+                      string_()
                 {
                 }
                 String_holder_(const String_holder_& val)
@@ -350,19 +350,13 @@ public:
                 }
 
                 String_holder_(const char_type* data, size_t length)
-                    : String_holder_base_(), string_()
+                    : String_holder_base_(), string_(data)
                 {
-                    string_.reserve(length+1);
-                    string_.assign(data,data+length);
-                    string_.push_back(0);
                 }
 
                 String_holder_(const char_type* data, size_t length, allocator_type allocator)
-                    : String_holder_base_(allocator), string_(char_allocator_type(allocator))
+                    : String_holder_base_(allocator), string_(data, length, char_allocator_type(allocator))
                 {
-                    string_.reserve(length+1);
-                    string_.assign(data,data+length);
-                    string_.push_back(0);
                 }
 
                 const char_type* data() const
@@ -372,12 +366,12 @@ public:
 
                 const char_type* c_str() const
                 {
-                    return string_.data();
+                    return string_.c_str();
                 }
 
                 size_t length() const
                 {
-                    return string_.size()-1;
+                    return string_.size();
                 }
             private:
                 string_storage_type string_;
