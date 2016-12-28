@@ -125,3 +125,38 @@ int main(int argc, char *argv[])
    return 0;
 }
 ```
+Output:
+```
+Parent:
+[
+    10,
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    },
+    [
+        {
+            "first": 1
+        },
+        {}
+    ]
+]
+Child:
+[
+    10,
+    {
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    },
+    [
+        {
+            "first": 1
+        },
+        {}
+    ]
+]
+```

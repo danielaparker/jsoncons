@@ -483,29 +483,31 @@ j.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pd
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/managed_shared_memory.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/containers/vector.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/allocators/allocator.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/interprocess/containers/string.hpp<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>cstdlib<span class="pl-pds">&gt;</span></span> <span class="pl-c"><span class="pl-c">//</span>std::system</span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">boost</span>::interprocess<span class="pl-k">;</span>
 
 <span class="pl-k">typedef</span> boost::interprocess::allocator&lt;<span class="pl-k">int</span>,
         boost::interprocess::managed_shared_memory::segment_manager&gt; shmem_allocator;
 
 <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">CharT</span>&gt;
-<span class="pl-k">struct</span> <span class="pl-en">b_json_traits</span> : <span class="pl-k">public</span> <span class="pl-en">json_traits</span>&lt;<span class="pl-k">char</span>&gt;
+<span class="pl-k">struct</span> <span class="pl-en">b_json_traits</span> : <span class="pl-k">public</span> <span class="pl-en">json_traits</span>&lt;CharT&gt;
 {
-   <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>,<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
-   <span class="pl-k">using</span> object_storage = boost::interprocess::vector&lt;T,Allocator&gt;;
+    <span class="pl-k">using</span> <span class="pl-k">typename</span> json_traits&lt;CharT&gt;::char_traits_type;
 
-   <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
-   <span class="pl-k">using</span> array_storage = boost::interprocess::vector&lt;T,Allocator&gt;;
+    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>,<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
+    <span class="pl-k">using</span> object_storage = boost::interprocess::vector&lt;T,Allocator&gt;;
 
-   <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
-   <span class="pl-k">using</span> key_storage = boost::interprocess::vector&lt;CharT,Allocator&gt;;
+    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>, <span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
+    <span class="pl-k">using</span> array_storage = boost::interprocess::vector&lt;T,Allocator&gt;;
 
-   <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
-   <span class="pl-k">using</span> string_storage = boost::interprocess::vector&lt;CharT, Allocator&gt;;
+    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
+    <span class="pl-k">using</span> key_storage = boost::interprocess::basic_string&lt;CharT, char_traits_type, Allocator&gt;;
+
+    <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">Allocator</span>&gt;
+    <span class="pl-k">using</span> string_storage = boost::interprocess::basic_string&lt;CharT, char_traits_type, Allocator&gt;;
 };
 
 <span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,b_json_traits&lt;<span class="pl-k">char</span>&gt;,shmem_allocator&gt; shm_json;
@@ -518,12 +520,13 @@ j.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pd
       <span class="pl-c"><span class="pl-c">//</span>Remove shared memory on construction and destruction</span>
       <span class="pl-k">struct</span> <span class="pl-en">shm_remove</span>
       {
-         <span class="pl-en">shm_remove</span>() { <span class="pl-c1">shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
-         <span class="pl-en">~shm_remove</span>(){ <span class="pl-c1">shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
+         <span class="pl-en">shm_remove</span>() { <span class="pl-c1">boost::interprocess::shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
+         <span class="pl-en">~shm_remove</span>(){ <span class="pl-c1">boost::interprocess::shared_memory_object::remove</span>(<span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>); }
       } remover;
 
       <span class="pl-c"><span class="pl-c">//</span>Construct managed shared memory</span>
-      managed_shared_memory <span class="pl-smi">segment</span>(create_only, <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>, <span class="pl-c1">65536</span>);
+      boost::interprocess::managed_shared_memory <span class="pl-smi">segment</span>(boost::interprocess::create_only, 
+                                                         <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>, <span class="pl-c1">65536</span>);
 
       <span class="pl-c"><span class="pl-c">//</span>Initialize shared memory STL-compatible allocator</span>
       <span class="pl-k">const</span> shmem_allocator <span class="pl-smi">allocator</span>(segment.<span class="pl-c1">get_segment_manager</span>());
@@ -541,7 +544,12 @@ j.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pd
 
       j-&gt;<span class="pl-c1">add</span>(o);
 
-      std::pair&lt;shm_json*,managed_shared_memory::size_type&gt; res;
+      shm_json a = <span class="pl-c1">shm_json::array</span>(<span class="pl-c1">2</span>,<span class="pl-c1">shm_json::object</span>(allocator),allocator);
+      a[<span class="pl-c1">0</span>][<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>] = <span class="pl-c1">1</span>;
+
+      j-&gt;<span class="pl-c1">add</span>(a);
+
+      std::pair&lt;shm_json*, boost::interprocess::managed_shared_memory::size_type&gt; res;
       res = segment.<span class="pl-smi">find</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>);
 
       std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Parent:<span class="pl-pds">"</span></span> &lt;&lt; std::endl;
@@ -559,9 +567,10 @@ j.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pd
    }
    <span class="pl-k">else</span>{
       <span class="pl-c"><span class="pl-c">//</span>Open managed shared memory</span>
-      managed_shared_memory <span class="pl-smi">segment</span>(open_only, <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>);
+      boost::interprocess::managed_shared_memory <span class="pl-smi">segment</span>(boost::interprocess::open_only, 
+                                                         <span class="pl-s"><span class="pl-pds">"</span>MySharedMemory<span class="pl-pds">"</span></span>);
 
-      std::pair&lt;shm_json*,managed_shared_memory::size_type&gt; res;
+      std::pair&lt;shm_json*, boost::interprocess::managed_shared_memory::size_type&gt; res;
       res = segment.<span class="pl-smi">find</span>&lt;shm_json&gt;(<span class="pl-s"><span class="pl-pds">"</span>my json<span class="pl-pds">"</span></span>);
 
       <span class="pl-k">if</span> (res.<span class="pl-smi">first</span> != <span class="pl-c1">nullptr</span>)
@@ -580,26 +589,39 @@ j.set(<span class="pl-s"><span class="pl-pds">"</span>LastName<span class="pl-pd
    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
 }</pre></div>
 <p>Output:</p>
-<div class="highlight highlight-source-json"><pre>Parent:
+<pre><code>Parent:
 [
-    <span class="pl-c1">10</span>,
+    10,
     {
-        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>,
-        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>
-    }
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    },
+    [
+        {
+            "first": 1
+        },
+        {}
+    ]
 ]
 Child:
 [
-    <span class="pl-c1">10</span>,
+    10,
     {
-        <span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>reference<span class="pl-pds">"</span></span>,
-        <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">8.95</span>,
-        <span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Sayings of the Century<span class="pl-pds">"</span></span>
-    }
-]</pre></div>
+        "author": "Nigel Rees",
+        "category": "reference",
+        "price": 8.95,
+        "title": "Sayings of the Century"
+    },
+    [
+        {
+            "first": 1
+        },
+        {}
+    ]
+]
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
