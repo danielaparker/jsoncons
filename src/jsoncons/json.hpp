@@ -311,21 +311,7 @@ public:
             string_data(const Json_string_<json_type>& val)
                 : base_data(value_types::string_t)
             {
-                create(val.get_self_allocator(), val);
-            }
-
-            string_data(string_data&& val) JSONCONS_NOEXCEPT
-                : base_data(value_types::string_t)
-            {
-                Init_rv_(std::forward<string_data&&>(val), 
-                         typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
-            }
-
-            string_data(string_data&& val, const Allocator& a) JSONCONS_NOEXCEPT
-                : base_data(value_types::string_t)
-            {
-                Init_rv_(std::forward<string_data&&>(val), 
-                         typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
+                create(val.get_allocator(), val);
             }
 
             string_data(pointer ptr)
@@ -343,7 +329,7 @@ public:
             string_data(const string_data & val)
                 : base_data(value_types::string_t)
             {
-                create(val.ptr_->get_self_allocator(), *(val.ptr_));
+                create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             string_data(const string_data & val, const Allocator& a)
@@ -367,7 +353,7 @@ public:
 
             ~string_data()
             {
-                typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<Json_string_<json_type>> alloc(ptr_->get_self_allocator());
+                typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<Json_string_<json_type>> alloc(ptr_->get_allocator());
                 std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<Json_string_<json_type>>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
@@ -389,29 +375,7 @@ public:
 
             allocator_type get_allocator() const
             {
-                return ptr_->get_self_allocator();
-            }
-        private:
-
-            void Init_(const string_data& val)
-            {
-                create(string_holder_allocator_type(val.get_allocator()), *(val->ptr_));
-            }
-
-            void Init_(const string_data& val, const Allocator& a)
-            {
-                create(string_holder_allocator_type(a), val, a);
-            }
-
-            void Init_rv_(string_data&& val, std::true_type) JSONCONS_NOEXCEPT
-            {
-                ptr_ = val.ptr_;
-                val.type_id_ = value_types::null_t;
-            }
-
-            void Init_rv_(string_data&& val, std::false_type) JSONCONS_NOEXCEPT
-            {
-                Init_(val);
+                return ptr_->get_allocator();
             }
         };
 
@@ -451,7 +415,7 @@ public:
             explicit object_data(const object & val)
                 : base_data(value_types::object_t)
             {
-                create(val.get_self_allocator(), val);
+                create(val.get_allocator(), val);
             }
 
             explicit object_data(const object & val, const Allocator& a)
@@ -463,7 +427,7 @@ public:
             explicit object_data(const object_data & val)
                 : base_data(value_types::object_t)
             {
-                create(val.ptr_->get_self_allocator(), *(val.ptr_));
+                create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             explicit object_data(const object_data & val, const Allocator& a)
@@ -472,23 +436,9 @@ public:
                 create(object_allocator(a), *(val.ptr_), a);
             }
 
-            object_data(object_data&& val) JSONCONS_NOEXCEPT
-                : base_data(value_types::object_t)
-            {
-                Init_rv_(std::forward<object_data&&>(val), std::true_type());
-                         //typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
-            }
-
-            object_data(object_data&& val, const Allocator& a) JSONCONS_NOEXCEPT
-                : base_data(value_types::object_t)
-            {
-                Init_rv_(std::forward<object_data&&>(val), 
-                         typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
-            }
-
             ~object_data()
             {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_self_allocator());
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_allocator());
                 std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
@@ -505,31 +455,8 @@ public:
 
             allocator_type get_allocator() const
             {
-                return ptr_->get_self_allocator();
+                return ptr_->get_allocator();
             }
-        private:
-
-            void Init_(const object_data& val)
-            {
-                create(val.get_allocator(), *(val->ptr_));
-            }
-
-            void Init_(const object_data& val, const Allocator& a)
-            {
-                create(object_allocator(a), val, a);
-            }
-
-            void Init_rv_(object_data&& val, std::true_type) JSONCONS_NOEXCEPT
-            {
-                ptr_ = val.ptr_;
-                val.type_id_ = value_types::null_t;
-            }
-
-            void Init_rv_(object_data&& val, std::false_type) JSONCONS_NOEXCEPT
-            {
-                Init_(std::forward<object_data&&>(val));
-            }
-
         };
     public:
         struct array_data : public base_data
@@ -555,13 +482,13 @@ public:
 
             allocator_type get_allocator() const
             {
-                return ptr_->get_self_allocator();
+                return ptr_->get_allocator();
             }
 
             array_data(const array& val)
                 : base_data(value_types::array_t)
             {
-                create(val.get_self_allocator(), val);
+                create(val.get_allocator(), val);
             }
 
             array_data(pointer ptr)
@@ -579,7 +506,7 @@ public:
             array_data(const array_data & val)
                 : base_data(value_types::array_t)
             {
-                create(val.ptr_->get_self_allocator(), *(val.ptr_));
+                create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             array_data(const array_data & val, const Allocator& a)
@@ -595,23 +522,9 @@ public:
                 create(array_allocator(a), first, last, a);
             }
 
-            array_data(array_data&& val) JSONCONS_NOEXCEPT
-                : base_data(value_types::array_t)
-            {
-                Init_rv_(std::forward<array_data&&>(val), //std::true_type());
-                         typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
-            }
-
-            array_data(array_data&& val, const Allocator& a) JSONCONS_NOEXCEPT
-                : base_data(value_types::array_t)
-            {
-                Init_rv_(std::forward<array_data&&>(val),//std::true_type()); 
-                         typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
-            }
-
             ~array_data()
             {
-                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_self_allocator());
+                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_allocator());
                 std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(ptr_));
                 alloc.deallocate(ptr_,1);
             }
@@ -624,27 +537,6 @@ public:
             const array& value() const
             {
                 return *ptr_;
-            }
-
-            void Init_(const array_data& val)
-            {
-                create(array_allocator(val.get_allocator()), *(val.ptr_));
-            }
-
-            void Init_(const array_data& val, const Allocator& a)
-            {
-                create(array_allocator(a), val, a);
-            }
-
-            void Init_rv_(array_data&& val, std::true_type) JSONCONS_NOEXCEPT
-            {
-                ptr_ = val.ptr_;
-                val.type_id_ = value_types::null_t;
-            }
-
-            void Init_rv_(array_data&& val, std::false_type) JSONCONS_NOEXCEPT
-            {
-                Init_(std::forward<array_data&&>(val));
             }
         };
 
@@ -676,154 +568,10 @@ public:
             Init_(val,allocator);
         }
 
-        void Init_(const variant& val)
-        {
-            switch (val.type_id())
-            {
-            case value_types::null_t:
-                new(reinterpret_cast<void*>(&data_))null_data();
-                break;
-            case value_types::empty_object_t:
-                new(reinterpret_cast<void*>(&data_))empty_object_data();
-                break;
-            case value_types::double_t:
-                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
-                break;
-            case value_types::integer_t:
-                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
-                break;
-            case value_types::uinteger_t:
-                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
-                break;
-            case value_types::bool_t:
-                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
-                break;
-            case value_types::small_string_t:
-                new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
-                break;
-            case value_types::string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
-                break;
-            case value_types::object_t:
-                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
-                break;
-            case value_types::array_t:
-                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
-                break;
-            default:
-                break;
-            }
-        }
-
-        void Init_(const variant& val, const Allocator& a)
-        {
-            switch (val.type_id())
-            {
-            case value_types::null_t:
-            case value_types::empty_object_t:
-            case value_types::double_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::bool_t:
-            case value_types::small_string_t:
-                Init_(val);
-                break;
-            case value_types::string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
-                break;
-            case value_types::object_t:
-                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),a);
-                break;
-            case value_types::array_t:
-                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),a);
-                break;
-            default:
-                break;
-            }
-        }
-
         variant(variant&& val) JSONCONS_NOEXCEPT
         {
             Init_rv_(std::forward<variant&&>(val), 
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
-        }
-
-        void Init_rv_(variant&& val, std::true_type) JSONCONS_NOEXCEPT
-        {
-            switch (val.type_id())
-            {
-            case value_types::null_t:
-                new(reinterpret_cast<void*>(&data_))null_data();
-                break;
-            case value_types::empty_object_t:
-                new(reinterpret_cast<void*>(&data_))empty_object_data();
-                break;
-            case value_types::double_t:
-                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
-                break;
-            case value_types::integer_t:
-                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
-                break;
-            case value_types::uinteger_t:
-                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
-                break;
-            case value_types::bool_t:
-                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
-                break;
-            case value_types::small_string_t:
-                new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
-                break;
-            case value_types::string_t:
-                {
-                    new(reinterpret_cast<void*>(&data_))string_data(std::move(*(val.string_data_cast())));
-                }
-                break;
-            case value_types::object_t:
-                {
-                    new(reinterpret_cast<void*>(&data_))object_data(std::move(*(val.object_data_cast())));
-                }
-                break;
-            case value_types::array_t:
-                {
-                    new(reinterpret_cast<void*>(&data_))array_data(std::move(*(val.array_data_cast())));
-                }
-                break;
-            default:
-                break;
-            }
-        }
-
-        void Init_rv_(variant&& val, std::false_type) JSONCONS_NOEXCEPT
-        {
-            switch (val.type_id())
-            {
-            case value_types::null_t:
-            case value_types::empty_object_t:
-            case value_types::double_t:
-            case value_types::integer_t:
-            case value_types::uinteger_t:
-            case value_types::bool_t:
-            case value_types::small_string_t:
-                Init_rv_(std::forward<variant&&>(val), std::true_type());
-                break;
-            case value_types::string_t:
-                {
-                    Init_(val);
-                }
-                break;
-            case value_types::object_t:
-                {
-                    Init_(val);
-                }
-                break;
-            case value_types::array_t:
-                {
-                    Init_(val);
-                }
-                break;
-            default:
-                break;
-            }
         }
 
         explicit variant(null_type)
@@ -1042,6 +790,11 @@ public:
         const small_string_data* small_string_data_cast() const
         {
             return reinterpret_cast<const small_string_data*>(&data_);
+        }
+
+        string_data* string_data_cast()
+        {
+            return reinterpret_cast<string_data*>(&data_);
         }
 
         const string_data* string_data_cast() const
@@ -1417,6 +1170,141 @@ public:
                 }
             }
         }
+    private:
+
+        void Init_(const variant& val)
+        {
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+                new(reinterpret_cast<void*>(&data_))null_data();
+                break;
+            case value_types::empty_object_t:
+                new(reinterpret_cast<void*>(&data_))empty_object_data();
+                break;
+            case value_types::double_t:
+                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
+                break;
+            case value_types::integer_t:
+                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
+                break;
+            case value_types::uinteger_t:
+                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
+                break;
+            case value_types::bool_t:
+                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
+                break;
+            case value_types::small_string_t:
+                new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
+                break;
+            case value_types::string_t:
+                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
+                break;
+            case value_types::object_t:
+                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
+                break;
+            case value_types::array_t:
+                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
+                break;
+            default:
+                break;
+            }
+        }
+
+        void Init_(const variant& val, const Allocator& a)
+        {
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+            case value_types::empty_object_t:
+            case value_types::double_t:
+            case value_types::integer_t:
+            case value_types::uinteger_t:
+            case value_types::bool_t:
+            case value_types::small_string_t:
+                Init_(val);
+                break;
+            case value_types::string_t:
+                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
+                break;
+            case value_types::object_t:
+                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),a);
+                break;
+            case value_types::array_t:
+                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),a);
+                break;
+            default:
+                break;
+            }
+        }
+        void Init_rv_(variant&& val, std::true_type) JSONCONS_NOEXCEPT
+        {
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+            case value_types::empty_object_t:
+            case value_types::double_t:
+            case value_types::integer_t:
+            case value_types::uinteger_t:
+            case value_types::bool_t:
+            case value_types::small_string_t:
+                Init_(val);
+                break;
+            case value_types::string_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))string_data(val.string_data_cast()->ptr_);
+                    val.string_data_cast()->type_id_ = value_types::null_t;
+                }
+                break;
+            case value_types::object_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))object_data(val.object_data_cast()->ptr_);
+                    val.object_data_cast()->type_id_ = value_types::null_t;
+                }
+                break;
+            case value_types::array_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
+                    val.array_data_cast()->type_id_ = value_types::null_t;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
+        void Init_rv_(variant&& val, std::false_type) JSONCONS_NOEXCEPT
+        {
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+            case value_types::empty_object_t:
+            case value_types::double_t:
+            case value_types::integer_t:
+            case value_types::uinteger_t:
+            case value_types::bool_t:
+            case value_types::small_string_t:
+                Init_rv_(std::forward<variant&&>(val), std::true_type());
+                break;
+            case value_types::string_t:
+                {
+                    Init_(val);
+                }
+                break;
+            case value_types::object_t:
+                {
+                    Init_(val);
+                }
+                break;
+            case value_types::array_t:
+                {
+                    Init_(val);
+                }
+                break;
+            default:
+                break;
+            }
+        }
     };
 
     template <class ParentT>
@@ -1452,7 +1340,7 @@ public:
             auto it = val.find(string_view_type(key_.data(),key_.size()));
             if (it == val.object_range().end())
             {
-                it = val.set_(val.object_range().begin(),std::move(key_),object(val.object_value().get_self_allocator()));            
+                it = val.set_(val.object_range().begin(),std::move(key_),object(val.object_value().get_allocator()));            
             }
             return it->value();
         }
@@ -2413,7 +2301,7 @@ public:
         case value_types::empty_object_t: 
             create_object_implicitly();
         case value_types::object_t:
-            return json_proxy<json_type>(*this, key_storage_type(name.begin(),name.end(),char_allocator_type(object_value().get_self_allocator())));
+            return json_proxy<json_type>(*this, key_storage_type(name.begin(),name.end(),char_allocator_type(object_value().get_allocator())));
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
