@@ -712,7 +712,7 @@ public:
         variant(variant&& val) JSONCONS_NOEXCEPT
         {
             Init_rv_(std::forward<variant&&>(val), 
-                     std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
+                     typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
         }
 
         void Init_rv_(variant&& val, std::true_type) JSONCONS_NOEXCEPT
