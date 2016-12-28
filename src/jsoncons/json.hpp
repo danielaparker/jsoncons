@@ -570,7 +570,12 @@ public:
 
         variant(variant&& val) JSONCONS_NOEXCEPT
         {
-            Init_rv_(std::forward<variant&&>(val), 
+            Init_rv_(std::forward<variant&&>(val));
+        }
+
+        variant(variant&& val, const Allocator& allocator) JSONCONS_NOEXCEPT
+        {
+            Init_rv_(std::forward<variant&&>(val), allocator,
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
         }
 
@@ -1237,7 +1242,8 @@ public:
                 break;
             }
         }
-        void Init_rv_(variant&& val, std::true_type) JSONCONS_NOEXCEPT
+
+        void Init_rv_(variant&& val) JSONCONS_NOEXCEPT
         {
             switch (val.type_id())
             {
@@ -1273,7 +1279,12 @@ public:
             }
         }
 
-        void Init_rv_(variant&& val, std::false_type) JSONCONS_NOEXCEPT
+        void Init_rv_(variant&& val, const Allocator& a, std::true_type) JSONCONS_NOEXCEPT
+        {
+            Init_rv_(std::forward<variant&&>(val));
+        }
+
+        void Init_rv_(variant&& val, const Allocator& a, std::false_type) JSONCONS_NOEXCEPT
         {
             switch (val.type_id())
             {
@@ -1284,21 +1295,42 @@ public:
             case value_types::uinteger_t:
             case value_types::bool_t:
             case value_types::small_string_t:
-                Init_rv_(std::forward<variant&&>(val), std::true_type());
+                Init_(std::forward<variant&&>(val));
                 break;
             case value_types::string_t:
                 {
-                    Init_(val);
+                    if (a == val.string_data_cast()->get_allocator())
+                    {
+                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                    }
+                    else
+                    {
+                        Init_(val,a);
+                    }
                 }
                 break;
             case value_types::object_t:
                 {
-                    Init_(val);
+                    if (a == val.object_data_cast()->get_allocator())
+                    {
+                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                    }
+                    else
+                    {
+                        Init_(val,a);
+                    }
                 }
                 break;
             case value_types::array_t:
                 {
-                    Init_(val);
+                    if (a == val.array_data_cast()->get_allocator())
+                    {
+                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                    }
+                    else
+                    {
+                        Init_(val,a);
+                    }
                 }
                 break;
             default:
