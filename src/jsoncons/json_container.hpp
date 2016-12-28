@@ -52,6 +52,7 @@ template <class Json>
 class Json_string_ : public Json_string_base_<Json>
 {
 public:
+    typedef typename Json::allocator_type allocator_type;
     typedef typename Json::char_type char_type;
     typedef typename Json::string_storage_type string_storage_type;
     typedef typename string_storage_type::iterator iterator;
