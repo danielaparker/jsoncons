@@ -350,6 +350,7 @@ public:
             {
                 create(string_holder_allocator_type(a), data, length, a);
             }
+
             ~string_data()
             {
                 typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<Json_string_<json_type>> alloc(ptr_->get_self_allocator());

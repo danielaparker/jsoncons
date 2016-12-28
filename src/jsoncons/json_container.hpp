@@ -92,7 +92,7 @@ public:
     }
 
     Json_string_(const char_type* data, size_t length)
-        : Json_string_base_<Json>(), string_(data)
+        : Json_string_base_<Json>(), string_(data,length)
     {
     }
 
