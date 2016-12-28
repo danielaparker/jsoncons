@@ -4,11 +4,12 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_OBJECT_HPP
-#define JSONCONS_JSON_OBJECT_HPP
+#ifndef JSONCONS_JSON_CONTAINER_HPP
+#define JSONCONS_JSON_CONTAINER_HPP
 
 #include <string>
 #include <vector>
+#include <deque>
 #include <exception>
 #include <cstdlib>
 #include <cstring>
@@ -23,6 +24,325 @@
 #include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
+
+template <class Json>
+class Json_string_base_
+{
+public:
+    typedef typename Json::allocator_type allocator_type;
+
+    Json_string_base_()
+        : self_allocator_()
+    {
+    }
+    Json_string_base_(const allocator_type& allocator)
+        : self_allocator_(allocator)
+    {
+    }
+
+    allocator_type get_self_allocator() const
+    {
+        return self_allocator_;
+    }
+private:
+    allocator_type self_allocator_;
+};
+
+template <class Json>
+class Json_string_ : public Json_string_base_<Json>
+{
+public:
+    typedef typename Json::char_type char_type;
+    typedef typename Json::string_storage_type string_storage_type;
+    typedef typename string_storage_type::iterator iterator;
+    typedef typename string_storage_type::const_iterator const_iterator;
+    using Json_string_base_<Json>::get_self_allocator;
+
+    Json_string_()
+        : Json_string_base_<Json>(), 
+          string_()
+    {
+    }
+    Json_string_(const Json_string_& val)
+        : Json_string_base_<Json>(val.get_self_allocator()),
+          string_(val.string_)
+    {
+    }
+    Json_string_(const Json_string_& val, const allocator_type& allocator)
+        : Json_string_base_<Json>(allocator), 
+          string_(val.string_,char_allocator_type(allocator))
+    {
+    }
+
+    Json_string_(Json_string_&& val) JSONCONS_NOEXCEPT
+        : Json_string_base_<Json>(val.get_self_allocator()), 
+          string_(std::move(val.string_))
+    {
+    }
+    Json_string_(Json_string_&& val, const allocator_type& allocator)
+        : Json_string_base_<Json>(allocator), 
+          string_(std::move(val.string_),char_allocator_type(allocator))
+    {
+    }
+
+    explicit Json_string_(const allocator_type& allocator)
+        : Json_string_base_<Json>(allocator), 
+          string_(char_allocator_type(allocator))
+    {
+    }
+
+    Json_string_(const char_type* data, size_t length)
+        : Json_string_base_<Json>(), string_(data)
+    {
+    }
+
+    Json_string_(const char_type* data, size_t length, allocator_type allocator)
+        : Json_string_base_<Json>(allocator), 
+          string_(data, length, allocator)
+    {
+    }
+
+    const char_type* data() const
+    {
+        return string_.data();
+    }
+
+    const char_type* c_str() const
+    {
+        return string_.c_str();
+    }
+
+    size_t length() const
+    {
+        return string_.size();
+    }
+private:
+    string_storage_type string_;
+
+    Json_string_<Json>& operator=(const Json_string_<Json>&) = delete;
+};
+
+// json_array
+
+template <class Json>
+class Json_array_base_
+{
+public:
+    typedef typename Json::allocator_type allocator_type;
+
+public:
+    Json_array_base_()
+        : self_allocator_()
+    {
+    }
+    Json_array_base_(const allocator_type& allocator)
+        : self_allocator_(allocator)
+    {
+    }
+
+    allocator_type get_self_allocator() const
+    {
+        return self_allocator_;
+    }
+
+    allocator_type self_allocator_;
+};
+
+template <class Json>
+class json_array : public Json_array_base_<Json>
+{
+public:
+    typedef typename Json::allocator_type allocator_type;
+    typedef Json value_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> val_allocator_type;
+
+    typedef typename Json::array_storage_type array_storage_type;
+
+    typedef typename array_storage_type::iterator iterator;
+    typedef typename array_storage_type::const_iterator const_iterator;
+
+    typedef typename std::iterator_traits<iterator>::reference reference;
+    typedef typename std::iterator_traits<const_iterator>::reference const_reference;
+
+    using Json_array_base_<Json>::get_self_allocator;
+
+    json_array()
+        : Json_array_base_<Json>(), 
+          elements_()
+    {
+    }
+
+    explicit json_array(const allocator_type& allocator)
+        : Json_array_base_<Json>(allocator), 
+          elements_(val_allocator_type(allocator))
+    {
+    }
+
+    explicit json_array(size_t n, 
+                        const allocator_type& allocator = allocator_type())
+        : Json_array_base_<Json>(allocator), 
+          elements_(n,Json(),val_allocator_type(allocator))
+    {
+    }
+
+    explicit json_array(size_t n, 
+                        const Json& value, 
+                        const allocator_type& allocator = allocator_type())
+        : Json_array_base_<Json>(allocator), 
+          elements_(n,value,val_allocator_type(allocator))
+    {
+    }
+
+    template <class InputIterator>
+    json_array(InputIterator begin, InputIterator end, const allocator_type& allocator = allocator_type())
+        : Json_array_base_<Json>(allocator), 
+          elements_(begin,end,val_allocator_type(allocator))
+    {
+    }
+    json_array(const json_array& val)
+        : Json_array_base_<Json>(val.get_self_allocator()),
+          elements_(val.elements_)
+    {
+    }
+    json_array(const json_array& val, const allocator_type& allocator)
+        : Json_array_base_<Json>(allocator), 
+          elements_(val.elements_,val_allocator_type(allocator))
+    {
+    }
+
+    json_array(json_array&& val) JSONCONS_NOEXCEPT
+        : Json_array_base_<Json>(val.get_self_allocator()), 
+          elements_(std::move(val.elements_))
+    {
+    }
+    json_array(json_array&& val, const allocator_type& allocator)
+        : Json_array_base_<Json>(allocator), 
+          elements_(std::move(val.elements_),val_allocator_type(allocator))
+    {
+    }
+
+    json_array(std::initializer_list<Json> init)
+        : Json_array_base_<Json>(), 
+          elements_(std::move(init))
+    {
+    }
+
+    json_array(std::initializer_list<Json> init, 
+               const allocator_type& allocator)
+        : Json_array_base_<Json>(allocator), 
+          elements_(std::move(init),val_allocator_type(allocator))
+    {
+    }
+    ~json_array()
+    {
+    }
+
+    void swap(json_array<Json>& val)
+    {
+        elements_.swap(val.elements_);
+    }
+
+    size_t size() const {return elements_.size();}
+
+    size_t capacity() const {return elements_.capacity();}
+
+    void clear() {elements_.clear();}
+
+    void shrink_to_fit() 
+    {
+        for (size_t i = 0; i < elements_.size(); ++i)
+        {
+            elements_[i].shrink_to_fit();
+        }
+        elements_.shrink_to_fit();
+    }
+
+    void reserve(size_t n) {elements_.reserve(n);}
+
+    void resize(size_t n) {elements_.resize(n);}
+
+    void resize(size_t n, const Json& val) {elements_.resize(n,val);}
+
+    void remove_range(size_t from_index, size_t to_index) 
+    {
+        JSONCONS_ASSERT(from_index <= to_index);
+        JSONCONS_ASSERT(to_index <= elements_.size());
+        elements_.erase(elements_.begin()+from_index,elements_.begin()+to_index);
+    }
+
+    void erase(iterator first, iterator last) 
+    {
+        elements_.erase(first,last);
+    }
+
+    Json& operator[](size_t i) {return elements_[i];}
+
+    const Json& operator[](size_t i) const {return elements_[i];}
+
+    template <class T, class U=allocator_type,
+             typename std::enable_if<is_stateless<U>::value
+                >::type* = nullptr>
+    void add(T&& value)
+    {
+        elements_.emplace_back(Json(std::forward<T&&>(value)));
+    }
+
+    template <class T, class U=allocator_type,
+             typename std::enable_if<!is_stateless<U>::value
+                >::type* = nullptr>
+    void add(T&& value)
+    {
+        elements_.emplace_back(std::forward<T&&>(value),get_self_allocator());
+    }
+
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+    template <class T, class U=allocator_type>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    add(const_iterator pos, T&& value)
+    {
+        iterator it = elements_.begin() + (pos - elements_.begin());
+        return elements_.emplace(it, Json(std::forward<T&&>(value)));
+    }
+#else
+    template <class T, class U=allocator_type>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    add(const_iterator pos, T&& value)
+    {
+        return elements_.emplace(pos, Json(std::forward<T&&>(value)));
+    }
+#endif
+
+    iterator begin() {return elements_.begin();}
+
+    iterator end() {return elements_.end();}
+
+    const_iterator begin() const {return elements_.begin();}
+
+    const_iterator end() const {return elements_.end();}
+
+    bool operator==(const json_array<Json>& rhs) const
+    {
+        if (size() != rhs.size())
+        {
+            return false;
+        }
+        for (size_t i = 0; i < size(); ++i)
+        {
+            if (elements_[i] != rhs.elements_[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+private:
+    array_storage_type elements_;
+
+    json_array& operator=(const json_array<Json>&) = delete;
+};
+
+// json_object
 
 template <class BidirectionalIt,class BinaryPredicate>
 BidirectionalIt last_wins_unique_sequence(BidirectionalIt first, BidirectionalIt last, BinaryPredicate compare)
@@ -1102,8 +1422,6 @@ public:
 private:
     json_object& operator=(const json_object&) = delete;
 };
-
-
 
 }
 
