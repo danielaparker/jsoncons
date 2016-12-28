@@ -179,8 +179,6 @@ BOOST_AUTO_TEST_CASE(test_string_allocation)
     pool a_pool(1024);
     pool_allocator<json> allocator(&a_pool); 
 
-    std::basic_string<char,std::char_traits<char>, pool_allocator<json>> s(allocator);
-
     typedef basic_json<char,json_traits<char>,pool_allocator<json>> myjson;
 
     {
