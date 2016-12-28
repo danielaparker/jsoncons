@@ -635,6 +635,16 @@ public:
 
         variant(const variant& val)
         {
+            Init_(val);
+        }
+
+        variant(const variant& val, const Allocator& allocator)
+        {
+            Init_(val,allocator);
+        }
+
+        void Init_(const variant& val)
+        {
             switch (val.type_id())
             {
             case value_types::null_t:
@@ -672,39 +682,27 @@ public:
             }
         }
 
-        variant(const variant& val, const Allocator& allocator)
+        void Init_(const variant& val, const Allocator& a)
         {
             switch (val.type_id())
             {
             case value_types::null_t:
-                new(reinterpret_cast<void*>(&data_))null_data();
-                break;
             case value_types::empty_object_t:
-                new(reinterpret_cast<void*>(&data_))empty_object_data();
-                break;
             case value_types::double_t:
-                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
-                break;
             case value_types::integer_t:
-                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
-                break;
             case value_types::uinteger_t:
-                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
-                break;
             case value_types::bool_t:
-                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
-                break;
             case value_types::small_string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(val.small_string_data_cast()->data(), val.small_string_data_cast()->length(),allocator);
+                Init_(val);
                 break;
             case value_types::string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),allocator);
+                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
                 break;
             case value_types::object_t:
-                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),allocator);
+                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),a);
                 break;
             case value_types::array_t:
-                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),allocator);
+                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),a);
                 break;
             default:
                 break;
@@ -712,6 +710,12 @@ public:
         }
 
         variant(variant&& val) JSONCONS_NOEXCEPT
+        {
+            Init_rv_(std::forward<variant&&>(val), 
+                     std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
+        }
+
+        void Init_rv_(variant&& val, std::true_type) JSONCONS_NOEXCEPT
         {
             switch (val.type_id())
             {
@@ -752,6 +756,39 @@ public:
                 {
                     new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
                     new(reinterpret_cast<void*>(&(val.data_)))null_data();
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
+        void Init_rv_(variant&& val, std::false_type) JSONCONS_NOEXCEPT
+        {
+            switch (val.type_id())
+            {
+            case value_types::null_t:
+            case value_types::empty_object_t:
+            case value_types::double_t:
+            case value_types::integer_t:
+            case value_types::uinteger_t:
+            case value_types::bool_t:
+            case value_types::small_string_t:
+                Init_rv_(std::forward<variant&&>(val), std::true_type());
+                break;
+            case value_types::string_t:
+                {
+                    Init_(val);
+                }
+                break;
+            case value_types::object_t:
+                {
+                    Init_(val);
+                }
+                break;
+            case value_types::array_t:
+                {
+                    Init_(val);
                 }
                 break;
             default:
