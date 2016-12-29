@@ -773,10 +773,10 @@ public:
     void insert(InputIt first, InputIt last, UnaryPredicate pred)
     {
         size_t count = std::distance(first,last);
-        members_.reserve(members_.size() + count);
+        this->members_.reserve(this->members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(pred(*s));
+            this->members_.emplace_back(pred(*s));
         }
         std::stable_sort(this->members_.begin(),this->members_.end(),
                          [](const value_type& a, const value_type& b){return a.key().compare(b.key()) < 0;});
@@ -1219,10 +1219,10 @@ public:
     void insert(InputIt first, InputIt last, UnaryPredicate pred)
     {
         size_t count = std::distance(first,last);
-        members_.reserve(members_.size() + count);
+        this->members_.reserve(this->members_.size() + count);
         for (auto s = first; s != last; ++s)
         {
-            members_.emplace_back(pred(*s));
+            this->members_.emplace_back(pred(*s));
         }
         auto it = last_wins_unique_sequence(this->members_.begin(), this->members_.end(),
                               [](const value_type& a, const value_type& b){ return a.key().compare(b.key());});
