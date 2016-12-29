@@ -43,7 +43,7 @@ inline bool is_trailing_surrogate(uint16_t c)
 
 // json_text_traits
 
-template <class CharT>
+template <class CharT, class Enable=void>
 struct json_text_traits
 {
 };
@@ -116,46 +116,48 @@ struct Json_text_traits_
     }
 };
 
-template <>
-struct json_text_traits<char> : Json_text_traits_<char>
+template <class CharT>
+struct json_text_traits<CharT,
+                        typename std::enable_if<std::is_integral<CharT>::value &&
+                        sizeof(CharT)==sizeof(uint8_t)>::type> : public Json_text_traits_<CharT>
 {
-    static const std::pair<const char*,size_t>& null_literal() 
+    static const std::pair<const CharT*,size_t>& null_literal() 
     {
-        static const std::pair<const char*,size_t> value = {"null",4};
+        static const std::pair<const CharT*,size_t> value = {"null",4};
         return value;
     }
 
-    static const std::pair<const char*,size_t>& true_literal() 
+    static const std::pair<const CharT*,size_t>& true_literal() 
     {
-        static const std::pair<const char*,size_t> value = {"true",4};
+        static const std::pair<const CharT*,size_t> value = {"true",4};
         return value;
     }
 
-    static const std::pair<const char*,size_t>& false_literal() 
+    static const std::pair<const CharT*,size_t>& false_literal() 
     {
-        static const std::pair<const char*,size_t> value = {"false",5};
+        static const std::pair<const CharT*,size_t> value = {"false",5};
         return value;
     }
 
-    static size_t detect_bom(const char* it, size_t length)
+    static size_t detect_bom(const CharT* it, size_t length)
     {
         size_t count = 0;
         if (length >= 3)
         {
-            uint32_t bom = static_cast<uint32_t>(static_cast<unsigned char>(it[0]) |
-                                                (static_cast<unsigned char>(it[1]) << 8) | 
-                                                (static_cast<unsigned char>(it[2]) << 16));
+            uint32_t bom = static_cast<uint32_t>(static_cast<uint8_t>(it[0]) |
+                                                (static_cast<uint8_t>(it[1]) << 8) |
+                                                (static_cast<uint8_t>(it[2]) << 16));
             if ((bom & 0xFFFFFF) == 0xBFBBEF)  
                 count += 3;
         }
         return count;
     }
 
-    static uint32_t char_sequence_to_codepoint(const char* it, 
-                                               const char* end,
-                                               const char** stop)
+    static uint32_t char_sequence_to_codepoint(const CharT* it, 
+                                               const CharT* end,
+                                               const CharT** stop)
     {
-        char c = *it;
+        CharT c = *it;
         uint32_t u(c >= 0 ? c : 256 + c );
         uint32_t cp = u;
         if (u < 0x80)
@@ -199,11 +201,11 @@ struct json_text_traits<char> : Json_text_traits_<char>
         return cp;
     }
 
-    static size_t codepoint_length(const char* it, 
-                                   const char* end)
+    static size_t codepoint_length(const CharT* it, 
+                                   const CharT* end)
     {
         size_t length = 0;
-        char c = *it;
+        CharT c = *it;
         uint32_t u(c >= 0 ? c : 256 + c );
         if (u < 0x80)
         {
@@ -228,25 +230,25 @@ struct json_text_traits<char> : Json_text_traits_<char>
     {
         if (cp <= 0x7f)
         {
-            s.push_back(static_cast<char>(cp));
+            s.push_back(static_cast<CharT>(cp));
         }
         else if (cp <= 0x7FF)
         {
-            s.push_back(static_cast<char>(0xC0 | (0x1f & (cp >> 6))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
+            s.push_back(static_cast<CharT>(0xC0 | (0x1f & (cp >> 6))));
+            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
         }
         else if (cp <= 0xFFFF)
         {
-            s.push_back(0xE0 | static_cast<char>((0xf & (cp >> 12))));
-            s.push_back(0x80 | static_cast<char>((0x3f & (cp >> 6))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
+            s.push_back(0xE0 | static_cast<CharT>((0xf & (cp >> 12))));
+            s.push_back(0x80 | static_cast<CharT>((0x3f & (cp >> 6))));
+            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
         }
         else if (cp <= 0x10FFFF)
         {
-            s.push_back(static_cast<char>(0xF0 | (0x7 & (cp >> 18))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & (cp >> 12))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & (cp >> 6))));
-            s.push_back(static_cast<char>(0x80 | (0x3f & cp)));
+            s.push_back(static_cast<CharT>(0xF0 | (0x7 & (cp >> 18))));
+            s.push_back(static_cast<CharT>(0x80 | (0x3f & (cp >> 12))));
+            s.push_back(static_cast<CharT>(0x80 | (0x3f & (cp >> 6))));
+            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
         }
     }
 
