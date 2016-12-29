@@ -28,7 +28,7 @@ public:
     static const int default_stack_size = 1000;
 
     typedef Json json_type;
-    typedef typename Json::kvp_type  kvp_type ;
+    typedef typename Json::kvp_type kvp_type;
     typedef typename Json::string_type string_type;
     typedef typename Json::key_storage_type key_storage_type;
     typedef typename string_type::allocator_type char_allocator;
@@ -176,22 +176,14 @@ private:
         JSONCONS_ASSERT(stack_offsets_.size() > 0);
         if (stack_[stack_offsets_.back()].value_.is_object())
         {
-            auto& j = stack_[stack_offsets_.back()].value_;
-            auto& o = j.object_value();
-
-            auto it = stack_.begin() + (stack_offsets_.back()+1);
-            auto end = stack_.begin() + top_;
-            size_t count = end - it;
-            o.reserve(count);
-            while (it < end)
-            {
-                o.bulk_insert(std::move(it->name_),
-                              std::move(it->value_));
-                ++it;
-            }
-            o.end_bulk_insert();
-
-            top_ -= count; 
+            size_t count = top_ - (stack_offsets_.back() + 1);
+            auto s = stack_.begin() + (stack_offsets_.back()+1);
+            auto send = s + count;
+            stack_[stack_offsets_.back()].value_.object_value().insert(
+                std::make_move_iterator(s),
+                std::make_move_iterator(send),
+                [](stack_item&& val){return kvp_type(std::move(val.name_),std::move(val.value_));});
+            top_ -= count;
         }
         else
         {

@@ -152,7 +152,7 @@ public:
 };
 
 template <class Json>
-class json_array : public Json_array_base_<Json>
+class json_array: public Json_array_base_<Json>
 {
 public:
     typedef typename Json::allocator_type allocator_type;
@@ -769,14 +769,15 @@ public:
         }
     }
 
-    template <class T>
-    void bulk_insert(key_storage_type&& name, T&& value)
+    template<class InputIt, class UnaryPredicate>
+    void insert(InputIt first, InputIt last, UnaryPredicate pred)
     {
-        this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                              std::forward<T&&>(value));
-    }
-    void end_bulk_insert()
-    {
+        size_t count = std::distance(first,last);
+        members_.reserve(members_.size() + count);
+        for (auto s = first; s != last; ++s)
+        {
+            members_.emplace_back(pred(*s));
+        }
         std::stable_sort(this->members_.begin(),this->members_.end(),
                          [](const value_type& a, const value_type& b){return a.key().compare(b.key()) < 0;});
         auto it = std::unique(this->members_.rbegin(), this->members_.rend(),
@@ -1214,14 +1215,15 @@ public:
         }
     }
 
-    template <class T> inline
-    void bulk_insert(key_storage_type&& name, T&& value)
+    template<class InputIt, class UnaryPredicate>
+    void insert(InputIt first, InputIt last, UnaryPredicate pred)
     {
-        this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                              std::forward<T&&>(value));
-    }
-    void end_bulk_insert()
-    {
+        size_t count = std::distance(first,last);
+        members_.reserve(members_.size() + count);
+        for (auto s = first; s != last; ++s)
+        {
+            members_.emplace_back(pred(*s));
+        }
         auto it = last_wins_unique_sequence(this->members_.begin(), this->members_.end(),
                               [](const value_type& a, const value_type& b){ return a.key().compare(b.key());});
         this->members_.erase(it,this->members_.end());
