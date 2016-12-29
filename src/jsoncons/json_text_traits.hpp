@@ -254,16 +254,31 @@ struct json_text_traits<CharT,
 
 };
 
-template <class CharT,size_t Size>
-struct json_wchar_traits
-{
-};
-
-template <>
-struct json_wchar_traits<wchar_t,2> // assume utf16
+template <class CharT>
+struct json_text_traits<CharT,
+                        typename std::enable_if<std::is_integral<CharT>::value &&
+                        sizeof(CharT)==sizeof(uint16_t)>::type> : public Json_text_traits_<CharT>
 {
 
-    static size_t detect_bom(const wchar_t* it, size_t length)
+    static const std::pair<const CharT*,size_t>& null_literal() 
+    {
+        static const std::pair<const CharT*,size_t> value = {L"null",4};
+        return value;
+    }
+
+    static const std::pair<const CharT*,size_t>& true_literal() 
+    {
+        static const std::pair<const CharT*,size_t> value = {L"true",4};
+        return value;
+    }
+
+    static const std::pair<const CharT*,size_t>& false_literal() 
+    {
+        static const std::pair<const CharT*,size_t> value = {L"false",5};
+        return value;
+    }
+
+    static size_t detect_bom(const CharT* it, size_t length)
     {
         size_t count = 0;
         if (length >= 1)
@@ -281,16 +296,16 @@ struct json_wchar_traits<wchar_t,2> // assume utf16
     {
         if (cp <= 0xFFFF)
         {
-            s.push_back(static_cast<wchar_t>(cp));
+            s.push_back(static_cast<CharT>(cp));
         }
         else if (cp <= 0x10FFFF)
         {
-            s.push_back(static_cast<wchar_t>((cp >> 10) + min_lead_surrogate - (0x10000 >> 10)));
-            s.push_back(static_cast<wchar_t>((cp & 0x3ff) + min_trail_surrogate));
+            s.push_back(static_cast<CharT>((cp >> 10) + min_lead_surrogate - (0x10000 >> 10)));
+            s.push_back(static_cast<CharT>((cp & 0x3ff) + min_trail_surrogate));
         }
     }
 
-    static uint32_t char_sequence_to_codepoint(const wchar_t* it, const wchar_t* end, const wchar_t** stop)
+    static uint32_t char_sequence_to_codepoint(const CharT* it, const CharT* end, const CharT** stop)
     {
         uint32_t cp = (0xffff & *it);
         if ((cp >= min_lead_surrogate && cp <= max_lead_surrogate) && (end-it) > 1) // surrogate pair
@@ -310,7 +325,7 @@ struct json_wchar_traits<wchar_t,2> // assume utf16
         return cp;
     }
 
-    static size_t codepoint_length(const wchar_t* it, const wchar_t* end)
+    static size_t codepoint_length(const CharT* it, const CharT* end)
     {
         size_t length = 1;
 
@@ -323,11 +338,31 @@ struct json_wchar_traits<wchar_t,2> // assume utf16
     }
 };
 
-template <>
-struct json_wchar_traits<wchar_t,4> // assume utf32
+template <class CharT>
+struct json_text_traits<CharT,
+                        typename std::enable_if<std::is_integral<CharT>::value &&
+                        sizeof(CharT)==sizeof(uint32_t)>::type> : public Json_text_traits_<CharT>
 {
 
-    static size_t detect_bom(const wchar_t* it, size_t length)
+    static const std::pair<const CharT*,size_t>& null_literal() 
+    {
+        static const std::pair<const CharT*,size_t> value = {L"null",4};
+        return value;
+    }
+
+    static const std::pair<const CharT*,size_t>& true_literal() 
+    {
+        static const std::pair<const CharT*,size_t> value = {L"true",4};
+        return value;
+    }
+
+    static const std::pair<const CharT*,size_t>& false_literal() 
+    {
+        static const std::pair<const CharT*,size_t> value = {L"false",5};
+        return value;
+    }
+
+    static size_t detect_bom(const CharT* it, size_t length)
     {
         size_t count = 0;
         if (length >= 1)
@@ -345,67 +380,24 @@ struct json_wchar_traits<wchar_t,4> // assume utf32
     {
         if (cp <= 0xFFFF)
         {
-            s.push_back(static_cast<wchar_t>(cp));
+            s.push_back(static_cast<CharT>(cp));
         }
         else if (cp <= 0x10FFFF)
         {
-            s.push_back(static_cast<wchar_t>(cp));
+            s.push_back(static_cast<CharT>(cp));
         }
     }
 
-    static uint32_t char_sequence_to_codepoint(const wchar_t* it, const wchar_t*, const wchar_t** stop)
+    static uint32_t char_sequence_to_codepoint(const CharT* it, const CharT*, const CharT** stop)
     {
         uint32_t cp = static_cast<uint32_t>(*it);
         *stop = it + 1;
         return cp;
     }
 
-    static size_t codepoint_length(const wchar_t* it, const wchar_t* end)
+    static size_t codepoint_length(const CharT* it, const CharT* end)
     {
         return (end > it) ? 1 : 0;
-    }
-};
-
-template <>
-struct json_text_traits<wchar_t>  : Json_text_traits_<wchar_t>
-{
-
-    static const std::pair<const wchar_t*,size_t>& null_literal() 
-    {
-        static const std::pair<const wchar_t*,size_t> value = {L"null",4};
-        return value;
-    }
-
-    static const std::pair<const wchar_t*,size_t>& true_literal() 
-    {
-        static const std::pair<const wchar_t*,size_t> value = {L"true",4};
-        return value;
-    }
-
-    static const std::pair<const wchar_t*,size_t>& false_literal() 
-    {
-        static const std::pair<const wchar_t*,size_t> value = {L"false",5};
-        return value;
-    }
-
-    static size_t detect_bom(const wchar_t* it, size_t length)
-    {
-        return json_wchar_traits<wchar_t,sizeof(wchar_t)>::detect_bom(it, length);
-    }
-
-    static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
-    {
-        json_wchar_traits<wchar_t,sizeof(wchar_t)>::append_codepoint_to_string(cp,s);
-    }
-
-    static uint32_t char_sequence_to_codepoint(const wchar_t* it, const wchar_t* end, const wchar_t** stop)
-    {
-        return json_wchar_traits<wchar_t,sizeof(wchar_t)>::char_sequence_to_codepoint(it, end, stop);
-    }
-
-    static size_t codepoint_length(const wchar_t* it, const wchar_t* end)
-    {
-        return json_wchar_traits<wchar_t, sizeof(wchar_t)>::codepoint_length(it, end);
     }
 };
 
