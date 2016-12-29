@@ -39,17 +39,12 @@ public:
         : self_allocator_(allocator)
     {
     }
-
-    allocator_type get_allocator() const
-    {
-        return self_allocator_;
-    }
 private:
     allocator_type self_allocator_;
 };
 
 template <class Json>
-class Json_string_ : public Json_string_base_<Json>
+class Json_string_ 
 {
 public:
     typedef typename Json::allocator_type allocator_type;
@@ -58,48 +53,49 @@ public:
     typedef typename Json::string_storage_type string_storage_type;
     typedef typename string_storage_type::iterator iterator;
     typedef typename string_storage_type::const_iterator const_iterator;
-    using Json_string_base_<Json>::get_allocator;
+    //using Json_string_base_<Json>::get_allocator;
 
     Json_string_()
-        : Json_string_base_<Json>(), 
+        : //Json_string_base_<Json>(), 
           string_()
     {
     }
     Json_string_(const Json_string_& val)
-        : Json_string_base_<Json>(val.get_allocator()),
+        : //Json_string_base_<Json>(val.get_allocator()),
           string_(val.string_)
     {
     }
     Json_string_(const Json_string_& val, const allocator_type& allocator)
-        : Json_string_base_<Json>(allocator), 
+        : //Json_string_base_<Json>(allocator), 
           string_(val.string_,char_allocator_type(allocator))
     {
     }
 
     Json_string_(Json_string_&& val) JSONCONS_NOEXCEPT
-        : Json_string_base_<Json>(val.get_allocator()), 
+        : //Json_string_base_<Json>(val.get_allocator()), 
           string_(std::move(val.string_))
     {
     }
     Json_string_(Json_string_&& val, const allocator_type& allocator)
-        : Json_string_base_<Json>(allocator), 
+        : //Json_string_base_<Json>(allocator), 
           string_(std::move(val.string_),char_allocator_type(allocator))
     {
     }
 
     explicit Json_string_(const allocator_type& allocator)
-        : Json_string_base_<Json>(allocator), 
+        : //Json_string_base_<Json>(allocator), 
           string_(char_allocator_type(allocator))
     {
     }
 
     Json_string_(const char_type* data, size_t length)
-        : Json_string_base_<Json>(), string_(data,length)
+        : //Json_string_base_<Json>(), 
+        string_(data,length)
     {
     }
 
     Json_string_(const char_type* data, size_t length, allocator_type allocator)
-        : Json_string_base_<Json>(allocator), 
+        : //Json_string_base_<Json>(allocator), 
           string_(data, length, allocator)
     {
     }
@@ -117,6 +113,11 @@ public:
     size_t length() const
     {
         return string_.size();
+    }
+
+    allocator_type get_allocator() const
+    {
+        return string_.get_allocator();
     }
 private:
     string_storage_type string_;

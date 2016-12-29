@@ -675,6 +675,11 @@ public:
 
         ~variant()
         {
+            Destroy_();
+        }
+
+        void Destroy_()
+        {
             switch (type_id())
             {
             case value_types::string_t:
@@ -695,20 +700,7 @@ public:
         {
             if (this != &val)
             {
-                switch (type_id())
-                {
-                case value_types::string_t:
-                    reinterpret_cast<string_data*>(&data_)->~string_data();
-                    break;
-                case value_types::object_t:
-                    reinterpret_cast<object_data*>(&data_)->~object_data();
-                    break;
-                case value_types::array_t:
-                    reinterpret_cast<array_data*>(&data_)->~array_data();
-                    break;
-                default:
-                    break;
-                }
+                Destroy_();
                 switch (val.type_id())
                 {
                 case value_types::null_t:
@@ -752,6 +744,8 @@ public:
         {
             if (this != &val)
             {
+                Destroy_();
+                new(reinterpret_cast<void*>(&data_))null_data();
                 swap(val);
             }
             return *this;
@@ -2169,7 +2163,6 @@ public:
     {
     }
 
-
     basic_json(json_type&& other) JSONCONS_NOEXCEPT
         : var_(std::move(other.var_))
     {
@@ -2180,7 +2173,7 @@ public:
     {
     }
 
-    basic_json(const array& val)
+    basic_json(const variant& val)
         : var_(val)
     {
     }
@@ -2190,7 +2183,7 @@ public:
     {
     }
 
-    basic_json(const variant& val)
+    basic_json(const array& val)
         : var_(val)
     {
     }
