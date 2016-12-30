@@ -1222,7 +1222,7 @@ public:
             case states::escape_u4: 
                 {
                     append_codepoint(*p_);
-                    if (cp_ >= min_lead_surrogate && cp_ <= max_lead_surrogate)
+                    if (cp_ >= uni_sur_high_start && cp_ <= uni_sur_high_end)
                     {
                         stack_.back() = states::escape_expect_surrogate_pair1;
                     }

@@ -74,6 +74,48 @@ BOOST_AUTO_TEST_CASE(test_utf8_to_utf32)
     BOOST_CHECK(U"Hello world" == target);
 }
 
+BOOST_AUTO_TEST_CASE(test_utf8_next_codepoint)
+{
+    std::string source = "Hello world";
+    const char* p = source.data();
+    char32_t codepoint;
+
+    auto result = json_text_traits<char>::next_codepoint(&p,source.data()+source.length(),
+                                           &codepoint,
+                                           uni_conversion_flags::strict);
+    BOOST_CHECK(result == uni_conversion_result::ok);
+    BOOST_CHECK(codepoint == 'H');
+    BOOST_CHECK(p == source.data()+1);
+}
+
+BOOST_AUTO_TEST_CASE(test_utf16_next_codepoint)
+{
+    std::u16string source = u"Hello world";
+    const char16_t* p = source.data();
+    char32_t codepoint;
+
+    auto result = json_text_traits<char16_t>::next_codepoint(&p,source.data()+source.length(),
+                                           &codepoint,
+                                           uni_conversion_flags::strict);
+    BOOST_CHECK(result == uni_conversion_result::ok);
+    BOOST_CHECK(codepoint == 'H');
+    BOOST_CHECK(p == source.data()+1);
+}
+
+BOOST_AUTO_TEST_CASE(test_utf32_next_codepoint)
+{
+    std::u32string source = U"Hello world";
+    const char32_t* p = source.data();
+    char32_t codepoint;
+
+    auto result = json_text_traits<char32_t>::next_codepoint(&p,source.data()+source.length(),
+                                           &codepoint,
+                                           uni_conversion_flags::strict);
+    BOOST_CHECK(result == uni_conversion_result::ok);
+    BOOST_CHECK(codepoint == 'H');
+    BOOST_CHECK(p == source.data()+1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

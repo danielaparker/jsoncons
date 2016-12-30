@@ -83,19 +83,19 @@ const int half_shift  = 10; // used for shifting by 10 bits
 const uint32_t half_base = 0x0010000UL;
 const uint32_t half_mask = 0x3FFUL;
 
-const uint16_t min_lead_surrogate = 0xD800;
-const uint16_t max_lead_surrogate = 0xDBFF;
-const uint16_t min_trail_surrogate = 0xDC00;
-const uint16_t max_trail_surrogate = 0xDFFF;
+const uint16_t uni_sur_high_start = 0xD800;
+const uint16_t uni_sur_high_end = 0xDBFF;
+const uint16_t uni_sur_low_start = 0xDC00;
+const uint16_t uni_sur_low_end = 0xDFFF;
 
 inline bool is_leading_surrogate(uint16_t c)
 {
-    return c >= min_lead_surrogate && c <= max_lead_surrogate;
+    return c >= uni_sur_high_start && c <= uni_sur_high_end;
 }
 
 inline bool is_trailing_surrogate(uint16_t c)
 {
-    return c >= min_trail_surrogate && c <= max_trail_surrogate;
+    return c >= uni_sur_low_start && c <= uni_sur_low_end;
 }
 
 
@@ -249,7 +249,7 @@ struct json_text_traits<CharT,
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
     to_utf8(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<UTF8,STraits,SAllocator>& target, uni_conversion_flags flags) 
+            std::basic_string<UTF8,STraits,SAllocator>& target, uni_conversion_flags) 
     {
         target.assign(*source_begin,source_end);
         uni_conversion_result result = uni_conversion_result::ok;
@@ -258,12 +258,69 @@ struct json_text_traits<CharT,
 
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    from_utf8(
-            const UTF8** source_begin, const UTF8* source_end, 
-            std::basic_string<CharT,STraits,SAllocator>& target, uni_conversion_flags flags) 
+    from_utf8(const UTF8** source_begin, const UTF8* source_end, 
+              std::basic_string<CharT,STraits,SAllocator>& target, 
+              uni_conversion_flags) 
     {
         target.assign(*source_begin,source_end);
         uni_conversion_result result = uni_conversion_result::ok;
+        return result;
+    }
+
+    template <class UTF32>
+    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
+    next_codepoint(const CharT** source_begin, const CharT* source_end, 
+                                         UTF32* target, 
+                                         uni_conversion_flags flags) 
+    {
+        uni_conversion_result result = uni_conversion_result::ok;
+
+        const CharT* source = *source_begin;
+
+        unsigned short extraBytesToRead = trailing_bytes_for_utf8[*source];
+        if (extraBytesToRead >= source_end - source) {
+            result = uni_conversion_result::source_exhausted;
+            return result;
+        }
+        /* Do this check whether lenient or strict */
+        if (!json_text_traits<CharT>::is_legal(source, extraBytesToRead+1)) {
+            result = uni_conversion_result::source_illegal;
+            return result;
+        }
+        /*
+         * The cases all fall through. See "Note A" below.
+         */
+        UTF32 ch = 0;
+        switch (extraBytesToRead) {
+            case 5: ch += *source++; ch <<= 6;
+            case 4: ch += *source++; ch <<= 6;
+            case 3: ch += *source++; ch <<= 6;
+            case 2: ch += *source++; ch <<= 6;
+            case 1: ch += *source++; ch <<= 6;
+            case 0: ch += *source++;
+        }
+        ch -= offsets_from_utf8[extraBytesToRead];
+
+        if (ch <= uni_max_legal_utf32) {
+            /*
+             * UTF-16 surrogate values are illegal in UTF-32, and anything
+             * over Plane 17 (> 0x10FFFF) is illegal.
+             */
+            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+                if (flags == uni_conversion_flags::strict) {
+                    source -= (extraBytesToRead+1); /* return to the illegal value itself */
+                    result = uni_conversion_result::source_illegal;
+                } else {
+                    *target = uni_replacement_char;
+                }
+            } else {
+                *target = ch;
+            }
+        } else { /* i.e., ch > UNI_MAX_LEGAL_UTF32 */
+            result = uni_conversion_result::source_illegal;
+            *target = uni_replacement_char;
+        }
+        *source_begin = source;
         return result;
     }
 
@@ -399,14 +456,14 @@ struct json_text_traits<CharT,
             const uint32_t byteMark = 0x80; 
             uint32_t ch = *source++;
             /* If we have a surrogate pair, convert to uint32_t first. */
-            if (ch >= min_lead_surrogate && ch <= max_lead_surrogate) {
+            if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) {
                 /* If the 16 bits following the high surrogate are in the source buffer... */
                 if (source < source_end) {
                     uint32_t ch2 = *source;
                     /* If it's a low surrogate, convert to uint32_t. */
-                    if (ch2 >= min_trail_surrogate && ch2 <= max_trail_surrogate) {
-                        ch = ((ch - min_lead_surrogate) << half_shift)
-                            + (ch2 - min_trail_surrogate) + half_base;
+                    if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
+                        ch = ((ch - uni_sur_high_start) << half_shift)
+                            + (ch2 - uni_sur_low_start) + half_base;
                         ++source;
                     } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
                         --source; /* return to the illegal value itself */
@@ -420,7 +477,7 @@ struct json_text_traits<CharT,
                 }
             } else if (flags == uni_conversion_flags::strict) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (ch >= min_trail_surrogate && ch <= max_trail_surrogate) {
+                if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) {
                     --source; /* return to the illegal value itself */
                     result = uni_conversion_result::source_illegal;
                     break;
@@ -487,7 +544,7 @@ struct json_text_traits<CharT,
 
             if (ch <= uni_max_bmp) { /* Target is a character <= 0xFFFF */
                 /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (ch >= min_lead_surrogate && ch <= max_trail_surrogate) {
+                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
                     if (flags == uni_conversion_flags::strict) {
                         source -= (extra_bytes_to_read+1); /* return to the illegal value itself */
                         result = uni_conversion_result::source_illegal;
@@ -496,7 +553,7 @@ struct json_text_traits<CharT,
                         target.push_back(uni_replacement_char);
                     }
                 } else {
-                    target.push_back(ch); /* normal case */
+                    target.push_back((uint16_t)ch); /* normal case */
                 }
             } else if (ch > uni_max_utf16) {
                 if (flags == uni_conversion_flags::strict) {
@@ -509,10 +566,53 @@ struct json_text_traits<CharT,
             } else {
                 /* target is a character in range 0xFFFF - 0x10FFFF. */
                 ch -= half_base;
-                target.push_back(((ch >> half_shift) + min_lead_surrogate));
-                target.push_back(((ch & half_mask) + min_trail_surrogate));
+                target.push_back((uint16_t)((ch >> half_shift) + uni_sur_high_start));
+                target.push_back((uint16_t)((ch & half_mask) + uni_sur_low_start));
             }
         }
+        *source_begin = source;
+        return result;
+    }
+
+    template <class UTF32>
+    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
+    next_codepoint(const CharT** source_begin, const CharT* source_end, 
+                                         UTF32* target, 
+                                         uni_conversion_flags flags) 
+    {
+        uni_conversion_result result = uni_conversion_result::ok;
+        const CharT* source = *source_begin;
+        uint32_t ch, ch2;
+
+        ch = *source++;
+        /* If we have a surrogate pair, convert to UTF32 first. */
+        if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) {
+            /* If the 16 bits following the high surrogate are in the source buffer... */
+            if (source < source_end) {
+                ch2 = *source;
+                /* If it's a low surrogate, convert to UTF32. */
+                if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
+                    ch = ((ch - uni_sur_high_start) << half_shift)
+                        + (ch2 - uni_sur_low_start) + half_base;
+                    ++source;
+                } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
+                    --source; /* return to the illegal value itself */
+                    result = uni_conversion_result::source_illegal;
+                    return result;
+                }
+            } else { /* We don't have the 16 bits following the high surrogate. */
+                --source; /* return to the high surrogate */
+                result = uni_conversion_result::source_exhausted;
+            }
+        } else if (flags == uni_conversion_flags::strict) {
+            /* UTF-16 surrogate values are illegal in UTF-32 */
+            if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) {
+                --source; /* return to the illegal value itself */
+                result = uni_conversion_result::source_illegal;
+            }
+        }
+        *target = ch;
+
         *source_begin = source;
         return result;
     }
@@ -557,18 +657,18 @@ struct json_text_traits<CharT,
         }
         else if (cp <= 0x10FFFF)
         {
-            s.push_back(static_cast<CharT>((cp >> 10) + min_lead_surrogate - (0x10000 >> 10)));
-            s.push_back(static_cast<CharT>((cp & 0x3ff) + min_trail_surrogate));
+            s.push_back(static_cast<CharT>((cp >> 10) + uni_sur_high_start - (0x10000 >> 10)));
+            s.push_back(static_cast<CharT>((cp & 0x3ff) + uni_sur_low_start));
         }
     }
 
     static uint32_t char_sequence_to_codepoint(const CharT* it, const CharT* end, const CharT** stop)
     {
         uint32_t cp = (0xffff & *it);
-        if ((cp >= min_lead_surrogate && cp <= max_lead_surrogate) && (end-it) > 1) // surrogate pair
+        if ((cp >= uni_sur_high_start && cp <= uni_sur_high_end) && (end-it) > 1) // surrogate pair
         {
             uint32_t trail_surrogate = 0xffff & *(++it);
-            cp = (cp << 10) + trail_surrogate + 0x10000u - (min_lead_surrogate << 10) - min_trail_surrogate;
+            cp = (cp << 10) + trail_surrogate + 0x10000u - (uni_sur_high_start << 10) - uni_sur_low_start;
             *stop = it + 1;
         }
         else if (end > it)
@@ -587,7 +687,7 @@ struct json_text_traits<CharT,
         size_t length = 1;
 
         uint32_t cp = (0xffff & *it);
-        if ((cp >= min_lead_surrogate && cp <= max_lead_surrogate) && (end-it) > 1) // surrogate pair
+        if ((cp >= uni_sur_high_start && cp <= uni_sur_high_end) && (end-it) > 1) // surrogate pair
         {
             length = 2;
         }
@@ -635,7 +735,7 @@ struct json_text_traits<CharT,
             ch = *source++;
             if (flags == uni_conversion_flags::strict ) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (ch >= min_lead_surrogate && ch <= max_trail_surrogate) {
+                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
                     --source; /* return to the illegal value itself */
                     result = uni_conversion_result::source_illegal;
                     break;
@@ -704,7 +804,7 @@ struct json_text_traits<CharT,
                  * UTF-16 surrogate values are illegal in UTF-32, and anything
                  * over Plane 17 (> 0x10FFFF) is illegal.
                  */
-                if (ch >= min_lead_surrogate && ch <= max_trail_surrogate) {
+                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
                     if (flags == uni_conversion_flags::strict) {
                         source -= (extra_bytes_to_read+1); /* return to the illegal value itself */
                         result = uni_conversion_result::source_illegal;
@@ -722,6 +822,19 @@ struct json_text_traits<CharT,
         }
         *source_begin = source;
         return result;
+    }
+
+    template <class UTF32>
+    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
+    next_codepoint(const CharT** source_begin, const CharT*, 
+                                         UTF32* target, 
+                                         uni_conversion_flags) 
+    {
+        const CharT* source = *source_begin;
+        *target = *source++;
+        *source_begin = source;
+
+        return uni_conversion_result::ok;
     }
 
     static size_t detect_bom(const CharT* it, size_t length)
