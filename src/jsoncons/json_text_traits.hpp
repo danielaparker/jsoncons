@@ -112,19 +112,19 @@ struct Json_text_traits_
     static const std::pair<const CharT*,size_t> null_literal() 
     {
         static const CharT data[] = {'n','u','l','l'};
-        return std::pair<const CharT*,size_t>{data,sizeof(data)/sizeof(CharT)};
+        return std::pair<const CharT*,size_t>{data,4};
     }
 
     static const std::pair<const CharT*,size_t> true_literal() 
     {
         static const CharT data[] = {'t','r','u','e'};
-        return std::pair<const CharT*,size_t>{data,sizeof(data)/sizeof(CharT)};
+        return std::pair<const CharT*,size_t>{data,4};
     }
 
     static const std::pair<const CharT*,size_t> false_literal() 
     {
         static const CharT data[] = {'f','a','l','s','e'};
-        return std::pair<const CharT*,size_t>{data,sizeof(data)/sizeof(CharT)};
+        return std::pair<const CharT*,size_t>{data,5};
     }
 
     static bool is_control_character(CharT c)
