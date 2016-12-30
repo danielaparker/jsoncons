@@ -49,6 +49,7 @@ class Encode_message_pack_
 {
     std::vector<uint8_t> v_;
 public:
+    typedef typename Json::char_type char_type;
     typedef typename Json::string_view_type string_view_type;
 
     std::vector<uint8_t> encode(const Json& jval)
@@ -478,9 +479,19 @@ public:
         }
     }
 
-    void encode_string(typename Json::string_view_type sv)
+    void encode_string(string_view_type sv)
     {
-        const size_t length = sv.length();
+        std::basic_string<uint8_t> target;
+        const char_type* p = sv.data();
+        auto rc = json_text_traits<char_type>::to_utf8(
+            &p, sv.data()+sv.length(), target, 
+            uni_conversion_flags::strict);
+        if (rc != uni_conversion_result::ok)
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+        }
+
+        const size_t length = target.length();
         if (length <= 31)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
@@ -507,7 +518,7 @@ public:
 
         for (size_t i = 0; i < length; ++i)
         {
-            v_.push_back(sv.data()[i]);
+            v_.push_back(target.data()[i]);
         }
     }
 };
@@ -528,6 +539,8 @@ class Decode_message_pack_
     std::vector<uint8_t>::const_iterator end_;
     std::vector<uint8_t>::const_iterator it_;
 public:
+    typedef typename Json::char_type char_type;
+
     Decode_message_pack_(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
         : begin_(begin), end_(end), it_(begin)
     {
@@ -576,7 +589,15 @@ public:
                 const size_t len = *pos & 0x1f;
                 auto offset = &(*(pos + 1));
                 it_ += len; 
-                return Json(reinterpret_cast<const typename Json::char_type*>(offset), len);
+
+                std::basic_string<char_type> target;
+                auto rc = json_text_traits<char_type>::from_utf8(
+                    &offset,offset+len,target,uni_conversion_flags::strict);
+                if (rc != uni_conversion_result::ok)
+                {
+                    JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                }
+                return Json(target);
             }
         }
         else if (*pos >= 0xe0) 
@@ -677,7 +698,16 @@ public:
                     const auto len = from_big_endian<uint8_t>(pos,end_);
                     auto offset = &(*(pos + 2));
                     it_ += len + 1; 
-                    return std::string(reinterpret_cast<const char*>(offset), len);
+
+                    std::basic_string<char_type> target;
+                    auto rc = json_text_traits<char_type>::from_utf8(
+                        &offset,offset+len,target,uni_conversion_flags::strict);
+                    if (rc != uni_conversion_result::ok)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                    }
+                    return target;
+                    //return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
                 case msgpack_format::str16_cd: 
@@ -685,7 +715,16 @@ public:
                     const auto len = from_big_endian<uint16_t>(pos,end_);
                     auto offset = &(*(pos + 3));
                     it_ += len + 2; 
-                    return std::string(reinterpret_cast<const char*>(offset), len);
+
+                    std::basic_string<char_type> target;
+                    auto rc = json_text_traits<char_type>::from_utf8(
+                        &offset,offset+len,target,uni_conversion_flags::strict);
+                    if (rc != uni_conversion_result::ok)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                    }
+                    return target;
+                    //return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
                 case msgpack_format::str32_cd: 
@@ -693,7 +732,17 @@ public:
                     const auto len = from_big_endian<uint32_t>(pos,end_);
                     auto offset = &(*(pos + 5));
                     it_ += len + 4; 
-                    return std::string(reinterpret_cast<const char*>(offset), len);
+
+                    std::basic_string<char_type> target;
+                    auto rc = json_text_traits<char_type>::from_utf8(
+                        &offset,offset+len,target,uni_conversion_flags::strict);
+                    if (rc != uni_conversion_result::ok)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                    }
+                    return target;
+
+                    //return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
                 case msgpack_format::array16_cd: 

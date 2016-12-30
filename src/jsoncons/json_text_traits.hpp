@@ -157,21 +157,6 @@ struct Json_text_traits_
         }
         return count;
     }
-
-    static uint32_t codepoint_at(const CharT* it, 
-                                 const CharT* end,
-                                 size_t index)
-    {
-        uint32_t cp = 0;
-        const CharT* p = it;
-        size_t count = 0;
-        while (p < end && count <= index)
-        {
-            cp = json_text_traits<CharT>::char_sequence_to_codepoint(p,end,&p);
-            ++count;
-        }
-        return cp;
-    }
 };
 
 enum class uni_conversion_result
@@ -222,7 +207,7 @@ struct json_text_traits<CharT,
      */
 
     static bool is_legal(const CharT *source, int length) {
-        CharT a;
+        uint8_t a;
         const CharT *srcptr = source+length;
         switch (length) {
         default: return false;
@@ -231,7 +216,7 @@ struct json_text_traits<CharT,
         case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
         case 2: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
 
-            switch (*source) {
+            switch (static_cast<uint8_t>(*source)) {
                 /* no fall-through in this inner switch */
                 case 0xE0: if (a < 0xA0) return false; break;
                 case 0xED: if (a > 0x9F) return false; break;
@@ -240,9 +225,9 @@ struct json_text_traits<CharT,
                 default:   if (a < 0x80) return false;
             }
 
-        case 1: if (*source >= 0x80 && *source < 0xC2) return false;
+        case 1: if (static_cast<uint8_t>(*source) >= 0x80 && static_cast<uint8_t>(*source) < 0xC2) return false;
         }
-        if (*source > 0xF4) return false;
+        if (static_cast<uint8_t>(*source) > 0xF4) return false;
         return true;
     }
 
@@ -277,7 +262,7 @@ struct json_text_traits<CharT,
 
         const CharT* source = *source_begin;
 
-        unsigned short extraBytesToRead = trailing_bytes_for_utf8[*source];
+        unsigned short extraBytesToRead = trailing_bytes_for_utf8[(uint8_t)(*source)];
         if (extraBytesToRead >= source_end - source) {
             result = uni_conversion_result::source_exhausted;
             return result;
@@ -292,12 +277,12 @@ struct json_text_traits<CharT,
          */
         UTF32 ch = 0;
         switch (extraBytesToRead) {
-            case 5: ch += *source++; ch <<= 6;
-            case 4: ch += *source++; ch <<= 6;
-            case 3: ch += *source++; ch <<= 6;
-            case 2: ch += *source++; ch <<= 6;
-            case 1: ch += *source++; ch <<= 6;
-            case 0: ch += *source++;
+            case 5: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+            case 4: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+            case 3: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+            case 2: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+            case 1: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+            case 0: ch += static_cast<uint8_t>(*source++);
         }
         ch -= offsets_from_utf8[extraBytesToRead];
 
@@ -336,54 +321,6 @@ struct json_text_traits<CharT,
                 count += 3;
         }
         return count;
-    }
-
-    static uint32_t char_sequence_to_codepoint(const CharT* it, 
-                                               const CharT* end,
-                                               const CharT** stop)
-    {
-        CharT c = *it;
-        uint32_t u(c >= 0 ? c : 256 + c );
-        uint32_t cp = u;
-        if (u < 0x80)
-        {
-            *stop = it + 1;
-        }
-        else if ((u >> 5) == 0x6 && (end-it) > 1)
-        {
-            c = *(++it);
-            u = (c >= 0 ? c : 256 + c );
-            cp = ((cp << 6) & 0x7ff) + (u & 0x3f);
-            *stop = it + 1;
-        }
-        else if ((u >> 4) == 0xe && (end-it) > 2)
-        {
-            c = *(++it);
-            u = (c >= 0 ? c : 256 + c );
-            cp = ((cp << 12) & 0xffff) + ((static_cast<uint32_t>(0xff & u) << 6) & 0xfff);
-            c = *(++it);
-            u = (c >= 0 ? c : 256 + c );
-            cp += (u) & 0x3f;
-            *stop = it + 1;
-        }
-        else if ((u >> 3) == 0x1e && (end-it) > 3)
-        {
-            c = *(++it);
-            u = (c >= 0 ? c : 256 + c );
-            cp = ((cp << 18) & 0x1fffff) + ((static_cast<uint32_t>(0xff & u) << 12) & 0x3ffff);
-            c = *(++it);
-            u = (c >= 0 ? c : 256 + c );
-            cp += (static_cast<uint32_t>(0xff & u) << 6) & 0xfff;
-            c = *(++it);
-            u = (c >= 0 ? c : 256 + c );
-            cp += (u) & 0x3f;
-            *stop = it + 1;
-        }
-        else
-        {
-            *stop = it;
-        }
-        return cp;
     }
 
     static size_t codepoint_length(const CharT* it, 
@@ -520,7 +457,7 @@ struct json_text_traits<CharT,
         const UTF8* source = *source_begin;
         while (source < source_end) {
             uint32_t ch = 0;
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*source];
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*source)];
             if (extra_bytes_to_read >= source_end - source) {
                 result = uni_conversion_result::source_exhausted; break;
             }
@@ -533,12 +470,12 @@ struct json_text_traits<CharT,
              * The cases all fall through. See "Note A" below.
              */
             switch (extra_bytes_to_read) {
-                case 5: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
-                case 4: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
-                case 3: ch += *source++; ch <<= 6;
-                case 2: ch += *source++; ch <<= 6;
-                case 1: ch += *source++; ch <<= 6;
-                case 0: ch += *source++;
+                case 5: ch += static_cast<uint8_t>(*source++); ch <<= 6; /* remember, illegal UTF-8 */
+                case 4: ch += static_cast<uint8_t>(*source++); ch <<= 6; /* remember, illegal UTF-8 */
+                case 3: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+                case 2: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+                case 1: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+                case 0: ch += static_cast<uint8_t>(*source++);
             }
             ch -= offsets_from_utf8[extra_bytes_to_read];
 
@@ -662,26 +599,6 @@ struct json_text_traits<CharT,
         }
     }
 
-    static uint32_t char_sequence_to_codepoint(const CharT* it, const CharT* end, const CharT** stop)
-    {
-        uint32_t cp = (0xffff & *it);
-        if ((cp >= uni_sur_high_start && cp <= uni_sur_high_end) && (end-it) > 1) // surrogate pair
-        {
-            uint32_t trail_surrogate = 0xffff & *(++it);
-            cp = (cp << 10) + trail_surrogate + 0x10000u - (uni_sur_high_start << 10) - uni_sur_low_start;
-            *stop = it + 1;
-        }
-        else if (end > it)
-        {
-            *stop = it+1;
-        }
-        else
-        {
-            *stop = it;
-        }
-        return cp;
-    }
-
     static size_t codepoint_length(const CharT* it, const CharT* end)
     {
         size_t length = 1;
@@ -777,7 +694,7 @@ struct json_text_traits<CharT,
         const UTF8* source = *source_begin;
         while (source < source_end) {
             uint32_t ch = 0;
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*source];
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*source)];
             if (extra_bytes_to_read >= source_end - source) {
                 result = uni_conversion_result::source_exhausted; break;
             }
@@ -790,12 +707,12 @@ struct json_text_traits<CharT,
              * The cases all fall through. See "Note A" below.
              */
             switch (extra_bytes_to_read) {
-                case 5: ch += *source++; ch <<= 6;
-                case 4: ch += *source++; ch <<= 6;
-                case 3: ch += *source++; ch <<= 6;
-                case 2: ch += *source++; ch <<= 6;
-                case 1: ch += *source++; ch <<= 6;
-                case 0: ch += *source++;
+                case 5: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+                case 4: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+                case 3: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+                case 2: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+                case 1: ch += static_cast<uint8_t>(*source++); ch <<= 6;
+                case 0: ch += static_cast<uint8_t>(*source++);
             }
             ch -= offsets_from_utf8[extra_bytes_to_read];
 
@@ -861,13 +778,6 @@ struct json_text_traits<CharT,
         {
             s.push_back(static_cast<CharT>(cp));
         }
-    }
-
-    static uint32_t char_sequence_to_codepoint(const CharT* it, const CharT*, const CharT** stop)
-    {
-        uint32_t cp = static_cast<uint32_t>(*it);
-        *stop = it + 1;
-        return cp;
     }
 
     static size_t codepoint_length(const CharT* it, const CharT* end)

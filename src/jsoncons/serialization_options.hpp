@@ -288,13 +288,13 @@ void escape_string(const CharT* s,
             else if (json_text_traits<CharT>::is_control_character(c) || options.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
-                const CharT* stop = nullptr;
-                uint32_t cp = json_text_traits<CharT>::char_sequence_to_codepoint(it, end, &stop);
-                if (it == stop)
+                uint32_t cp;
+                auto result = json_text_traits<CharT>::next_codepoint(&it, end, &cp, uni_conversion_flags::strict);
+                if (result != uni_conversion_result::ok)
                 {
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");
                 }
-                it = stop - 1;
+                --it;
                 if (json_text_traits<CharT>::is_non_ascii_codepoint(cp) || json_text_traits<CharT>::is_control_character(c))
                 {
                     if (cp > 0xFFFF)

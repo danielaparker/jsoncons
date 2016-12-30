@@ -88,6 +88,72 @@ BOOST_AUTO_TEST_CASE(test_utf8_next_codepoint)
     BOOST_CHECK(p == source.data()+1);
 }
 
+BOOST_AUTO_TEST_CASE(test_utf8_next_codepoint2)
+{
+    std::string source{"\u0040\u0040\u0000\u0011",4};
+    const char* p = source.data();
+    char32_t codepoint;
+
+    auto result1 = json_text_traits<char>::next_codepoint(&p,source.data()+source.length(),
+                                           &codepoint,
+                                           uni_conversion_flags::strict);
+    BOOST_CHECK(result1 == uni_conversion_result::ok);
+    BOOST_CHECK(codepoint == '@');
+    BOOST_CHECK(p == source.data()+1);
+
+    auto result2 = json_text_traits<char>::next_codepoint(&p, source.data() + source.length(),
+        &codepoint,
+        uni_conversion_flags::strict);
+    BOOST_CHECK(result2 == uni_conversion_result::ok);
+    BOOST_CHECK(codepoint == '@');
+    BOOST_CHECK(p == source.data() + 2);
+
+    auto result3 = json_text_traits<char>::next_codepoint(&p, source.data() + source.length(),
+        &codepoint,
+        uni_conversion_flags::strict);
+    BOOST_CHECK(result3 == uni_conversion_result::ok);
+    //BOOST_CHECK(codepoint == '@');
+    BOOST_CHECK(p == source.data() + 3);
+
+    auto result4 = json_text_traits<char>::next_codepoint(&p, source.data() + source.length(),
+        &codepoint,
+        uni_conversion_flags::strict);
+    BOOST_CHECK(result4 == uni_conversion_result::ok);
+    //BOOST_CHECK(codepoint == '@');
+    BOOST_CHECK(p == source.data() + 4);
+}
+
+BOOST_AUTO_TEST_CASE(test_utf8_next_codepoint3)
+{
+    std::string source{"\x7f\xdf\xbf\xe0\xa0\x80",6};
+    const char* p = source.data();
+    char32_t codepoint;
+
+    auto result1 = json_text_traits<char>::next_codepoint(&p,source.data()+source.length(),
+                                           &codepoint,
+                                           uni_conversion_flags::strict);
+    BOOST_REQUIRE(result1 == uni_conversion_result::ok);
+    //BOOST_CHECK(codepoint == '@');
+    BOOST_CHECK(p == source.data()+1);
+
+    auto result2 = json_text_traits<char>::next_codepoint(&p,source.data()+source.length(),
+                                           &codepoint,
+                                           uni_conversion_flags::strict);
+    BOOST_REQUIRE(result2 == uni_conversion_result::ok);
+
+    //BOOST_CHECK(codepoint == '@');
+    BOOST_CHECK(p == source.data()+3);
+
+    auto result3 = json_text_traits<char>::next_codepoint(&p, source.data() + source.length(),
+        &codepoint,
+        uni_conversion_flags::strict);
+    BOOST_REQUIRE(result3 == uni_conversion_result::ok);
+
+    //BOOST_CHECK(codepoint == '@');
+    BOOST_CHECK(p == source.data() + 6);
+
+}
+
 BOOST_AUTO_TEST_CASE(test_utf16_next_codepoint)
 {
     std::u16string source = u"Hello world";
