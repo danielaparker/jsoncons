@@ -109,6 +109,23 @@ struct json_text_traits
 template <class CharT>
 struct Json_text_traits_
 {
+    static const std::pair<const CharT*,size_t> null_literal() 
+    {
+        static const CharT data[] = {'n','u','l','l'};
+        return std::pair<const CharT*,size_t>{data,sizeof(data)/sizeof(CharT)};
+    }
+
+    static const std::pair<const CharT*,size_t> true_literal() 
+    {
+        static const CharT data[] = {'t','r','u','e'};
+        return std::pair<const CharT*,size_t>{data,sizeof(data)/sizeof(CharT)};
+    }
+
+    static const std::pair<const CharT*,size_t> false_literal() 
+    {
+        static const CharT data[] = {'f','a','l','s','e'};
+        return std::pair<const CharT*,size_t>{data,sizeof(data)/sizeof(CharT)};
+    }
 
     static bool is_control_character(CharT c)
     {
@@ -177,24 +194,6 @@ struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint8_t)>::type> : public Json_text_traits_<CharT>
 {
-    static const std::pair<const CharT*,size_t>& null_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {"null",4};
-        return value;
-    }
-
-    static const std::pair<const CharT*,size_t>& true_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {"true",4};
-        return value;
-    }
-
-    static const std::pair<const CharT*,size_t>& false_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {"false",5};
-        return value;
-    }
-
     /*
      * Utility routine to tell whether a sequence of bytes is legal UTF-8.
      * This must be called with the length pre-determined by the first byte.
@@ -554,24 +553,6 @@ struct json_text_traits<CharT,
         return result;
     }
 
-    static const std::pair<const CharT*,size_t>& null_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {L"null",4};
-        return value;
-    }
-
-    static const std::pair<const CharT*,size_t>& true_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {L"true",4};
-        return value;
-    }
-
-    static const std::pair<const CharT*,size_t>& false_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {L"false",5};
-        return value;
-    }
-
     static size_t detect_bom(const CharT* it, size_t length)
     {
         size_t count = 0;
@@ -617,25 +598,6 @@ struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint32_t)>::type> : public Json_text_traits_<CharT>
 {
-
-    static const std::pair<const CharT*,size_t>& null_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {L"null",4};
-        return value;
-    }
-
-    static const std::pair<const CharT*,size_t>& true_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {L"true",4};
-        return value;
-    }
-
-    static const std::pair<const CharT*,size_t>& false_literal() 
-    {
-        static const std::pair<const CharT*,size_t> value = {L"false",5};
-        return value;
-    }
-
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
     to_utf8(const CharT** source_begin, const CharT* source_end, 
