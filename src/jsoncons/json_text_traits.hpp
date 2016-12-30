@@ -26,6 +26,53 @@ static bool is_continuation_byte(unsigned char ch)
     return (ch & 0xC0) == 0x80;
 }
 
+/*
+ * Magic values subtracted from a buffer value during UTF8 conversion.
+ * This table contains as many values as there might be trailing bytes
+ * in a UTF-8 sequence.
+ */
+const uint32_t offsetsFromUTF8[6] = { 0x00000000UL, 0x00003080UL, 0x000E2080UL, 
+              0x03C82080UL, 0xFA082080UL, 0x82082080UL };
+
+/*
+ * Once the bits are split out into bytes of UTF-8, this is a mask OR-ed
+ * into the first byte, depending on how many bytes follow.  There are
+ * as many entries in this table as there are UTF-8 sequence types.
+ * (I.e., one byte sequence, two byte... etc.). Remember that sequencs
+ * for *legal* UTF-8 will be 4 or fewer bytes total.
+ */
+const uint8_t firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC };
+
+/*
+ * Index into the table below with the first byte of a UTF-8 sequence to
+ * get the number of trailing bytes that are supposed to follow it.
+ * Note that *legal* UTF-8 values can't have 4 or 5-bytes. The table is
+ * left as-is for anyone who may want to do such conversion, which was
+ * allowed in earlier algorithms.
+ */
+const unsigned char trailingBytesForUTF8[256] = {
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, 3,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5
+};
+
+
+// Some fundamental constants 
+const uint32_t UNI_REPLACEMENT_CHAR = 0x0000FFFD;
+const uint32_t UNI_MAX_BMP = 0x0000FFFF;
+const uint32_t UNI_MAX_UTF16 = 0x0010FFFF;
+const uint32_t UNI_MAX_UTF32 = 0x7FFFFFFF;
+const uint32_t UNI_MAX_LEGAL_UTF32 = 0x0010FFFF;
+
+const int halfShift  = 10; // used for shifting by 10 bits
+const uint32_t halfBase = 0x0010000UL;
+const uint32_t halfMask = 0x3FFUL;
+
 const uint16_t min_lead_surrogate = 0xD800;
 const uint16_t max_lead_surrogate = 0xDBFF;
 const uint16_t min_trail_surrogate = 0xDC00;
@@ -40,6 +87,7 @@ inline bool is_trailing_surrogate(uint16_t c)
 {
     return c >= min_trail_surrogate && c <= max_trail_surrogate;
 }
+
 
 // json_text_traits
 
@@ -116,6 +164,30 @@ struct Json_text_traits_
     }
 };
 
+enum class conversion_result
+{
+    ok,                  // conversion successful
+    source_exhausted,    // partial character in source, but hit end
+    target_exhausted,    // insuff. room in target for conversion
+    source_illegal       // source sequence is illegal/malformed
+};
+
+enum class conversion_flags
+{
+    strict = 0,
+    lenient
+};
+
+/* --------------------------------------------------------------------- */
+/*
+ * Exported function to return the total number of bytes in a codepoint
+ * represented in UTF-8, given the value of the first byte.
+ */
+inline
+unsigned getNumBytesForUTF8(unsigned char first) {
+  return trailingBytesForUTF8[first] + 1;
+}
+
 template <class CharT>
 struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
@@ -137,6 +209,93 @@ struct json_text_traits<CharT,
     {
         static const std::pair<const CharT*,size_t> value = {"false",5};
         return value;
+    }
+
+    /*
+     * Utility routine to tell whether a sequence of bytes is legal UTF-8.
+     * This must be called with the length pre-determined by the first byte.
+     * If not calling this from ConvertUTF8to*, then the length can be set by:
+     *  length = trailingBytesForUTF8[*source]+1;
+     * and the sequence is illegal right away if there aren't that many bytes
+     * available.
+     * If presented with a length > 4, this returns false.  The Unicode
+     * definition of UTF-8 goes up to 4-byte sequences.
+     */
+
+    static bool isLegalUTF8(const CharT *source, int length) {
+        CharT a;
+        const CharT *srcptr = source+length;
+        switch (length) {
+        default: return false;
+            /* Everything else falls through when "true"... */
+        case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+        case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+        case 2: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+
+            switch (*source) {
+                /* no fall-through in this inner switch */
+                case 0xE0: if (a < 0xA0) return false; break;
+                case 0xED: if (a > 0x9F) return false; break;
+                case 0xF0: if (a < 0x90) return false; break;
+                case 0xF4: if (a > 0x8F) return false; break;
+                default:   if (a < 0x80) return false;
+            }
+
+        case 1: if (*source >= 0x80 && *source < 0xC2) return false;
+        }
+        if (*source > 0xF4) return false;
+        return true;
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    /*
+     * Exported function to return whether a UTF-8 sequence is legal or not.
+     * This is not used here; it's just exported.
+     */
+    static bool isLegalUTF8Sequence(const CharT *source, const CharT *sourceEnd) {
+        int length = trailingBytesForUTF8[*source]+1;
+        if (length > sourceEnd - source) {
+            return false;
+        }
+        return isLegalUTF8(source, length);
+    }
+
+    /* --------------------------------------------------------------------- */
+
+    /*
+     * Exported function to return whether a UTF-8 string is legal or not.
+     * This is not used here; it's just exported.
+     */
+    static bool isLegalUTF8String(const CharT **source, const CharT *sourceEnd) {
+        while (*source != sourceEnd) {
+            int length = trailingBytesForUTF8[**source] + 1;
+            if (length > sourceEnd - *source || !isLegalUTF8(*source, length))
+                return false;
+            *source += length;
+        }
+        return true;
+    }
+
+    template <class UTF8,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),conversion_result>::type 
+    to_utf8(const CharT** sourceStart, const CharT* sourceEnd, 
+            std::basic_string<UTF8,STraits,SAllocator>& target, conversion_flags flags) 
+    {
+        target.assign(*sourceStart,sourceEnd);
+        conversion_result result = conversion_result::ok;
+        return result;
+    }
+
+    template <class UTF8,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),conversion_result>::type 
+    from_utf8(
+            const UTF8** sourceStart, const UTF8* sourceEnd, 
+            std::basic_string<CharT,STraits,SAllocator>& target, conversion_flags flags) 
+    {
+        target.assign(*sourceStart,sourceEnd);
+        conversion_result result = conversion_result::ok;
+        return result;
     }
 
     static size_t detect_bom(const CharT* it, size_t length)
@@ -259,6 +418,135 @@ struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint16_t)>::type> : public Json_text_traits_<CharT>
 {
+    template <class UTF8,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),conversion_result>::type 
+    to_utf8(const CharT** sourceStart, const CharT* sourceEnd, 
+            std::basic_string<UTF8,STraits,SAllocator>& target, conversion_flags flags) {
+        conversion_result result = conversion_result::ok;
+        const CharT* source = *sourceStart;
+        while (source < sourceEnd) {
+            unsigned short bytesToWrite = 0;
+            const uint32_t byteMask = 0xBF;
+            const uint32_t byteMark = 0x80; 
+            uint32_t ch = *source++;
+            /* If we have a surrogate pair, convert to uint32_t first. */
+            if (ch >= min_lead_surrogate && ch <= max_lead_surrogate) {
+                /* If the 16 bits following the high surrogate are in the source buffer... */
+                if (source < sourceEnd) {
+                    uint32_t ch2 = *source;
+                    /* If it's a low surrogate, convert to uint32_t. */
+                    if (ch2 >= min_trail_surrogate && ch2 <= max_trail_surrogate) {
+                        ch = ((ch - min_lead_surrogate) << halfShift)
+                            + (ch2 - min_trail_surrogate) + halfBase;
+                        ++source;
+                    } else if (flags == conversion_flags::strict) { /* it's an unpaired high surrogate */
+                        --source; /* return to the illegal value itself */
+                        result = conversion_result::source_illegal;
+                        break;
+                    }
+                } else { /* We don't have the 16 bits following the high surrogate. */
+                    --source; /* return to the high surrogate */
+                    result = conversion_result::source_exhausted;
+                    break;
+                }
+            } else if (flags == conversion_flags::strict) {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (ch >= min_trail_surrogate && ch <= max_trail_surrogate) {
+                    --source; /* return to the illegal value itself */
+                    result = conversion_result::source_illegal;
+                    break;
+                }
+            }
+            /* Figure out how many bytes the result will require */
+            if (ch < (uint32_t)0x80) {      
+                bytesToWrite = 1;
+            } else if (ch < (uint32_t)0x800) {     
+                bytesToWrite = 2;
+            } else if (ch < (uint32_t)0x10000) {   
+                bytesToWrite = 3;
+            } else if (ch < (uint32_t)0x110000) {  
+                bytesToWrite = 4;
+            } else {                            
+                bytesToWrite = 3;
+                ch = UNI_REPLACEMENT_CHAR;
+            }
+            target.resize(target.size()+bytesToWrite);
+            UTF8* target_ptr = &target[0] + target.length();
+
+            switch (bytesToWrite) { /* note: everything falls through. */
+                case 4: *--target_ptr = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+                case 3: *--target_ptr = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+                case 2: *--target_ptr = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+                case 1: *--target_ptr = (uint8_t)(ch | firstByteMark[bytesToWrite]);
+            }
+        }
+        *sourceStart = source;
+        return result;
+    }
+
+    template <class UTF8,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),conversion_result>::type 
+    from_utf8(const UTF8** sourceStart, const UTF8* sourceEnd, 
+              std::basic_string<CharT,STraits,SAllocator>& target, 
+              conversion_flags flags) 
+    {
+        conversion_result result = conversion_result::ok;
+        const UTF8* source = *sourceStart;
+        while (source < sourceEnd) {
+            uint32_t ch = 0;
+            unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+            if (extraBytesToRead >= sourceEnd - source) {
+                result = conversion_result::source_exhausted; break;
+            }
+            /* Do this check whether lenient or strict */
+            if (!json_text_traits<UTF8>::isLegalUTF8(source, extraBytesToRead+1)) {
+                result = conversion_result::source_illegal;
+                break;
+            }
+            /*
+             * The cases all fall through. See "Note A" below.
+             */
+            switch (extraBytesToRead) {
+                case 5: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
+                case 4: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
+                case 3: ch += *source++; ch <<= 6;
+                case 2: ch += *source++; ch <<= 6;
+                case 1: ch += *source++; ch <<= 6;
+                case 0: ch += *source++;
+            }
+            ch -= offsetsFromUTF8[extraBytesToRead];
+
+            if (ch <= UNI_MAX_BMP) { /* Target is a character <= 0xFFFF */
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (ch >= min_lead_surrogate && ch <= max_trail_surrogate) {
+                    if (flags == conversion_flags::strict) {
+                        source -= (extraBytesToRead+1); /* return to the illegal value itself */
+                        result = conversion_result::source_illegal;
+                        break;
+                    } else {
+                        target.push_back(UNI_REPLACEMENT_CHAR);
+                    }
+                } else {
+                    target.push_back(ch); /* normal case */
+                }
+            } else if (ch > UNI_MAX_UTF16) {
+                if (flags == conversion_flags::strict) {
+                    result = conversion_result::source_illegal;
+                    source -= (extraBytesToRead+1); /* return to the start */
+                    break; /* Bail out; shouldn't continue */
+                } else {
+                    target.push_back( UNI_REPLACEMENT_CHAR);
+                }
+            } else {
+                /* target is a character in range 0xFFFF - 0x10FFFF. */
+                ch -= halfBase;
+                target.push_back(((ch >> halfShift) + min_lead_surrogate));
+                target.push_back(((ch & halfMask) + min_trail_surrogate));
+            }
+        }
+        *sourceStart = source;
+        return result;
+    }
 
     static const std::pair<const CharT*,size_t>& null_literal() 
     {
@@ -362,6 +650,114 @@ struct json_text_traits<CharT,
         return value;
     }
 
+    template <class UTF8,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),conversion_result>::type 
+    to_utf8(const CharT** sourceStart, const CharT* sourceEnd, 
+            std::basic_string<UTF8,STraits,SAllocator>& target, 
+            conversion_flags flags) 
+    {
+        conversion_result result = conversion_result::ok;
+        const CharT* source = *sourceStart;
+        while (source < sourceEnd) {
+            uint32_t ch;
+            unsigned short bytesToWrite = 0;
+            const uint32_t byteMask = 0xBF;
+            const uint32_t byteMark = 0x80; 
+            ch = *source++;
+            if (flags == conversion_flags::strict ) {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (ch >= min_lead_surrogate && ch <= max_trail_surrogate) {
+                    --source; /* return to the illegal value itself */
+                    result = conversion_result::source_illegal;
+                    break;
+                }
+            }
+            /*
+             * Figure out how many bytes the result will require. Turn any
+             * illegally large UTF32 things (> Plane 17) into replacement chars.
+             */
+            if (ch < (uint32_t)0x80) {      bytesToWrite = 1;
+            } else if (ch < (uint32_t)0x800) {     bytesToWrite = 2;
+            } else if (ch < (uint32_t)0x10000) {   bytesToWrite = 3;
+            } else if (ch <= UNI_MAX_LEGAL_UTF32) {  bytesToWrite = 4;
+            } else {                            bytesToWrite = 3;
+                                                ch = UNI_REPLACEMENT_CHAR;
+                                                result = conversion_result::source_illegal;
+            }
+            
+            target.resize(target.size()+bytesToWrite);
+            UTF8* target_ptr = &target[0] + target.length();
+            switch (bytesToWrite) { /* note: everything falls through. */
+                case 4: *--target_ptr = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+                case 3: *--target_ptr = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+                case 2: *--target_ptr = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+                case 1: *--target_ptr = (UTF8) (ch | firstByteMark[bytesToWrite]);
+            }
+        }
+        *sourceStart = source;
+        return result;
+    }
+#if 0
+    static conversion_result from_utf8 (
+            const UTF8** sourceStart, const UTF8* sourceEnd, 
+            UTF32** targetStart, UTF32* targetEnd, conversion_flags flags) {
+        conversion_result result = conversion_result::ok;
+        const UTF8* source = *sourceStart;
+        UTF32* target = *targetStart;
+        while (source < sourceEnd) {
+            UTF32 ch = 0;
+            unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+            if (extraBytesToRead >= sourceEnd - source) {
+                result = conversion_result::source_exhausted; break;
+            }
+            /* Do this check whether lenient or strict */
+            if (!isLegalUTF8(source, extraBytesToRead+1)) {
+                result = conversion_result::source_illegal;
+                break;
+            }
+            /*
+             * The cases all fall through. See "Note A" below.
+             */
+            switch (extraBytesToRead) {
+                case 5: ch += *source++; ch <<= 6;
+                case 4: ch += *source++; ch <<= 6;
+                case 3: ch += *source++; ch <<= 6;
+                case 2: ch += *source++; ch <<= 6;
+                case 1: ch += *source++; ch <<= 6;
+                case 0: ch += *source++;
+            }
+            ch -= offsetsFromUTF8[extraBytesToRead];
+
+            if (target >= targetEnd) {
+                source -= (extraBytesToRead+1); /* Back up the source pointer! */
+                result = conversion_result::target_exhausted; break;
+            }
+            if (ch <= UNI_MAX_LEGAL_UTF32) {
+                /*
+                 * UTF-16 surrogate values are illegal in UTF-32, and anything
+                 * over Plane 17 (> 0x10FFFF) is illegal.
+                 */
+                if (ch >= min_lead_surrogate && ch <= max_trail_surrogate) {
+                    if (flags == conversion_flags::strict) {
+                        source -= (extraBytesToRead+1); /* return to the illegal value itself */
+                        result = conversion_result::source_illegal;
+                        break;
+                    } else {
+                        *target++ = UNI_REPLACEMENT_CHAR;
+                    }
+                } else {
+                    *target++ = ch;
+                }
+            } else { /* i.e., ch > UNI_MAX_LEGAL_UTF32 */
+                result = conversion_result::source_illegal;
+                *target++ = UNI_REPLACEMENT_CHAR;
+            }
+        }
+        *sourceStart = source;
+        *targetStart = target;
+        return result;
+    }
+#endif
     static size_t detect_bom(const CharT* it, size_t length)
     {
         size_t count = 0;
