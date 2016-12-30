@@ -63,6 +63,17 @@ BOOST_AUTO_TEST_CASE(test_utf32_to_utf8)
     BOOST_CHECK("Hello world" == target);
 }
 
+BOOST_AUTO_TEST_CASE(test_utf8_to_utf32)
+{
+    std::string source = "Hello world";
+    const char* p = source.data();
+    std::u32string target;
+    json_text_traits<char32_t>::from_utf8(&p,source.data()+source.length(),
+                                        target,
+                                        conversion_flags::strict);
+    BOOST_CHECK(U"Hello world" == target);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
