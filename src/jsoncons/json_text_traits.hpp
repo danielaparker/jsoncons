@@ -111,19 +111,19 @@ struct Json_text_traits_
 {
     static const std::pair<const CharT*,size_t> null_literal() 
     {
-        static const CharT data[] = {'n','u','l','l'};
+        static const CharT data[] = {'n','u','l','l',0};
         return std::pair<const CharT*,size_t>{data,4};
     }
 
     static const std::pair<const CharT*,size_t> true_literal() 
     {
-        static const CharT data[] = {'t','r','u','e'};
+        static const CharT data[] = {'t','r','u','e',0};
         return std::pair<const CharT*,size_t>{data,4};
     }
 
     static const std::pair<const CharT*,size_t> false_literal() 
     {
-        static const CharT data[] = {'f','a','l','s','e'};
+        static const CharT data[] = {'f','a','l','s','e',0};
         return std::pair<const CharT*,size_t>{data,5};
     }
 
