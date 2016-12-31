@@ -29,8 +29,8 @@ Features:
 
 Extensions:
 
-- The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [jsonpath](#user-content-ext_jsonpath) extension supports search using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
+- The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [binary](#user-content-ext_binary) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 ## Get jsoncons
@@ -333,77 +333,6 @@ Or define and use your own filters. See [json_filter](https://github.com/daniela
 
 ## Extensions
 
-<div id="ext_binary"/>
-
-### binary
-
-The `binary` extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
-
-#### MessagePack example
-
-Example file (book.json):
-```json
-[
-    {
-        "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-    },
-    {
-        "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-    }
-]
-```
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/binary/message_pack.hpp>
-
-using namespace jsoncons;
-using namespace jsoncons::binary;
-
-int main()
-{
-    std::ifstream is("input/book.json");
-    ojson j1;
-    is >> j1;
-
-    // Encode ojson to MessagePack
-    std::vector<uint8_t> v = encode_message_pack(j1);
-
-    // Decode MessagePack to ojson 
-    ojson j2 = decode_message_pack<ojson>(v);
-
-    std::cout << pretty_print(j2) << std::endl;
-
-    // or to json (now alphabetically sorted)
-    json j3 = decode_message_pack<json>(v);
-
-    // or to wjson (utf8 converted to wide characters)
-    wjson j4 = decode_message_pack<wjson>(v);
-}
-```
-Output:
-```json
-[
-    {
-        "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-    },
-    {
-        "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-    }
-]
-```
-
 <div id="ext_jsonpath"/>
 
 ### jsonpath
@@ -581,6 +510,77 @@ project_id,task_name,task_start,task_finish
 4001,task3,03/01/2003,03/31/2003
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
+```
+
+<div id="ext_binary"/>
+
+### binary
+
+The `binary` extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+
+#### MessagePack example
+
+Example file (book.json):
+```json
+[
+    {
+        "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+    },
+    {
+        "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+    }
+]
+```
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/binary/message_pack.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::binary;
+
+int main()
+{
+    std::ifstream is("input/book.json");
+    ojson j1;
+    is >> j1;
+
+    // Encode ojson to MessagePack
+    std::vector<uint8_t> v = encode_message_pack(j1);
+
+    // Decode MessagePack to ojson 
+    ojson j2 = decode_message_pack<ojson>(v);
+
+    std::cout << pretty_print(j2) << std::endl;
+
+    // or to json (now alphabetically sorted)
+    json j3 = decode_message_pack<json>(v);
+
+    // or to wjson (utf8 converted to wide characters)
+    wjson j4 = decode_message_pack<wjson>(v);
+}
+```
+Output:
+```json
+[
+    {
+        "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+    },
+    {
+        "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+    }
+]
 ```
 
 See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) and [csv_serializer](https://github.com/danielaparker/jsoncons/wiki/csv_serializer) for details.
