@@ -561,7 +561,7 @@ int main()
     // or to json (now alphabetically sorted)
     json j3 = decode_message_pack<json>(v);
 
-    // or to wjson (utf8 converted to wide characters)
+    // or to wjson (converts from utf8 to wide characters)
     wjson j4 = decode_message_pack<wjson>(v);
 }
 ```

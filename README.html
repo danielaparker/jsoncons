@@ -945,7 +945,7 @@ project_id,task_name,task_start,task_finish
     <span class="pl-c"><span class="pl-c">//</span> or to json (now alphabetically sorted)</span>
     json j3 = decode_message_pack&lt;json&gt;(v);
 
-    <span class="pl-c"><span class="pl-c">//</span> or to wjson (utf8 converted to wide characters)</span>
+    <span class="pl-c"><span class="pl-c">//</span> or to wjson (converts from utf8 to wide characters)</span>
     wjson j4 = decode_message_pack&lt;wjson&gt;(v);
 }</pre></div>
 <p>Output:</p>
