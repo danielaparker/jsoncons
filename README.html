@@ -774,11 +774,19 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     ojson <span class="pl-c1">j1</span>;
     is &gt;&gt; <span class="pl-c1">j1</span>;
 
+    <span class="pl-c"><span class="pl-c">//</span> Encode ojson to MessagePack</span>
     std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; v = <span class="pl-c1">encode_message_pack</span>(<span class="pl-c1">j1</span>);
 
+    <span class="pl-c"><span class="pl-c">//</span> Decode MessagePack to ojson </span>
     ojson j2 = decode_message_pack&lt;ojson&gt;(v);
 
     std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(j2) &lt;&lt; std::endl;
+
+    <span class="pl-c"><span class="pl-c">//</span> or to json (now alphabetically sorted)</span>
+    json j3 = decode_message_pack&lt;json&gt;(v);
+
+    <span class="pl-c"><span class="pl-c">//</span> or to wjson (utf8 converted to wide characters)</span>
+    wjson j4 = decode_message_pack&lt;wjson&gt;(v);
 }</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>[

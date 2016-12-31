@@ -371,11 +371,19 @@ int main()
     ojson j1;
     is >> j1;
 
+    // Encode ojson to MessagePack
     std::vector<uint8_t> v = encode_message_pack(j1);
 
+    // Decode MessagePack to ojson 
     ojson j2 = decode_message_pack<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
+
+    // or to json (now alphabetically sorted)
+    json j3 = decode_message_pack<json>(v);
+
+    // or to wjson (utf8 converted to wide characters)
+    wjson j4 = decode_message_pack<wjson>(v);
 }
 ```
 Output:

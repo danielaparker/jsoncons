@@ -31,6 +31,16 @@ ojson j1 = ojson::parse(R"(
 
     std::cout << pretty_print(j2) << std::endl;
 
+    json j3 = decode_message_pack<json>(v);
+
+    std::cout << pretty_print(j3) << std::endl;
+
+    std::cout << std::endl;
+
+    wjson j4 = decode_message_pack<wjson>(v);
+
+    std::wcout << pretty_print(j4) << std::endl;
+
     std::cout << std::endl;
 }
 
