@@ -29,30 +29,35 @@ namespace jsoncons { namespace csv {
 template <class CharT>
 struct json_csv_parser_traits
 {
-};
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+    typedef Basic_string_view_<CharT> string_view_type;
+#else
+    typedef std::basic_string_view<CharT> string_view_type;
+#endif
 
-template <>
-struct json_csv_parser_traits<char>
-{
-    static const std::string string_literal() {return "string";};
+    static string_view_type string_literal() 
+    {
+        static const CharT data[] = {'s','t','r','i','n','g'};
+        return string_view_type{data,sizeof(data)/sizeof(CharT)};
+    }
 
-    static const std::string integer_literal() {return "integer";};
+    static string_view_type integer_literal() 
+    {
+        static const CharT data[] = {'i','n','t','e','g','e','r'};
+        return string_view_type{data,sizeof(data)/sizeof(CharT)};
+    }
 
-    static const std::string float_literal() {return "float";};
+    static string_view_type float_literal() 
+    {
+        static const CharT data[] = {'f','l','o','a','t'};
+        return string_view_type{data,sizeof(data)/sizeof(CharT)};
+    }
 
-    static const std::string boolean_literal() {return "boolean";};
-};
-
-template <>
-struct json_csv_parser_traits<wchar_t> // assume utf16
-{
-    static const std::wstring string_literal() {return L"string";};
-
-    static const std::wstring integer_literal() {return L"integer";};
-
-    static const std::wstring float_literal() {return L"float";};
-
-    static const std::wstring boolean_literal() {return L"boolean";};
+    static string_view_type boolean_literal() 
+    {
+        static const CharT data[] = {'b','o','o','l','e','a','n'};
+        return string_view_type{data,sizeof(data)/sizeof(CharT)};
+    }
 };
 
 enum class csv_modes {

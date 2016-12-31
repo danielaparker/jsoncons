@@ -19,81 +19,62 @@
 
 namespace jsoncons { namespace jsonpath {
 
-    template<class CharT>
-    bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* positive)
+template<class CharT>
+bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* positive)
+{
+    static const size_t max_value = (std::numeric_limits<size_t>::max)();
+    static const size_t max_value_div_10 = max_value / 10;
+
+    size_t start = 0;
+    size_t n = 0;
+    if (length > 0)
     {
-        static const size_t max_value = (std::numeric_limits<size_t>::max)();
-        static const size_t max_value_div_10 = max_value / 10;
-
-        size_t start = 0;
-        size_t n = 0;
-        if (length > 0)
+        if (s[start] == '-')
         {
-            if (s[start] == '-')
-            {
-                *positive = false;
-                ++start;
-            }
-            else
-            {
-                *positive = true;
-            }
-        }
-        if (length > start)
-        {
-            for (size_t i = start; i < length; ++i)
-            {
-                CharT c = s[i];
-                switch (c)
-                {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    {
-                        size_t x = c - '0';
-                        if (n > max_value_div_10)
-                        {
-                            return false;
-                        }
-                        n = n * 10;
-                        if (n > max_value - x)
-                        {
-                            return false;
-                        }
-
-                        n += x;
-                    }
-                    break;
-                default:
-                    return false;
-                    break;
-                }
-            }
-            *value = n;
-            return true;
+            *positive = false;
+            ++start;
         }
         else
         {
-            return false;
+            *positive = true;
         }
     }
-
-    template <class CharT>
-    struct json_jsonpath_traits
+    if (length > start)
     {
-    };
+        for (size_t i = start; i < length; ++i)
+        {
+            CharT c = s[i];
+            switch (c)
+            {
+            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                {
+                    size_t x = c - '0';
+                    if (n > max_value_div_10)
+                    {
+                        return false;
+                    }
+                    n = n * 10;
+                    if (n > max_value - x)
+                    {
+                        return false;
+                    }
 
-    template <>
-    struct json_jsonpath_traits<char>
+                    n += x;
+                }
+                break;
+            default:
+                return false;
+                break;
+            }
+        }
+        *value = n;
+        return true;
+    }
+    else
     {
-        static const std::string length_literal() {return "length";};
-    };
-
-    template <>
-    struct json_jsonpath_traits<wchar_t> // assume utf16
-    {
-        static const std::wstring length_literal() {return L"length";};
-    };
-
-// here
+        return false;
+    }
+}
 
 template<class Json>
 Json json_query(const Json& root, typename Json::string_view_type path)
@@ -145,6 +126,12 @@ private:
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
     typedef std::vector<json_pointer> node_set;
+
+    static string_view_type length_literal() 
+    {
+        static const char_type data[] = {'l','e','n','g','t','h'};
+        return string_view_type{data,sizeof(data)/sizeof(char_type)};
+    }
 
     class selector
     {
@@ -929,7 +916,7 @@ public:
                     nodes_.push_back(std::addressof(context[index]));
                 }
             }
-            else if (name == json_jsonpath_traits<char_type>::length_literal() && context.size() > 0)
+            else if (name == length_literal() && context.size() > 0)
             {
                 auto temp = std::make_shared<Json>(context.size());
                 temp_json_values_.push_back(temp);
@@ -960,7 +947,7 @@ public:
                     nodes_.push_back(temp.get());
                 }
             }
-            else if (name == json_jsonpath_traits<char_type>::length_literal() && s.size() > 0)
+            else if (name == length_literal() && s.size() > 0)
             {
                 size_t count = json_text_traits<char_type>::codepoint_count(s.data(),s.data()+s.size());
                 auto temp = std::make_shared<Json>(count);

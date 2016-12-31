@@ -22,35 +22,6 @@
 namespace jsoncons { namespace csv {
 
 template <class CharT>
-struct csv_string_traits
-{
-};
-
-template <>
-struct csv_string_traits<char>
-{
-    static const std::string all_literal() {return "all";};
-
-    static const std::string minimal_literal() {return "minimal";};
-
-    static const std::string none_literal() {return "none";};
-
-    static const std::string nonnumeric_literal() {return "nonumeric";};
-};
-
-template <>
-struct csv_string_traits<wchar_t>
-{
-    static const std::wstring all_literal() {return L"all";};
-
-    static const std::wstring minimal_literal() {return L"minimal";};
-
-    static const std::wstring none_literal() {return L"none";};
-
-    static const std::wstring nonnumeric_literal() {return L"nonumeric";};
-};
- 
-template <class CharT>
 void escape_string(const CharT* s,
                    size_t length,
                    CharT quote_char, CharT quote_escape_char,
