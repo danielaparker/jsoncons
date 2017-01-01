@@ -194,8 +194,13 @@ struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint8_t)>::type> : public Json_text_traits_<CharT>
 {
+    static size_t utf_length(const CharT*, size_t length)
+    {
+        return length;
+    }
+
     /*
-     * Utility routine to tell whether a sequence of bytes is legal UTF-8.
+     * Indicates whether a sequence of bytes is legal UTF-8.
      * This must be called with the length pre-determined by the first byte.
      * If not calling this from ConvertUTF8to*, then the length can be set by:
      *  length = trailing_bytes_for_utf8[*source]+1;
@@ -205,7 +210,7 @@ struct json_text_traits<CharT,
      * definition of UTF-8 goes up to 4-byte sequences.
      */
 
-    static bool is_legal(const CharT *source, int length) {
+    static bool is_legal(const CharT *source, size_t length) {
         uint8_t a;
         const CharT *srcptr = source+length;
         switch (length) {
@@ -347,7 +352,8 @@ struct json_text_traits<CharT,
         return length;
     }
 
-    static void append_codepoint_to_string(uint32_t cp, std::string& s)
+    template <class STraits,class SAllocator>
+    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
     {
         if (cp <= 0x7f)
         {
@@ -380,6 +386,29 @@ struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint16_t)>::type> : public Json_text_traits_<CharT>
 {
+    static size_t utf_length(const CharT *source, size_t length)
+    {
+        const CharT* source_end = source + length;
+
+        size_t count = 0;
+        for (const CharT* p = source; p < source_end; ++p)
+        {
+            uint32_t ch = *p;
+            if (ch < (uint32_t)0x80) {      
+                ++count;
+            } else if (ch < (uint32_t)0x800) {     
+                count += 2;
+            } else if (ch < (uint32_t)0x10000) {   
+                count += 3;
+            } else if (ch < (uint32_t)0x110000) {  
+                count += 4;
+            } else {                            
+                count += 3;
+            }
+        }
+        return count;
+    }
+
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
     to_utf8(const CharT** source_begin, const CharT* source_end, 
@@ -513,8 +542,8 @@ struct json_text_traits<CharT,
     template <class UTF32>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
     next_codepoint(const CharT** source_begin, const CharT* source_end, 
-                                         UTF32* target, 
-                                         uni_conversion_flags flags) 
+                   UTF32* target, 
+                   uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
         const CharT* source = *source_begin;
@@ -567,7 +596,8 @@ struct json_text_traits<CharT,
         return count;
     }
 
-    static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
+    template <class STraits,class SAllocator>
+    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
     {
         if (cp <= 0xFFFF)
         {
@@ -598,6 +628,29 @@ struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint32_t)>::type> : public Json_text_traits_<CharT>
 {
+    static size_t utf_length(const CharT *source, size_t length)
+    {
+        const CharT* source_end = source + length;
+
+        size_t count = 0;
+        for (const CharT* p = source; p < source_end; ++p)
+        {
+            uint32_t ch = *p;
+            if (ch < (uint32_t)0x80) {      
+                ++count;
+            } else if (ch < (uint32_t)0x800) {     
+                count += 2;
+            } else if (ch < (uint32_t)0x10000) {   
+                count += 3;
+            } else if (ch <= uni_max_legal_utf32) {  
+                count += 4;
+            } else {                            
+                count += 3;
+            }
+        }
+        return count;
+    }
+
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
     to_utf8(const CharT** source_begin, const CharT* source_end, 
@@ -730,7 +783,8 @@ struct json_text_traits<CharT,
         return count;
     }
 
-    static void append_codepoint_to_string(uint32_t cp, std::wstring& s)
+    template <class STraits,class SAllocator>
+    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
     {
         if (cp <= 0xFFFF)
         {

@@ -248,7 +248,7 @@ public:
     {
         size_t n = 0;
 
-        const size_t length = sv.length();
+        const size_t length = json_text_traits<char_type>::utf_length(sv.data(),sv.length());
         if (length <= 31)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
