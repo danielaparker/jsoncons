@@ -102,14 +102,6 @@ bool try_string_to_integer(bool has_neg, const CharT *s, size_t length, int64_t&
     }
 }
 
-enum class string_states
-{
-    u1,
-    u2,
-    u3,
-    u4
-};
-
 enum class states 
 {
     root,
@@ -182,7 +174,6 @@ class basic_json_parser : private basic_parsing_context<CharT>
     uint8_t precision_;
     size_t literal_index_;
     size_t continuation_count_;
-    string_states string_state_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -203,8 +194,7 @@ public:
          nesting_depth_(0), 
          precision_(0), 
          literal_index_(0),
-         continuation_count_(0),
-         string_state_(string_states::u1 )
+         continuation_count_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
     }
@@ -223,8 +213,7 @@ public:
          nesting_depth_(0), 
          precision_(0), 
          literal_index_(0),
-         continuation_count_(0),
-         string_state_(string_states::u1 )
+         continuation_count_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
     }
@@ -383,316 +372,7 @@ public:
             }
         }
     }
-
-    template<class T=CharT>
-    typename std::enable_if<(sizeof(T) == sizeof(uint8_t))>::type 
-    parse_string()
-    {
-        const CharT* sb = p_;
-        bool done = false;
-        while (!done && p_ < end_input_)
-        {
-            switch (string_state_)
-            {
-            case string_states::u1:
-                {
-                    switch (*p_)
-                    {
-                    case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
-                    case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
-                    case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
-                        string_buffer_.append(sb,p_-sb);
-                        column_ += (p_ - sb + 1);
-                        err_handler_.error(json_parser_errc::illegal_control_character, *this);
-                        // recovery - skip
-                        done = true;
-                        ++p_;
-                        break;
-                    case '\r':
-                        {
-                            column_ += (p_ - sb + 1);
-                            err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                            // recovery - keep
-                            string_buffer_.append(sb, p_ - sb + 1);
-                            stack_.push_back(states::cr);
-                            done = true;
-                            ++p_;
-                        }
-                        break;
-                    case '\n':
-                        {
-                            column_ += (p_ - sb + 1);
-                            err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                            // recovery - keep
-                            string_buffer_.append(sb, p_ - sb + 1);
-                            stack_.push_back(states::lf);
-                            done = true;
-                            ++p_;
-                        }
-                        break;
-                    case '\t':
-                        {
-                            column_ += (p_ - sb + 1);
-                            err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                            // recovery - keep
-                            string_buffer_.append(sb, p_ - sb + 1);
-                            done = true;
-                            ++p_;
-                        }
-                        break;
-                    case '\\': 
-                        string_buffer_.append(sb,p_-sb);
-                        column_ += (p_ - sb + 1);
-                        stack_.back() = states::escape;
-                        done = true;
-                        ++p_;
-                        break;
-                    case '\"':
-                        if (string_buffer_.length() == 0)
-                        {
-                            end_string_value(sb,p_-sb);
-                        }
-                        else
-                        {
-                            string_buffer_.append(sb,p_-sb);
-                            end_string_value(string_buffer_.data(),string_buffer_.length());
-                            string_buffer_.clear();
-                        }
-                        column_ += (p_ - sb + 1);
-                        done = true;
-                        ++p_;
-                        break;
-                    default:
-                        if (static_cast<unsigned char>(*p_) < 0x80)
-                        {
-                        }
-                        else if (is_continuation_byte(*p_))
-                        {
-                            err_handler_.error(json_parser_errc::unexpected_continuation_byte, *this);
-                        }
-                        else if (static_cast<unsigned char>(*p_) < 0xe0)
-                        {
-                            cp_  = (static_cast<unsigned char>(*p_) & 0x1f) << 6;
-                            continuation_count_ = 1;
-                            string_state_ = string_states::u2;
-                        }
-                        else if (static_cast<unsigned char>(*p_) < 0xf0)
-                        {
-                            continuation_count_ = 2;
-                            cp_  = (static_cast<unsigned char>(*p_) & 0x0f) << 12;
-                            string_state_ = string_states::u3;
-                        }
-                        else if (static_cast<unsigned char>(*p_) < 0xf8)
-                        {
-                            continuation_count_ = 3;
-                            cp_  = (static_cast<unsigned char>(*p_) & 0x07) << 18;
-                            string_state_ = string_states::u4;
-                        }
-                        else
-                        {
-                            err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                        }
-
-                        ++p_;
-                        break;
-                    }
-                }
-                break;
-            case string_states::u2:
-                if (!is_continuation_byte(*p_))
-                {
-                    err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                }
-                continuation_count_ = 0;
-                string_state_ = string_states::u1;
-                cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
-                if (cp_ < 0x80) 
-                {
-                    err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                }
-                ++p_;
-                break;
-            case string_states::u3:
-                if (!is_continuation_byte(*p_))
-                {
-                    err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                }
-                switch (continuation_count_)
-                {
-                case 2:
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
-                    --continuation_count_;
-                    break;
-                default:
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
-                    if (cp_ < 0x0800) 
-                    {
-                        err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                    }
-                    if (cp_ >= 0xD800 && cp_ <= 0xDFFF) 
-                    {
-                        err_handler_.error(json_parser_errc::illegal_codepoint, *this);
-                    }
-                    continuation_count_ = 0;
-                    string_state_ = string_states::u1;
-                    break;
-                }
-                ++p_;
-                break;
-            case string_states::u4:
-                if (!is_continuation_byte(*p_))
-                {
-                    err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                }
-                switch (continuation_count_)
-                {
-                case 3:
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 12;
-                    --continuation_count_;
-                    break;
-                case 2:
-                    --continuation_count_;
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
-                    break;
-                default:
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
-                    if (cp_ <= 0x010000) 
-                    {
-                        err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                    }
-                    continuation_count_ = 0;
-                    string_state_ = string_states::u1;
-                    break;
-                }
-                ++p_;
-                break;
-            default:
-                break;
-            }
-        }
-        if (!done)
-        {
-            string_buffer_.append(sb,p_-sb);
-            column_ += (p_ - sb + 1);
-        }
-    }
-
-    template<class T=CharT>
-    typename std::enable_if<(sizeof(T) == sizeof(uint16_t))>::type 
-    parse_string()
-    {
-        const CharT* sb = p_;
-        bool done = false;
-        while (!done && p_ < end_input_)
-        {
-            switch (string_state_)
-            {
-            case string_states::u1:
-                {
-                    switch (*p_)
-                    {
-                    case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
-                    case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
-                    case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
-                        string_buffer_.append(sb,p_-sb);
-                        column_ += (p_ - sb + 1);
-                        err_handler_.error(json_parser_errc::illegal_control_character, *this);
-                        // recovery - skip
-                        done = true;
-                        ++p_;
-                        break;
-                    case '\r':
-                        {
-                            column_ += (p_ - sb + 1);
-                            err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                            // recovery - keep
-                            string_buffer_.append(sb, p_ - sb + 1);
-                            stack_.push_back(states::cr);
-                            done = true;
-                            ++p_;
-                        }
-                        break;
-                    case '\n':
-                        {
-                            column_ += (p_ - sb + 1);
-                            err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                            // recovery - keep
-                            string_buffer_.append(sb, p_ - sb + 1);
-                            stack_.push_back(states::lf);
-                            done = true;
-                            ++p_;
-                        }
-                        break;
-                    case '\t':
-                        {
-                            column_ += (p_ - sb + 1);
-                            err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                            // recovery - keep
-                            string_buffer_.append(sb, p_ - sb + 1);
-                            done = true;
-                            ++p_;
-                        }
-                        break;
-                    case '\\': 
-                        string_buffer_.append(sb,p_-sb);
-                        column_ += (p_ - sb + 1);
-                        stack_.back() = states::escape;
-                        done = true;
-                        ++p_;
-                        break;
-                    case '\"':
-                        if (string_buffer_.length() == 0)
-                        {
-                            end_string_value(sb,p_-sb);
-                        }
-                        else
-                        {
-                            string_buffer_.append(sb,p_-sb);
-                            end_string_value(string_buffer_.data(),string_buffer_.length());
-                            string_buffer_.clear();
-                        }
-                        column_ += (p_ - sb + 1);
-                        done = true;
-                        ++p_;
-                        break;
-                    default:
-                        if (is_trailing_surrogate(*p_))
-                        {
-                            err_handler_.error(json_parser_errc::unexpected_trailing_surrogate, *this);
-                        }
-                        if (is_leading_surrogate(*p_))
-                        {
-                            string_state_ = string_states::u2;
-                        }
-                        ++p_;
-                        break;
-                    }
-                    break;
-                case string_states::u2:
-                    if (!is_trailing_surrogate(*p_))
-                    {
-                        err_handler_.error(json_parser_errc::expected_trailing_surrogate, *this);
-                    }
-                    string_state_ = string_states::u1;
-                    ++p_;
-                    break;
-                case string_states::u3:
-                case string_states::u4:
-                default:
-                    break;
-                }
-            }
-        }
-        if (!done)
-        {
-            string_buffer_.append(sb,p_-sb);
-            column_ += (p_ - sb + 1);
-        }
-    }
-
-    template<class T=CharT>
-    typename std::enable_if<(sizeof(T) == sizeof(uint32_t))>::type 
-    parse_string()
+void parse_string()
     {
         const CharT* sb = p_;
         bool done = false;
@@ -703,7 +383,6 @@ public:
             case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
             case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
             case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
-                string_buffer_.append(sb,p_-sb);
                 column_ += (p_ - sb + 1);
                 err_handler_.error(json_parser_errc::illegal_control_character, *this);
                 // recovery - skip
@@ -715,6 +394,7 @@ public:
                     column_ += (p_ - sb + 1);
                     err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
                     // recovery - keep
+
                     string_buffer_.append(sb, p_ - sb + 1);
                     stack_.push_back(states::cr);
                     done = true;
@@ -742,28 +422,42 @@ public:
                     ++p_;
                 }
                 break;
-            case '\\': 
-                string_buffer_.append(sb,p_-sb);
-                column_ += (p_ - sb + 1);
-                stack_.back() = states::escape;
-                done = true;
-                ++p_;
-                break;
-            case '\"':
-                if (string_buffer_.length() == 0)
+            case '\\':
                 {
-                    end_string_value(sb,p_-sb);
-                }
-                else
-                {
+                    const CharT* begin = sb;
+                    if (!json_text_traits<CharT>::is_legal_string(&begin,p_,uni_conversion_flags::strict))
+                    {
+                        err_handler_.error(json_parser_errc::illegal_codepoint, *this);
+                    }
                     string_buffer_.append(sb,p_-sb);
-                    end_string_value(string_buffer_.data(),string_buffer_.length());
-                    string_buffer_.clear();
+                    column_ += (p_ - sb + 1);
+                    stack_.back() = states::escape;
+                    done = true;
+                    ++p_;
+                    break;
                 }
-                column_ += (p_ - sb + 1);
-                done = true;
-                ++p_;
-                break;
+            case '\"':
+                {
+                    const CharT* begin = sb;
+                    if (!json_text_traits<CharT>::is_legal_string(&begin,p_,uni_conversion_flags::strict))
+                    {
+                        err_handler_.error(json_parser_errc::illegal_codepoint, *this);
+                    }
+                    if (string_buffer_.length() == 0)
+                    {
+                        end_string_value(sb,p_-sb);
+                    }
+                    else
+                    {
+                        string_buffer_.append(sb,p_-sb);
+                        end_string_value(string_buffer_.data(),string_buffer_.length());
+                        string_buffer_.clear();
+                    }
+                    column_ += (p_ - sb + 1);
+                    done = true;
+                    ++p_;
+                    break;
+                }
             default:
                 ++p_;
                 break;
@@ -771,6 +465,12 @@ public:
         }
         if (!done)
         {
+
+            const CharT* begin = sb;
+            if (!json_text_traits<CharT>::is_legal_string(&begin,p_,uni_conversion_flags::strict))
+            {
+                err_handler_.error(json_parser_errc::illegal_codepoint, *this);
+            }
             string_buffer_.append(sb,p_-sb);
             column_ += (p_ - sb + 1);
         }
