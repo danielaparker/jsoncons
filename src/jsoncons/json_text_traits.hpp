@@ -236,19 +236,6 @@ struct json_text_traits<CharT,
         if (static_cast<uint8_t>(*source) > 0xF4) return false;
         return true;
     }
-/*
- * Determines whether a UTF-8 string is legal or not.
- */
-    static bool is_legal_string(const CharT **source, const CharT *source_end, uni_conversion_flags) 
-    {
-        while (*source != source_end) {
-            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(**source)] + 1;
-            if (length > (size_t)(source_end - *source) || !is_legal(*source, length))
-                return false;
-            *source += length;
-        }
-        return true;
-    }
 
     template <class STraits,class SAllocator>
     static uni_conversion_result append(const CharT** source, const CharT* source_end, 
@@ -428,44 +415,6 @@ struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint16_t)>::type> : public Json_text_traits_<CharT>
 {
-    static bool is_legal_string(const CharT **source_begin, const CharT *source_end, uni_conversion_flags flags) 
-    {
-        uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
-        while (source < source_end) {
-            uint32_t ch = *source++;
-            /* If we have a surrogate pair, convert to uint32_t first. */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) {
-                /* If the 16 bits following the high surrogate are in the source buffer... */
-                if (source < source_end) {
-                    uint32_t ch2 = *source;
-                    /* If it's a low surrogate, convert to uint32_t. */
-                    if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) 
-                    {
-                        ++source;
-                    } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
-                        --source; /* return to the illegal value itself */
-                        result = uni_conversion_result::source_illegal;
-                        break;
-                    }
-                } else { /* We don't have the 16 bits following the high surrogate. */
-                    --source; /* return to the high surrogate */
-                    result = uni_conversion_result::source_exhausted;
-                    break;
-                }
-            } else if (flags == uni_conversion_flags::strict) {
-                /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) {
-                    --source; /* return to the illegal value itself */
-                    result = uni_conversion_result::source_illegal;
-                    break;
-                }
-            }
-        }
-        *source_begin = source;
-        return result == uni_conversion_result::ok;
-    }
-
     static size_t utf_length(const CharT *source, size_t length)
     {
         const CharT* source_end = source + length;
@@ -491,14 +440,14 @@ struct json_text_traits<CharT,
 
     template <class STraits,class SAllocator>
     static uni_conversion_result append(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<CharT,STraits,SAllocator>& target, uni_conversion_flags) 
+            std::basic_string<CharT,STraits,SAllocator>& target, uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
         const CharT* source = *source_begin;
         while (source < source_end) {
-            unsigned short bytes_to_write = 0;
-            const uint32_t byteMask = 0xBF;
-            const uint32_t byteMark = 0x80; 
+            //unsigned short bytes_to_write = 0;
+            //const uint32_t byteMask = 0xBF;
+            //const uint32_t byteMark = 0x80; 
             uint32_t ch = *source++;
             /* If we have a surrogate pair, convert to uint32_t first. */
             if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
@@ -510,8 +459,8 @@ struct json_text_traits<CharT,
                     if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
                         ch = ((ch - uni_sur_high_start) << half_shift)
                             + (ch2 - uni_sur_low_start) + half_base;
-                        target.push_back(ch);
-                        target.push_back(ch2);
+                        target.push_back((CharT)ch);
+                        target.push_back((CharT)ch2);
                         ++source;
                     } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
                         --source; /* return to the illegal value itself */
@@ -533,12 +482,12 @@ struct json_text_traits<CharT,
                 }
                 else
                 {
-                    target.push_back(ch);
+                    target.push_back((CharT)ch);
                 }
             }
             else
             {
-                target.push_back(ch);
+                target.push_back((CharT)ch);
             }
         }
         return result;
@@ -763,40 +712,6 @@ struct json_text_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint32_t)>::type> : public Json_text_traits_<CharT>
 {
-    static bool is_legal_string(const CharT **source_begin, const CharT *source_end, uni_conversion_flags flags) 
-    {
-        uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
-        while (source < source_end) {
-            uint32_t ch;
-            unsigned short bytes_to_write = 0;
-            ch = *source++;
-            if (flags == uni_conversion_flags::strict ) {
-                /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
-                    --source; /* return to the illegal value itself */
-                    result = uni_conversion_result::source_illegal;
-                    break;
-                }
-            }
-            /*
-             * Figure out how many bytes the result will require. Turn any
-             * illegally large UTF32 things (> Plane 17) into replacement chars.
-             */
-            if (ch < (uint32_t)0x80) {
-            } else if (ch < (uint32_t)0x800) {
-            } else if (ch < (uint32_t)0x10000) {
-            } else if (ch <= uni_max_legal_utf32) {
-            } 
-            else 
-            {
-                result = uni_conversion_result::source_illegal;
-            }
-        }
-        *source_begin = source;
-        return result == uni_conversion_result::ok;
-    }
-
     static size_t utf_length(const CharT *source, size_t length)
     {
         const CharT* source_end = source + length;

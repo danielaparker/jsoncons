@@ -425,11 +425,10 @@ void parse_string()
             case '\\':
                 {
                     const CharT* begin = sb;
-                    if (!json_text_traits<CharT>::is_legal_string(&begin,p_,uni_conversion_flags::strict))
+                    if (json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict) != uni_conversion_result::ok)
                     {
                         err_handler_.error(json_parser_errc::illegal_codepoint, *this);
                     }
-                    string_buffer_.append(sb,p_-sb);
                     column_ += (p_ - sb + 1);
                     stack_.back() = states::escape;
                     done = true;
@@ -439,20 +438,12 @@ void parse_string()
             case '\"':
                 {
                     const CharT* begin = sb;
-                    if (!json_text_traits<CharT>::is_legal_string(&begin,p_,uni_conversion_flags::strict))
+                    if (json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict) != uni_conversion_result::ok)
                     {
                         err_handler_.error(json_parser_errc::illegal_codepoint, *this);
                     }
-                    if (string_buffer_.length() == 0)
-                    {
-                        end_string_value(sb,p_-sb);
-                    }
-                    else
-                    {
-                        string_buffer_.append(sb,p_-sb);
-                        end_string_value(string_buffer_.data(),string_buffer_.length());
-                        string_buffer_.clear();
-                    }
+                    end_string_value(string_buffer_.data(),string_buffer_.length());
+                    string_buffer_.clear();
                     column_ += (p_ - sb + 1);
                     done = true;
                     ++p_;
@@ -467,11 +458,10 @@ void parse_string()
         {
 
             const CharT* begin = sb;
-            if (!json_text_traits<CharT>::is_legal_string(&begin,p_,uni_conversion_flags::strict))
+            if (json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict) != uni_conversion_result::ok)
             {
                 err_handler_.error(json_parser_errc::illegal_codepoint, *this);
             }
-            string_buffer_.append(sb,p_-sb);
             column_ += (p_ - sb + 1);
         }
     }
