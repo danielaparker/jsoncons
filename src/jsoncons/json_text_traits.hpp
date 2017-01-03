@@ -111,7 +111,7 @@ struct Json_text_traits_
 
     static bool is_control_character(CharT c)
     {
-        uint32_t u(c >= 0 ? c : 256 + c);
+        uint32_t u = c;
         return u <= 0x1F || u == 0x7f;
     }
 
