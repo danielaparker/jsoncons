@@ -483,7 +483,7 @@ public:
     {
         std::basic_string<uint8_t> target;
         const char_type* p = sv.data();
-        auto rc = unicode_traits<char_type>::to_utf8(
+        auto rc = unicode_traits<char_type>::append_to_string(
             &p, sv.data()+sv.length(), target, 
             uni_conversion_flags::strict);
         if (rc != uni_conversion_result::ok)
@@ -591,7 +591,7 @@ public:
                 it_ += len; 
 
                 std::basic_string<char_type> target;
-                auto rc = unicode_traits<char_type>::from_utf8(
+                auto rc = unicode_traits<uint8_t>::append_to_string(
                     &offset,offset+len,target,uni_conversion_flags::strict);
                 if (rc != uni_conversion_result::ok)
                 {
@@ -700,7 +700,7 @@ public:
                     it_ += len + 1; 
 
                     std::basic_string<char_type> target;
-                    auto rc = unicode_traits<char_type>::from_utf8(
+                    auto rc = unicode_traits<uint8_t>::append_to_string(
                         &offset,offset+len,target,uni_conversion_flags::strict);
                     if (rc != uni_conversion_result::ok)
                     {
@@ -717,7 +717,7 @@ public:
                     it_ += len + 2; 
 
                     std::basic_string<char_type> target;
-                    auto rc = unicode_traits<char_type>::from_utf8(
+                    auto rc = unicode_traits<uint8_t>::append_to_string(
                         &offset,offset+len,target,uni_conversion_flags::strict);
                     if (rc != uni_conversion_result::ok)
                     {
@@ -734,7 +734,7 @@ public:
                     it_ += len + 4; 
 
                     std::basic_string<char_type> target;
-                    auto rc = unicode_traits<char_type>::from_utf8(
+                    auto rc = unicode_traits<uint8_t>::append_to_string(
                         &offset,offset+len,target,uni_conversion_flags::strict);
                     if (rc != uni_conversion_result::ok)
                     {
