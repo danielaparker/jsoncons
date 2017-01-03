@@ -16,6 +16,7 @@
 #include <limits>
 #include <cwchar>
 #include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
 

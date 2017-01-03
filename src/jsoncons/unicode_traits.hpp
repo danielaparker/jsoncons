@@ -916,7 +916,7 @@ struct unicode_traits<CharT,
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
     append_to_string(const CharT* source_begin, const CharT* source_end, 
                      std::basic_string<UTF32,STraits,SAllocator>& target, const CharT** source_stop, 
-                     uni_conversion_flags = uni_conversion_flags::strict) 
+                     uni_conversion_flags flags = uni_conversion_flags::strict) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
