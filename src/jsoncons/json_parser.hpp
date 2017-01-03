@@ -425,9 +425,23 @@ void parse_string()
             case '\\':
                 {
                     const CharT* begin = sb;
-                    if (json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict) != uni_conversion_result::ok)
+                    auto result = json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict);
+                    switch (result)
                     {
+                    case uni_conversion_result::ok:
+                        break;
+                    case uni_conversion_result::over_long_utf8_sequence:
+                        err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
+                        break;
+                    case uni_conversion_result::unpaired_high_surrogate:
+                        err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
+                        break;
+                    case uni_conversion_result::expected_continuation_byte:
+                        err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
+                        break;
+                    default:
                         err_handler_.error(json_parser_errc::illegal_codepoint, *this);
+                        break;
                     }
                     column_ += (p_ - sb + 1);
                     stack_.back() = states::escape;
@@ -438,9 +452,23 @@ void parse_string()
             case '\"':
                 {
                     const CharT* begin = sb;
-                    if (json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict) != uni_conversion_result::ok)
+                    auto result = json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict);
+                    switch (result)
                     {
+                    case uni_conversion_result::ok:
+                        break;
+                    case uni_conversion_result::over_long_utf8_sequence:
+                        err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
+                        break;
+                    case uni_conversion_result::unpaired_high_surrogate:
+                        err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
+                        break;
+                    case uni_conversion_result::expected_continuation_byte:
+                        err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
+                        break;
+                    default:
                         err_handler_.error(json_parser_errc::illegal_codepoint, *this);
+                        break;
                     }
                     end_string_value(string_buffer_.data(),string_buffer_.length());
                     string_buffer_.clear();
@@ -458,9 +486,23 @@ void parse_string()
         {
 
             const CharT* begin = sb;
-            if (json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict) != uni_conversion_result::ok)
+            auto result = json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict);
+            switch (result)
             {
+            case uni_conversion_result::ok:
+                break;
+            case uni_conversion_result::over_long_utf8_sequence:
+                err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
+                break;
+            case uni_conversion_result::unpaired_high_surrogate:
+                err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
+                break;
+            case uni_conversion_result::expected_continuation_byte:
+                err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
+                break;
+            default:
                 err_handler_.error(json_parser_errc::illegal_codepoint, *this);
+                break;
             }
             column_ += (p_ - sb + 1);
         }
