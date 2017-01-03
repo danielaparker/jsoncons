@@ -30,12 +30,6 @@
 
 namespace jsoncons {
 
-inline
-static bool is_continuation_byte(unsigned char ch)
-{
-    return (ch & 0xC0) == 0x80;
-}
-
 /*
  * Magic values subtracted from a buffer value during UTF8 conversion.
  * This table contains as many values as there might be trailing bytes
@@ -167,6 +161,7 @@ struct Json_text_traits_
 enum class uni_conversion_result
 {
     ok,                         // conversion successful
+    over_long_utf8_sequence,    // over long utf8 sequence
     expected_continuation_byte, // expected continuation byte                         //
     unpaired_high_surrogate,    // unpaired high surrogate UTF-16
     illegal_surrogate_value,    // UTF-16 surrogate values are illegal in UTF-32
@@ -208,7 +203,7 @@ struct json_text_traits<CharT,
         uint8_t a;
         const UTF8 *srcptr = source+length;
         switch (length) {
-        default: return uni_conversion_result::source_illegal;
+        default: return uni_conversion_result::over_long_utf8_sequence;
             /* Everything else falls through when "true"... */
         case 4: if (((a = (*--srcptr))& 0xC0) != 0x80) 
             return uni_conversion_result::expected_continuation_byte;
