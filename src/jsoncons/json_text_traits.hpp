@@ -162,17 +162,24 @@ struct json_text_traits<CharT,
         const CharT* p = it;
         size_t count = 0;
 
-        uint8_t ch = 0;
         while (p < end && count < index)
         {
-            ch = *p;
+            uint8_t ch = *p;
             size_t length = trailing_bytes_for_utf8[ch] + 1;
             p += length;
             ++count;
         }
-        size_t len = trailing_bytes_for_utf8[ch] + 1;
 
-        return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
+        if (p < end)
+        {
+            uint8_t ch = *p;
+            size_t len = trailing_bytes_for_utf8[ch] + 1;
+            return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
+        }
+        else
+        {
+            return std::make_pair(it,static_cast<size_t>(0));
+        }
     }
 
     static size_t codepoint_count(const CharT* it, 
@@ -428,17 +435,24 @@ struct json_text_traits<CharT,
         const CharT* p = it;
         size_t count = 0;
 
-        uint32_t ch = 0;
         while (p < end && count < index)
         {
-            ch = *p;
+            uint8_t ch = *p;
             size_t length = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
             p += length;
             ++count;
         }
-        size_t len = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
 
-        return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
+        if (p < end)
+        {
+            uint8_t ch = *p;
+            size_t len = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
+            return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
+        }
+        else
+        {
+            return std::make_pair(it,static_cast<size_t>(0));
+        }
     }
 
     static size_t codepoint_count(const CharT* it, 
