@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(test_utf8_next_codepoint)
     const char* p = source.data();
     char32_t codepoint;
 
-    auto result = unicode_traits<char>::next_codepoint(p,source.data()+source.length(),
+    auto result = unicode_traits<char>::next_codepoint(source.data(),source.data()+source.length(),
                                            &codepoint,&p,
                                            uni_conversion_flags::strict);
     BOOST_CHECK(result == uni_conversion_result::ok);
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(test_utf8_next_codepoint2)
     const char* p = source.data();
     char32_t codepoint;
 
-    auto result1 = unicode_traits<char>::next_codepoint(p,source.data()+source.length(),
+    auto result1 = unicode_traits<char>::next_codepoint(source.data(),source.data()+source.length(),
                                            &codepoint,&p,
                                            uni_conversion_flags::strict);
     BOOST_CHECK(result1 == uni_conversion_result::ok);
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(test_utf8_next_codepoint3)
     const char* p = source.data();
     char32_t codepoint;
 
-    auto result1 = unicode_traits<char>::next_codepoint(p,source.data()+source.length(),
+    auto result1 = unicode_traits<char>::next_codepoint(source.data(),source.data()+source.length(),
                                            &codepoint,&p,
                                            uni_conversion_flags::strict);
     BOOST_REQUIRE(result1 == uni_conversion_result::ok);
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(test_utf16_next_codepoint)
     const char16_t* p = source.data();
     char32_t codepoint;
 
-    auto result = unicode_traits<char16_t>::next_codepoint(p,source.data()+source.length(),
+    auto result = unicode_traits<char16_t>::next_codepoint(source.data(),source.data()+source.length(),
                                            &codepoint,&p,
                                            uni_conversion_flags::strict);
     BOOST_CHECK(result == uni_conversion_result::ok);
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(test_utf32_next_codepoint)
     const char32_t* p = source.data();
     char32_t codepoint;
 
-    auto result = unicode_traits<char32_t>::next_codepoint(p,source.data()+source.length(),
+    auto result = unicode_traits<char32_t>::next_codepoint(source.data(),source.data()+source.length(),
                                            &codepoint,&p,
                                            uni_conversion_flags::strict);
     BOOST_CHECK(result == uni_conversion_result::ok);
