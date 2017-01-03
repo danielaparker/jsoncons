@@ -204,32 +204,34 @@ struct unicode_traits<CharT,
 
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source, const CharT* source_end, 
-            std::basic_string<UTF8,STraits,SAllocator>& target, uni_conversion_flags) 
+    append_to_string(const CharT* source, const CharT* source_end, 
+                     std::basic_string<UTF8,STraits,SAllocator>& target, const CharT** stop, 
+                     uni_conversion_flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        while (*source != source_end) 
+        while (source != source_end) 
         {
-            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(**source)] + 1;
-            if (length > (size_t)(source_end - *source))
+            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*source)] + 1;
+            if (length > (size_t)(source_end - source))
                 return uni_conversion_result::source_exhausted;
-            if ((result=is_legal(*source, length)) != uni_conversion_result::ok)
+            if ((result=is_legal(source, length)) != uni_conversion_result::ok)
                 return result;
-            target.append(*source, (*source) + length);
-            *source += length;
+            target.append(source, (source) + length);
+            source += length;
         }
+        *stop = source;
         return result;
     }
 
     template <class UTF16,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF16>::value && sizeof(UTF16) == sizeof(uint16_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<UTF16,STraits,SAllocator>& target, 
-             uni_conversion_flags flags) 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF16,STraits,SAllocator>& target, 
+                     const CharT** stop, uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source != source_end) 
         {
             uint32_t ch = 0;
@@ -285,19 +287,19 @@ struct unicode_traits<CharT,
                 target.push_back((UTF16)((ch & half_mask) + uni_sur_low_start));
             }
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
     template <class UTF32,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source_begin, const CharT* source_end, 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
             std::basic_string<UTF32,STraits,SAllocator>& target, 
-             uni_conversion_flags flags) 
+             const CharT** stop, uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source != source_end) 
         {
             UTF32 ch = 0;
@@ -343,19 +345,19 @@ struct unicode_traits<CharT,
                 target.push_back(uni_replacement_char);
             }
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
     template <class UTF32>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    next_codepoint(const CharT** source_begin, const CharT* source_end, 
-                   UTF32* target, 
+    next_codepoint(const CharT* source_begin, const CharT* source_end, 
+                   UTF32* target, const CharT** stop,
                    uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
 
         unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[(uint8_t)(*source)];
         if (extra_bytes_to_read >= source_end - source) 
@@ -401,7 +403,7 @@ struct unicode_traits<CharT,
             result = uni_conversion_result::source_illegal;
             *target = uni_replacement_char;
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
@@ -520,10 +522,10 @@ struct unicode_traits<CharT,
 
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<UTF8,STraits,SAllocator>& target, uni_conversion_flags flags) {
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+            std::basic_string<UTF8,STraits,SAllocator>& target, const CharT** stop, uni_conversion_flags flags) {
         uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source < source_end) {
             unsigned short bytes_to_write = 0;
             const uint32_t byteMask = 0xBF;
@@ -580,18 +582,18 @@ struct unicode_traits<CharT,
                 case 1: *--target_ptr = (uint8_t)(ch | first_byte_mark[bytes_to_write]);
             }
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
     template <class UTF16,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF16>::value && sizeof(UTF16) == sizeof(uint16_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<UTF16,STraits,SAllocator>& target, uni_conversion_flags flags) 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+            std::basic_string<UTF16,STraits,SAllocator>& target, const CharT** stop, uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source != source_end) 
         {
             uint32_t ch = *source++;
@@ -634,18 +636,18 @@ struct unicode_traits<CharT,
                 target.push_back((CharT)ch);
             }
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
     template <class UTF32,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<UTF32,STraits,SAllocator>& target, uni_conversion_flags flags) 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+            std::basic_string<UTF32,STraits,SAllocator>& target, const CharT** stop, uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source != source_end) 
         {
             uint32_t ch = *source++;
@@ -679,18 +681,18 @@ struct unicode_traits<CharT,
             }
             target.push_back(ch);
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
     template <class UTF32>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    next_codepoint(const CharT** source_begin, const CharT* source_end, 
-                   UTF32* target, 
+    next_codepoint(const CharT* source_begin, const CharT* source_end, 
+                   UTF32* target, const CharT** stop,
                    uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         uint32_t ch, ch2;
 
         ch = *source++;
@@ -722,7 +724,7 @@ struct unicode_traits<CharT,
         }
         *target = ch;
 
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
@@ -807,12 +809,12 @@ struct unicode_traits<CharT,
 
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source_begin, const CharT* source_end, 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
             std::basic_string<UTF8,STraits,SAllocator>& target, 
-            uni_conversion_flags flags) 
+            const CharT** stop, uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source < source_end) {
             uint32_t ch;
             unsigned short bytes_to_write = 0;
@@ -852,19 +854,19 @@ struct unicode_traits<CharT,
                 case 1: *--target_ptr = (UTF8) (ch | first_byte_mark[bytes_to_write]);
             }
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
     template <class UTF16,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF16>::value && sizeof(UTF16) == sizeof(uint16_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source_begin, const CharT* source_end, 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
             std::basic_string<UTF16,STraits,SAllocator>& target, 
-             uni_conversion_flags flags) 
+             const CharT** stop, uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source != source_end) 
         {
             uint32_t ch = *source++;
@@ -894,18 +896,19 @@ struct unicode_traits<CharT,
                 target.push_back((UTF16)((ch & half_mask) + uni_sur_low_start));
             }
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
     template <class UTF32,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    append_to_string(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<UTF32,STraits,SAllocator>& target, uni_conversion_flags) 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF32,STraits,SAllocator>& target, const CharT** stop, 
+                     uni_conversion_flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source != source_end) 
         {
             uint32_t ch;
@@ -931,19 +934,19 @@ struct unicode_traits<CharT,
                 result = uni_conversion_result::source_illegal;
             }
         }
-        *source_begin = source;
+        *stop = source;
         return result;
     }
 
     template <class UTF32>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    next_codepoint(const CharT** source_begin, const CharT*, 
-                   UTF32* target, 
+    next_codepoint(const CharT* source_begin, const CharT*, 
+                   UTF32* target, const CharT** stop,
                    uni_conversion_flags) 
     {
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         *target = *source++;
-        *source_begin = source;
+        *stop = source;
 
         return uni_conversion_result::ok;
     }

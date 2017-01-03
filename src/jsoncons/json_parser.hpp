@@ -453,8 +453,8 @@ public:
 
     void append_to_string(const CharT* sb, const CharT* se)
     {
-            const CharT* begin = sb;
-            auto result = unicode_traits<CharT>::append_to_string(&begin,se,string_buffer_,uni_conversion_flags::strict);
+            const CharT* stop = sb;
+            auto result = unicode_traits<CharT>::append_to_string(sb,se,string_buffer_,&stop,uni_conversion_flags::strict);
             switch (result)
             {
             case uni_conversion_result::ok:
