@@ -210,9 +210,12 @@ struct json_text_traits<CharT,
         switch (length) {
         default: return uni_conversion_result::source_illegal;
             /* Everything else falls through when "true"... */
-        case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return uni_conversion_result::expected_continuation_byte;
-        case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return uni_conversion_result::expected_continuation_byte;
-        case 2: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return uni_conversion_result::expected_continuation_byte;
+        case 4: if (((a = (*--srcptr))& 0xC0) != 0x80) 
+            return uni_conversion_result::expected_continuation_byte;
+        case 3: if (((a = (*--srcptr))& 0xC0) != 0x80) 
+            return uni_conversion_result::expected_continuation_byte;
+        case 2: if (((a = (*--srcptr))& 0xC0) != 0x80) 
+            return uni_conversion_result::expected_continuation_byte;
 
             switch (static_cast<uint8_t>(*source)) 
             {
