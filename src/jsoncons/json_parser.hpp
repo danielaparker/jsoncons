@@ -173,7 +173,6 @@ class basic_json_parser : private basic_parsing_context<CharT>
     int nesting_depth_;
     uint8_t precision_;
     size_t literal_index_;
-    size_t continuation_count_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -193,8 +192,7 @@ public:
          initial_stack_capacity_(default_initial_stack_capacity_),
          nesting_depth_(0), 
          precision_(0), 
-         literal_index_(0),
-         continuation_count_(0)
+         literal_index_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
     }
@@ -212,8 +210,7 @@ public:
          initial_stack_capacity_(default_initial_stack_capacity_),
          nesting_depth_(0), 
          precision_(0), 
-         literal_index_(0),
-         continuation_count_(0)
+         literal_index_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
     }
@@ -372,7 +369,8 @@ public:
             }
         }
     }
-void parse_string()
+
+    void parse_string()
     {
         const CharT* sb = p_;
         bool done = false;
@@ -424,25 +422,7 @@ void parse_string()
                 break;
             case '\\':
                 {
-                    const CharT* begin = sb;
-                    auto result = json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict);
-                    switch (result)
-                    {
-                    case uni_conversion_result::ok:
-                        break;
-                    case uni_conversion_result::over_long_utf8_sequence:
-                        err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                        break;
-                    case uni_conversion_result::unpaired_high_surrogate:
-                        err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
-                        break;
-                    case uni_conversion_result::expected_continuation_byte:
-                        err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                        break;
-                    default:
-                        err_handler_.error(json_parser_errc::illegal_codepoint, *this);
-                        break;
-                    }
+                    append_to_string(sb,p_);
                     column_ += (p_ - sb + 1);
                     stack_.back() = states::escape;
                     done = true;
@@ -451,25 +431,7 @@ void parse_string()
                 }
             case '\"':
                 {
-                    const CharT* begin = sb;
-                    auto result = json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict);
-                    switch (result)
-                    {
-                    case uni_conversion_result::ok:
-                        break;
-                    case uni_conversion_result::over_long_utf8_sequence:
-                        err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                        break;
-                    case uni_conversion_result::unpaired_high_surrogate:
-                        err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
-                        break;
-                    case uni_conversion_result::expected_continuation_byte:
-                        err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                        break;
-                    default:
-                        err_handler_.error(json_parser_errc::illegal_codepoint, *this);
-                        break;
-                    }
+                    append_to_string(sb,p_);
                     end_string_value(string_buffer_.data(),string_buffer_.length());
                     string_buffer_.clear();
                     column_ += (p_ - sb + 1);
@@ -484,9 +446,15 @@ void parse_string()
         }
         if (!done)
         {
+            append_to_string(sb,p_);
+            column_ += (p_ - sb + 1);
+        }
+    }
 
+    void append_to_string(const CharT* sb, const CharT* se)
+    {
             const CharT* begin = sb;
-            auto result = json_text_traits<CharT>::append(&begin,p_,string_buffer_,uni_conversion_flags::strict);
+            auto result = json_text_traits<CharT>::append(&begin,se,string_buffer_,uni_conversion_flags::strict);
             switch (result)
             {
             case uni_conversion_result::ok:
@@ -504,8 +472,6 @@ void parse_string()
                 err_handler_.error(json_parser_errc::illegal_codepoint, *this);
                 break;
             }
-            column_ += (p_ - sb + 1);
-        }
     }
 
     void parse(const CharT* const input, size_t start, size_t length)
