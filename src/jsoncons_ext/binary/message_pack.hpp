@@ -248,7 +248,7 @@ public:
     {
         size_t n = 0;
 
-        const size_t length = json_text_traits<char_type>::utf_length(sv.data(),sv.length());
+        const size_t length = unicode_traits<char_type>::utf_length(sv.data(),sv.length());
         if (length <= 31)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
@@ -483,7 +483,7 @@ public:
     {
         std::basic_string<uint8_t> target;
         const char_type* p = sv.data();
-        auto rc = json_text_traits<char_type>::to_utf8(
+        auto rc = unicode_traits<char_type>::to_utf8(
             &p, sv.data()+sv.length(), target, 
             uni_conversion_flags::strict);
         if (rc != uni_conversion_result::ok)
@@ -591,7 +591,7 @@ public:
                 it_ += len; 
 
                 std::basic_string<char_type> target;
-                auto rc = json_text_traits<char_type>::from_utf8(
+                auto rc = unicode_traits<char_type>::from_utf8(
                     &offset,offset+len,target,uni_conversion_flags::strict);
                 if (rc != uni_conversion_result::ok)
                 {
@@ -700,7 +700,7 @@ public:
                     it_ += len + 1; 
 
                     std::basic_string<char_type> target;
-                    auto rc = json_text_traits<char_type>::from_utf8(
+                    auto rc = unicode_traits<char_type>::from_utf8(
                         &offset,offset+len,target,uni_conversion_flags::strict);
                     if (rc != uni_conversion_result::ok)
                     {
@@ -717,7 +717,7 @@ public:
                     it_ += len + 2; 
 
                     std::basic_string<char_type> target;
-                    auto rc = json_text_traits<char_type>::from_utf8(
+                    auto rc = unicode_traits<char_type>::from_utf8(
                         &offset,offset+len,target,uni_conversion_flags::strict);
                     if (rc != uni_conversion_result::ok)
                     {
@@ -734,7 +734,7 @@ public:
                     it_ += len + 4; 
 
                     std::basic_string<char_type> target;
-                    auto rc = json_text_traits<char_type>::from_utf8(
+                    auto rc = unicode_traits<char_type>::from_utf8(
                         &offset,offset+len,target,uni_conversion_flags::strict);
                     if (rc != uni_conversion_result::ok)
                     {

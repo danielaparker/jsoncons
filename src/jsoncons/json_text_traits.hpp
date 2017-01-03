@@ -81,15 +81,10 @@ const uint16_t uni_sur_high_end = 0xDBFF;
 const uint16_t uni_sur_low_start = 0xDC00;
 const uint16_t uni_sur_low_end = 0xDFFF;
 
-// json_text_traits
-
-template <class CharT, class Enable=void>
-struct json_text_traits
-{
-};
+// unicode_traits
 
 template <class CharT>
-struct Json_text_traits_
+struct json_literals
 {
     static const std::pair<const CharT*,size_t> null_literal() 
     {
@@ -108,25 +103,27 @@ struct Json_text_traits_
         static const CharT data[] = {'f','a','l','s','e',0};
         return std::pair<const CharT*,size_t>{data,5};
     }
-
-    static bool is_control_character(CharT c)
-    {
-        uint32_t u(c >= 0 ? c : 256 + c);
-        return u <= 0x1F || u == 0x7f;
-    }
-
-    static CharT to_hex_character(unsigned char c)
-    {
-        JSONCONS_ASSERT(c <= 0xF);
-
-        return (c < 10) ? ('0' + c) : ('A' - 10 + c);
-    }
-
-    static bool is_non_ascii_codepoint(uint32_t cp)
-    {
-        return cp >= 0x80;
-    }
 };
+
+inline
+unsigned char to_hex_character(unsigned char c)
+{
+    JSONCONS_ASSERT(c <= 0xF);
+
+    return (c < 10) ? ('0' + c) : ('A' - 10 + c);
+}
+
+inline
+bool is_control_character(uint32_t c)
+{
+    return c <= 0x1F || c == 0x7f;
+}
+
+inline
+bool is_non_ascii_codepoint(uint32_t cp)
+{
+    return cp >= 0x80;
+}
 
 enum class uni_conversion_result
 {
@@ -145,10 +142,15 @@ enum class uni_conversion_flags
     lenient
 };
 
+template <class CharT, class Enable=void>
+struct unicode_traits
+{
+};
+
 template <class CharT>
-struct json_text_traits<CharT,
+struct unicode_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
-                        sizeof(CharT)==sizeof(uint8_t)>::type> : public Json_text_traits_<CharT>
+                        sizeof(CharT)==sizeof(uint8_t)>::type> 
 {
     static size_t utf_length(const CharT*, size_t length)
     {
@@ -401,9 +403,9 @@ struct json_text_traits<CharT,
 };
 
 template <class CharT>
-struct json_text_traits<CharT,
+struct unicode_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
-                        sizeof(CharT)==sizeof(uint16_t)>::type> : public Json_text_traits_<CharT>
+                        sizeof(CharT)==sizeof(uint16_t)>::type> 
 {
     static size_t utf_length(const CharT *source, size_t length)
     {
@@ -604,7 +606,7 @@ struct json_text_traits<CharT,
                 result = uni_conversion_result::source_exhausted; break;
             }
             /* Do this check whether lenient or strict */
-            if ((result=json_text_traits<UTF8>::is_legal(source, extra_bytes_to_read +1)) != uni_conversion_result::ok)
+            if ((result=unicode_traits<UTF8>::is_legal(source, extra_bytes_to_read +1)) != uni_conversion_result::ok)
             {
                 break;
             }
@@ -726,9 +728,9 @@ struct json_text_traits<CharT,
 };
 
 template <class CharT>
-struct json_text_traits<CharT,
+struct unicode_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
-                        sizeof(CharT)==sizeof(uint32_t)>::type> : public Json_text_traits_<CharT>
+                        sizeof(CharT)==sizeof(uint32_t)>::type> 
 {
     static size_t utf_length(const CharT *source, size_t length)
     {
@@ -876,7 +878,7 @@ struct json_text_traits<CharT,
                 result = uni_conversion_result::source_exhausted; break;
             }
             /* Do this check whether lenient or strict */
-            if ((result=json_text_traits<UTF8>::is_legal(source, extra_bytes_to_read+1)) != uni_conversion_result::ok)
+            if ((result=unicode_traits<UTF8>::is_legal(source, extra_bytes_to_read+1)) != uni_conversion_result::ok)
             {
                 break;
             }
