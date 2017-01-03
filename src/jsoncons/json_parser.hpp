@@ -468,6 +468,9 @@ public:
             case uni_conversion_result::expected_continuation_byte:
                 err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
                 break;
+            case uni_conversion_result::illegal_surrogate_value:
+                err_handler_.error(json_parser_errc::illegal_surrogate_value, *this);
+                break;
             default:
                 err_handler_.error(json_parser_errc::illegal_codepoint, *this);
                 break;

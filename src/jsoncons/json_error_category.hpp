@@ -39,7 +39,7 @@ namespace jsoncons {
         expected_continuation_byte = 24,
         over_long_utf8_sequence = 25,
         illegal_codepoint = 26,
-        illegal_suurogate_value = 27,
+        illegal_surrogate_value = 27,
         unpaired_high_surrogate = 28
     };
 
@@ -107,7 +107,7 @@ public:
             return "Over long UTF-8 sequence";
         case json_parser_errc::illegal_codepoint:
             return "Illegal codepoint (>= 0xd800 && <= 0xdfff)";
-        case json_parser_errc::illegal_suurogate_value:
+        case json_parser_errc::illegal_surrogate_value:
             return "UTF-16 surrogate values are illegal in UTF-32";
         case json_parser_errc::unpaired_high_surrogate:
             return "Expected low surrogate following the high surrogate";

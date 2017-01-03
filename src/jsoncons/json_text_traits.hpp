@@ -126,36 +126,6 @@ struct Json_text_traits_
     {
         return cp >= 0x80;
     }
-
-    static std::pair<const CharT*,size_t> char_sequence_at(const CharT* it, 
-                                                           const CharT* end,
-                                                           size_t index)
-    {
-        const CharT* p = it;
-        size_t count = 0;
-
-        while (p < end && count < index)
-        {
-            size_t length = json_text_traits<CharT>::codepoint_length(p,end);
-            p += length;
-            ++count;
-        }
-        size_t len = json_text_traits<CharT>::codepoint_length(p,end);
-        return (count == index) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
-    }
-
-    static size_t codepoint_count(const CharT* it, 
-                                  const CharT* end)
-    {
-        size_t count = 0;
-        const CharT* p = it;
-        while (p < end)
-        {
-            p += json_text_traits<CharT>::codepoint_length(p,end);
-            ++count;
-        }
-        return count;
-    }
 };
 
 enum class uni_conversion_result
@@ -183,6 +153,38 @@ struct json_text_traits<CharT,
     static size_t utf_length(const CharT*, size_t length)
     {
         return length;
+    }
+
+    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
+                                                      const CharT* end,
+                                                      size_t index)
+    {
+        const CharT* p = it;
+        size_t count = 0;
+
+        while (p < end && count < index)
+        {
+            size_t length = trailing_bytes_for_utf8[(uint8_t)(*p)] + 1;
+            p += length;
+            ++count;
+        }
+        size_t len = trailing_bytes_for_utf8[(uint8_t)(*p)] + 1;
+
+        return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
+    }
+
+    static size_t codepoint_count(const CharT* it, 
+                                  const CharT* end)
+    {
+        size_t count = 0;
+        const CharT* p = it;
+        while (p < end)
+        {
+            size_t length = trailing_bytes_for_utf8[(uint8_t)(*p)] + 1;
+            p += length;
+            ++count;
+        }
+        return count;
     }
 
     /*
@@ -291,8 +293,8 @@ struct json_text_traits<CharT,
     template <class UTF32>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
     next_codepoint(const CharT** source_begin, const CharT* source_end, 
-                                         UTF32* target, 
-                                         uni_conversion_flags flags) 
+                   UTF32* target, 
+                   uni_conversion_flags flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
@@ -360,31 +362,6 @@ struct json_text_traits<CharT,
         return count;
     }
 
-    static size_t codepoint_length(const CharT* it, 
-                                   const CharT* end)
-    {
-        size_t length = 0;
-        CharT c = *it;
-        uint32_t u(c >= 0 ? c : 256 + c );
-        if (u < 0x80)
-        {
-            length = 1;
-        }
-        else if ((u >> 5) == 0x6 && (end-it) > 1)
-        {
-            length = 2;
-        }
-        else if ((u >> 4) == 0xe && (end-it) > 2)
-        {
-            length = 3;
-        }
-        else if ((u >> 3) == 0x1e && (end-it) > 3)
-        {
-            length = 4;
-        }
-        return length;
-    }
-
     template <class STraits,class SAllocator>
     static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
     {
@@ -438,6 +415,37 @@ struct json_text_traits<CharT,
             } else {                            
                 count += 3;
             }
+        }
+        return count;
+    }
+
+    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
+                                                      const CharT* end,
+                                                      size_t index)
+    {
+        const CharT* p = it;
+        size_t count = 0;
+
+        while (p < end && count < index)
+        {
+            size_t length = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
+            p += length;
+            ++count;
+        }
+        size_t len = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
+
+        return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
+    }
+
+    static size_t codepoint_count(const CharT* it, 
+                                  const CharT* end)
+    {
+        size_t count = 0;
+        const CharT* p = it;
+        while (p < end)
+        {
+            size_t length = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
+            ++count;
         }
         return count;
     }
@@ -695,18 +703,6 @@ struct json_text_traits<CharT,
             s.push_back(static_cast<CharT>((cp & 0x3ff) + uni_sur_low_start));
         }
     }
-
-    static size_t codepoint_length(const CharT* it, const CharT* end)
-    {
-        size_t length = 1;
-
-        uint32_t cp = (0xffff & *it);
-        if ((cp >= uni_sur_high_start && cp <= uni_sur_high_end) && (end-it) > 1) // surrogate pair
-        {
-            length = 2;
-        }
-        return length;
-    }
 };
 
 template <class CharT>
@@ -735,6 +731,28 @@ struct json_text_traits<CharT,
             }
         }
         return count;
+    }
+
+    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
+                                                      const CharT* end,
+                                                      size_t index)
+    {
+        const CharT* p = it;
+        size_t count = 0;
+
+        while (p < end && count < index)
+        {
+            ++p;
+            ++count;
+        }
+
+        return (p < end) ? std::make_pair(p,1) : std::make_pair(it,static_cast<size_t>(0));
+    }
+
+    static size_t codepoint_count(const CharT* it, 
+                                  const CharT* end)
+    {
+        return (size_t)(end-it);
     }
 
     template <class STraits,class SAllocator>
@@ -918,11 +936,6 @@ struct json_text_traits<CharT,
         {
             s.push_back(static_cast<CharT>(cp));
         }
-    }
-
-    static size_t codepoint_length(const CharT* it, const CharT* end)
-    {
-        return (end > it) ? 1 : 0;
     }
 };
 
