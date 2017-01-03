@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <map>
 #include <limits> // std::numeric_limits
-#include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/unicode_traits.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons_ext/csv/csv_parameters.hpp>

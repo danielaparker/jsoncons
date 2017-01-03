@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <cctype>
-#include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/unicode_traits.hpp>
 #include <jsoncons/json_input_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_parser.hpp>

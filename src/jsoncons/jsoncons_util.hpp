@@ -33,6 +33,49 @@
 
 namespace jsoncons
 {
+
+template <class CharT>
+struct json_literals
+{
+    static const std::pair<const CharT*,size_t> null_literal() 
+    {
+        static const CharT data[] = {'n','u','l','l',0};
+        return std::pair<const CharT*,size_t>{data,4};
+    }
+
+    static const std::pair<const CharT*,size_t> true_literal() 
+    {
+        static const CharT data[] = {'t','r','u','e',0};
+        return std::pair<const CharT*,size_t>{data,4};
+    }
+
+    static const std::pair<const CharT*,size_t> false_literal() 
+    {
+        static const CharT data[] = {'f','a','l','s','e',0};
+        return std::pair<const CharT*,size_t>{data,5};
+    }
+};
+
+inline
+unsigned char to_hex_character(unsigned char c)
+{
+    JSONCONS_ASSERT(c <= 0xF);
+
+    return (c < 10) ? ('0' + c) : ('A' - 10 + c);
+}
+
+inline
+bool is_control_character(uint32_t c)
+{
+    return c <= 0x1F || c == 0x7f;
+}
+
+inline
+bool is_non_ascii_codepoint(uint32_t cp)
+{
+    return cp >= 0x80;
+}
+
 template <typename T>
 struct is_stateless
  : public std::integral_constant<bool,  
