@@ -369,7 +369,106 @@ public:
             }
         }
     }
-
+    void parse_string()
+    {
+        const CharT* sb = p_;
+        bool done = false;
+        while (!done && p_ < end_input_)
+        {
+            switch (*p_)
+            {
+            case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
+            case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
+            case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
+                string_buffer_.append(sb,p_-sb);
+                column_ += (p_ - sb + 1);
+                err_handler_.error(json_parser_errc::illegal_control_character, *this);
+                // recovery - skip
+                done = true;
+                ++p_;
+                break;
+            case '\r':
+                {
+                    column_ += (p_ - sb + 1);
+                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+                    stack_.push_back(states::cr);
+                    done = true;
+                    ++p_;
+                }
+                break;
+            case '\n':
+                {
+                    column_ += (p_ - sb + 1);
+                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+                    stack_.push_back(states::lf);
+                    done = true;
+                    ++p_;
+                }
+                break;
+            case '\t':
+                {
+                    column_ += (p_ - sb + 1);
+                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+                    done = true;
+                    ++p_;
+                }
+                break;
+            case '\\': 
+                string_buffer_.append(sb,p_-sb);
+                column_ += (p_ - sb + 1);
+                stack_.back() = states::escape;
+                done = true;
+                ++p_;
+                break;
+            case '\"':
+                if (string_buffer_.length() == 0)
+                {
+                    auto result = unicode_traits<CharT>::is_legal_string(sb,p_);
+                    if (result == uni_conversion_result::ok)
+                    {
+                        end_string_value(sb,p_-sb);
+                    }
+                    else
+                    {
+                        error(result);
+                    }
+                }
+                else
+                {
+                    string_buffer_.append(sb,p_-sb);
+                    auto result = unicode_traits<CharT>::is_legal_string(string_buffer_.data(),string_buffer_.data()+string_buffer_.length());
+                    if (result == uni_conversion_result::ok)
+                    {
+                        end_string_value(string_buffer_.data(),string_buffer_.length());
+                        string_buffer_.clear();
+                    }
+                    else
+                    {
+                        error(result);
+                    }
+                }
+                column_ += (p_ - sb + 1);
+                done = true;
+                ++p_;
+                break;
+            default:
+                ++p_;
+                break;
+            }
+        }
+        if (!done)
+        {
+            string_buffer_.append(sb,p_-sb);
+            column_ += (p_ - sb + 1);
+        }
+    }
+/*
     void parse_string()
     {
         const CharT* sb = p_;
@@ -450,31 +549,29 @@ public:
             column_ += (p_ - sb + 1);
         }
     }
-
-    void append_to_string(const CharT* sb, const CharT* se)
+*/
+    void error(uni_conversion_result result)
     {
-            const CharT* stop = sb;
-            auto result = unicode_traits<CharT>::append_to_string(sb,se,string_buffer_,&stop,uni_conversion_flags::strict);
-            switch (result)
-            {
-            case uni_conversion_result::ok:
-                break;
-            case uni_conversion_result::over_long_utf8_sequence:
-                err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                break;
-            case uni_conversion_result::unpaired_high_surrogate:
-                err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
-                break;
-            case uni_conversion_result::expected_continuation_byte:
-                err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                break;
-            case uni_conversion_result::illegal_surrogate_value:
-                err_handler_.error(json_parser_errc::illegal_surrogate_value, *this);
-                break;
-            default:
-                err_handler_.error(json_parser_errc::illegal_codepoint, *this);
-                break;
-            }
+        switch (result)
+        {
+        case uni_conversion_result::ok:
+            break;
+        case uni_conversion_result::over_long_utf8_sequence:
+            err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
+            break;
+        case uni_conversion_result::unpaired_high_surrogate:
+            err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
+            break;
+        case uni_conversion_result::expected_continuation_byte:
+            err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
+            break;
+        case uni_conversion_result::illegal_surrogate_value:
+            err_handler_.error(json_parser_errc::illegal_surrogate_value, *this);
+            break;
+        default:
+            err_handler_.error(json_parser_errc::illegal_codepoint, *this);
+            break;
+        }
     }
 
     void parse(const CharT* const input, size_t start, size_t length)

@@ -202,6 +202,24 @@ struct unicode_traits<CharT,
         return uni_conversion_result::ok;
     }
 
+    static uni_conversion_result is_legal_string(const CharT *source, const CharT* source_end) 
+    {
+        uni_conversion_result result = uni_conversion_result::ok;
+        while (source != source_end) {
+            size_t length = trailing_bytes_for_utf8[(uint8_t)*source] + 1;
+            if (length > (size_t)(source_end - source))
+            {
+                return uni_conversion_result::source_exhausted;
+            }
+            if ((result=is_legal(source, length)) != uni_conversion_result::ok)
+            {
+                return result;
+            }
+            source += length;
+        }
+        return result;
+    }
+
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
     append_to_string(const CharT* source, const CharT* source_end, 
@@ -528,6 +546,43 @@ struct unicode_traits<CharT,
         return count;
     }
 
+    static uni_conversion_result is_legal_string(const CharT *source, const CharT* source_end) 
+    {
+        uni_conversion_result result = uni_conversion_result::ok;
+
+        while (source != source_end) 
+        {
+            uint32_t ch = *source++;
+            /* If we have a surrogate pair, convert to uint32_t first. */
+            if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
+            {
+                /* If the 16 bits following the high surrogate are in the source buffer... */
+                if (source < source_end) {
+                    uint32_t ch2 = *source;
+                    /* If it's a low surrogate, */
+                    if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
+                        ++source;
+                    } else { /* it's an unpaired high surrogate */
+                        --source; /* return to the illegal value itself */
+                        result = uni_conversion_result::unpaired_high_surrogate;
+                        break;
+                    }
+                } else { /* We don't have the 16 bits following the high surrogate. */
+                    --source; /* return to the high surrogate */
+                    result = uni_conversion_result::source_exhausted;
+                    break;
+                }
+            } else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
+            {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                --source; /* return to the illegal value itself */
+                result = uni_conversion_result::source_illegal;
+                break;
+            }
+        }
+        return result;
+    }
+
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
     append_to_string(const CharT* source_begin, const CharT* source_end, 
@@ -819,6 +874,31 @@ struct unicode_traits<CharT,
         return (size_t)(end-it);
     }
 
+    static uni_conversion_result is_legal_string(const CharT *source, const CharT* source_end) 
+    {
+        uni_conversion_result result = uni_conversion_result::ok;
+        while (source != source_end) 
+        {
+            uint32_t ch = *source++;
+            if (flags == uni_conversion_flags::strict ) {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+                    --source; /* return to the illegal value itself */
+                    result = uni_conversion_result::illegal_surrogate_value;
+                    break;
+                }
+            }
+            if (ch <= uni_max_legal_utf32)
+            {
+            }
+            else
+            {
+                result = uni_conversion_result::source_illegal;
+            }
+        }
+        return result;
+    }
+
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
     append_to_string(const CharT* source_begin, const CharT* source_end, 
@@ -828,11 +908,10 @@ struct unicode_traits<CharT,
         uni_conversion_result result = uni_conversion_result::ok;
         const CharT* source = source_begin;
         while (source < source_end) {
-            uint32_t ch;
             unsigned short bytes_to_write = 0;
             const uint32_t byteMask = 0xBF;
             const uint32_t byteMark = 0x80; 
-            ch = *source++;
+            uint32_t ch = *source++;
             if (flags == uni_conversion_flags::strict ) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
@@ -923,11 +1002,7 @@ struct unicode_traits<CharT,
         const CharT* source = source_begin;
         while (source != source_end) 
         {
-            uint32_t ch;
-            unsigned short bytes_to_write = 0;
-            const uint32_t byteMask = 0xBF;
-            const uint32_t byteMark = 0x80; 
-            ch = *source++;
+            uint32_t ch = *source++;
             if (flags == uni_conversion_flags::strict ) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
