@@ -27,7 +27,6 @@
 #include <iostream>
 #include <vector>
 #include <jsoncons/jsoncons.hpp>
-#include <jsoncons/json_error_category.hpp>
 
 namespace jsoncons {
 
@@ -87,17 +86,6 @@ const uint16_t uni_sur_high_start = 0xD800;
 const uint16_t uni_sur_high_end = 0xDBFF;
 const uint16_t uni_sur_low_start = 0xDC00;
 const uint16_t uni_sur_low_end = 0xDFFF;
-
-inline bool is_leading_surrogate(uint16_t c)
-{
-    return c >= uni_sur_high_start && c <= uni_sur_high_end;
-}
-
-inline bool is_trailing_surrogate(uint16_t c)
-{
-    return c >= uni_sur_low_start && c <= uni_sur_low_end;
-}
-
 
 // json_text_traits
 
@@ -178,9 +166,12 @@ struct Json_text_traits_
 
 enum class uni_conversion_result
 {
-    ok,                  // conversion successful
-    source_exhausted,    // partial character in source, but hit end
-    source_illegal       // source sequence is illegal/malformed
+    ok,                         // conversion successful
+    expected_continuation_byte, // expected continuation byte                         //
+    unpaired_high_surrogate,    // unpaired high surrogate UTF-16
+    illegal_surrogate_value,    // UTF-16 surrogate values are illegal in UTF-32
+    source_exhausted,           // partial character in source, but hit end
+    source_illegal              // source sequence is illegal/malformed
 };
 
 enum class uni_conversion_flags
@@ -211,30 +202,35 @@ struct json_text_traits<CharT,
      */
 
     template <class UTF8>
-    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t), bool>::type
-    is_legal(const UTF8 *source, size_t length) {
+    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t), uni_conversion_result>::type
+    is_legal(const UTF8 *source, size_t length) 
+    {
         uint8_t a;
         const UTF8 *srcptr = source+length;
         switch (length) {
-        default: return false;
+        default: return uni_conversion_result::source_illegal;
             /* Everything else falls through when "true"... */
-        case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
-        case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
-        case 2: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+        case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return uni_conversion_result::expected_continuation_byte;
+        case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return uni_conversion_result::expected_continuation_byte;
+        case 2: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return uni_conversion_result::expected_continuation_byte;
 
-            switch (static_cast<uint8_t>(*source)) {
+            switch (static_cast<uint8_t>(*source)) 
+            {
                 /* no fall-through in this inner switch */
-                case 0xE0: if (a < 0xA0) return false; break;
-                case 0xED: if (a > 0x9F) return false; break;
-                case 0xF0: if (a < 0x90) return false; break;
-                case 0xF4: if (a > 0x8F) return false; break;
-                default:   if (a < 0x80) return false;
+                case 0xE0: if (a < 0xA0) return uni_conversion_result::source_illegal; break;
+                case 0xED: if (a > 0x9F) return uni_conversion_result::source_illegal; break;
+                case 0xF0: if (a < 0x90) return uni_conversion_result::source_illegal; break;
+                case 0xF4: if (a > 0x8F) return uni_conversion_result::source_illegal; break;
+                default:   if (a < 0x80) return uni_conversion_result::source_illegal;
             }
 
-        case 1: if (static_cast<uint8_t>(*source) >= 0x80 && static_cast<uint8_t>(*source) < 0xC2) return false;
+        case 1: if (static_cast<uint8_t>(*source) >= 0x80 && static_cast<uint8_t>(*source) < 0xC2) 
+            return uni_conversion_result::source_illegal;
         }
-        if (static_cast<uint8_t>(*source) > 0xF4) return false;
-        return true;
+        if (static_cast<uint8_t>(*source) > 0xF4) 
+            return uni_conversion_result::source_illegal;
+
+        return uni_conversion_result::ok;
     }
 
     template <class STraits,class SAllocator>
@@ -242,10 +238,13 @@ struct json_text_traits<CharT,
             std::basic_string<CharT,STraits,SAllocator>& target, uni_conversion_flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        while (*source != source_end) {
+        while (*source != source_end) 
+        {
             size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(**source)] + 1;
-            if (length > (size_t)(source_end - *source) || !is_legal(*source, length))
-                return uni_conversion_result::source_illegal;
+            if (length > (size_t)(source_end - *source))
+                return uni_conversion_result::source_exhausted;
+            if ((result=is_legal(*source, length)) != uni_conversion_result::ok)
+                return result;
             target.append(*source, (*source) + length);
             *source += length;
         }
@@ -258,10 +257,13 @@ struct json_text_traits<CharT,
             std::basic_string<UTF8,STraits,SAllocator>& target, uni_conversion_flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        while (*source != source_end) {
+        while (*source != source_end) 
+        {
             size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(**source)] + 1;
-            if (length > (size_t)(source_end - *source) || !is_legal(*source, length))
-                return uni_conversion_result::source_illegal;
+            if (length > (size_t)(source_end - *source))
+                return uni_conversion_result::source_exhausted;
+            if ((result=is_legal(*source, length)) != uni_conversion_result::ok)
+                return result;
             target.append(*source, (*source) + length);
             *source += length;
         }
@@ -275,10 +277,13 @@ struct json_text_traits<CharT,
               uni_conversion_flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        while (*source != source_end) {
+        while (*source != source_end) 
+        {
             size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(**source)] + 1;
-            if (length > (size_t)(source_end - *source) || !is_legal(*source, length))
-                return uni_conversion_result::source_illegal;
+            if (length > (size_t)(source_end - *source))
+                return uni_conversion_result::source_exhausted;
+            if ((result=is_legal(*source, length)) != uni_conversion_result::ok)
+                return result;
             target.append(*source,(*source)+length);
             *source += length;
         }
@@ -295,21 +300,22 @@ struct json_text_traits<CharT,
 
         const CharT* source = *source_begin;
 
-        unsigned short extraBytesToRead = trailing_bytes_for_utf8[(uint8_t)(*source)];
-        if (extraBytesToRead >= source_end - source) {
+        unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[(uint8_t)(*source)];
+        if (extra_bytes_to_read >= source_end - source) 
+        {
             result = uni_conversion_result::source_exhausted;
             return result;
         }
         /* Do this check whether lenient or strict */
-        if (!json_text_traits<CharT>::is_legal(source, extraBytesToRead+1)) {
-            result = uni_conversion_result::source_illegal;
+        if ((result=is_legal(source, extra_bytes_to_read+1)) != uni_conversion_result::ok)
+        {
             return result;
         }
         /*
          * The cases all fall through. See "Note A" below.
          */
         UTF32 ch = 0;
-        switch (extraBytesToRead) {
+        switch (extra_bytes_to_read) {
             case 5: ch += static_cast<uint8_t>(*source++); ch <<= 6;
             case 4: ch += static_cast<uint8_t>(*source++); ch <<= 6;
             case 3: ch += static_cast<uint8_t>(*source++); ch <<= 6;
@@ -317,7 +323,7 @@ struct json_text_traits<CharT,
             case 1: ch += static_cast<uint8_t>(*source++); ch <<= 6;
             case 0: ch += static_cast<uint8_t>(*source++);
         }
-        ch -= offsets_from_utf8[extraBytesToRead];
+        ch -= offsets_from_utf8[extra_bytes_to_read];
 
         if (ch <= uni_max_legal_utf32) {
             /*
@@ -326,8 +332,8 @@ struct json_text_traits<CharT,
              */
             if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
                 if (flags == uni_conversion_flags::strict) {
-                    source -= (extraBytesToRead+1); /* return to the illegal value itself */
-                    result = uni_conversion_result::source_illegal;
+                    source -= (extra_bytes_to_read+1); /* return to the illegal value itself */
+                    result = uni_conversion_result::illegal_surrogate_value;
                 } else {
                     *target = uni_replacement_char;
                 }
@@ -455,16 +461,14 @@ struct json_text_traits<CharT,
                 /* If the 16 bits following the high surrogate are in the source buffer... */
                 if (source < source_end) {
                     uint32_t ch2 = *source;
-                    /* If it's a low surrogate, convert to uint32_t. */
+                    /* If it's a low surrogate, */
                     if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
-                        ch = ((ch - uni_sur_high_start) << half_shift)
-                            + (ch2 - uni_sur_low_start) + half_base;
                         target.push_back((CharT)ch);
                         target.push_back((CharT)ch2);
                         ++source;
                     } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
                         --source; /* return to the illegal value itself */
-                        result = uni_conversion_result::source_illegal;
+                        result = uni_conversion_result::unpaired_high_surrogate;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
@@ -516,7 +520,7 @@ struct json_text_traits<CharT,
                         ++source;
                     } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
                         --source; /* return to the illegal value itself */
-                        result = uni_conversion_result::source_illegal;
+                        result = uni_conversion_result::unpaired_high_surrogate;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
@@ -574,8 +578,8 @@ struct json_text_traits<CharT,
                 result = uni_conversion_result::source_exhausted; break;
             }
             /* Do this check whether lenient or strict */
-            if (!json_text_traits<UTF8>::is_legal(source, extra_bytes_to_read+1)) {
-                result = uni_conversion_result::source_illegal;
+            if ((result=json_text_traits<UTF8>::is_legal(source, extra_bytes_to_read +1)) != uni_conversion_result::ok)
+            {
                 break;
             }
             /*
@@ -651,7 +655,7 @@ struct json_text_traits<CharT,
                 }
             } else { /* We don't have the 16 bits following the high surrogate. */
                 --source; /* return to the high surrogate */
-                result = uni_conversion_result::source_exhausted;
+                result = uni_conversion_result::unpaired_high_surrogate;
             }
         } else if (flags == uni_conversion_flags::strict) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
@@ -752,7 +756,7 @@ struct json_text_traits<CharT,
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
                     --source; /* return to the illegal value itself */
-                    result = uni_conversion_result::source_illegal;
+                    result = uni_conversion_result::illegal_surrogate_value;
                     break;
                 }
             }
@@ -788,7 +792,7 @@ struct json_text_traits<CharT,
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
                     --source; /* return to the illegal value itself */
-                    result = uni_conversion_result::source_illegal;
+                    result = uni_conversion_result::illegal_surrogate_value;
                     break;
                 }
             }
@@ -836,8 +840,8 @@ struct json_text_traits<CharT,
                 result = uni_conversion_result::source_exhausted; break;
             }
             /* Do this check whether lenient or strict */
-            if (!json_text_traits<UTF8>::is_legal(source, extra_bytes_to_read+1)) {
-                result = uni_conversion_result::source_illegal;
+            if ((result=json_text_traits<UTF8>::is_legal(source, extra_bytes_to_read+1)) != uni_conversion_result::ok)
+            {
                 break;
             }
             /*

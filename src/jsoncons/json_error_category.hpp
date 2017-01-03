@@ -41,7 +41,7 @@ namespace jsoncons {
         over_long_utf8_sequence = 26,
         illegal_codepoint = 27,
         unexpected_trailing_surrogate = 28,
-        expected_trailing_surrogate = 29
+        unpaired_high_surrogate = 29
     };
 
 class json_error_category_impl
@@ -112,7 +112,7 @@ public:
             return "Illegal codepoint (>= 0xd800 && <= 0xdfff)";
         case json_parser_errc::unexpected_trailing_surrogate:
             return "Unexpected trailing surrogate";
-        case json_parser_errc::expected_trailing_surrogate:
+        case json_parser_errc::unpaired_high_surrogate:
             return "Expected trailing surrogate";
         default:
             return "Unknown JSON parser error";
