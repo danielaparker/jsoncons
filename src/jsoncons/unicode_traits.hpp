@@ -15,8 +15,8 @@
  * remains attached.
 */
 
-#ifndef JSONCONS_JSON_TEXT_TRAITS_HPP
-#define JSONCONS_JSON_TEXT_TRAITS_HPP
+#ifndef JSONCONS_UNICODE_TRAITS_HPP
+#define JSONCONS_UNICODE_TRAITS_HPP
 
 #include <locale>
 #include <string>
@@ -81,58 +81,13 @@ const uint16_t uni_sur_high_end = 0xDBFF;
 const uint16_t uni_sur_low_start = 0xDC00;
 const uint16_t uni_sur_low_end = 0xDFFF;
 
-// json_text_traits
-
-template <class CharT, class Enable=void>
-struct json_text_traits
-{
-};
-
-template <class CharT>
-struct Json_text_traits_
-{
-    static const std::pair<const CharT*,size_t> null_literal() 
-    {
-        static const CharT data[] = {'n','u','l','l',0};
-        return std::pair<const CharT*,size_t>{data,4};
-    }
-
-    static const std::pair<const CharT*,size_t> true_literal() 
-    {
-        static const CharT data[] = {'t','r','u','e',0};
-        return std::pair<const CharT*,size_t>{data,4};
-    }
-
-    static const std::pair<const CharT*,size_t> false_literal() 
-    {
-        static const CharT data[] = {'f','a','l','s','e',0};
-        return std::pair<const CharT*,size_t>{data,5};
-    }
-
-    static bool is_control_character(CharT c)
-    {
-        uint32_t u = c;
-        return u <= 0x1F || u == 0x7f;
-    }
-
-    static CharT to_hex_character(unsigned char c)
-    {
-        JSONCONS_ASSERT(c <= 0xF);
-
-        return (c < 10) ? ('0' + c) : ('A' - 10 + c);
-    }
-
-    static bool is_non_ascii_codepoint(uint32_t cp)
-    {
-        return cp >= 0x80;
-    }
-};
+// unicode_traits
 
 enum class uni_conversion_result
 {
     ok,                         // conversion successful
     over_long_utf8_sequence,    // over long utf8 sequence
-    expected_continuation_byte, // expected continuation byte                         //
+    expected_continuation_byte, // expected continuation byte    
     unpaired_high_surrogate,    // unpaired high surrogate UTF-16
     illegal_surrogate_value,    // UTF-16 surrogate values are illegal in UTF-32
     source_exhausted,           // partial character in source, but hit end
@@ -145,10 +100,15 @@ enum class uni_conversion_flags
     lenient
 };
 
+template <class CharT, class Enable=void>
+struct unicode_traits
+{
+};
+
 template <class CharT>
-struct json_text_traits<CharT,
-                        typename std::enable_if<std::is_integral<CharT>::value &&
-                        sizeof(CharT)==sizeof(uint8_t)>::type> : public Json_text_traits_<CharT>
+struct unicode_traits<CharT,
+                      typename std::enable_if<std::is_integral<CharT>::value &&
+                      sizeof(CharT)==sizeof(uint8_t)>::type> 
 {
     static size_t utf_length(const CharT*, size_t length)
     {
@@ -242,82 +202,180 @@ struct json_text_traits<CharT,
         return uni_conversion_result::ok;
     }
 
-    template <class STraits,class SAllocator>
-    static uni_conversion_result append(const CharT** source, const CharT* source_end, 
-            std::basic_string<CharT,STraits,SAllocator>& target, uni_conversion_flags) 
+    template <class UTF8,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
+    append_to_string(const CharT* source, const CharT* source_end, 
+                     std::basic_string<UTF8,STraits,SAllocator>& target, const CharT** source_stop, 
+                     uni_conversion_flags) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        while (*source != source_end) 
+        while (source != source_end) 
         {
-            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(**source)] + 1;
-            if (length > (size_t)(source_end - *source))
+            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*source)] + 1;
+            if (length > (size_t)(source_end - source))
+            {
+                *source_stop = source;
                 return uni_conversion_result::source_exhausted;
-            if ((result=is_legal(*source, length)) != uni_conversion_result::ok)
+            }
+            if ((result=is_legal(source, length)) != uni_conversion_result::ok)
+            {
+                *source_stop = source;
                 return result;
-            target.append(*source, (*source) + length);
-            *source += length;
+            }
+            target.append(source, (source) + length);
+            source += length;
         }
+        *source_stop = source;
         return result;
     }
 
-    template <class UTF8,class STraits,class SAllocator>
-    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    to_utf8(const CharT** source, const CharT* source_end, 
-            std::basic_string<UTF8,STraits,SAllocator>& target, uni_conversion_flags) 
+    template <class UTF16,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF16>::value && sizeof(UTF16) == sizeof(uint16_t),uni_conversion_result>::type 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF16,STraits,SAllocator>& target, 
+                     const CharT** source_stop, uni_conversion_flags flags = uni_conversion_flags::strict) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        while (*source != source_end) 
+
+        const CharT* source = source_begin;
+        while (source != source_end) 
         {
-            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(**source)] + 1;
-            if (length > (size_t)(source_end - *source))
-                return uni_conversion_result::source_exhausted;
-            if ((result=is_legal(*source, length)) != uni_conversion_result::ok)
-                return result;
-            target.append(*source, (*source) + length);
-            *source += length;
+            uint32_t ch = 0;
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*source];
+            if (extra_bytes_to_read >= source_end - source) 
+            {
+                result = uni_conversion_result::source_exhausted; 
+                break;
+            }
+            /* Do this check whether lenient or strict */
+            if ((result=is_legal(source, extra_bytes_to_read+1)) != uni_conversion_result::ok)
+            {
+                break;
+            }
+            /*
+             * The cases all fall through. See "Note A" below.
+             */
+            switch (extra_bytes_to_read) {
+                case 5: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
+                case 4: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
+                case 3: ch += *source++; ch <<= 6;
+                case 2: ch += *source++; ch <<= 6;
+                case 1: ch += *source++; ch <<= 6;
+                case 0: ch += *source++;
+            }
+            ch -= offsets_from_utf8[extra_bytes_to_read];
+
+            if (ch <= uni_max_bmp) { /* Target is a character <= 0xFFFF */
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end ) {
+                    if (flags == uni_conversion_flags::strict) {
+                        source -= (extra_bytes_to_read+1); /* return to the illegal value itself */
+                        result = uni_conversion_result::source_illegal;
+                        break;
+                    } else {
+                        target.push_back(uni_replacement_char);
+                    }
+                } else {
+                    target.push_back((UTF16)ch); /* normal case */
+                }
+            } else if (ch > uni_max_utf16) {
+                if (flags == uni_conversion_flags::strict) {
+                    result = uni_conversion_result::source_illegal;
+                    source -= (extra_bytes_to_read+1); /* return to the start */
+                    break; /* Bail out; shouldn't continue */
+                } else {
+                    target.push_back(uni_replacement_char);
+                }
+            } else {
+                /* target is a character in range 0xFFFF - 0x10FFFF. */
+                ch -= half_base;
+                target.push_back((UTF16)((ch >> half_shift) + uni_sur_high_start));
+                target.push_back((UTF16)((ch & half_mask) + uni_sur_low_start));
+            }
         }
+        *source_stop = source;
         return result;
     }
 
-    template <class UTF8,class STraits,class SAllocator>
-    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    from_utf8(const UTF8** source, const UTF8* source_end, 
-              std::basic_string<CharT,STraits,SAllocator>& target, 
-              uni_conversion_flags) 
+    template <class UTF32,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF32,STraits,SAllocator>& target, 
+                     const CharT** source_stop, uni_conversion_flags flags = uni_conversion_flags::strict) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        while (*source != source_end) 
+
+        const CharT* source = source_begin;
+        while (source != source_end) 
         {
-            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(**source)] + 1;
-            if (length > (size_t)(source_end - *source))
-                return uni_conversion_result::source_exhausted;
-            if ((result=is_legal(*source, length)) != uni_conversion_result::ok)
-                return result;
-            target.append(*source,(*source)+length);
-            *source += length;
+            UTF32 ch = 0;
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[*source];
+            if (extra_bytes_to_read >= source_end - source) {
+                result = uni_conversion_result::source_exhausted; break;
+            }
+            /* Do this check whether lenient or strict */
+            if ((result=is_legal(source, extra_bytes_to_read+1)) != uni_conversion_result::ok) {
+                break;
+            }
+            /*
+             * The cases all fall through. See "Note A" below.
+             */
+            switch (extra_bytes_to_read) {
+                case 5: ch += *source++; ch <<= 6;
+                case 4: ch += *source++; ch <<= 6;
+                case 3: ch += *source++; ch <<= 6;
+                case 2: ch += *source++; ch <<= 6;
+                case 1: ch += *source++; ch <<= 6;
+                case 0: ch += *source++;
+            }
+            ch -= offsets_from_utf8[extra_bytes_to_read];
+
+            if (ch <= uni_max_legal_utf32) {
+                /*
+                 * UTF-16 surrogate values are illegal in UTF-32, and anything
+                 * over Plane 17 (> 0x10FFFF) is illegal.
+                 */
+                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end ) {
+                    if (flags == uni_conversion_flags::strict) {
+                        source -= (extra_bytes_to_read+1); /* return to the illegal value itself */
+                        result = uni_conversion_result::source_illegal;
+                        break;
+                    } else {
+                        target.push_back(uni_replacement_char);
+                    }
+                } else {
+                    target.push_back(ch);
+                }
+            } else { /* i.e., ch > uni_max_legal_utf32 */
+                result = uni_conversion_result::source_illegal;
+                target.push_back(uni_replacement_char);
+            }
         }
+        *source_stop = source;
         return result;
     }
 
     template <class UTF32>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    next_codepoint(const CharT** source_begin, const CharT* source_end, 
-                   UTF32* target, 
-                   uni_conversion_flags flags) 
+    next_codepoint(const CharT* source_begin, const CharT* source_end, 
+                   UTF32* target, const CharT** source_stop,
+                   uni_conversion_flags flags = uni_conversion_flags::strict) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
 
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
 
         unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[(uint8_t)(*source)];
         if (extra_bytes_to_read >= source_end - source) 
         {
             result = uni_conversion_result::source_exhausted;
+            *source_stop = source;
             return result;
         }
         /* Do this check whether lenient or strict */
         if ((result=is_legal(source, extra_bytes_to_read+1)) != uni_conversion_result::ok)
         {
+            *source_stop = source;
             return result;
         }
         /*
@@ -349,11 +407,11 @@ struct json_text_traits<CharT,
             } else {
                 *target = ch;
             }
-        } else { /* i.e., ch > UNI_MAX_LEGAL_UTF32 */
+        } else { /* i.e., ch > uni_max_legal_utf32 */
             result = uni_conversion_result::source_illegal;
             *target = uni_replacement_char;
         }
-        *source_begin = source;
+        *source_stop = source;
         return result;
     }
 
@@ -401,9 +459,9 @@ struct json_text_traits<CharT,
 };
 
 template <class CharT>
-struct json_text_traits<CharT,
-                        typename std::enable_if<std::is_integral<CharT>::value &&
-                        sizeof(CharT)==sizeof(uint16_t)>::type> : public Json_text_traits_<CharT>
+struct unicode_traits<CharT,
+                      typename std::enable_if<std::is_integral<CharT>::value &&
+                      sizeof(CharT)==sizeof(uint16_t)>::type> 
 {
     static size_t utf_length(const CharT *source, size_t length)
     {
@@ -470,65 +528,13 @@ struct json_text_traits<CharT,
         return count;
     }
 
-    template <class STraits,class SAllocator>
-    static uni_conversion_result append(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<CharT,STraits,SAllocator>& target, uni_conversion_flags flags) 
-    {
-        uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
-        while (source < source_end) {
-            //unsigned short bytes_to_write = 0;
-            //const uint32_t byteMask = 0xBF;
-            //const uint32_t byteMark = 0x80; 
-            uint32_t ch = *source++;
-            /* If we have a surrogate pair, convert to uint32_t first. */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
-            {
-                /* If the 16 bits following the high surrogate are in the source buffer... */
-                if (source < source_end) {
-                    uint32_t ch2 = *source;
-                    /* If it's a low surrogate, */
-                    if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
-                        target.push_back((CharT)ch);
-                        target.push_back((CharT)ch2);
-                        ++source;
-                    } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
-                        --source; /* return to the illegal value itself */
-                        result = uni_conversion_result::unpaired_high_surrogate;
-                        break;
-                    }
-                } else { /* We don't have the 16 bits following the high surrogate. */
-                    --source; /* return to the high surrogate */
-                    result = uni_conversion_result::source_exhausted;
-                    break;
-                }
-            } else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
-            {
-                /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (flags == uni_conversion_flags::strict) {
-                    --source; /* return to the illegal value itself */
-                    result = uni_conversion_result::source_illegal;
-                    break;
-                }
-                else
-                {
-                    target.push_back((CharT)ch);
-                }
-            }
-            else
-            {
-                target.push_back((CharT)ch);
-            }
-        }
-        return result;
-    }
-
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    to_utf8(const CharT** source_begin, const CharT* source_end, 
-            std::basic_string<UTF8,STraits,SAllocator>& target, uni_conversion_flags flags) {
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF8,STraits,SAllocator>& target, const CharT** source_stop, 
+                     uni_conversion_flags flags = uni_conversion_flags::strict) {
         uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source < source_end) {
             unsigned short bytes_to_write = 0;
             const uint32_t byteMask = 0xBF;
@@ -585,82 +591,119 @@ struct json_text_traits<CharT,
                 case 1: *--target_ptr = (uint8_t)(ch | first_byte_mark[bytes_to_write]);
             }
         }
-        *source_begin = source;
+        *source_stop = source;
         return result;
     }
 
-    template <class UTF8,class STraits,class SAllocator>
-    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    from_utf8(const UTF8** source_begin, const UTF8* source_end, 
-              std::basic_string<CharT,STraits,SAllocator>& target, 
-              uni_conversion_flags flags) 
+    template <class UTF16,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF16>::value && sizeof(UTF16) == sizeof(uint16_t),uni_conversion_result>::type 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF16,STraits,SAllocator>& target, const CharT** source_stop, 
+                     uni_conversion_flags flags = uni_conversion_flags::strict) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        const UTF8* source = *source_begin;
-        while (source < source_end) {
-            uint32_t ch = 0;
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*source)];
-            if (extra_bytes_to_read >= source_end - source) {
-                result = uni_conversion_result::source_exhausted; break;
-            }
-            /* Do this check whether lenient or strict */
-            if ((result=json_text_traits<UTF8>::is_legal(source, extra_bytes_to_read +1)) != uni_conversion_result::ok)
-            {
-                break;
-            }
-            /*
-             * The cases all fall through. See "Note A" below.
-             */
-            switch (extra_bytes_to_read) {
-                case 5: ch += static_cast<uint8_t>(*source++); ch <<= 6; /* remember, illegal UTF-8 */
-                case 4: ch += static_cast<uint8_t>(*source++); ch <<= 6; /* remember, illegal UTF-8 */
-                case 3: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-                case 2: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-                case 1: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-                case 0: ch += static_cast<uint8_t>(*source++);
-            }
-            ch -= offsets_from_utf8[extra_bytes_to_read];
 
-            if (ch <= uni_max_bmp) { /* Target is a character <= 0xFFFF */
-                /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
-                    if (flags == uni_conversion_flags::strict) {
-                        source -= (extra_bytes_to_read+1); /* return to the illegal value itself */
-                        result = uni_conversion_result::source_illegal;
+        const CharT* source = source_begin;
+        while (source != source_end) 
+        {
+            uint32_t ch = *source++;
+            /* If we have a surrogate pair, convert to uint32_t first. */
+            if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
+            {
+                /* If the 16 bits following the high surrogate are in the source buffer... */
+                if (source < source_end) {
+                    uint32_t ch2 = *source;
+                    /* If it's a low surrogate, */
+                    if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
+                        target.push_back((CharT)ch);
+                        target.push_back((CharT)ch2);
+                        ++source;
+                    } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
+                        --source; /* return to the illegal value itself */
+                        result = uni_conversion_result::unpaired_high_surrogate;
                         break;
-                    } else {
-                        target.push_back(uni_replacement_char);
                     }
-                } else {
-                    target.push_back((uint16_t)ch); /* normal case */
+                } else { /* We don't have the 16 bits following the high surrogate. */
+                    --source; /* return to the high surrogate */
+                    result = uni_conversion_result::source_exhausted;
+                    break;
                 }
-            } else if (ch > uni_max_utf16) {
+            } else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
+            {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (flags == uni_conversion_flags::strict) {
+                    --source; /* return to the illegal value itself */
                     result = uni_conversion_result::source_illegal;
-                    source -= (extra_bytes_to_read+1); /* return to the start */
-                    break; /* Bail out; shouldn't continue */
-                } else {
-                    target.push_back( uni_replacement_char);
+                    break;
                 }
-            } else {
-                /* target is a character in range 0xFFFF - 0x10FFFF. */
-                ch -= half_base;
-                target.push_back((uint16_t)((ch >> half_shift) + uni_sur_high_start));
-                target.push_back((uint16_t)((ch & half_mask) + uni_sur_low_start));
+                else
+                {
+                    target.push_back((CharT)ch);
+                }
+            }
+            else
+            {
+                target.push_back((CharT)ch);
             }
         }
-        *source_begin = source;
+        *source_stop = source;
+        return result;
+    }
+
+    template <class UTF32,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF32,STraits,SAllocator>& target, const CharT** source_stop, 
+                     uni_conversion_flags flags = uni_conversion_flags::strict) 
+    {
+        uni_conversion_result result = uni_conversion_result::ok;
+
+        const CharT* source = source_begin;
+        while (source != source_end) 
+        {
+            uint32_t ch = *source++;
+            /* If we have a surrogate pair, convert to UTF32 first. */
+            if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) {
+                /* If the 16 bits following the high surrogate are in the source buffer... */
+                if (source < source_end) {
+                    uint32_t ch2 = *source;
+                    /* If it's a low surrogate, convert to UTF32. */
+                    if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end ) {
+                        ch = ((ch - uni_sur_high_start) << half_shift)
+                            + (ch2 - uni_sur_low_start) + half_base;
+                        ++source;
+                    } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
+                        --source; /* return to the illegal value itself */
+                        result = uni_conversion_result::source_illegal;
+                        break;
+                    }
+                } else { /* We don't have the 16 bits following the high surrogate. */
+                    --source; /* return to the high surrogate */
+                    result = uni_conversion_result::source_exhausted;
+                    break;
+                }
+            } else if (flags == uni_conversion_flags::strict) {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (ch >= uni_sur_low_start && ch <= uni_sur_low_end ) {
+                    --source; /* return to the illegal value itself */
+                    result = uni_conversion_result::source_illegal;
+                    break;
+                }
+            }
+            target.push_back(ch);
+        }
+        *source_stop = source;
         return result;
     }
 
     template <class UTF32>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    next_codepoint(const CharT** source_begin, const CharT* source_end, 
-                   UTF32* target, 
-                   uni_conversion_flags flags) 
+    next_codepoint(const CharT* source_begin, const CharT* source_end, 
+                   UTF32* target, const CharT** source_stop,
+                   uni_conversion_flags flags = uni_conversion_flags::strict) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         uint32_t ch, ch2;
 
         ch = *source++;
@@ -677,6 +720,7 @@ struct json_text_traits<CharT,
                 } else if (flags == uni_conversion_flags::strict) { /* it's an unpaired high surrogate */
                     --source; /* return to the illegal value itself */
                     result = uni_conversion_result::source_illegal;
+                    *source_stop = source;
                     return result;
                 }
             } else { /* We don't have the 16 bits following the high surrogate. */
@@ -692,7 +736,7 @@ struct json_text_traits<CharT,
         }
         *target = ch;
 
-        *source_begin = source;
+        *source_stop = source;
         return result;
     }
 
@@ -726,9 +770,9 @@ struct json_text_traits<CharT,
 };
 
 template <class CharT>
-struct json_text_traits<CharT,
+struct unicode_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
-                        sizeof(CharT)==sizeof(uint32_t)>::type> : public Json_text_traits_<CharT>
+                        sizeof(CharT)==sizeof(uint32_t)>::type> 
 {
     static size_t utf_length(const CharT *source, size_t length)
     {
@@ -775,49 +819,14 @@ struct json_text_traits<CharT,
         return (size_t)(end-it);
     }
 
-    template <class STraits,class SAllocator>
-    static uni_conversion_result append(const CharT** source_begin, const CharT* source_end,
-            std::basic_string<CharT,STraits,SAllocator>& target, 
-            uni_conversion_flags flags) 
-    {
-        uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
-        while (source < source_end) {
-            uint32_t ch;
-            unsigned short bytes_to_write = 0;
-            const uint32_t byteMask = 0xBF;
-            const uint32_t byteMark = 0x80; 
-            ch = *source++;
-            if (flags == uni_conversion_flags::strict ) {
-                /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
-                    --source; /* return to the illegal value itself */
-                    result = uni_conversion_result::illegal_surrogate_value;
-                    break;
-                }
-            }
-            if (ch <= uni_max_legal_utf32)
-            {
-                target.push_back(ch);
-            }
-            else
-            {
-                target.push_back(uni_replacement_char);
-                result = uni_conversion_result::source_illegal;
-            }
-        }
-        *source_begin = source;
-        return result;
-    }
-
     template <class UTF8,class STraits,class SAllocator>
     static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    to_utf8(const CharT** source_begin, const CharT* source_end, 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
             std::basic_string<UTF8,STraits,SAllocator>& target, 
-            uni_conversion_flags flags) 
+            const CharT** source_stop, uni_conversion_flags flags = uni_conversion_flags::strict) 
     {
         uni_conversion_result result = uni_conversion_result::ok;
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         while (source < source_end) {
             uint32_t ch;
             unsigned short bytes_to_write = 0;
@@ -857,76 +866,99 @@ struct json_text_traits<CharT,
                 case 1: *--target_ptr = (UTF8) (ch | first_byte_mark[bytes_to_write]);
             }
         }
-        *source_begin = source;
+        *source_stop = source;
         return result;
     }
 
-    template <class UTF8,class STraits,class SAllocator>
-    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t),uni_conversion_result>::type 
-    from_utf8 (
-            const UTF8** source_begin, const UTF8* source_end, 
-            std::basic_string<CharT,STraits,SAllocator>& target, 
-            uni_conversion_flags flags) {
+    template <class UTF16,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF16>::value && sizeof(UTF16) == sizeof(uint16_t),uni_conversion_result>::type 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF16,STraits,SAllocator>& target, 
+                     const CharT** source_stop, uni_conversion_flags flags = uni_conversion_flags::strict) 
+    {
         uni_conversion_result result = uni_conversion_result::ok;
-        const UTF8* source = *source_begin;
-        while (source < source_end) {
-            uint32_t ch = 0;
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*source)];
-            if (extra_bytes_to_read >= source_end - source) {
-                result = uni_conversion_result::source_exhausted; break;
-            }
-            /* Do this check whether lenient or strict */
-            if ((result=json_text_traits<UTF8>::is_legal(source, extra_bytes_to_read+1)) != uni_conversion_result::ok)
-            {
-                break;
-            }
-            /*
-             * The cases all fall through. See "Note A" below.
-             */
-            switch (extra_bytes_to_read) {
-                case 5: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-                case 4: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-                case 3: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-                case 2: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-                case 1: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-                case 0: ch += static_cast<uint8_t>(*source++);
-            }
-            ch -= offsets_from_utf8[extra_bytes_to_read];
 
-            if (ch <= uni_max_legal_utf32) {
-                /*
-                 * UTF-16 surrogate values are illegal in UTF-32, and anything
-                 * over Plane 17 (> 0x10FFFF) is illegal.
-                 */
-                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+        const CharT* source = source_begin;
+        while (source != source_end) 
+        {
+            uint32_t ch = *source++;
+            if (ch <= uni_max_bmp) { /* Target is a character <= 0xFFFF */
+                /* UTF-16 surrogate values are illegal in UTF-32; 0xffff or 0xfffe are both reserved values */
+                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end ) {
                     if (flags == uni_conversion_flags::strict) {
-                        source -= (extra_bytes_to_read+1); /* return to the illegal value itself */
+                        --source; /* return to the illegal value itself */
                         result = uni_conversion_result::source_illegal;
                         break;
                     } else {
                         target.push_back(uni_replacement_char);
                     }
                 } else {
-                    target.push_back(ch);
+                    target.push_back((UTF16)ch); /* normal case */
                 }
-            } else { /* i.e., ch > uni_max_legal_utf32 */
-                result = uni_conversion_result::source_illegal;
-                target.push_back(uni_replacement_char);
+            } else if (ch > uni_max_legal_utf32) {
+                if (flags == uni_conversion_flags::strict) {
+                    result = uni_conversion_result::source_illegal;
+                } else {
+                    target.push_back(uni_replacement_char);
+                }
+            } else {
+                /* target is a character in range 0xFFFF - 0x10FFFF. */
+                ch -= half_base;
+                target.push_back((UTF16)((ch >> half_shift) + uni_sur_high_start));
+                target.push_back((UTF16)((ch & half_mask) + uni_sur_low_start));
             }
         }
-        *source_begin = source;
+        *source_stop = source;
+        return result;
+    }
+
+    template <class UTF32,class STraits,class SAllocator>
+    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
+    append_to_string(const CharT* source_begin, const CharT* source_end, 
+                     std::basic_string<UTF32,STraits,SAllocator>& target, const CharT** source_stop, 
+                     uni_conversion_flags flags = uni_conversion_flags::strict) 
+    {
+        uni_conversion_result result = uni_conversion_result::ok;
+
+        const CharT* source = source_begin;
+        while (source != source_end) 
+        {
+            uint32_t ch;
+            unsigned short bytes_to_write = 0;
+            const uint32_t byteMask = 0xBF;
+            const uint32_t byteMark = 0x80; 
+            ch = *source++;
+            if (flags == uni_conversion_flags::strict ) {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+                    --source; /* return to the illegal value itself */
+                    result = uni_conversion_result::illegal_surrogate_value;
+                    break;
+                }
+            }
+            if (ch <= uni_max_legal_utf32)
+            {
+                target.push_back(ch);
+            }
+            else
+            {
+                target.push_back(uni_replacement_char);
+                result = uni_conversion_result::source_illegal;
+            }
+        }
+        *source_stop = source;
         return result;
     }
 
     template <class UTF32>
     static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_conversion_result>::type 
-    next_codepoint(const CharT** source_begin, const CharT*, 
-                                         UTF32* target, 
-                                         uni_conversion_flags) 
+    next_codepoint(const CharT* source_begin, const CharT*, 
+                   UTF32* target, const CharT** source_stop,
+                   uni_conversion_flags = uni_conversion_flags::strict) 
     {
-        const CharT* source = *source_begin;
+        const CharT* source = source_begin;
         *target = *source++;
-        *source_begin = source;
+        *source_stop = source;
 
         return uni_conversion_result::ok;
     }

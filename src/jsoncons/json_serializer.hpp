@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <limits> // std::numeric_limits
 #include <fstream>
-#include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/unicode_traits.hpp>
 #include <jsoncons/jsoncons_util.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
@@ -301,7 +301,7 @@ private:
             begin_scalar_value();
         }
 
-        auto buf = json_text_traits<CharT>::null_literal();
+        auto buf = json_literals<CharT>::null_literal();
         bos_.write(buf.first,buf.second);
 
         end_value();
@@ -377,12 +377,12 @@ private:
 
         if (value)
         {
-            auto buf = json_text_traits<CharT>::true_literal();
+            auto buf = json_literals<CharT>::true_literal();
             bos_.write(buf.first,buf.second);
         }
         else
         {
-            auto buf = json_text_traits<CharT>::false_literal();
+            auto buf = json_literals<CharT>::false_literal();
             bos_.write(buf.first,buf.second);
         }
 

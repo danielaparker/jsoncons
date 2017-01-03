@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <system_error>
-#include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/unicode_traits.hpp>
 #include <jsoncons/json_input_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error_category.hpp>
@@ -453,8 +453,8 @@ public:
 
     void append_to_string(const CharT* sb, const CharT* se)
     {
-            const CharT* begin = sb;
-            auto result = json_text_traits<CharT>::append(&begin,se,string_buffer_,uni_conversion_flags::strict);
+            const CharT* stop = sb;
+            auto result = unicode_traits<CharT>::append_to_string(sb,se,string_buffer_,&stop,uni_conversion_flags::strict);
             switch (result)
             {
             case uni_conversion_result::ok:
@@ -483,7 +483,7 @@ public:
 
         if (start == 0)
         {
-            index_ = json_text_traits<CharT>::detect_bom(input,length);
+            index_ = unicode_traits<CharT>::detect_bom(input,length);
             column_ = index_+1;
             begin_input_ = input + index_;
         }
@@ -494,7 +494,7 @@ public:
         }
         p_ = begin_input_;
 
-        index_ = (start == 0) ? json_text_traits<CharT>::detect_bom(input,length) : start;
+        index_ = (start == 0) ? unicode_traits<CharT>::detect_bom(input,length) : start;
         while ((p_ < end_input_) && (stack_.back() != states::done))
         {
             switch (*p_)
@@ -578,19 +578,19 @@ public:
                     case 'f':
                         handler_.begin_json();
                         stack_.back() = states::f;
-                        literal_ = json_text_traits<CharT>::false_literal();
+                        literal_ = json_literals<CharT>::false_literal();
                         literal_index_ = 1;
                         break;
                     case 'n':
                         handler_.begin_json();
                         stack_.back() = states::n;
-                        literal_ = json_text_traits<CharT>::null_literal();
+                        literal_ = json_literals<CharT>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         handler_.begin_json();
                         stack_.back() = states::t;
-                        literal_ = json_text_traits<CharT>::true_literal();
+                        literal_ = json_literals<CharT>::true_literal();
                         literal_index_ = 1;
                         break;
                     case '}':
@@ -784,17 +784,17 @@ public:
                         break;
                     case 'f':
                         stack_.back() = states::f;
-                        literal_ = json_text_traits<CharT>::false_literal();
+                        literal_ = json_literals<CharT>::false_literal();
                         literal_index_ = 1;
                         break;
                     case 'n':
                         stack_.back() = states::n;
-                        literal_ = json_text_traits<CharT>::null_literal();
+                        literal_ = json_literals<CharT>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         stack_.back() = states::t;
-                        literal_ = json_text_traits<CharT>::true_literal();
+                        literal_ = json_literals<CharT>::true_literal();
                         literal_index_ = 1;
                         break;
                     case ']':
@@ -862,17 +862,17 @@ public:
                         break;
                     case 'f':
                         stack_.back() = states::f;
-                        literal_ = json_text_traits<CharT>::false_literal();
+                        literal_ = json_literals<CharT>::false_literal();
                         literal_index_ = 1;
                         break;
                     case 'n':
                         stack_.back() = states::n;
-                        literal_ = json_text_traits<CharT>::null_literal();
+                        literal_ = json_literals<CharT>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         stack_.back() = states::t;
-                        literal_ = json_text_traits<CharT>::true_literal();
+                        literal_ = json_literals<CharT>::true_literal();
                         literal_index_ = 1;
                         break;
                     case '\'':
@@ -929,7 +929,7 @@ public:
                     }
                     else
                     {
-                        json_text_traits<CharT>::append_codepoint_to_string(cp_, string_buffer_);
+                        unicode_traits<CharT>::append_codepoint_to_string(cp_, string_buffer_);
                         stack_.back() = states::string;
                     }
                 }
@@ -995,7 +995,7 @@ public:
                 {
                     append_second_codepoint(*p_);
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
-                    json_text_traits<CharT>::append_codepoint_to_string(cp, string_buffer_);
+                    unicode_traits<CharT>::append_codepoint_to_string(cp, string_buffer_);
                     stack_.back() = states::string;
                 }
                 ++p_;

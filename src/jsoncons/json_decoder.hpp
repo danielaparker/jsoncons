@@ -13,7 +13,7 @@
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/unicode_traits.hpp>
 #include <jsoncons/json_input_handler.hpp>
 
 namespace jsoncons {

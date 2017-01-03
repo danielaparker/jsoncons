@@ -15,7 +15,8 @@
 #include <cstdlib>
 #include <limits>
 #include <cwchar>
-#include <jsoncons/json_text_traits.hpp>
+#include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
 
@@ -58,9 +59,9 @@ public:
         replace_nan_(true),
         replace_pos_inf_(true),
         replace_neg_inf_(true),
-        nan_replacement_(json_text_traits<CharT>::null_literal().first,json_text_traits<CharT>::null_literal().second),
-        pos_inf_replacement_(json_text_traits<CharT>::null_literal().first,json_text_traits<CharT>::null_literal().second),
-        neg_inf_replacement_(json_text_traits<CharT>::null_literal().first,json_text_traits<CharT>::null_literal().second),
+        nan_replacement_(json_literals<CharT>::null_literal().first,json_literals<CharT>::null_literal().second),
+        pos_inf_replacement_(json_literals<CharT>::null_literal().first,json_literals<CharT>::null_literal().second),
+        neg_inf_replacement_(json_literals<CharT>::null_literal().first,json_literals<CharT>::null_literal().second),
         escape_all_non_ascii_(false),
         escape_solidus_(false),
         object_object_split_lines_(line_split_kind::multi_line),
@@ -285,17 +286,18 @@ void escape_string(const CharT* s,
                 os.put('\\');
                 os.put('/');
             }
-            else if (json_text_traits<CharT>::is_control_character(c) || options.escape_all_non_ascii())
+            else if (is_control_character(c) || options.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
                 uint32_t cp;
-                auto result = json_text_traits<CharT>::next_codepoint(&it, end, &cp, uni_conversion_flags::strict);
+                const CharT* stop = it;
+                auto result = unicode_traits<CharT>::next_codepoint(it, end, &cp, &stop, uni_conversion_flags::strict);
                 if (result != uni_conversion_result::ok)
                 {
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");
                 }
-                --it;
-                if (json_text_traits<CharT>::is_non_ascii_codepoint(cp) || json_text_traits<CharT>::is_control_character(c))
+                it = stop - 1;
+                if (is_non_ascii_codepoint(cp) || is_control_character(c))
                 {
                     if (cp > 0xFFFF)
                     {
@@ -305,25 +307,25 @@ void escape_string(const CharT* s,
 
                         os.put('\\');
                         os.put('u');
-                        os.put(json_text_traits<CharT>::to_hex_character(first >> 12 & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(first >> 8  & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(first >> 4  & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(first     & 0x000F));
+                        os.put(to_hex_character(first >> 12 & 0x000F));
+                        os.put(to_hex_character(first >> 8  & 0x000F));
+                        os.put(to_hex_character(first >> 4  & 0x000F));
+                        os.put(to_hex_character(first     & 0x000F));
                         os.put('\\');
                         os.put('u');
-                        os.put(json_text_traits<CharT>::to_hex_character(second >> 12 & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(second >> 8  & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(second >> 4  & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(second     & 0x000F));
+                        os.put(to_hex_character(second >> 12 & 0x000F));
+                        os.put(to_hex_character(second >> 8  & 0x000F));
+                        os.put(to_hex_character(second >> 4  & 0x000F));
+                        os.put(to_hex_character(second     & 0x000F));
                     }
                     else
                     {
                         os.put('\\');
                         os.put('u');
-                        os.put(json_text_traits<CharT>::to_hex_character(cp >> 12 & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(cp >> 8  & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(cp >> 4  & 0x000F));
-                        os.put(json_text_traits<CharT>::to_hex_character(cp     & 0x000F));
+                        os.put(to_hex_character(cp >> 12 & 0x000F));
+                        os.put(to_hex_character(cp >> 8  & 0x000F));
+                        os.put(to_hex_character(cp >> 4  & 0x000F));
+                        os.put(to_hex_character(cp     & 0x000F));
                     }
                 }
                 else
