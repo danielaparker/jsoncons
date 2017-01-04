@@ -880,13 +880,11 @@ struct unicode_traits<CharT,
         while (source != source_end) 
         {
             uint32_t ch = *source++;
-            if (flags == uni_conversion_flags::strict ) {
-                /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
-                    --source; /* return to the illegal value itself */
-                    result = uni_conversion_result::illegal_surrogate_value;
-                    break;
-                }
+            /* UTF-16 surrogate values are illegal in UTF-32 */
+            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+                --source; /* return to the illegal value itself */
+                result = uni_conversion_result::illegal_surrogate_value;
+                break;
             }
             if (ch <= uni_max_legal_utf32)
             {
