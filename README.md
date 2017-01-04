@@ -512,6 +512,8 @@ project_id,task_name,task_start,task_finish
 4002,task2,05/01/2003,
 ```
 
+See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) and [csv_serializer](https://github.com/danielaparker/jsoncons/wiki/csv_serializer) for details.
+
 <div id="ext_binary"/>
 
 ### binary
@@ -583,7 +585,7 @@ Output:
 ]
 ```
 
-See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) and [csv_serializer](https://github.com/danielaparker/jsoncons/wiki/csv_serializer) for details.
+See [encode_message_pack](https://github.com/danielaparker/jsoncons/wiki/encode_message_pack) and [decode_message_pack](https://github.com/danielaparker/jsoncons/wiki/decode_message_pack) for details.
 
 ## Acknowledgements
 
