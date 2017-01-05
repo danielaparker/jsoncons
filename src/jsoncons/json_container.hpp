@@ -19,7 +19,7 @@
 #include <iomanip>
 #include <utility>
 #include <initializer_list>
-#include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/jsoncons.hpp>
 #include <jsoncons/json_traits.hpp>
 #include <jsoncons/jsoncons_util.hpp>
 

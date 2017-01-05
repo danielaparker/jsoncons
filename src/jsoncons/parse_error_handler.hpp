@@ -7,7 +7,7 @@
 #ifndef JSONCONS_PARSE_ERROR_HANDLER_HPP
 #define JSONCONS_PARSE_ERROR_HANDLER_HPP
 
-#include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/jsoncons.hpp>
 #include <jsoncons/json_error_category.hpp>
 #include <system_error>
 

@@ -8,7 +8,7 @@
 #define JSONCONS_JSON_INPUT_HANDLER_HPP
 
 #include <string>
-#include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/jsoncons.hpp>
 #include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {

@@ -7,7 +7,7 @@
 #ifndef JSONCONS_CSV_CSV_ERROR_CATEGORY_HPP
 #define JSONCONS_CSV_CSV_ERROR_CATEGORY_HPP
 
-#include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/jsoncons.hpp>
 #include <system_error>
 
 namespace jsoncons { namespace csv {

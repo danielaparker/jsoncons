@@ -17,9 +17,9 @@
 #include <memory>
 #include <typeinfo>
 #include <cstring>
+#include <jsoncons/jsoncons.hpp>
 #include <jsoncons/json_traits.hpp>
 #include <jsoncons/json_container.hpp>
-#include <jsoncons/unicode_traits.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_serializer.hpp>

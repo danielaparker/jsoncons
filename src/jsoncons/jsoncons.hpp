@@ -15,10 +15,13 @@
 #include <cstdint> 
 #include <iostream>
 #include <vector>
+#include <jsoncons/unicode_traits.hpp>
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/jsoncons.hpp>
 
 namespace jsoncons {
+
+using namespace unicons;
 
 // json_exception
 

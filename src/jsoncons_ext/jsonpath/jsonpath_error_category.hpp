@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSONPATH_JSONPATH_ERROR_CATEGORY_HPP
 #define JSONCONS_JSONPATH_JSONPATH_ERROR_CATEGORY_HPP
 
-#include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/jsoncons.hpp>
 #include <system_error>
 
 namespace jsoncons { namespace jsonpath {

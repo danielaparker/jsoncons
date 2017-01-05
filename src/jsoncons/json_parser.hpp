@@ -15,7 +15,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <system_error>
-#include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/jsoncons.hpp>
 #include <jsoncons/json_input_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error_category.hpp>
@@ -430,7 +430,7 @@ public:
                 if (string_buffer_.length() == 0)
                 {
                     auto result = unicode_traits<CharT>::is_legal_string(sb,p_);
-                    if (result == uni_conversion_result::ok)
+                    if (result == conversion_result::ok)
                     {
                         end_string_value(sb,p_-sb);
                     }
@@ -443,7 +443,7 @@ public:
                 {
                     string_buffer_.append(sb,p_-sb);
                     auto result = unicode_traits<CharT>::is_legal_string(string_buffer_.data(),string_buffer_.data()+string_buffer_.length());
-                    if (result == uni_conversion_result::ok)
+                    if (result == conversion_result::ok)
                     {
                         end_string_value(string_buffer_.data(),string_buffer_.length());
                         string_buffer_.clear();
@@ -550,22 +550,22 @@ public:
         }
     }
 */
-    void error(uni_conversion_result result)
+    void error(conversion_result result)
     {
         switch (result)
         {
-        case uni_conversion_result::ok:
+        case conversion_result::ok:
             break;
-        case uni_conversion_result::over_long_utf8_sequence:
+        case conversion_result::over_long_utf8_sequence:
             err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
             break;
-        case uni_conversion_result::unpaired_high_surrogate:
+        case conversion_result::unpaired_high_surrogate:
             err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
             break;
-        case uni_conversion_result::expected_continuation_byte:
+        case conversion_result::expected_continuation_byte:
             err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
             break;
-        case uni_conversion_result::illegal_surrogate_value:
+        case conversion_result::illegal_surrogate_value:
             err_handler_.error(json_parser_errc::illegal_surrogate_value, *this);
             break;
         default:

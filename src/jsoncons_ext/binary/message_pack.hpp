@@ -485,8 +485,8 @@ public:
         const char_type* p = sv.data();
         auto rc = unicode_traits<char_type>::append_to_string(
             p, sv.data()+sv.length(), target, &p, 
-            uni_conversion_flags::strict);
-        if (rc != uni_conversion_result::ok)
+            conversion_flags::strict);
+        if (rc != conversion_result::ok)
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
         }
@@ -592,8 +592,8 @@ public:
 
                 std::basic_string<char_type> target;
                 auto rc = unicode_traits<uint8_t>::append_to_string(
-                    offset,offset+len,target,&offset,uni_conversion_flags::strict);
-                if (rc != uni_conversion_result::ok)
+                    offset,offset+len,target,&offset,conversion_flags::strict);
+                if (rc != conversion_result::ok)
                 {
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                 }
@@ -701,8 +701,8 @@ public:
 
                     std::basic_string<char_type> target;
                     auto rc = unicode_traits<uint8_t>::append_to_string(
-                        offset,offset+len,target,&offset,uni_conversion_flags::strict);
-                    if (rc != uni_conversion_result::ok)
+                        offset,offset+len,target,&offset,conversion_flags::strict);
+                    if (rc != conversion_result::ok)
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }
@@ -718,8 +718,8 @@ public:
 
                     std::basic_string<char_type> target;
                     auto rc = unicode_traits<uint8_t>::append_to_string(
-                        offset,offset+len,target,&offset,uni_conversion_flags::strict);
-                    if (rc != uni_conversion_result::ok)
+                        offset,offset+len,target,&offset,conversion_flags::strict);
+                    if (rc != conversion_result::ok)
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }
@@ -735,8 +735,8 @@ public:
 
                     std::basic_string<char_type> target;
                     auto rc = unicode_traits<uint8_t>::append_to_string(
-                        offset,offset+len,target,&offset,uni_conversion_flags::strict);
-                    if (rc != uni_conversion_result::ok)
+                        offset,offset+len,target,&offset,conversion_flags::strict);
+                    if (rc != conversion_result::ok)
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }
