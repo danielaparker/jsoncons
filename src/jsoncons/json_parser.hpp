@@ -429,28 +429,28 @@ public:
             case '\"':
                 if (string_buffer_.length() == 0)
                 {
-                    auto result = unicons::unicode_traits<CharT>::is_legal_string(sb,p_);
-                    if (result == unicons::conv_result::ok)
+                    auto result = unicons::validate(sb,p_,unicons::conv_flags::strict);
+                    if (result.first == unicons::uni_errc::ok)
                     {
                         end_string_value(sb,p_-sb);
                     }
                     else
                     {
-                        error(result);
+                        error(result.first);
                     }
                 }
                 else
                 {
                     string_buffer_.append(sb,p_-sb);
-                    auto result = unicons::unicode_traits<CharT>::is_legal_string(string_buffer_.data(),string_buffer_.data()+string_buffer_.length());
-                    if (result == unicons::conv_result::ok)
+                    auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end(),unicons::conv_flags::strict);
+                    if (result.first == unicons::uni_errc::ok)
                     {
                         end_string_value(string_buffer_.data(),string_buffer_.length());
                         string_buffer_.clear();
                     }
                     else
                     {
-                        error(result);
+                        error(result.first);
                     }
                 }
                 column_ += (p_ - sb + 1);
@@ -550,22 +550,22 @@ public:
         }
     }
 */
-    void error(unicons::conv_result  result)
+    void error(unicons::uni_errc  result)
     {
         switch (result)
         {
-        case unicons::conv_result::ok:
+        case unicons::uni_errc::ok:
             break;
-        case unicons::conv_result::over_long_utf8_sequence:
+        case unicons::uni_errc::over_long_utf8_sequence:
             err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
             break;
-        case unicons::conv_result::unpaired_high_surrogate:
+        case unicons::uni_errc::unpaired_high_surrogate:
             err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
             break;
-        case unicons::conv_result::expected_continuation_byte:
+        case unicons::uni_errc::expected_continuation_byte:
             err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
             break;
-        case unicons::conv_result::illegal_surrogate_value:
+        case unicons::uni_errc::illegal_surrogate_value:
             err_handler_.error(json_parser_errc::illegal_surrogate_value, *this);
             break;
         default:
