@@ -482,11 +482,10 @@ public:
     void encode_string(string_view_type sv)
     {
         std::basic_string<uint8_t> target;
-        string_view_type::iterator p;
-        auto rc = unicons::convert(
-            sv.begin(), sv.end(), std::back_inserter(target), &p, 
+        auto result = unicons::convert(
+            sv.begin(), sv.end(), std::back_inserter(target), 
             unicons::conv_flags::strict);
-        if (rc != unicons::conv_result::ok)
+        if (result.first != unicons::conv_result::ok)
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
         }
@@ -587,13 +586,14 @@ public:
             {
                 // fixstr
                 const size_t len = *pos & 0x1f;
-                auto offset = &(*(pos + 1));
+                const uint8_t* first = &(*(pos + 1));
+                const uint8_t* last = first + len;
                 it_ += len; 
 
                 std::basic_string<char_type> target;
-                auto rc = unicons::convert(
-                    offset,offset+len,std::back_inserter(target),&offset,unicons::conv_flags::strict);
-                if (rc != unicons::conv_result::ok)
+                auto result = unicons::convert(
+                    first, last,std::back_inserter(target),unicons::conv_flags::strict);
+                if (result.first != unicons::conv_result::ok)
                 {
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                 }
@@ -696,53 +696,52 @@ public:
                 case msgpack_format::str8_cd: 
                 {
                     const auto len = from_big_endian<uint8_t>(pos,end_);
-                    auto offset = &(*(pos + 2));
-                    it_ += len + 1; 
+                    const uint8_t* first = &(*(pos + 2));
+                    const uint8_t* last = first + len;
+                    it_ += len+1; 
 
                     std::basic_string<char_type> target;
-                    auto rc = unicons::convert(
-                        offset,offset+len,std::back_inserter(target),&offset,unicons::conv_flags::strict);
-                    if (rc != unicons::conv_result::ok)
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(target),unicons::conv_flags::strict);
+                    if (result.first != unicons::conv_result::ok)
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }
                     return target;
-                    //return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
                 case msgpack_format::str16_cd: 
                 {
                     const auto len = from_big_endian<uint16_t>(pos,end_);
-                    auto offset = &(*(pos + 3));
+                    const uint8_t* first = &(*(pos + 3));
+                    const uint8_t* last = first + len;
                     it_ += len + 2; 
 
                     std::basic_string<char_type> target;
-                    auto rc = unicons::convert(
-                        offset,offset+len,std::back_inserter(target),&offset,unicons::conv_flags::strict);
-                    if (rc != unicons::conv_result::ok)
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(target),unicons::conv_flags::strict);
+                    if (result.first != unicons::conv_result::ok)
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }
                     return target;
-                    //return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
                 case msgpack_format::str32_cd: 
                 {
                     const auto len = from_big_endian<uint32_t>(pos,end_);
-                    auto offset = &(*(pos + 5));
+                    const uint8_t* first = &(*(pos + 5));
+                    const uint8_t* last = first + len;
                     it_ += len + 4; 
 
                     std::basic_string<char_type> target;
-                    auto rc = unicons::convert(
-                        offset,offset+len,std::back_inserter(target),&offset,unicons::conv_flags::strict);
-                    if (rc != unicons::conv_result::ok)
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(target),unicons::conv_flags::strict);
+                    if (result.first != unicons::conv_result::ok)
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }
                     return target;
-
-                    //return std::string(reinterpret_cast<const char*>(offset), len);
                 }
 
                 case msgpack_format::array16_cd: 
