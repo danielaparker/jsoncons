@@ -429,8 +429,8 @@ public:
             case '\"':
                 if (string_buffer_.length() == 0)
                 {
-                    auto result = unicode_traits<CharT>::is_legal_string(sb,p_);
-                    if (result == conversion_result::ok)
+                    auto result = unicons::unicode_traits<CharT>::is_legal_string(sb,p_);
+                    if (result == unicons::conv_result::ok)
                     {
                         end_string_value(sb,p_-sb);
                     }
@@ -442,8 +442,8 @@ public:
                 else
                 {
                     string_buffer_.append(sb,p_-sb);
-                    auto result = unicode_traits<CharT>::is_legal_string(string_buffer_.data(),string_buffer_.data()+string_buffer_.length());
-                    if (result == conversion_result::ok)
+                    auto result = unicons::unicode_traits<CharT>::is_legal_string(string_buffer_.data(),string_buffer_.data()+string_buffer_.length());
+                    if (result == unicons::conv_result::ok)
                     {
                         end_string_value(string_buffer_.data(),string_buffer_.length());
                         string_buffer_.clear();
@@ -550,22 +550,22 @@ public:
         }
     }
 */
-    void error(conversion_result result)
+    void error(unicons::conv_result  result)
     {
         switch (result)
         {
-        case conversion_result::ok:
+        case unicons::conv_result::ok:
             break;
-        case conversion_result::over_long_utf8_sequence:
+        case unicons::conv_result::over_long_utf8_sequence:
             err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
             break;
-        case conversion_result::unpaired_high_surrogate:
+        case unicons::conv_result::unpaired_high_surrogate:
             err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
             break;
-        case conversion_result::expected_continuation_byte:
+        case unicons::conv_result::expected_continuation_byte:
             err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
             break;
-        case conversion_result::illegal_surrogate_value:
+        case unicons::conv_result::illegal_surrogate_value:
             err_handler_.error(json_parser_errc::illegal_surrogate_value, *this);
             break;
         default:
@@ -580,7 +580,7 @@ public:
 
         if (start == 0)
         {
-            index_ = unicode_traits<CharT>::detect_bom(input,length);
+            index_ = unicons::unicode_traits<CharT>::detect_bom(input,length);
             column_ = index_+1;
             begin_input_ = input + index_;
         }
@@ -591,7 +591,7 @@ public:
         }
         p_ = begin_input_;
 
-        index_ = (start == 0) ? unicode_traits<CharT>::detect_bom(input,length) : start;
+        index_ = (start == 0) ? unicons::unicode_traits<CharT>::detect_bom(input,length) : start;
         while ((p_ < end_input_) && (stack_.back() != states::done))
         {
             switch (*p_)
@@ -1020,13 +1020,13 @@ public:
             case states::escape_u4: 
                 {
                     append_codepoint(*p_);
-                    if (cp_ >= uni_sur_high_start && cp_ <= uni_sur_high_end)
+                    if (cp_ >= unicons::uni_sur_high_start && cp_ <= unicons::uni_sur_high_end)
                     {
                         stack_.back() = states::escape_expect_surrogate_pair1;
                     }
                     else
                     {
-                        unicode_traits<CharT>::append_codepoint_to_string(cp_, string_buffer_);
+                        unicons::unicode_traits<CharT>::append_codepoint_to_string(cp_, string_buffer_);
                         stack_.back() = states::string;
                     }
                 }
@@ -1092,7 +1092,7 @@ public:
                 {
                     append_second_codepoint(*p_);
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
-                    unicode_traits<CharT>::append_codepoint_to_string(cp, string_buffer_);
+                    unicons::unicode_traits<CharT>::append_codepoint_to_string(cp, string_buffer_);
                     stack_.back() = states::string;
                 }
                 ++p_;

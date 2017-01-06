@@ -21,8 +21,6 @@
 
 namespace jsoncons {
 
-using namespace unicons;
-
 // json_exception
 
 class json_exception 
