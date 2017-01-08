@@ -183,7 +183,7 @@ public:
 
     std::pair<Iterator,size_t> get() const 
     {
-        return std::make_pair(begin_,leng77th_);
+        return std::make_pair(begin_,length_);
     }
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
