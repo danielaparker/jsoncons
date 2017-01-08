@@ -429,7 +429,7 @@ public:
             case '\"':
                 if (string_buffer_.length() == 0)
                 {
-                    auto result = unicons::validate(sb,p_,unicons::conv_flags::strict);
+                    auto result = unicons::validate(sb,p_);
                     if (result.first == unicons::uni_errc::ok)
                     {
                         end_string_value(sb,p_-sb);
@@ -442,7 +442,7 @@ public:
                 else
                 {
                     string_buffer_.append(sb,p_-sb);
-                    auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end(),unicons::conv_flags::strict);
+                    auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end());
                     if (result.first == unicons::uni_errc::ok)
                     {
                         end_string_value(string_buffer_.data(),string_buffer_.length());
