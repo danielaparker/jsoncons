@@ -1028,7 +1028,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
                                ,std::pair<InputIt,size_t>>::type 
 sequence_at(InputIt first, InputIt last, size_t index) 
 {
-    std::distance size = last - first;
+    size_t size = std::distance(first,last);
     return index < size ? *(first+size) : std::make_pair(last,0);
 }
 
@@ -1047,33 +1047,6 @@ struct unicode_traits<CharT,
     static size_t utf_length(const CharT*, size_t length)
     {
         return length;
-    }
-
-    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
-                                                      const CharT* end,
-                                                      size_t index)
-    {
-        const CharT* p = it;
-        size_t count = 0;
-
-        while (p < end && count < index)
-        {
-            uint8_t ch = *p;
-            size_t length = trailing_bytes_for_utf8[ch] + 1;
-            p += length;
-            ++count;
-        }
-
-        if (p < end)
-        {
-            uint8_t ch = *p;
-            size_t len = trailing_bytes_for_utf8[ch] + 1;
-            return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
-        }
-        else
-        {
-            return std::make_pair(it,static_cast<size_t>(0));
-        }
     }
 
     static size_t codepoint_count(const CharT* it, 
@@ -1133,33 +1106,6 @@ struct unicode_traits<CharT,
         return count;
     }
 
-    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
-                                                      const CharT* end,
-                                                      size_t index)
-    {
-        const CharT* p = it;
-        size_t count = 0;
-
-        while (p < end && count < index)
-        {
-            uint8_t ch = *p;
-            size_t length = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
-            p += length;
-            ++count;
-        }
-
-        if (p < end)
-        {
-            uint8_t ch = *p;
-            size_t len = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
-            return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
-        }
-        else
-        {
-            return std::make_pair(it,static_cast<size_t>(0));
-        }
-    }
-
     static size_t codepoint_count(const CharT* it, 
                                   const CharT* end)
     {
@@ -1216,22 +1162,6 @@ struct unicode_traits<CharT,
             }
         }
         return count;
-    }
-
-    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
-                                                      const CharT* end,
-                                                      size_t index)
-    {
-        const CharT* p = it;
-        size_t count = 0;
-
-        while (p < end && count < index)
-        {
-            ++p;
-            ++count;
-        }
-
-        return (p < end) ? std::make_pair(p,1) : std::make_pair(it,static_cast<size_t>(0));
     }
 
     static size_t codepoint_count(const CharT* it, 
