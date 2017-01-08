@@ -1162,36 +1162,6 @@ struct unicode_traits<CharT,
         }
         return count;
     }
-
-    template <class STraits,class SAllocator>
-    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
-    {
-        auto result = convert(&cp,&cp+1,std::back_inserter(s));
-/*
-        if (cp <= 0x7f)
-        {
-            s.push_back(static_cast<CharT>(cp));
-        }
-        else if (cp <= 0x7FF)
-        {
-            s.push_back(static_cast<CharT>(0xC0 | (0x1f & (cp >> 6))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
-        }
-        else if (cp <= 0xFFFF)
-        {
-            s.push_back(0xE0 | static_cast<CharT>((0xf & (cp >> 12))));
-            s.push_back(0x80 | static_cast<CharT>((0x3f & (cp >> 6))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
-        }
-        else if (cp <= 0x10FFFF)
-        {
-            s.push_back(static_cast<CharT>(0xF0 | (0x7 & (cp >> 18))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & (cp >> 12))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & (cp >> 6))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
-        }
-*/
-    }
 };
 
 template <class CharT>
@@ -1321,23 +1291,6 @@ struct unicode_traits<CharT,
         }
         return count;
     }
-
-    template <class STraits,class SAllocator>
-    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
-    {
-        auto result = convert(&cp,&cp+1,std::back_inserter(s));
-/*
-        if (cp <= 0xFFFF)
-        {
-            s.push_back(static_cast<CharT>(cp));
-        }
-        else if (cp <= 0x10FFFF)
-        {
-            s.push_back(static_cast<CharT>((cp >> 10) + uni_sur_high_start - (0x10000 >> 10)));
-            s.push_back(static_cast<CharT>((cp & 0x3ff) + uni_sur_low_start));
-        }
-*/
-    }
 };
 
 template <class CharT>
@@ -1415,22 +1368,6 @@ struct unicode_traits<CharT,
                 ++count;
         }
         return count;
-    }
-
-    template <class STraits,class SAllocator>
-    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
-    {
-        auto result = convert(&cp,&cp+1,std::back_inserter(s));
-/*
-        if (cp <= 0xFFFF)
-        {
-            s.push_back(static_cast<CharT>(cp));
-        }
-        else if (cp <= 0x10FFFF)
-        {
-            s.push_back(static_cast<CharT>(cp));
-        }
-*/
     }
 };
 
