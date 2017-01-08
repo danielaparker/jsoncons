@@ -162,11 +162,14 @@ class sequence_generator
 {
     Iterator begin_;
     Iterator last_;
+    conv_flags flags_;
     size_t length_;
     uni_errc err_cd_;
 public:
-    sequence_generator(Iterator first, Iterator last)
-        : begin_(first), last_(last), length_(0), err_cd_(uni_errc::ok)
+    sequence_generator(Iterator first, Iterator last, 
+                       conv_flags flags = conv_flags::strict)
+        : begin_(first), last_(last), flags_(flags), 
+          length_(0), err_cd_(uni_errc::ok)
     {
         next();
     }
@@ -203,6 +206,24 @@ public:
         case 1: ch += static_cast<uint8_t>(*it++);
             ch -= offsets_from_utf8[length_ - 1];
             break;
+        }
+        if (ch <= uni_max_legal_utf32) 
+        {
+            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) 
+            {
+                if (flags_ == conv_flags::strict) 
+                {
+                    err_cd_ = uni_errc::illegal_surrogate_value;
+                } 
+                else 
+                {
+                    ch = uni_replacement_char;
+                }
+            }
+        }
+        else // ch > uni_max_legal_utf32
+        {
+            ch = uni_replacement_char;
         }
         return ch;
     }

@@ -289,14 +289,13 @@ void escape_string(const CharT* s,
             else if (is_control_character(c) || options.escape_all_non_ascii())
             {
                 // convert utf8 to codepoint
-                uint32_t cp;
-                const CharT* stop = it;
-                auto result = unicons::unicode_traits<CharT>::next_codepoint(it, end, &cp, &stop, unicons::conv_flags::strict);
-                if (result != unicons::uni_errc::ok)
+                unicons::sequence_generator<const CharT*> g(it,end,unicons::conv_flags::strict);
+                if (g.done() || g.status() != unicons::uni_errc::ok)
                 {
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");
                 }
-                it = stop - 1;
+                uint32_t cp = g.get_codepoint();
+                it += (g.get().second - 1);
                 if (is_non_ascii_codepoint(cp) || is_control_character(c))
                 {
                     if (cp > 0xFFFF)
