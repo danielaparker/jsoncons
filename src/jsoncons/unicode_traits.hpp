@@ -154,446 +154,6 @@ std::error_code make_error_code(uni_errc result)
 {
     return std::error_code(static_cast<int>(result),unicode_traits_error_category());
 }
-// unicode_traits
-
-template <class CharT, class Enable=void>
-struct unicode_traits
-{
-};
-
-template <class CharT>
-struct unicode_traits<CharT,
-                      typename std::enable_if<std::is_integral<CharT>::value &&
-                      sizeof(CharT)==sizeof(uint8_t)>::type> 
-{
-    static size_t utf_length(const CharT*, size_t length)
-    {
-        return length;
-    }
-
-    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
-                                                      const CharT* end,
-                                                      size_t index)
-    {
-        const CharT* p = it;
-        size_t count = 0;
-
-        while (p < end && count < index)
-        {
-            uint8_t ch = *p;
-            size_t length = trailing_bytes_for_utf8[ch] + 1;
-            p += length;
-            ++count;
-        }
-
-        if (p < end)
-        {
-            uint8_t ch = *p;
-            size_t len = trailing_bytes_for_utf8[ch] + 1;
-            return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
-        }
-        else
-        {
-            return std::make_pair(it,static_cast<size_t>(0));
-        }
-    }
-
-    static size_t codepoint_count(const CharT* it, 
-                                  const CharT* end)
-    {
-        size_t count = 0;
-        const CharT* p = it;
-        while (p < end)
-        {
-            size_t length = trailing_bytes_for_utf8[(uint8_t)(*p)] + 1;
-            p += length;
-            ++count;
-        }
-        return count;
-    }
-
-    /*
-     * Indicates whether a sequence of bytes is legal UTF-8.
-     * This must be called with the length pre-determined by the first byte.
-     * If not calling this from ConvertUTF8to*, then the length can be set by:
-     *  length = trailing_bytes_for_utf8[*source]+1;
-     * and the sequence is illegal right away if there aren't that many bytes
-     * available.
-     * If presented with a length > 4, this returns false.  The Unicode
-     * definition of UTF-8 goes up to 4-byte sequences.
-     */
-
-    template <class UTF8>
-    static typename std::enable_if<std::is_integral<UTF8>::value && sizeof(UTF8) == sizeof(uint8_t), uni_errc >::type
-    is_legal(const UTF8 *source, size_t length) 
-    {
-        uint8_t a;
-        const UTF8 *srcptr = source+length;
-        switch (length) {
-        default: return uni_errc::over_long_utf8_sequence;
-            /* Everything else falls through when "true"... */
-        case 4: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-            return uni_errc::expected_continuation_byte;
-        case 3: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-            return uni_errc::expected_continuation_byte;
-        case 2: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-            return uni_errc::expected_continuation_byte;
-
-            switch (static_cast<uint8_t>(*source)) 
-            {
-                /* no fall-through in this inner switch */
-                case 0xE0: if (a < 0xA0) return uni_errc::source_illegal; break;
-                case 0xED: if (a > 0x9F) return uni_errc::source_illegal; break;
-                case 0xF0: if (a < 0x90) return uni_errc::source_illegal; break;
-                case 0xF4: if (a > 0x8F) return uni_errc::source_illegal; break;
-                default:   if (a < 0x80) return uni_errc::source_illegal;
-            }
-
-        case 1: if (static_cast<uint8_t>(*source) >= 0x80 && static_cast<uint8_t>(*source) < 0xC2) 
-            return uni_errc::source_illegal;
-        }
-        if (static_cast<uint8_t>(*source) > 0xF4) 
-            return uni_errc::source_illegal;
-
-        return uni_errc::ok;
-    }
-
-    template <class UTF32>
-    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_errc >::type 
-    next_codepoint(const CharT* source_begin, const CharT* source_end, 
-                   UTF32* target, const CharT** source_stop,
-                   conv_flags  flags = conv_flags::strict) 
-    {
-        uni_errc  result = uni_errc::ok;
-
-        const CharT* source = source_begin;
-
-        unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[(uint8_t)(*source)];
-        if (extra_bytes_to_read >= source_end - source) 
-        {
-            result = uni_errc::source_exhausted;
-            *source_stop = source;
-            return result;
-        }
-        /* Do this check whether lenient or strict */
-        if ((result=is_legal(source, extra_bytes_to_read+1)) != uni_errc::ok)
-        {
-            *source_stop = source;
-            return result;
-        }
-        /*
-         * The cases all fall through. See "Note A" below.
-         */
-        UTF32 ch = 0;
-        switch (extra_bytes_to_read) {
-            case 5: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-            case 4: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-            case 3: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-            case 2: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-            case 1: ch += static_cast<uint8_t>(*source++); ch <<= 6;
-            case 0: ch += static_cast<uint8_t>(*source++);
-        }
-        ch -= offsets_from_utf8[extra_bytes_to_read];
-
-        if (ch <= uni_max_legal_utf32) {
-            /*
-             * UTF-16 surrogate values are illegal in UTF-32, and anything
-             * over Plane 17 (> 0x10FFFF) is illegal.
-             */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
-                if (flags == conv_flags::strict) {
-                    source -= (extra_bytes_to_read+1); /* return to the illegal value itself */
-                    result = uni_errc::illegal_surrogate_value;
-                } else {
-                    *target = uni_replacement_char;
-                }
-            } else {
-                *target = ch;
-            }
-        } else { /* i.e., ch > uni_max_legal_utf32 */
-            result = uni_errc::source_illegal;
-            *target = uni_replacement_char;
-        }
-        *source_stop = source;
-        return result;
-    }
-
-    static size_t detect_bom(const CharT* it, size_t length)
-    {
-        size_t count = 0;
-        if (length >= 3)
-        {
-            uint32_t bom = static_cast<uint32_t>(static_cast<uint8_t>(it[0]) |
-                                                (static_cast<uint8_t>(it[1]) << 8) |
-                                                (static_cast<uint8_t>(it[2]) << 16));
-            if ((bom & 0xFFFFFF) == 0xBFBBEF)  
-                count += 3;
-        }
-        return count;
-    }
-
-    template <class STraits,class SAllocator>
-    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
-    {
-        if (cp <= 0x7f)
-        {
-            s.push_back(static_cast<CharT>(cp));
-        }
-        else if (cp <= 0x7FF)
-        {
-            s.push_back(static_cast<CharT>(0xC0 | (0x1f & (cp >> 6))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
-        }
-        else if (cp <= 0xFFFF)
-        {
-            s.push_back(0xE0 | static_cast<CharT>((0xf & (cp >> 12))));
-            s.push_back(0x80 | static_cast<CharT>((0x3f & (cp >> 6))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
-        }
-        else if (cp <= 0x10FFFF)
-        {
-            s.push_back(static_cast<CharT>(0xF0 | (0x7 & (cp >> 18))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & (cp >> 12))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & (cp >> 6))));
-            s.push_back(static_cast<CharT>(0x80 | (0x3f & cp)));
-        }
-    }
-
-};
-
-template <class CharT>
-struct unicode_traits<CharT,
-                      typename std::enable_if<std::is_integral<CharT>::value &&
-                      sizeof(CharT)==sizeof(uint16_t)>::type> 
-{
-    static size_t utf_length(const CharT *source, size_t length)
-    {
-        const CharT* source_end = source + length;
-
-        size_t count = 0;
-        for (const CharT* p = source; p < source_end; ++p)
-        {
-            uint32_t ch = *p;
-            if (ch < (uint32_t)0x80) {      
-                ++count;
-            } else if (ch < (uint32_t)0x800) {     
-                count += 2;
-            } else if (ch < (uint32_t)0x10000) {   
-                count += 3;
-            } else if (ch < (uint32_t)0x110000) {  
-                count += 4;
-            } else {                            
-                count += 3;
-            }
-        }
-        return count;
-    }
-
-    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
-                                                      const CharT* end,
-                                                      size_t index)
-    {
-        const CharT* p = it;
-        size_t count = 0;
-
-        while (p < end && count < index)
-        {
-            uint8_t ch = *p;
-            size_t length = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
-            p += length;
-            ++count;
-        }
-
-        if (p < end)
-        {
-            uint8_t ch = *p;
-            size_t len = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
-            return (p+len <= end) ? std::make_pair(p,len) : std::make_pair(it,static_cast<size_t>(0));
-        }
-        else
-        {
-            return std::make_pair(it,static_cast<size_t>(0));
-        }
-    }
-
-    static size_t codepoint_count(const CharT* it, 
-                                  const CharT* end)
-    {
-        size_t count = 0;
-        const CharT* p = it;
-        while (p < end)
-        {
-            uint8_t ch = *p;
-            size_t length = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
-            p += length;
-            ++count;
-        }
-        return count;
-    }
-
-    template <class UTF32>
-    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_errc >::type 
-    next_codepoint(const CharT* source_begin, const CharT* source_end, 
-                   UTF32* target, const CharT** source_stop,
-                   conv_flags  flags = conv_flags::strict) 
-    {
-        uni_errc  result = uni_errc::ok;
-        const CharT* source = source_begin;
-        uint32_t ch, ch2;
-
-        ch = *source++;
-        /* If we have a surrogate pair, convert to UTF32 first. */
-        if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) {
-            /* If the 16 bits following the high surrogate are in the source buffer... */
-            if (source < source_end) {
-                ch2 = *source;
-                /* If it's a low surrogate, convert to UTF32. */
-                if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
-                    ch = ((ch - uni_sur_high_start) << half_shift)
-                        + (ch2 - uni_sur_low_start) + half_base;
-                    ++source;
-                } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
-                    --source; /* return to the illegal value itself */
-                    result = uni_errc::source_illegal;
-                    *source_stop = source;
-                    return result;
-                }
-            } else { /* We don't have the 16 bits following the high surrogate. */
-                --source; /* return to the high surrogate */
-                result = uni_errc::unpaired_high_surrogate;
-            }
-        } else if (flags == conv_flags::strict) {
-            /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) {
-                --source; /* return to the illegal value itself */
-                result = uni_errc::source_illegal;
-            }
-        }
-        *target = ch;
-
-        *source_stop = source;
-        return result;
-    }
-
-    static size_t detect_bom(const CharT* it, size_t length)
-    {
-        size_t count = 0;
-        if (length >= 1)
-        {
-            uint32_t bom = static_cast<uint32_t>(it[0]);
-            if ((bom & 0xFFFF) == 0xFFFE)      
-                ++count;
-            else if ((bom & 0xFFFF) == 0xFEFF)      
-                ++count;
-        }
-        return count;
-    }
-
-    template <class STraits,class SAllocator>
-    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
-    {
-        if (cp <= 0xFFFF)
-        {
-            s.push_back(static_cast<CharT>(cp));
-        }
-        else if (cp <= 0x10FFFF)
-        {
-            s.push_back(static_cast<CharT>((cp >> 10) + uni_sur_high_start - (0x10000 >> 10)));
-            s.push_back(static_cast<CharT>((cp & 0x3ff) + uni_sur_low_start));
-        }
-    }
-};
-
-template <class CharT>
-struct unicode_traits<CharT,
-                        typename std::enable_if<std::is_integral<CharT>::value &&
-                        sizeof(CharT)==sizeof(uint32_t)>::type> 
-{
-    static size_t utf_length(const CharT *source, size_t length)
-    {
-        const CharT* source_end = source + length;
-
-        size_t count = 0;
-        for (const CharT* p = source; p < source_end; ++p)
-        {
-            uint32_t ch = *p;
-            if (ch < (uint32_t)0x80) {      
-                ++count;
-            } else if (ch < (uint32_t)0x800) {     
-                count += 2;
-            } else if (ch < (uint32_t)0x10000) {   
-                count += 3;
-            } else if (ch <= uni_max_legal_utf32) {  
-                count += 4;
-            } else {                            
-                count += 3;
-            }
-        }
-        return count;
-    }
-
-    static std::pair<const CharT*,size_t> sequence_at(const CharT* it, 
-                                                      const CharT* end,
-                                                      size_t index)
-    {
-        const CharT* p = it;
-        size_t count = 0;
-
-        while (p < end && count < index)
-        {
-            ++p;
-            ++count;
-        }
-
-        return (p < end) ? std::make_pair(p,1) : std::make_pair(it,static_cast<size_t>(0));
-    }
-
-    static size_t codepoint_count(const CharT* it, 
-                                  const CharT* end)
-    {
-        return (size_t)(end-it);
-    }
-
-    template <class UTF32>
-    static typename std::enable_if<std::is_integral<UTF32>::value && sizeof(UTF32) == sizeof(uint32_t),uni_errc >::type 
-    next_codepoint(const CharT* source_begin, const CharT*, 
-                   UTF32* target, const CharT** source_stop,
-                   conv_flags = conv_flags::strict) 
-    {
-        const CharT* source = source_begin;
-        *target = *source++;
-        *source_stop = source;
-
-        return uni_errc::ok;
-    }
-
-    static size_t detect_bom(const CharT* it, size_t length)
-    {
-        size_t count = 0;
-        if (length >= 1)
-        {
-            uint32_t bom = static_cast<uint32_t>(it[0]);
-            if (bom == 0xFFFE0000)                  
-                ++count;
-            else if (bom == 0x0000FEFF)             
-                ++count;
-        }
-        return count;
-    }
-
-    template <class STraits,class SAllocator>
-    static void append_codepoint_to_string(uint32_t cp, std::basic_string<CharT,STraits,SAllocator>& s)
-    {
-        if (cp <= 0xFFFF)
-        {
-            s.push_back(static_cast<CharT>(cp));
-        }
-        else if (cp <= 0x10FFFF)
-        {
-            s.push_back(static_cast<CharT>(cp));
-        }
-    }
-};
 
 // utf8
 
@@ -675,8 +235,10 @@ struct is_compatible_output_iterator<OutputIt,CharT,
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
                                && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<uni_errc,InputIt>>::type 
-convert(InputIt first, InputIt last, OutputIt target, conv_flags) 
+convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flags::strict) 
 {
+    (void)flags;
+
     uni_errc  result = uni_errc::ok;
     while (first != last) 
     {
@@ -772,7 +334,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
                                && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<uni_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
-                 conv_flags  flags = conv_flags::strict) 
+                 conv_flags flags = conv_flags::strict) 
 {
     uni_errc  result = uni_errc::ok;
 
@@ -833,7 +395,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
                                && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<uni_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
-                 conv_flags  flags = conv_flags::strict) {
+                 conv_flags flags = conv_flags::strict) {
     uni_errc  result = uni_errc::ok;
     while (first < last) {
         unsigned short bytes_to_write = 0;
@@ -922,8 +484,8 @@ template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
                                && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<uni_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
-                 OutputIt target, 
-                 conv_flags  flags = conv_flags::strict) 
+        OutputIt target, 
+        conv_flags flags = conv_flags::strict) 
 {
     uni_errc  result = uni_errc::ok;
 
@@ -953,7 +515,7 @@ convert(InputIt first, InputIt last,
             }
         } else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
         {
-            /* UTF-16 surrogate values are illegal in UTF-32 */
+            // illegal leading low surrogate
             if (flags == conv_flags::strict) {
                 --first; /* return to the illegal value itself */
                 result = uni_errc::source_illegal;
@@ -977,7 +539,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
                                && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<uni_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
-                 conv_flags  flags = conv_flags::strict) 
+                 conv_flags flags = conv_flags::strict) 
 {
     uni_errc  result = uni_errc::ok;
 
@@ -1024,7 +586,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
                                && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<uni_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
         OutputIt target, 
-        conv_flags  flags = conv_flags::strict) 
+        conv_flags flags = conv_flags::strict) 
 {
     uni_errc  result = uni_errc::ok;
     while (first < last) {
@@ -1096,7 +658,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
                                && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<uni_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
-                 conv_flags  flags = conv_flags::strict) 
+                 conv_flags flags = conv_flags::strict) 
 {
     uni_errc  result = uni_errc::ok;
 
@@ -1137,7 +699,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
                                && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<uni_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
-                 conv_flags  flags = conv_flags::strict) 
+                 conv_flags flags = conv_flags::strict) 
 {
     uni_errc  result = uni_errc::ok;
 
@@ -1170,7 +732,7 @@ convert(InputIt first, InputIt last,
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
                                ,std::pair<uni_errc,InputIt>>::type 
-validate(InputIt first, InputIt last, conv_flags) 
+validate(InputIt first, InputIt last) 
 {
     uni_errc  result = uni_errc::ok;
     while (first != last) 
@@ -1191,12 +753,10 @@ validate(InputIt first, InputIt last, conv_flags)
 
 // utf16
 
-
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
                                ,std::pair<uni_errc,InputIt>>::type 
-validate(InputIt first, InputIt last, 
-                 conv_flags  flags = conv_flags::strict) 
+validate(InputIt first, InputIt last) 
 {
     uni_errc  result = uni_errc::ok;
 
@@ -1212,7 +772,7 @@ validate(InputIt first, InputIt last,
                 /* If it's a low surrogate, */
                 if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
                     ++first;
-                } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
+                } else {
                     --first; /* return to the illegal value itself */
                     result = uni_errc::unpaired_high_surrogate;
                     break;
@@ -1225,11 +785,9 @@ validate(InputIt first, InputIt last,
         } else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
         {
             /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (flags == conv_flags::strict) {
-                --first; /* return to the illegal value itself */
-                result = uni_errc::source_illegal;
-                break;
-            }
+            --first; /* return to the illegal value itself */
+            result = uni_errc::source_illegal;
+            break;
         }
     }
     return std::make_pair(result,first);
@@ -1242,21 +800,18 @@ validate(InputIt first, InputIt last,
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
                                ,std::pair<uni_errc,InputIt>>::type 
-validate(InputIt first, InputIt last, 
-         conv_flags  flags = conv_flags::strict) 
+validate(InputIt first, InputIt last) 
 {
     uni_errc  result = uni_errc::ok;
 
     while (first != last) 
     {
         uint32_t ch = *first++;
-        if (flags == conv_flags::strict ) {
-            /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
-                --first; /* return to the illegal value itself */
-                result = uni_errc::illegal_surrogate_value;
-                break;
-            }
+        /* UTF-16 surrogate values are illegal in UTF-32 */
+        if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+            --first; /* return to the illegal value itself */
+            result = uni_errc::illegal_surrogate_value;
+            break;
         }
         if (!(ch <= uni_max_legal_utf32))
         {
@@ -1265,6 +820,370 @@ validate(InputIt first, InputIt last,
     }
     return std::make_pair(result,first);
 }
+
+// sequence_generator
+
+template <class Iterator>
+class sequence_generator
+{
+    Iterator begin_;
+    Iterator last_;
+    conv_flags flags_;
+    size_t length_;
+    uni_errc err_cd_;
+public:
+    sequence_generator(Iterator first, Iterator last, 
+                       conv_flags flags = conv_flags::strict)
+        : begin_(first), last_(last), flags_(flags), 
+          length_(0), err_cd_(uni_errc::ok)
+    {
+        next();
+    }
+
+    bool done() const
+    {
+        return err_cd_ != uni_errc::ok || begin_ == last_;
+    }
+
+    uni_errc status() const
+    {
+        return err_cd_;
+    }
+
+    std::pair<Iterator,size_t> get() const 
+    {
+        return std::make_pair(begin_,length_);
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint8_t),uint32_t>::type 
+    get_codepoint()
+    {
+        uint32_t ch = 0;
+        Iterator it = begin_;
+        switch (length_) 
+        {
+        default:
+            throw std::invalid_argument("Invalid sequence");
+            break;
+        case 4: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 3: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 2: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 1: ch += static_cast<uint8_t>(*it++);
+            ch -= offsets_from_utf8[length_ - 1];
+            break;
+        }
+        if (ch <= uni_max_legal_utf32) 
+        {
+            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) 
+            {
+                if (flags_ == conv_flags::strict) 
+                {
+                    err_cd_ = uni_errc::illegal_surrogate_value;
+                } 
+                else 
+                {
+                    ch = uni_replacement_char;
+                }
+            }
+        }
+        else // ch > uni_max_legal_utf32
+        {
+            ch = uni_replacement_char;
+        }
+        return ch;
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint16_t),uint32_t>::type 
+    get_codepoint()
+    {
+        if (length_ == 0)
+        {
+            throw std::invalid_argument("Invalid sequence");
+        }
+        if (length_ == 2)
+        {
+            uint32_t ch = *begin_;
+            uint32_t ch2 = *(begin_ + 1);
+            ch = ((ch - uni_sur_high_start) << half_shift)
+                 + (ch2 - uni_sur_low_start) + half_base;
+            return ch;
+        }
+        else 
+        {
+            return *begin_;
+        }
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint32_t),uint32_t>::type 
+    get_codepoint()
+    {
+        if (length_ == 0)
+        {
+            throw std::invalid_argument("Invalid sequence");
+        }
+        return *begin_;
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint8_t)>::type 
+    next() 
+    {
+        begin_ += length_;
+        if (begin_ != last_)
+        {
+            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*begin_)] + 1;
+            if (length > (size_t)(last_ - begin_))
+            {
+                err_cd_ = uni_errc::source_exhausted;
+            }
+            else if ((err_cd_ = is_legal_utf8(begin_, length)) != uni_errc::ok)
+            {
+            }
+            else
+            {
+                length_ = length;
+            }
+        }
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint16_t)>::type 
+    next() 
+    {
+        begin_ += length_;
+        if (begin_ != last_)
+        {
+            if (begin_ != last_)
+            {
+
+                Iterator it = begin_;
+
+                uint32_t ch = *it++;
+                /* If we have a surrogate pair, validate to uint32_t it. */
+                if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
+                {
+                    /* If the 16 bits following the high surrogate are in the it buffer... */
+                    if (it < last_) {
+                        uint32_t ch2 = *it;
+                        /* If it's a low surrogate, */
+                        if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) 
+                        {
+                            ++it;
+                            length_ = 2;
+                        } 
+                        else 
+                        {
+                            err_cd_ = uni_errc::unpaired_high_surrogate;
+                        }
+                    } 
+                    else 
+                    { 
+                        // We don't have the 16 bits following the high surrogate.
+                        err_cd_ = uni_errc::source_exhausted;
+                    }
+                } 
+                else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
+                {
+                    /* leading low surrogate */
+                    err_cd_ = uni_errc::source_illegal;
+                }
+                else
+                {
+                    length_ = 1;
+                }
+            }
+        }
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint32_t)>::type 
+    next() 
+    {
+        begin_ += length_;
+        length_ = 1;
+    }
+};
+
+template <class InputIt>
+static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) != sizeof(uint32_t)
+                               ,std::pair<InputIt,size_t>>::type 
+sequence_at(InputIt first, InputIt last, size_t index) 
+{
+    sequence_generator<InputIt> g(first, last, unicons::conv_flags::strict);
+
+    size_t count = 0;
+    while (!g.done() && count < index)
+    {
+        g.next();
+        ++count;
+    }
+    return (!g.done() && count == index) ? g.get() : std::pair<InputIt,size_t>(last,0);
+}
+
+template <class InputIt>
+static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
+                               ,std::pair<InputIt,size_t>>::type 
+sequence_at(InputIt first, InputIt last, size_t index) 
+{
+    size_t size = std::distance(first,last);
+    return index < size ? *(first+size) : std::pair<InputIt,size_t>(last,0);
+}
+
+// unicode_traits
+
+template <class CharT, class Enable=void>
+struct unicode_traits
+{
+};
+
+template <class CharT>
+struct unicode_traits<CharT,
+                      typename std::enable_if<std::is_integral<CharT>::value &&
+                      sizeof(CharT)==sizeof(uint8_t)>::type> 
+{
+    static size_t utf_length(const CharT*, size_t length)
+    {
+        return length;
+    }
+
+    static size_t codepoint_count(const CharT* it, 
+                                  const CharT* end)
+    {
+        size_t count = 0;
+        const CharT* p = it;
+        while (p < end)
+        {
+            size_t length = trailing_bytes_for_utf8[(uint8_t)(*p)] + 1;
+            p += length;
+            ++count;
+        }
+        return count;
+    }
+
+    static size_t detect_bom(const CharT* it, size_t length)
+    {
+        size_t count = 0;
+        if (length >= 3)
+        {
+            uint32_t bom = static_cast<uint32_t>(static_cast<uint8_t>(it[0]) |
+                                                (static_cast<uint8_t>(it[1]) << 8) |
+                                                (static_cast<uint8_t>(it[2]) << 16));
+            if ((bom & 0xFFFFFF) == 0xBFBBEF)  
+                count += 3;
+        }
+        return count;
+    }
+};
+
+template <class CharT>
+struct unicode_traits<CharT,
+                      typename std::enable_if<std::is_integral<CharT>::value &&
+                      sizeof(CharT)==sizeof(uint16_t)>::type> 
+{
+    static size_t utf_length(const CharT *source, size_t length)
+    {
+        const CharT* source_end = source + length;
+
+        size_t count = 0;
+        for (const CharT* p = source; p < source_end; ++p)
+        {
+            uint32_t ch = *p;
+            if (ch < (uint32_t)0x80) {      
+                ++count;
+            } else if (ch < (uint32_t)0x800) {     
+                count += 2;
+            } else if (ch < (uint32_t)0x10000) {   
+                count += 3;
+            } else if (ch < (uint32_t)0x110000) {  
+                count += 4;
+            } else {                            
+                count += 3;
+            }
+        }
+        return count;
+    }
+
+    static size_t codepoint_count(const CharT* it, 
+                                  const CharT* end)
+    {
+        size_t count = 0;
+        const CharT* p = it;
+        while (p < end)
+        {
+            uint8_t ch = *p;
+            size_t length = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
+            p += length;
+            ++count;
+        }
+        return count;
+    }
+
+    static size_t detect_bom(const CharT* it, size_t length)
+    {
+        size_t count = 0;
+        if (length >= 1)
+        {
+            uint32_t bom = static_cast<uint32_t>(it[0]);
+            if ((bom & 0xFFFF) == 0xFFFE)      
+                ++count;
+            else if ((bom & 0xFFFF) == 0xFEFF)      
+                ++count;
+        }
+        return count;
+    }
+};
+
+template <class CharT>
+struct unicode_traits<CharT,
+                        typename std::enable_if<std::is_integral<CharT>::value &&
+                        sizeof(CharT)==sizeof(uint32_t)>::type> 
+{
+    static size_t utf_length(const CharT *source, size_t length)
+    {
+        const CharT* source_end = source + length;
+
+        size_t count = 0;
+        for (const CharT* p = source; p < source_end; ++p)
+        {
+            uint32_t ch = *p;
+            if (ch < (uint32_t)0x80) {      
+                ++count;
+            } else if (ch < (uint32_t)0x800) {     
+                count += 2;
+            } else if (ch < (uint32_t)0x10000) {   
+                count += 3;
+            } else if (ch <= uni_max_legal_utf32) {  
+                count += 4;
+            } else {                            
+                count += 3;
+            }
+        }
+        return count;
+    }
+
+    static size_t codepoint_count(const CharT* it, 
+                                  const CharT* end)
+    {
+        return (size_t)(end-it);
+    }
+
+    static size_t detect_bom(const CharT* it, size_t length)
+    {
+        size_t count = 0;
+        if (length >= 1)
+        {
+            uint32_t bom = static_cast<uint32_t>(it[0]);
+            if (bom == 0xFFFE0000)                  
+                ++count;
+            else if (bom == 0x0000FEFF)             
+                ++count;
+        }
+        return count;
+    }
+};
 
 }
 

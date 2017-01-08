@@ -429,7 +429,7 @@ public:
             case '\"':
                 if (string_buffer_.length() == 0)
                 {
-                    auto result = unicons::validate(sb,p_,unicons::conv_flags::strict);
+                    auto result = unicons::validate(sb,p_);
                     if (result.first == unicons::uni_errc::ok)
                     {
                         end_string_value(sb,p_-sb);
@@ -442,7 +442,7 @@ public:
                 else
                 {
                     string_buffer_.append(sb,p_-sb);
-                    auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end(),unicons::conv_flags::strict);
+                    auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end());
                     if (result.first == unicons::uni_errc::ok)
                     {
                         end_string_value(string_buffer_.data(),string_buffer_.length());
@@ -1026,7 +1026,7 @@ public:
                     }
                     else
                     {
-                        unicons::unicode_traits<CharT>::append_codepoint_to_string(cp_, string_buffer_);
+                        unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
                         stack_.back() = states::string;
                     }
                 }
@@ -1092,7 +1092,7 @@ public:
                 {
                     append_second_codepoint(*p_);
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
-                    unicons::unicode_traits<CharT>::append_codepoint_to_string(cp, string_buffer_);
+                    unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
                     stack_.back() = states::string;
                 }
                 ++p_;
