@@ -155,192 +155,6 @@ std::error_code make_error_code(uni_errc result)
     return std::error_code(static_cast<int>(result),unicode_traits_error_category());
 }
 
-// sequence_generator
-
-template <class Iterator>
-class sequence_generator
-{
-    Iterator begin_;
-    Iterator last_;
-    conv_flags flags_;
-    size_t length_;
-    uni_errc err_cd_;
-public:
-    sequence_generator(Iterator first, Iterator last, 
-                       conv_flags flags = conv_flags::strict)
-        : begin_(first), last_(last), flags_(flags), 
-          length_(0), err_cd_(uni_errc::ok)
-    {
-        next();
-    }
-
-    bool done() const
-    {
-        return err_cd_ != uni_errc::ok || begin_ == last_;
-    }
-
-    uni_errc status() const
-    {
-        return err_cd_;
-    }
-
-    std::pair<Iterator,size_t> get() const 
-    {
-        return std::make_pair(begin_,length_);
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint8_t),uint32_t>::type 
-    get_codepoint()
-    {
-        uint32_t ch = 0;
-        Iterator it = begin_;
-        switch (length_) 
-        {
-        default:
-            throw std::invalid_argument("Invalid sequence");
-            break;
-        case 4: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-        case 3: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-        case 2: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-        case 1: ch += static_cast<uint8_t>(*it++);
-            ch -= offsets_from_utf8[length_ - 1];
-            break;
-        }
-        if (ch <= uni_max_legal_utf32) 
-        {
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) 
-            {
-                if (flags_ == conv_flags::strict) 
-                {
-                    err_cd_ = uni_errc::illegal_surrogate_value;
-                } 
-                else 
-                {
-                    ch = uni_replacement_char;
-                }
-            }
-        }
-        else // ch > uni_max_legal_utf32
-        {
-            ch = uni_replacement_char;
-        }
-        return ch;
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint16_t),uint32_t>::type 
-    get_codepoint()
-    {
-        if (length_ == 0)
-        {
-            throw std::invalid_argument("Invalid sequence");
-        }
-        if (length_ == 2)
-        {
-            uint32_t ch = *begin_;
-            uint32_t ch2 = *(begin_ + 1);
-            ch = ((ch - uni_sur_high_start) << half_shift)
-                 + (ch2 - uni_sur_low_start) + half_base;
-            return ch;
-        }
-        else 
-        {
-            return *begin_;
-        }
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint32_t),uint32_t>::type 
-    get_codepoint()
-    {
-        if (length_ == 0)
-        {
-            throw std::invalid_argument("Invalid sequence");
-        }
-        return *begin_;
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint8_t)>::type 
-    next() 
-    {
-        begin_ += length_;
-        if (begin_ != last_)
-        {
-            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*begin_)] + 1;
-            if (length > (size_t)(last_ - begin_))
-            {
-                err_cd_ = uni_errc::source_exhausted;
-            }
-            else if ((err_cd_ = is_legal_utf8(begin_, length)) != uni_errc::ok)
-            {
-            }
-            else
-            {
-                length_ = length;
-            }
-        }
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint16_t)>::type 
-    next() 
-    {
-        begin_ += length_;
-        if (begin_ != last_)
-        {
-            if (begin_ != last_)
-            {
-
-                Iterator it = begin_;
-
-                uint32_t ch = *it++;
-                /* If we have a surrogate pair, validate to uint32_t it. */
-                if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
-                {
-                    /* If the 16 bits following the high surrogate are in the it buffer... */
-                    if (it < last_) {
-                        uint32_t ch2 = *it;
-                        /* If it's a low surrogate, */
-                        if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) 
-                        {
-                            ++it;
-                            length_ = 2;
-                        } 
-                        else 
-                        {
-                            err_cd_ = uni_errc::unpaired_high_surrogate;
-                        }
-                    } 
-                    else 
-                    { 
-                        // We don't have the 16 bits following the high surrogate.
-                        err_cd_ = uni_errc::source_exhausted;
-                    }
-                } 
-                else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
-                {
-                    /* leading low surrogate */
-                    err_cd_ = uni_errc::source_illegal;
-                }
-                else
-                {
-                    length_ = 1;
-                }
-            }
-        }
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint32_t)>::type 
-    next() 
-    {
-        begin_ += length_;
-        length_ = 1;
-    }
-};
-
 // utf8
 
 template <class Iterator>
@@ -1006,6 +820,193 @@ validate(InputIt first, InputIt last)
     }
     return std::make_pair(result,first);
 }
+
+// sequence_generator
+
+template <class Iterator>
+class sequence_generator
+{
+    Iterator begin_;
+    Iterator last_;
+    conv_flags flags_;
+    size_t length_;
+    uni_errc err_cd_;
+public:
+    sequence_generator(Iterator first, Iterator last, 
+                       conv_flags flags = conv_flags::strict)
+        : begin_(first), last_(last), flags_(flags), 
+          length_(0), err_cd_(uni_errc::ok)
+    {
+        next();
+    }
+
+    bool done() const
+    {
+        return err_cd_ != uni_errc::ok || begin_ == last_;
+    }
+
+    uni_errc status() const
+    {
+        return err_cd_;
+    }
+
+    std::pair<Iterator,size_t> get() const 
+    {
+        return std::make_pair(begin_,length_);
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint8_t),uint32_t>::type 
+    get_codepoint()
+    {
+        uint32_t ch = 0;
+        Iterator it = begin_;
+        switch (length_) 
+        {
+        default:
+            throw std::invalid_argument("Invalid sequence");
+            break;
+        case 4: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 3: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 2: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 1: ch += static_cast<uint8_t>(*it++);
+            ch -= offsets_from_utf8[length_ - 1];
+            break;
+        }
+        if (ch <= uni_max_legal_utf32) 
+        {
+            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) 
+            {
+                if (flags_ == conv_flags::strict) 
+                {
+                    err_cd_ = uni_errc::illegal_surrogate_value;
+                } 
+                else 
+                {
+                    ch = uni_replacement_char;
+                }
+            }
+        }
+        else // ch > uni_max_legal_utf32
+        {
+            ch = uni_replacement_char;
+        }
+        return ch;
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint16_t),uint32_t>::type 
+    get_codepoint()
+    {
+        if (length_ == 0)
+        {
+            throw std::invalid_argument("Invalid sequence");
+        }
+        if (length_ == 2)
+        {
+            uint32_t ch = *begin_;
+            uint32_t ch2 = *(begin_ + 1);
+            ch = ((ch - uni_sur_high_start) << half_shift)
+                 + (ch2 - uni_sur_low_start) + half_base;
+            return ch;
+        }
+        else 
+        {
+            return *begin_;
+        }
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint32_t),uint32_t>::type 
+    get_codepoint()
+    {
+        if (length_ == 0)
+        {
+            throw std::invalid_argument("Invalid sequence");
+        }
+        return *begin_;
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint8_t)>::type 
+    next() 
+    {
+        begin_ += length_;
+        if (begin_ != last_)
+        {
+            size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*begin_)] + 1;
+            if (length > (size_t)(last_ - begin_))
+            {
+                err_cd_ = uni_errc::source_exhausted;
+            }
+            else if ((err_cd_ = is_legal_utf8(begin_, length)) != uni_errc::ok)
+            {
+            }
+            else
+            {
+                length_ = length;
+            }
+        }
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint16_t)>::type 
+    next() 
+    {
+        begin_ += length_;
+        if (begin_ != last_)
+        {
+            if (begin_ != last_)
+            {
+
+                Iterator it = begin_;
+
+                uint32_t ch = *it++;
+                /* If we have a surrogate pair, validate to uint32_t it. */
+                if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
+                {
+                    /* If the 16 bits following the high surrogate are in the it buffer... */
+                    if (it < last_) {
+                        uint32_t ch2 = *it;
+                        /* If it's a low surrogate, */
+                        if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) 
+                        {
+                            ++it;
+                            length_ = 2;
+                        } 
+                        else 
+                        {
+                            err_cd_ = uni_errc::unpaired_high_surrogate;
+                        }
+                    } 
+                    else 
+                    { 
+                        // We don't have the 16 bits following the high surrogate.
+                        err_cd_ = uni_errc::source_exhausted;
+                    }
+                } 
+                else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
+                {
+                    /* leading low surrogate */
+                    err_cd_ = uni_errc::source_illegal;
+                }
+                else
+                {
+                    length_ = 1;
+                }
+            }
+        }
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint32_t)>::type 
+    next() 
+    {
+        begin_ += length_;
+        length_ = 1;
+    }
+};
+
 // unicode_traits
 
 template <class CharT, class Enable=void>
