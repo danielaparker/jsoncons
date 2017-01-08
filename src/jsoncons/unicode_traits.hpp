@@ -1020,7 +1020,7 @@ sequence_at(InputIt first, InputIt last, size_t index)
         g.next();
         ++count;
     }
-    return (!g.done() && count == index) ? g.get() : std::make_pair(last,0);
+    return (!g.done() && count == index) ? g.get() : std::pair<InputIt,size_t>(last,0);
 }
 
 template <class InputIt>
@@ -1029,7 +1029,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
 sequence_at(InputIt first, InputIt last, size_t index) 
 {
     size_t size = std::distance(first,last);
-    return index < size ? *(first+size) : std::make_pair(last,0);
+    return index < size ? *(first+size) : std::pair<InputIt,size_t>(last,0);
 }
 
 // unicode_traits
