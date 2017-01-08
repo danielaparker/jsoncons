@@ -1026,7 +1026,7 @@ public:
                     }
                     else
                     {
-                        unicons::unicode_traits<CharT>::append_codepoint_to_string(cp_, string_buffer_);
+                        unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
                         stack_.back() = states::string;
                     }
                 }
@@ -1092,7 +1092,7 @@ public:
                 {
                     append_second_codepoint(*p_);
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
-                    unicons::unicode_traits<CharT>::append_codepoint_to_string(cp, string_buffer_);
+                    unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
                     stack_.back() = states::string;
                 }
                 ++p_;
