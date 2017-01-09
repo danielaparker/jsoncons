@@ -248,7 +248,7 @@ public:
     {
         size_t n = 0;
 
-        const size_t length = unicons::unicode_traits<char_type>::utf_length(sv.data(),sv.length());
+        const size_t length = unicons::u8_length(sv.begin(),sv.end());
         if (length <= 31)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
