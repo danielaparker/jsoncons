@@ -147,6 +147,32 @@ enum class states
     done
 };
 
+template <class Iterator>
+static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
+                              Iterator>::type 
+skip_bom(Iterator first, Iterator last)
+{
+    auto result = unicons::detect_encoding(first,last);
+    /*switch (result.first)
+    {
+    case unicons::encoding::u8:
+        begin_input_ = result.second;
+        break;
+    default:
+        JSONCONS_THROW_EXCEPTION(std::invalid_argument,"Expected utf-8 encoding");
+        break;
+    }*/
+    return result.second;
+}
+
+template <class Iterator>
+static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) != sizeof(uint8_t),
+                               Iterator>::type 
+skip_bom(Iterator first, Iterator)
+{
+    return first;
+}
+
 template<class CharT>
 class basic_json_parser : private basic_parsing_context<CharT>
 {
@@ -468,88 +494,7 @@ public:
             column_ += (p_ - sb + 1);
         }
     }
-/*
-    void parse_string()
-    {
-        const CharT* sb = p_;
-        bool done = false;
-        while (!done && p_ < end_input_)
-        {
-            switch (*p_)
-            {
-            case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
-            case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
-            case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
-                column_ += (p_ - sb + 1);
-                err_handler_.error(json_parser_errc::illegal_control_character, *this);
-                // recovery - skip
-                done = true;
-                ++p_;
-                break;
-            case '\r':
-                {
-                    column_ += (p_ - sb + 1);
-                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                    // recovery - keep
 
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    stack_.push_back(states::cr);
-                    done = true;
-                    ++p_;
-                }
-                break;
-            case '\n':
-                {
-                    column_ += (p_ - sb + 1);
-                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                    // recovery - keep
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    stack_.push_back(states::lf);
-                    done = true;
-                    ++p_;
-                }
-                break;
-            case '\t':
-                {
-                    column_ += (p_ - sb + 1);
-                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                    // recovery - keep
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    done = true;
-                    ++p_;
-                }
-                break;
-            case '\\':
-                {
-                    append_to_string(sb,p_);
-                    column_ += (p_ - sb + 1);
-                    stack_.back() = states::escape;
-                    done = true;
-                    ++p_;
-                    break;
-                }
-            case '\"':
-                {
-                    append_to_string(sb,p_);
-                    end_string_value(string_buffer_.data(),string_buffer_.length());
-                    string_buffer_.clear();
-                    column_ += (p_ - sb + 1);
-                    done = true;
-                    ++p_;
-                    break;
-                }
-            default:
-                ++p_;
-                break;
-            }
-        }
-        if (!done)
-        {
-            append_to_string(sb,p_);
-            column_ += (p_ - sb + 1);
-        }
-    }
-*/
     void error(unicons::uni_errc  result)
     {
         switch (result)
@@ -574,15 +519,15 @@ public:
         }
     }
 
-    void parse(const CharT* const input, size_t start, size_t length)
+    void parse(const CharT* input, size_t start, size_t length)
     {
         end_input_ = input + length;
 
         if (start == 0)
         {
-            index_ = unicons::unicode_traits<CharT>::detect_bom(input,length);
+            begin_input_ = skip_bom(input, end_input_);
+            index_ = begin_input_ - input;
             column_ = index_+1;
-            begin_input_ = input + index_;
         }
         else
         {
@@ -591,7 +536,6 @@ public:
         }
         p_ = begin_input_;
 
-        index_ = (start == 0) ? unicons::unicode_traits<CharT>::detect_bom(input,length) : start;
         while ((p_ < end_input_) && (stack_.back() != states::done))
         {
             switch (*p_)

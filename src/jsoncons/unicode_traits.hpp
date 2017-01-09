@@ -1018,6 +1018,14 @@ public:
     }
 };
 
+
+template <class Iterator>
+sequence_generator<Iterator> make_sequence_generator(Iterator first, Iterator last, 
+                                                     conv_flags flags = conv_flags::strict)
+{
+    return sequence_generator<Iterator>(first,last,flags);
+}
+
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value 
                                && (sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t) || sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)),
@@ -1153,6 +1161,59 @@ u32_length(InputIt first, InputIt last)
     return std::distance(first,last);
 }
 
+enum class encoding {u8,u16le,u16be,u32le,u32be,unknown};
+
+template <class Iterator>
+static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
+                               std::pair<encoding,Iterator>>::type 
+detect_encoding(Iterator first, Iterator)
+{
+    Iterator it1 = first;
+    Iterator it2 = first++;
+    Iterator it3 = first++;
+    Iterator it4 = first++;
+
+    uint32_t bom = static_cast<uint8_t>(*it1) | (static_cast<uint8_t>(*it2) << 8) | (static_cast<uint8_t>(*it3) << 16) | (static_cast<uint8_t>(*it4) << 24);
+    if (bom == 0xFFFE0000)                  
+    { 
+        return std::make_pair(encoding::u32be,it4++);
+    }
+    else if (bom == 0x0000FEFF) 
+    {
+        return std::make_pair(encoding::u32le,it4++);
+    }
+    else if ((bom & 0xFFFF) == 0xFFFE)     
+    {
+        return std::make_pair(encoding::u16be,it3);
+    }
+    else if ((bom & 0xFFFF) == 0xFEFF)      
+    {
+        return std::make_pair(encoding::u16le,it3);
+    }
+    else if ((bom & 0xFFFFFF) == 0xBFBBEF)  
+    {
+        return std::make_pair(encoding::u8,it4);
+    }
+    else
+    {
+        uint32_t pattern = (static_cast<uint8_t>(*it1) ? 1 : 0) | (static_cast<uint8_t>(*it2) ? 2 : 0) | (static_cast<uint8_t>(*it3) ? 4 : 0) | (static_cast<uint8_t>(*it4) ? 8 : 0);
+        switch (pattern) {
+        case 0x08: 
+            return std::make_pair(encoding::u32be,it1);
+        case 0x0A: 
+            return std::make_pair(encoding::u16be,it1);
+        case 0x01: 
+            return std::make_pair(encoding::u32le,it1);
+        case 0x05: 
+            return std::make_pair(encoding::u16le,it1);
+        case 0x0F: 
+            return std::make_pair(encoding::u8,it1);
+        default:
+            return std::make_pair(encoding::unknown,it1);
+        }
+    }
+}
+
 // unicode_traits
 
 template <class CharT, class Enable=void>
@@ -1165,25 +1226,6 @@ struct unicode_traits<CharT,
                       typename std::enable_if<std::is_integral<CharT>::value &&
                       sizeof(CharT)==sizeof(uint8_t)>::type> 
 {
-    static size_t utf_length(const CharT*, size_t length)
-    {
-        return length;
-    }
-
-    static size_t codepoint_count(const CharT* it, 
-                                  const CharT* end)
-    {
-        size_t count = 0;
-        const CharT* p = it;
-        while (p < end)
-        {
-            size_t length = trailing_bytes_for_utf8[(uint8_t)(*p)] + 1;
-            p += length;
-            ++count;
-        }
-        return count;
-    }
-
     static size_t detect_bom(const CharT* it, size_t length)
     {
         size_t count = 0;
@@ -1204,44 +1246,6 @@ struct unicode_traits<CharT,
                       typename std::enable_if<std::is_integral<CharT>::value &&
                       sizeof(CharT)==sizeof(uint16_t)>::type> 
 {
-    static size_t utf_length(const CharT *source, size_t length)
-    {
-        const CharT* source_end = source + length;
-
-        size_t count = 0;
-        for (const CharT* p = source; p < source_end; ++p)
-        {
-            uint32_t ch = *p;
-            if (ch < (uint32_t)0x80) {      
-                ++count;
-            } else if (ch < (uint32_t)0x800) {     
-                count += 2;
-            } else if (ch < (uint32_t)0x10000) {   
-                count += 3;
-            } else if (ch < (uint32_t)0x110000) {  
-                count += 4;
-            } else {                            
-                count += 3;
-            }
-        }
-        return count;
-    }
-
-    static size_t codepoint_count(const CharT* it, 
-                                  const CharT* end)
-    {
-        size_t count = 0;
-        const CharT* p = it;
-        while (p < end)
-        {
-            uint8_t ch = *p;
-            size_t length = (is_high_surrogate(ch)) ? 2 : 1; 
-            p += length;
-            ++count;
-        }
-        return count;
-    }
-
     static size_t detect_bom(const CharT* it, size_t length)
     {
         size_t count = 0;
@@ -1262,35 +1266,6 @@ struct unicode_traits<CharT,
                         typename std::enable_if<std::is_integral<CharT>::value &&
                         sizeof(CharT)==sizeof(uint32_t)>::type> 
 {
-    static size_t utf_length(const CharT *source, size_t length)
-    {
-        const CharT* source_end = source + length;
-
-        size_t count = 0;
-        for (const CharT* p = source; p < source_end; ++p)
-        {
-            uint32_t ch = *p;
-            if (ch < (uint32_t)0x80) {      
-                ++count;
-            } else if (ch < (uint32_t)0x800) {     
-                count += 2;
-            } else if (ch < (uint32_t)0x10000) {   
-                count += 3;
-            } else if (ch <= uni_max_legal_utf32) {  
-                count += 4;
-            } else {                            
-                count += 3;
-            }
-        }
-        return count;
-    }
-
-    static size_t codepoint_count(const CharT* it, 
-                                  const CharT* end)
-    {
-        return (size_t)(end-it);
-    }
-
     static size_t detect_bom(const CharT* it, size_t length)
     {
         size_t count = 0;
