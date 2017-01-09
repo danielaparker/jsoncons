@@ -949,7 +949,7 @@ public:
             }
             else if (name == length_literal() && s.size() > 0)
             {
-                size_t count = unicons::unicode_traits<char_type>::codepoint_count(s.data(),s.data()+s.size());
+                size_t count = unicons::u32_length(s.begin(),s.end());
                 auto temp = std::make_shared<Json>(count);
                 temp_json_values_.push_back(temp);
                 nodes_.push_back(temp.get());
