@@ -92,6 +92,24 @@ const uint16_t uni_sur_high_end = 0xDBFF;
 const uint16_t uni_sur_low_start = 0xDC00;
 const uint16_t uni_sur_low_end = 0xDFFF;
 
+inline
+bool is_high_surrogate(uint32_t ch)
+{
+    return (ch >= uni_sur_high_start && ch <= uni_sur_high_end);
+}
+
+inline
+bool is_low_surrogate(uint32_t ch)
+{
+    return (ch >= uni_sur_low_start && ch <= uni_sur_low_end);
+}
+
+inline
+bool is_surrogate(uint32_t ch)
+{
+    return (ch >= uni_sur_high_start && ch <= uni_sur_low_end);
+}
+
 enum class conv_flags 
 {
     strict = 0,
@@ -298,7 +316,7 @@ convert(InputIt first, InputIt last,
 
         if (ch <= uni_max_bmp) { /* Target is a character <= 0xFFFF */
             /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end ) {
+            if (is_surrogate(ch) ) {
                 if (flags == conv_flags::strict) {
                     first -= (extra_bytes_to_read+1); /* return to the illegal value itself */
                     result = uni_errc::source_illegal;
@@ -367,7 +385,7 @@ convert(InputIt first, InputIt last,
              * UTF-16 surrogate values are illegal in UTF-32, and anything
              * over Plane 17 (> 0x10FFFF) is illegal.
              */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end ) {
+            if (is_surrogate(ch) ) {
                 if (flags == conv_flags::strict) {
                     first -= (extra_bytes_to_read+1); /* return to the illegal value itself */
                     result = uni_errc::source_illegal;
@@ -401,7 +419,7 @@ convert(InputIt first, InputIt last,
         const uint32_t byteMark = 0x80; 
         uint32_t ch = *first++;
         /* If we have a surrogate pair, convert to uint32_t first. */
-        if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) {
+        if (is_high_surrogate(ch)) {
             /* If the 16 bits following the high surrogate are in the first buffer... */
             if (first < last) {
                 uint32_t ch2 = *first;
@@ -422,7 +440,7 @@ convert(InputIt first, InputIt last,
             }
         } else if (flags == conv_flags::strict) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) {
+            if (is_low_surrogate(ch)) {
                 --first; /* return to the illegal value itself */
                 result = uni_errc::source_illegal;
                 break;
@@ -491,7 +509,7 @@ convert(InputIt first, InputIt last,
     {
         uint32_t ch = *first++;
         /* If we have a surrogate pair, convert to uint32_t first. */
-        if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
+        if (is_high_surrogate(ch)) 
         {
             /* If the 16 bits following the high surrogate are in the first buffer... */
             if (first < last) {
@@ -511,7 +529,7 @@ convert(InputIt first, InputIt last,
                 result = uni_errc::source_exhausted;
                 break;
             }
-        } else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
+        } else if (is_low_surrogate(ch)) 
         {
             // illegal leading low surrogate
             if (flags == conv_flags::strict) {
@@ -545,7 +563,7 @@ convert(InputIt first, InputIt last,
     {
         uint32_t ch = *first++;
         /* If we have a surrogate pair, convert to UTF32 first. */
-        if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) {
+        if (is_high_surrogate(ch)) {
             /* If the 16 bits following the high surrogate are in the first buffer... */
             if (first < last) {
                 uint32_t ch2 = *first;
@@ -566,7 +584,7 @@ convert(InputIt first, InputIt last,
             }
         } else if (flags == conv_flags::strict) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (ch >= uni_sur_low_start && ch <= uni_sur_low_end ) {
+            if (is_low_surrogate(ch) ) {
                 --first; /* return to the illegal value itself */
                 result = uni_errc::source_illegal;
                 break;
@@ -594,7 +612,7 @@ convert(InputIt first, InputIt last,
         uint32_t ch = *first++;
         if (flags == conv_flags::strict ) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+            if (is_surrogate(ch)) {
                 --first; /* return to the illegal value itself */
                 result = uni_errc::illegal_surrogate_value;
                 break;
@@ -665,7 +683,7 @@ convert(InputIt first, InputIt last,
         uint32_t ch = *first++;
         if (ch <= uni_max_bmp) { /* Target is a character <= 0xFFFF */
             /* UTF-16 surrogate values are illegal in UTF-32; 0xffff or 0xfffe are both reserved values */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end ) {
+            if (is_surrogate(ch) ) {
                 if (flags == conv_flags::strict) {
                     --first; /* return to the illegal value itself */
                     result = uni_errc::source_illegal;
@@ -706,7 +724,7 @@ convert(InputIt first, InputIt last,
         uint32_t ch = *first++;
         if (flags == conv_flags::strict ) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+            if (is_surrogate(ch)) {
                 --first; /* return to the illegal value itself */
                 result = uni_errc::illegal_surrogate_value;
                 break;
@@ -762,7 +780,7 @@ validate(InputIt first, InputIt last)
     {
         uint32_t ch = *first++;
         /* If we have a surrogate pair, validate to uint32_t first. */
-        if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
+        if (is_high_surrogate(ch)) 
         {
             /* If the 16 bits following the high surrogate are in the first buffer... */
             if (first < last) {
@@ -780,7 +798,7 @@ validate(InputIt first, InputIt last)
                 result = uni_errc::source_exhausted;
                 break;
             }
-        } else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
+        } else if (is_low_surrogate(ch)) 
         {
             /* UTF-16 surrogate values are illegal in UTF-32 */
             --first; /* return to the illegal value itself */
@@ -806,7 +824,7 @@ validate(InputIt first, InputIt last)
     {
         uint32_t ch = *first++;
         /* UTF-16 surrogate values are illegal in UTF-32 */
-        if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) {
+        if (is_surrogate(ch)) {
             --first; /* return to the illegal value itself */
             result = uni_errc::illegal_surrogate_value;
             break;
@@ -830,6 +848,8 @@ class sequence_generator
     size_t length_;
     uni_errc err_cd_;
 public:
+    typedef std::pair<Iterator,size_t> sequence_type;
+
     sequence_generator(Iterator first, Iterator last, 
                        conv_flags flags = conv_flags::strict)
         : begin_(first), last_(last), flags_(flags), 
@@ -848,14 +868,14 @@ public:
         return err_cd_;
     }
 
-    std::pair<Iterator,size_t> get() const 
+    sequence_type get() const 
     {
         return std::make_pair(begin_,length_);
     }
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint8_t),uint32_t>::type 
-    get_codepoint()
+    get_codepoint() const
     {
         uint32_t ch = 0;
         Iterator it = begin_;
@@ -873,16 +893,9 @@ public:
         }
         if (ch <= uni_max_legal_utf32) 
         {
-            if (ch >= uni_sur_high_start && ch <= uni_sur_low_end) 
+            if (is_surrogate(ch)) 
             {
-                if (flags_ == conv_flags::strict) 
-                {
-                    err_cd_ = uni_errc::illegal_surrogate_value;
-                } 
-                else 
-                {
-                    ch = uni_replacement_char;
-                }
+                ch = uni_replacement_char;
             }
         }
         else // ch > uni_max_legal_utf32
@@ -894,7 +907,7 @@ public:
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint16_t),uint32_t>::type 
-    get_codepoint()
+    get_codepoint() const
     {
         if (length_ == 0)
         {
@@ -916,7 +929,7 @@ public:
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint32_t),uint32_t>::type 
-    get_codepoint()
+    get_codepoint() const
     {
         if (length_ == 0)
         {
@@ -961,7 +974,7 @@ public:
 
                 uint32_t ch = *it++;
                 /* If we have a surrogate pair, validate to uint32_t it. */
-                if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) 
+                if (is_high_surrogate(ch)) 
                 {
                     /* If the 16 bits following the high surrogate are in the it buffer... */
                     if (it < last_) {
@@ -983,7 +996,7 @@ public:
                         err_cd_ = uni_errc::source_exhausted;
                     }
                 } 
-                else if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) 
+                else if (is_low_surrogate(ch)) 
                 {
                     /* leading low surrogate */
                     err_cd_ = uni_errc::source_illegal;
@@ -1051,7 +1064,7 @@ u8_length(InputIt first, InputIt last)
     for (InputIt p = first; p != last; ++p)
     {
         uint32_t ch = *p;
-        if (ch >= uni_sur_high_start && ch <= uni_sur_high_end) {
+        if (is_high_surrogate(ch)) {
             /* If the 16 bits following the high surrogate are in the p buffer... */
             if (p < last) {
                 uint32_t ch2 = *(++p);
@@ -1068,7 +1081,7 @@ u8_length(InputIt first, InputIt last)
             }
         } else if (flags == conv_flags::strict) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (ch >= uni_sur_low_start && ch <= uni_sur_low_end) {
+            if (is_low_surrogate(ch)) {
                 break;
             }
         }
@@ -1222,7 +1235,7 @@ struct unicode_traits<CharT,
         while (p < end)
         {
             uint8_t ch = *p;
-            size_t length = (ch >= uni_sur_high_start && ch <= uni_sur_high_end) ? 2 : 1; 
+            size_t length = (is_high_surrogate(ch)) ? 2 : 1; 
             p += length;
             ++count;
         }

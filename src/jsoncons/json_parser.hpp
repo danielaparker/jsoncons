@@ -1020,7 +1020,7 @@ public:
             case states::escape_u4: 
                 {
                     append_codepoint(*p_);
-                    if (cp_ >= unicons::uni_sur_high_start && cp_ <= unicons::uni_sur_high_end)
+                    if (unicons::is_high_surrogate(cp_))
                     {
                         stack_.back() = states::escape_expect_surrogate_pair1;
                     }
