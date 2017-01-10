@@ -1222,52 +1222,64 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<It
                                std::pair<encoding,Iterator>>::type 
 detect_encoding(Iterator first, Iterator last)
 {
+    Iterator it1 = first;
     if (std::distance(first,last) < 4)
     {
-        return std::make_pair(encoding::unknown,first);
-    }
-    Iterator it1 = first++;
-    Iterator it2 = first++;
-    Iterator it3 = first++;
-    Iterator it4 = first++;
-
-    uint32_t bom = static_cast<uint8_t>(*it1) | (static_cast<uint8_t>(*it2) << 8) | (static_cast<uint8_t>(*it3) << 16) | (static_cast<uint8_t>(*it4) << 24);
-    if (bom == 0xFFFE0000)                  
-    { 
-        return std::make_pair(encoding::u32be,it4++);
-    }
-    else if (bom == 0x0000FEFF) 
-    {
-        return std::make_pair(encoding::u32le,first);
-    }
-    else if ((bom & 0xFFFF) == 0xFFFE)     
-    {
-        return std::make_pair(encoding::u16be,it3);
-    }
-    else if ((bom & 0xFFFF) == 0xFEFF)      
-    {
-        return std::make_pair(encoding::u16le,it3);
-    }
-    else if ((bom & 0xFFFFFF) == 0xBFBBEF)  
-    {
-        return std::make_pair(encoding::u8,it4);
+        if (std::distance(first,last) == 3)
+        {
+            Iterator it2 = ++first;
+            Iterator it3 = ++first;
+            if (static_cast<uint8_t>(*it1) == 0xEF && static_cast<uint8_t>(*it2) == 0xBB && static_cast<uint8_t>(*it3) == 0xBF)
+            {
+                return std::make_pair(encoding::u8,last);
+            }
+        }
+        return std::make_pair(encoding::unknown,it1);
     }
     else
     {
-        uint32_t pattern = (static_cast<uint8_t>(*it1) ? 1 : 0) | (static_cast<uint8_t>(*it2) ? 2 : 0) | (static_cast<uint8_t>(*it3) ? 4 : 0) | (static_cast<uint8_t>(*it4) ? 8 : 0);
-        switch (pattern) {
-        case 0x08: 
-            return std::make_pair(encoding::u32be,it1);
-        case 0x0A: 
-            return std::make_pair(encoding::u16be,it1);
-        case 0x01: 
-            return std::make_pair(encoding::u32le,it1);
-        case 0x05: 
-            return std::make_pair(encoding::u16le,it1);
-        case 0x0F: 
-            return std::make_pair(encoding::u8,it1);
-        default:
-            return std::make_pair(encoding::unknown,it1);
+        Iterator it2 = ++first;
+        Iterator it3 = ++first;
+        Iterator it4 = ++first;
+
+        uint32_t bom = static_cast<uint8_t>(*it1) | (static_cast<uint8_t>(*it2) << 8) | (static_cast<uint8_t>(*it3) << 16) | (static_cast<uint8_t>(*it4) << 24);
+        if (bom == 0xFFFE0000)                  
+        { 
+            return std::make_pair(encoding::u32be,it4++);
+        }
+        else if (bom == 0x0000FEFF) 
+        {
+            return std::make_pair(encoding::u32le,first);
+        }
+        else if ((bom & 0xFFFF) == 0xFFFE)     
+        {
+            return std::make_pair(encoding::u16be,it3);
+        }
+        else if ((bom & 0xFFFF) == 0xFEFF)      
+        {
+            return std::make_pair(encoding::u16le,it3);
+        }
+        else if ((bom & 0xFFFFFF) == 0xBFBBEF)  
+        {
+            return std::make_pair(encoding::u8,it4);
+        }
+        else
+        {
+            uint32_t pattern = (static_cast<uint8_t>(*it1) ? 1 : 0) | (static_cast<uint8_t>(*it2) ? 2 : 0) | (static_cast<uint8_t>(*it3) ? 4 : 0) | (static_cast<uint8_t>(*it4) ? 8 : 0);
+            switch (pattern) {
+            case 0x08: 
+                return std::make_pair(encoding::u32be,it1);
+            case 0x0A: 
+                return std::make_pair(encoding::u16be,it1);
+            case 0x01: 
+                return std::make_pair(encoding::u32le,it1);
+            case 0x05: 
+                return std::make_pair(encoding::u16le,it1);
+            case 0x0F: 
+                return std::make_pair(encoding::u8,it1);
+            default:
+                return std::make_pair(encoding::unknown,it1);
+            }
         }
     }
 }
