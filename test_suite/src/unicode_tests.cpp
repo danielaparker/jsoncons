@@ -37,13 +37,13 @@ BOOST_AUTO_TEST_CASE(test_skip_bom)
     BOOST_CHECK_EQUAL(3,value.size());
 }
 
-/*BOOST_AUTO_TEST_CASE(test_skip_bom2)
+BOOST_AUTO_TEST_CASE(test_skip_bom2)
 {
     std::wstring input = L"\xFEFF[1,2,3]";
     wjson value = wjson::parse(input);
     BOOST_CHECK_EQUAL(true,value.is_array());
     BOOST_CHECK_EQUAL(3,value.size());
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(test_wide_surrogate_pair)
 {

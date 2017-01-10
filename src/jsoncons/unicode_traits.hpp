@@ -116,15 +116,17 @@ enum class conv_flags
     lenient
 };
 
-enum class uni_errc 
+// conv_errc
+
+enum class conv_errc 
 {
-    ok = 0,                         // conversion successful
-    over_long_utf8_sequence = 1,    // over long utf8 sequence
-    expected_continuation_byte = 2, // expected continuation byte    
-    unpaired_high_surrogate = 3,    // unpaired high surrogate UTF-16
-    illegal_surrogate_value = 4,    // UTF-16 surrogate values are illegal in UTF-32
-    source_exhausted = 5,           // partial character in source, but hit end
-    source_illegal = 6              // source sequence is illegal/malformed
+    ok = 0,                     // conversion successful
+    over_long_utf8_sequence,    // over long utf8 sequence
+    expected_continuation_byte, // expected continuation byte    
+    unpaired_high_surrogate,    // unpaired high surrogate UTF-16
+    illegal_surrogate_value,    // UTF-16 surrogate values are illegal in UTF-32
+    source_exhausted,           // partial character in source, but hit end
+    source_illegal              // source sequence is illegal/malformed
 };
 
 class Unicode_traits_error_category_impl_
@@ -133,23 +135,23 @@ class Unicode_traits_error_category_impl_
 public:
     virtual const char* name() const UNICONS_NOEXCEPT
     {
-        return "unicode_traits";
+        return "unicons conversion error";
     }
     virtual std::string message(int ev) const
     {
-        switch (static_cast<uni_errc>(ev))
+        switch (static_cast<conv_errc>(ev))
         {
-        case uni_errc::over_long_utf8_sequence:
+        case conv_errc::over_long_utf8_sequence:
             return "Over long utf8 sequence";
-        case uni_errc::expected_continuation_byte:
+        case conv_errc::expected_continuation_byte:
             return "Expected continuation byte";
-        case uni_errc::unpaired_high_surrogate:
+        case conv_errc::unpaired_high_surrogate:
             return "Unpaired high surrogate UTF-16";
-        case uni_errc::illegal_surrogate_value:
+        case conv_errc::illegal_surrogate_value:
             return "UTF-16 surrogate values are illegal in UTF-32";
-        case uni_errc::source_exhausted:
+        case conv_errc::source_exhausted:
             return "Partial character in source, but hit end";
-        case uni_errc::source_illegal:
+        case conv_errc::source_illegal:
             return "Source sequence is illegal/malformed";
         default:
             return "";
@@ -166,48 +168,103 @@ const std::error_category& unicode_traits_error_category()
 }
 
 inline 
-std::error_code make_error_code(uni_errc result)
+std::error_code make_error_code(conv_errc result)
 {
     return std::error_code(static_cast<int>(result),unicode_traits_error_category());
 }
+
+// encoding_errc
+
+enum class encoding_errc
+{
+    ok = 0,
+    expected_u8_found_u16,
+    expected_u8_found_u32,
+    expected_u16_found_fffe,
+    expected_u32_found_fffe,
+    source_exhausted
+};
+
+class Encoding_errc_impl_
+   : public std::error_category
+{
+public:
+    virtual const char* name() const UNICONS_NOEXCEPT
+    {
+        return "unicons encoding error";
+    }
+    virtual std::string message(int ev) const
+    {
+        switch (static_cast<encoding_errc>(ev))
+        {
+        case encoding_errc::expected_u8_found_u16:
+            return "Expected UTF-8, found UTF-16";
+        case encoding_errc::expected_u8_found_u32:
+            return "Expected UTF-8, found UTF-32";
+        case encoding_errc::expected_u16_found_fffe:
+            return "Expected UTF-16, found non character";
+        case encoding_errc::expected_u32_found_fffe:
+            return "Expected UTF-32, found non character";
+        case encoding_errc::source_exhausted:
+            return "Hit end";
+        default:
+            return "";
+            break;
+        }
+    }
+};
+
+inline
+const std::error_category& encoding_error_category()
+{
+    static Encoding_errc_impl_ instance;
+    return instance;
+}
+
+inline 
+std::error_code make_error_code(encoding_errc result)
+{
+    return std::error_code(static_cast<int>(result),encoding_error_category());
+}
+
 
 // utf8
 
 template <class Iterator>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value 
                               && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t), 
-                              uni_errc >::type
+                              conv_errc >::type
 is_legal_utf8(Iterator first, size_t length) 
 {
     uint8_t a;
     Iterator srcptr = first+length;
     switch (length) {
-    default: return uni_errc::over_long_utf8_sequence;
+    default: return conv_errc::over_long_utf8_sequence;
         /* Everything else falls through when "true"... */
     case 4: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-        return uni_errc::expected_continuation_byte;
+        return conv_errc::expected_continuation_byte;
     case 3: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-        return uni_errc::expected_continuation_byte;
+        return conv_errc::expected_continuation_byte;
     case 2: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-        return uni_errc::expected_continuation_byte;
+        return conv_errc::expected_continuation_byte;
 
         switch (static_cast<uint8_t>(*first)) 
         {
             /* no fall-through in this inner switch */
-            case 0xE0: if (a < 0xA0) return uni_errc::source_illegal; break;
-            case 0xED: if (a > 0x9F) return uni_errc::source_illegal; break;
-            case 0xF0: if (a < 0x90) return uni_errc::source_illegal; break;
-            case 0xF4: if (a > 0x8F) return uni_errc::source_illegal; break;
-            default:   if (a < 0x80) return uni_errc::source_illegal;
+            case 0xE0: if (a < 0xA0) return conv_errc::source_illegal; break;
+            case 0xED: if (a > 0x9F) return conv_errc::source_illegal; break;
+            case 0xF0: if (a < 0x90) return conv_errc::source_illegal; break;
+            case 0xF4: if (a > 0x8F) return conv_errc::source_illegal; break;
+            default:   if (a < 0x80) return conv_errc::source_illegal;
         }
 
     case 1: if (static_cast<uint8_t>(*first) >= 0x80 && static_cast<uint8_t>(*first) < 0xC2) 
-        return uni_errc::source_illegal;
+        return conv_errc::source_illegal;
     }
     if (static_cast<uint8_t>(*first) > 0xF4) 
-        return uni_errc::source_illegal;
+        return conv_errc::source_illegal;
 
-    return uni_errc::ok;
+    return conv_errc::ok;
 }
 
 template <class...> using void_t = void;
@@ -250,20 +307,20 @@ struct is_compatible_output_iterator<OutputIt,CharT,
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flags::strict) 
 {
     (void)flags;
 
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
     while (first != last) 
     {
         size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)] + 1;
         if (length > (size_t)(last - first))
         {
-            return std::make_pair(uni_errc::source_exhausted,first);
+            return std::make_pair(conv_errc::source_exhausted,first);
         }
-        if ((result=is_legal_utf8(first, length)) != uni_errc::ok)
+        if ((result=is_legal_utf8(first, length)) != conv_errc::ok)
         {
             return std::make_pair(result,first);
         }
@@ -280,12 +337,12 @@ convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flag
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
         OutputIt target, 
         conv_flags flags = conv_flags::strict) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
 
     while (first != last) 
     {
@@ -293,11 +350,11 @@ convert(InputIt first, InputIt last,
         unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)];
         if (extra_bytes_to_read >= last - first) 
         {
-            result = uni_errc::source_exhausted; 
+            result = conv_errc::source_exhausted; 
             break;
         }
         /* Do this check whether lenient or strict */
-        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != uni_errc::ok)
+        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc::ok)
         {
             break;
         }
@@ -319,7 +376,7 @@ convert(InputIt first, InputIt last,
             if (is_surrogate(ch) ) {
                 if (flags == conv_flags::strict) {
                     first -= (extra_bytes_to_read+1); /* return to the illegal value itself */
-                    result = uni_errc::source_illegal;
+                    result = conv_errc::source_illegal;
                     break;
                 } else {
                     *target++ = (uni_replacement_char);
@@ -329,7 +386,7 @@ convert(InputIt first, InputIt last,
             }
         } else if (ch > uni_max_utf16) {
             if (flags == conv_flags::strict) {
-                result = uni_errc::source_illegal;
+                result = conv_errc::source_illegal;
                 first -= (extra_bytes_to_read+1); /* return to the start */
                 break; /* Bail out; shouldn't continue */
             } else {
@@ -347,12 +404,12 @@ convert(InputIt first, InputIt last,
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
 
     while (first < last) 
     {
@@ -360,11 +417,11 @@ convert(InputIt first, InputIt last,
         unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)];
         if (extra_bytes_to_read >= last - first) 
         {
-            result = uni_errc::source_exhausted; 
+            result = conv_errc::source_exhausted; 
             break;
         }
         /* Do this check whether lenient or strict */
-        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != uni_errc::ok) {
+        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc::ok) {
             break;
         }
         /*
@@ -388,7 +445,7 @@ convert(InputIt first, InputIt last,
             if (is_surrogate(ch) ) {
                 if (flags == conv_flags::strict) {
                     first -= (extra_bytes_to_read+1); /* return to the illegal value itself */
-                    result = uni_errc::source_illegal;
+                    result = conv_errc::source_illegal;
                     break;
                 } else {
                     *target++ = (uni_replacement_char);
@@ -397,7 +454,7 @@ convert(InputIt first, InputIt last,
                 *target++ = (ch);
             }
         } else { /* i.e., ch > uni_max_legal_utf32 */
-            result = uni_errc::source_illegal;
+            result = conv_errc::source_illegal;
             *target++ = (uni_replacement_char);
         }
     }
@@ -408,11 +465,11 @@ convert(InputIt first, InputIt last,
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
     while (first < last) {
         unsigned short bytes_to_write = 0;
         const uint32_t byteMask = 0xBF;
@@ -430,19 +487,19 @@ convert(InputIt first, InputIt last,
                     ++first;
                 } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
                     --first; /* return to the illegal value itself */
-                    result = uni_errc::unpaired_high_surrogate;
+                    result = conv_errc::unpaired_high_surrogate;
                     break;
                 }
             } else { /* We don't have the 16 bits following the high surrogate. */
                 --first; /* return to the high surrogate */
-                result = uni_errc::source_exhausted;
+                result = conv_errc::source_exhausted;
                 break;
             }
         } else if (flags == conv_flags::strict) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
             if (is_low_surrogate(ch)) {
                 --first; /* return to the illegal value itself */
-                result = uni_errc::source_illegal;
+                result = conv_errc::source_illegal;
                 break;
             }
         }
@@ -498,12 +555,12 @@ convert(InputIt first, InputIt last,
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
         OutputIt target, 
         conv_flags flags = conv_flags::strict) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
 
     while (first != last) 
     {
@@ -521,12 +578,12 @@ convert(InputIt first, InputIt last,
                     ++first;
                 } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
                     --first; /* return to the illegal value itself */
-                    result = uni_errc::unpaired_high_surrogate;
+                    result = conv_errc::unpaired_high_surrogate;
                     break;
                 }
             } else { /* We don't have the 16 bits following the high surrogate. */
                 --first; /* return to the high surrogate */
-                result = uni_errc::source_exhausted;
+                result = conv_errc::source_exhausted;
                 break;
             }
         } else if (is_low_surrogate(ch)) 
@@ -534,7 +591,7 @@ convert(InputIt first, InputIt last,
             // illegal leading low surrogate
             if (flags == conv_flags::strict) {
                 --first; /* return to the illegal value itself */
-                result = uni_errc::source_illegal;
+                result = conv_errc::source_illegal;
                 break;
             }
             else
@@ -552,12 +609,12 @@ convert(InputIt first, InputIt last,
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
 
     while (first != last) 
     {
@@ -574,19 +631,19 @@ convert(InputIt first, InputIt last,
                     ++first;
                 } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
                     --first; /* return to the illegal value itself */
-                    result = uni_errc::source_illegal;
+                    result = conv_errc::source_illegal;
                     break;
                 }
             } else { /* We don't have the 16 bits following the high surrogate. */
                 --first; /* return to the high surrogate */
-                result = uni_errc::source_exhausted;
+                result = conv_errc::source_exhausted;
                 break;
             }
         } else if (flags == conv_flags::strict) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
             if (is_low_surrogate(ch) ) {
                 --first; /* return to the illegal value itself */
-                result = uni_errc::source_illegal;
+                result = conv_errc::source_illegal;
                 break;
             }
         }
@@ -599,12 +656,12 @@ convert(InputIt first, InputIt last,
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
         OutputIt target, 
         conv_flags flags = conv_flags::strict) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
     while (first < last) {
         unsigned short bytes_to_write = 0;
         const uint32_t byteMask = 0xBF;
@@ -614,7 +671,7 @@ convert(InputIt first, InputIt last,
             /* UTF-16 surrogate values are illegal in UTF-32 */
             if (is_surrogate(ch)) {
                 --first; /* return to the illegal value itself */
-                result = uni_errc::illegal_surrogate_value;
+                result = conv_errc::illegal_surrogate_value;
                 break;
             }
         }
@@ -629,7 +686,7 @@ convert(InputIt first, InputIt last,
         } else {                            
             bytes_to_write = 3;
             ch = uni_replacement_char;
-            result = uni_errc::source_illegal;
+            result = conv_errc::source_illegal;
         }
 
         uint8_t byte1 = 0;
@@ -671,12 +728,12 @@ convert(InputIt first, InputIt last,
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
 
     while (first != last) 
     {
@@ -686,7 +743,7 @@ convert(InputIt first, InputIt last,
             if (is_surrogate(ch) ) {
                 if (flags == conv_flags::strict) {
                     --first; /* return to the illegal value itself */
-                    result = uni_errc::source_illegal;
+                    result = conv_errc::source_illegal;
                     break;
                 } else {
                     *target++ = (uni_replacement_char);
@@ -696,7 +753,7 @@ convert(InputIt first, InputIt last,
             }
         } else if (ch > uni_max_legal_utf32) {
             if (flags == conv_flags::strict) {
-                result = uni_errc::source_illegal;
+                result = conv_errc::source_illegal;
             } else {
                 *target++ = (uni_replacement_char);
             }
@@ -712,12 +769,12 @@ convert(InputIt first, InputIt last,
 
 template <class InputIt,class OutputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<uni_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
 
     while (first != last) 
     {
@@ -726,7 +783,7 @@ convert(InputIt first, InputIt last,
             /* UTF-16 surrogate values are illegal in UTF-32 */
             if (is_surrogate(ch)) {
                 --first; /* return to the illegal value itself */
-                result = uni_errc::illegal_surrogate_value;
+                result = conv_errc::illegal_surrogate_value;
                 break;
             }
         }
@@ -737,7 +794,7 @@ convert(InputIt first, InputIt last,
         else
         {
             *target++ = (uni_replacement_char);
-            result = uni_errc::source_illegal;
+            result = conv_errc::source_illegal;
         }
     }
     return std::make_pair(result,first);
@@ -747,18 +804,18 @@ convert(InputIt first, InputIt last,
 
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                               ,std::pair<uni_errc,InputIt>>::type 
+                               ,std::pair<conv_errc,InputIt>>::type 
 validate(InputIt first, InputIt last) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
     while (first != last) 
     {
         size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)] + 1;
         if (length > (size_t)(last - first))
         {
-            return std::make_pair(uni_errc::source_exhausted,first);
+            return std::make_pair(conv_errc::source_exhausted,first);
         }
-        if ((result=is_legal_utf8(first, length)) != uni_errc::ok)
+        if ((result=is_legal_utf8(first, length)) != conv_errc::ok)
         {
             return std::make_pair(result,first);
         }
@@ -771,10 +828,10 @@ validate(InputIt first, InputIt last)
 
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                               ,std::pair<uni_errc,InputIt>>::type 
+                               ,std::pair<conv_errc,InputIt>>::type 
 validate(InputIt first, InputIt last) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
 
     while (first != last) 
     {
@@ -790,19 +847,19 @@ validate(InputIt first, InputIt last)
                     ++first;
                 } else {
                     --first; /* return to the illegal value itself */
-                    result = uni_errc::unpaired_high_surrogate;
+                    result = conv_errc::unpaired_high_surrogate;
                     break;
                 }
             } else { /* We don't have the 16 bits following the high surrogate. */
                 --first; /* return to the high surrogate */
-                result = uni_errc::source_exhausted;
+                result = conv_errc::source_exhausted;
                 break;
             }
         } else if (is_low_surrogate(ch)) 
         {
             /* UTF-16 surrogate values are illegal in UTF-32 */
             --first; /* return to the illegal value itself */
-            result = uni_errc::source_illegal;
+            result = conv_errc::source_illegal;
             break;
         }
     }
@@ -815,10 +872,10 @@ validate(InputIt first, InputIt last)
 
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                               ,std::pair<uni_errc,InputIt>>::type 
+                               ,std::pair<conv_errc,InputIt>>::type 
 validate(InputIt first, InputIt last) 
 {
-    uni_errc  result = uni_errc::ok;
+    conv_errc  result = conv_errc::ok;
 
     while (first != last) 
     {
@@ -826,12 +883,12 @@ validate(InputIt first, InputIt last)
         /* UTF-16 surrogate values are illegal in UTF-32 */
         if (is_surrogate(ch)) {
             --first; /* return to the illegal value itself */
-            result = uni_errc::illegal_surrogate_value;
+            result = conv_errc::illegal_surrogate_value;
             break;
         }
         if (!(ch <= uni_max_legal_utf32))
         {
-            result = uni_errc::source_illegal;
+            result = conv_errc::source_illegal;
         }
     }
     return std::make_pair(result,first);
@@ -846,24 +903,24 @@ class sequence_generator
     Iterator last_;
     conv_flags flags_;
     size_t length_;
-    uni_errc err_cd_;
+    conv_errc err_cd_;
 public:
     typedef std::pair<Iterator,size_t> sequence_type;
 
     sequence_generator(Iterator first, Iterator last, 
                        conv_flags flags = conv_flags::strict)
         : begin_(first), last_(last), flags_(flags), 
-          length_(0), err_cd_(uni_errc::ok)
+          length_(0), err_cd_(conv_errc::ok)
     {
         next();
     }
 
     bool done() const
     {
-        return err_cd_ != uni_errc::ok || begin_ == last_;
+        return err_cd_ != conv_errc::ok || begin_ == last_;
     }
 
-    uni_errc status() const
+    conv_errc status() const
     {
         return err_cd_;
     }
@@ -948,9 +1005,9 @@ public:
             size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*begin_)] + 1;
             if (length > (size_t)(last_ - begin_))
             {
-                err_cd_ = uni_errc::source_exhausted;
+                err_cd_ = conv_errc::source_exhausted;
             }
-            else if ((err_cd_ = is_legal_utf8(begin_, length)) != uni_errc::ok)
+            else if ((err_cd_ = is_legal_utf8(begin_, length)) != conv_errc::ok)
             {
             }
             else
@@ -987,19 +1044,19 @@ public:
                         } 
                         else 
                         {
-                            err_cd_ = uni_errc::unpaired_high_surrogate;
+                            err_cd_ = conv_errc::unpaired_high_surrogate;
                         }
                     } 
                     else 
                     { 
                         // We don't have the 16 bits following the high surrogate.
-                        err_cd_ = uni_errc::source_exhausted;
+                        err_cd_ = conv_errc::source_exhausted;
                     }
                 } 
                 else if (is_low_surrogate(ch)) 
                 {
                     /* leading low surrogate */
-                    err_cd_ = uni_errc::source_illegal;
+                    err_cd_ = conv_errc::source_illegal;
                 }
                 else
                 {
@@ -1166,9 +1223,13 @@ enum class encoding {u8,u16le,u16be,u32le,u32be,unknown};
 template <class Iterator>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
                                std::pair<encoding,Iterator>>::type 
-detect_encoding(Iterator first, Iterator)
+detect_encoding(Iterator first, Iterator last)
 {
-    Iterator it1 = first;
+    if (std::distance(first,last) < 4)
+    {
+        return std::make_pair(encoding::unknown,first);
+    }
+    Iterator it1 = first++;
     Iterator it2 = first++;
     Iterator it3 = first++;
     Iterator it4 = first++;
@@ -1180,7 +1241,7 @@ detect_encoding(Iterator first, Iterator)
     }
     else if (bom == 0x0000FEFF) 
     {
-        return std::make_pair(encoding::u32le,it4++);
+        return std::make_pair(encoding::u32le,first);
     }
     else if ((bom & 0xFFFF) == 0xFFFE)     
     {
@@ -1214,78 +1275,88 @@ detect_encoding(Iterator first, Iterator)
     }
 }
 
-// unicode_traits
-
-template <class CharT, class Enable=void>
-struct unicode_traits
+template <class Iterator>
+static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
+                               std::pair<encoding_errc,Iterator>>::type 
+skip_bom(Iterator first, Iterator last)
 {
-};
-
-template <class CharT>
-struct unicode_traits<CharT,
-                      typename std::enable_if<std::is_integral<CharT>::value &&
-                      sizeof(CharT)==sizeof(uint8_t)>::type> 
-{
-    static size_t detect_bom(const CharT* it, size_t length)
+    auto result = unicons::detect_encoding(first,last);
+    switch (result.first)
     {
-        size_t count = 0;
-        if (length >= 3)
-        {
-            uint32_t bom = static_cast<uint32_t>(static_cast<uint8_t>(it[0]) |
-                                                (static_cast<uint8_t>(it[1]) << 8) |
-                                                (static_cast<uint8_t>(it[2]) << 16));
-            if ((bom & 0xFFFFFF) == 0xBFBBEF)  
-                count += 3;
-        }
-        return count;
+    case unicons::encoding::u8:
+        return std::make_pair(encoding_errc::ok,result.second);
+        break;
+    case unicons::encoding::u16le:
+    case unicons::encoding::u16be:
+        return std::make_pair(encoding_errc::expected_u8_found_u16,result.second);
+        break;
+    case unicons::encoding::u32le:
+    case unicons::encoding::u32be:
+        return std::make_pair(encoding_errc::expected_u8_found_u32,result.second);
+        break;
+    default:
+        return std::make_pair(encoding_errc::ok,result.second);
+        break;
     }
-};
+}
 
-template <class CharT>
-struct unicode_traits<CharT,
-                      typename std::enable_if<std::is_integral<CharT>::value &&
-                      sizeof(CharT)==sizeof(uint16_t)>::type> 
+template <class Iterator>
+static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint16_t),
+                               std::pair<encoding_errc,Iterator>>::type 
+skip_bom(Iterator first, Iterator last)
 {
-    static size_t detect_bom(const CharT* it, size_t length)
+    if (first == last)
     {
-        size_t count = 0;
-        if (length >= 1)
-        {
-            uint32_t bom = static_cast<uint32_t>(it[0]);
-            if ((bom & 0xFFFF) == 0xFFFE)      
-                ++count;
-            else if ((bom & 0xFFFF) == 0xFEFF)      
-                ++count;
-        }
-        return count;
+        return std::make_pair(encoding_errc::ok,first);
     }
-};
+    uint16_t bom = static_cast<uint16_t>(*first);
+    if (bom == 0xFEFF)                  
+    {
+        return std::make_pair(encoding_errc::ok,++first);
+    }
+    else if (bom == 0xFFFE) 
+    {
+        return std::make_pair(encoding_errc::expected_u16_found_fffe,last);
+    }
+    else
+    {
+        return std::make_pair(encoding_errc::ok,first);
+    }
+}
 
-template <class CharT>
-struct unicode_traits<CharT,
-                        typename std::enable_if<std::is_integral<CharT>::value &&
-                        sizeof(CharT)==sizeof(uint32_t)>::type> 
+template <class Iterator>
+static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint32_t),
+                               std::pair<encoding_errc,Iterator>>::type 
+skip_bom(Iterator first, Iterator last)
 {
-    static size_t detect_bom(const CharT* it, size_t length)
+    if (first == last)
     {
-        size_t count = 0;
-        if (length >= 1)
-        {
-            uint32_t bom = static_cast<uint32_t>(it[0]);
-            if (bom == 0xFFFE0000)                  
-                ++count;
-            else if (bom == 0x0000FEFF)             
-                ++count;
-        }
-        return count;
+        return std::make_pair(encoding_errc::ok,first);
     }
-};
+    uint32_t bom = static_cast<uint32_t>(*first);
+    if (bom == 0xFEFF0000)                  
+    {
+        return std::make_pair(encoding_errc::ok,++first);
+    }
+    else if (bom == 0xFFFE0000) 
+    {
+        return std::make_pair(encoding_errc::expected_u32_found_fffe,last);
+    }
+    else
+    {
+        return std::make_pair(encoding_errc::ok,first);
+    }
+}
 
 }
 
 namespace std {
     template<>
-    struct is_error_code_enum<unicons::uni_errc> : public true_type
+    struct is_error_code_enum<unicons::conv_errc> : public true_type
+    {
+    };
+    template<>
+    struct is_error_code_enum<unicons::encoding_errc> : public true_type
     {
     };
 }

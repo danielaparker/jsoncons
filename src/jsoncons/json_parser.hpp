@@ -147,32 +147,6 @@ enum class states
     done
 };
 
-template <class Iterator>
-static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
-                              Iterator>::type 
-skip_bom(Iterator first, Iterator last)
-{
-    auto result = unicons::detect_encoding(first,last);
-    /*switch (result.first)
-    {
-    case unicons::encoding::u8:
-        begin_input_ = result.second;
-        break;
-    default:
-        JSONCONS_THROW_EXCEPTION(std::invalid_argument,"Expected utf-8 encoding");
-        break;
-    }*/
-    return result.second;
-}
-
-template <class Iterator>
-static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) != sizeof(uint8_t),
-                               Iterator>::type 
-skip_bom(Iterator first, Iterator)
-{
-    return first;
-}
-
 template<class CharT>
 class basic_json_parser : private basic_parsing_context<CharT>
 {
@@ -456,7 +430,7 @@ public:
                 if (string_buffer_.length() == 0)
                 {
                     auto result = unicons::validate(sb,p_);
-                    if (result.first == unicons::uni_errc::ok)
+                    if (result.first == unicons::conv_errc::ok)
                     {
                         end_string_value(sb,p_-sb);
                     }
@@ -469,7 +443,7 @@ public:
                 {
                     string_buffer_.append(sb,p_-sb);
                     auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end());
-                    if (result.first == unicons::uni_errc::ok)
+                    if (result.first == unicons::conv_errc::ok)
                     {
                         end_string_value(string_buffer_.data(),string_buffer_.length());
                         string_buffer_.clear();
@@ -495,22 +469,22 @@ public:
         }
     }
 
-    void error(unicons::uni_errc  result)
+    void error(unicons::conv_errc  result)
     {
         switch (result)
         {
-        case unicons::uni_errc::ok:
+        case unicons::conv_errc::ok:
             break;
-        case unicons::uni_errc::over_long_utf8_sequence:
+        case unicons::conv_errc::over_long_utf8_sequence:
             err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
             break;
-        case unicons::uni_errc::unpaired_high_surrogate:
+        case unicons::conv_errc::unpaired_high_surrogate:
             err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
             break;
-        case unicons::uni_errc::expected_continuation_byte:
+        case unicons::conv_errc::expected_continuation_byte:
             err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
             break;
-        case unicons::uni_errc::illegal_surrogate_value:
+        case unicons::conv_errc::illegal_surrogate_value:
             err_handler_.error(json_parser_errc::illegal_surrogate_value, *this);
             break;
         default:
@@ -525,7 +499,8 @@ public:
 
         if (start == 0)
         {
-            begin_input_ = skip_bom(input, end_input_);
+            auto result = unicons::skip_bom(input, end_input_);
+            begin_input_ = result.second;
             index_ = begin_input_ - input;
             column_ = index_+1;
         }
