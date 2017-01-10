@@ -1103,7 +1103,7 @@ static typename std::enable_if<std::is_integral<typename std::iterator_traits<In
 sequence_at(InputIt first, InputIt last, size_t index) 
 {
     size_t size = std::distance(first,last);
-    return index < size ? *(first+size) : std::pair<InputIt,size_t>(last,0);
+    return index < size ? std::pair<InputIt,size_t>(first+index,1) : std::pair<InputIt,size_t>(last,0);
 }
 
 // u8_length
