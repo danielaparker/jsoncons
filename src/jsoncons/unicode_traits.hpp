@@ -77,37 +77,37 @@ const uint8_t trailing_bytes_for_utf8[256] = {
 };
 
 // Some fundamental constants.  Source: ConvertUTF.h 
-const uint32_t uni_replacement_char = 0x0000FFFD;
-const uint32_t uni_max_bmp = 0x0000FFFF;
-const uint32_t uni_max_utf16 = 0x0010FFFF;
-const uint32_t uni_max_utf32 = 0x7FFFFFFF;
-const uint32_t uni_max_legal_utf32 = 0x0010FFFF;
+const uint32_t replacement_char = 0x0000FFFD;
+const uint32_t max_bmp = 0x0000FFFF;
+const uint32_t max_utf16 = 0x0010FFFF;
+const uint32_t max_utf32 = 0x7FFFFFFF;
+const uint32_t max_legal_utf32 = 0x0010FFFF;
 
 const int half_shift  = 10; // used for shifting by 10 bits
 const uint32_t half_base = 0x0010000UL;
 const uint32_t half_mask = 0x3FFUL;
 
-const uint16_t uni_sur_high_start = 0xD800;
-const uint16_t uni_sur_high_end = 0xDBFF;
-const uint16_t uni_sur_low_start = 0xDC00;
-const uint16_t uni_sur_low_end = 0xDFFF;
+const uint16_t sur_high_start = 0xD800;
+const uint16_t sur_high_end = 0xDBFF;
+const uint16_t sur_low_start = 0xDC00;
+const uint16_t sur_low_end = 0xDFFF;
 
 inline
 bool is_high_surrogate(uint32_t ch)
 {
-    return (ch >= uni_sur_high_start && ch <= uni_sur_high_end);
+    return (ch >= sur_high_start && ch <= sur_high_end);
 }
 
 inline
 bool is_low_surrogate(uint32_t ch)
 {
-    return (ch >= uni_sur_low_start && ch <= uni_sur_low_end);
+    return (ch >= sur_low_start && ch <= sur_low_end);
 }
 
 inline
 bool is_surrogate(uint32_t ch)
 {
-    return (ch >= uni_sur_high_start && ch <= uni_sur_low_end);
+    return (ch >= sur_high_start && ch <= sur_low_end);
 }
 
 enum class conv_flags 
@@ -368,7 +368,7 @@ convert(InputIt first, InputIt last,
         }
         ch -= offsets_from_utf8[extra_bytes_to_read];
 
-        if (ch <= uni_max_bmp) { /* Target is a character <= 0xFFFF */
+        if (ch <= max_bmp) { /* Target is a character <= 0xFFFF */
             /* UTF-16 surrogate values are illegal in UTF-32 */
             if (is_surrogate(ch) ) {
                 if (flags == conv_flags::strict) {
@@ -376,24 +376,24 @@ convert(InputIt first, InputIt last,
                     result = conv_errc::source_illegal;
                     break;
                 } else {
-                    *target++ = (uni_replacement_char);
+                    *target++ = (replacement_char);
                 }
             } else {
                 *target++ = ((uint16_t)ch); /* normal case */
             }
-        } else if (ch > uni_max_utf16) {
+        } else if (ch > max_utf16) {
             if (flags == conv_flags::strict) {
                 result = conv_errc::source_illegal;
                 first -= (extra_bytes_to_read+1); /* return to the start */
                 break; /* Bail out; shouldn't continue */
             } else {
-                *target++ = (uni_replacement_char);
+                *target++ = (replacement_char);
             }
         } else {
             /* target is a character in range 0xFFFF - 0x10FFFF. */
             ch -= half_base;
-            *target++ = ((uint16_t)((ch >> half_shift) + uni_sur_high_start));
-            *target++ = ((uint16_t)((ch & half_mask) + uni_sur_low_start));
+            *target++ = ((uint16_t)((ch >> half_shift) + sur_high_start));
+            *target++ = ((uint16_t)((ch & half_mask) + sur_low_start));
         }
     }
     return std::make_pair(result,first);
@@ -434,7 +434,7 @@ convert(InputIt first, InputIt last,
         }
         ch -= offsets_from_utf8[extra_bytes_to_read];
 
-        if (ch <= uni_max_legal_utf32) {
+        if (ch <= max_legal_utf32) {
             /*
              * UTF-16 surrogate values are illegal in UTF-32, and anything
              * over Plane 17 (> 0x10FFFF) is illegal.
@@ -445,14 +445,14 @@ convert(InputIt first, InputIt last,
                     result = conv_errc::source_illegal;
                     break;
                 } else {
-                    *target++ = (uni_replacement_char);
+                    *target++ = (replacement_char);
                 }
             } else {
                 *target++ = (ch);
             }
-        } else { /* i.e., ch > uni_max_legal_utf32 */
+        } else { /* i.e., ch > max_legal_utf32 */
             result = conv_errc::source_illegal;
-            *target++ = (uni_replacement_char);
+            *target++ = (replacement_char);
         }
     }
     return std::make_pair(result,first);
@@ -478,9 +478,9 @@ convert(InputIt first, InputIt last,
             if (first < last) {
                 uint32_t ch2 = *first;
                 /* If it's a low surrogate, convert to uint32_t. */
-                if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
-                    ch = ((ch - uni_sur_high_start) << half_shift)
-                        + (ch2 - uni_sur_low_start) + half_base;
+                if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
+                    ch = ((ch - sur_high_start) << half_shift)
+                        + (ch2 - sur_low_start) + half_base;
                     ++first;
                 } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
                     --first; /* return to the illegal value itself */
@@ -511,7 +511,7 @@ convert(InputIt first, InputIt last,
             bytes_to_write = 4;
         } else {                            
             bytes_to_write = 3;
-            ch = uni_replacement_char;
+            ch = replacement_char;
         }
         
         uint8_t byte1 = 0;
@@ -569,7 +569,7 @@ convert(InputIt first, InputIt last,
             if (first < last) {
                 uint32_t ch2 = *first;
                 /* If it's a low surrogate, */
-                if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
+                if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
                     *target++ = ((uint16_t)ch);
                     *target++ = ((uint16_t)ch2);
                     ++first;
@@ -622,9 +622,9 @@ convert(InputIt first, InputIt last,
             if (first < last) {
                 uint32_t ch2 = *first;
                 /* If it's a low surrogate, convert to UTF32. */
-                if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end ) {
-                    ch = ((ch - uni_sur_high_start) << half_shift)
-                        + (ch2 - uni_sur_low_start) + half_base;
+                if (ch2 >= sur_low_start && ch2 <= sur_low_end ) {
+                    ch = ((ch - sur_high_start) << half_shift)
+                        + (ch2 - sur_low_start) + half_base;
                     ++first;
                 } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
                     --first; /* return to the illegal value itself */
@@ -679,10 +679,10 @@ convert(InputIt first, InputIt last,
         if (ch < (uint32_t)0x80) {      bytes_to_write = 1;
         } else if (ch < (uint32_t)0x800) {     bytes_to_write = 2;
         } else if (ch < (uint32_t)0x10000) {   bytes_to_write = 3;
-        } else if (ch <= uni_max_legal_utf32) {  bytes_to_write = 4;
+        } else if (ch <= max_legal_utf32) {  bytes_to_write = 4;
         } else {                            
             bytes_to_write = 3;
-            ch = uni_replacement_char;
+            ch = replacement_char;
             result = conv_errc::source_illegal;
         }
 
@@ -735,7 +735,7 @@ convert(InputIt first, InputIt last,
     while (first != last) 
     {
         uint32_t ch = *first++;
-        if (ch <= uni_max_bmp) { /* Target is a character <= 0xFFFF */
+        if (ch <= max_bmp) { /* Target is a character <= 0xFFFF */
             /* UTF-16 surrogate values are illegal in UTF-32; 0xffff or 0xfffe are both reserved values */
             if (is_surrogate(ch) ) {
                 if (flags == conv_flags::strict) {
@@ -743,22 +743,22 @@ convert(InputIt first, InputIt last,
                     result = conv_errc::source_illegal;
                     break;
                 } else {
-                    *target++ = (uni_replacement_char);
+                    *target++ = (replacement_char);
                 }
             } else {
                 *target++ = ((uint16_t)ch); /* normal case */
             }
-        } else if (ch > uni_max_legal_utf32) {
+        } else if (ch > max_legal_utf32) {
             if (flags == conv_flags::strict) {
                 result = conv_errc::source_illegal;
             } else {
-                *target++ = (uni_replacement_char);
+                *target++ = (replacement_char);
             }
         } else {
             /* target is a character in range 0xFFFF - 0x10FFFF. */
             ch -= half_base;
-            *target++ = ((uint16_t)((ch >> half_shift) + uni_sur_high_start));
-            *target++ = ((uint16_t)((ch & half_mask) + uni_sur_low_start));
+            *target++ = ((uint16_t)((ch >> half_shift) + sur_high_start));
+            *target++ = ((uint16_t)((ch & half_mask) + sur_low_start));
         }
     }
     return std::make_pair(result,first);
@@ -784,13 +784,13 @@ convert(InputIt first, InputIt last,
                 break;
             }
         }
-        if (ch <= uni_max_legal_utf32)
+        if (ch <= max_legal_utf32)
         {
             *target++ = (ch);
         }
         else
         {
-            *target++ = (uni_replacement_char);
+            *target++ = (replacement_char);
             result = conv_errc::source_illegal;
         }
     }
@@ -840,7 +840,7 @@ validate(InputIt first, InputIt last)
             if (first < last) {
                 uint32_t ch2 = *first;
                 /* If it's a low surrogate, */
-                if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
+                if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
                     ++first;
                 } else {
                     --first; /* return to the illegal value itself */
@@ -883,7 +883,7 @@ validate(InputIt first, InputIt last)
             result = conv_errc::illegal_surrogate_value;
             break;
         }
-        if (!(ch <= uni_max_legal_utf32))
+        if (!(ch <= max_legal_utf32))
         {
             result = conv_errc::source_illegal;
         }
@@ -945,16 +945,16 @@ public:
             ch -= offsets_from_utf8[length_ - 1];
             break;
         }
-        if (ch <= uni_max_legal_utf32) 
+        if (ch <= max_legal_utf32) 
         {
             if (is_surrogate(ch)) 
             {
-                ch = uni_replacement_char;
+                ch = replacement_char;
             }
         }
-        else // ch > uni_max_legal_utf32
+        else // ch > max_legal_utf32
         {
-            ch = uni_replacement_char;
+            ch = replacement_char;
         }
         return ch;
     }
@@ -971,8 +971,8 @@ public:
         {
             uint32_t ch = *begin_;
             uint32_t ch2 = *(begin_ + 1);
-            ch = ((ch - uni_sur_high_start) << half_shift)
-                 + (ch2 - uni_sur_low_start) + half_base;
+            ch = ((ch - sur_high_start) << half_shift)
+                 + (ch2 - sur_low_start) + half_base;
             return ch;
         }
         else 
@@ -1034,7 +1034,7 @@ public:
                     if (it < last_) {
                         uint32_t ch2 = *it;
                         /* If it's a low surrogate, */
-                        if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) 
+                        if (ch2 >= sur_low_start && ch2 <= sur_low_end) 
                         {
                             ++it;
                             length_ = 2;
@@ -1131,9 +1131,9 @@ u8_length(InputIt first, InputIt last)
             if (p < last) {
                 uint32_t ch2 = *(++p);
                 /* If it's a low surrogate, convert to uint32_t. */
-                if (ch2 >= uni_sur_low_start && ch2 <= uni_sur_low_end) {
-                    ch = ((ch - uni_sur_high_start) << half_shift)
-                        + (ch2 - uni_sur_low_start) + half_base;
+                if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
+                    ch = ((ch - sur_high_start) << half_shift)
+                        + (ch2 - sur_low_start) + half_base;
                
                 } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
                     break;
@@ -1179,7 +1179,7 @@ u8_length(InputIt first, InputIt last)
             count += 2;
         } else if (ch < (uint32_t)0x10000) {   
             count += 3;
-        } else if (ch <= uni_max_legal_utf32) {  
+        } else if (ch <= max_legal_utf32) {  
             count += 4;
         } else {                            
             count += 3;
