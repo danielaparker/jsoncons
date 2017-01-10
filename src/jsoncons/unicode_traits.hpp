@@ -93,19 +93,19 @@ const uint16_t sur_low_start = 0xDC00;
 const uint16_t sur_low_end = 0xDFFF;
 
 inline
-bool is_high_surrogate(uint32_t ch)
+bool is_high_surrogate(uint32_t ch) UNICONS_NOEXCEPT
 {
     return (ch >= sur_high_start && ch <= sur_high_end);
 }
 
 inline
-bool is_low_surrogate(uint32_t ch)
+bool is_low_surrogate(uint32_t ch) UNICONS_NOEXCEPT
 {
     return (ch >= sur_low_start && ch <= sur_low_end);
 }
 
 inline
-bool is_surrogate(uint32_t ch)
+bool is_surrogate(uint32_t ch) UNICONS_NOEXCEPT
 {
     return (ch >= sur_high_start && ch <= sur_low_end);
 }
@@ -802,7 +802,7 @@ convert(InputIt first, InputIt last,
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
                                ,std::pair<conv_errc,InputIt>>::type 
-validate(InputIt first, InputIt last) 
+validate(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
     conv_errc  result = conv_errc::ok;
     while (first != last) 
@@ -826,7 +826,7 @@ validate(InputIt first, InputIt last)
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
                                ,std::pair<conv_errc,InputIt>>::type 
-validate(InputIt first, InputIt last) 
+validate(InputIt first, InputIt last)  UNICONS_NOEXCEPT
 {
     conv_errc  result = conv_errc::ok;
 
@@ -870,7 +870,7 @@ validate(InputIt first, InputIt last)
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
                                ,std::pair<conv_errc,InputIt>>::type 
-validate(InputIt first, InputIt last) 
+validate(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
     conv_errc  result = conv_errc::ok;
 
@@ -905,38 +905,38 @@ public:
     typedef std::pair<Iterator,size_t> sequence_type;
 
     sequence_generator(Iterator first, Iterator last, 
-                       conv_flags flags = conv_flags::strict)
+                       conv_flags flags = conv_flags::strict) UNICONS_NOEXCEPT
         : begin_(first), last_(last), flags_(flags), 
           length_(0), err_cd_(conv_errc::ok)
     {
         next();
     }
 
-    bool done() const
+    bool done() const UNICONS_NOEXCEPT
     {
         return err_cd_ != conv_errc::ok || begin_ == last_;
     }
 
-    conv_errc status() const
+    conv_errc status() const UNICONS_NOEXCEPT
     {
         return err_cd_;
     }
 
-    sequence_type get() const 
+    sequence_type get() const UNICONS_NOEXCEPT
     {
         return std::make_pair(begin_,length_);
     }
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint8_t),uint32_t>::type 
-    get_codepoint() const
+    get_codepoint() const UNICONS_NOEXCEPT
     {
         uint32_t ch = 0;
         Iterator it = begin_;
         switch (length_) 
         {
         default:
-            throw std::invalid_argument("Invalid sequence");
+            return replacement_char;
             break;
         case 4: ch += static_cast<uint8_t>(*it++); ch <<= 6;
         case 3: ch += static_cast<uint8_t>(*it++); ch <<= 6;
@@ -961,11 +961,11 @@ public:
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint16_t),uint32_t>::type 
-    get_codepoint() const
+    get_codepoint() const UNICONS_NOEXCEPT
     {
         if (length_ == 0)
         {
-            throw std::invalid_argument("Invalid sequence");
+            return replacement_char;
         }
         if (length_ == 2)
         {
@@ -983,18 +983,18 @@ public:
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint32_t),uint32_t>::type 
-    get_codepoint() const
+    get_codepoint() const UNICONS_NOEXCEPT
     {
         if (length_ == 0)
         {
-            throw std::invalid_argument("Invalid sequence");
+            return replacement_char;
         }
         return *begin_;
     }
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint8_t)>::type 
-    next() 
+    next() UNICONS_NOEXCEPT
     {
         begin_ += length_;
         if (begin_ != last_)
@@ -1016,7 +1016,7 @@ public:
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint16_t)>::type 
-    next() 
+    next() UNICONS_NOEXCEPT
     {
         begin_ += length_;
         if (begin_ != last_)
@@ -1065,7 +1065,7 @@ public:
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
     typename std::enable_if<sizeof(CharT) == sizeof(uint32_t)>::type 
-    next() 
+    next() UNICONS_NOEXCEPT
     {
         begin_ += length_;
         length_ = 1;
@@ -1110,7 +1110,7 @@ sequence_at(InputIt first, InputIt last, size_t index)
 
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t),size_t>::type 
-u8_length(InputIt first, InputIt last) 
+u8_length(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
     return std::distance(first,last);
 }
@@ -1119,7 +1119,7 @@ u8_length(InputIt first, InputIt last)
 
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t),size_t>::type 
-u8_length(InputIt first, InputIt last) 
+u8_length(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
     conv_flags flags = conv_flags::strict;
     size_t count = 0;
@@ -1167,7 +1167,7 @@ u8_length(InputIt first, InputIt last)
 
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t),size_t>::type 
-u8_length(InputIt first, InputIt last) 
+u8_length(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
     size_t count = 0;
     for (InputIt p = first; p < last; ++p)
@@ -1194,7 +1194,7 @@ template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value 
                                && (sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t) || sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)),
                                size_t>::type 
-u32_length(InputIt first, InputIt last) 
+u32_length(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
     sequence_generator<InputIt> g(first, last, unicons::conv_flags::strict);
 
@@ -1210,17 +1210,17 @@ u32_length(InputIt first, InputIt last)
 template <class InputIt>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t),
                                size_t>::type 
-u32_length(InputIt first, InputIt last) 
+u32_length(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
     return std::distance(first,last);
 }
 
-enum class encoding {u8,u16le,u16be,u32le,u32be,unknown};
+enum class encoding {u8,u16le,u16be,u32le,u32be,undetectable};
 
 template <class Iterator>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
                                std::pair<encoding,Iterator>>::type 
-detect_encoding(Iterator first, Iterator last)
+detect_encoding(Iterator first, Iterator last) UNICONS_NOEXCEPT
 {
     Iterator it1 = first;
     if (std::distance(first,last) < 4)
@@ -1234,7 +1234,7 @@ detect_encoding(Iterator first, Iterator last)
                 return std::make_pair(encoding::u8,last);
             }
         }
-        return std::make_pair(encoding::unknown,it1);
+        return std::make_pair(encoding::undetectable,it1);
     }
     else
     {
@@ -1278,7 +1278,7 @@ detect_encoding(Iterator first, Iterator last)
             case 0x0F: 
                 return std::make_pair(encoding::u8,it1);
             default:
-                return std::make_pair(encoding::unknown,it1);
+                return std::make_pair(encoding::undetectable,it1);
             }
         }
     }
@@ -1287,7 +1287,7 @@ detect_encoding(Iterator first, Iterator last)
 template <class Iterator>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
                                std::pair<encoding_errc,Iterator>>::type 
-skip_bom(Iterator first, Iterator last)
+skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
 {
     auto result = unicons::detect_encoding(first,last);
     switch (result.first)
@@ -1312,7 +1312,7 @@ skip_bom(Iterator first, Iterator last)
 template <class Iterator>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint16_t),
                                std::pair<encoding_errc,Iterator>>::type 
-skip_bom(Iterator first, Iterator last)
+skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
 {
     if (first == last)
     {
@@ -1336,7 +1336,7 @@ skip_bom(Iterator first, Iterator last)
 template <class Iterator>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint32_t),
                                std::pair<encoding_errc,Iterator>>::type 
-skip_bom(Iterator first, Iterator last)
+skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
 {
     if (first == last)
     {

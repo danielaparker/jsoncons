@@ -33,6 +33,10 @@ Extensions:
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [binary](#user-content-ext_binary) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
+## What's new on master
+
+All unicode conversion and validation functions required by jsoncons have been gathered into the header file `unicode_traits.hpp`, which is included in this distribution, but now maintained in a separate github project, [unicode_traits](https://github.com/danielaparker/unicode_traits).
+
 ## Get jsoncons
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.
