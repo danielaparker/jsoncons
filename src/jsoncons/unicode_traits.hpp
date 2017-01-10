@@ -181,8 +181,7 @@ enum class encoding_errc
     expected_u8_found_u16,
     expected_u8_found_u32,
     expected_u16_found_fffe,
-    expected_u32_found_fffe,
-    source_exhausted
+    expected_u32_found_fffe
 };
 
 class Encoding_errc_impl_
@@ -205,8 +204,6 @@ public:
             return "Expected UTF-16, found non character";
         case encoding_errc::expected_u32_found_fffe:
             return "Expected UTF-32, found non character";
-        case encoding_errc::source_exhausted:
-            return "Hit end";
         default:
             return "";
             break;
