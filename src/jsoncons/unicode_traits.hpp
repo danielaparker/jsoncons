@@ -1215,7 +1215,7 @@ u32_length(InputIt first, InputIt last) UNICONS_NOEXCEPT
     return std::distance(first,last);
 }
 
-enum class encoding {u8,u16le,u16be,u32le,u32be,undetectable};
+enum class encoding {u8,u16le,u16be,u32le,u32be,undetected};
 
 template <class Iterator>
 static typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
@@ -1234,7 +1234,7 @@ detect_encoding(Iterator first, Iterator last) UNICONS_NOEXCEPT
                 return std::make_pair(encoding::u8,last);
             }
         }
-        return std::make_pair(encoding::undetectable,it1);
+        return std::make_pair(encoding::undetected,it1);
     }
     else
     {
@@ -1278,7 +1278,7 @@ detect_encoding(Iterator first, Iterator last) UNICONS_NOEXCEPT
             case 0x0F: 
                 return std::make_pair(encoding::u8,it1);
             default:
-                return std::make_pair(encoding::undetectable,it1);
+                return std::make_pair(encoding::undetected,it1);
             }
         }
     }
