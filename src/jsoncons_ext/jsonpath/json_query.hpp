@@ -193,6 +193,13 @@ private:
                     }
                 }
             }
+            else if (context.is_object())
+            {
+                if (result_.exists(context))
+                {
+                    nodes.push_back(std::addressof(context));
+                }
+            }
         }
     };
 
