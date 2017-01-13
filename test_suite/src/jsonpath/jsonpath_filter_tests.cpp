@@ -71,7 +71,6 @@ BOOST_AUTO_TEST_CASE(test_evaluate2)
         std::cout << e.what() << std::endl;
     }
 }
-#endif
 BOOST_AUTO_TEST_CASE(test_evaluate3)
 {
     try
@@ -93,7 +92,33 @@ BOOST_AUTO_TEST_CASE(test_evaluate3)
         std::cout << e.what() << std::endl;
     }
 }
+#endif
+BOOST_AUTO_TEST_CASE(test_evaluate4)
+{
+    try
+    {
+     std::string expr1 = "(-1 + 1)";
 
+        std::vector<token<json>> tokens;
+        tokens.push_back(token<json>(token_types::lparen));
+        tokens.push_back(token<json>(token_types::minus));
+        tokens.push_back(token<json>(token_types::term,std::make_shared<value_term<json>>(json::parse("1"))));
+        tokens.push_back(token<json>(token_types::plus));
+        tokens.push_back(token<json>(token_types::term, std::make_shared<value_term<json>>(json::parse("1"))));
+        tokens.push_back(token<json>(token_types::rparen));
+
+        json context;
+
+        auto result = evaluate(context, tokens);
+
+        std::cout << result->evaluate_single_node() << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+#if 0
 struct jsonpath_filter_fixture
 {
     static const char* store_text()
@@ -282,6 +307,6 @@ BOOST_AUTO_TEST_CASE(test_precedence)
     //auto result5 = res.eval(parent);
     //BOOST_CHECK(result5);
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()
 
