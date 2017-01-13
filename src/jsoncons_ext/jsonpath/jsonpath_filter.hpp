@@ -68,26 +68,26 @@ size_t precedence(token_types val)
 {
     switch (val)
     {
-    case token_types::eq:
-    case token_types::ne:
-        return 9;
-    case token_types::ampamp:
-        return 13;
-    case token_types::pipepipe:
-        return 13;
+    case token_types::exclaim:
+    case token_types::unary_minus:
+        return 1;
+    case token_types::regex:
+        return 2;
+    case token_types::plus:
+    case token_types::minus:
+        return 3;
     case token_types::lt:
     case token_types::gt:
     case token_types::lte:
     case token_types::gte:
-        return 8;
-    case token_types::plus:
-    case token_types::minus:
+        return 4;
+    case token_types::eq:
+    case token_types::ne:
+        return 5;
+    case token_types::ampamp:
         return 6;
-    case token_types::unary_minus:
-    case token_types::exclaim:
-        return 3;
-    case token_types::term:
-    case token_types::regex:
+    case token_types::pipepipe:
+        return 7;
     default:
         return 0;
     }

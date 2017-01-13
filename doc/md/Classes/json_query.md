@@ -77,6 +77,18 @@ Operator|       Description
 !       |Not right
 -       |Negates right
 
+Operator precedence
+
+Precedence|Operator|Associativity
+----------|--------|-----------
+1 |`!` unary `-`    |Right
+2 |`=~`             |Left
+3 |`+` `-`          |Left 
+4 |`<` `>` `<=` `>=`|Left 
+5 |`==` `!=`        |Left 
+6 |`&&`             |Left 
+7 |`||`             |Left 
+
 ### Examples
 
 The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (store.json).
