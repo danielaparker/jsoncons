@@ -19,6 +19,31 @@ using namespace jsoncons::jsonpath;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_filter_tests)
 
+BOOST_AUTO_TEST_CASE(test_evaluate)
+{
+    try
+    {
+        std::string expr1 = "(1 + 1)";
+
+        std::vector<token<json>> tokens;
+        tokens.push_back(token<json>(token_types::lparen));
+        tokens.push_back(token<json>(token_types::term,std::make_shared<value_term<json>>(json::parse("1"))));
+        tokens.push_back(token<json>(token_types::plus));
+        tokens.push_back(token<json>(token_types::term, std::make_shared<value_term<json>>(json::parse("1"))));
+        tokens.push_back(token<json>(token_types::rparen));
+
+        json context;
+
+        auto result = evaluate(context, tokens);
+
+        std::cout << result->evaluate_single_node() << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
 struct jsonpath_filter_fixture
 {
     static const char* store_text()
