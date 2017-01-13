@@ -19,6 +19,34 @@ using namespace jsoncons::jsonpath;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_filter_tests)
 
+struct jsonpath_filter_fixture
+{
+    static const char* store_text()
+    {
+        static const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"0-395-19395-8\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
+        return text;
+    }
+    static const char* book_text()
+    {
+        static const char* text = "{ \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95}";
+        return text;
+    }
+
+    json book()
+    {
+        json root = json::parse(jsonpath_filter_fixture::store_text());
+        json book = root["store"]["book"];
+        return book;
+    }
+
+    json bicycle()
+    {
+        json root = json::parse(jsonpath_filter_fixture::store_text());
+        json bicycle = root["store"]["bicycle"];
+        return bicycle;
+    }
+};
+#if 0
 BOOST_AUTO_TEST_CASE(test_evaluate)
 {
     try
@@ -122,34 +150,6 @@ BOOST_AUTO_TEST_CASE(test_evaluate4)
     }
 
 }
-
-struct jsonpath_filter_fixture
-{
-    static const char* store_text()
-    {
-        static const char* text = "{ \"store\": {\"book\": [ { \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95},{ \"category\": \"fiction\",\"author\": \"Evelyn Waugh\",\"title\": \"Sword of Honour\",\"price\": 12.99},{ \"category\": \"fiction\",\"author\": \"Herman Melville\",\"title\": \"Moby Dick\",\"isbn\": \"0-553-21311-3\",\"price\": 8.99},{ \"category\": \"fiction\",\"author\": \"J. R. R. Tolkien\",\"title\": \"The Lord of the Rings\",\"isbn\": \"0-395-19395-8\",\"price\": 22.99}],\"bicycle\": {\"color\": \"red\",\"price\": 19.95}}}";
-        return text;
-    }
-    static const char* book_text()
-    {
-        static const char* text = "{ \"category\": \"reference\",\"author\": \"Nigel Rees\",\"title\": \"Sayings of the Century\",\"price\": 8.95}";
-        return text;
-    }
-
-    json book()
-    {
-        json root = json::parse(jsonpath_filter_fixture::store_text());
-        json book = root["store"]["book"];
-        return book;
-    }
-
-    json bicycle()
-    {
-        json root = json::parse(jsonpath_filter_fixture::store_text());
-        json bicycle = root["store"]["bicycle"];
-        return bicycle;
-    }
-};
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
 {
@@ -330,6 +330,29 @@ BOOST_AUTO_TEST_CASE(test_evaluate5)
         auto res1 = parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
         auto result1 = res1.eval(context);
         BOOST_CHECK_EQUAL(json(true), result1);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+}
+#endif
+BOOST_AUTO_TEST_CASE(test_evaluate6)
+{
+    try
+    {
+        const char* pend;
+        jsonpath_filter_parser<json> parser;
+
+        jsonpath_filter_fixture fixture;
+
+        json context = json::parse(jsonpath_filter_fixture::store_text());
+
+        std::string expr5 = "(@.category != @.category)";
+        auto res5 = parser.parse(expr5.c_str(), expr5.c_str() + expr5.length(), &pend);
+        auto result5 = res5.eval(context);
+        BOOST_CHECK_EQUAL(json(false), result5);
     }
     catch (const std::exception& e)
     {

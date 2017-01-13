@@ -63,6 +63,7 @@ enum class token_types
     done
 };
 
+inline
 size_t precedence(token_types val)
 {
     switch (val)
@@ -92,6 +93,7 @@ size_t precedence(token_types val)
     }
 }
 
+inline
 bool is_operator(token_types val)
 {
     switch (val)
@@ -740,7 +742,7 @@ public:
         return nodes_.size() == 1 ? jsoncons::jsonpath::plus(nodes_[0],rhs) : a_null;
     }
 
-    Json plus(const term<Json>& rhs) const override
+    Json plus(const term    <Json>& rhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
@@ -802,7 +804,7 @@ token<Json> evaluate(typename std::vector<token<Json>>::reverse_iterator first, 
             case token_types::regex:
                 {
                     ++first;
-                    bool e = right->regex(*first->term_ptr());
+                    bool e = first->term_ptr()->regex(*right);
                     Json val(e);
                     right = std::make_shared<value_term<Json>>(val);
                 }
@@ -892,7 +894,7 @@ std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json
             }
             if (found)
             {
-                token<Json> tok = evaluate<json>(stack.rbegin(),p);
+                token<Json> tok = evaluate<Json>(stack.rbegin(),p);
                 stack.erase(p.base(),stack.end());
                 if (!stack.empty())
                 {
@@ -921,7 +923,7 @@ std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json
             }
             if (found)
             {
-                token<Json> tok = evaluate<json>(stack.rbegin(), p);
+                token<Json> tok = evaluate<Json>(stack.rbegin(), p);
                 stack.erase(p.base(), stack.end());
                 if (!stack.empty())
                 {
@@ -937,7 +939,7 @@ std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json
         }
     }
 
-    auto e = evaluate<json>(stack.rbegin(), stack.rend());
+    auto e = evaluate<Json>(stack.rbegin(), stack.rend());
 
     return e.term_ptr();
 }

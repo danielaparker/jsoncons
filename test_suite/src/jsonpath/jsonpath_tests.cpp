@@ -609,9 +609,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_tests)
     json result4 = json_query(root,"$.store.book[ ?(@.category != @.category) ]");
     json expected4 = json::array();
     BOOST_CHECK_EQUAL(expected4,result4);
-
-    json result5 = json_query(root,"$.store.book[ ?(@.category != @) ]");
-    BOOST_CHECK_EQUAL(fixture.book(),result5);
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_tests2)
