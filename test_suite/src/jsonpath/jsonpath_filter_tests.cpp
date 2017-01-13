@@ -19,6 +19,7 @@ using namespace jsoncons::jsonpath;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_filter_tests)
 
+#if 0
 BOOST_AUTO_TEST_CASE(test_evaluate)
 {
     try
@@ -31,6 +32,55 @@ BOOST_AUTO_TEST_CASE(test_evaluate)
         tokens.push_back(token<json>(token_types::plus));
         tokens.push_back(token<json>(token_types::term, std::make_shared<value_term<json>>(json::parse("1"))));
         tokens.push_back(token<json>(token_types::rparen));
+
+        json context;
+
+        auto result = evaluate(context, tokens);
+
+        std::cout << result->evaluate_single_node() << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_evaluate2)
+{
+    try
+    {
+        std::string expr1 = "(@.length - 1)";
+
+        std::vector<token<json>> tokens;
+        tokens.push_back(token<json>(token_types::lparen));
+        tokens.push_back(token<json>(token_types::term,std::make_shared<path_term<json>>("@.length")));
+        tokens.push_back(token<json>(token_types::minus));
+        tokens.push_back(token<json>(token_types::term,std::make_shared<value_term<json>>(json::parse("1"))));
+        tokens.push_back(token<json>(token_types::rparen));
+
+        json context = json::array();
+        context.add(1);
+        context.add(2);
+
+        auto result = evaluate(context, tokens);
+
+        std::cout << result->evaluate_single_node() << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+#endif
+BOOST_AUTO_TEST_CASE(test_evaluate3)
+{
+    try
+    {
+        std::string expr1 = "!1";
+
+        std::vector<token<json>> tokens;
+        tokens.push_back(token<json>(token_types::exclaim));
+        tokens.push_back(token<json>(token_types::term,std::make_shared<value_term<json>>(json::parse("1"))));
 
         json context;
 

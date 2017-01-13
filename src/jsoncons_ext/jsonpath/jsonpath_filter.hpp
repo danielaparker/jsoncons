@@ -461,7 +461,7 @@ public:
 
     Json minus(const term<Json>& rhs) const override
     {
-        return jsoncons::jsonpath::plus(rhs.unary_minus(),value_);
+        return rhs.minus(value_);
     }
 
     Json minus(const Json& rhs) const override
@@ -751,101 +751,128 @@ token<Json> evaluate(typename std::vector<token<Json>>::reverse_iterator first, 
     if (++first != last)
     {
         auto t = *first++;;
-
-        while (first != last)
+        if (first == last)
         {
             switch (t.type_id())
             {
-            case token_types::plus:
-            {
-                Json val = left->plus(*first->term_ptr());
-                left = std::make_shared<value_term<Json>>(val);
-                ++first;
-                break;
-            }
-            case token_types::minus:
-            {
-                Json val = left->minus(*first->term_ptr());
-                left = std::make_shared<value_term<Json>>(val);
-                ++first;
-                break;
-            }
-            case token_types::eq:
-            {
-                bool e = left->eq(*first->term_ptr());
-                Json val(e);
-                left = std::make_shared<value_term<Json>>(val);
-                ++first;
-            }
-                break;
-            case token_types::ne:
-            {
-                bool e = left->ne(*first->term_ptr());
-                Json val(e);
-                left = std::make_shared<value_term<Json>>(val);
-                ++first;
-            }
-                break;
-            case token_types::regex:
-                {
-                    bool e = left->regex(*first->term_ptr());
-                    Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
-                    ++first;
-                }
-                break;
-            case token_types::ampamp:
-                {
-                    bool e = left->ampamp(*first->term_ptr());
-                    Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
-                    ++first;
-                }
-                break;
-            case token_types::pipepipe:
-                {
-                    bool e = left->pipepipe(*first->term_ptr());
-                    Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
-                    ++first;
-                }
-                break;
-            case token_types::lt:
-                {
-                    bool e = left->lt(*first->term_ptr());
-                    Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
-                    ++first;
-                }
-                break;
-            case token_types::gt:
-                {
-                    bool e = left->gt(*first->term_ptr());
-                    Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
-                    ++first;
-                }
-                break;
-            case token_types::lte:
-                {
-                    bool e = left->lt(*first->term_ptr()) || left->eq(*first->term_ptr());
-                    Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
-                    ++first;
-                }
-                break;
-            case token_types::gte:
-            {
-                bool e = left->gt(*first->term_ptr()) || left->eq(*first->term_ptr());
-                Json val(e);
-                left = std::make_shared<value_term<Json>>(val);
-                ++first;
-                break;
-            }
-            default:
-                {
-                    throw std::runtime_error("op not found");
+                case token_types::term:
                     break;
+                case token_types::exclaim:
+                {
+                    Json val = left->exclaim();
+                    left = std::make_shared<value_term<Json>>(val);
+                    break;
+                }
+                case token_types::minus:
+                {
+                    Json val = left->unary_minus();
+                    left = std::make_shared<value_term<Json>>(val);
+                    break;
+                }
+                default:
+                {
+                    throw parse_exception(jsonpath_parser_errc::invalid_filter_expected_primary,0,0);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            while (first != last)
+            {
+                switch (t.type_id())
+                {
+                case token_types::plus:
+                {
+                    Json val = left->plus(*first->term_ptr());
+                    left = std::make_shared<value_term<Json>>(val);
+                    ++first;
+                    break;
+                }
+                case token_types::minus:
+                {
+                    Json val = left->minus(*first->term_ptr());
+                    left = std::make_shared<value_term<Json>>(val);
+                    ++first;
+                    break;
+                }
+                case token_types::eq:
+                {
+                    bool e = left->eq(*first->term_ptr());
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
+                    ++first;
+                }
+                    break;
+                case token_types::ne:
+                {
+                    bool e = left->ne(*first->term_ptr());
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
+                    ++first;
+                }
+                    break;
+                case token_types::regex:
+                    {
+                        bool e = left->regex(*first->term_ptr());
+                        Json val(e);
+                        left = std::make_shared<value_term<Json>>(val);
+                        ++first;
+                    }
+                    break;
+                case token_types::ampamp:
+                    {
+                        bool e = left->ampamp(*first->term_ptr());
+                        Json val(e);
+                        left = std::make_shared<value_term<Json>>(val);
+                        ++first;
+                    }
+                    break;
+                case token_types::pipepipe:
+                    {
+                        bool e = left->pipepipe(*first->term_ptr());
+                        Json val(e);
+                        left = std::make_shared<value_term<Json>>(val);
+                        ++first;
+                    }
+                    break;
+                case token_types::lt:
+                    {
+                        bool e = left->lt(*first->term_ptr());
+                        Json val(e);
+                        left = std::make_shared<value_term<Json>>(val);
+                        ++first;
+                    }
+                    break;
+                case token_types::gt:
+                    {
+                        bool e = left->gt(*first->term_ptr());
+                        Json val(e);
+                        left = std::make_shared<value_term<Json>>(val);
+                        ++first;
+                    }
+                    break;
+                case token_types::lte:
+                    {
+                        bool e = left->lt(*first->term_ptr()) || left->eq(*first->term_ptr());
+                        Json val(e);
+                        left = std::make_shared<value_term<Json>>(val);
+                        ++first;
+                    }
+                    break;
+                case token_types::gte:
+                {
+                    bool e = left->gt(*first->term_ptr()) || left->eq(*first->term_ptr());
+                    Json val(e);
+                    left = std::make_shared<value_term<Json>>(val);
+                    ++first;
+                    break;
+                }
+                default:
+                    {
+                        throw std::runtime_error("op not found");
+                        break;
+                    }
                 }
             }
         }
