@@ -750,7 +750,7 @@ public:
 template <class Json>
 token<Json> evaluate(typename std::vector<token<Json>>::reverse_iterator first, typename std::vector<token<Json>>::reverse_iterator last)
 {
-    auto left = first->term_ptr();
+    auto right = first->term_ptr();
     ++first;
     while (first != last)
     {
@@ -759,100 +759,100 @@ token<Json> evaluate(typename std::vector<token<Json>>::reverse_iterator first, 
         {
             case token_types::exclaim:
             {
-                Json val = left->exclaim();
-                left = std::make_shared<value_term<Json>>(val);
+                Json val = right->exclaim();
+                right = std::make_shared<value_term<Json>>(val);
                 break;
             }
             case token_types::unary_minus:
             {
-                Json val = left->unary_minus();
-                left = std::make_shared<value_term<Json>>(val);
+                Json val = right->unary_minus();
+                right = std::make_shared<value_term<Json>>(val);
                 break;
             }
             case token_types::plus:
             {
                 ++first;
-                Json val = left->plus(*first->term_ptr());
-                left = std::make_shared<value_term<Json>>(val);
+                Json val = right->plus(*first->term_ptr());
+                right = std::make_shared<value_term<Json>>(val);
                 break;
             }
             case token_types::minus:
             {
                 ++first;
-                Json val = left->minus(*first->term_ptr());
-                left = std::make_shared<value_term<Json>>(val);
+                Json val = right->minus(*first->term_ptr());
+                right = std::make_shared<value_term<Json>>(val);
                 break;
             }
             case token_types::eq:
             {
                 ++first;
-                bool e = left->eq(*first->term_ptr());
+                bool e = right->eq(*first->term_ptr());
                 Json val(e);
-                left = std::make_shared<value_term<Json>>(val);
+                right = std::make_shared<value_term<Json>>(val);
             }
                 break;
             case token_types::ne:
             {
                 ++first;
-                bool e = left->ne(*first->term_ptr());
+                bool e = right->ne(*first->term_ptr());
                 Json val(e);
-                left = std::make_shared<value_term<Json>>(val);
+                right = std::make_shared<value_term<Json>>(val);
             }
                 break;
             case token_types::regex:
                 {
                     ++first;
-                    bool e = left->regex(*first->term_ptr());
+                    bool e = right->regex(*first->term_ptr());
                     Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
+                    right = std::make_shared<value_term<Json>>(val);
                 }
                 break;
             case token_types::ampamp:
                 {
                     ++first;
-                    bool e = left->ampamp(*first->term_ptr());
+                    bool e = right->ampamp(*first->term_ptr());
                     Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
+                    right = std::make_shared<value_term<Json>>(val);
                 }
                 break;
             case token_types::pipepipe:
                 {
                     ++first;
-                    bool e = left->pipepipe(*first->term_ptr());
+                    bool e = right->pipepipe(*first->term_ptr());
                     Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
+                    right = std::make_shared<value_term<Json>>(val);
                 }
                 break;
             case token_types::lt:
                 {
                     ++first;
-                    bool e = left->lt(*first->term_ptr());
+                    bool e = first->term_ptr()->lt(*right);
                     Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
+                    right = std::make_shared<value_term<Json>>(val);
                 }
                 break;
             case token_types::gt:
                 {
                     ++first;
-                    bool e = left->gt(*first->term_ptr());
+                    bool e = first->term_ptr()->gt(*right);
                     Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
+                    right = std::make_shared<value_term<Json>>(val);
                 }
                 break;
             case token_types::lte:
                 {
                     ++first;
-                    bool e = left->lt(*first->term_ptr()) || left->eq(*first->term_ptr());
+                    bool e = first->term_ptr()->lt(*right) || right->eq(*first->term_ptr());
                     Json val(e);
-                    left = std::make_shared<value_term<Json>>(val);
+                    right = std::make_shared<value_term<Json>>(val);
                 }
                 break;
             case token_types::gte:
             {
                 ++first;
-                bool e = left->gt(*first->term_ptr()) || left->eq(*first->term_ptr());
+                bool e = first->term_ptr()->gt(*right) || right->eq(*first->term_ptr());
                 Json val(e);
-                left = std::make_shared<value_term<Json>>(val);
+                right = std::make_shared<value_term<Json>>(val);
                 break;
             }
             default:
@@ -864,7 +864,7 @@ token<Json> evaluate(typename std::vector<token<Json>>::reverse_iterator first, 
         ++first;
     }
     
-    return token<Json>(token_types::term,left);
+    return token<Json>(token_types::term,right);
 }
 
 template <class Json>
@@ -925,7 +925,7 @@ std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json
                 stack.erase(p.base(), stack.end());
                 if (!stack.empty())
                 {
-                    stack.pop_back();
+                    //stack.pop_back();
                 }
                 stack.push_back(tok);
             }

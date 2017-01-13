@@ -18,7 +18,7 @@ using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_filter_tests)
-#if 0
+
 BOOST_AUTO_TEST_CASE(test_evaluate)
 {
     try
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(test_evaluate3)
         std::cout << e.what() << std::endl;
     }
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(test_evaluate4)
 {
     try
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_evaluate4)
     }
 
 }
-#if 0
+
 struct jsonpath_filter_fixture
 {
     static const char* store_text()
@@ -311,6 +311,31 @@ BOOST_AUTO_TEST_CASE(test_precedence)
     //auto result5 = res.eval(parent);
     //BOOST_CHECK(result5);
 }
-#endif
+
+BOOST_AUTO_TEST_CASE(test_evaluate5)
+{
+    try
+    {
+        const char* pend;
+        jsonpath_filter_parser<json> parser;
+
+        json context;
+
+        std::string expr5 = "(-2 < -1)";
+        auto res5 = parser.parse(expr5.c_str(), expr5.c_str() + expr5.length(), &pend);
+        auto result5 = res5.eval(context);
+        BOOST_CHECK_EQUAL(json(true), result5);
+
+        std::string expr1 = "((-2 < -1))";
+        auto res1 = parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
+        auto result1 = res1.eval(context);
+        BOOST_CHECK_EQUAL(json(true), result1);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+}
 BOOST_AUTO_TEST_SUITE_END()
 
