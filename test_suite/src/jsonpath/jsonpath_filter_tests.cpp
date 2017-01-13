@@ -18,7 +18,6 @@ using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_filter_tests)
-
 #if 0
 BOOST_AUTO_TEST_CASE(test_evaluate)
 {
@@ -37,7 +36,7 @@ BOOST_AUTO_TEST_CASE(test_evaluate)
 
         auto result = evaluate(context, tokens);
 
-        std::cout << result->evaluate_single_node() << std::endl;
+        BOOST_CHECK(result->evaluate_single_node() == json(2));
     }
     catch (const std::exception& e)
     {
@@ -63,8 +62,7 @@ BOOST_AUTO_TEST_CASE(test_evaluate2)
         context.add(2);
 
         auto result = evaluate(context, tokens);
-
-        std::cout << result->evaluate_single_node() << std::endl;
+        BOOST_CHECK(result->evaluate_single_node() == json(1));
     }
     catch (const std::exception& e)
     {
@@ -84,8 +82,7 @@ BOOST_AUTO_TEST_CASE(test_evaluate3)
         json context;
 
         auto result = evaluate(context, tokens);
-
-        std::cout << result->evaluate_single_node() << std::endl;
+        BOOST_CHECK(result->evaluate_single_node() == json(false));
     }
     catch (const std::exception& e)
     {
@@ -97,11 +94,15 @@ BOOST_AUTO_TEST_CASE(test_evaluate4)
 {
     try
     {
-     std::string expr1 = "(-1 + 1)";
+        std::string expr1 = "(-1 + 1)";
 
+        jsonpath_filter_parser<json> parser;
+        const char* pend;
+        //auto res1 = parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
+        
         std::vector<token<json>> tokens;
         tokens.push_back(token<json>(token_types::lparen));
-        tokens.push_back(token<json>(token_types::minus));
+        tokens.push_back(token<json>(token_types::unary_minus));
         tokens.push_back(token<json>(token_types::term,std::make_shared<value_term<json>>(json::parse("1"))));
         tokens.push_back(token<json>(token_types::plus));
         tokens.push_back(token<json>(token_types::term, std::make_shared<value_term<json>>(json::parse("1"))));
@@ -110,13 +111,16 @@ BOOST_AUTO_TEST_CASE(test_evaluate4)
         json context;
 
         auto result = evaluate(context, tokens);
-
-        std::cout << result->evaluate_single_node() << std::endl;
+        json j = result->evaluate_single_node();
+        std::cout << j << std::endl;
+        BOOST_CHECK(j == json(0));
+        
     }
     catch (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
+
 }
 #if 0
 struct jsonpath_filter_fixture
