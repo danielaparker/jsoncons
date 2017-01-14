@@ -246,6 +246,16 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_negative_numbers)
     auto res6 = parser.parse(expr6.c_str(), expr6.c_str()+ expr6.length(), &pend);
     auto result6 = res6.eval(parent);
     BOOST_CHECK_EQUAL(json(true), result6);
+
+    std::string expr7 = "(-2 < -1 && -3 > -4)";
+    auto res7 = parser.parse(expr7.c_str(), expr7.c_str()+ expr7.length(), &pend);
+    auto result7 = res7.eval(parent);
+    BOOST_CHECK_EQUAL(json(true), result7);
+
+    std::string expr8 = "(-2 < -1 || -4 > -3)";
+    auto res8 = parser.parse(expr8.c_str(), expr8.c_str()+ expr8.length(), &pend);
+    auto result8 = res8.eval(parent);
+    BOOST_CHECK_EQUAL(json(true), result8);
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
@@ -337,7 +347,7 @@ BOOST_AUTO_TEST_CASE(test_evaluate5)
     }
 
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(test_evaluate6)
 {
     try
@@ -359,6 +369,45 @@ BOOST_AUTO_TEST_CASE(test_evaluate6)
         std::cout << e.what() << std::endl;
     }
 
+}
+#endif
+BOOST_AUTO_TEST_CASE(test_evaluate7)
+{
+    try
+    {
+        const char* pend;
+        jsonpath_filter_parser<json> parser;
+
+        jsonpath_filter_fixture fixture;
+
+        json context = json::parse(jsonpath_filter_fixture::store_text());
+        
+        //std::string expr1 = "(true && true)";
+        //auto res1 = parser.parse(expr1.c_str(), expr1.c_str() + expr1.length(), &pend);
+        //auto result1 = res1.eval(context);
+        //BOOST_CHECK_EQUAL(json(true), result1);
+
+        //std::string expr2 = "(true && -3 > -4)";
+        //auto res2 = parser.parse(expr2.c_str(), expr2.c_str() + expr2.length(), &pend);
+        //auto result2 = res2.eval(context);
+        //BOOST_CHECK_EQUAL(json(true), result2);
+
+        std::string expr3 = "(-2 < -1 && true)";
+        auto res3 = parser.parse(expr3.c_str(), expr3.c_str() + expr3.length(), &pend);
+        auto result3 = res3.eval(context);
+        BOOST_CHECK_EQUAL(json(true), result3);
+
+        //std::string expr5 = "(-2 < -1 && -3 > -4)";
+
+        //std::string expr4 = "(-2 < -1 && -3 > -4)";
+        //auto res4 = parser.parse(expr4.c_str(), expr4.c_str() + expr4.length(), &pend);
+        //auto result4 = res4.eval(context);
+        //BOOST_CHECK_EQUAL(json(true), result4);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 }
 BOOST_AUTO_TEST_SUITE_END()
 

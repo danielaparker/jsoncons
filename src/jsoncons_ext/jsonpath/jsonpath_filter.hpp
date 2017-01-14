@@ -264,28 +264,6 @@ public:
 };
 
 template <class Json>
-class token_stream
-{
-    std::vector<token<Json>>& tokens_;
-    size_t index_;
-public:
-    token_stream(std::vector<token<Json>>& tokens)
-        : tokens_(tokens), index_(0)
-    {
-    }
-
-    token<Json> get()
-    {
-        static token<Json> done = token<Json>(token_types::done);
-        return index_ < tokens_.size() ? tokens_[index_++] : done;
-    }
-    void putback()
-    {
-        --index_;
-    }
-};
-
-template <class Json>
 bool ampamp(const Json& lhs, const Json& rhs)
 {
     return lhs.as_bool() && rhs.as_bool();
@@ -869,6 +847,30 @@ token<Json> evaluate(typename std::vector<token<Json>>::reverse_iterator first, 
     return token<Json>(token_types::term,right);
 }
 
+    template <class Json>
+    std::pair<bool,typename std::vector<token<Json>>::reverse_iterator> find_lower(std::vector<token<Json>>& stack, token_types type_id)
+    {
+        bool found = false;
+        typename std::vector<token<Json>>::reverse_iterator q;
+        for (auto p = stack.rbegin(); p != stack.rend(); ++p)
+        {
+            if (p->type_id() == token_types::lparen)
+            {
+                break;
+            }
+            else if (is_operator(p->type_id()))
+            {
+                if (precedence(type_id) >= precedence(p->type_id()))
+                {
+                    q = p;
+                    found = true;
+                    break;
+                }
+            }
+        }
+        return std::make_pair(found,q);
+    }
+
 template <class Json>
 std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json>>& tokens)
 {
@@ -905,7 +907,14 @@ std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json
         }
         else if (is_operator(it->type_id()))
         {
-            bool found = false;
+            auto p = find_lower(stack, it->type_id());
+            if (p.first)
+            {
+                token<Json> tok = evaluate<Json>(stack.rbegin(), p.second);
+                stack.erase(p.second.base(), stack.end());
+                stack.push_back(tok);
+            }
+            /*bool found = false;
             typename std::vector<token<Json>>::reverse_iterator p;
             for (p = stack.rbegin(); p != stack.rend(); ++p)
             {
@@ -925,12 +934,8 @@ std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json
             {
                 token<Json> tok = evaluate<Json>(stack.rbegin(), p);
                 stack.erase(p.base(), stack.end());
-                if (!stack.empty())
-                {
-                    //stack.pop_back();
-                }
                 stack.push_back(tok);
-            }
+            }*/
             stack.push_back(*it);
         }
         else
