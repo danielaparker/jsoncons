@@ -49,13 +49,13 @@ struct jsonpath_filter_fixture
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
 {
-    std::string expr1 = "(1 + 1)";
     const char* pend;
     jsonpath_filter_parser<json> parser;
     json parent = json::array();
     parent.add(1);
     parent.add(2);
 
+    std::string expr1 = "(1 + 1)";
     auto res1 = parser.parse(expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
     auto result1 = res1.eval(parent);
     BOOST_CHECK_EQUAL(json(2),result1);
@@ -71,6 +71,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
     BOOST_CHECK_EQUAL(json(1), result3);
 
 }
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
 {
     const char* pend;
@@ -178,6 +179,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
 // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
 BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(test_jsonpath_filter_regex, 2)
 #endif
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter_regex)
 {
     const char* pend;

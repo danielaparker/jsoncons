@@ -112,6 +112,7 @@ bool is_operator(token_types val)
     {
     case token_types::eq:
     case token_types::ne:
+    case token_types::regex:
     case token_types::ampamp:
     case token_types::pipepipe:
     case token_types::lt:
@@ -738,156 +739,12 @@ public:
         return nodes_.size() == 1 ? jsoncons::jsonpath::plus(nodes_[0],rhs) : a_null;
     }
 
-    Json plus(const term    <Json>& rhs) const override
+    Json plus(const term<Json>& rhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
     }
 };
-
-template <class Json>
-token<Json> evaluate(typename std::vector<token<Json>>::reverse_iterator first, typename std::vector<token<Json>>::reverse_iterator last)
-{
-    auto right = first->term_ptr();
-    ++first;
-    while (first != last)
-    {
-        auto t = *first;
-        switch (t.type_id())
-        {
-            case token_types::exclaim:
-            {
-                Json val = right->exclaim();
-                right = std::make_shared<value_term<Json>>(val);
-                break;
-            }
-            case token_types::unary_minus:
-            {
-                Json val = right->unary_minus();
-                right = std::make_shared<value_term<Json>>(val);
-                break;
-            }
-            case token_types::plus:
-            {
-                ++first;
-                Json val = right->plus(*first->term_ptr());
-                right = std::make_shared<value_term<Json>>(val);
-                break;
-            }
-            case token_types::minus:
-            {
-                ++first;
-                Json val = right->minus(*first->term_ptr());
-                right = std::make_shared<value_term<Json>>(val);
-                break;
-            }
-            case token_types::eq:
-            {
-                ++first;
-                bool e = right->eq(*first->term_ptr());
-                Json val(e);
-                right = std::make_shared<value_term<Json>>(val);
-            }
-                break;
-            case token_types::ne:
-            {
-                ++first;
-                bool e = right->ne(*first->term_ptr());
-                Json val(e);
-                right = std::make_shared<value_term<Json>>(val);
-            }
-                break;
-            case token_types::regex:
-                {
-                    ++first;
-                    bool e = first->term_ptr()->regex(*right);
-                    Json val(e);
-                    right = std::make_shared<value_term<Json>>(val);
-                }
-                break;
-            case token_types::ampamp:
-                {
-                    ++first;
-                    bool e = right->ampamp(*first->term_ptr());
-                    Json val(e);
-                    right = std::make_shared<value_term<Json>>(val);
-                }
-                break;
-            case token_types::pipepipe:
-                {
-                    ++first;
-                    bool e = right->pipepipe(*first->term_ptr());
-                    Json val(e);
-                    right = std::make_shared<value_term<Json>>(val);
-                }
-                break;
-            case token_types::lt:
-                {
-                    ++first;
-                    bool e = first->term_ptr()->lt(*right);
-                    Json val(e);
-                    right = std::make_shared<value_term<Json>>(val);
-                }
-                break;
-            case token_types::gt:
-                {
-                    ++first;
-                    bool e = first->term_ptr()->gt(*right);
-                    Json val(e);
-                    right = std::make_shared<value_term<Json>>(val);
-                }
-                break;
-            case token_types::lte:
-                {
-                    ++first;
-                    bool e = first->term_ptr()->lt(*right) || right->eq(*first->term_ptr());
-                    Json val(e);
-                    right = std::make_shared<value_term<Json>>(val);
-                }
-                break;
-            case token_types::gte:
-            {
-                ++first;
-                bool e = first->term_ptr()->gt(*right) || right->eq(*first->term_ptr());
-                Json val(e);
-                right = std::make_shared<value_term<Json>>(val);
-                break;
-            }
-            default:
-                {
-                    //throw std::runtime_error("op not found");
-                    break;
-                }
-        }
-        ++first;
-    }
-    
-    return token<Json>(token_types::term,right);
-}
-
-    template <class Json>
-    std::pair<bool,typename std::vector<token<Json>>::reverse_iterator> find_lower(std::vector<token<Json>>& stack, token_types type_id)
-    {
-        bool found = false;
-        typename std::vector<token<Json>>::reverse_iterator q;
-        for (auto p = stack.rbegin(); p != stack.rend(); ++p)
-        {
-            if (p->type_id() == token_types::lparen)
-            {
-                break;
-            }
-            else if (is_operator(p->type_id()))
-            {
-                if (precedence(type_id) >= precedence(p->type_id()))
-                {
-                    q = p;
-                    found = true;
-                    break;
-                }
-            }
-        }
-        return std::make_pair(found,q);
-    }
 
 template <class Json>
 std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json>>& tokens)
@@ -896,7 +753,7 @@ std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json
     {
         it->initialize(context);
     }
-    std::vector<token<json>> stack;
+    std::vector<token<Json>> stack;
     for (auto t : tokens)
     {
         if (is_operand(t.type_id()))
@@ -1167,6 +1024,9 @@ public:
 
     jsonpath_filter_expr<Json> parse(const char_type* p, const char_type* end_expr, const char_type** end_ptr)
     {
+        output_stack_.clear();
+        operator_stack_.clear();
+
         string_type buffer;
         filter_states pre_line_break_state = filter_states::start;
 
