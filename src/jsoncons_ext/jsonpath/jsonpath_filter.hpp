@@ -463,7 +463,7 @@ public:
 
     Json minus(const term<Json>& rhs) const override
     {
-        return rhs.minus(value_);
+        return jsoncons::jsonpath::unary_minus(rhs.minus(value_));
     }
 
     Json minus(const Json& rhs) const override
@@ -762,115 +762,115 @@ std::shared_ptr<term<Json>> evaluate(const Json& context, std::vector<token<Json
         }
         else if (is_operator(t.type_id()))
         {
-            auto temp = stack.back();
+            auto rhs = stack.back();
             stack.pop_back();
             switch (t.type_id())
             {
                 case token_types::exclaim:
                 {
-                    Json val = temp.term_ptr()->exclaim();
+                    Json val = rhs.term_ptr()->exclaim();
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::unary_minus:
                 {
-                    Json val = temp.term_ptr()->unary_minus();
+                    Json val = rhs.term_ptr()->unary_minus();
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::plus:
                 {
-                    auto temp2 = stack.back();
+                    auto lhs = stack.back();
                     stack.pop_back();
-                    Json val = temp.term_ptr()->plus(*temp2.term_ptr());
+                    Json val = lhs.term_ptr()->plus(*rhs.term_ptr());
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::minus:
                 {
-                    auto temp2 = stack.back();
+                    auto lhs = stack.back();
                     stack.pop_back();
-                    Json val = temp.term_ptr()->minus(*temp2.term_ptr());
+                    Json val = lhs.term_ptr()->minus(*rhs.term_ptr());
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::eq:
                 {
-                    auto temp2 = stack.back();
+                    auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = temp.term_ptr()->eq(*temp2.term_ptr());
+                    bool e = lhs.term_ptr()->eq(*rhs.term_ptr());
                     Json val(e);
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                 }
                     break;
                 case token_types::ne:
                 {
-                    auto temp2 = stack.back();
+                    auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = temp.term_ptr()->ne(*temp2.term_ptr());
+                    bool e = lhs.term_ptr()->ne(*rhs.term_ptr());
                     Json val(e);
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                 }
                     break;
                 case token_types::regex:
                     {
-                        auto temp2 = stack.back();
+                        auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = temp2.term_ptr()->regex(*temp.term_ptr());
+                        bool e = lhs.term_ptr()->regex(*rhs.term_ptr());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::ampamp:
                     {
-                        auto temp2 = stack.back();
+                        auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = temp.term_ptr()->ampamp(*temp2.term_ptr());
+                        bool e = lhs.term_ptr()->ampamp(*rhs.term_ptr());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::pipepipe:
                     {
-                        auto temp2 = stack.back();
+                        auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = temp.term_ptr()->pipepipe(*temp2.term_ptr());
+                        bool e = lhs.term_ptr()->pipepipe(*rhs.term_ptr());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::lt:
                     {
-                        auto temp2 = stack.back();
+                        auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = temp2.term_ptr()->lt(*(temp.term_ptr()));
+                        bool e = lhs.term_ptr()->lt(*(rhs.term_ptr()));
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::gt:
                     {
-                        auto temp2 = stack.back();
+                        auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = temp2.term_ptr()->gt(*(temp.term_ptr()));
+                        bool e = lhs.term_ptr()->gt(*(rhs.term_ptr()));
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::lte:
                     {
-                        auto temp2 = stack.back();
+                        auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = temp2.term_ptr()->lt(*(temp.term_ptr())) || temp.term_ptr()->eq(*temp2.term_ptr());
+                        bool e = lhs.term_ptr()->lt(*(rhs.term_ptr())) || lhs.term_ptr()->eq(*rhs.term_ptr());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::gte:
                 {
-                    auto temp2 = stack.back();
+                    auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = temp2.term_ptr()->gt(*(temp.term_ptr())) || temp.term_ptr()->eq(*temp2.term_ptr());
+                    bool e = lhs.term_ptr()->gt(*(rhs.term_ptr())) || lhs.term_ptr()->eq(*rhs.term_ptr());
                     Json val(e);
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;

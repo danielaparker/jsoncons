@@ -3984,6 +3984,30 @@ typedef json_decoder<owjson> wojson_deserializer;
 
 }
 
+inline 
+jsoncons::json operator "" _json(const char* s, std::size_t n)
+{
+    return jsoncons::json::parse(s, n);
+}
+
+inline 
+jsoncons::wjson operator "" _json(const wchar_t* s, std::size_t n)
+{
+    return jsoncons::wjson::parse(s, n);
+}
+
+inline
+jsoncons::ojson operator "" _ojson(const char* s, std::size_t n)
+{
+    return jsoncons::ojson::parse(s, n);
+}
+
+inline
+jsoncons::owjson operator "" _ojson(const wchar_t* s, std::size_t n)
+{
+    return jsoncons::owjson::parse(s, n);
+}
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif

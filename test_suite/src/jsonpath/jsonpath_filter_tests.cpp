@@ -47,6 +47,199 @@ struct jsonpath_filter_fixture
     }
 };
 
+BOOST_AUTO_TEST_CASE(test_minus)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+
+    std::string s1 = "(3-1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(2),result1);
+
+    std::string s2 = "(3-@.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(2),result2);
+
+    std::string s3 = "(3.5-1.0)";
+    auto expr3 = parser.parse(s3.c_str(), s3.c_str()+ s3.length(), &pend);
+    auto result3 = expr3.eval(context);
+    BOOST_CHECK_EQUAL(json(2.5),result3);
+
+    std::string s4 = "(@.length-3)";
+    auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
+    auto result4 = expr4.eval(context);
+    BOOST_CHECK_EQUAL(json(-2),result4);
+}
+
+BOOST_AUTO_TEST_CASE(test_lt)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+
+    std::string s1 = "(3 < 1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result1);
+
+    std::string s2 = "(3 < @.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result2);
+}
+
+BOOST_AUTO_TEST_CASE(test_lte)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+
+    std::string s1 = "(3 <= 1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result1);
+
+    std::string s2 = "(3 <= @.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result2);
+}
+
+BOOST_AUTO_TEST_CASE(test_gt)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+
+    std::string s1 = "(3 > 1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result1);
+
+    std::string s2 = "(3 > @.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result2);
+}
+
+BOOST_AUTO_TEST_CASE(test_gte)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+
+    std::string s1 = "(3 >= 1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result1);
+
+    std::string s2 = "(3 >= @.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result2);
+}
+
+BOOST_AUTO_TEST_CASE(test_eq)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+
+    std::string s1 = "(3 == 1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result1);
+
+    std::string s2 = "(3 == @.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result2);
+
+    std::string s3 = "(1 == 1)";
+    auto expr3 = parser.parse(s3.c_str(), s3.c_str()+ s3.length(), &pend);
+    auto result3 = expr3.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result3);
+
+    std::string s4 = "(1 == @.length)";
+    auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
+    auto result4 = expr4.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result4);
+}
+
+BOOST_AUTO_TEST_CASE(test_precedence)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+    context.add(2);
+
+    std::string s1 = "(@.0 == 1 && @.1 == 2)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result1);
+
+    std::string s2 = "((@.0 == 1) && (@.1 == 2))";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result2);
+
+    std::string s3 = "(@.0 == 2 && @.1 == 2)";
+    auto expr3 = parser.parse(s3.c_str(), s3.c_str()+ s3.length(), &pend);
+    auto result3 = expr3.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result3);
+
+    std::string s4 = "((@.0 == 1) && (@.1 == 1))";
+    auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
+    auto result4 = expr4.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result4);
+}
+
+BOOST_AUTO_TEST_CASE(test_ne)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+
+    std::string s1 = "(3 != 1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result1);
+
+    std::string s2 = "(3 != @.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(true),result2);
+
+    std::string s3 = "(1 != 1)";
+    auto expr3 = parser.parse(s3.c_str(), s3.c_str()+ s3.length(), &pend);
+    auto result3 = expr3.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result3);
+
+    std::string s4 = "(1 != @.length)";
+    auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
+    auto result4 = expr4.eval(context);
+    BOOST_CHECK_EQUAL(json(false),result4);
+}
+
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
 {
     const char* pend;
