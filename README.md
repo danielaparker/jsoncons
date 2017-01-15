@@ -35,7 +35,9 @@ Extensions:
 
 ## What's new on master
 
-All unicode conversion and validation functions required by jsoncons have been gathered into the header file `unicode_traits.hpp`, which is included in this distribution, but now maintained in a separate github project, [unicode_traits](https://github.com/danielaparker/unicode_traits).
+- All unicode conversion and validation functions required by jsoncons have been gathered into the header file `unicode_traits.hpp`, which is included in this distribution, but now maintained in a separate github project, [unicode_traits](https://github.com/danielaparker/unicode_traits).
+- Issues with precedence in JsonPath evaluations have been fixed
+- literal operators _json and _wjson have been introduced
 
 ## Get jsoncons
 
@@ -173,6 +175,23 @@ for (auto val : book.array_range())
 {
     std::cout << val << std::endl;
 }
+```
+### _json and _ojson literal operators
+
+```c++
+json j1 = R"(
+{
+    "StartDate" : "2017-03-01",
+    "MaturityDate" : "2020-12-30"          
+}
+)"_json;
+
+ojson j2 = R"(
+{
+    "StartDate" : "2017-03-01",
+    "MaturityDate" : "2020-12-30"          
+}
+)"_ojson;
 ```
 
 ### Range-based for loops with objects
