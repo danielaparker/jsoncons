@@ -614,6 +614,51 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
 </code></pre>
 </li>
 </ul>
+<p>Operator precedence</p>
+<table>
+<thead>
+<tr>
+<th>Precedence</th>
+<th>Operator</th>
+<th>Associativity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>!</code> unary <code>-</code></td>
+<td>Right</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>=~</code></td>
+<td>Left</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>+</code> <code>-</code></td>
+<td>Left</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code></td>
+<td>Left</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>==</code> <code>!=</code></td>
+<td>Left</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>&amp;&amp;</code></td>
+<td>Left</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>||</code></td>
+<td>Left</td>
+</tr></tbody></table>
 <h3>Examples</h3>
 <p>The examples below use the JSON text from <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> (store.json).</p>
 <pre><code>{ "store": {

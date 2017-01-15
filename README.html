@@ -499,6 +499,12 @@ vertical-align:1px;
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="#user-content-ext_binary">binary</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
+<h2>What's new on master</h2>
+<ul>
+<li>All unicode conversion and validation functions required by jsoncons have been gathered into the header file <code>unicode_traits.hpp</code>, which is included in this distribution, but now maintained in a separate github project, <a href="https://github.com/danielaparker/unicode_traits">unicode_traits</a>.</li>
+<li>Issues with precedence in JsonPath evaluations have been fixed</li>
+<li>literal operators _json and _wjson have been introduced</li>
+</ul>
 <h2>Get jsoncons</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
@@ -613,6 +619,20 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 {
     std::cout &lt;&lt; val &lt;&lt; std::endl;
 }</pre></div>
+<h3>_json and _ojson literal operators</h3>
+<div class="highlight highlight-source-c++"><pre>json j1 = <span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "StartDate" : "2017-03-01",</span>
+<span class="pl-s">    "MaturityDate" : "2020-12-30"          </span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>_json;
+
+ojson j2 = <span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "StartDate" : "2017-03-01",</span>
+<span class="pl-s">    "MaturityDate" : "2020-12-30"          </span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>_ojson;</pre></div>
 <h3>Range-based for loops with objects</h3>
 <div class="highlight highlight-source-c++"><pre>json book = json::object{
     {<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>},
