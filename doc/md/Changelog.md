@@ -1,9 +1,16 @@
 0.99.6
 ------
 
+Bug fixes
+
+- Issues with precedence in JsonPath filter evaluations have been fixed
+- An issue with (a - expression) in JsonPath filter evaluations has been fixed
+
 New feature
 
 - The new binary extension supports encoding to and decoding from the MessagePack binary serialization format.
+- literal operators _json and _ojson have been introduced
+- An extension to JsonPath to allow filter expressions over a single object.
 
 Non-breaking changes
 

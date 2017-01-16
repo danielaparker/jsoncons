@@ -469,9 +469,16 @@ vertical-align:1px;
 </head>
 <body>
 <h2>0.99.6</h2>
+<p>Bug fixes</p>
+<ul>
+<li>Issues with precedence in JsonPath filter evaluations have been fixed</li>
+<li>An issue with (a - expression) in JsonPath filter evaluations has been fixed</li>
+</ul>
 <p>New feature</p>
 <ul>
 <li>The new binary extension supports encoding to and decoding from the MessagePack binary serialization format.</li>
+<li>literal operators _json and _ojson have been introduced</li>
+<li>An extension to JsonPath to allow filter expressions over a single object.</li>
 </ul>
 <p>Non-breaking changes</p>
 <ul>

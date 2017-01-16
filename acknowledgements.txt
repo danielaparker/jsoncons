@@ -26,6 +26,8 @@ Tom Bass for assistance with clang build errors
 
 Andrey Alifanov and Amit Naik for failing test cases for JSON Path
 
+Yuri Plaksyuk for contributing an extension to JsonPath to allow filter expressions over a single object. 
+
 Nikolay Amiantov for fixing compilation errors and warnings by GCC and 
 Clang, adding read support for std::array and, most appreciated,
 adding Travis CI configuration.
