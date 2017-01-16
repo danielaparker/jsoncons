@@ -47,6 +47,65 @@ struct jsonpath_filter_fixture
     }
 };
 
+BOOST_AUTO_TEST_CASE(test_div)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+
+    std::string s1 = "(3/1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(3),result1);
+
+    std::string s2 = "(3/@.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(3),result2);
+
+    std::string s3 = "(5/2)";
+    auto expr3 = parser.parse(s3.c_str(), s3.c_str()+ s3.length(), &pend);
+    auto result3 = expr3.eval(context);
+    BOOST_CHECK_EQUAL(json(2.5),result3);
+
+    std::string s4 = "(@.length/3)";
+    auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
+    auto result4 = expr4.eval(context);
+    BOOST_CHECK_CLOSE(0.333333,result4.as<double>(),0.001);
+}
+
+BOOST_AUTO_TEST_CASE(test_mult)
+{
+    const char* pend;
+    jsonpath_filter_parser<json> parser;
+
+    json context = json::array();
+    context.add(1);
+    context.add(2);
+
+    std::string s1 = "(3*1)";
+    auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
+    auto result1 = expr1.eval(context);
+    BOOST_CHECK_EQUAL(json(3),result1);
+
+    std::string s2 = "(3*@.length)";
+    auto expr2 = parser.parse(s2.c_str(), s2.c_str()+ s2.length(), &pend);
+    auto result2 = expr2.eval(context);
+    BOOST_CHECK_EQUAL(json(6),result2);
+
+    std::string s3 = "(5*2)";
+    auto expr3 = parser.parse(s3.c_str(), s3.c_str()+ s3.length(), &pend);
+    auto result3 = expr3.eval(context);
+    BOOST_CHECK_EQUAL(json(10),result3);
+
+    std::string s4 = "(@.length*3)";
+    auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
+    auto result4 = expr4.eval(context);
+    BOOST_CHECK_EQUAL(json(6),result4);
+}
+
 BOOST_AUTO_TEST_CASE(test_minus)
 {
     const char* pend;

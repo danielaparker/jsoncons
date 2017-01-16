@@ -58,6 +58,8 @@ enum class token_types
     gte,
     plus,
     minus,
+    mult,
+    div,
     unary_minus,
     exclaim
 };
@@ -72,21 +74,24 @@ size_t precedence(token_types val)
         return 1;
     case token_types::regex:
         return 2;
+    case token_types::mult:
+    case token_types::div:
+        return 3;
     case token_types::plus:
     case token_types::minus:
-        return 3;
+        return 4;
     case token_types::lt:
     case token_types::gt:
     case token_types::lte:
     case token_types::gte:
-        return 4;
+        return 5;
     case token_types::eq:
     case token_types::ne:
-        return 5;
-    case token_types::ampamp:
         return 6;
-    case token_types::pipepipe:
+    case token_types::ampamp:
         return 7;
+    case token_types::pipepipe:
+        return 8;
     default:
         return 0;
     }
@@ -121,6 +126,8 @@ bool is_operator(token_types val)
     case token_types::gte:
     case token_types::plus:
     case token_types::minus:
+    case token_types::mult:
+    case token_types::div:
     case token_types::exclaim:
     case token_types::unary_minus:
         return true;
@@ -235,6 +242,22 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
+    virtual Json mult(const term&) const
+    {
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+    }
+    virtual Json mult(const Json&) const
+    {
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+    }
+    virtual Json div(const term&) const
+    {
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+    }
+    virtual Json div(const Json&) const
+    {
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+    }
 };
 
 template <class Json>
@@ -339,6 +362,44 @@ Json plus(const Json& lhs, const Json& rhs)
     else if (lhs.is_uinteger() && rhs.is_uinteger())
     {
         result = Json((lhs.as_uinteger() + rhs.as_uinteger()));
+    }
+    return result;
+}
+
+template <class Json>
+Json mult(const Json& lhs, const Json& rhs)
+{
+    Json result = Json(jsoncons::null_type());
+    if (lhs.is_integer() && rhs.is_integer())
+    {
+        result = Json(((lhs.as_integer() * rhs.as_integer())));
+    }
+    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
+    {
+        result = Json((lhs.as_double() * rhs.as_double()));
+    }
+    else if (lhs.is_uinteger() && rhs.is_uinteger())
+    {
+        result = Json((lhs.as_uinteger() * rhs.as_uinteger()));
+    }
+    return result;
+}
+
+template <class Json>
+Json div(const Json& lhs, const Json& rhs)
+{
+    Json result = Json(jsoncons::null_type());
+    if (lhs.is_integer() && rhs.is_integer())
+    {
+        result = Json((double)(lhs.as_integer() / (double)rhs.as_integer()));
+    }
+    else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
+    {
+        result = Json((lhs.as_double() / rhs.as_double()));
+    }
+    else if (lhs.is_uinteger() && rhs.is_uinteger())
+    {
+        result = Json((double)(lhs.as_uinteger() / (double)rhs.as_uinteger()));
     }
     return result;
 }
@@ -485,6 +546,25 @@ public:
     Json plus(const Json& rhs) const override
     {
         return jsoncons::jsonpath::plus(value_,rhs);
+    }
+    Json mult(const term<Json>& rhs) const override
+    {
+        return rhs.mult(value_);
+    }
+
+    Json mult(const Json& rhs) const override
+    {
+        return jsoncons::jsonpath::mult(value_,rhs);
+    }
+    Json div(const term<Json>& rhs) const override
+    {
+        static auto one = Json(1.0);
+        return jsoncons::jsonpath::div(one,rhs.div(value_));
+    }
+
+    Json div(const Json& rhs) const override
+    {
+        return jsoncons::jsonpath::div(value_,rhs);
     }
 };
 
@@ -745,6 +825,31 @@ public:
         static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
     }
+
+    Json mult(const Json& rhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? jsoncons::jsonpath::mult(nodes_[0],rhs) : a_null;
+    }
+
+    Json mult(const term<Json>& rhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? rhs.mult(nodes_[0]) : a_null;
+    }
+
+    Json div(const Json& rhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? jsoncons::jsonpath::div(nodes_[0],rhs) : a_null;
+    }
+
+    Json div(const term<Json>& rhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        static auto one = Json(1.0);
+        return nodes_.size() == 1 ? jsoncons::jsonpath::div(one,rhs.div(nodes_[0])) : a_null;
+    }
 };
 
 template <class Json>
@@ -792,6 +897,22 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     auto lhs = stack.back();
                     stack.pop_back();
                     Json val = lhs.operand().minus(rhs.operand());
+                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    break;
+                }
+                case token_types::mult:
+                {
+                    auto lhs = stack.back();
+                    stack.pop_back();
+                    Json val = lhs.operand().mult(rhs.operand());
+                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    break;
+                }
+                case token_types::div:
+                {
+                    auto lhs = stack.back();
+                    stack.pop_back();
+                    Json val = lhs.operand().div(rhs.operand());
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
@@ -1174,6 +1295,14 @@ public:
                     state = filter_states::expect_path_or_value_or_unary_op;
                     add_token(token<Json>(token_types::minus));
                     break;
+                case '*':
+                    state = filter_states::expect_path_or_value_or_unary_op;
+                    add_token(token<Json>(token_types::mult));
+                    break;
+                case '/':
+                    state = filter_states::expect_path_or_value_or_unary_op;
+                    add_token(token<Json>(token_types::div));
+                    break;
                 case ' ':case '\t':
                     break;
                 default:
@@ -1202,6 +1331,8 @@ public:
                     case '|':
                     case '+':
                     case '-':
+                    case '*':
+                    case '/':
                         {
                             if (buffer.length() > 0)
                             {
@@ -1453,6 +1584,8 @@ public:
                 case '|':
                 case '+':
                 case '-':
+                case '*':
+                case '/':
                     {
                         state = filter_states::oper;
                         // don't increment p
@@ -1510,6 +1643,8 @@ public:
                 case '|':
                 case '+':
                 case '-':
+                case '*':
+                case '/':
                     {
                         if (buffer.length() > 0)
                         {

@@ -36,7 +36,7 @@ Extensions:
 ## What's new on master
 
 - All unicode conversion and validation functions required by jsoncons have been gathered into the header file `unicode_traits.hpp`, which is included in this distribution, but now maintained in a separate github project, [unicode_traits](https://github.com/danielaparker/unicode_traits).
-- Issues with precedence in JsonPath evaluations have been fixed
+- Issues with precedence in JsonPath filter evaluation have been fixed
 - literal operators _json and _ojson have been introduced
 
 ## Get jsoncons
