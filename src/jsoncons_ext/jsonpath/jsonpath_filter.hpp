@@ -31,7 +31,7 @@ enum class filter_states
     lf,
     expect_right_round_bracket,
     expect_oper_or_right_round_bracket,
-    expect_path_or_value,
+    expect_path_or_value_or_unary_op,
     expect_regex,
     regex,
     single_quoted_text,
@@ -1066,7 +1066,7 @@ public:
                     state = filter_states::lf;
                     break;
                 case '(':
-                    state = filter_states::expect_path_or_value;
+                    state = filter_states::expect_path_or_value_or_unary_op;
                     ++depth;
                     add_token(token<Json>(token_types::lparen));
                     break;
@@ -1095,13 +1095,12 @@ public:
                     {
                         ++p;
                         ++column_;
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         add_token(token<Json>(token_types::ne));
                     }
                     else
                     {
-                        state = filter_states::expect_path_or_value;
-                        add_token(token<Json>(token_types::exclaim));
+                        throw parse_exception(jsonpath_parser_errc::unexpected_operator,line_,column_);
                     }
                     break;
                 case '&':
@@ -1109,7 +1108,7 @@ public:
                     {
                         ++p;
                         ++column_;
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         add_token(token<Json>(token_types::ampamp));
                     }
                     break;
@@ -1118,7 +1117,7 @@ public:
                     {
                         ++p;
                         ++column_;
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         add_token(token<Json>(token_types::pipepipe));
                     }
                     break;
@@ -1127,7 +1126,7 @@ public:
                     {
                         ++p;
                         ++column_;
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         add_token(token<Json>(token_types::eq));
                     }
                     else if (p+1  < end_expr && *(p+1) == '~')
@@ -1143,12 +1142,12 @@ public:
                     {
                         ++p;
                         ++column_;
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         add_token(token<Json>(token_types::gte));
                     }
                     else
                     {
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         add_token(token<Json>(token_types::gt));
                     }
                     break;
@@ -1157,21 +1156,21 @@ public:
                     {
                         ++p;
                         ++column_;
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         add_token(token<Json>(token_types::lte));
                     }
                     else
                     {
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         add_token(token<Json>(token_types::lt));
                     }
                     break;
                 case '+':
-                    state = filter_states::expect_path_or_value;
+                    state = filter_states::expect_path_or_value_or_unary_op;
                     add_token(token<Json>(token_types::plus));
                     break;
                 case '-':
-                    state = filter_states::expect_path_or_value;
+                    state = filter_states::expect_path_or_value_or_unary_op;
                     add_token(token<Json>(token_types::minus));
                     break;
                 case ' ':case '\t':
@@ -1241,7 +1240,7 @@ public:
                         }
                         else
                         {
-                            state = filter_states::expect_path_or_value;
+                            state = filter_states::expect_path_or_value_or_unary_op;
                         }
                         ++p;
                         ++column_;
@@ -1305,7 +1304,7 @@ public:
                             }
                             buffer.clear();
                         }
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         break;
 
                     default: 
@@ -1350,7 +1349,7 @@ public:
                             }
                             buffer.clear();
                         }
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         break;
 
                     default: 
@@ -1361,7 +1360,7 @@ public:
                 ++p;
                 ++column_;
                 break;
-            case filter_states::expect_path_or_value: 
+            case filter_states::expect_path_or_value_or_unary_op: 
                 switch (*p)
                 {
                 case '\r':
@@ -1370,15 +1369,10 @@ public:
                     column_ = 1;
                     state = pre_line_break_state;
                     break;
-                case '<':
-                case '>':
                 case '!':
-                case '=':
-                case '&':
-                case '|':
-                case '+':
-                    state = filter_states::oper;
-                    // don't increment
+                    add_token(token<Json>(token_types::exclaim));
+                    ++p;
+                    ++column_;
                     break;
                 case '-':
                     add_token(token<Json>(token_types::unary_minus));
@@ -1539,7 +1533,7 @@ public:
                     }
                     else
                     {
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                     }
                     ++p;
                     ++column_;
@@ -1595,7 +1589,7 @@ public:
                             add_token(token<Json>(token_types::term,std::make_shared<regex_term<Json>>(buffer,flags)));
                             buffer.clear();
                         }
-                        state = filter_states::expect_path_or_value;
+                        state = filter_states::expect_path_or_value_or_unary_op;
                         break;
 
                     default: 

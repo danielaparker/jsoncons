@@ -25,7 +25,8 @@ enum class jsonpath_parser_errc
     invalid_filter_expected_right_brace = 9,
     invalid_filter_expected_primary = 10,
     expected_index = 11,
-    expected_left_bracket_token = 12
+    expected_left_bracket_token = 12,
+    unexpected_operator = 13
 };
 
 class jsonpath_error_category_impl
