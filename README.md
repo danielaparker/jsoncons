@@ -170,6 +170,22 @@ for (auto val : book.array_range())
     std::cout << val << std::endl;
 }
 ```
+
+### Range-based for loops with objects
+
+```c++
+json book = json::object{
+    {"author", "Haruki Murakami"},
+    {"title", "Kafka on the Shore"},
+    {"price", 25.17}
+};
+
+for (const auto& kvp : book.object_range())
+{
+    std::cout << kvp.key() << "=" 
+              << kvp.value() << std::endl;
+}
+```
 ### _json and _ojson literal operators
 
 ```c++
@@ -186,22 +202,6 @@ ojson j2 = R"(
     "MaturityDate" : "2020-12-30"          
 }
 )"_ojson;
-```
-
-### Range-based for loops with objects
-
-```c++
-json book = json::object{
-    {"author", "Haruki Murakami"},
-    {"title", "Kafka on the Shore"},
-    {"price", 25.17}
-};
-
-for (const auto& kvp : book.object_range())
-{
-    std::cout << kvp.key() << "=" 
-              << kvp.value() << std::endl;
-}
 ```
 
 ### Multi-dimensional json arrays
