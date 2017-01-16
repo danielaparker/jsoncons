@@ -294,8 +294,8 @@ void escape_string(const CharT* s,
                 {
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid codepoint");
                 }
-                uint32_t cp = g.get_codepoint();
-                it += (g.get().second - 1);
+                uint32_t cp = g.get().codepoint();
+                it += (g.get().length() - 1);
                 if (is_non_ascii_codepoint(cp) || is_control_character(c))
                 {
                     if (cp > 0xFFFF)

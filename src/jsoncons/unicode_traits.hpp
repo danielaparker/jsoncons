@@ -891,73 +891,94 @@ validate(InputIt first, InputIt last) UNICONS_NOEXCEPT
     return std::make_pair(result,first);
 }
 
+// sequence 
+
 template <class Iterator>
-typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t)
-                               ,uint32_t>::type 
-to_codepoint(Iterator first, size_t length) UNICONS_NOEXCEPT
+class sequence
 {
-    uint32_t ch = 0;
-    Iterator it = first;
-    switch (length) 
+    Iterator first_;
+    size_t length_;
+public:
+    sequence(Iterator first, size_t length)
+        : first_(first), length_(length)
     {
-    default:
-        return replacement_char;
-        break;
-    case 4: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-    case 3: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-    case 2: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-    case 1: ch += static_cast<uint8_t>(*it++);
-        ch -= offsets_from_utf8[length - 1];
-        break;
     }
-    if (ch <= max_legal_utf32) 
+
+    Iterator begin() const
     {
-        if (is_surrogate(ch)) 
+        return first_;
+    }
+
+    size_t length() const
+    {
+        return length_;
+    }
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint8_t),uint32_t>::type 
+    codepoint() const UNICONS_NOEXCEPT
+    {
+        uint32_t ch = 0;
+        Iterator it = first_;
+        switch (length_) 
+        {
+        default:
+            return replacement_char;
+            break;
+        case 4: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 3: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 2: ch += static_cast<uint8_t>(*it++); ch <<= 6;
+        case 1: ch += static_cast<uint8_t>(*it++);
+            ch -= offsets_from_utf8[length_ - 1];
+            break;
+        }
+        if (ch <= max_legal_utf32) 
+        {
+            if (is_surrogate(ch)) 
+            {
+                ch = replacement_char;
+            }
+        }
+        else // ch > max_legal_utf32
         {
             ch = replacement_char;
         }
-    }
-    else // ch > max_legal_utf32
-    {
-        ch = replacement_char;
-    }
-    return ch;
-}
-
-template <class Iterator>
-typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint16_t)
-                               ,uint32_t>::type 
-to_codepoint(Iterator first, size_t length) UNICONS_NOEXCEPT
-{
-    if (length == 0)
-    {
-        return replacement_char;
-    }
-    if (length == 2)
-    {
-        uint32_t ch = *first;
-        uint32_t ch2 = *(first+ 1);
-        ch = ((ch - sur_high_start) << half_shift)
-             + (ch2 - sur_low_start) + half_base;
         return ch;
     }
-    else 
-    {
-        return *first;
-    }
-}
 
-template <class Iterator>
-typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint32_t)
-                               ,uint32_t>::type 
-to_codepoint(Iterator first, size_t length) UNICONS_NOEXCEPT
-{
-    if (length == 0)
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint16_t),uint32_t>::type 
+    codepoint() const UNICONS_NOEXCEPT
     {
-        return replacement_char;
+        if (length_ == 0)
+        {
+            return replacement_char;
+        }
+        if (length_ == 2)
+        {
+            uint32_t ch = *first_;
+            uint32_t ch2 = *(first_+ 1);
+            ch = ((ch - sur_high_start) << half_shift)
+                 + (ch2 - sur_low_start) + half_base;
+            return ch;
+        }
+        else 
+        {
+            return *first_;
+        }
     }
-    return *(first);
-}
+
+    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
+    typename std::enable_if<sizeof(CharT) == sizeof(uint32_t),uint32_t>::type 
+    codepoint() const UNICONS_NOEXCEPT
+    {
+        if (length_ == 0)
+        {
+            return replacement_char;
+        }
+        return *(first_);
+    }
+};
 
 // sequence_generator
 
@@ -970,7 +991,7 @@ class sequence_generator
     size_t length_;
     conv_errc err_cd_;
 public:
-    typedef std::pair<Iterator,size_t> sequence_type;
+    typedef sequence<Iterator> sequence_type;
 
     sequence_generator(Iterator first, Iterator last, 
                        conv_flags flags = conv_flags::strict) UNICONS_NOEXCEPT
@@ -992,28 +1013,7 @@ public:
 
     sequence_type get() const UNICONS_NOEXCEPT
     {
-        return std::make_pair(begin_,length_);
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint8_t),uint32_t>::type 
-    get_codepoint() const UNICONS_NOEXCEPT
-    {
-        return to_codepoint(begin_,length_);
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint16_t),uint32_t>::type 
-    get_codepoint() const UNICONS_NOEXCEPT
-    {
-        return to_codepoint(begin_,length_);
-    }
-
-    template <class CharT = typename std::iterator_traits<Iterator>::value_type>
-    typename std::enable_if<sizeof(CharT) == sizeof(uint32_t),uint32_t>::type 
-    get_codepoint() const UNICONS_NOEXCEPT
-    {
-        return to_codepoint(begin_,length_);
+        return sequence<Iterator>(begin_,length_);
     }
 
     template <class CharT = typename std::iterator_traits<Iterator>::value_type>
@@ -1106,7 +1106,7 @@ sequence_generator<Iterator> make_sequence_generator(Iterator first, Iterator la
 template <class InputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value 
                                && (sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t) || sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)),
-                               std::pair<InputIt,size_t>>::type 
+                               sequence<InputIt>>::type 
 sequence_at(InputIt first, InputIt last, size_t index) 
 {
     sequence_generator<InputIt> g(first, last, unicons::conv_flags::strict);
@@ -1117,16 +1117,16 @@ sequence_at(InputIt first, InputIt last, size_t index)
         g.next();
         ++count;
     }
-    return (!g.done() && count == index) ? g.get() : std::pair<InputIt,size_t>(last,0);
+    return (!g.done() && count == index) ? g.get() : sequence<InputIt>(last,0);
 }
 
 template <class InputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t),
-                               std::pair<InputIt,size_t>>::type 
+                               sequence<InputIt>>::type 
 sequence_at(InputIt first, InputIt last, size_t index) 
 {
     size_t size = std::distance(first,last);
-    return index < size ? std::pair<InputIt,size_t>(first+index,1) : std::pair<InputIt,size_t>(last,0);
+    return index < size ? sequence<InputIt>(first+index,1) : sequence<InputIt>(last,0);
 }
 
 // u8_length

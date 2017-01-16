@@ -242,9 +242,9 @@ private:
                 {
                     size_t index = positive_start_ ? pos : s.size() - pos;
                     auto sequence = unicons::sequence_at(s.data(), s.data() + s.size(), index);
-                    if (sequence.second > 0)
+                    if (sequence.length() > 0)
                     {
-                        auto temp = std::make_shared<Json>(sequence.first,sequence.second);
+                        auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
                         temp_json_values.push_back(temp);
                         nodes.push_back(temp.get());
                     }
@@ -947,9 +947,9 @@ public:
             if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
             {
                 auto sequence = unicons::sequence_at(s.data(), s.data() + s.size(), pos);
-                if (sequence.second > 0)
+                if (sequence.length() > 0)
                 {
-                    auto temp = std::make_shared<Json>(sequence.first,sequence.second);
+                    auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
                     temp_json_values_.push_back(temp);
                     nodes_.push_back(temp.get());
                 }
