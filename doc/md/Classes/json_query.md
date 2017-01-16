@@ -58,6 +58,8 @@ JSONPath|       Description
 
 Operator|       Description
 --------|--------------------------------
+`*`     |Left times right
+`/`     |Left divided by right
 `+`     |Left plus right
 `-`     |Left minus right
 `&&`    |Left and right
@@ -83,11 +85,12 @@ Precedence|Operator|Associativity
 ----------|--------|-----------
 1 |`!` unary `-`    |Right
 2 |`=~`             |Left
-3 |`+` `-`          |Left 
-4 |`<` `>` `<=` `>=`|Left 
-5 |`==` `!=`        |Left 
-6 |`&&`             |Left 
-7 |`||`             |Left 
+3 |`*` `/`          |Left 
+4 |`+` `-`          |Left 
+5 |`<` `>` `<=` `>=`|Left 
+6 |`==` `!=`        |Left 
+7 |`&&`             |Left 
+8 |`||`             |Left 
 
 ### Examples
 

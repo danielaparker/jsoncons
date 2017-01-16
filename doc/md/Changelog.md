@@ -9,8 +9,9 @@ Bug fixes
 New feature
 
 - The new binary extension supports encoding to and decoding from the MessagePack binary serialization format.
-- literal operators _json and _ojson have been introduced
 - An extension to JsonPath to allow filter expressions over a single object.
+- Added support for `*` and `/` operators to jsonpath filter
+- literal operators _json and _ojson have been introduced
 
 Non-breaking changes
 

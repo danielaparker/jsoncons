@@ -552,6 +552,14 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
 </thead>
 <tbody>
 <tr>
+<td><code>*</code></td>
+<td>Left times right</td>
+</tr>
+<tr>
+<td><code>/</code></td>
+<td>Left divided by right</td>
+</tr>
+<tr>
 <td><code>+</code></td>
 <td>Left plus right</td>
 </tr>
@@ -636,26 +644,31 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
 </tr>
 <tr>
 <td>3</td>
-<td><code>+</code> <code>-</code></td>
+<td><code>*</code> <code>/</code></td>
 <td>Left</td>
 </tr>
 <tr>
 <td>4</td>
-<td><code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code></td>
+<td><code>+</code> <code>-</code></td>
 <td>Left</td>
 </tr>
 <tr>
 <td>5</td>
-<td><code>==</code> <code>!=</code></td>
+<td><code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code></td>
 <td>Left</td>
 </tr>
 <tr>
 <td>6</td>
-<td><code>&amp;&amp;</code></td>
+<td><code>==</code> <code>!=</code></td>
 <td>Left</td>
 </tr>
 <tr>
 <td>7</td>
+<td><code>&amp;&amp;</code></td>
+<td>Left</td>
+</tr>
+<tr>
+<td>8</td>
 <td><code>||</code></td>
 <td>Left</td>
 </tr></tbody></table>
