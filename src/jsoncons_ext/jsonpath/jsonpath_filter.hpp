@@ -241,25 +241,25 @@ template <class Json>
 class token
 {
     token_types type_;
-    std::shared_ptr<term<Json>> term_ptr_;
+    std::shared_ptr<term<Json>> operand_ptr_;
 public:
     token(token_types type)
         : type_(type)
     {
     }
     token(token_types type, std::shared_ptr<term<Json>> term_ptr)
-        : type_(type), term_ptr_(term_ptr)
+        : type_(type), operand_ptr_(term_ptr)
     {
     }
     token(const token& t)
-        : type_(t.type_), term_ptr_(t.term_ptr_)
+        : type_(t.type_), operand_ptr_(t.operand_ptr_)
     {
     }
 
     token<Json>& operator=(const token<Json>& val)
     {
         type_ = val.type_;
-        term_ptr_ = val.term_ptr_;
+        operand_ptr_ = val.operand_ptr_;
         return *this;
     }
 
@@ -268,17 +268,17 @@ public:
         return type_;
     }
 
-    const term<Json>& term()
+    const term<Json>& operand()
     {
-        JSONCONS_ASSERT(type_ == token_types::term && term_ptr_ != nullptr);
-        return *term_ptr_;
+        JSONCONS_ASSERT(type_ == token_types::term && operand_ptr_ != nullptr);
+        return *operand_ptr_;
     }
 
     void initialize(const Json& context_node)
     {
-        if (term_ptr_.get() != nullptr)
+        if (operand_ptr_.get() != nullptr)
         {
-            term_ptr_->initialize(context_node);
+            operand_ptr_->initialize(context_node);
         }
     }
 };
@@ -769,13 +769,13 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
             {
                 case token_types::exclaim:
                 {
-                    Json val = rhs.term().exclaim();
+                    Json val = rhs.operand().exclaim();
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::unary_minus:
                 {
-                    Json val = rhs.term().unary_minus();
+                    Json val = rhs.operand().unary_minus();
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
@@ -783,7 +783,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                 {
                     auto lhs = stack.back();
                     stack.pop_back();
-                    Json val = lhs.term().plus(rhs.term());
+                    Json val = lhs.operand().plus(rhs.operand());
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
@@ -791,7 +791,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                 {
                     auto lhs = stack.back();
                     stack.pop_back();
-                    Json val = lhs.term().minus(rhs.term());
+                    Json val = lhs.operand().minus(rhs.operand());
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
@@ -799,7 +799,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                 {
                     auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = lhs.term().eq(rhs.term());
+                    bool e = lhs.operand().eq(rhs.operand());
                     Json val(e);
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                 }
@@ -808,7 +808,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                 {
                     auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = lhs.term().ne(rhs.term());
+                    bool e = lhs.operand().ne(rhs.operand());
                     Json val(e);
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                 }
@@ -817,7 +817,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     {
                         auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = lhs.term().regex(rhs.term());
+                        bool e = lhs.operand().regex(rhs.operand());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
@@ -826,7 +826,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     {
                         auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = lhs.term().ampamp(rhs.term());
+                        bool e = lhs.operand().ampamp(rhs.operand());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
@@ -835,7 +835,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     {
                         auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = lhs.term().pipepipe(rhs.term());
+                        bool e = lhs.operand().pipepipe(rhs.operand());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
@@ -844,7 +844,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     {
                         auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = lhs.term().lt(rhs.term());
+                        bool e = lhs.operand().lt(rhs.operand());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
@@ -853,7 +853,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     {
                         auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = lhs.term().gt(rhs.term());
+                        bool e = lhs.operand().gt(rhs.operand());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
@@ -862,7 +862,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     {
                         auto lhs = stack.back();
                         stack.pop_back();
-                        bool e = lhs.term().lt(rhs.term()) || lhs.term().eq(rhs.term());
+                        bool e = lhs.operand().lt(rhs.operand()) || lhs.operand().eq(rhs.operand());
                         Json val(e);
                         stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     }
@@ -871,7 +871,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                 {
                     auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = lhs.term().gt(rhs.term()) || lhs.term().eq(rhs.term());
+                    bool e = lhs.operand().gt(rhs.operand()) || lhs.operand().eq(rhs.operand());
                     Json val(e);
                     stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
                     break;
@@ -912,7 +912,7 @@ public:
         {
             auto t = evaluate(context_node,tokens_);
 
-            return t.term().evaluate_single_node();
+            return t.operand().evaluate_single_node();
 
         }
         catch (const parse_exception& e)
@@ -926,7 +926,7 @@ public:
         try
         {
             auto t = evaluate(context_node,tokens_);
-            return t.term().accept_single_node();
+            return t.operand().accept_single_node();
         }
         catch (const parse_exception& e)
         {
