@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <memory>
 #include <regex>
+#include <functional>
 #include <jsoncons/json.hpp>
 #include "jsonpath_error_category.hpp"
 
@@ -162,11 +163,11 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool exclaim() const
+    virtual Json exclaim() const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool eq(const term&) const 
+    virtual bool eq_term(const term&) const 
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -174,7 +175,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool ne(const term&) const
+    virtual Json ne_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -182,7 +183,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool regex(const term&) const
+    virtual Json regex_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -190,7 +191,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool ampamp(const term&) const
+    virtual bool ampamp_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -198,7 +199,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool pipepipe(const term&) const
+    virtual bool pipepipe_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -206,7 +207,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool lt(const term&) const
+    virtual bool lt_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -214,7 +215,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool gt(const term&) const
+    virtual bool gt_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -223,7 +224,7 @@ public:
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
 
-    virtual Json minus(const term&) const 
+    virtual Json minus_term(const term&) const 
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -232,10 +233,6 @@ public:
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
 
-    virtual Json left_minus(const term&) const 
-    {
-        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
-    }
     virtual Json left_minus(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
@@ -245,7 +242,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json plus(const term&) const
+    virtual Json plus_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -253,7 +250,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json mult(const term&) const
+    virtual Json mult_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -262,7 +259,7 @@ public:
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
 
-    virtual Json div(const term&) const
+    virtual Json div_term(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -271,10 +268,6 @@ public:
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
 
-    virtual Json left_div(const term&) const
-    {
-        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
-    }
     virtual Json left_div(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
@@ -480,12 +473,12 @@ public:
         return value_;
     }
 
-    bool exclaim() const override
+    Json exclaim() const override
     {
         return !value_.as_bool();
     }
 
-    bool eq(const term<Json>& rhs) const override
+    bool eq_term(const term<Json>& rhs) const override
     {
         return rhs.eq(value_);
     }
@@ -495,7 +488,7 @@ public:
         return value_ == rhs;
     }
 
-    bool ne(const term<Json>& rhs) const override
+    Json ne_term(const term<Json>& rhs) const override
     {
         return rhs.ne(value_);
     }
@@ -503,11 +496,11 @@ public:
     {
         return value_ != rhs;
     }
-    bool regex(const term<Json>& rhs) const override
+    Json regex_term(const term<Json>& rhs) const override
     {
         return rhs.regex2(value_.as_string());
     }
-    bool ampamp(const term<Json>& rhs) const override
+    bool ampamp_term(const term<Json>& rhs) const override
     {
         return rhs.ampamp(value_);
     }
@@ -515,7 +508,7 @@ public:
     {
         return jsoncons::jsonpath::ampamp(value_,rhs);
     }
-    bool pipepipe(const term<Json>& rhs) const override
+    bool pipepipe_term(const term<Json>& rhs) const override
     {
         return rhs.pipepipe(value_);
     }
@@ -524,7 +517,7 @@ public:
         return jsoncons::jsonpath::pipepipe(value_,rhs);
     }
 
-    bool lt(const term<Json>& rhs) const override
+    bool lt_term(const term<Json>& rhs) const override
     {
         return rhs.gt(value_);
     }
@@ -533,7 +526,7 @@ public:
         return jsoncons::jsonpath::lt(value_,rhs);
     }
 
-    bool gt(const term<Json>& rhs) const override
+    bool gt_term(const term<Json>& rhs) const override
     {
         return rhs.lt(value_);
     }
@@ -542,7 +535,7 @@ public:
         return jsoncons::jsonpath::gt(value_,rhs);
     }
 
-    Json minus(const term<Json>& rhs) const override
+    Json minus_term(const term<Json>& rhs) const override
     {
         return rhs.left_minus(value_);
     }
@@ -551,10 +544,6 @@ public:
         return jsoncons::jsonpath::minus(value_,rhs);
     }
 
-    Json left_minus(const term<Json>& lhs) const override
-    {
-        return lhs.minus(value_);
-    }
     Json left_minus(const Json& lhs) const override
     {
         return jsoncons::jsonpath::minus(lhs,value_);
@@ -565,7 +554,7 @@ public:
         return jsoncons::jsonpath::unary_minus(value_);
     }
 
-    Json plus(const term<Json>& rhs) const override
+    Json plus_term(const term<Json>& rhs) const override
     {
         return rhs.plus(value_);
     }
@@ -574,7 +563,7 @@ public:
     {
         return jsoncons::jsonpath::plus(value_,rhs);
     }
-    Json mult(const term<Json>& rhs) const override
+    Json mult_term(const term<Json>& rhs) const override
     {
         return rhs.mult(value_);
     }
@@ -584,7 +573,7 @@ public:
         return jsoncons::jsonpath::mult(value_,rhs);
     }
 
-    Json div(const term<Json>& rhs) const override
+    Json div_term(const term<Json>& rhs) const override
     {
         return rhs.left_div(value_);
     }
@@ -593,10 +582,6 @@ public:
         return jsoncons::jsonpath::div(value_,rhs);
     }
 
-    Json left_div(const term<Json>& lhs) const override
-    {
-        return lhs.div(value_);
-    }
     Json left_div(const Json& lhs) const override
     {
         return jsoncons::jsonpath::div(lhs,value_);
@@ -651,12 +636,12 @@ public:
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
     }
 
-    bool exclaim() const override
+    Json exclaim() const override
     {
         return nodes_.size() == 0;
     }
 
-    bool eq(const term<Json>& rhs) const override
+    bool eq_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -684,7 +669,7 @@ public:
         return result;
     }
 
-    bool ne(const term<Json>& rhs) const override
+    Json ne_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -711,7 +696,7 @@ public:
         }
         return result;
     }
-    bool regex(const term<Json>& rhs) const override
+    Json regex_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -724,7 +709,7 @@ public:
         }
         return result;
     }
-    bool ampamp(const term<Json>& rhs) const override
+    bool ampamp_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -750,7 +735,7 @@ public:
         }
         return result;
     }
-    bool pipepipe(const term<Json>& rhs) const override
+    bool pipepipe_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -791,7 +776,7 @@ public:
         return result;
     }
 
-    bool lt(const term<Json>& rhs) const override
+    bool lt_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -819,7 +804,7 @@ public:
         return result;
     }
 
-    bool gt(const term<Json>& rhs) const override
+    bool gt_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -833,7 +818,7 @@ public:
         return result;
     }
 
-    Json minus(const term<Json>& rhs) const override
+    Json minus_term(const term<Json>& rhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? rhs.left_minus(nodes_[0]) : a_null;
@@ -843,11 +828,6 @@ public:
         return nodes_.size() == 1 ? jsoncons::jsonpath::minus(nodes_[0],rhs) : Json(jsoncons::null_type());
     }
 
-    Json left_minus(const term<Json>& lhs) const override
-    {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? lhs.left_minus(nodes_[0]) : a_null;
-    }
     Json left_minus(const Json& lhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
@@ -859,31 +839,29 @@ public:
         return nodes_.size() == 1 ? jsoncons::jsonpath::unary_minus(nodes_[0]) : Json::null();
     }
 
+    Json plus_term(const term<Json>& rhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
+    }
     Json plus(const Json& rhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? jsoncons::jsonpath::plus(nodes_[0],rhs) : a_null;
     }
 
-    Json plus(const term<Json>& rhs) const override
+    Json mult_term(const term<Json>& rhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? rhs.plus(nodes_[0]) : a_null;
+        return nodes_.size() == 1 ? rhs.mult(nodes_[0]) : a_null;
     }
-
     Json mult(const Json& rhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? jsoncons::jsonpath::mult(nodes_[0],rhs) : a_null;
     }
 
-    Json mult(const term<Json>& rhs) const override
-    {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? rhs.mult(nodes_[0]) : a_null;
-    }
-
-    Json div(const term<Json>& rhs) const override
+    Json div_term(const term<Json>& rhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? rhs.left_div(nodes_[0]) : a_null;
@@ -894,11 +872,6 @@ public:
         return nodes_.size() == 1 ? jsoncons::jsonpath::div(nodes_[0],rhs) : a_null;
     }
 
-    Json left_div(const term<Json>& lhs) const override
-    {
-        static auto a_null = Json(jsoncons::null_type());
-        return nodes_.size() == 1 ? lhs.left_div(nodes_[0]) : a_null;
-    }
     Json left_div(const Json& lhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
@@ -928,134 +901,153 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
             {
                 case token_types::exclaim:
                 {
-                    Json val = rhs.operand().exclaim();
+                    std::function<Json(const term<Json>&)> f = &term<Json>::exclaim;
+                    Json val = f(rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::unary_minus:
                 {
-                    Json val = rhs.operand().unary_minus();
+                    std::function<Json(const term<Json>&)> f = &term<Json>::unary_minus;
+                    Json val = f(rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::plus:
                 {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::plus_term;
+                    
                     auto lhs = stack.back();
                     stack.pop_back();
-                    Json val = lhs.operand().plus(rhs.operand());
+                    Json val = f(lhs.operand(), rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::minus:
                 {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::minus_term;
+
                     auto lhs = stack.back();
                     stack.pop_back();
-                    Json val = lhs.operand().minus(rhs.operand());
+                    Json val = f(lhs.operand(), rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::mult:
                 {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::mult_term;
+
                     auto lhs = stack.back();
                     stack.pop_back();
-                    Json val = lhs.operand().mult(rhs.operand());
+                    Json val = f(lhs.operand(), rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::div:
                 {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::div_term;
+
                     auto lhs = stack.back();
                     stack.pop_back();
-                    Json val = lhs.operand().div(rhs.operand());
+                    Json val = f(lhs.operand(), rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::eq:
                 {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.eq_term(b); };
+
                     auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = lhs.operand().eq(rhs.operand());
-                    Json val(e);
+                    Json val = f(lhs.operand(), rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                 }
                     break;
                 case token_types::ne:
                 {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::ne_term;
+
                     auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = lhs.operand().ne(rhs.operand());
-                    Json val(e);
+                    Json val = f(lhs.operand(), rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                 }
                     break;
                 case token_types::regex:
-                    {
-                        auto lhs = stack.back();
-                        stack.pop_back();
-                        bool e = lhs.operand().regex(rhs.operand());
-                        Json val(e);
-                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    }
-                    break;
-                case token_types::ampamp:
-                    {
-                        auto lhs = stack.back();
-                        stack.pop_back();
-                        bool e = lhs.operand().ampamp(rhs.operand());
-                        Json val(e);
-                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    }
-                    break;
-                case token_types::pipepipe:
-                    {
-                        auto lhs = stack.back();
-                        stack.pop_back();
-                        bool e = lhs.operand().pipepipe(rhs.operand());
-                        Json val(e);
-                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    }
-                    break;
-                case token_types::lt:
-                    {
-                        auto lhs = stack.back();
-                        stack.pop_back();
-                        bool e = lhs.operand().lt(rhs.operand());
-                        Json val(e);
-                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    }
-                    break;
-                case token_types::gt:
-                    {
-                        auto lhs = stack.back();
-                        stack.pop_back();
-                        bool e = lhs.operand().gt(rhs.operand());
-                        Json val(e);
-                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    }
-                    break;
-                case token_types::lte:
-                    {
-                        auto lhs = stack.back();
-                        stack.pop_back();
-                        bool e = lhs.operand().lt(rhs.operand()) || lhs.operand().eq(rhs.operand());
-                        Json val(e);
-                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    }
-                    break;
-                case token_types::gte:
                 {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::regex_term;
+
                     auto lhs = stack.back();
                     stack.pop_back();
-                    bool e = lhs.operand().gt(rhs.operand()) || lhs.operand().eq(rhs.operand());
-                    Json val(e);
+                    Json val = f(lhs.operand(), rhs.operand());
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
+                    break;
+                }
+                case token_types::ampamp:
+                {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.ampamp_term(b); };
+
+                    auto lhs = stack.back();
+                    stack.pop_back();
+                    Json val = f(lhs.operand(), rhs.operand());
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
+                    break;
+                }
+                case token_types::pipepipe:
+                {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.pipepipe_term(b); };
+
+                    auto lhs = stack.back();
+                    stack.pop_back();
+                    Json val = f(lhs.operand(), rhs.operand());
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
+                    break;
+                }
+                case token_types::lt:
+                {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.lt_term(b); };
+
+                    auto lhs = stack.back();
+                    stack.pop_back();
+                    Json val = f(lhs.operand(), rhs.operand());
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
+                    break;
+                }
+                case token_types::gt:
+                {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.gt_term(b); };
+
+                    auto lhs = stack.back();
+                    stack.pop_back();
+                    Json val = f(lhs.operand(), rhs.operand());
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
+                    break;
+                }
+                case token_types::lte:
+                {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.lt_term(b) || a.eq_term(b); };
+
+                    auto lhs = stack.back();
+                    stack.pop_back();
+                    Json val = f(lhs.operand(), rhs.operand());
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
+                    break;
+                }
+                case token_types::gte:
+                {
+                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.gt_term(b) || a.eq_term(b); };
+
+                    auto lhs = stack.back();
+                    stack.pop_back();
+                    Json val = f(lhs.operand(), rhs.operand());
                     stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 default:
-                    {
-                        //throw std::runtime_error("op not found");
-                        break;
-                    }
+                {
+                    throw std::runtime_error("op not found");
+                    break;
+                }
             }
         }
     }
