@@ -222,6 +222,7 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
+
     virtual Json minus(const term&) const 
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
@@ -230,7 +231,17 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json  unary_minus() const
+
+    virtual Json left_minus(const term&) const 
+    {
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+    }
+    virtual Json left_minus(const Json&) const
+    {
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+    }
+
+    virtual Json unary_minus() const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -250,11 +261,21 @@ public:
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
+
     virtual Json div(const term&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
     virtual Json div(const Json&) const
+    {
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+    }
+
+    virtual Json left_div(const term&) const
+    {
+        throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+    }
+    virtual Json left_div(const Json&) const
     {
         throw parse_exception(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -507,7 +528,6 @@ public:
     {
         return rhs.gt(value_);
     }
-
     bool lt(const Json& rhs) const override
     {
         return jsoncons::jsonpath::lt(value_,rhs);
@@ -517,7 +537,6 @@ public:
     {
         return rhs.lt(value_);
     }
-
     bool gt(const Json& rhs) const override
     {
         return jsoncons::jsonpath::gt(value_,rhs);
@@ -525,12 +544,20 @@ public:
 
     Json minus(const term<Json>& rhs) const override
     {
-        return jsoncons::jsonpath::unary_minus(rhs.minus(value_));
+        return rhs.left_minus(value_);
     }
-
     Json minus(const Json& rhs) const override
     {
         return jsoncons::jsonpath::minus(value_,rhs);
+    }
+
+    Json left_minus(const term<Json>& lhs) const override
+    {
+        return lhs.minus(value_);
+    }
+    Json left_minus(const Json& lhs) const override
+    {
+        return jsoncons::jsonpath::minus(lhs,value_);
     }
 
     Json unary_minus() const override
@@ -556,15 +583,23 @@ public:
     {
         return jsoncons::jsonpath::mult(value_,rhs);
     }
+
     Json div(const term<Json>& rhs) const override
     {
-        static auto one = Json(1.0);
-        return jsoncons::jsonpath::div(one,rhs.div(value_));
+        return rhs.left_div(value_);
     }
-
     Json div(const Json& rhs) const override
     {
         return jsoncons::jsonpath::div(value_,rhs);
+    }
+
+    Json left_div(const term<Json>& lhs) const override
+    {
+        return lhs.div(value_);
+    }
+    Json left_div(const Json& lhs) const override
+    {
+        return jsoncons::jsonpath::div(lhs,value_);
     }
 };
 
@@ -798,15 +833,25 @@ public:
         return result;
     }
 
+    Json minus(const term<Json>& rhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? rhs.left_minus(nodes_[0]) : a_null;
+    }
     Json minus(const Json& rhs) const override
     {
         return nodes_.size() == 1 ? jsoncons::jsonpath::minus(nodes_[0],rhs) : Json(jsoncons::null_type());
     }
 
-    Json minus(const term<Json>& rhs) const override
+    Json left_minus(const term<Json>& lhs) const override
     {
-
-        return nodes_.size() == 1 ? jsoncons::jsonpath::plus(rhs.unary_minus(),nodes_[0]) : Json(jsoncons::null_type());
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? lhs.left_minus(nodes_[0]) : a_null;
+    }
+    Json left_minus(const Json& lhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? jsoncons::jsonpath::minus(lhs,nodes_[0]) : a_null;
     }
 
     Json unary_minus() const override
@@ -838,17 +883,26 @@ public:
         return nodes_.size() == 1 ? rhs.mult(nodes_[0]) : a_null;
     }
 
+    Json div(const term<Json>& rhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? rhs.left_div(nodes_[0]) : a_null;
+    }
     Json div(const Json& rhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
         return nodes_.size() == 1 ? jsoncons::jsonpath::div(nodes_[0],rhs) : a_null;
     }
 
-    Json div(const term<Json>& rhs) const override
+    Json left_div(const term<Json>& lhs) const override
     {
         static auto a_null = Json(jsoncons::null_type());
-        static auto one = Json(1.0);
-        return nodes_.size() == 1 ? jsoncons::jsonpath::div(one,rhs.div(nodes_[0])) : a_null;
+        return nodes_.size() == 1 ? lhs.left_div(nodes_[0]) : a_null;
+    }
+    Json left_div(const Json& lhs) const override
+    {
+        static auto a_null = Json(jsoncons::null_type());
+        return nodes_.size() == 1 ? jsoncons::jsonpath::div(lhs, nodes_[0]) : a_null;
     }
 };
 
