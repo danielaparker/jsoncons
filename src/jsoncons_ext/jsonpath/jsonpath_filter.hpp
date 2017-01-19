@@ -44,9 +44,11 @@ enum class filter_states
 
 enum class token_types 
 {
+    operand,
+    unary_minus,
+    exclaim,
     lparen,
     rparen,
-    term,
     eq,
     ne,
     regex,
@@ -59,9 +61,7 @@ enum class token_types
     plus,
     minus,
     mult,
-    div,
-    unary_minus,
-    exclaim
+    div
 };
 
 inline
@@ -139,7 +139,7 @@ bool is_operator(token_types val)
 inline
 bool is_operand(token_types val)
 {
-    return val == token_types::term;
+    return val == token_types::operand;
 }
 
 template <class Json>
@@ -314,7 +314,7 @@ public:
 
     const term<Json>& operand()
     {
-        JSONCONS_ASSERT(type_ == token_types::term && operand_ptr_ != nullptr);
+        JSONCONS_ASSERT(type_ == token_types::operand && operand_ptr_ != nullptr);
         return *operand_ptr_;
     }
 
@@ -929,13 +929,13 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                 case token_types::exclaim:
                 {
                     Json val = rhs.operand().exclaim();
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::unary_minus:
                 {
                     Json val = rhs.operand().unary_minus();
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::plus:
@@ -943,7 +943,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     auto lhs = stack.back();
                     stack.pop_back();
                     Json val = lhs.operand().plus(rhs.operand());
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::minus:
@@ -951,7 +951,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     auto lhs = stack.back();
                     stack.pop_back();
                     Json val = lhs.operand().minus(rhs.operand());
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::mult:
@@ -959,7 +959,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     auto lhs = stack.back();
                     stack.pop_back();
                     Json val = lhs.operand().mult(rhs.operand());
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::div:
@@ -967,7 +967,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     auto lhs = stack.back();
                     stack.pop_back();
                     Json val = lhs.operand().div(rhs.operand());
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 case token_types::eq:
@@ -976,7 +976,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     stack.pop_back();
                     bool e = lhs.operand().eq(rhs.operand());
                     Json val(e);
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                 }
                     break;
                 case token_types::ne:
@@ -985,7 +985,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     stack.pop_back();
                     bool e = lhs.operand().ne(rhs.operand());
                     Json val(e);
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                 }
                     break;
                 case token_types::regex:
@@ -994,7 +994,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                         stack.pop_back();
                         bool e = lhs.operand().regex(rhs.operand());
                         Json val(e);
-                        stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::ampamp:
@@ -1003,7 +1003,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                         stack.pop_back();
                         bool e = lhs.operand().ampamp(rhs.operand());
                         Json val(e);
-                        stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::pipepipe:
@@ -1012,7 +1012,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                         stack.pop_back();
                         bool e = lhs.operand().pipepipe(rhs.operand());
                         Json val(e);
-                        stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::lt:
@@ -1021,7 +1021,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                         stack.pop_back();
                         bool e = lhs.operand().lt(rhs.operand());
                         Json val(e);
-                        stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::gt:
@@ -1030,7 +1030,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                         stack.pop_back();
                         bool e = lhs.operand().gt(rhs.operand());
                         Json val(e);
-                        stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::lte:
@@ -1039,7 +1039,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                         stack.pop_back();
                         bool e = lhs.operand().lt(rhs.operand()) || lhs.operand().eq(rhs.operand());
                         Json val(e);
-                        stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                        stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     }
                     break;
                 case token_types::gte:
@@ -1048,7 +1048,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
                     stack.pop_back();
                     bool e = lhs.operand().gt(rhs.operand()) || lhs.operand().eq(rhs.operand());
                     Json val(e);
-                    stack.push_back(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                     break;
                 }
                 default:
@@ -1393,7 +1393,7 @@ public:
                                 try
                                 {
                                     auto val = Json::parse(buffer);
-                                    add_token(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                                    add_token(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                                 }
                                 catch (const parse_exception& e)
                                 {
@@ -1410,7 +1410,7 @@ public:
                             try
                             {
                                 auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                                add_token(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1437,7 +1437,7 @@ public:
                             try
                             {
                                 auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                                add_token(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1482,7 +1482,7 @@ public:
                             try
                             {
                                 auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                                add_token(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1527,7 +1527,7 @@ public:
                             try
                             {
                                 auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_types::term,std::make_shared<value_term<Json>>(val)));
+                                add_token(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
                             }
                             catch (const parse_exception& e)
                             {
@@ -1702,7 +1702,7 @@ public:
                     {
                         if (buffer.length() > 0)
                         {
-                            add_token(token<Json>(token_types::term,std::make_shared<path_term<Json>>(buffer)));
+                            add_token(token<Json>(token_types::operand,std::make_shared<path_term<Json>>(buffer)));
                             buffer.clear();
                         }
                         state = filter_states::oper;
@@ -1712,7 +1712,7 @@ public:
                 case ')':
                     if (buffer.length() > 0)
                     {
-                        add_token(token<Json>(token_types::term,std::make_shared<path_term<Json>>(buffer)));
+                        add_token(token<Json>(token_types::operand,std::make_shared<path_term<Json>>(buffer)));
                         add_token(token<Json>(token_types::rparen));
                         buffer.clear();
                     }
@@ -1776,7 +1776,7 @@ public:
                                 ++column_;
                                 flags |= std::regex_constants::icase;
                             }
-                            add_token(token<Json>(token_types::term,std::make_shared<regex_term<Json>>(buffer,flags)));
+                            add_token(token<Json>(token_types::operand,std::make_shared<regex_term<Json>>(buffer,flags)));
                             buffer.clear();
                         }
                         state = filter_states::expect_path_or_value_or_unary_op;

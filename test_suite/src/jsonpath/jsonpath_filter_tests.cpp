@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_div)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
+    context.add(3);
 
     std::string s1 = "(3/1)";
     auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -74,6 +74,11 @@ BOOST_AUTO_TEST_CASE(test_div)
     auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
     auto result4 = expr4.eval(context);
     BOOST_CHECK_CLOSE(0.333333,result4.as<double>(),0.001);
+
+    std::string s5 = "(@.0/@.length)";
+    auto expr5 = parser.parse(s5.c_str(), s5.c_str()+ s5.length(), &pend);
+    auto result5 = expr5.eval(context);
+    BOOST_CHECK_EQUAL(json(3),result5);
 }
 
 BOOST_AUTO_TEST_CASE(test_mult)
@@ -104,6 +109,11 @@ BOOST_AUTO_TEST_CASE(test_mult)
     auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
     auto result4 = expr4.eval(context);
     BOOST_CHECK_EQUAL(json(6),result4);
+
+    std::string s5 = "(@.length*@.1)";
+    auto expr5 = parser.parse(s5.c_str(), s5.c_str()+ s5.length(), &pend);
+    auto result5 = expr5.eval(context);
+    BOOST_CHECK_EQUAL(json(4),result5);
 }
 
 BOOST_AUTO_TEST_CASE(test_minus)
@@ -112,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_minus)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
+    context.add(10.0);
 
     std::string s1 = "(3-1)";
     auto expr1 = parser.parse(s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -133,6 +143,11 @@ BOOST_AUTO_TEST_CASE(test_minus)
     auto expr4 = parser.parse(s4.c_str(), s4.c_str()+ s4.length(), &pend);
     auto result4 = expr4.eval(context);
     BOOST_CHECK_EQUAL(json(-2),result4);
+
+    std::string s5 = "(@.length-@.0)";
+    auto expr5 = parser.parse(s5.c_str(), s5.c_str()+ s5.length(), &pend);
+    auto result5 = expr5.eval(context);
+    BOOST_CHECK_EQUAL(json(-9),result5);
 }
 
 BOOST_AUTO_TEST_CASE(test_lt)
