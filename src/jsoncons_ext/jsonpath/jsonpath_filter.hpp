@@ -46,102 +46,11 @@ enum class filter_states
 enum class token_types 
 {
     operand,
-    unary_minus,
-    exclaim,
+    unary_operator,
+    binary_operator,
     lparen,
-    rparen,
-    eq,
-    ne,
-    regex,
-    ampamp,
-    pipepipe,
-    lt,
-    gt,
-    lte,
-    gte,
-    plus,
-    minus,
-    mult,
-    div
+    rparen
 };
-
-inline
-size_t precedence(token_types val)
-{
-    switch (val)
-    {
-    case token_types::exclaim:
-    case token_types::unary_minus:
-        return 1;
-    case token_types::regex:
-        return 2;
-    case token_types::mult:
-    case token_types::div:
-        return 3;
-    case token_types::plus:
-    case token_types::minus:
-        return 4;
-    case token_types::lt:
-    case token_types::gt:
-    case token_types::lte:
-    case token_types::gte:
-        return 5;
-    case token_types::eq:
-    case token_types::ne:
-        return 6;
-    case token_types::ampamp:
-        return 7;
-    case token_types::pipepipe:
-        return 8;
-    default:
-        return 0;
-    }
-}
-
-inline
-bool is_right_associative(token_types val)
-{
-    switch (val)
-    {
-    case token_types::exclaim:
-    case token_types::unary_minus:
-        return true;
-    default:
-        return false;
-    }
-}
-
-inline
-bool is_operator(token_types val)
-{
-    switch (val)
-    {
-    case token_types::eq:
-    case token_types::ne:
-    case token_types::regex:
-    case token_types::ampamp:
-    case token_types::pipepipe:
-    case token_types::lt:
-    case token_types::gt:
-    case token_types::lte:
-    case token_types::gte:
-    case token_types::plus:
-    case token_types::minus:
-    case token_types::mult:
-    case token_types::div:
-    case token_types::exclaim:
-    case token_types::unary_minus:
-        return true;
-    default:
-        return false;
-    }
-}
-
-inline
-bool is_operand(token_types val)
-{
-    return val == token_types::operand;
-}
 
 template <class Json>
 class term
@@ -274,41 +183,136 @@ public:
     }
 };
 
+namespace binary_operators
+{
+enum{regex=0,mult=1,div=2,plus=3,minus=4,lt=5,lte=6,gt=7,gte=8,eq=9,ne=10,ampamp=11,pipepipe=12};
+}
+
+template <class Json>
+struct operator_properties
+{
+    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
+
+    size_t precedence_level;
+    bool is_right_associative;
+    operator_type op;
+};
+
 template <class Json>
 class token
 {
     token_types type_;
+    size_t precedence_level_;
+    bool is_right_associative_;
     std::shared_ptr<term<Json>> operand_ptr_;
+    std::function<Json(const term<Json>&)> unary_operator_;
+    std::function<Json(const term<Json>&, const term<Json>&)> operator_;
 public:
+    typedef std::function<Json(const term<Json>&)> unary_operator_type;
+    typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
+
     token(token_types type)
-        : type_(type)
+        : type_(type),precedence_level_(0),is_right_associative_(false)
     {
     }
     token(token_types type, std::shared_ptr<term<Json>> term_ptr)
-        : type_(type), operand_ptr_(term_ptr)
+        : type_(type),precedence_level_(0),is_right_associative_(false),operand_ptr_(term_ptr)
+    {
+    }
+    token(size_t precedence_level, 
+          bool is_right_associative,
+          std::function<Json(const term<Json>&)> unary_operator)
+        : type_(token_types::unary_operator), 
+          precedence_level_(precedence_level), 
+          is_right_associative_(is_right_associative), 
+          unary_operator_(unary_operator)
+    {
+    }
+    token(const operator_properties<Json>& properties)
+        : type_(token_types::binary_operator), 
+          precedence_level_(properties.precedence_level), 
+          is_right_associative_(properties.is_right_associative), 
+          operator_(properties.op)
     {
     }
     token(const token& t)
-        : type_(t.type_), operand_ptr_(t.operand_ptr_)
+        : type_(t.type_), 
+          precedence_level_(t.precedence_level_),
+          is_right_associative_(t.is_right_associative_),
+          operand_ptr_(t.operand_ptr_),
+          unary_operator_(t.unary_operator_),
+          operator_(t.operator_)
     {
     }
 
     token<Json>& operator=(const token<Json>& val)
     {
-        type_ = val.type_;
-        operand_ptr_ = val.operand_ptr_;
+        if (this != &val)
+        {
+            type_ = val.type_;
+            precedence_level_ = precedence_level_;
+            is_right_associative_ = is_right_associative_;
+            operand_ptr_ = val.operand_ptr_;
+            unary_operator_ = val.unary_operator_;
+            operator_ = val.operator_;
+        }
         return *this;
     }
 
-    token_types type_id() const
+    bool is_operator() const
     {
-        return type_;
+        return is_unary_operator() || is_binary_operator(); 
+    }
+
+    bool is_unary_operator() const
+    {
+        return type_ == token_types::unary_operator; 
+    }
+
+    bool is_binary_operator() const
+    {
+        return type_ == token_types::binary_operator; 
+    }
+
+    bool is_operand() const
+    {
+        return type_ == token_types::operand; 
+    }
+
+    bool is_lparen() const
+    {
+        return type_ == token_types::lparen; 
+    }
+
+    bool is_rparen() const
+    {
+        return type_ == token_types::rparen; 
+    }
+
+    size_t precedence_level() const
+    {
+        return precedence_level_;
+    }
+
+    bool is_right_associative() const
+    {
+        return is_right_associative_;
     }
 
     const term<Json>& operand()
     {
         JSONCONS_ASSERT(type_ == token_types::operand && operand_ptr_ != nullptr);
         return *operand_ptr_;
+    }
+
+    operator_type& binary_operator()
+    {
+        return operator_;
+    }
+
+    unary_operator_type& unary_operator()
+    {
+        return unary_operator_;
     }
 
     void initialize(const Json& context_node)
@@ -889,166 +893,25 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
     std::vector<token<Json>> stack;
     for (auto t : tokens)
     {
-        if (is_operand(t.type_id()))
+        if (t.is_operand())
         {
             stack.push_back(t);
         }
-        else if (is_operator(t.type_id()))
+        else if (t.is_unary_operator())
         {
             auto rhs = stack.back();
             stack.pop_back();
-            switch (t.type_id())
-            {
-                case token_types::exclaim:
-                {
-                    std::function<Json(const term<Json>&)> f = &term<Json>::exclaim;
-                    Json val = f(rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::unary_minus:
-                {
-                    std::function<Json(const term<Json>&)> f = &term<Json>::unary_minus;
-                    Json val = f(rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::plus:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::plus_term;
-                    
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::minus:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::minus_term;
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::mult:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::mult_term;
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::div:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::div_term;
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::eq:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.eq_term(b); };
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                }
-                    break;
-                case token_types::ne:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::ne_term;
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                }
-                    break;
-                case token_types::regex:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = &term<Json>::regex_term;
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::ampamp:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.ampamp_term(b); };
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::pipepipe:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.pipepipe_term(b); };
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::lt:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.lt_term(b); };
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::gt:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.gt_term(b); };
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::lte:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.lt_term(b) || a.eq_term(b); };
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                case token_types::gte:
-                {
-                    std::function<Json(const term<Json>&, const term<Json>&)> f = [](const term<Json>& a, const term<Json>& b) {return a.gt_term(b) || a.eq_term(b); };
-
-                    auto lhs = stack.back();
-                    stack.pop_back();
-                    Json val = f(lhs.operand(), rhs.operand());
-                    stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
-                    break;
-                }
-                default:
-                {
-                    throw std::runtime_error("op not found");
-                    break;
-                }
-            }
+            Json val = t.unary_operator()(rhs.operand());
+            stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
+        }
+        else if (t.is_binary_operator())
+        {
+            auto rhs = stack.back();
+            stack.pop_back();
+            auto lhs = stack.back();
+            stack.pop_back();
+            Json val = t.binary_operator()(lhs.operand(), rhs.operand());
+            stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
         }
     }
     if (stack.size() != 1)
@@ -1112,6 +975,9 @@ class jsonpath_filter_parser
     std::vector<token<Json>> operator_stack_;
     size_t line_;
     size_t column_;
+
+    static const operator_properties<Json> op_properties_[];
+
 public:
     jsonpath_filter_parser()
         : line_(1), column_(1)
@@ -1139,18 +1005,18 @@ public:
 
     void add_token(token<Json> token)
     {
-        if (is_operand(token.type_id()))
+        if (token.is_operand())
         {
             output_stack_.push_back(token);
         }
-        else if (token.type_id() == token_types::lparen)
+        else if (token.is_lparen())
         {
             operator_stack_.push_back(token);
         }
-        else if (token.type_id() == token_types::rparen)
+        else if (token.is_rparen())
         {
             auto it = operator_stack_.rbegin();
-            while (it != operator_stack_.rend() && it->type_id() != token_types::lparen)
+            while (it != operator_stack_.rend() && !it->is_lparen())
             {
                 output_stack_.push_back(*it);
                 ++it;
@@ -1162,23 +1028,23 @@ public:
             operator_stack_.erase(it.base(),operator_stack_.end());
             operator_stack_.pop_back();
         }
-        else if (is_operator(token.type_id()))
+        else if (token.is_operator())
         {
-            if (operator_stack_.empty() || operator_stack_.back().type_id() == token_types::lparen)
+            if (operator_stack_.empty() || operator_stack_.back().is_lparen())
             {
                 operator_stack_.push_back(token);
             }
-            else if (precedence(token.type_id()) < precedence(operator_stack_.back().type_id())
-                     || (precedence(token.type_id()) == precedence(operator_stack_.back().type_id()) && is_right_associative(token.type_id())))
+            else if (token.precedence_level() < operator_stack_.back().precedence_level()
+                     || (token.precedence_level() == operator_stack_.back().precedence_level() && token.is_right_associative()))
             {
                 operator_stack_.push_back(token);
             }
             else
             {
                 auto it = operator_stack_.rbegin();
-                while (it != operator_stack_.rend() && is_operator(it->type_id())
-                       && (precedence(token.type_id()) > precedence(it->type_id())
-                     || (precedence(token.type_id()) == precedence(it->type_id()) && is_right_associative(token.type_id()))))
+                while (it != operator_stack_.rend() && it->is_operator()
+                       && (token.precedence_level() > it->precedence_level()
+                     || (token.precedence_level() == it->precedence_level() && token.is_right_associative())))
                 {
                     output_stack_.push_back(*it);
                     ++it;
@@ -1239,6 +1105,7 @@ public:
                     add_token(token<Json>(token_types::lparen));
                     break;
                 case ')':
+                    state = filter_states::expect_path_or_value_or_unary_op;
                     add_token(token<Json>(token_types::rparen));
                     if (--depth == 0)
                     {
@@ -1254,107 +1121,128 @@ public:
                 {
                 case '\r':
                 case '\n':
-                    ++line_;
-                    column_ = 1;
-                    state = pre_line_break_state;
-                    break;
+                    {
+                        ++line_;
+                        column_ = 1;
+                        state = pre_line_break_state;
+                        break;
+                    }
                 case '!':
-                    if (p+1  < end_expr && *(p+1) == '=')
                     {
-                        ++p;
-                        ++column_;
-                        state = filter_states::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(token_types::ne));
+                        if (p+1  < end_expr && *(p+1) == '=')
+                        {
+                            ++p;
+                            ++column_;
+                            state = filter_states::expect_path_or_value_or_unary_op;
+                            add_token(token<Json>(op_properties_[binary_operators::ne]));
+                        }
+                        else
+                        {
+                            throw parse_exception(jsonpath_parser_errc::unexpected_operator,line_,column_);
+                        }
+                        break;
                     }
-                    else
-                    {
-                        throw parse_exception(jsonpath_parser_errc::unexpected_operator,line_,column_);
-                    }
-                    break;
                 case '&':
-                    if (p+1  < end_expr && *(p+1) == '&')
                     {
-                        ++p;
-                        ++column_;
-                        state = filter_states::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(token_types::ampamp));
+                        if (p+1  < end_expr && *(p+1) == '&')
+                        {
+                            ++p;
+                            ++column_;
+                            state = filter_states::expect_path_or_value_or_unary_op;
+                            add_token(token<Json>(op_properties_[binary_operators::ampamp]));
+                        }
+                        break;
                     }
-                    break;
                 case '|':
-                    if (p+1  < end_expr && *(p+1) == '|')
                     {
-                        ++p;
-                        ++column_;
-                        state = filter_states::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(token_types::pipepipe));
+                        if (p+1  < end_expr && *(p+1) == '|')
+                        {
+                            ++p;
+                            ++column_;
+                            state = filter_states::expect_path_or_value_or_unary_op;
+                            add_token(token<Json>(op_properties_[binary_operators::pipepipe]));
+                        }
+                        break;
                     }
-                    break;
                 case '=':
-                    if (p+1  < end_expr && *(p+1) == '=')
                     {
-                        ++p;
-                        ++column_;
-                        state = filter_states::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(token_types::eq));
+                        if (p+1  < end_expr && *(p+1) == '=')
+                        {
+                            ++p;
+                            ++column_;
+                            state = filter_states::expect_path_or_value_or_unary_op;
+                            add_token(token<Json>(op_properties_[binary_operators::eq]));
+                        }
+                        else if (p+1  < end_expr && *(p+1) == '~')
+                        {
+                            ++p;
+                            ++column_;
+                            state = filter_states::expect_regex;
+                            add_token(token<Json>(op_properties_[binary_operators::regex]));
+                        }
+                        break;
                     }
-                    else if (p+1  < end_expr && *(p+1) == '~')
-                    {
-                        ++p;
-                        ++column_;
-                        state = filter_states::expect_regex;
-                        add_token(token<Json>(token_types::regex));
-                    }
-                    break;
                 case '>':
-                    if (p+1  < end_expr && *(p+1) == '=')
                     {
-                        ++p;
-                        ++column_;
-                        state = filter_states::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(token_types::gte));
+                        if (p+1  < end_expr && *(p+1) == '=')
+                        {
+                            ++p;
+                            ++column_;
+                            state = filter_states::expect_path_or_value_or_unary_op;
+                            add_token(token<Json>(op_properties_[binary_operators::gte]));
+                        }
+                        else
+                        {
+                            state = filter_states::expect_path_or_value_or_unary_op;
+                            add_token(token<Json>(op_properties_[binary_operators::gt]));
+                        }
+                        break;
                     }
-                    else
-                    {
-                        state = filter_states::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(token_types::gt));
-                    }
-                    break;
                 case '<':
-                    if (p+1  < end_expr && *(p+1) == '=')
                     {
-                        ++p;
-                        ++column_;
-                        state = filter_states::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(token_types::lte));
+                        if (p+1  < end_expr && *(p+1) == '=')
+                        {
+                            ++p;
+                            ++column_;
+                            state = filter_states::expect_path_or_value_or_unary_op;
+                            add_token(token<Json>(op_properties_[binary_operators::lte]));
+                        }
+                        else
+                        {
+                            state = filter_states::expect_path_or_value_or_unary_op;
+                            add_token(token<Json>(op_properties_[binary_operators::lt]));
+                        }
+                        break;
                     }
-                    else
-                    {
-                        state = filter_states::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(token_types::lt));
-                    }
-                    break;
                 case '+':
-                    state = filter_states::expect_path_or_value_or_unary_op;
-                    add_token(token<Json>(token_types::plus));
-                    break;
+                    {
+                        state = filter_states::expect_path_or_value_or_unary_op;
+                        add_token(token<Json>(op_properties_[binary_operators::plus]));
+                        break;
+                    }
                 case '-':
-                    state = filter_states::expect_path_or_value_or_unary_op;
-                    add_token(token<Json>(token_types::minus));
-                    break;
+                    {
+                        state = filter_states::expect_path_or_value_or_unary_op;
+                        add_token(token<Json>(op_properties_[binary_operators::minus]));
+                        break;
+                    }
                 case '*':
-                    state = filter_states::expect_path_or_value_or_unary_op;
-                    add_token(token<Json>(token_types::mult));
-                    break;
+                    {
+                        state = filter_states::expect_path_or_value_or_unary_op;
+                        add_token(token<Json>(op_properties_[binary_operators::mult]));
+                        break;
+                    }
                 case '/':
-                    state = filter_states::expect_path_or_value_or_unary_op;
-                    add_token(token<Json>(token_types::div));
-                    break;
+                    {
+                        state = filter_states::expect_path_or_value_or_unary_op;
+                        add_token(token<Json>(op_properties_[binary_operators::div]));
+                        break;
+                    }
                 case ' ':case '\t':
                     break;
                 default:
                     throw parse_exception(jsonpath_parser_errc::invalid_filter,line_,column_);
                     break;
-
                 }
                 ++p;
                 ++column_;
@@ -1548,15 +1436,21 @@ public:
                     state = pre_line_break_state;
                     break;
                 case '!':
-                    add_token(token<Json>(token_types::exclaim));
+                {
+                    std::function<Json(const term<Json>&)> f = &term<Json>::exclaim;
+                    add_token(token<Json>(1, true, f));
                     ++p;
                     ++column_;
                     break;
+                }
                 case '-':
-                    add_token(token<Json>(token_types::unary_minus));
+                {
+                    std::function<Json(const term<Json>&)> f = &term<Json>::unary_minus;
+                    add_token(token<Json>(1, true, f));
                     ++p;
                     ++column_;
                     break;
+                }
                 case '@':
                     buffer.push_back(*p);
                     state = filter_states::path;
@@ -1798,6 +1692,23 @@ public:
     }
 };
 
+template <class Json>
+const operator_properties<Json> jsonpath_filter_parser<Json>::op_properties_[] =
+{
+    {2,false,&term<Json>::regex_term},
+    {3,false,&term<Json>::mult_term},
+    {3,false,&term<Json>::div_term},
+    {4,false,&term<Json>::plus_term},
+    {4,false,&term<Json>::minus_term},
+    {5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b);}},
+    {5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b) || a.eq_term(b);}},
+    {5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b);}},
+    {5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b) || a.eq_term(b);}},
+    {6,false,[](const term<Json>& a, const term<Json>& b) {return a.eq_term(b); }},
+    {6,false,[](const term<Json>& a, const term<Json>& b) {return a.ne_term(b); }},
+    {7,false,[](const term<Json>& a, const term<Json>& b) {return a.ampamp_term(b);}},
+    {8,false,[](const term<Json>& a, const term<Json>& b) {return a.pipepipe_term(b);}}
+};
 
 }}
 #endif
