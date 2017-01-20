@@ -211,6 +211,16 @@ public:
     typedef std::function<Json(const term<Json>&)> unary_operator_type;
     typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
 
+    Json operator()(const term<Json>& a)
+    {
+        return unary_operator_(a);
+    }
+
+    Json operator()(const term<Json>& a, const term<Json>& b)
+    {
+        return operator_(a,b);
+    }
+
     token(token_types type)
         : type_(type),precedence_level_(0),is_right_associative_(false)
     {
@@ -303,16 +313,6 @@ public:
     {
         JSONCONS_ASSERT(type_ == token_types::operand && operand_ptr_ != nullptr);
         return *operand_ptr_;
-    }
-
-    operator_type& binary_operator()
-    {
-        return operator_;
-    }
-
-    unary_operator_type& unary_operator()
-    {
-        return unary_operator_;
     }
 
     void initialize(const Json& context_node)
@@ -901,7 +901,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
         {
             auto rhs = stack.back();
             stack.pop_back();
-            Json val = t.unary_operator()(rhs.operand());
+            Json val = t(rhs.operand());
             stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
         }
         else if (t.is_binary_operator())
@@ -910,7 +910,7 @@ token<Json> evaluate(const Json& context, std::vector<token<Json>>& tokens)
             stack.pop_back();
             auto lhs = stack.back();
             stack.pop_back();
-            Json val = t.binary_operator()(lhs.operand(), rhs.operand());
+            Json val = t(lhs.operand(), rhs.operand());
             stack.push_back(token<Json>(token_types::operand,std::make_shared<value_term<Json>>(val)));
         }
     }
