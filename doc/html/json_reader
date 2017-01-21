@@ -471,99 +471,65 @@ vertical-align:1px;
 <div class="highlight highlight-source-c++"><pre>jsoncons::json_reader
 
 <span class="pl-k">typedef</span> basic_json_reader&lt;<span class="pl-k">char</span>&gt; json_reader</pre></div>
-
 <p>A <code>json_reader</code> can read a sequence of JSON texts from a stream.</p>
-
 <p><code>json_reader</code> is noncopyable and nonmoveable.</p>
-
 <h3>Header</h3>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_reader.hpp<span class="pl-pds">&gt;</span></span></pre></div>
-
 <h3>Constructors</h3>
-
 <pre><code>json_reader(std::istream&amp; is,
             json_input_handler&amp; handler,
             parse_error_handler&amp; err_handler)
 </code></pre>
-
 <p>Constructs a <code>json_reader</code> that is associated with an input stream <code>is</code> of JSON text, a <a href="json_input_handler">json_input_handler</a> that receives JSON events, and the specified <a href="parse_error_handler">parse_error_handler</a>.<br>
 You must ensure that the input stream, input handler, and error handler exist as long as does <code>json_reader</code>, as <code>json_reader</code> holds pointers to but does not own these objects.</p>
-
 <pre><code>json_reader(std::istream&amp; is,
             json_input_handler&amp; handler)
 </code></pre>
-
 <p>Constructs a <code>json_reader</code> that is associated with an input stream <code>is</code> of JSON text, a <a href="json_input_handler">json_input_handler</a> that receives JSON events, and a <a href="default_parse_error_handler">default_parse_error_handler</a>.<br>
 You must ensure that the input stream and input handler exist as long as does <code>json_reader</code>, as <code>json_reader</code> holds pointers to does not own these objects.</p>
-
 <h3>Member functions</h3>
-
 <pre><code>bool eof() const
 </code></pre>
-
 <p>Returns <code>true</code> when there are no more JSON texts to be read from the stream, <code>false</code> otherwise</p>
-
 <pre><code>void read()
 </code></pre>
-
 <p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
 Throws if there are any unconsumed non-whitespace characters left in the input.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
-
 <pre><code>void read_next()
 </code></pre>
-
 <p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
-
 <pre><code>void check_done()
 </code></pre>
-
 <p>Throws if there are any unconsumed non-whitespace characters in the input.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
-
 <pre><code>size_t buffer_capacity() const
 
 void buffer_capacity(size_t capacity)
 
 size_t max_nesting_depth() const
 </code></pre>
-
 <p>By default <code>jsoncons</code> can read a <code>JSON</code> text of arbitrarily large depth.</p>
-
 <pre><code>void max_nesting_depth(size_t depth)
 </code></pre>
-
 <h3>Deprecated methods</h3>
-
 <pre><code>void read()
 </code></pre>
-
-<p>Use <code>read_next</code> instead. </p>
-
+<p>Use <code>read_next</code> instead.</p>
 <pre><code>size_t max_depth() const
 </code></pre>
-
 <p>Use <code>max_nesting_depth()</code> instead</p>
-
 <pre><code>void max_depth(size_t depth)
 </code></pre>
-
 <p>Use <code>max_nesting_depth(size_t depth)</code> instead</p>
-
 <h2>Examples</h2>
-
 <h3>Reading a sequence of JSON texts from a stream</h3>
-
 <p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>json-texts.json</code>):</p>
-
 <div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>}
 {<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">5</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">6</span>}
 {<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">7</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">8</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">9</span>}</pre></div>
-
-<p>This is the code that reads them: </p>
-
+<p>This is the code that reads them:</p>
 <div class="highlight highlight-source-c++"><pre>std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>json-texts.json<span class="pl-pds">"</span></span>);
 <span class="pl-k">if</span> (!is.is_open())
 {
@@ -578,13 +544,11 @@ json_reader <span class="pl-en">reader</span>(is,decoder);
     reader.<span class="pl-c1">read_next</span>();
     <span class="pl-k">if</span> (!reader.<span class="pl-c1">eof</span>())
     {
-        json val = encoder.<span class="pl-c1">get_result</span>();
+        json val = decoder.<span class="pl-c1">get_result</span>();
         std::cout &lt;&lt; val &lt;&lt; std::endl;
     }
 }</pre></div>
-
 <p>Output:</p>
-
 <div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>}
 {<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">5</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">6</span>}
 {<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">7</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">8</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">9</span>}</pre></div>

@@ -85,7 +85,7 @@ json_decoder<json> decoder;
 
 csv_reader reader(is,decoder);
 reader.read();
-json countries = encoder.get_result();
+json countries = decoder.get_result();
 
 std::cout << pretty_print(countries) << std::endl;
 ```
@@ -127,7 +127,7 @@ params.field_delimiter = '\t'
 
 csv_reader reader(is,decoder,params);
 reader.read();
-json employees = encoder.get_result();
+json employees = decoder.get_result();
 
 std::cout << pretty_print(employees) << std::endl;
 ```
@@ -186,7 +186,7 @@ params.column_names({"Country Code","Name"})
 
 csv_reader reader(is,decoder,params);
 reader.read();
-json countries = encoder.get_result();
+json countries = decoder.get_result();
 
 std::cout << pretty_print(countries) << std::endl;
 ```

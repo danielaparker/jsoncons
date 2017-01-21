@@ -476,7 +476,7 @@ int main()
           .column_types({"integer","string","string","string"});
     csv_reader reader(is,decoder,params);
     reader.read();
-    ojson tasks = encoder.get_result();
+    ojson tasks = decoder.get_result();
 
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 

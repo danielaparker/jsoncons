@@ -55,7 +55,7 @@ std::ifstream is(in_file);
 json_decoder<json> decoder;
 json_reader reader(is,decoder);
 reader.read();
-json countries = encoder.get_result();
+json countries = decoder.get_result();
 
 csv_serializer serializer(std::cout);
 
@@ -120,7 +120,7 @@ params.field_delimiter = '\t';
 
 json_reader reader(is,decoder);
 reader.read();
-json employees = encoder.get_result();
+json employees = decoder.get_result();
 
 csv_serializer serializer(std::cout,params);
 

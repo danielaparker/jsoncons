@@ -469,99 +469,72 @@ vertical-align:1px;
 </head>
 <body>
 <div class="highlight highlight-source-c++"><pre>jsoncons::csv::csv_reader</pre></div>
-
 <p>The <code>csv_reader</code> class is an instantiation of the <code>basic_csv_reader</code> class template that uses <code>char</code> as the character type. It reads a <a href="http://tools.ietf.org/html/rfc4180">CSV file</a> and produces JSON parse events.</p>
-
 <p><code>csv_reader</code> is noncopyable and nonmoveable.</p>
-
 <h3>Header</h3>
-
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/csv/csv_reader.hpp<span class="pl-pds">&gt;</span></span></pre></div>
-
 <h3>Constructors</h3>
-
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler)
 </code></pre>
-
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream<br>
 <code>is</code> of CSV text and a <a href="json_input_handler">json_input_handler</a> that receives<br>
 JSON events. Uses default <a href="csv_parameters">csv_parameters</a>.<br>
 You must ensure that the input stream and input handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
-
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            const csv_parameters&amp; params)
 </code></pre>
-
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream<br>
 <code>is</code> of CSV text, a <a href="json_input_handler">json_input_handler</a> that receives<br>
 JSON events, and <a href="csv_parameters">csv_parameters</a>.<br>
 You must ensure that the input stream and input handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
-
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            parse_error_handler&amp; err_handler)
 </code></pre>
-
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream<br>
 <code>is</code> of CSV text, a <a href="json_input_handler">json_input_handler</a> that receives<br>
 JSON events and the specified <a href="parse_error_handler">parse_error_handler</a>.<br>
 Uses default <a href="csv_parameters">csv_parameters</a>.<br>
 You must ensure that the input stream, input handler, and error handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
-
 <pre><code>csv_reader(std::istream&amp; is,
            json_input_handler&amp; handler,
            parse_error_handler&amp; err_handler,
            const csv_parameters&amp; params)
 </code></pre>
-
 <p>Constructs a <code>csv_reader</code> that is associated with an input stream<br>
 <code>is</code> of CSV text, a <a href="json_input_handler">json_input_handler</a> that receives<br>
 JSON events, the specified <a href="parse_error_handler">parse_error_handler</a>,<br>
 and <a href="csv_parameters">csv_parameters</a>.<br>
 You must ensure that the input stream, input handler, and error handler exist as long as does <code>csv_reader</code>, as <code>csv_reader</code> holds pointers to but does not own these objects.</p>
-
 <h3>Member functions</h3>
-
 <pre><code>bool eof() const
 </code></pre>
-
 <p>Returns <code>true</code> when there is no more data to be read from the stream, <code>false</code> otherwise</p>
-
 <pre><code>void read()
 </code></pre>
-
 <p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
 Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
-
 <pre><code>size_t buffer_capacity() const
 
 void buffer_capacity(size_t buffer_capacity)
 </code></pre>
-
 <h3>Examples</h3>
-
 <h3>Reading a comma delimted file into an array of json values</h3>
-
 <h4>Comma delimited input file</h4>
-
 <pre><code>country_code,name
 ABW,ARUBA
 ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
 VUT,VANUATU
 WLF,WALLIS &amp; FUTUNA ISLANDS
 </code></pre>
-
-<p>Note </p>
-
+<p>Note</p>
 <ul>
 <li>The first record contains a header line, but we're going to ignore that and read the entire file as an array of arrays.</li>
 <li>The third record has a field value that contains an embedded comma, so it must be quoted.</li>
 </ul>
-
 <h4>Code</h4>
-
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
@@ -569,12 +542,10 @@ json_decoder&lt;json&gt; decoder;
 
 csv_reader <span class="pl-en">reader</span>(is,decoder);
 reader.read();
-json countries = encoder.get_result();
+json countries = decoder.get_result();
 
 std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
-
 <h4>Output</h4>
-
 <div class="highlight highlight-source-json"><pre>[
     [<span class="pl-s"><span class="pl-pds">"</span>country_code<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>],
     [<span class="pl-s"><span class="pl-pds">"</span>ABW<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ARUBA<span class="pl-pds">"</span></span>],
@@ -582,11 +553,8 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
     [<span class="pl-s"><span class="pl-pds">"</span>VUT<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>VANUATU<span class="pl-pds">"</span></span>],
     [<span class="pl-s"><span class="pl-pds">"</span>WLF<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>WALLIS &amp; FUTUNA ISLANDS<span class="pl-pds">"</span></span>]
 ]</pre></div>
-
 <h3>Reading a tab delimted file into an array of json objects</h3>
-
 <h4>Tab delimited input file</h4>
-
 <pre><code>employee-no employee-name   dept    salary  note
 00000001    Smith, Matthew  sales   150,000.00      
 00000002    Brown, Sarah    sales   89,000.00       
@@ -594,16 +562,12 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
 00000004    Scott, Colette  sales   75,000.00       """Exemplary"" employee
 Dependable, trustworthy"
 </code></pre>
-
-<p>Note </p>
-
+<p>Note</p>
 <ul>
 <li>The first record is a header line, which will be used to associate data values with names</li>
 <li>The fifth record has a field value that contains embedded quotes and a new line character, so it must be quoted and the embedded quotes escaped.</li>
 </ul>
-
 <h4>Code</h4>
-
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>employees.txt<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
@@ -614,12 +578,10 @@ params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span c
 
 csv_reader <span class="pl-en">reader</span>(is,decoder,params);
 reader.read();
-json employees = encoder.get_result();
+json employees = decoder.get_result();
 
 std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;</pre></div>
-
 <h4>Output</h4>
-
 <div class="highlight highlight-source-json"><pre>[
     {
         <span class="pl-s"><span class="pl-pds">"</span>dept<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>sales<span class="pl-pds">"</span></span>,
@@ -650,17 +612,12 @@ std::cout &lt;&lt; pretty_print(employees) &lt;&lt; std::endl;</pre></div>
         <span class="pl-s"><span class="pl-pds">"</span>salary<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>75,000.00<span class="pl-pds">"</span></span>
     }
 ]</pre></div>
-
 <h4>Reading the comma delimited file as an array of objects with user supplied columns names</h4>
-
-<p>Note </p>
-
+<p>Note</p>
 <ul>
 <li>The first record contains a header line, but we're going to ignore that and use our own names for the fields.</li>
 </ul>
-
 <h4>Code</h4>
-
 <div class="highlight highlight-source-c++"><pre>std::string in_file = <span class="pl-s"><span class="pl-pds">"</span>countries.csv<span class="pl-pds">"</span></span>;
 std::ifstream <span class="pl-en">is</span>(in_file);
 
@@ -672,12 +629,10 @@ params.column_names({<span class="pl-s"><span class="pl-pds">"</span>Country Cod
 
 csv_reader <span class="pl-en">reader</span>(is,decoder,params);
 reader.read();
-json countries = encoder.get_result();
+json countries = decoder.get_result();
 
 std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
-
 <h4>Output</h4>
-
 <div class="highlight highlight-source-json"><pre>[
     {
         <span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>ABW<span class="pl-pds">"</span></span>,

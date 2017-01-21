@@ -89,7 +89,7 @@ while (!reader.eof())
     reader.read_next();
     if (!reader.eof())
     {
-        json val = encoder.get_result();
+        json val = decoder.get_result();
         std::cout << val << std::endl;
     }
 }

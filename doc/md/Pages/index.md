@@ -341,7 +341,7 @@ params.assume_header(true)
 
 csv_reader reader(is,decoder,params);
 reader.read();
-json val = encoder.get_result();
+json val = decoder.get_result();
 
 std::cout << pretty_print(val) << std::endl;
 ```

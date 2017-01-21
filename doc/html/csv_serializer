@@ -510,7 +510,7 @@ std::ifstream <span class="pl-en">is</span>(in_file);
 json_decoder&lt;json&gt; decoder;
 json_reader <span class="pl-en">reader</span>(is,decoder);
 reader.read();
-json countries = encoder.get_result();
+json countries = decoder.get_result();
 
 csv_serializer <span class="pl-en">serializer</span>(std::cout);
 
@@ -569,7 +569,7 @@ params.field_delimiter = <span class="pl-s"><span class="pl-pds">'</span><span c
 
 json_reader <span class="pl-en">reader</span>(is,decoder);
 reader.read();
-json employees = encoder.get_result();
+json employees = decoder.get_result();
 
 csv_serializer <span class="pl-en">serializer</span>(std::cout,params);
 
