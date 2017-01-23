@@ -660,33 +660,27 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
 </code></pre>
 <h4>Code</h4>
 <div class="highlight highlight-source-c++"><pre>json_decoder&lt;ojson&gt; decoder;
-
-std::istringstream <span class="pl-en">is1</span>(<span class="pl-s"><span class="pl-pds">"</span>bond_yields.csv<span class="pl-pds">"</span></span>);
-csv_parameters params1;
-params1.assume_header(<span class="pl-c1">true</span>)
-       .mapping(mapping_type::n_rows)
+csv_parameters params;
+params.assume_header(<span class="pl-c1">true</span>)
        .column_types({<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>});
-csv_reader <span class="pl-en">reader1</span>(is1,decoder,params1);
+
+params.mapping(mapping_type::n_rows);
+std::istringstream <span class="pl-en">is1</span>(<span class="pl-s"><span class="pl-pds">"</span>bond_yields.csv<span class="pl-pds">"</span></span>);
+csv_reader <span class="pl-en">reader1</span>(is1,decoder,params);
 reader1.read();
 ojson val1 = decoder.get_result();
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>&lt;&lt; pretty_print(val1) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
 
+params.mapping(mapping_type::n_objects);
 std::istringstream <span class="pl-en">is2</span>(<span class="pl-s"><span class="pl-pds">"</span>bond_yields.csv<span class="pl-pds">"</span></span>);
-csv_parameters params2;
-params2.assume_header(<span class="pl-c1">true</span>)
-       .mapping(mapping_type::n_objects)
-       .column_types({<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>});
-csv_reader <span class="pl-en">reader2</span>(is2,decoder,params2);
+csv_reader <span class="pl-en">reader2</span>(is2,decoder,params);
 reader2.read();
 ojson val2 = decoder.get_result();
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>(2)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>&lt;&lt; pretty_print(val2) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
 
+params.mapping(mapping_type::m_columns);
 std::istringstream <span class="pl-en">is3</span>(<span class="pl-s"><span class="pl-pds">"</span>bond_yields.csv<span class="pl-pds">"</span></span>);
-csv_parameters params3;
-params3.assume_header(<span class="pl-c1">true</span>)
-    .mapping(mapping_type::m_columns)
-    .column_types({ <span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span> });
-csv_reader <span class="pl-en">reader3</span>(is3, decoder, params3);
+csv_reader <span class="pl-en">reader3</span>(is3, decoder, params);
 reader3.read();
 ojson val3 = decoder.get_result();
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>(3)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; pretty_print(val3) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
