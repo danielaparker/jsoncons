@@ -230,7 +230,7 @@ Date,1Y,2Y,3Y,5Y
 ```c++
 json_decoder<ojson> decoder;
 
-std::istringstream is1(bond_yields);
+std::istringstream is1("bond_yields.csv");
 csv_parameters params1;
 params1.assume_header(true)
        .mapping(mapping_type::n_rows)
@@ -240,7 +240,7 @@ reader1.read();
 ojson val1 = decoder.get_result();
 std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
 
-std::istringstream is2(bond_yields);
+std::istringstream is2("bond_yields.csv");
 csv_parameters params2;
 params2.assume_header(true)
        .mapping(mapping_type::n_objects)
@@ -250,7 +250,7 @@ reader2.read();
 ojson val2 = decoder.get_result();
 std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
 
-std::istringstream is3(bond_yields);
+std::istringstream is3("bond_yields.csv");
 csv_parameters params3;
 params3.assume_header(true)
     .mapping(mapping_type::m_columns)

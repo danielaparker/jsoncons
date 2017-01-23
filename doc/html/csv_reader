@@ -661,7 +661,7 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
 <h4>Code</h4>
 <div class="highlight highlight-source-c++"><pre>json_decoder&lt;ojson&gt; decoder;
 
-std::istringstream <span class="pl-en">is1</span>(bond_yields);
+std::istringstream <span class="pl-en">is1</span>(<span class="pl-s"><span class="pl-pds">"</span>bond_yields.csv<span class="pl-pds">"</span></span>);
 csv_parameters params1;
 params1.assume_header(<span class="pl-c1">true</span>)
        .mapping(mapping_type::n_rows)
@@ -671,7 +671,7 @@ reader1.read();
 ojson val1 = decoder.get_result();
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>&lt;&lt; pretty_print(val1) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
 
-std::istringstream <span class="pl-en">is2</span>(bond_yields);
+std::istringstream <span class="pl-en">is2</span>(<span class="pl-s"><span class="pl-pds">"</span>bond_yields.csv<span class="pl-pds">"</span></span>);
 csv_parameters params2;
 params2.assume_header(<span class="pl-c1">true</span>)
        .mapping(mapping_type::n_objects)
@@ -681,7 +681,7 @@ reader2.read();
 ojson val2 = decoder.get_result();
 std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>(2)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>&lt;&lt; pretty_print(val2) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
 
-std::istringstream <span class="pl-en">is3</span>(bond_yields);
+std::istringstream <span class="pl-en">is3</span>(<span class="pl-s"><span class="pl-pds">"</span>bond_yields.csv<span class="pl-pds">"</span></span>);
 csv_parameters params3;
 params3.assume_header(<span class="pl-c1">true</span>)
     .mapping(mapping_type::m_columns)
