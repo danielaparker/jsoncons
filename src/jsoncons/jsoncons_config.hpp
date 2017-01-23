@@ -33,9 +33,9 @@ namespace jsoncons
 #if defined(_MSC_VER)
 #if _MSC_VER >= 1900
 #define JSONCONS_HAS_USER_DEFINED_LITERALS
+#endif
 #else
 #define JSONCONS_HAS_USER_DEFINED_LITERALS
-#endif
 #endif
 
 //#define JSONCONS_HAS_STRING_VIEW
