@@ -64,19 +64,19 @@ public:
         size_t n = 0;
         switch (jval.type_id())
         {
-            case value_types::null_t:
+            case value_type::null_t:
             {
                 ++n;
                 break;
             }
 
-            case value_types::bool_t:
+            case value_type::bool_t:
             {
                 ++n;
                 break;
             }
 
-            case value_types::integer_t:
+            case value_type::integer_t:
             {
                 int64_t val = jval.as_integer();
                 if (val >= 0)
@@ -137,7 +137,7 @@ public:
                 break;
             }
 
-        case value_types::uinteger_t:
+        case value_type::uinteger_t:
             {
                 uint64_t val = jval.as_uinteger();
                 if (val <= (std::numeric_limits<int8_t>::max)())
@@ -167,21 +167,21 @@ public:
                 break;
             }
 
-            case value_types::double_t:
+            case value_type::double_t:
             {
                 // float 64
                 n += (1 + sizeof(double));
                 break;
             }
 
-            case value_types::small_string_t:
-            case value_types::string_t:
+            case value_type::small_string_t:
+            case value_type::string_t:
             {
                 n += calculate_string_size(jval.as_string_view());
                 break;
             }
 
-            case value_types::array_t:
+            case value_type::array_t:
             {
                 const auto length = jval.array_value().size();
                 if (length <= 15)
@@ -208,7 +208,7 @@ public:
                 break;
             }
 
-            case value_types::object_t:
+            case value_type::object_t:
             {
                 const auto length = jval.object_value().size();
                 if (length <= 15)
@@ -279,21 +279,21 @@ public:
     {
         switch (jval.type_id())
         {
-            case value_types::null_t:
+            case value_type::null_t:
             {
                 // nil
                 v_.push_back(msgpack_format::nil_cd);
                 break;
             }
 
-            case value_types::bool_t:
+            case value_type::bool_t:
             {
                 // true and false
                 v_.push_back(jval.as_bool() ? msgpack_format::true_cd : msgpack_format::false_cd );
                 break;
             }
 
-            case value_types::integer_t:
+            case value_type::integer_t:
             {
                 int64_t val = jval.as_integer();
                 if (val >= 0)
@@ -363,7 +363,7 @@ public:
                 break;
             }
 
-        case value_types::uinteger_t:
+        case value_type::uinteger_t:
             {
                 uint64_t val = jval.as_uinteger();
                 if (val <= (std::numeric_limits<int8_t>::max)())
@@ -398,7 +398,7 @@ public:
                 break;
             }
 
-            case value_types::double_t:
+            case value_type::double_t:
             {
                 // float 64
                 v_.push_back(msgpack_format::float64_cd);
@@ -406,14 +406,14 @@ public:
                 break;
             }
 
-            case value_types::small_string_t:
-            case value_types::string_t:
+            case value_type::small_string_t:
+            case value_type::string_t:
             {
                 encode_string(jval.as_string_view());
                 break;
             }
 
-            case value_types::array_t:
+            case value_type::array_t:
             {
                 const auto length = jval.array_value().size();
                 if (length <= 15)
@@ -442,7 +442,7 @@ public:
                 break;
             }
 
-            case value_types::object_t:
+            case value_type::object_t:
             {
                 const auto length = jval.object_value().size();
                 if (length <= 15)

@@ -216,8 +216,8 @@ private:
     void write_string(const CharT* s, size_t length, buffered_output<CharT>& os)
     {
         bool quote = false;
-        if (parameters_.quote_style() == quote_styles::all || parameters_.quote_style() == quote_styles::nonnumeric ||
-            (parameters_.quote_style() == quote_styles::minimal &&
+        if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
+            (parameters_.quote_style() == quote_style_type::minimal &&
             (std::char_traits<CharT>::find(s, length, parameters_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, parameters_.quote_char()) != nullptr)))
         {
             quote = true;

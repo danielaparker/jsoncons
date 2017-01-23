@@ -18,9 +18,18 @@
 
 namespace jsoncons { namespace csv {
 
-enum class quote_styles
+enum class quote_style_type
 {
     all,minimal,none,nonnumeric
+};
+
+typedef quote_style_type quote_styles;
+
+enum class mapping_type
+{
+    n_rows, 
+    n_objects, 
+    m_columns
 };
 
 template <class CharT>
@@ -44,7 +53,8 @@ public:
         quote_char_('\"'),
         quote_escape_char_('\"'),
         comment_starter_('\0'),
-        quote_style_(quote_styles::minimal),
+        quote_style_(quote_style_type::minimal),
+        mapping_({mapping_type::n_rows,false}),
         max_lines_((std::numeric_limits<unsigned long>::max)()),
         header_lines_(0)
     {
@@ -253,14 +263,25 @@ public:
         return *this;
     }
 
-    quote_styles quote_style() const
+    quote_style_type quote_style() const
     {
         return quote_style_;
     }
 
-    basic_csv_parameters<CharT>& assume_header(quote_styles value)
+    mapping_type mapping() const
+    {
+        return mapping_.second ? (mapping_.first) : (assume_header() || column_names_.size() > 0 ? mapping_type::n_objects : mapping_type::n_rows);
+    }
+
+    basic_csv_parameters<CharT>& quote_style(quote_style_type value)
     {
         quote_style_ = value;
+        return *this;
+    }
+
+    basic_csv_parameters<CharT>& mapping(mapping_type value)
+    {
+        mapping_ = {value,true};
         return *this;
     }
 
@@ -275,41 +296,6 @@ public:
         return *this;
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    std::basic_string<CharT> header() const
-    {
-        return header_;
-    }
-
-    basic_csv_parameters<CharT>& header(const std::basic_string<CharT>& value)
-    {
-        header_ = value;
-        return *this;
-    }
-
-    std::basic_string<CharT> data_types() const
-    {
-        return data_types_;
-    }
-
-    basic_csv_parameters<CharT>& data_types(const std::basic_string<CharT>& value)
-    {
-        data_types_ = value;
-        return *this;
-    }
-
-    std::basic_string<CharT> default_values() const
-    {
-        return default_values_;
-    }
-
-    basic_csv_parameters<CharT>& default_values(const std::basic_string<CharT>& value)
-    {
-        default_values_ = value;
-        return *this;
-    }
-#endif
 private:
     bool assume_header_;
     bool ignore_empty_values_;
@@ -322,7 +308,8 @@ private:
     CharT quote_char_;
     CharT quote_escape_char_;
     CharT comment_starter_;
-    quote_styles quote_style_;
+    quote_style_type quote_style_;
+    std::pair<mapping_type,bool> mapping_;
     unsigned long max_lines_;
     size_t header_lines_;
     std::basic_string<CharT> line_delimiter_;

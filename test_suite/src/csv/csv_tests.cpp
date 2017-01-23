@@ -19,6 +19,30 @@ using namespace jsoncons::csv;
 
 BOOST_AUTO_TEST_SUITE(csv_tests)
 
+BOOST_AUTO_TEST_CASE(n_columns_test)
+{
+    std::string s = R"(Date,1Y,2Y,3Y,5Y
+2017-01-09,0.0062,0.0075,0.0083,0.011
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+)";
+
+    std::istringstream is(s);
+
+    json_decoder<json> decoder;
+
+    csv_parameters params;
+    params.assume_header(true)
+          .mapping(mapping_type::m_columns)
+          .column_types({"string","float","float","float","float"});
+
+    csv_reader reader(is,decoder,params);
+    reader.read();
+    json val = decoder.get_result();
+
+    std::cout << val << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(csv_test_empty_values)
 {
     std::string input = "bool-f,int-f,float-f,string-f"
