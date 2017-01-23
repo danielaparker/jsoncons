@@ -651,6 +651,86 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
         <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>WALLIS &amp; FUTUNA ISLANDS<span class="pl-pds">"</span></span>
     }
 ]</pre></div>
+<h3>Reading a comma delimted file with different mapping options</h3>
+<h4>Input</h4>
+<pre><code class="language-csv">Date,1Y,2Y,3Y,5Y
+2017-01-09,0.0062,0.0075,0.0083,0.011
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+</code></pre>
+<h4>Code</h4>
+<div class="highlight highlight-source-c++"><pre>json_decoder&lt;ojson&gt; decoder;
+
+std::istringstream <span class="pl-en">is1</span>(bond_yields);
+csv_parameters params1;
+params1.assume_header(<span class="pl-c1">true</span>)
+       .mapping(mapping_type::n_rows)
+       .column_types({<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>});
+csv_reader <span class="pl-en">reader1</span>(is1,decoder,params1);
+reader1.read();
+ojson val1 = decoder.get_result();
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>&lt;&lt; pretty_print(val1) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
+
+std::istringstream <span class="pl-en">is2</span>(bond_yields);
+csv_parameters params2;
+params2.assume_header(<span class="pl-c1">true</span>)
+       .mapping(mapping_type::n_objects)
+       .column_types({<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>});
+csv_reader <span class="pl-en">reader2</span>(is2,decoder,params2);
+reader2.read();
+ojson val2 = decoder.get_result();
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>(2)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span>&lt;&lt; pretty_print(val2) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;
+
+std::istringstream <span class="pl-en">is3</span>(bond_yields);
+csv_parameters params3;
+params3.assume_header(<span class="pl-c1">true</span>)
+    .mapping(mapping_type::m_columns)
+    .column_types({ <span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span> });
+csv_reader <span class="pl-en">reader3</span>(is3, decoder, params3);
+reader3.read();
+ojson val3 = decoder.get_result();
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>(3)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; pretty_print(val3) &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>;</pre></div>
+<h4>Output</h4>
+<div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>)
+[
+    [<span class="pl-s"><span class="pl-pds">"</span>2017-01-09<span class="pl-pds">"</span></span>,<span class="pl-c1">0.0062</span>,<span class="pl-c1">0.0075</span>,<span class="pl-c1">0.0083</span>,<span class="pl-c1">0.011</span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>2017-01-08<span class="pl-pds">"</span></span>,<span class="pl-c1">0.0063</span>,<span class="pl-c1">0.0076</span>,<span class="pl-c1">0.0084</span>,<span class="pl-c1">0.0112</span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>2017-01-08<span class="pl-pds">"</span></span>,<span class="pl-c1">0.0063</span>,<span class="pl-c1">0.0076</span>,<span class="pl-c1">0.0084</span>,<span class="pl-c1">0.0112</span>]
+]
+
+(<span class="pl-c1">2</span>)
+[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>Date<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>2017-01-09<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>1Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0062</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>2Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0075</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>3Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0083</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>5Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.011</span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>Date<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>2017-01-08<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>1Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0063</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>2Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0076</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>3Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0084</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>5Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0112</span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>Date<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>2017-01-08<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>1Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0063</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>2Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0076</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>3Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0084</span>,
+        <span class="pl-s"><span class="pl-pds">"</span>5Y<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0112</span>
+    }
+]
+
+(<span class="pl-c1">3</span>)
+{
+    <span class="pl-s"><span class="pl-pds">"</span>Date<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>2017-01-09<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>2017-01-08<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>2017-01-08<span class="pl-pds">"</span></span>],
+    <span class="pl-s"><span class="pl-pds">"</span>1Y<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>0.0062<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>0.0063<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>0.0063<span class="pl-pds">"</span></span>],
+    <span class="pl-s"><span class="pl-pds">"</span>2Y<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>0.0075<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>0.0076<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>0.0076<span class="pl-pds">"</span></span>],
+    <span class="pl-s"><span class="pl-pds">"</span>3Y<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>0.0083<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>0.0084<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>0.0084<span class="pl-pds">"</span></span>],
+    <span class="pl-s"><span class="pl-pds">"</span>5Y<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>0.011<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>0.0112<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>0.0112<span class="pl-pds">"</span></span>]
+}</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

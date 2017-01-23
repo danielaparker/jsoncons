@@ -500,7 +500,7 @@ vertical-align:1px;
 <tr>
 <td>column_defaults</td>
 <td>A list of strings containing default json values corresponding to the columns in the file.</td>
-<td>{"false","0.0","\"\""}</td>
+<td>{"false","0.0",""""}</td>
 </tr>
 <tr>
 <td>max_lines</td>
@@ -529,8 +529,13 @@ vertical-align:1px;
 </tr>
 <tr>
 <td>quote_style</td>
-<td>all, minimal, none, or nonnumeric</td>
-<td>minimal</td>
+<td>quote_style_type::all, quote_style_type::minimal, quote_style_type::none, or quote_style_type::nonnumeric</td>
+<td>quote_style_type::minimal</td>
+</tr>
+<tr>
+<td>mapping</td>
+<td>mapping_type::n_rows, mapping_type::n_objects, mapping_type::m_columns</td>
+<td>If assume_header is true or column_names is not empty, mapping_type::n_rows, mapping_type::n_columns otherwise</td>
 </tr>
 <tr>
 <td>comment_starter</td>
@@ -576,9 +581,7 @@ vertical-align:1px;
 <td>ignore_empty_values</td>
 <td>Do not output name-value pairs with empty values</td>
 <td>false</td>
-</tr>
-</tbody>
-</table>
+</tr></tbody></table>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
