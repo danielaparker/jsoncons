@@ -34,6 +34,7 @@ namespace jsoncons
 #if _MSC_VER >= 1900
 #define JSONCONS_HAS_USER_DEFINED_LITERALS
 #else
+#define JSONCONS_HAS_USER_DEFINED_LITERALS
 #endif
 #endif
 
