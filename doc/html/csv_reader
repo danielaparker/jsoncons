@@ -651,7 +651,7 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
         <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>WALLIS &amp; FUTUNA ISLANDS<span class="pl-pds">"</span></span>
     }
 ]</pre></div>
-<h3>Reading a comma delimted file with different mapping options</h3>
+<h3>Reading a comma delimited file with different mapping options</h3>
 <h4>Input</h4>
 <pre><code class="language-csv">Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
@@ -687,7 +687,8 @@ std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="
 <h4>Output</h4>
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>)
 [
-    [<span class="pl-s"><span class="pl-pds">"</span>2017-01-09<span class="pl-pds">"</span></span>,<span class="pl-c1">0.0062</span>,<span class="pl-c1">0.0075</span>,<span class="pl-c1">0.0083</span>,<span class="pl-c1">0.011</span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>Date<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>1Y<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>2Y<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>3Y<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>5Y<span class="pl-pds">"</span></span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>5Y2017-01-09<span class="pl-pds">"</span></span>,<span class="pl-c1">0.0062</span>,<span class="pl-c1">0.0075</span>,<span class="pl-c1">0.0083</span>,<span class="pl-c1">0.011</span>],
     [<span class="pl-s"><span class="pl-pds">"</span>2017-01-08<span class="pl-pds">"</span></span>,<span class="pl-c1">0.0063</span>,<span class="pl-c1">0.0076</span>,<span class="pl-c1">0.0084</span>,<span class="pl-c1">0.0112</span>],
     [<span class="pl-s"><span class="pl-pds">"</span>2017-01-08<span class="pl-pds">"</span></span>,<span class="pl-c1">0.0063</span>,<span class="pl-c1">0.0076</span>,<span class="pl-c1">0.0084</span>,<span class="pl-c1">0.0112</span>]
 ]

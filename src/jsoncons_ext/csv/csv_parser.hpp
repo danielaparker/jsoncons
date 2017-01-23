@@ -249,6 +249,23 @@ public:
                 flip(csv_mode_type::header, csv_mode_type::data);
             }
             column_values_.resize(column_names_.size());
+            switch (parameters_.mapping())
+            {
+            case mapping_type::n_rows:
+                if (column_names_.size() > 0)
+                {
+                    handler_.begin_array(*this);
+                    for (const auto& name : column_names_)
+                    {
+                        value_buffer_ = name;
+                        end_value();
+                    }
+                    handler_.end_array(*this);
+                }
+                break;
+            default:
+                break;
+            }
         }
         else if (stack_[top_] == csv_mode_type::data)
         {

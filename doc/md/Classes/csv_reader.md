@@ -214,7 +214,7 @@ std::cout << pretty_print(countries) << std::endl;
 ```
 
 
-### Reading a comma delimted file with different mapping options
+### Reading a comma delimited file with different mapping options
 
 #### Input
 
@@ -260,7 +260,8 @@ std::cout << "\n(3)\n" << pretty_print(val3) << "\n";
 ```json
 (1)
 [
-    ["2017-01-09",0.0062,0.0075,0.0083,0.011],
+    ["Date","1Y","2Y","3Y","5Y"],
+    ["5Y2017-01-09",0.0062,0.0075,0.0083,0.011],
     ["2017-01-08",0.0063,0.0076,0.0084,0.0112],
     ["2017-01-08",0.0063,0.0076,0.0084,0.0112]
 ]
