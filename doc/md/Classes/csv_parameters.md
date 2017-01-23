@@ -10,7 +10,8 @@ line_delimiter|String to write between records|\n
 field_delimiter    | Field separator              | ,             
 quote_char         | Quote character              | "             
 quote_escape_char  | Character to escape quote character (by default the quote character is doubled)| "             
-quote_style|all, minimal, none, or nonnumeric|minimal
+quote_style|quote_style_type::all, quote_style_type::minimal, quote_style_type::none, or quote_style_type::nonnumeric|quote_style_type::minimal
+mapping|mapping_type::n_rows,mapping_type::n_objects,mapping_type::m_columns|If assume_header is true or column_names is not empty, mapping_type::n_rows, mapping_type::n_columns otherwise
 comment_starter|Character to comment out a line, must be at column 1.|None
 trim_leading      | Trim leading whitespace | false         
 trim_trailing      | Trim trailing whitespace | false         

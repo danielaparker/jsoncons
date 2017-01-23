@@ -21,26 +21,43 @@ BOOST_AUTO_TEST_SUITE(csv_tests)
 
 BOOST_AUTO_TEST_CASE(n_columns_test)
 {
-    std::string s = R"(Date,1Y,2Y,3Y,5Y
+    const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    std::istringstream is(s);
+    json_decoder<ojson> decoder;
 
-    json_decoder<json> decoder;
+    std::istringstream is1(bond_yields);
+    csv_parameters params1;
+    params1.assume_header(true)
+           .mapping(mapping_type::n_rows)
+           .column_types({"string","float","float","float","float"});
+    csv_reader reader1(is1,decoder,params1);
+    reader1.read();
+    ojson val1 = decoder.get_result();
+    std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
 
-    csv_parameters params;
-    params.assume_header(true)
-          .mapping(mapping_type::m_columns)
-          .column_types({"string","float","float","float","float"});
+    std::istringstream is2(bond_yields);
+    csv_parameters params2;
+    params2.assume_header(true)
+           .mapping(mapping_type::n_objects)
+           .column_types({"string","float","float","float","float"});
+    csv_reader reader2(is2,decoder,params2);
+    reader2.read();
+    ojson val2 = decoder.get_result();
+    std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
 
-    csv_reader reader(is,decoder,params);
-    reader.read();
-    json val = decoder.get_result();
-
-    std::cout << val << std::endl;
+    std::istringstream is3(bond_yields);
+    csv_parameters params3;
+    params3.assume_header(true)
+        .mapping(mapping_type::m_columns)
+        .column_types({ "string","float","float","float","float" });
+    csv_reader reader3(is3, decoder, params3);
+    reader3.read();
+    ojson val3 = decoder.get_result();
+    std::cout << "\n(3)\n" << pretty_print(val3) << "\n";
 }
 
 BOOST_AUTO_TEST_CASE(csv_test_empty_values)

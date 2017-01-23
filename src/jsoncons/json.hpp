@@ -3984,6 +3984,7 @@ typedef json_decoder<owjson> wojson_deserializer;
 
 }
 
+#if defined(JSONCONS_HAS_USER_DEFINED_LITERALS)
 inline 
 jsoncons::json operator "" _json(const char* s, std::size_t n)
 {
@@ -4007,6 +4008,7 @@ jsoncons::owjson operator "" _ojson(const wchar_t* s, std::size_t n)
 {
     return jsoncons::owjson::parse(s, n);
 }
+#endif
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop

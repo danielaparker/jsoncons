@@ -30,6 +30,13 @@ namespace jsoncons
 #define JSONCONS_NO_CONSTEXPR
 #endif
 
+#if defined(_MSC_VER)
+#if _MSC_VER >= 1900
+#define JSONCONS_HAS_USER_DEFINED_LITERALS
+#else
+#endif
+#endif
+
 //#define JSONCONS_HAS_STRING_VIEW
 
 #if defined(ANDROID) || defined(__ANDROID__)

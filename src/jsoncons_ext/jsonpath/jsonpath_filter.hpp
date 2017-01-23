@@ -260,8 +260,8 @@ public:
         if (this != &val)
         {
             type_ = val.type_;
-            precedence_level_ = precedence_level_;
-            is_right_associative_ = is_right_associative_;
+            precedence_level_ = val.precedence_level_;
+            is_right_associative_ = val.is_right_associative_;
             operand_ptr_ = val.operand_ptr_;
             unary_operator_ = val.unary_operator_;
             operator_ = val.operator_;
