@@ -94,6 +94,11 @@ enum class data_type
 template<class CharT>
 class basic_csv_parser : private basic_parsing_context<CharT>
 {
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+    typedef Basic_string_view_<CharT> string_view_type;
+#else
+    typedef std::basic_string_view<CharT> string_view_type;
+#endif
     static const int default_depth = 3;
 
     basic_default_parse_error_handler<CharT> default_err_handler_;
@@ -257,8 +262,7 @@ public:
                     handler_.begin_array(*this);
                     for (const auto& name : column_names_)
                     {
-                        value_buffer_ = name;
-                        end_value();
+                        end_value(name,column_index_);
                     }
                     handler_.end_array(*this);
                 }
@@ -529,8 +533,7 @@ all_csv_states:
                 handler_.begin_array(*this);
                 for (const auto& val : column_values_[i])
                 {
-                    value_buffer_ = val;
-                    end_value();
+                    end_value(val,i);
                 }
                 handler_.end_array(*this);
             }
@@ -622,7 +625,7 @@ private:
                 }
                 else
                 {
-                    end_value();
+                    end_value(value_buffer_,column_index_);
                 }
                 break;
             case mapping_type::n_objects:
@@ -637,7 +640,7 @@ private:
                         }
                         else
                         {
-                            end_value();
+                            end_value(value_buffer_,column_index_);
                         }
                     }
                 }
@@ -675,7 +678,7 @@ private:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
-                end_value();
+                end_value(value_buffer_,column_index_);
                 break;
             case mapping_type::n_objects:
                 if (!(parameters_.ignore_empty_values() && value_buffer_.size() == 0))
@@ -683,7 +686,7 @@ private:
                     if (column_index_ < column_names_.size())
                     {
                         handler_.name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
-                        end_value();
+                        end_value(value_buffer_,column_index_);
                     }
                 }
                 break;
@@ -699,15 +702,15 @@ private:
         value_buffer_.clear();
     }
 
-    void end_value()
+    void end_value(string_view_type value, size_t column_index)
     {
-        if (column_index_ < column_types_.size())
+        if (column_index < column_types_.size())
         {
-            switch (column_types_[column_index_])
+            switch (column_types_[column_index])
             {
             case data_type::integer_t:
                 {
-                    std::istringstream iss(value_buffer_);
+                    std::istringstream iss(value);
                     long long val;
                     iss >> val;
                     if (!iss.fail())
@@ -716,10 +719,10 @@ private:
                     }
                     else
                     {
-                        if (column_index_ < column_defaults_.size() && column_defaults_[column_index_].length() > 0)
+                        if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             parser_.begin_parse();
-                            parser_.parse(column_defaults_[column_index_].data(),0,column_defaults_[column_index_].length());
+                            parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
                         else
@@ -731,7 +734,7 @@ private:
                 break;
             case data_type::float_t:
                 {
-                    std::istringstream iss(value_buffer_);
+                    std::istringstream iss(value);
                     double val;
                     iss >> val;
                     if (!iss.fail())
@@ -740,10 +743,10 @@ private:
                     }
                     else
                     {
-                        if (column_index_ < column_defaults_.size() && column_defaults_[column_index_].length() > 0)
+                        if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             parser_.begin_parse();
-                            parser_.parse(column_defaults_[column_index_].data(),0,column_defaults_[column_index_].length());
+                            parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
                         else
@@ -755,28 +758,28 @@ private:
                 break;
             case data_type::boolean_t:
                 {
-                    if (value_buffer_.length() == 1 && value_buffer_[0] == '0')
+                    if (value.length() == 1 && value[0] == '0')
                     {
                         handler_.value(false, *this);
                     }
-                    else if (value_buffer_.length() == 1 && value_buffer_[0] == '1')
+                    else if (value.length() == 1 && value[0] == '1')
                     {
                         handler_.value(true, *this);
                     }
-                    else if (value_buffer_.length() == 5 && ((value_buffer_[0] == 'f' || value_buffer_[0] == 'F') && (value_buffer_[1] == 'a' || value_buffer_[1] == 'A') && (value_buffer_[2] == 'l' || value_buffer_[2] == 'L') && (value_buffer_[3] == 's' || value_buffer_[3] == 'S') && (value_buffer_[4] == 'e' || value_buffer_[4] == 'E')))
+                    else if (value.length() == 5 && ((value[0] == 'f' || value[0] == 'F') && (value[1] == 'a' || value[1] == 'A') && (value[2] == 'l' || value[2] == 'L') && (value[3] == 's' || value[3] == 'S') && (value[4] == 'e' || value[4] == 'E')))
                     {
                         handler_.value(false, *this);
                     }
-                    else if (value_buffer_.length() == 4 && ((value_buffer_[0] == 't' || value_buffer_[0] == 'T') && (value_buffer_[1] == 'r' || value_buffer_[1] == 'R') && (value_buffer_[2] == 'u' || value_buffer_[2] == 'U') && (value_buffer_[3] == 'e' || value_buffer_[3] == 'E')))
+                    else if (value.length() == 4 && ((value[0] == 't' || value[0] == 'T') && (value[1] == 'r' || value[1] == 'R') && (value[2] == 'u' || value[2] == 'U') && (value[3] == 'e' || value[3] == 'E')))
                     {
                         handler_.value(true, *this);
                     }
                     else
                     {
-                        if (column_index_ < column_defaults_.size() && column_defaults_[column_index_].length() > 0)
+                        if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             parser_.begin_parse();
-                            parser_.parse(column_defaults_[column_index_].data(),0,column_defaults_[column_index_].length());
+                            parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
                         else
@@ -787,16 +790,16 @@ private:
                 }
                 break;
             default:
-                if (value_buffer_.length() > 0)
+                if (value.length() > 0)
                 {
-                    handler_.value(value_buffer_.data(), value_buffer_.length(), *this);
+                    handler_.value(value.data(), value.length(), *this);
                 }
                 else
                 {
-                    if (column_index_ < column_defaults_.size() && column_defaults_[column_index_].length() > 0)
+                    if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                     {
                         parser_.begin_parse();
-                        parser_.parse(column_defaults_[column_index_].data(),0,column_defaults_[column_index_].length());
+                        parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
                         parser_.end_parse();
                     }
                     else
@@ -809,7 +812,7 @@ private:
         }
         else
         {
-            handler_.value(value_buffer_.data(), value_buffer_.length(), *this);
+            handler_.value(value.data(), value.length(), *this);
         }
     }
 
