@@ -4,8 +4,6 @@
 #include <stdexcept>
 #include <string>
 
-#if 0
-
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
@@ -319,18 +317,3 @@ int main()
 
     return 0;
 }
-#endif
-
-#include <type_traits>
-#include <iostream>
-#include <string>
-#include <cstdint>
-#include <jsoncons/unicode_traits.hpp>
-
-int main()
-{
-    std::cout << unicons::is_same_size<void, void>::value << std::endl;
-    std::cout << unicons::is_same_size<char, unsigned char>::value << std::endl;
-    std::cout << unicons::is_same_size<uint16_t, wchar_t>::value << std::endl;
-}
-

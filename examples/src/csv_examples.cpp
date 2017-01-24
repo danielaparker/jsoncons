@@ -19,36 +19,40 @@ void mapping_types()
 )";
 
     json_decoder<ojson> decoder;
-
-    std::istringstream is1(bond_yields);
-    csv_parameters params1;
-    params1.assume_header(true)
-           .mapping(mapping_type::n_rows)
+    csv_parameters params;
+    params.assume_header(true)
            .column_types({"string","float","float","float","float"});
-    csv_reader reader1(is1,decoder,params1);
+
+    // Default
+    std::istringstream is1(bond_yields);
+    csv_reader reader1(is1,decoder,params);
     reader1.read();
     ojson val1 = decoder.get_result();
     std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
 
+    // mapping_type::n_rows
+    params.mapping(mapping_type::n_rows);
     std::istringstream is2(bond_yields);
-    csv_parameters params2;
-    params2.assume_header(true)
-           .mapping(mapping_type::n_objects)
-           .column_types({"string","float","float","float","float"});
-    csv_reader reader2(is2,decoder,params2);
+    csv_reader reader2(is2,decoder,params);
     reader2.read();
     ojson val2 = decoder.get_result();
     std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
 
+    // mapping_type::n_objects
+    params.mapping(mapping_type::n_objects);
     std::istringstream is3(bond_yields);
-    csv_parameters params3;
-    params3.assume_header(true)
-        .mapping(mapping_type::m_columns)
-        .column_types({ "string","float","float","float","float" });
-    csv_reader reader3(is3, decoder, params3);
+    csv_reader reader3(is3,decoder,params);
     reader3.read();
     ojson val3 = decoder.get_result();
-    std::cout << "\n(3)\n" << pretty_print(val3) << "\n";
+    std::cout << "\n(3)\n"<< pretty_print(val3) << "\n";
+
+    // mapping_type::m_columns
+    params.mapping(mapping_type::m_columns);
+    std::istringstream is4(bond_yields);
+    csv_reader reader4(is4, decoder, params);
+    reader4.read();
+    ojson val4 = decoder.get_result();
+    std::cout << "\n(4)\n" << pretty_print(val4) << "\n";
 }
 
 void read_csv_file1()
