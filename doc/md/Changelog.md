@@ -1,3 +1,9 @@
+0.99.7.1
+--------
+
+- Workarounds in unicode_traits and jsonpath to maintain support for vs2013 
+- Added `mapping_type::n_rows`, `mapping_type::n_objects`, and `mapping_type::m_columns` options for csv to json 
+
 0.99.7
 ------
 
