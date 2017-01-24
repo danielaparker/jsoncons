@@ -15,7 +15,23 @@
 
 using namespace jsoncons;
 
+// the partial specialization of A is enabled via a template parameter
+template<class T, class Enable = void>
+class A {}; // primary template
+ 
+template<class T>
+class A<T, typename std::enable_if<std::is_floating_point<T>::value>::type> {
+}; // specialization for floating point types
+
+
 BOOST_AUTO_TEST_SUITE(unicode_tests)
+
+
+BOOST_AUTO_TEST_CASE( test_is_same_size )
+{
+}
+
+#if 0
 
 BOOST_AUTO_TEST_CASE( test_surrogate_pair )
 {
@@ -67,6 +83,6 @@ BOOST_AUTO_TEST_CASE( test1 )
 
     json copy(root);
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()
 
