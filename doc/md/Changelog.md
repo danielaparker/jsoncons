@@ -1,3 +1,9 @@
+master
+------
+
+- jsoncons_ext/binary changed to jsoncons_ext/msgpack
+- namespace jsoncons::binary changed to jsoncons::msgpack
+
 0.99.7.1
 --------
 

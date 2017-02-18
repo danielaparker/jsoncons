@@ -15,7 +15,7 @@
 #include <memory>
 #include <limits>
 
-namespace jsoncons { namespace binary {
+namespace jsoncons { namespace msgpack {
 
 // to_big_endian
 

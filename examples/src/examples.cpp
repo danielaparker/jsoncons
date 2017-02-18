@@ -20,7 +20,7 @@ void unicode_examples();
 void csv_examples();
 void jsonpath_examples();
 void json_is_as_examples();
-void binary_examples();
+void msgpack_examples();
 
 void first_example_a()
 {
@@ -307,7 +307,7 @@ int main()
 
         jsonpath_examples();
 
-        binary_examples();
+        msgpack_examples();
 
     }
     catch (const std::exception& e)

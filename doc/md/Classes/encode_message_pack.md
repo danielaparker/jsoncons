@@ -1,11 +1,11 @@
 ```c++
-jsoncons::binary::encode_message_pack
+jsoncons::msgpack::encode_message_pack
 ```
 Encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 ### Header
 ```c++
-#include <jsoncons/binary/message_pack.hpp>
+#include <jsoncons/msgpack/message_pack.hpp>
 
 template<class Json>
 std::vector<uint8_t> encode_message_pack(const Json& jval)
@@ -17,10 +17,10 @@ std::vector<uint8_t> encode_message_pack(const Json& jval)
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/binary/message_pack.hpp>
+#include <jsoncons_ext/msgpack/message_pack.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::binary;
+using namespace jsoncons::msgpack;
 
 int main()
 {

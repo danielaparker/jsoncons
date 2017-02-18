@@ -3,10 +3,10 @@
 
 #include <string>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/binary/message_pack.hpp>
+#include <jsoncons_ext/msgpack/message_pack.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::binary;
+using namespace jsoncons::msgpack;
 
 void message_pack_example1()
 {
@@ -25,7 +25,7 @@ ojson j1 = ojson::parse(R"(
 ]
 )");
 
-    std::vector<uint8_t> v = jsoncons::binary::encode_message_pack(j1);
+    std::vector<uint8_t> v = jsoncons::msgpack::encode_message_pack(j1);
 
     ojson j2 = decode_message_pack<ojson>(v);
 
@@ -81,9 +81,9 @@ void message_pack_example2()
     std::cout << std::endl;
 }
 
-void binary_examples()
+void msgpack_examples()
 {
-    std::cout << "\nbinary examples\n\n";
+    std::cout << "\nmsgpack examples\n\n";
     message_pack_example1();
     message_pack_example2();
     std::cout << std::endl;

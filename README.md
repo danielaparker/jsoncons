@@ -31,7 +31,7 @@ Extensions:
 
 - The [jsonpath](#user-content-ext_jsonpath) extension supports search using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
-- The [binary](#user-content-ext_binary) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+- The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 ## Get jsoncons
 
@@ -531,11 +531,11 @@ project_id,task_name,task_start,task_finish
 
 See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) and [csv_serializer](https://github.com/danielaparker/jsoncons/wiki/csv_serializer) for details.
 
-<div id="ext_binary"/>
+<div id="ext_msgpack"/>
 
-### binary
+### msgpack
 
-The `binary` extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+The `msgpack` extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 #### MessagePack example
 
@@ -558,10 +558,10 @@ Example file (book.json):
 ```
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/binary/message_pack.hpp>
+#include <jsoncons_ext/msgpack/message_pack.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::binary;
+using namespace jsoncons::msgpack;
 
 int main()
 {

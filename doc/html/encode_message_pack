@@ -468,20 +468,20 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::binary::encode_message_pack</pre></div>
+<div class="highlight highlight-source-c++"><pre>jsoncons::msgpack::encode_message_pack</pre></div>
 <p>Encodes a json value to the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
 <h3>Header</h3>
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/binary/message_pack.hpp<span class="pl-pds">&gt;</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/msgpack/message_pack.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
 std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; <span class="pl-en">encode_message_pack</span>(<span class="pl-k">const</span> Json&amp; jval)</pre></div>
 <h3>Examples</h3>
 <h2>MessagePack example</h2>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/binary/message_pack.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/msgpack/message_pack.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::binary<span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::msgpack<span class="pl-k">;</span>
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {

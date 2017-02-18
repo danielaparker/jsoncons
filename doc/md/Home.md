@@ -50,7 +50,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [json_replace](json_replace)
 
-#### binary
+#### msgpack
 
 [encode_message_pack](encode_message_pack)
 

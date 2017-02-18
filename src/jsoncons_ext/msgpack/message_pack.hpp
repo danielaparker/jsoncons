@@ -16,9 +16,9 @@
 #include <limits>
 #include <cassert>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/binary/binary_util.hpp>
+#include <jsoncons_ext/msgpack/binary_util.hpp>
 
-namespace jsoncons { namespace binary {
+namespace jsoncons { namespace msgpack {
   
 namespace msgpack_format
 {

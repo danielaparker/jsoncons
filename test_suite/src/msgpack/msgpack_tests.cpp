@@ -7,7 +7,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/binary/message_pack.hpp>
+#include <jsoncons_ext/msgpack/message_pack.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -15,7 +15,7 @@
 #include <limits>
 
 using namespace jsoncons;
-using namespace jsoncons::binary;
+using namespace jsoncons::msgpack;
 
 BOOST_AUTO_TEST_SUITE(message_pack_tests)
 
