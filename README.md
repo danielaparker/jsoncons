@@ -35,7 +35,7 @@ Extensions:
 
 ## What's new on master
 
-A bug was introduced in 0.99.7 causing the values of existing object members to not be changed wiht set or assignment operations. This has been fixed on master and in Release 0.99.7.2.
+A bug was introduced in 0.99.7 causing the values of existing object members to not be changed with set or assignment operations. This has been fixed on master and in Release 0.99.7.2.
 
 ## Get jsoncons
 
