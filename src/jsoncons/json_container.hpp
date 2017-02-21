@@ -1274,7 +1274,7 @@ public:
     {
         string_view_type s(name.data(),name.size());
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
-                               [s](const value_type& a){return a.key().compare(s);});
+                               [s](const value_type& a){return a.key().compare(s) == 0;});
 
         if (it == this->members_.end())
         {
@@ -1294,7 +1294,7 @@ public:
     {
         string_view_type s(name.data(),name.size());
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
-                               [s](const value_type& a){return a.key().compare(s);});
+                               [s](const value_type& a){return a.key().compare(s) == 0;});
 
         if (it == this->members_.end())
         {

@@ -845,5 +845,18 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
                           [](const std::exception& ex ) { return ex.what() == std::string("first_aid_certification not found"); });
 }
 
+BOOST_AUTO_TEST_CASE(test_set_override)
+{
+    json obj;
+    obj["first_name"] = "Jane";
+    obj["height"] = 0.9;
+
+    obj["first_name"] = "Joe";
+    obj["height"] = "0.3";
+
+    BOOST_CHECK(obj["first_name"] == "Joe");
+    BOOST_CHECK_CLOSE(obj["height"].as<double>(),0.3,0.00000000001);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
