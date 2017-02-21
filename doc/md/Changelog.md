@@ -1,5 +1,11 @@
-master
-------
+0.99.7.2
+--------
+
+Bug fix
+
+- A bug was introduced in 0.99.7 causing the values of existing object members to not be changed wiht set or assignment operations. This has been fixed.
+
+Change
 
 - jsoncons_ext/binary changed to jsoncons_ext/msgpack
 - namespace jsoncons::binary changed to jsoncons::msgpack

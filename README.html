@@ -497,8 +497,10 @@ vertical-align:1px;
 <ul>
 <li>The <a href="#user-content-ext_jsonpath">jsonpath</a> extension supports search using <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>.  It also supports search and replace using JsonPath expressions.</li>
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
-<li>The <a href="#user-content-ext_binary">binary</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
+<li>The <a href="#user-content-ext_msgpack">msgpack</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
+<h2>What's new on master</h2>
+<p>A bug was introduced in 0.99.7 causing the values of existing object members to not be changed wiht set or assignment operations. This has been fixed on master and in Release 0.99.7.2.</p>
 <h2>Get jsoncons</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
@@ -918,9 +920,9 @@ project_id,task_name,task_start,task_finish
 4002,task2,05/01/2003,
 </code></pre>
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/csv_reader">csv_reader</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/csv_serializer">csv_serializer</a> for details.</p>
-<div id="user-content-ext_binary">
-<h3>binary</h3>
-<p>The <code>binary</code> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
+<div id="user-content-ext_msgpack">
+<h3>msgpack</h3>
+<p>The <code>msgpack</code> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
 <h4>MessagePack example</h4>
 <p>Example file (book.json):</p>
 <div class="highlight highlight-source-json"><pre>[
@@ -938,10 +940,10 @@ project_id,task_name,task_start,task_finish
     }
 ]</pre></div>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/binary/message_pack.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/msgpack/message_pack.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::binary<span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::msgpack<span class="pl-k">;</span>
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {
