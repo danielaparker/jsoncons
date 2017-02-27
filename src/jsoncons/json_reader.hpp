@@ -89,7 +89,7 @@ public:
 
     void read_next()
     {
-        parser_.begin_parse();
+        parser_.reset();
         while (!eof_ && !parser_.done())
         {
             if (!(index_ < buffer_length_))
@@ -115,7 +115,10 @@ public:
                 index_ = parser_.index();
             }
         }
-        parser_.end_parse();
+        if (eof_)
+        {
+            parser_.end_parse();
+        }
     }
 
     void check_done()

@@ -156,21 +156,23 @@ class basic_json_parser : private basic_parsing_context<CharT>
     std::vector<parse_state> stack_;
     basic_json_input_handler<CharT>& handler_;
     basic_parse_error_handler<CharT>& err_handler_;
-    size_t column_;
-    size_t line_;
     uint32_t cp_;
     uint32_t cp2_;
     std::basic_string<CharT> string_buffer_;
     bool is_negative_;
     size_t index_;
+
+    size_t line_;
+    size_t column_;
+    int nesting_depth_;
     int initial_stack_capacity_;
+
     int max_depth_;
     string_to_double<CharT> str_to_double_;
     const CharT* begin_input_;
     const CharT* end_input_;
     const CharT* p_;
     std::pair<const CharT*,size_t> literal_;
-    int nesting_depth_;
     uint8_t precision_;
     size_t literal_index_;
 
@@ -183,36 +185,44 @@ public:
     basic_json_parser(basic_json_input_handler<CharT>& handler)
        : handler_(handler),
          err_handler_(default_err_handler_),
-         column_(0),
-         line_(0),
          cp_(0),
          cp2_(0),
          is_negative_(false),
          index_(0),
-         initial_stack_capacity_(default_initial_stack_capacity_),
+         line_(1),
+         column_(1),
          nesting_depth_(0), 
+         initial_stack_capacity_(default_initial_stack_capacity_),
          precision_(0), 
          literal_index_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
+
+        stack_.reserve(initial_stack_capacity_);
+        stack_.push_back(parse_state::root);
+        stack_.push_back(parse_state::start);
     }
 
     basic_json_parser(basic_json_input_handler<CharT>& handler,
                       basic_parse_error_handler<CharT>& err_handler)
        : handler_(handler),
          err_handler_(err_handler),
-         column_(0),
-         line_(0),
          cp_(0),
          cp2_(0),
          is_negative_(false),
          index_(0),
-         initial_stack_capacity_(default_initial_stack_capacity_),
+         line_(1),
+         column_(1),
          nesting_depth_(0), 
+         initial_stack_capacity_(default_initial_stack_capacity_),
          precision_(0), 
          literal_index_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
+
+        stack_.reserve(initial_stack_capacity_);
+        stack_.push_back(parse_state::root);
+        stack_.push_back(parse_state::start);
     }
 
     const basic_parsing_context<CharT>& parsing_context() const
@@ -334,7 +344,7 @@ public:
         }
     }
 
-    void begin_parse()
+    void reset()
     {
         stack_.clear();
         stack_.reserve(initial_stack_capacity_);

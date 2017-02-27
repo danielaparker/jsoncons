@@ -288,7 +288,7 @@ public:
         column_index_ = 0;
     }
 
-    void begin_parse()
+    void reset()
     {
         push_mode(csv_mode_type::initial);
         handler_.begin_json();
@@ -721,7 +721,7 @@ private:
                     {
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
-                            parser_.begin_parse();
+                            parser_.reset();
                             parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
@@ -745,7 +745,7 @@ private:
                     {
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
-                            parser_.begin_parse();
+                            parser_.reset();
                             parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
@@ -778,7 +778,7 @@ private:
                     {
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
-                            parser_.begin_parse();
+                            parser_.reset();
                             parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
@@ -798,7 +798,7 @@ private:
                 {
                     if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                     {
-                        parser_.begin_parse();
+                        parser_.reset();
                         parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
                         parser_.end_parse();
                     }

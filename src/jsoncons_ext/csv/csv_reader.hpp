@@ -111,7 +111,7 @@ public:
 
     void read()
     {
-        parser_.begin_parse();
+        parser_.reset();
         while (!eof_ && !parser_.done())
         {
             if (!(index_ < buffer_length_))
