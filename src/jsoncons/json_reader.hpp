@@ -34,6 +34,7 @@ class basic_json_reader
     size_t buffer_length_;
     size_t buffer_capacity_;
     size_t index_;
+    bool begin_;
 
     // Noncopyable and nonmoveable
     basic_json_reader(const basic_json_reader&) = delete;
@@ -48,7 +49,8 @@ public:
           eof_(false),
           buffer_length_(0),
           buffer_capacity_(default_max_buffer_length),
-          index_(0)
+          index_(0),
+          begin_(true)
     {
         buffer_.resize(buffer_capacity_);
     }
@@ -61,7 +63,8 @@ public:
          eof_(false),
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
-         index_(0)
+         index_(0),
+         begin_(true)
     {
         buffer_.resize(buffer_capacity_);
     }
@@ -102,7 +105,16 @@ public:
                     {
                         eof_ = true;
                     }
-                    index_ = 0;
+                    else if (begin_)
+                    {
+                        parser_.skip_bom(buffer_.data(),buffer_length_);
+                        index_ = parser_.index();
+                        begin_ = false;
+                    }
+                    else
+                    {
+                        index_ = 0;
+                    }
                 }
                 else
                 {

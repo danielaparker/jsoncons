@@ -503,39 +503,41 @@ public:
         }
     }
 
+    void skip_bom(const CharT* input, size_t length)
+    {
+        end_input_ = input + length;
+
+        auto result = unicons::skip_bom(input, end_input_);
+        switch (result.first)
+        {
+        case unicons::encoding_errc::expected_u8_found_u16:
+            err_handler_.fatal_error(json_parser_errc::expected_u8_found_u16, *this);
+            break;
+        case unicons::encoding_errc::expected_u8_found_u32:
+            err_handler_.fatal_error(json_parser_errc::expected_u8_found_u32, *this);
+            break;
+        case unicons::encoding_errc::expected_u16_found_fffe:
+            err_handler_.fatal_error(json_parser_errc::expected_u16_found_fffe, *this);
+            break;
+        case unicons::encoding_errc::expected_u32_found_fffe:
+            err_handler_.fatal_error(json_parser_errc::expected_u32_found_fffe, *this);
+            break;
+        default: // ok
+            break;
+        }
+        begin_input_ = result.second;
+        index_ = begin_input_ - input;
+        column_ = index_+1;
+        p_ = begin_input_;
+    }
+
     void parse(const CharT* input, size_t start, size_t length)
     {
         end_input_ = input + length;
 
-        if (start == 0)
-        {
-            auto result = unicons::skip_bom(input, end_input_);
-            switch (result.first)
-            {
-            case unicons::encoding_errc::expected_u8_found_u16:
-                err_handler_.fatal_error(json_parser_errc::expected_u8_found_u16, *this);
-                break;
-            case unicons::encoding_errc::expected_u8_found_u32:
-                err_handler_.fatal_error(json_parser_errc::expected_u8_found_u32, *this);
-                break;
-            case unicons::encoding_errc::expected_u16_found_fffe:
-                err_handler_.fatal_error(json_parser_errc::expected_u16_found_fffe, *this);
-                break;
-            case unicons::encoding_errc::expected_u32_found_fffe:
-                err_handler_.fatal_error(json_parser_errc::expected_u32_found_fffe, *this);
-                break;
-            default: // ok
-                break;
-            }
-            begin_input_ = result.second;
-            index_ = begin_input_ - input;
-            column_ = index_+1;
-        }
-        else
-        {
-            index_ = start;
-            begin_input_ = input + start;
-        }
+        index_ = start;
+        begin_input_ = input + start;
+        
         p_ = begin_input_;
 
         while ((p_ < end_input_) && (stack_.back() != parse_state::done))
