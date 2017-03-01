@@ -722,7 +722,8 @@ private:
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             parser_.reset();
-                            parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
+                            parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser_.parse(column_defaults_[column_index].data(),column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
                         else
@@ -746,7 +747,8 @@ private:
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             parser_.reset();
-                            parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
+                            parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser_.parse(column_defaults_[column_index].data(),column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
                         else
@@ -779,7 +781,8 @@ private:
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             parser_.reset();
-                            parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
+                            parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser_.parse(column_defaults_[column_index].data(),column_defaults_[column_index].length());
                             parser_.end_parse();
                         }
                         else
@@ -799,7 +802,8 @@ private:
                     if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                     {
                         parser_.reset();
-                        parser_.parse(column_defaults_[column_index].data(),0,column_defaults_[column_index].length());
+                        parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                        parser_.parse(column_defaults_[column_index].data(),column_defaults_[column_index].length());
                         parser_.end_parse();
                     }
                     else

@@ -33,7 +33,6 @@ class basic_json_reader
     std::vector<CharT> buffer_;
     size_t buffer_length_;
     size_t buffer_capacity_;
-    size_t index_;
     bool begin_;
 
     // Noncopyable and nonmoveable
@@ -49,7 +48,6 @@ public:
           eof_(false),
           buffer_length_(0),
           buffer_capacity_(default_max_buffer_length),
-          index_(0),
           begin_(true)
     {
         buffer_.resize(buffer_capacity_);
@@ -63,7 +61,6 @@ public:
          eof_(false),
          buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
-         index_(0),
          begin_(true)
     {
         buffer_.resize(buffer_capacity_);
@@ -95,12 +92,13 @@ public:
         parser_.reset();
         while (!eof_ && !parser_.done())
         {
-            if (!(index_ < buffer_length_))
+            if (!(parser_.index() < buffer_length_))
             {
                 if (!is_.eof())
                 {
                     is_.read(buffer_.data(), buffer_capacity_);
                     buffer_length_ = static_cast<size_t>(is_.gcount());
+                    parser_.set_buffer(buffer_.data(),buffer_length_);
                     if (buffer_length_ == 0)
                     {
                         eof_ = true;
@@ -108,12 +106,7 @@ public:
                     else if (begin_)
                     {
                         parser_.skip_bom(buffer_.data(),buffer_length_);
-                        index_ = parser_.index();
                         begin_ = false;
-                    }
-                    else
-                    {
-                        index_ = 0;
                     }
                 }
                 else
@@ -123,8 +116,7 @@ public:
             }
             if (!eof_)
             {
-                parser_.parse(buffer_.data(),index_,buffer_length_);
-                index_ = parser_.index();
+                parser_.parse(buffer_.data(),buffer_length_);
             }
         }
         if (eof_)
@@ -137,13 +129,13 @@ public:
     {
         if (eof_)
         {
-            parser_.check_done(buffer_.data(),0,0);
+            parser_.check_done(buffer_.data(),0);
         }
         else
         {
             while (!eof_)
             {
-                if (!(index_ < buffer_length_))
+                if (!(parser_.index() < buffer_length_))
                 {
                     if (!is_.eof())
                     {
@@ -153,7 +145,6 @@ public:
                         {
                             eof_ = true;
                         }
-                        index_ = 0;
                     }
                     else
                     {
@@ -162,8 +153,7 @@ public:
                 }
                 if (!eof_)
                 {
-                    parser_.check_done(buffer_.data(),index_,buffer_length_);
-                    index_ = parser_.index();
+                    parser_.check_done(buffer_.data(),buffer_length_);
                 }
             }
         }

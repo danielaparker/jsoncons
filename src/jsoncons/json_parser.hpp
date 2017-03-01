@@ -355,14 +355,14 @@ public:
         nesting_depth_ = 0;
     }
 
-    void check_done(const CharT* input, size_t start, size_t length)
+    void check_done(const CharT* input, size_t length)
     {
         JSONCONS_ASSERT(stack_.size() >= 1);
         if (stack_.back() != parse_state::done)
         {
             err_handler_.error(json_parser_errc::unexpected_eof, *this);
         }
-        index_ = start;
+        //index_ = start;
         for (; index_ < length; ++index_)
         {
             CharT curr_char_ = input[index_];
@@ -531,12 +531,12 @@ public:
         p_ = begin_input_;
     }
 
-    void parse(const CharT* input, size_t start, size_t length)
+    void parse(const CharT* input, size_t length)
     {
         end_input_ = input + length;
 
-        index_ = start;
-        begin_input_ = input + start;
+        //index_ = start;
+        begin_input_ = input + index_;
         
         p_ = begin_input_;
 
@@ -1522,6 +1522,14 @@ public:
     size_t index() const
     {
         return index_;
+    }
+
+    void set_buffer(const CharT* input, size_t length)
+    {
+        index_ = 0;
+        begin_input_ = input;
+        end_input_ = input + length;
+        p_ = begin_input_;
     }
 private:
     void end_fraction_value()

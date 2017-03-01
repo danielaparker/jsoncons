@@ -1987,9 +1987,9 @@ public:
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
-        parser.parse(s.data(),0,s.length());
+        parser.parse(s.data(),s.length());
         parser.end_parse();
-        parser.check_done(s.data(),parser.index(),s.length());
+        parser.check_done(s.data(),s.length());
         if (!handler.is_valid())
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
@@ -2001,10 +2001,9 @@ public:
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
-        parser.reset();
-        parser.parse(s,0,length);
+        parser.parse(s,length);
         parser.end_parse();
-        parser.check_done(s,parser.index(),length);
+        parser.check_done(s,length);
         if (!handler.is_valid())
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
@@ -2057,10 +2056,9 @@ public:
                 }
 
                 basic_json_parser<char_type> parser(handler,err_handler);
-                parser.reset();
-                parser.parse(buffer.data(),0,buffer.size());
+                parser.parse(buffer.data(),buffer.size());
                 parser.end_parse();
-                parser.check_done(buffer.data(),parser.index(),buffer.size());
+                parser.check_done(buffer.data(),buffer.size());
             }
 
             std::fclose (fp);
