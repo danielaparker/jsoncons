@@ -178,6 +178,29 @@ BOOST_AUTO_TEST_CASE(test_null)
     json j = decoder.get_result();
 }
 
+BOOST_AUTO_TEST_CASE(test_array_string)
+{
+    jsoncons::json_decoder<json> decoder;
+    json_parser parser(decoder);
+
+    parser.reset();
+
+    static std::string s1("[\"\"");
+
+    parser.set_buffer(s1.data(),s1.length());
+    parser.parse();
+    BOOST_CHECK(!parser.done());
+    static std::string s2("]");
+    parser.set_buffer(s2.data(), s2.length());
+    parser.parse();
+
+    BOOST_CHECK(parser.done());
+
+    parser.end_parse();
+
+    json j = decoder.get_result();
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

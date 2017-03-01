@@ -92,7 +92,7 @@ public:
         parser_.reset();
         while (!eof_ && !parser_.done())
         {
-            if (!(parser_.index() < buffer_length_))
+            if (parser_.source_exhausted())
             {
                 if (!is_.eof())
                 {
@@ -129,18 +129,19 @@ public:
     {
         if (eof_)
         {
-            parser_.check_done(buffer_.data(),0);
+            parser_.check_done();
         }
         else
         {
             while (!eof_)
             {
-                if (!(parser_.index() < buffer_length_))
+                if (parser_.source_exhausted())
                 {
                     if (!is_.eof())
                     {
                         is_.read(buffer_.data(), buffer_capacity_);
                         buffer_length_ = static_cast<size_t>(is_.gcount());
+                        parser_.set_buffer(buffer_.data(),buffer_length_);
                         if (buffer_length_ == 0)
                         {
                             eof_ = true;
@@ -153,7 +154,7 @@ public:
                 }
                 if (!eof_)
                 {
-                    parser_.check_done(buffer_.data(),buffer_length_);
+                    parser_.check_done();
                 }
             }
         }

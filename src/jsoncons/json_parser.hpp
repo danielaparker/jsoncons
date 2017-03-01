@@ -160,7 +160,6 @@ class basic_json_parser : private basic_parsing_context<CharT>
     uint32_t cp2_;
     std::basic_string<CharT> string_buffer_;
     bool is_negative_;
-    size_t index_;
 
     size_t line_;
     size_t column_;
@@ -188,7 +187,6 @@ public:
          cp_(0),
          cp2_(0),
          is_negative_(false),
-         index_(0),
          line_(1),
          column_(1),
          nesting_depth_(0), 
@@ -210,7 +208,6 @@ public:
          cp_(0),
          cp2_(0),
          is_negative_(false),
-         index_(0),
          line_(1),
          column_(1),
          nesting_depth_(0), 
@@ -223,6 +220,11 @@ public:
         stack_.reserve(initial_stack_capacity_);
         stack_.push_back(parse_state::root);
         stack_.push_back(parse_state::start);
+    }
+
+    bool source_exhausted() const
+    {
+        return p_ == end_input_;
     }
 
     const basic_parsing_context<CharT>& parsing_context() const
@@ -355,17 +357,16 @@ public:
         nesting_depth_ = 0;
     }
 
-    void check_done(const CharT* input, size_t length)
+    void check_done()
     {
         JSONCONS_ASSERT(stack_.size() >= 1);
         if (stack_.back() != parse_state::done)
         {
             err_handler_.error(json_parser_errc::unexpected_eof, *this);
         }
-        //index_ = start;
-        for (; index_ < length; ++index_)
+        for (; p_ != end_input_; ++p_)
         {
-            CharT curr_char_ = input[index_];
+            CharT curr_char_ = *p_;
             switch (curr_char_)
             {
             case '\n':
@@ -524,8 +525,7 @@ public:
             break;
         }
         begin_input_ = result.second;
-        index_ = begin_input_ - p_;
-        column_ = index_+1;
+        column_ = begin_input_ - p_ + 1;
         p_ = begin_input_;
     }
 
@@ -1472,7 +1472,6 @@ public:
                 break;
             }
         }
-        index_ += (p_-begin_input_);
     }
 
     void end_parse()
@@ -1510,14 +1509,8 @@ public:
         return stack_.back();
     }
 
-    size_t index() const
-    {
-        return index_;
-    }
-
     void set_buffer(const CharT* input, size_t length)
     {
-        index_ = 0;
         begin_input_ = input;
         end_input_ = input + length;
         p_ = begin_input_;

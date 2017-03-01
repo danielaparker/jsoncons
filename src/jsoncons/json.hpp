@@ -1991,7 +1991,7 @@ public:
         parser.skip_bom();
         parser.parse();
         parser.end_parse();
-        parser.check_done(s.data(),s.length());
+        parser.check_done();
         if (!handler.is_valid())
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
@@ -2007,7 +2007,7 @@ public:
         parser.skip_bom();
         parser.parse();
         parser.end_parse();
-        parser.check_done(s,length);
+        parser.check_done();
         if (!handler.is_valid())
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
@@ -2064,7 +2064,7 @@ public:
                 parser.skip_bom();
                 parser.parse();
                 parser.end_parse();
-                parser.check_done(buffer.data(),buffer.size());
+                parser.check_done();
             }
 
             std::fclose (fp);
