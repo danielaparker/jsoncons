@@ -121,7 +121,6 @@ class basic_csv_parser : private basic_parsing_context<CharT>
     std::vector<std::basic_string<CharT>> column_defaults_;
     size_t column_index_;
     basic_json_body_filter<CharT> filter_;
-    basic_json_parser<CharT> parser_;
 
 public:
     basic_csv_parser(basic_json_input_handler<CharT>& handler)
@@ -130,8 +129,7 @@ public:
          handler_(handler),
          err_handler_(default_err_handler_),
          index_(0),
-         filter_(handler),
-         parser_(filter_)
+         filter_(handler)
     {
         depth_ = default_depth;
         state_ = csv_state_type::start;
@@ -149,8 +147,7 @@ public:
          err_handler_(default_err_handler_),
          index_(0),
          parameters_(params),
-         filter_(handler),
-         parser_(filter_)
+         filter_(handler)
    {
         depth_ = default_depth;
         state_ = csv_state_type::start;
@@ -167,8 +164,7 @@ public:
          handler_(handler),
          err_handler_(err_handler),
          index_(0),
-         filter_(handler),
-         parser_(filter_)
+         filter_(handler)
     {
         depth_ = default_depth;
         state_ = csv_state_type::start;
@@ -187,8 +183,7 @@ public:
          err_handler_(err_handler),
          index_(0),
          parameters_(params),
-         filter_(handler),
-         parser_(filter_)
+         filter_(handler)
     {
         depth_ = default_depth;
         state_ = csv_state_type::start;
@@ -721,10 +716,10 @@ private:
                     {
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
-                            parser_.reset();
-                            parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser_.parse();
-                            parser_.end_parse();
+                            basic_json_parser<CharT> parser(filter_);
+                            parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser.parse();
+                            parser.end_parse();
                         }
                         else
                         {
@@ -746,10 +741,10 @@ private:
                     {
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
-                            parser_.reset();
-                            parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser_.parse();
-                            parser_.end_parse();
+                            basic_json_parser<CharT> parser(filter_);
+                            parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser.parse();
+                            parser.end_parse();
                         }
                         else
                         {
@@ -780,10 +775,10 @@ private:
                     {
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
-                            parser_.reset();
-                            parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser_.parse();
-                            parser_.end_parse();
+                            basic_json_parser<CharT> parser(filter_);
+                            parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser.parse();
+                            parser.end_parse();
                         }
                         else
                         {
@@ -801,10 +796,10 @@ private:
                 {
                     if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                     {
-                        parser_.reset();
-                        parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                        parser_.parse();
-                        parser_.end_parse();
+                        basic_json_parser<CharT> parser(filter_);
+                        parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                        parser.parse();
+                        parser.end_parse();
                     }
                     else
                     {
