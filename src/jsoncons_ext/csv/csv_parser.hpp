@@ -718,7 +718,7 @@ private:
                         {
                             basic_json_parser<CharT> parser(filter_);
                             parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser.parse();
+                            parser.parse_some();
                             parser.end_parse();
                         }
                         else
@@ -743,7 +743,7 @@ private:
                         {
                             basic_json_parser<CharT> parser(filter_);
                             parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser.parse();
+                            parser.parse_some();
                             parser.end_parse();
                         }
                         else
@@ -777,7 +777,7 @@ private:
                         {
                             basic_json_parser<CharT> parser(filter_);
                             parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser.parse();
+                            parser.parse_some();
                             parser.end_parse();
                         }
                         else
@@ -798,7 +798,7 @@ private:
                     {
                         basic_json_parser<CharT> parser(filter_);
                         parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                        parser.parse();
+                        parser.parse_some();
                         parser.end_parse();
                     }
                     else
