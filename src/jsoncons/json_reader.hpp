@@ -105,7 +105,7 @@ public:
                     }
                     else if (begin_)
                     {
-                        parser_.skip_bom(buffer_.data(),buffer_length_);
+                        parser_.skip_bom();
                         begin_ = false;
                     }
                 }
@@ -116,7 +116,7 @@ public:
             }
             if (!eof_)
             {
-                parser_.parse(buffer_.data(),buffer_length_);
+                parser_.parse();
             }
         }
         if (eof_)

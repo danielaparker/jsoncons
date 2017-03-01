@@ -503,11 +503,9 @@ public:
         }
     }
 
-    void skip_bom(const CharT* input, size_t length)
+    void skip_bom()
     {
-        end_input_ = input + length;
-
-        auto result = unicons::skip_bom(input, end_input_);
+        auto result = unicons::skip_bom(p_, end_input_);
         switch (result.first)
         {
         case unicons::encoding_errc::expected_u8_found_u16:
@@ -526,20 +524,13 @@ public:
             break;
         }
         begin_input_ = result.second;
-        index_ = begin_input_ - input;
+        index_ = begin_input_ - p_;
         column_ = index_+1;
         p_ = begin_input_;
     }
 
-    void parse(const CharT* input, size_t length)
+    void parse()
     {
-        end_input_ = input + length;
-
-        //index_ = start;
-        begin_input_ = input + index_;
-        
-        p_ = begin_input_;
-
         while ((p_ < end_input_) && (stack_.back() != parse_state::done))
         {
             switch (*p_)

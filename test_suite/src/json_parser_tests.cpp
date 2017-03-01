@@ -24,7 +24,8 @@ BOOST_AUTO_TEST_CASE(test_object)
 
     static std::string s("{}");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(parser.done());
 
     parser.end_parse();
@@ -41,7 +42,8 @@ BOOST_AUTO_TEST_CASE(test_array)
 
     static std::string s("[]");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(parser.done());
 
     parser.end_parse();
@@ -58,7 +60,8 @@ BOOST_AUTO_TEST_CASE(test_string)
 
     static std::string s("\"\"");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(parser.done());
 
     parser.end_parse();
@@ -75,7 +78,8 @@ BOOST_AUTO_TEST_CASE(test_integer)
 
     static std::string s("10");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(!parser.done());
 
     parser.end_parse();
@@ -93,7 +97,8 @@ BOOST_AUTO_TEST_CASE(test_integer_space)
 
     static std::string s("10 ");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(parser.done());
 
     parser.end_parse();
@@ -110,7 +115,8 @@ BOOST_AUTO_TEST_CASE(test_double_space)
 
     static std::string s("10.0 ");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(parser.done());
 
     parser.end_parse();
@@ -127,7 +133,8 @@ BOOST_AUTO_TEST_CASE(test_false)
 
     static std::string s("false");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(parser.done());
 
     parser.end_parse();
@@ -144,7 +151,8 @@ BOOST_AUTO_TEST_CASE(test_true)
 
     static std::string s("true");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(parser.done());
 
     parser.end_parse();
@@ -161,7 +169,8 @@ BOOST_AUTO_TEST_CASE(test_null)
 
     static std::string s("null");
 
-    parser.parse(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
+    parser.parse();
     BOOST_CHECK(parser.done());
 
     parser.end_parse();

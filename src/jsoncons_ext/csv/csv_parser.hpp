@@ -723,7 +723,7 @@ private:
                         {
                             parser_.reset();
                             parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser_.parse(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser_.parse();
                             parser_.end_parse();
                         }
                         else
@@ -748,7 +748,7 @@ private:
                         {
                             parser_.reset();
                             parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser_.parse(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser_.parse();
                             parser_.end_parse();
                         }
                         else
@@ -782,7 +782,7 @@ private:
                         {
                             parser_.reset();
                             parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                            parser_.parse(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser_.parse();
                             parser_.end_parse();
                         }
                         else
@@ -803,7 +803,7 @@ private:
                     {
                         parser_.reset();
                         parser_.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
-                        parser_.parse(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                        parser_.parse();
                         parser_.end_parse();
                     }
                     else

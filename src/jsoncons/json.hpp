@@ -1987,7 +1987,9 @@ public:
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
-        parser.parse(s.data(),s.length());
+        parser.set_buffer(s.data(),s.length());
+        parser.skip_bom();
+        parser.parse();
         parser.end_parse();
         parser.check_done(s.data(),s.length());
         if (!handler.is_valid())
@@ -2001,7 +2003,9 @@ public:
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
-        parser.parse(s,length);
+        parser.set_buffer(s,length);
+        parser.skip_bom();
+        parser.parse();
         parser.end_parse();
         parser.check_done(s,length);
         if (!handler.is_valid())
@@ -2056,7 +2060,9 @@ public:
                 }
 
                 basic_json_parser<char_type> parser(handler,err_handler);
-                parser.parse(buffer.data(),buffer.size());
+                parser.set_buffer(buffer.data(),buffer.size());
+                parser.skip_bom();
+                parser.parse();
                 parser.end_parse();
                 parser.check_done(buffer.data(),buffer.size());
             }
