@@ -192,7 +192,10 @@ public:
          nesting_depth_(0), 
          initial_stack_capacity_(default_initial_stack_capacity_),
          precision_(0), 
-         literal_index_(0)
+         literal_index_(0),
+         begin_input_(nullptr),
+         end_input_(nullptr),
+         p_(nullptr)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
 
@@ -213,7 +216,10 @@ public:
          nesting_depth_(0), 
          initial_stack_capacity_(default_initial_stack_capacity_),
          precision_(0), 
-         literal_index_(0)
+         literal_index_(0),
+         begin_input_(nullptr),
+         end_input_(nullptr),
+         p_(nullptr)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
 
