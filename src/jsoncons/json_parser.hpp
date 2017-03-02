@@ -1515,7 +1515,7 @@ public:
         return stack_.back();
     }
 
-    void set_buffer(const CharT* input, size_t length)
+    void set_source(const CharT* input, size_t length)
     {
         begin_input_ = input;
         end_input_ = input + length;

@@ -717,7 +717,7 @@ private:
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             basic_json_parser<CharT> parser(filter_);
-                            parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser.set_source(column_defaults_[column_index].data(),column_defaults_[column_index].length());
                             parser.parse_some();
                             parser.end_parse();
                         }
@@ -742,7 +742,7 @@ private:
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             basic_json_parser<CharT> parser(filter_);
-                            parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser.set_source(column_defaults_[column_index].data(),column_defaults_[column_index].length());
                             parser.parse_some();
                             parser.end_parse();
                         }
@@ -776,7 +776,7 @@ private:
                         if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                         {
                             basic_json_parser<CharT> parser(filter_);
-                            parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                            parser.set_source(column_defaults_[column_index].data(),column_defaults_[column_index].length());
                             parser.parse_some();
                             parser.end_parse();
                         }
@@ -797,7 +797,7 @@ private:
                     if (column_index < column_defaults_.size() && column_defaults_[column_index].length() > 0)
                     {
                         basic_json_parser<CharT> parser(filter_);
-                        parser.set_buffer(column_defaults_[column_index].data(),column_defaults_[column_index].length());
+                        parser.set_source(column_defaults_[column_index].data(),column_defaults_[column_index].length());
                         parser.parse_some();
                         parser.end_parse();
                     }

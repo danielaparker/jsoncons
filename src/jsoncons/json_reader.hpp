@@ -92,16 +92,13 @@ public:
         parser_.reset();
         while (!eof_ && !parser_.done())
         {
-            //std::cout << "Check 10" << std::endl;
             if (parser_.source_exhausted())
             {
-                //std::cout << "Check 20" << std::endl;
                 if (!is_.eof())
                 {
-                    //std::cout << "Check 30" << std::endl;
                     is_.read(buffer_.data(), buffer_capacity_);
                     buffer_length_ = static_cast<size_t>(is_.gcount());
-                    parser_.set_buffer(buffer_.data(),buffer_length_);
+                    parser_.set_source(buffer_.data(),buffer_length_);
                     if (buffer_length_ == 0)
                     {
                         eof_ = true;
@@ -119,7 +116,6 @@ public:
             }
             if (!eof_)
             {
-                //std::cout << "Check 40" << std::endl;
                 parser_.parse_some();
             }
         }
@@ -145,7 +141,7 @@ public:
                     {
                         is_.read(buffer_.data(), buffer_capacity_);
                         buffer_length_ = static_cast<size_t>(is_.gcount());
-                        parser_.set_buffer(buffer_.data(),buffer_length_);
+                        parser_.set_source(buffer_.data(),buffer_length_);
                         if (buffer_length_ == 0)
                         {
                             eof_ = true;

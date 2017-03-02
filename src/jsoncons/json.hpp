@@ -1987,7 +1987,7 @@ public:
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
-        parser.set_buffer(s.data(),s.length());
+        parser.set_source(s.data(),s.length());
         parser.skip_bom();
         parser.parse_some();
         parser.end_parse();
@@ -2003,7 +2003,7 @@ public:
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
-        parser.set_buffer(s,length);
+        parser.set_source(s,length);
         parser.skip_bom();
         parser.parse_some();
         parser.end_parse();
@@ -2060,7 +2060,7 @@ public:
                 }
 
                 basic_json_parser<char_type> parser(handler,err_handler);
-                parser.set_buffer(buffer.data(),buffer.size());
+                parser.set_source(buffer.data(),buffer.size());
                 parser.skip_bom();
                 parser.parse_some();
                 parser.end_parse();
