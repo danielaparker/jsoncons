@@ -116,7 +116,7 @@ public:
             }
             if (!eof_)
             {
-                parser_.parse_some();
+                parser_.parse();
             }
         }
         if (eof_)

@@ -497,7 +497,7 @@ vertical-align:1px;
 <p><a href="wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p>
 </li>
 <li>
-<p><a href="owjson">owjson</a> constructs a wide character json value that preserves the original insertion order of an object's name/value pairs</p>
+<p><a href="wojson">wojson</a> constructs a wide character json value that preserves the original insertion order of an object's name/value pairs</p>
 </li>
 </ul>
 <h2>Examples</h2>

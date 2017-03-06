@@ -1989,7 +1989,7 @@ public:
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.set_source(s.data(),s.length());
         parser.skip_bom();
-        parser.parse_some();
+        parser.parse();
         parser.end_parse();
         parser.check_done();
         if (!handler.is_valid())
@@ -2005,7 +2005,7 @@ public:
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.set_source(s,length);
         parser.skip_bom();
-        parser.parse_some();
+        parser.parse();
         parser.end_parse();
         parser.check_done();
         if (!handler.is_valid())
@@ -2062,7 +2062,7 @@ public:
                 basic_json_parser<char_type> parser(handler,err_handler);
                 parser.set_source(buffer.data(),buffer.size());
                 parser.skip_bom();
-                parser.parse_some();
+                parser.parse();
                 parser.end_parse();
                 parser.check_done();
             }
@@ -3975,14 +3975,14 @@ json_printable<Json> pretty_print(const Json& val,
 typedef basic_json<char,json_traits<char>,std::allocator<char>> json;
 typedef basic_json<wchar_t,json_traits<wchar_t>,std::allocator<wchar_t>> wjson;
 typedef basic_json<char, o_json_traits<char>, std::allocator<char>> ojson;
-typedef basic_json<wchar_t, o_json_traits<wchar_t>, std::allocator<wchar_t>> owjson;
+typedef basic_json<wchar_t, o_json_traits<wchar_t>, std::allocator<wchar_t>> wojson;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_json<wchar_t, o_json_traits<wchar_t>, std::allocator<wchar_t>> wojson;
+typedef basic_json<wchar_t, o_json_traits<wchar_t>, std::allocator<wchar_t>> owjson;
 typedef json_decoder<json> json_deserializer;
 typedef json_decoder<wjson> wjson_deserializer;
 typedef json_decoder<ojson> ojson_deserializer;
-typedef json_decoder<owjson> wojson_deserializer;
+typedef json_decoder<wojson> wojson_deserializer;
 #endif
 
 }
@@ -4007,9 +4007,9 @@ jsoncons::ojson operator "" _ojson(const char* s, std::size_t n)
 }
 
 inline
-jsoncons::owjson operator "" _ojson(const wchar_t* s, std::size_t n)
+jsoncons::wojson operator "" _ojson(const wchar_t* s, std::size_t n)
 {
-    return jsoncons::owjson::parse(s, n);
+    return jsoncons::wojson::parse(s, n);
 }
 #endif
 

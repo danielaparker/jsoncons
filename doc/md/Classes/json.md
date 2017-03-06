@@ -389,7 +389,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - [wjson](wjson) constructs a wide character json value that sorts name-value members alphabetically
 
-- [owjson](owjson) constructs a wide character json value that preserves the original name-value insertion order
+- [wojson](wojson) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Examples
 

@@ -27,7 +27,7 @@ The interface is the same as [json](json), with these provisos:
 
 - [wjson](wjson) constructs a wide character json value that sorts name-value members alphabetically
 
-- [owjson](owjson) constructs a wide character json value that preserves the original insertion order of an object's name/value pairs
+- [wojson](wojson) constructs a wide character json value that preserves the original insertion order of an object's name/value pairs
 
 ## Examples
 ```c++

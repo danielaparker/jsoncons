@@ -42,7 +42,7 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
     |wjson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wjson>`
     |ojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<ojson>`
     |wojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wojson>`
-    |wojson|<em>&#x2713;</em>|Use owjson`
+    |owjson|<em>&#x2713;</em>|Use wojson`
     |member_type name()|<em>&#x2713;</em>|Use key()
 json member types|any||
                  |member_type|<em>&#x2713;</em>|Use kvp_type

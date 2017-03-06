@@ -535,7 +535,7 @@ public:
         p_ = begin_input_;
     }
 
-    void parse_some()
+    void parse()
     {
         while ((p_ < end_input_) && (stack_.back() != parse_state::done))
         {

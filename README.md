@@ -144,7 +144,7 @@ The library includes four instantiations of `basic_json`:
 
 - [wjson](https://github.com/danielaparker/jsoncons/wiki/wjson) constructs a wide character json value that sorts name-value members alphabetically
 
-- [owjson](https://github.com/danielaparker/jsoncons/wiki/owjson) constructs a wide character json value that preserves the original name-value insertion order
+- [wojson](https://github.com/danielaparker/jsoncons/wiki/wojson) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Features
 

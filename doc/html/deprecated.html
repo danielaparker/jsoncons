@@ -515,13 +515,14 @@ vertical-align:1px;
 |parse_string(const std::string&amp; s,parse_error_handler&amp; err_handler)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use parse(const std::string&amp; s,parse_error_handler&amp; err_handler)
 |resize_array(size_t n)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|resize(size_t n)
 |resize_array(size_t n, const json&amp; val)|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use resize(size_t n, const json&amp; val)
-|to_stream|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use write
+|to_stream|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use dump
+|write|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use dump
 |`json` initializer-list constructor||Construct from `json::array` with initializer-list
 |json_deserializer|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use json_decoder&lt;json&gt;`
 |wjson_deserializer|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `json_decoder&lt;wjson&gt;`
 |ojson_deserializer|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `json_decoder&lt;ojson&gt;`
 |wojson_deserializer|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use `json_decoder&lt;wojson&gt;`
-|wojson|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use owjson`
+|owjson|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use wojson`
 |member_type name()|&lt;em&gt;&amp;#x2713;&lt;/em&gt;|Use key()
 </code></pre>
 <p>json member types|any||<br>
@@ -543,9 +544,9 @@ json_output_handler class|do_longlong_value(long long value)||Removed, override 
 basic_parsing_context|last_char()|<em>✓</em>|Use current_char()<br>
 json_filter|parent()|<em>✓</em>|Use downstream_handler()<br>
 |input_handler()|<em>✓</em>|Use downstream_handler()<br>
-csv_parameters|<code>header(std::string value)</code>|<em>✓</em>|Use <code>column_names(std::vector&lt;std::string&gt;&gt; value)</code><br>
-|<code>data_types()</code>|<em>✓</em>|Use <code>column_types()</code><br>
-|<code>data_types(std::string value)</code>|<em>✓</em>|Use <code>column_types(std::vector&lt;std::string&gt;&gt; value)</code><br>
+csv_parameters|<code>header(std::string value)</code>||Use <code>column_names(std::vector&lt;std::string&gt;&gt; value)</code><br>
+|<code>data_types()</code>||Use <code>column_types()</code><br>
+|<code>data_types(std::string value)</code>||Use <code>column_types(std::vector&lt;std::string&gt;&gt; value)</code><br>
 output_format|<code>array_array_block_option accessor and modifier</code> accessor and modifier|<em>✓</em>|Use <code>array_array_split_lines</code> accessor and modifier<br>
 |<code>array_object_block_option accessor and modifier</code>|<em>✓</em>|Use <code>array_object_split_lines</code> accessor and modifier<br>
 |<code>object_array_block_option accessor and modifier</code>|<em>✓</em>|Use <code>object_array_split_lines</code> accessor and modifier<br>

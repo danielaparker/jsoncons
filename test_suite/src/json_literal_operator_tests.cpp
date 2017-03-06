@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(json_literal_operator_test2)
 
 BOOST_AUTO_TEST_CASE(ojson_literal_operator_test2)
 {
-    owjson j = LR"(
+    wojson j = LR"(
 {
     "StartDate" : "2017-03-01",
     "MaturityDate" : "2020-12-30",

@@ -1,3 +1,7 @@
+master
+
+- The name `owjson` has been deprecated (still works) and changed to `wojson`. Rationale: naming consistency
+
 0.99.7.2
 --------
 
