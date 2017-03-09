@@ -15,12 +15,13 @@ before_install:
   - echo 'deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.8 main' | sudo tee /etc/apt/sources.list
 env:
   - CC=gcc-6 CXX=g++-6
+  - CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES
   - CC=clang-3.8 CXX=clang++-3.8
 matrix:
   allow_failures:
     - env: CC=clang-3.8 CXX=clang++-3.8
 script:
   - cd test_suite/build/cmake
-  - cmake .
+  - cmake $CMAKEFLAGS .
   - make -j2
   - ./run_tests.sh

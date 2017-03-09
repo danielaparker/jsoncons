@@ -37,6 +37,10 @@ elseif()
 target_compile_definitions (jsoncons_tests PUBLIC BOOST_ALL_DYN_LINK)
 endif()
 
+if (NO_DEPRECATED)
+add_definitions(-DJSONCONS_NO_DEPRECATED)
+endif()
+
 target_include_directories (jsoncons_tests PUBLIC ${Boost_INCLUDE_DIRS}
                                            PUBLIC ../../../src
                                            PRIVATE ../../src)
