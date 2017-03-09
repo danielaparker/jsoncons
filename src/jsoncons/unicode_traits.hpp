@@ -236,14 +236,18 @@ is_legal_utf8(Iterator first, size_t length)
     uint8_t a;
     Iterator srcptr = first+length;
     switch (length) {
-    default: return conv_errc::over_long_utf8_sequence;
-        /* Everything else falls through when "true"... */
-    case 4: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-        return conv_errc::expected_continuation_byte;
-    case 3: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-        return conv_errc::expected_continuation_byte;
-    case 2: if (((a = (*--srcptr))& 0xC0) != 0x80) 
-        return conv_errc::expected_continuation_byte;
+    default:
+        return conv_errc::over_long_utf8_sequence;
+    /* Everything else falls through when "true"... */
+    case 4:
+        if (((a = (*--srcptr))& 0xC0) != 0x80)
+            return conv_errc::expected_continuation_byte;
+    case 3:
+        if (((a = (*--srcptr))& 0xC0) != 0x80)
+            return conv_errc::expected_continuation_byte;
+    case 2:
+        if (((a = (*--srcptr))& 0xC0) != 0x80)
+            return conv_errc::expected_continuation_byte;
 
         switch (static_cast<uint8_t>(*first)) 
         {
@@ -255,8 +259,9 @@ is_legal_utf8(Iterator first, size_t length)
             default:   if (a < 0x80) return conv_errc::source_illegal;
         }
 
-    case 1: if (static_cast<uint8_t>(*first) >= 0x80 && static_cast<uint8_t>(*first) < 0xC2) 
-        return conv_errc::source_illegal;
+    case 1:
+        if (static_cast<uint8_t>(*first) >= 0x80 && static_cast<uint8_t>(*first) < 0xC2)
+            return conv_errc::source_illegal;
     }
     if (static_cast<uint8_t>(*first) > 0xF4) 
         return conv_errc::source_illegal;

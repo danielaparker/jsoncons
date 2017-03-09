@@ -2446,8 +2446,6 @@ public:
         dump(serializer);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
     string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const JSONCONS_NOEXCEPT
     {
         string_type s(allocator);
@@ -2472,6 +2470,8 @@ public:
         }
         return os.str();
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
 
     void write_body(basic_json_output_handler<char_type>& handler) const
     {
