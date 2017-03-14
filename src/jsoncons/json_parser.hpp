@@ -228,6 +228,16 @@ public:
         stack_.push_back(parse_state::start);
     }
 
+    size_t line_number() const
+    {
+        return line_;
+    }
+
+    size_t column_number() const
+    {
+        return column_;
+    }
+
     bool source_exhausted() const
     {
         return p_ == end_input_;
@@ -271,18 +281,22 @@ public:
         }                                      
     }
 
-    void do_begin_object()
+    void do_begin_object(std::error_code& ec)
     {
         if (++nesting_depth_ >= max_depth_)
         {
-            err_handler_.error(json_parser_errc::max_depth_exceeded, *this);
-        }
+            if (err_handler_.error(json_parser_errc::max_depth_exceeded, *this))
+            {
+                ec = json_parser_errc::max_depth_exceeded;
+                return;
+            }
+        } 
         stack_.back() = parse_state::object;
         stack_.push_back(parse_state::expect_member_name_or_end);
         handler_.begin_object(*this);
     }
 
-    void do_end_object()
+    void do_end_object(std::error_code& ec)
     {
         --nesting_depth_;
         JSONCONS_ASSERT(!stack_.empty())
@@ -294,10 +308,14 @@ public:
         else if (stack_.back() == parse_state::array)
         {
             err_handler_.fatal_error(json_parser_errc::expected_comma_or_right_bracket, *this);
+            ec = json_parser_errc::expected_comma_or_right_bracket;
+            return;
         }
         else
         {
             err_handler_.fatal_error(json_parser_errc::unexpected_right_brace, *this);
+            ec = json_parser_errc::unexpected_right_brace;
+            return;
         }
 
         JSONCONS_ASSERT(stack_.size() >= 2);
@@ -312,18 +330,23 @@ public:
         }
     }
 
-    void do_begin_array()
+    void do_begin_array(std::error_code& ec)
     {
         if (++nesting_depth_ >= max_depth_)
         {
-            err_handler_.error(json_parser_errc::max_depth_exceeded, *this);
+            if (err_handler_.error(json_parser_errc::max_depth_exceeded, *this))
+            {
+                ec = json_parser_errc::max_depth_exceeded;
+                return;
+            }
+
         }
         stack_.back() = parse_state::array;
         stack_.push_back(parse_state::expect_value_or_end);
         handler_.begin_array(*this);
     }
 
-    void do_end_array()
+    void do_end_array(std::error_code& ec)
     {
         --nesting_depth_;
         JSONCONS_ASSERT(!stack_.empty())
@@ -335,10 +358,14 @@ public:
         else if (stack_.back() == parse_state::object)
         {
             err_handler_.fatal_error(json_parser_errc::expected_comma_or_right_brace, *this);
+            ec = json_parser_errc::expected_comma_or_right_brace;
+            return;
         }
         else
         {
             err_handler_.fatal_error(json_parser_errc::unexpected_right_bracket, *this);
+            ec = json_parser_errc::unexpected_right_bracket;
+            return;
         }
         JSONCONS_ASSERT(stack_.size() >= 2);
         if (parent() == parse_state::root)
@@ -365,10 +392,24 @@ public:
 
     void check_done()
     {
+        std::error_code ec;
+        check_done(ec);
+        if (ec)
+        {
+            throw parse_exception(ec,line_,column_);
+        }
+    }
+
+    void check_done(std::error_code& ec)
+    {
         JSONCONS_ASSERT(stack_.size() >= 1);
         if (stack_.back() != parse_state::done)
         {
-            err_handler_.error(json_parser_errc::unexpected_eof, *this);
+            if (err_handler_.error(json_parser_errc::unexpected_eof, *this))
+            {
+                ec = json_parser_errc::unexpected_eof;
+                return;
+            }
         }
         for (; p_ != end_input_; ++p_)
         {
@@ -381,12 +422,16 @@ public:
             case ' ':
                 break;
             default:
-                err_handler_.error(json_parser_errc::extra_character, *this);
+                if (err_handler_.error(json_parser_errc::extra_character, *this))
+                {
+                    ec = json_parser_errc::extra_character;
+                    return;
+                }
                 break;
             }
         }
     }
-    void parse_string()
+    void parse_string(std::error_code& ec)
     {
         const CharT* sb = p_;
         bool done = false;
@@ -399,7 +444,11 @@ public:
             case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
                 string_buffer_.append(sb,p_-sb);
                 column_ += (p_ - sb + 1);
-                err_handler_.error(json_parser_errc::illegal_control_character, *this);
+                if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                {
+                    ec = json_parser_errc::illegal_control_character;
+                    return;
+                }
                 // recovery - skip
                 done = true;
                 ++p_;
@@ -407,7 +456,11 @@ public:
             case '\r':
                 {
                     column_ += (p_ - sb + 1);
-                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
+                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    {
+                        ec = json_parser_errc::illegal_character_in_string;
+                        return;
+                    }
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
                     stack_.push_back(parse_state::cr);
@@ -418,7 +471,11 @@ public:
             case '\n':
                 {
                     column_ += (p_ - sb + 1);
-                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
+                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    {
+                        ec = json_parser_errc::illegal_character_in_string;
+                        return;
+                    }
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
                     stack_.push_back(parse_state::lf);
@@ -429,7 +486,11 @@ public:
             case '\t':
                 {
                     column_ += (p_ - sb + 1);
-                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
+                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    {
+                        ec = json_parser_errc::illegal_character_in_string;
+                        return;
+                    }
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
                     done = true;
@@ -449,11 +510,13 @@ public:
                     auto result = unicons::validate(sb,p_);
                     if (result.first == unicons::conv_errc::ok)
                     {
-                        end_string_value(sb,p_-sb);
+                        end_string_value(sb,p_-sb, ec);
+                        if (ec) return;
                     }
                     else
                     {
-                        error(result.first);
+                        error(result.first,ec);
+                        if (ec) return;
                     }
                 }
                 else
@@ -462,12 +525,14 @@ public:
                     auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end());
                     if (result.first == unicons::conv_errc::ok)
                     {
-                        end_string_value(string_buffer_.data(),string_buffer_.length());
+                        end_string_value(string_buffer_.data(),string_buffer_.length(), ec);
+                        if (ec) return;
                         string_buffer_.clear();
                     }
                     else
                     {
-                        error(result.first);
+                        error(result.first,ec);
+                        if (ec) return;
                     }
                 }
                 column_ += (p_ - sb + 1);
@@ -486,47 +551,81 @@ public:
         }
     }
 
-    void error(unicons::conv_errc  result)
+    void error(unicons::conv_errc result, std::error_code& ec)
     {
         switch (result)
         {
         case unicons::conv_errc::ok:
             break;
         case unicons::conv_errc::over_long_utf8_sequence:
-            err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
+            if (err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this))
+            {
+                ec = json_parser_errc::over_long_utf8_sequence;
+                return;
+            }
             break;
         case unicons::conv_errc::unpaired_high_surrogate:
-            err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this);
+            if (err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this))
+            {
+                ec = json_parser_errc::unpaired_high_surrogate;
+                return;
+            }
             break;
         case unicons::conv_errc::expected_continuation_byte:
-            err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
+            if (err_handler_.error(json_parser_errc::expected_continuation_byte, *this))
+            {
+                ec = json_parser_errc::expected_continuation_byte;
+                return;
+            }
             break;
         case unicons::conv_errc::illegal_surrogate_value:
-            err_handler_.error(json_parser_errc::illegal_surrogate_value, *this);
+            if (err_handler_.error(json_parser_errc::illegal_surrogate_value, *this))
+            {
+                ec = json_parser_errc::illegal_surrogate_value;
+                return;
+            }
             break;
         default:
-            err_handler_.error(json_parser_errc::illegal_codepoint, *this);
+            if (err_handler_.error(json_parser_errc::illegal_codepoint, *this))
+            {
+                ec = json_parser_errc::illegal_codepoint;
+                return;
+            }
             break;
         }
     }
 
     void skip_bom()
     {
+        std::error_code ec;
+        skip_bom(ec);
+        if (ec)
+        {
+            throw parse_exception(ec,line_,column_);
+        }
+    }
+
+    void skip_bom(std::error_code& ec)
+    {
         auto result = unicons::skip_bom(p_, end_input_);
         switch (result.first)
         {
         case unicons::encoding_errc::expected_u8_found_u16:
             err_handler_.fatal_error(json_parser_errc::expected_u8_found_u16, *this);
-            break;
+            ec = json_parser_errc::expected_u8_found_u16;
+            return;
         case unicons::encoding_errc::expected_u8_found_u32:
             err_handler_.fatal_error(json_parser_errc::expected_u8_found_u32, *this);
-            break;
+            ec = json_parser_errc::expected_u8_found_u32;
+            return;
         case unicons::encoding_errc::expected_u16_found_fffe:
             err_handler_.fatal_error(json_parser_errc::expected_u16_found_fffe, *this);
-            break;
+            ec = json_parser_errc::expected_u16_found_fffe;
+            return;
         case unicons::encoding_errc::expected_u32_found_fffe:
             err_handler_.fatal_error(json_parser_errc::expected_u32_found_fffe, *this);
-            break;
+            ec = json_parser_errc::expected_u32_found_fffe;
+            return;
         default: // ok
             break;
         }
@@ -537,6 +636,16 @@ public:
 
     void parse()
     {
+        std::error_code ec;
+        parse(ec);
+        if (ec)
+        {
+            throw parse_exception(ec,line_,column_);
+        }
+    }
+
+    void parse(std::error_code& ec)
+    {
         while ((p_ < end_input_) && (stack_.back() != parse_state::done))
         {
             switch (*p_)
@@ -544,7 +653,11 @@ public:
             case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
             case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
             case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
-                err_handler_.error(json_parser_errc::illegal_control_character, *this);
+                if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                {
+                    ec = json_parser_errc::illegal_control_character;
+                    return;
+                }
                 break;
             default:
                 break;
@@ -592,11 +705,13 @@ public:
                         break;
                     case '{':
                         handler_.begin_json();
-                        do_begin_object();
+                        do_begin_object(ec);
+                        if (ec) return;
                         break;
                     case '[':
                         handler_.begin_json();
-                        do_begin_array();
+                        do_begin_array(ec);
+                        if (ec) return;
                         break;
                     case '\"':
                         handler_.begin_json();
@@ -637,13 +752,16 @@ public:
                         break;
                     case '}':
                         err_handler_.fatal_error(json_parser_errc::unexpected_right_brace, *this);
-                        break;
+                        ec = json_parser_errc::unexpected_right_brace;
+                        return;
                     case ']':
                         err_handler_.fatal_error(json_parser_errc::unexpected_right_bracket, *this);
-                        break;
+                        ec = json_parser_errc::unexpected_right_bracket;
+                        return;
                     default:
                         err_handler_.fatal_error(json_parser_errc::invalid_json_text, *this);
-                        break;
+                        ec = json_parser_errc::invalid_json_text;
+                        return;
                     }
                 }
                 ++p_;
@@ -667,23 +785,34 @@ public:
                         stack_.push_back(parse_state::slash);
                         break;
                     case '}':
-                        do_end_object();
+                        do_end_object(ec);
+                        if (ec) return;
                         break;
                     case ']':
-                        do_end_array();
+                        do_end_array(ec);
+                        if (ec) return;
                         break;
                     case ',':
-                        begin_member_or_element();
+                        begin_member_or_element(ec);
+                        if (ec) return;
                         break;
                     default:
                         JSONCONS_ASSERT(stack_.size() >= 2);
                         if (parent() == parse_state::array)
                         {
-                            err_handler_.error(json_parser_errc::expected_comma_or_right_bracket, *this);
+                            if (err_handler_.error(json_parser_errc::expected_comma_or_right_bracket, *this))
+                            {
+                                ec = json_parser_errc::expected_comma_or_right_bracket;
+                                return;
+                            }
                         }
                         else if (parent() == parse_state::object)
                         {
-                            err_handler_.error(json_parser_errc::expected_comma_or_right_brace, *this);
+                            if (err_handler_.error(json_parser_errc::expected_comma_or_right_brace, *this))
+                            {
+                                ec = json_parser_errc::expected_comma_or_right_brace;
+                                return;
+                            }
                         }
                         break;
                     }
@@ -708,17 +837,26 @@ public:
                         stack_.push_back(parse_state::slash);
                         break;
                     case '}':
-                        do_end_object();
+                        do_end_object(ec);
+                        if (ec) return;
                         break;
                     case '\"':
                         stack_.back() = parse_state::member_name;
                         stack_.push_back(parse_state::string);
                         break;
                     case '\'':
-                        err_handler_.error(json_parser_errc::single_quote, *this);
+                        if (err_handler_.error(json_parser_errc::single_quote, *this))
+                        {
+                            ec = json_parser_errc::single_quote;
+                            return;
+                        }
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_name, *this);
+                        if (err_handler_.error(json_parser_errc::expected_name, *this))
+                        {
+                            ec = json_parser_errc::expected_name;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -746,14 +884,27 @@ public:
                         stack_.push_back(parse_state::string);
                         break;
                     case '}':
-                        err_handler_.error(json_parser_errc::extra_comma, *this);
-                        do_end_object();  // Recover
+                        if (err_handler_.error(json_parser_errc::extra_comma, *this))
+                        {
+                            ec = json_parser_errc::extra_comma;
+                            return;
+                        }
+                        do_end_object(ec);  // Recover
+                        if (ec) return;
                         break;
                     case '\'':
-                        err_handler_.error(json_parser_errc::single_quote, *this);
+                        if (err_handler_.error(json_parser_errc::single_quote, *this))
+                        {
+                            ec = json_parser_errc::single_quote;
+                            return;
+                        }
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_name, *this);
+                        if (err_handler_.error(json_parser_errc::expected_name, *this))
+                        {
+                            ec = json_parser_errc::expected_name;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -780,7 +931,11 @@ public:
                         stack_.back() = parse_state::expect_value;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_colon, *this);
+                        if (err_handler_.error(json_parser_errc::expected_colon, *this))
+                        {
+                            ec = json_parser_errc::expected_colon;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -804,10 +959,12 @@ public:
                         stack_.push_back(parse_state::slash);
                         break;
                     case '{':
-                        do_begin_object();
+                        do_begin_object(ec);
+                        if (ec) return;
                         break;
                     case '[':
-                        do_begin_array();
+                        do_begin_array(ec);
+                        if (ec) return;
                         break;
                     case '\"':
                         stack_.back() = parse_state::string;
@@ -843,19 +1000,36 @@ public:
                         JSONCONS_ASSERT(stack_.size() >= 2);
                         if (parent() == parse_state::array)
                         {
-                            err_handler_.error(json_parser_errc::extra_comma, *this);
-                            do_end_array();  // Recover
+                            if (err_handler_.error(json_parser_errc::extra_comma, *this))
+                            {
+                                ec = json_parser_errc::extra_comma;
+                                return;
+                            }
+                            do_end_array(ec);  // Recover
+                            if (ec) return;
                         }
                         else
                         {
-                            err_handler_.error(json_parser_errc::expected_value, *this);
+                            if (err_handler_.error(json_parser_errc::expected_value, *this))
+                            {
+                                ec = json_parser_errc::expected_value;
+                                return;
+                            }
                         }
                         break;
                     case '\'':
-                        err_handler_.error(json_parser_errc::single_quote, *this);
+                        if (err_handler_.error(json_parser_errc::single_quote, *this))
+                        {
+                            ec = json_parser_errc::single_quote;
+                            return;
+                        }
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_value, *this);
+                        if (err_handler_.error(json_parser_errc::expected_value, *this))
+                        {
+                            ec = json_parser_errc::expected_value;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -879,13 +1053,16 @@ public:
                         stack_.push_back(parse_state::slash);
                         break;
                     case '{':
-                        do_begin_object();
+                        do_begin_object(ec);
+                        if (ec) return;
                         break;
                     case '[':
-                        do_begin_array();
+                        do_begin_array(ec);
+                        if (ec) return;
                         break;
                     case ']':
-                        do_end_array();
+                        do_end_array(ec);
+                        if (ec) return;
                         break;
                     case '\"':
                         stack_.back() = parse_state::string;
@@ -918,10 +1095,18 @@ public:
                         literal_index_ = 1;
                         break;
                     case '\'':
-                        err_handler_.error(json_parser_errc::single_quote, *this);
+                        if (err_handler_.error(json_parser_errc::single_quote, *this))
+                        {
+                            ec = json_parser_errc::single_quote;
+                            return;
+                        }
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_value, *this);
+                        if (err_handler_.error(json_parser_errc::expected_value, *this))
+                        {
+                            ec = json_parser_errc::expected_value;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -929,18 +1114,19 @@ public:
                 ++column_;
                 break;
             case parse_state::string: 
-                parse_string();
+                parse_string(ec);
+                if (ec) return;
                 break;
             case parse_state::escape: 
-                {
-                    escape_next_char(*p_);
-                }
+                escape_next_char(*p_, ec);
+                if (ec) return;
                 ++p_;
                 ++column_;
                 break;
             case parse_state::escape_u1: 
                 {
-                    append_codepoint(*p_);
+                    append_codepoint(*p_,ec);
+                    if (ec) return;
                     stack_.back() = parse_state::escape_u2;
                 }
                 ++p_;
@@ -948,7 +1134,8 @@ public:
                 break;
             case parse_state::escape_u2: 
                 {
-                    append_codepoint(*p_);
+                    append_codepoint(*p_, ec);
+                    if (ec) return;
                     stack_.back() = parse_state::escape_u3;
                 }
                 ++p_;
@@ -956,7 +1143,8 @@ public:
                 break;
             case parse_state::escape_u3: 
                 {
-                    append_codepoint(*p_);
+                    append_codepoint(*p_, ec);
+                    if (ec) return;
                     stack_.back() = parse_state::escape_u4;
                 }
                 ++p_;
@@ -964,7 +1152,8 @@ public:
                 break;
             case parse_state::escape_u4: 
                 {
-                    append_codepoint(*p_);
+                    append_codepoint(*p_, ec);
+                    if (ec) return;
                     if (unicons::is_high_surrogate(cp_))
                     {
                         stack_.back() = parse_state::escape_expect_surrogate_pair1;
@@ -987,7 +1176,11 @@ public:
                         stack_.back() = parse_state::escape_expect_surrogate_pair2;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
+                        if (err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this))
+                        {
+                            ec = json_parser_errc::expected_codepoint_surrogate_pair;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1002,7 +1195,11 @@ public:
                         stack_.back() = parse_state::escape_u6;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
+                        if (err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this))
+                        {
+                            ec = json_parser_errc::expected_codepoint_surrogate_pair;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1011,7 +1208,8 @@ public:
                 break;
             case parse_state::escape_u6:
                 {
-                    append_second_codepoint(*p_);
+                    append_second_codepoint(*p_, ec);
+                    if (ec) return;
                     stack_.back() = parse_state::escape_u7;
                 }
                 ++p_;
@@ -1019,7 +1217,8 @@ public:
                 break;
             case parse_state::escape_u7: 
                 {
-                    append_second_codepoint(*p_);
+                    append_second_codepoint(*p_, ec);
+                    if (ec) return;
                     stack_.back() = parse_state::escape_u8;
                 }
                 ++p_;
@@ -1027,7 +1226,8 @@ public:
                 break;
             case parse_state::escape_u8: 
                 {
-                    append_second_codepoint(*p_);
+                    append_second_codepoint(*p_, ec);
+                    if (ec) return;
                     stack_.back() = parse_state::escape_u9;
                 }
                 ++p_;
@@ -1035,7 +1235,8 @@ public:
                 break;
             case parse_state::escape_u9: 
                 {
-                    append_second_codepoint(*p_);
+                    append_second_codepoint(*p_, ec);
+                    if (ec) return;
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
                     unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
                     stack_.back() = parse_state::string;
@@ -1056,7 +1257,11 @@ public:
                         stack_.back() = parse_state::integer;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_value, *this);
+                        if (err_handler_.error(json_parser_errc::expected_value, *this))
+                        {
+                            ec = json_parser_errc::expected_value;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1068,28 +1273,36 @@ public:
                     switch (*p_)
                     {
                     case '\r': 
-                        end_integer_value();
+                        end_integer_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::cr);
                         break; 
                     case '\n': 
-                        end_integer_value();
+                        end_integer_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::lf); 
                         break;   
                     case ' ':case '\t':
-                        end_integer_value();
+                        end_integer_value(ec);
+                        if (ec) return;
                         do_space();
                         break;
                     case '/': 
-                        end_integer_value();
+                        end_integer_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::slash);
                         break;
                     case '}':
-                        end_integer_value();
-                        do_end_object();
+                        end_integer_value(ec);
+                        if (ec) return;
+                        do_end_object(ec);
+                        if (ec) return;
                         break;
                     case ']':
-                        end_integer_value();
-                        do_end_array();
+                        end_integer_value(ec);
+                        if (ec) return;
+                        do_end_array(ec);
+                        if (ec) return;
                         break;
                     case '.':
                         precision_ = static_cast<uint8_t>(string_buffer_.length());
@@ -1102,14 +1315,24 @@ public:
                         stack_.back() = parse_state::exp1;
                         break;
                     case ',':
-                        end_integer_value();
-                        begin_member_or_element();
+                        end_integer_value(ec);
+                        if (ec) return;
+                        begin_member_or_element(ec);
+                        if (ec) return;
                         break;
                     case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        err_handler_.error(json_parser_errc::leading_zero, *this);
+                        if (err_handler_.error(json_parser_errc::leading_zero, *this))
+                        {
+                            ec = json_parser_errc::leading_zero;
+                            return;
+                        }
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::invalid_number, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_number, *this))
+                        {
+                            ec = json_parser_errc::invalid_number;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1121,28 +1344,36 @@ public:
                     switch (*p_)
                     {
                     case '\r': 
-                        end_integer_value();
+                        end_integer_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::cr);
                         break; 
                     case '\n': 
-                        end_integer_value();
+                        end_integer_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::lf); 
                         break;   
                     case ' ':case '\t':
-                        end_integer_value();
+                        end_integer_value(ec);
+                        if (ec) return;
                         do_space();
                         break;
                     case '/': 
-                        end_integer_value();
+                        end_integer_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::slash);
                         break;
                     case '}':
-                        end_integer_value();
-                        do_end_object();
+                        end_integer_value(ec);
+                        if (ec) return;
+                        do_end_object(ec);
+                        if (ec) return;
                         break;
                     case ']':
-                        end_integer_value();
-                        do_end_array();
+                        end_integer_value(ec);
+                        if (ec) return;
+                        do_end_array(ec);
+                        if (ec) return;
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -1155,8 +1386,10 @@ public:
                         stack_.back() = parse_state::fraction1;
                         break;
                     case ',':
-                        end_integer_value();
-                        begin_member_or_element();
+                        end_integer_value(ec);
+                        if (ec) return;
+                        begin_member_or_element(ec);
+                        if (ec) return;
                         break;
                     case 'e':case 'E':
                         precision_ = static_cast<uint8_t>(string_buffer_.length());
@@ -1164,7 +1397,11 @@ public:
                         stack_.back() = parse_state::exp1;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::invalid_number, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_number, *this))
+                        {
+                            ec = json_parser_errc::invalid_number;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1182,7 +1419,11 @@ public:
                         stack_.back() = parse_state::fraction2;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::invalid_number, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_number, *this))
+                        {
+                            ec = json_parser_errc::invalid_number;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1194,28 +1435,36 @@ public:
                     switch (*p_)
                     {
                     case '\r': 
-                        end_fraction_value();
+                        end_fraction_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::cr);
                         break; 
                     case '\n': 
-                        end_fraction_value();
+                        end_fraction_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::lf); 
                         break;   
                     case ' ':case '\t':
-                        end_fraction_value();
+                        end_fraction_value(ec);
+                        if (ec) return;
                         do_space();
                         break;
                     case '/': 
-                        end_fraction_value();
+                        end_fraction_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::slash);
                         break;
                     case '}':
-                        end_fraction_value();
-                        do_end_object();
+                        end_fraction_value(ec);
+                        if (ec) return;
+                        do_end_object(ec);
+                        if (ec) return;
                         break;
                     case ']':
-                        end_fraction_value();
-                        do_end_array();
+                        end_fraction_value(ec);
+                        if (ec) return;
+                        do_end_array(ec);
+                        if (ec) return;
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -1224,15 +1473,21 @@ public:
                         stack_.back() = parse_state::fraction2;
                         break;
                     case ',':
-                        end_fraction_value();
-                        begin_member_or_element();
+                        end_fraction_value(ec);
+                        if (ec) return;
+                        begin_member_or_element(ec);
+                        if (ec) return;
                         break;
                     case 'e':case 'E':
                         string_buffer_.push_back(static_cast<char>(*p_));
                         stack_.back() = parse_state::exp1;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::invalid_number, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_number, *this))
+                        {
+                            ec = json_parser_errc::invalid_number;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1256,7 +1511,11 @@ public:
                         stack_.back() = parse_state::exp3;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_value, *this);
+                        if (err_handler_.error(json_parser_errc::expected_value, *this))
+                        {
+                            ec = json_parser_errc::expected_value;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1273,7 +1532,11 @@ public:
                         stack_.back() = parse_state::exp3;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::expected_value, *this);
+                        if (err_handler_.error(json_parser_errc::expected_value, *this))
+                        {
+                            ec = json_parser_errc::expected_value;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1285,32 +1548,42 @@ public:
                     switch (*p_)
                     {
                     case '\r': 
-                        end_fraction_value();
+                        end_fraction_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::cr);
                         break; 
                     case '\n': 
-                        end_fraction_value();
+                        end_fraction_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::lf); 
                         break;   
                     case ' ':case '\t':
-                        end_fraction_value();
+                        end_fraction_value(ec);
+                        if (ec) return;
                         do_space();
                         break;
                     case '/': 
-                        end_fraction_value();
+                        end_fraction_value(ec);
+                        if (ec) return;
                         stack_.push_back(parse_state::slash);
                         break;
                     case '}':
-                        end_fraction_value();
-                        do_end_object();
+                        end_fraction_value(ec);
+                        if (ec) return;
+                        do_end_object(ec);
+                        if (ec) return;
                         break;
                     case ']':
-                        end_fraction_value();
-                        do_end_array();
+                        end_fraction_value(ec);
+                        if (ec) return;
+                        do_end_array(ec);
+                        if (ec) return;
                         break;
                     case ',':
-                        end_fraction_value();
-                        begin_member_or_element();
+                        end_fraction_value(ec);
+                        if (ec) return;
+                        begin_member_or_element(ec);
+                        if (ec) return;
                         break;
                     case '0': 
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
@@ -1318,7 +1591,11 @@ public:
                         stack_.back() = parse_state::exp3;
                         break;
                     default:
-                        err_handler_.error(json_parser_errc::invalid_number, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_number, *this))
+                        {
+                            ec = json_parser_errc::invalid_number;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1330,7 +1607,11 @@ public:
                 {
                     if (*p_ != literal_.first[literal_index_])
                     {
-                        err_handler_.error(json_parser_errc::invalid_value, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_value, *this))
+                        {
+                            ec = json_parser_errc::invalid_value;
+                            return;
+                        }
                     }
                     ++p_;
                     ++literal_index_;
@@ -1356,7 +1637,11 @@ public:
                 {
                     if (*p_ != literal_.first[literal_index_])
                     {
-                        err_handler_.error(json_parser_errc::invalid_value, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_value, *this))
+                        {
+                            ec = json_parser_errc::invalid_value;
+                            return;
+                        }
                     }
                     ++p_;
                     ++literal_index_;
@@ -1382,7 +1667,11 @@ public:
                 {
                     if (*p_ != literal_.first[literal_index_])
                     {
-                        err_handler_.error(json_parser_errc::invalid_value, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_value, *this))
+                        {
+                            ec = json_parser_errc::invalid_value;
+                            return;
+                        }
                     }
                     ++p_;
                     ++literal_index_;
@@ -1409,14 +1698,26 @@ public:
                     {
                     case '*':
                         stack_.back() = parse_state::slash_star;
-                        err_handler_.error(json_parser_errc::illegal_comment, *this);
+                        if (err_handler_.error(json_parser_errc::illegal_comment, *this))
+                        {
+                            ec = json_parser_errc::illegal_comment;
+                            return;
+                        }
                         break;
                     case '/':
                         stack_.back() = parse_state::slash_slash;
-                        err_handler_.error(json_parser_errc::illegal_comment, *this);
+                        if (err_handler_.error(json_parser_errc::illegal_comment, *this))
+                        {
+                            ec = json_parser_errc::illegal_comment;
+                            return;
+                        }
                         break;
                     default:    
-                        err_handler_.error(json_parser_errc::invalid_json_text, *this);
+                        if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+                        {
+                            ec = json_parser_errc::invalid_json_text;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -1474,13 +1775,23 @@ public:
                 ++column_;
                 break;
             default:
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad parser state");
+                JSONCONS_ASSERT(false);
                 break;
             }
         }
     }
 
     void end_parse()
+    {
+        std::error_code ec;
+        end_parse(ec);
+        if (ec)
+        {
+            throw parse_exception(ec,line_,column_);
+        }
+    }
+
+    void end_parse(std::error_code& ec)
     {
         JSONCONS_ASSERT(stack_.size() >= 2);
         
@@ -1490,11 +1801,13 @@ public:
             {
             case parse_state::zero:  
             case parse_state::integer:
-                end_integer_value();
+                end_integer_value(ec);
+                if (ec) return;
                 break;
             case parse_state::fraction2:
             case parse_state::exp3:
-                end_fraction_value();
+                end_fraction_value(ec);
+                if (ec) return;
                 break;
             default:
                 break;
@@ -1506,7 +1819,11 @@ public:
         }
         if (!(stack_.back() == parse_state::done || stack_.back() == parse_state::start))
         {
-            err_handler_.error(json_parser_errc::unexpected_eof, *this);
+            if (err_handler_.error(json_parser_errc::unexpected_eof, *this))
+            {
+                ec = json_parser_errc::unexpected_eof;
+                return;
+            }
         }
     }
 
@@ -1522,7 +1839,7 @@ public:
         p_ = begin_input_;
     }
 private:
-    void end_fraction_value()
+    void end_fraction_value(std::error_code& ec)
     {
         try
         {
@@ -1533,7 +1850,11 @@ private:
         }
         catch (...)
         {
-            err_handler_.error(json_parser_errc::invalid_number, *this);
+            if (err_handler_.error(json_parser_errc::invalid_number, *this))
+            {
+                ec = json_parser_errc::invalid_number;
+                return;
+            }
             handler_.value(null_type(), *this); // recovery
         }
         string_buffer_.clear();
@@ -1551,12 +1872,16 @@ private:
             handler_.end_json();
             break;
         default:
-            err_handler_.error(json_parser_errc::invalid_json_text, *this);
+            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            {
+                ec = json_parser_errc::invalid_json_text;
+                return;
+            }
             break;
         }
     }
 
-    void end_integer_value()
+    void end_integer_value(std::error_code& ec)
     {
         if (is_negative_)
         {
@@ -1574,7 +1899,11 @@ private:
                 }
                 catch (...)
                 {
-                    err_handler_.error(json_parser_errc::invalid_number, *this);
+                    if (err_handler_.error(json_parser_errc::invalid_number, *this))
+                    {
+                        ec = json_parser_errc::invalid_number;
+                        return;
+                    }
                     handler_.value(null_type(), *this);
                 }
             }
@@ -1595,7 +1924,11 @@ private:
                 }
                 catch (...)
                 {
-                    err_handler_.error(json_parser_errc::invalid_number, *this);
+                    if (err_handler_.error(json_parser_errc::invalid_number, *this))
+                    {
+                        ec = json_parser_errc::invalid_number;
+                        return;
+                    }
                     handler_.value(null_type(), *this);
                 }
             }
@@ -1613,29 +1946,38 @@ private:
             handler_.end_json();
             break;
         default:
-            err_handler_.error(json_parser_errc::invalid_json_text, *this);
+            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            {
+                ec = json_parser_errc::invalid_json_text;
+                return;
+            }
             break;
         }
         string_buffer_.clear();
         is_negative_ = false;
     }
 
-    void append_codepoint(int c)
+    void append_codepoint(int c, std::error_code& ec)
     {
         switch (c)
         {
         case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
         case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
         case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-            cp_ = append_to_codepoint(cp_, c);
+            cp_ = append_to_codepoint(cp_, c, ec);
+            if (ec) return;
             break;
         default:
-            err_handler_.error(json_parser_errc::expected_value, *this);
+            if (err_handler_.error(json_parser_errc::expected_value, *this))
+            {
+                ec = json_parser_errc::expected_value;
+                return;
+            }
             break;
         }
     }
 
-    void append_second_codepoint(int c)
+    void append_second_codepoint(int c, std::error_code& ec)
     {
         switch (c)
         {
@@ -1643,15 +1985,20 @@ private:
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
         case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
         case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-            cp2_ = append_to_codepoint(cp2_, c);
+            cp2_ = append_to_codepoint(cp2_, c, ec);
+            if (ec) return;
             break;
         default:
-            err_handler_.error(json_parser_errc::expected_value, *this);
+            if (err_handler_.error(json_parser_errc::expected_value, *this))
+            {
+                ec = json_parser_errc::expected_value;
+                return;
+            }
             break;
         }
     }
 
-    void escape_next_char(int next_input)
+    void escape_next_char(int next_input, std::error_code& ec)
     {
         switch (next_input)
         {
@@ -1692,12 +2039,16 @@ private:
             stack_.back() = parse_state::escape_u1;
             break;
         default:    
-            err_handler_.error(json_parser_errc::illegal_escaped_character, *this);
+            if (err_handler_.error(json_parser_errc::illegal_escaped_character, *this))
+            {
+                ec = json_parser_errc::illegal_escaped_character;
+                return;
+            }
             break;
         }
     }
 
-    void end_string_value(const CharT* s, size_t length) 
+    void end_string_value(const CharT* s, size_t length, std::error_code& ec) 
     {
         JSONCONS_ASSERT(stack_.size() >= 2);
         switch (parent())
@@ -1718,12 +2069,16 @@ private:
             handler_.end_json();
             break;
         default:
-            err_handler_.error(json_parser_errc::invalid_json_text, *this);
+            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            {
+                ec = json_parser_errc::invalid_json_text;
+                return;
+            }
             break;
         }
     }
 
-    void begin_member_or_element() 
+    void begin_member_or_element(std::error_code& ec) 
     {
         JSONCONS_ASSERT(stack_.size() >= 2);
         switch (parent())
@@ -1737,12 +2092,16 @@ private:
         case parse_state::root:
             break;
         default:
-            err_handler_.error(json_parser_errc::invalid_json_text, *this);
+            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            {
+                ec = json_parser_errc::invalid_json_text;
+                return;
+            }
             break;
         }
     }
  
-    uint32_t append_to_codepoint(uint32_t cp, int c)
+    uint32_t append_to_codepoint(uint32_t cp, int c, std::error_code& ec)
     {
         cp *= 16;
         if (c >= '0'  &&  c <= '9')
@@ -1759,7 +2118,11 @@ private:
         }
         else
         {
-            err_handler_.error(json_parser_errc::invalid_hex_escape_sequence, *this);
+            if (err_handler_.error(json_parser_errc::invalid_hex_escape_sequence, *this))
+            {
+                ec = json_parser_errc::invalid_hex_escape_sequence;
+                return cp;
+            }
         }
         return cp;
     }

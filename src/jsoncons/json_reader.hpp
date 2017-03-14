@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <system_error>
+#include <ios>
 #include <jsoncons/jsoncons.hpp>
 #include <jsoncons/json_input_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
@@ -89,6 +90,16 @@ public:
 
     void read_next()
     {
+        std::error_code ec;
+        read_next(ec);
+        if (ec)
+        {
+            throw parse_exception(ec,parser_.line_number(),parser_.column_number());
+        }
+    }
+
+    void read_next(std::error_code& ec)
+    {
         parser_.reset();
         while (!eof_ && !parser_.done())
         {
@@ -96,6 +107,11 @@ public:
             {
                 if (!is_.eof())
                 {
+                    if (is_.fail())
+                    {
+                        ec = std::io_errc::stream;
+                        return;
+                    }        
                     is_.read(buffer_.data(), buffer_capacity_);
                     buffer_length_ = static_cast<size_t>(is_.gcount());
                     parser_.set_source(buffer_.data(),buffer_length_);
@@ -105,7 +121,8 @@ public:
                     }
                     else if (begin_)
                     {
-                        parser_.skip_bom();
+                        parser_.skip_bom(ec);
+                        if (ec) return;
                         begin_ = false;
                     }
                 }
@@ -116,20 +133,33 @@ public:
             }
             if (!eof_)
             {
-                parser_.parse();
+                parser_.parse(ec);
+                if (ec) return;
             }
         }
         if (eof_)
         {
-            parser_.end_parse();
+            parser_.end_parse(ec);
+            if (ec) return;
         }
     }
 
     void check_done()
     {
+        std::error_code ec;
+        check_done(ec);
+        if (ec)
+        {
+            throw parse_exception(ec,parser_.line_number(),parser_.column_number());
+        }
+    }
+
+    void check_done(std::error_code& ec)
+    {
         if (eof_)
         {
-            parser_.check_done();
+            parser_.check_done(ec);
+            if (ec) return;
         }
         else
         {
@@ -139,6 +169,11 @@ public:
                 {
                     if (!is_.eof())
                     {
+                        if (is_.fail())
+                        {
+                            ec = std::io_errc::stream;
+                            return;
+                        }        
                         is_.read(buffer_.data(), buffer_capacity_);
                         buffer_length_ = static_cast<size_t>(is_.gcount());
                         parser_.set_source(buffer_.data(),buffer_length_);
@@ -154,7 +189,8 @@ public:
                 }
                 if (!eof_)
                 {
-                    parser_.check_done();
+                    parser_.check_done(ec);
+                    if (ec) return;
                 }
             }
         }

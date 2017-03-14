@@ -340,6 +340,16 @@ public:
 
     void parse(const CharT* p, size_t start, size_t length)
     {
+        std::error_code ec;
+        parse(p, start, length, ec);
+        if (ec)
+        {
+            throw parse_exception(ec,line_,column_);
+        }
+    }
+
+    void parse(const CharT* p, size_t start, size_t length, std::error_code& ec)
+    {
         index_ = start;
         for (; index_ < length && state_ != csv_state_type::done; ++index_)
         {
@@ -390,7 +400,8 @@ all_csv_states:
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
                     {
                         before_record();
-                        end_quoted_string_value();
+                        end_quoted_string_value(ec);
+                        if (ec) return;
                         after_field();
                         state_ = csv_state_type::between_fields;
                         goto all_csv_states;
@@ -406,7 +417,8 @@ all_csv_states:
                     else if (curr_char_ == parameters_.quote_char())
                     {
                         before_record();
-                        end_quoted_string_value();
+                        end_quoted_string_value(ec);
+                        if (ec) return;
                         after_field();
                         state_ = csv_state_type::between_fields;
                     }
@@ -456,8 +468,9 @@ all_csv_states:
                 }
                 break;
             default:
-                err_handler_.error(csv_parser_errc::invalid_state, *this);
-                break;
+                err_handler_.fatal_error(csv_parser_errc::invalid_state, *this);
+                ec = csv_parser_errc::invalid_state;
+                return;
             }
             if (line_ > parameters_.max_lines())
             {
@@ -486,6 +499,16 @@ all_csv_states:
 
     void end_parse()
     {
+        std::error_code ec;
+        end_parse(ec);
+        if (ec)
+        {
+            throw parse_exception(ec,line_,column_);
+        }
+    }
+
+    void end_parse(std::error_code& ec)
+    {
         switch (state_)
         {
         case csv_state_type::unquoted_string: 
@@ -497,7 +520,8 @@ all_csv_states:
             if (parameters_.quote_escape_char() == parameters_.quote_char())
             {
                 before_record();
-                end_quoted_string_value();
+                end_quoted_string_value(ec);
+                if (ec) return;
                 after_field();
             }
             break;
@@ -540,7 +564,9 @@ all_csv_states:
         }
         if (!pop_mode(csv_mode_type::initial))
         {
-            err_handler_.error(csv_parser_errc::unexpected_eof, *this);
+            err_handler_.fatal_error(csv_parser_errc::unexpected_eof, *this);
+            ec = csv_parser_errc::unexpected_eof;
+            return;
         }
         handler_.end_json();
     }
@@ -655,7 +681,7 @@ private:
         value_buffer_.clear();
     }
 
-    void end_quoted_string_value() 
+    void end_quoted_string_value(std::error_code& ec) 
     {
         if (parameters_.trim_leading_inside_quotes() | parameters_.trim_trailing_inside_quotes())
         {
@@ -690,8 +716,9 @@ private:
             }
             break;
         default:
-            err_handler_.error(csv_parser_errc::invalid_csv_text, *this);
-            break;
+            err_handler_.fatal_error(csv_parser_errc::invalid_csv_text, *this);
+            ec = csv_parser_errc::invalid_csv_text;
+            return;
         }
         state_ = csv_state_type::expect_value;
         value_buffer_.clear();

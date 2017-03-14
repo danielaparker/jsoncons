@@ -112,21 +112,16 @@ public:
     {
     }
 
-    void error(std::error_code ec,
+    bool error(std::error_code ec,
                const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
-        if (do_error(ec,context))
-        {
-            throw parse_exception(ec,context.line_number(),context.column_number());
-        }
-        // else attempt recovery
+        return do_error(ec,context);
     }
 
     void fatal_error(std::error_code ec,
                      const basic_parsing_context<CharT>& context) throw (parse_exception) 
     {
         do_fatal_error(ec,context);
-        throw parse_exception(ec,context.line_number(),context.column_number());
     }
 
 private:

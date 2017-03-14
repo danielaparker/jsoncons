@@ -414,7 +414,22 @@ public:
         evaluate(root,path,char_traits_type::length(path));
     }
 
-    void evaluate(json_reference root, const char_type* path, size_t length)
+    void evaluate(json_reference root, 
+                  const char_type* path, 
+                  size_t length)
+    {
+        std::error_code ec;
+        evaluate(root, path, length, ec);
+        if (ec)
+        {
+            throw parse_exception(ec,line_,column_);
+        }
+    }
+
+    void evaluate(json_reference root, 
+                  const char_type* path, 
+                  size_t length,
+                  std::error_code& ec)
     {
         jp_state pre_line_break_state = jp_state::start;
 
@@ -470,7 +485,8 @@ public:
                     break;
                 default:
                     err_handler_->fatal_error(jsonpath_parser_errc::expected_root, *this);
-                    break;
+                    ec = jsonpath_parser_errc::expected_root;
+                    return;
                 };
                 ++p_;
                 ++column_;
@@ -494,9 +510,8 @@ public:
                 {
                 case '.':
                     err_handler_->fatal_error(jsonpath_parser_errc::expected_name, *this);
-                    ++p_;
-                    ++column_;
-                    break;
+                    ec = jsonpath_parser_errc::expected_name;
+                    return;
                 case '*':
                     end_all();
                     transfer_nodes();
@@ -528,7 +543,8 @@ public:
                     break;
                 default:
                     err_handler_->fatal_error(jsonpath_parser_errc::expected_separator, *this);
-                    break;
+                    ec = jsonpath_parser_errc::expected_separator;
+                    return;
                 };
                 ++p_;
                 ++column_;
@@ -548,7 +564,8 @@ public:
                     break;
                 default:
                     err_handler_->fatal_error(jsonpath_parser_errc::expected_right_bracket, *this);
-                    break;
+                    ec = jsonpath_parser_errc::expected_right_bracket;
+                    return;
                 }
                 ++p_;
                 ++column_;
@@ -618,6 +635,8 @@ public:
                     if (!try_string_to_index(buffer_.data(), buffer_.size(), &start_, &positive_start_))
                     {
                         err_handler_->fatal_error(jsonpath_parser_errc::expected_index, *this);
+                        ec = jsonpath_parser_errc::expected_index;
+                        return;
                     }
                     state_ = jp_state::left_bracket_end;
                     break;
