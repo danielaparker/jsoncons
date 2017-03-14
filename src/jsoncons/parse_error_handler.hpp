@@ -113,25 +113,24 @@ public:
     }
 
     bool error(std::error_code ec,
-               const basic_parsing_context<CharT>& context) throw (parse_exception) 
+               const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT 
     {
         return do_error(ec,context);
     }
 
     void fatal_error(std::error_code ec,
-                     const basic_parsing_context<CharT>& context) throw (parse_exception) 
+                     const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT 
     {
         do_fatal_error(ec,context);
     }
 
 private:
     virtual bool do_error(std::error_code,
-                          const basic_parsing_context<CharT>& context) = 0;
+                          const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT = 0;
 
     virtual void do_fatal_error(std::error_code,
-                                const basic_parsing_context<CharT>& context)
+                                const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
     {
-        (void)context;
     }
 };
 
@@ -140,7 +139,7 @@ class basic_default_parse_error_handler : public basic_parse_error_handler<CharT
 {
 private:
     virtual bool do_error(std::error_code code,
-                          const basic_parsing_context<CharT>&) 
+                          const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
     {
         static const std::error_code illegal_comment = make_error_code(json_parser_errc::illegal_comment);
 
@@ -160,7 +159,7 @@ class basic_strict_parse_error_handler : public basic_parse_error_handler<CharT>
 {
 private:
     virtual bool do_error(std::error_code,
-                          const basic_parsing_context<CharT>&) 
+                          const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
     {
         return true;
     }
