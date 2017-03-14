@@ -109,7 +109,7 @@ public:
                 {
                     if (is_.fail())
                     {
-                        ec = std::error_code(static_cast<int>(std::io_errc::stream),std::iostream_category());
+                        ec = json_parser_errc::source_error;
                         return;
                     }        
                     is_.read(buffer_.data(), buffer_capacity_);
@@ -171,7 +171,7 @@ public:
                     {
                         if (is_.fail())
                         {
-                            ec = std::error_code(static_cast<int>(std::io_errc::stream),std::iostream_category());
+                            ec = json_parser_errc::source_error;
                             return;
                         }        
                         is_.read(buffer_.data(), buffer_capacity_);
