@@ -109,7 +109,7 @@ public:
                 {
                     if (is_.fail())
                     {
-                        ec = std::make_error_code(std::io_errc::stream);
+                        ec = std::error_code(static_cast<int>(std::io_errc::stream),std::iostream_category());
                         return;
                     }        
                     is_.read(buffer_.data(), buffer_capacity_);
@@ -171,7 +171,7 @@ public:
                     {
                         if (is_.fail())
                         {
-                            ec = std::make_error_code(std::io_errc::stream);
+                            ec = std::error_code(static_cast<int>(std::io_errc::stream),std::iostream_category());
                             return;
                         }        
                         is_.read(buffer_.data(), buffer_capacity_);
