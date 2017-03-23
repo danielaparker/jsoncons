@@ -396,7 +396,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw parse_exception(ec,line_,column_);
+            throw parse_error(ec,line_,column_);
         }
     }
 
@@ -601,7 +601,7 @@ public:
         skip_bom(ec);
         if (ec)
         {
-            throw parse_exception(ec,line_,column_);
+            throw parse_error(ec,line_,column_);
         }
     }
 
@@ -640,7 +640,7 @@ public:
         parse(ec);
         if (ec)
         {
-            throw parse_exception(ec,line_,column_);
+            throw parse_error(ec,line_,column_);
         }
     }
 
@@ -1787,7 +1787,7 @@ public:
         end_parse(ec);
         if (ec)
         {
-            throw parse_exception(ec,line_,column_);
+            throw parse_error(ec,line_,column_);
         }
     }
 

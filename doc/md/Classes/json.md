@@ -39,19 +39,19 @@ Member type                         |Definition
     static json parse(string_view_type s, 
                       parse_error_handler& err_handler)
 Parses a string of JSON text and returns a json object or array value. 
-Throws [parse_exception](parse_exception) if parsing fails.
+Throws [parse_error](parse_error) if parsing fails.
 
     static json parse_stream(std::istream& is)
     static json parse_stream(std::istream& is, 
                              parse_error_handler& err_handler)
 Parses an input stream of JSON text and returns a json object or array value. 
-Throws [parse_exception](parse_exception) if parsing fails.
+Throws [parse_error](parse_error) if parsing fails.
 
     static json parse_file(const std::string& filename)
     static json parse_file(const std::string& filename, 
                            parse_error_handler& err_handler)
 Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
-Throws [parse_exception](parse_exception) if parsing fails.
+Throws [parse_error](parse_error) if parsing fails.
 ```c++
 template <class T>
 static json make_array(size_ n, const T& val)

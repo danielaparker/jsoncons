@@ -1,4 +1,4 @@
-    jsoncons::parse_exception
+    jsoncons::parse_error
 
 ### Header
 
@@ -10,11 +10,11 @@ std::exception
 
 ### Constructors
 
-    parse_exception(std::error_code ec,
+    parse_error(std::error_code ec,
                     size_t line,
                     size_t column)
 
-    parse_exception(const parse_exception& other)
+    parse_error(const parse_error& other)
 
 ### Member functions
 
@@ -45,9 +45,9 @@ Constructs an error message, including line and column position
         {
             jsoncons::json val = jsoncons::json::parse(s);
         } 
-        catch(const jsoncons::parse_exception& e) 
+        catch(const jsoncons::parse_error& e) 
         {
-            std::cout << "Caught parse_exception with category " 
+            std::cout << "Caught parse_error with category " 
                       << e.code().category().name() 
                               << ", code " << e.code().value() 
                       << " and message " << e.what() << std::endl;
@@ -57,4 +57,4 @@ Constructs an error message, including line and column position
 
 Output:
 
-    Caught parse_exception with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+    Caught parse_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10

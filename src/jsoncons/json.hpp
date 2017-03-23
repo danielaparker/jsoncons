@@ -1983,27 +1983,16 @@ public:
         return parse(s,length,err_handler);
     }
 
+    static basic_json parse(const char_type* s, size_t length, basic_parse_error_handler<char_type>& err_handler)
+    {
+        return parse(string_view_type(s,length),err_handler);
+    }
+
     static basic_json parse(string_view_type s, basic_parse_error_handler<char_type>& err_handler)
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
         parser.set_source(s.data(),s.length());
-        parser.skip_bom();
-        parser.parse();
-        parser.end_parse();
-        parser.check_done();
-        if (!handler.is_valid())
-        {
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
-        }
-        return handler.get_result();
-    }
-
-    static basic_json parse(const char_type* s, size_t length, basic_parse_error_handler<char_type>& err_handler)
-    {
-        json_decoder<json_type> handler;
-        basic_json_parser<char_type> parser(handler,err_handler);
-        parser.set_source(s,length);
         parser.skip_bom();
         parser.parse();
         parser.end_parse();

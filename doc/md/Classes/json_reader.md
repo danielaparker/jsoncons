@@ -32,15 +32,27 @@ Returns `true` when there are no more JSON texts to be read from the stream, `fa
     void read()
 Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_decoder](json_decoder).
 Throws if there are any unconsumed non-whitespace characters left in the input.
-Throws [parse_exception](parse_exception) if parsing fails.
+Throws [parse_error](parse_error) if parsing fails.
+
+    void read(std::error_code& ec)
+Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_decoder](json_decoder).
+The error code `ec` is set if parsing fails or if there are any unconsumed non-whitespace characters left in the input.
 
     void read_next()
 Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_decoder](json_decoder).
-Throws [parse_exception](parse_exception) if parsing fails.
+Throws [parse_error](parse_error) if parsing fails.
+
+    void read_next(std::error_code& ec)
+Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler), such as a [json_decoder](json_decoder).
+The error code `ec` is set if parsing fails.
 
     void check_done()
 Throws if there are any unconsumed non-whitespace characters in the input.
-Throws [parse_exception](parse_exception) if parsing fails.
+Throws [parse_error](parse_error) if there are any unconsumed non-whitespace characters left in the input.
+
+    void check_done(std::error_code& ec)
+Throws if there are any unconsumed non-whitespace characters in the input.
+The error code `ec` is set if there are any unconsumed non-whitespace characters left in the input.
 
     size_t buffer_capacity() const
 
@@ -51,19 +63,62 @@ By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
     void max_nesting_depth(size_t depth)
 
-### Deprecated methods
+    size_t line_number() const
 
-    void read()
-Use `read_next` instead. 
-
-    size_t max_depth() const
-Use `max_nesting_depth()` instead
-
-    void max_depth(size_t depth)
-Use `max_nesting_depth(size_t depth)` instead
+    size_t column_number() const
 
 ## Examples
 
+### Parsing JSON text with exceptions
+```
+std::string input = R"({"field1"{}})";    
+std::istringstream is(input);
+
+json_decoder<json> decoder;
+json_reader reader(is,decoder);
+
+try
+{
+    reader.read();
+    json j = decoder.get_result();
+}
+catch (const parse_error& e)
+{
+    std::cout << e.what() << std::endl;
+}
+
+```
+Output:
+```
+Expected name separator ':' at line 1 and column 10
+```
+
+### Parsing JSON text with error codes
+```
+std::string input = R"({"field1":ru})";    
+std::istringstream is(input);
+
+json_decoder<json> decoder;
+json_reader reader(is,decoder);
+
+std::error_code ec;
+reader.read(ec);
+
+if (!ec)
+{
+    json j = decoder.get_result();   
+}
+else
+{
+    std::cerr << ec.message() 
+              << " at line " << reader.line_number() 
+              << " and column " << reader.column_number() << std::endl;
+}
+```
+Output:
+```
+Expected value at line 1 and column 11
+```
 
 ### Reading a sequence of JSON texts from a stream
 

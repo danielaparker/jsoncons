@@ -94,7 +94,7 @@ public:
         read_next(ec);
         if (ec)
         {
-            throw parse_exception(ec,parser_.line_number(),parser_.column_number());
+            throw parse_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
@@ -150,8 +150,18 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw parse_exception(ec,parser_.line_number(),parser_.column_number());
+            throw parse_error(ec,parser_.line_number(),parser_.column_number());
         }
+    }
+
+    size_t line_number() const
+    {
+        return parser_.line_number();
+    }
+
+    size_t column_number() const
+    {
+        return parser_.column_number();
     }
 
     void check_done(std::error_code& ec)
@@ -205,6 +215,15 @@ public:
     {
         read_next();
         check_done();
+    }
+
+    void read(std::error_code& ec)
+    {
+        read_next(ec);
+        if (!ec)
+        {
+            check_done(ec);
+        }
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)

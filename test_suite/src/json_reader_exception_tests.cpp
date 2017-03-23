@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(test_exception_left_brace)
         json_reader reader(is,decoder);
         reader.read_next();
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK(e.code() == json_parser_errc::expected_comma_or_right_bracket);
         BOOST_CHECK_EQUAL(14,e.line_number());
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(test_exception_right_brace)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK(e.code() == json_parser_errc::expected_comma_or_right_brace);
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(test_exception_array_eof)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_exception_unicode_eof)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(test_exception_tru_eof)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(test_exception_fals_eof)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(test_exception_nul_eof)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         //std::cout << e.what() << std::endl;
         BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(test_exception_true_eof)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(test_exception_false_eof)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE(test_exception_null_eof)
         reader.read_next();  // must throw
         BOOST_CHECK(0 != 0);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK(e.code() == json_parser_errc::unexpected_eof);
         BOOST_CHECK_EQUAL(1,e.line_number());
@@ -245,8 +245,8 @@ BOOST_AUTO_TEST_CASE(test_exception)
 {
     std::string input("{\"field1\":\n\"value}");
     BOOST_CHECK_EXCEPTION(json::parse(input),
-                          parse_exception,
-                          [](const parse_exception& e)
+                          parse_error,
+                          [](const parse_error& e)
                             {return e.code() == json_parser_errc::unexpected_eof && e.line_number() == 2 && e.column_number() == 9;}
                          );
 }

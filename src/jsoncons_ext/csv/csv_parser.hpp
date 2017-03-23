@@ -344,7 +344,7 @@ public:
         parse(p, start, length, ec);
         if (ec)
         {
-            throw parse_exception(ec,line_,column_);
+            throw parse_error(ec,line_,column_);
         }
     }
 
@@ -503,7 +503,7 @@ all_csv_states:
         end_parse(ec);
         if (ec)
         {
-            throw parse_exception(ec,line_,column_);
+            throw parse_error(ec,line_,column_);
         }
     }
 

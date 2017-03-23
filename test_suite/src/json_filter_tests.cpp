@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
 }]}}
 )");
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }

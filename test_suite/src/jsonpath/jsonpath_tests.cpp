@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                         is >> document;
                         //std::cout << dir_itr->path().filename() << '\n';
                     }
-                    catch (const jsoncons::parse_exception& e)
+                    catch (const jsoncons::parse_error& e)
                     {
                         std::cerr << dir_itr->path() << " " << e.what() << std::endl;
                     }
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                         expected_dictionary[dir_itr->path().stem()] = j;
                         //std::cout << ".json " << dir_itr->path() << '\n';
                     }
-                    catch (const jsoncons::parse_exception& e)
+                    catch (const jsoncons::parse_error& e)
                     {
                         std::cerr << dir_itr->path() << " " << e.what() << std::endl;
                     }
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                         BOOST_CHECK_EQUAL(it->second,result);
                     //}
                 }
-                catch (const jsoncons::parse_exception& e)
+                catch (const jsoncons::parse_error& e)
                 {
                     std::cerr << pair.first << " " << pair.second << " " << e.what() << std::endl;
                 }
@@ -1056,7 +1056,7 @@ BOOST_AUTO_TEST_CASE(test_replace)
 }]}}
 )");
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }

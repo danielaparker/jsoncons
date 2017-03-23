@@ -59,7 +59,7 @@ void test_error_code(const json& root, const std::string& path, int value, const
         json result = json_query(root,path);
         BOOST_FAIL(path);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK_MESSAGE(e.code().value() == value && e.code().category() == category, e.what());
         BOOST_CHECK_MESSAGE(e.line_number() == line, e.what());
@@ -74,7 +74,7 @@ void test_error_code(const json& root, const std::string& path, std::error_code 
         json result = json_query(root,path);
         BOOST_FAIL(path);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK_MESSAGE(e.code() == value, e.what());
         BOOST_CHECK_MESSAGE(e.line_number() == line, e.what());

@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(test_json)
                                 fin >> document;
                             }
                         }
-                        catch (const parse_exception& e)
+                        catch (const parse_error& e)
                         {
                             std::ostringstream os;
                             os << dir_itr->path().filename() << " should pass. " << e.what();
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(test_json)
                             os << dir_itr->path().filename() << " should fail";
                             BOOST_CHECK_MESSAGE(false, os.str());  
                         }
-                        catch (const parse_exception&)
+                        catch (const parse_error&)
                         {
                         }
                         catch (const std::exception&)
