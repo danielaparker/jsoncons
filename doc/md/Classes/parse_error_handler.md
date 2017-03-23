@@ -1,6 +1,8 @@
-    jsoncons::parse_error_handler
+```c++
+jsoncons::parse_error_handler
 
-    typedef basic_parse_error_handler<char> parse_error_handler
+typedef basic_parse_error_handler<char> parse_error_handler
+```
 
 When parsing JSON text with [json_reader](json_reader), if you need to implement
 customized error handling, you must implement this abstract class

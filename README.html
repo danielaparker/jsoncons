@@ -499,8 +499,6 @@ vertical-align:1px;
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="#user-content-ext_msgpack">msgpack</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
-<h2>What's new on master</h2>
-<p>A bug was introduced in 0.99.7 causing the values of existing object members to not be changed with set or assignment operations. This has been fixed on master and in Release 0.99.7.2.</p>
 <h2>Get jsoncons</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
@@ -592,7 +590,7 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <p><a href="https://github.com/danielaparker/jsoncons/wiki/wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p>
 </li>
 <li>
-<p><a href="https://github.com/danielaparker/jsoncons/wiki/owjson">owjson</a> constructs a wide character json value that preserves the original name-value insertion order</p>
+<p><a href="https://github.com/danielaparker/jsoncons/wiki/wojson">wojson</a> constructs a wide character json value that preserves the original name-value insertion order</p>
 </li>
 </ul>
 <h2>Features</h2>
@@ -844,7 +842,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 <div id="user-content-ext_csv">
 <h3>csv</h3>
 <p>Example file (tasks.csv)</p>
-<pre><code class="language-csv">project_id, task_name, task_start, task_finish
+<pre lang="csv"><code>project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
 4001,task2,02/01/2003,02/28/2003
 4001,task3,03/01/2003,03/31/2003
@@ -912,7 +910,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
         <span class="pl-s"><span class="pl-pds">"</span>task_start<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>05/01/2003<span class="pl-pds">"</span></span>
     }
 ]</pre></div>
-<pre><code class="language-csv">(2)
+<pre lang="csv"><code>(2)
 project_id,task_name,task_start,task_finish
 4001,task2,02/01/2003,02/28/2003
 4001,task3,03/01/2003,03/31/2003

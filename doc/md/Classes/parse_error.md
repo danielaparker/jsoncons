@@ -1,5 +1,6 @@
-    jsoncons::parse_error
-
+```c++
+jsoncons::parse_error
+```
 ### Header
 
     #include <jsoncons/parse_error_handler.hpp>
