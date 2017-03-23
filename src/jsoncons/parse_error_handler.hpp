@@ -13,29 +13,42 @@
 
 namespace jsoncons {
 
-class parse_exception : public std::exception, public virtual json_exception
+class parse_error : public std::exception, public virtual json_exception
 {
 public:
-    parse_exception(std::error_code ec,
-                    size_t line,
-                    size_t column)
+    parse_error()
+        : line_number_(0),
+          column_number_(0)
+    {
+    }
+    parse_error(std::error_code ec,
+                size_t line,
+                size_t column)
         : error_code_(ec),
           line_number_(line),
           column_number_(column)
     {
     }
-    parse_exception(const parse_exception& other)
+    parse_error(const parse_error& other)
         : error_code_(other.error_code_),
           line_number_(other.line_number_),
           column_number_(other.column_number_)
     {
     }
-    const char* what() const JSONCONS_NOEXCEPT
+
+    const char* what() const JSONCONS_NOEXCEPT override
     {
-        std::ostringstream os;
-        os << error_code_.message() << " at line " << line_number_ << " and column " << column_number_;
-        const_cast<std::string&>(buffer_) = os.str();
-        return buffer_.c_str();
+        try
+        {
+            std::ostringstream os;
+            os << error_code_.message() << " at line " << line_number_ << " and column " << column_number_;
+            const_cast<std::string&>(buffer_) = os.str();
+            return buffer_.c_str();
+        }
+        catch (...)
+        {
+            return "";
+        }
     }
 
     const std::error_code code() const
@@ -53,7 +66,7 @@ public:
         return column_number_;
     }
 
-    parse_exception& operator=(const parse_exception& e)
+    parse_error& operator=(const parse_error& e)
     {
         error_code_ = e.error_code_;
         line_number_ = e.line_number_;
@@ -67,7 +80,10 @@ private:
     size_t column_number_;
 };
 
-typedef parse_exception json_parse_exception;
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef parse_error json_parse_exception;
+typedef parse_error parse_exception;
+#endif
 
 template<class CharT>
 class basic_parsing_context
@@ -112,31 +128,25 @@ public:
     {
     }
 
-    void error(std::error_code ec,
-               const basic_parsing_context<CharT>& context) throw (parse_exception) 
+    bool error(std::error_code ec,
+               const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT 
     {
-        if (do_error(ec,context))
-        {
-            throw parse_exception(ec,context.line_number(),context.column_number());
-        }
-        // else attempt recovery
+        return do_error(ec,context);
     }
 
     void fatal_error(std::error_code ec,
-                     const basic_parsing_context<CharT>& context) throw (parse_exception) 
+                     const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT 
     {
         do_fatal_error(ec,context);
-        throw parse_exception(ec,context.line_number(),context.column_number());
     }
 
 private:
     virtual bool do_error(std::error_code,
-                          const basic_parsing_context<CharT>& context) = 0;
+                          const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT = 0;
 
     virtual void do_fatal_error(std::error_code,
-                                const basic_parsing_context<CharT>& context)
+                                const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
     {
-        (void)context;
     }
 };
 
@@ -145,7 +155,7 @@ class basic_default_parse_error_handler : public basic_parse_error_handler<CharT
 {
 private:
     virtual bool do_error(std::error_code code,
-                          const basic_parsing_context<CharT>&) 
+                          const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
     {
         static const std::error_code illegal_comment = make_error_code(json_parser_errc::illegal_comment);
 
@@ -165,7 +175,7 @@ class basic_strict_parse_error_handler : public basic_parse_error_handler<CharT>
 {
 private:
     virtual bool do_error(std::error_code,
-                          const basic_parsing_context<CharT>&) 
+                          const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
     {
         return true;
     }

@@ -53,7 +53,7 @@ Returns `true` when there is no more data to be read from the stream, `false` ot
 
     void read()
 Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_input_handler](json_input_handler), such as a [json_decoder](json_decoder).
-Throws [parse_exception](parse_exception) if parsing fails.
+Throws [parse_error](parse_error) if parsing fails.
 
     size_t buffer_capacity() const
 

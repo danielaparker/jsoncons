@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>parse_exception</title>
+<title>parse_error</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,53 +468,35 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::parse_exception
-</code></pre>
-
+<div class="highlight highlight-source-c++"><pre>jsoncons::parse_error</pre></div>
 <h3>Header</h3>
-
 <pre><code>#include &lt;jsoncons/parse_error_handler.hpp&gt;
 </code></pre>
-
 <h3>Base class</h3>
-
 <p>std::exception</p>
-
 <h3>Constructors</h3>
-
-<pre><code>parse_exception(std::error_code ec,
+<pre><code>parse_error(std::error_code ec,
                 size_t line,
                 size_t column)
 
-parse_exception(const parse_exception&amp; other)
+parse_error(const parse_error&amp; other)
 </code></pre>
-
 <h3>Member functions</h3>
-
 <pre><code>const std::error_code code() const
 </code></pre>
-
 <p>Returns a message for this exception</p>
-
 <pre><code>size_t line_number() const
 </code></pre>
-
 <p>Returns the line number to the end of the text where the exception occurred.<br>
 Line numbers start at 1.</p>
-
 <pre><code>size_t column_number() const
 </code></pre>
-
 <p>Returns the column number to the end of the text where the exception occurred.<br>
 Column numbers start at 1.</p>
-
 <pre><code>const char* what() const
 </code></pre>
-
 <p>Constructs an error message, including line and column position</p>
-
 <h3>Example</h3>
-
 <pre><code>#include &lt;jsoncons/json.hpp&gt;
 
 using jsoncons::json;
@@ -526,19 +508,17 @@ int main()
     {
         jsoncons::json val = jsoncons::json::parse(s);
     } 
-    catch(const jsoncons::parse_exception&amp; e) 
+    catch(const jsoncons::parse_error&amp; e) 
     {
-        std::cout &lt;&lt; "Caught parse_exception with category " 
+        std::cout &lt;&lt; "Caught parse_error with category " 
                   &lt;&lt; e.code().category().name() 
                           &lt;&lt; ", code " &lt;&lt; e.code().value() 
                   &lt;&lt; " and message " &lt;&lt; e.what() &lt;&lt; std::endl;
     }
 }
 </code></pre>
-
 <p>Output:</p>
-
-<pre><code>Caught parse_exception with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+<pre><code>Caught parse_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
 </code></pre>
 </body>
 </html>

@@ -15,37 +15,38 @@ namespace jsoncons {
     enum class json_parser_errc
     {
         unexpected_eof = 1,
-        invalid_json_text = 2,
-        extra_character = 3,
-        max_depth_exceeded = 4,
-        single_quote = 5,
-        illegal_character_in_string = 6,
-        extra_comma = 7,
-        expected_name = 8,
-        expected_value = 9,
-        invalid_value = 10,
-        expected_colon = 11,
-        illegal_control_character = 12,
-        illegal_escaped_character = 13,
-        expected_codepoint_surrogate_pair = 14,
-        invalid_hex_escape_sequence = 15,
-        invalid_unicode_escape_sequence = 16,
-        leading_zero = 17,
-        invalid_number = 18,
-        expected_comma_or_right_brace = 19,
-        expected_comma_or_right_bracket = 20,
-        unexpected_right_bracket = 21,
-        unexpected_right_brace = 22,
-        illegal_comment = 23,
-        expected_continuation_byte = 24,
-        over_long_utf8_sequence = 25,
-        illegal_codepoint = 26,
-        illegal_surrogate_value = 27,
-        unpaired_high_surrogate = 28,
-        expected_u8_found_u16 = 29,
-        expected_u8_found_u32 = 30,
-        expected_u16_found_fffe = 31,
-        expected_u32_found_fffe = 32
+        source_error,
+        invalid_json_text,
+        extra_character,
+        max_depth_exceeded,
+        single_quote,
+        illegal_character_in_string,
+        extra_comma,
+        expected_name,
+        expected_value,
+        invalid_value,
+        expected_colon,
+        illegal_control_character,
+        illegal_escaped_character,
+        expected_codepoint_surrogate_pair,
+        invalid_hex_escape_sequence,
+        invalid_unicode_escape_sequence,
+        leading_zero,
+        invalid_number,
+        expected_comma_or_right_brace,
+        expected_comma_or_right_bracket,
+        unexpected_right_bracket,
+        unexpected_right_brace,
+        illegal_comment,
+        expected_continuation_byte,
+        over_long_utf8_sequence,
+        illegal_codepoint,
+        illegal_surrogate_value,
+        unpaired_high_surrogate,
+        expected_u8_found_u16,
+        expected_u8_found_u32,
+        expected_u16_found_fffe,
+        expected_u32_found_fffe
     };
 
 class json_error_category_impl
@@ -62,6 +63,8 @@ public:
         {
         case json_parser_errc::unexpected_eof:
             return "Unexpected end of file";
+        case json_parser_errc::source_error:
+            return "Source error";
         case json_parser_errc::invalid_json_text:
             return "Invalid JSON text";
         case json_parser_errc::extra_character:

@@ -495,15 +495,27 @@ You must ensure that the input stream and input handler exist as long as does <c
 </code></pre>
 <p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
 Throws if there are any unconsumed non-whitespace characters left in the input.<br>
-Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
+Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
+<pre><code>void read(std::error_code&amp; ec)
+</code></pre>
+<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
+The error code <code>ec</code> is set if parsing fails or if there are any unconsumed non-whitespace characters left in the input.</p>
 <pre><code>void read_next()
 </code></pre>
 <p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
-Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
+Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
+<pre><code>void read_next(std::error_code&amp; ec)
+</code></pre>
+<p>Reads the next JSON text from the stream and reports JSON events to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
+The error code <code>ec</code> is set if parsing fails.</p>
 <pre><code>void check_done()
 </code></pre>
 <p>Throws if there are any unconsumed non-whitespace characters in the input.<br>
-Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
+Throws <a href="parse_error">parse_error</a> if there are any unconsumed non-whitespace characters left in the input.</p>
+<pre><code>void check_done(std::error_code&amp; ec)
+</code></pre>
+<p>Throws if there are any unconsumed non-whitespace characters in the input.<br>
+The error code <code>ec</code> is set if there are any unconsumed non-whitespace characters left in the input.</p>
 <pre><code>size_t buffer_capacity() const
 
 void buffer_capacity(size_t capacity)
@@ -512,18 +524,57 @@ size_t max_nesting_depth() const
 </code></pre>
 <p>By default <code>jsoncons</code> can read a <code>JSON</code> text of arbitrarily large depth.</p>
 <pre><code>void max_nesting_depth(size_t depth)
+
+size_t line_number() const
+
+size_t column_number() const
 </code></pre>
-<h3>Deprecated methods</h3>
-<pre><code>void read()
-</code></pre>
-<p>Use <code>read_next</code> instead.</p>
-<pre><code>size_t max_depth() const
-</code></pre>
-<p>Use <code>max_nesting_depth()</code> instead</p>
-<pre><code>void max_depth(size_t depth)
-</code></pre>
-<p>Use <code>max_nesting_depth(size_t depth)</code> instead</p>
 <h2>Examples</h2>
+<h3>Parsing JSON text with exceptions</h3>
+<pre><code>std::string input = R"({"field1"{}})";    
+std::istringstream is(input);
+
+json_decoder&lt;json&gt; decoder;
+json_reader reader(is,decoder);
+
+try
+{
+    reader.read();
+    json j = decoder.get_result();
+}
+catch (const parse_error&amp; e)
+{
+    std::cout &lt;&lt; e.what() &lt;&lt; std::endl;
+}
+
+</code></pre>
+<p>Output:</p>
+<pre><code>Expected name separator ':' at line 1 and column 10
+</code></pre>
+<h3>Parsing JSON text with error codes</h3>
+<pre><code>std::string input = R"({"field1":ru})";    
+std::istringstream is(input);
+
+json_decoder&lt;json&gt; decoder;
+json_reader reader(is,decoder);
+
+std::error_code ec;
+reader.read(ec);
+
+if (!ec)
+{
+    json j = decoder.get_result();   
+}
+else
+{
+    std::cerr &lt;&lt; ec.message() 
+              &lt;&lt; " at line " &lt;&lt; reader.line_number() 
+              &lt;&lt; " and column " &lt;&lt; reader.column_number() &lt;&lt; std::endl;
+}
+</code></pre>
+<p>Output:</p>
+<pre><code>Expected value at line 1 and column 11
+</code></pre>
 <h3>Reading a sequence of JSON texts from a stream</h3>
 <p><code>jsoncons</code> supports reading a sequence of JSON texts, such as shown below (<code>json-texts.json</code>):</p>
 <div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>}

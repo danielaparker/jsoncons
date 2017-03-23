@@ -28,7 +28,7 @@ public:
 private:
     std::error_code value_;
 
-    bool do_error(std::error_code ec, const parsing_context&) 
+    bool do_error(std::error_code ec, const parsing_context&) JSONCONS_NOEXCEPT
     {
         return (ec != value_) ? true: false;
     }

@@ -515,7 +515,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 <pre><code>void read()
 </code></pre>
 <p>Reports JSON related events for JSON objects, arrays, object members and array elements to a <a href="json_input_handler">json_input_handler</a>, such as a <a href="json_decoder">json_decoder</a>.<br>
-Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
+Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
 <pre><code>size_t buffer_capacity() const
 
 void buffer_capacity(size_t buffer_capacity)
@@ -653,7 +653,7 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
 ]</pre></div>
 <h3>Reading a comma delimited file with different mapping options</h3>
 <h4>Input</h4>
-<pre><code class="language-csv">Date,1Y,2Y,3Y,5Y
+<pre lang="csv"><code>Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 2017-01-08,0.0063,0.0076,0.0084,0.0112

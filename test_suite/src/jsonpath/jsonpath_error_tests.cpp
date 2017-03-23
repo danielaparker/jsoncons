@@ -59,7 +59,7 @@ void test_error_code(const json& root, const std::string& path, int value, const
         json result = json_query(root,path);
         BOOST_FAIL(path);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK_MESSAGE(e.code().value() == value && e.code().category() == category, e.what());
         BOOST_CHECK_MESSAGE(e.line_number() == line, e.what());
@@ -74,7 +74,7 @@ void test_error_code(const json& root, const std::string& path, std::error_code 
         json result = json_query(root,path);
         BOOST_FAIL(path);
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         BOOST_CHECK_MESSAGE(e.code() == value, e.what());
         BOOST_CHECK_MESSAGE(e.line_number() == line, e.what());
@@ -84,7 +84,6 @@ void test_error_code(const json& root, const std::string& path, std::error_code 
 
 BOOST_AUTO_TEST_CASE(test_root_error)
 {
-
     json root = json::parse(jsonpath_fixture::store_text());
     test_error_code(root, "..*", jsonpath_parser_errc::expected_root,1,1);
 }
@@ -115,7 +114,6 @@ BOOST_AUTO_TEST_CASE(test_filter_error)
     json root = json::parse(jsonpath_fixture::store_text());
     test_error_code(root, "$..book[?(.price<10)]", json_parser_errc::invalid_json_text,1,17);
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
 

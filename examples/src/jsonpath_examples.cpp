@@ -68,7 +68,7 @@ void json_replace_example2()
 }]}}
 )");
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
