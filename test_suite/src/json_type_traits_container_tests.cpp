@@ -22,6 +22,29 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_type_traits_stl_suite)
 
+BOOST_AUTO_TEST_CASE(test_tuple_to_json)
+{
+    auto t = std::make_tuple(false,1,"foo");
+    json j(t);
+
+    BOOST_REQUIRE(j.is_array());
+    BOOST_REQUIRE(j.size() == 3);
+    BOOST_CHECK_EQUAL(false,j[0].as<bool>());
+    BOOST_CHECK_EQUAL(1,j[1].as<int>());
+    BOOST_CHECK_EQUAL(std::string("foo"),j[2].as<std::string>());
+}
+
+BOOST_AUTO_TEST_CASE(test_json_as_tuple)
+{
+    json j = json::array{false,1,"foo"};
+
+    auto t = j.as<std::tuple<bool,int,std::string>>();
+
+    BOOST_CHECK(std::get<0>(t) == false);
+    BOOST_CHECK(std::get<1>(t) == 1);
+    BOOST_CHECK(std::get<2>(t) == std::string("foo"));
+}
+
 BOOST_AUTO_TEST_CASE(test_characters)
 {
     const json a = "short";
