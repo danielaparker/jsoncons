@@ -274,6 +274,19 @@ Output:
 (1) {"one":1,"three":3,"two":2}
 ```
 
+### Convert from and to std::tuple
+
+```c++
+auto t = std::make_tuple(false,1,"foo");
+json j(t);
+std::cout << "(1) "<< j << std::endl;
+auto t2 = j.as<std::tuple<bool,int,std::string>>();
+```
+Output:
+```
+(1) [false,1,"foo"]
+```
+
 ### Convert from and to user defined types (and standard library containers of user defined types)
 
 ```c++
