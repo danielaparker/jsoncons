@@ -694,6 +694,14 @@ std::unordered_map&lt;std::string,<span class="pl-k">int</span>&gt; um = j.as&lt
 <p>Output:</p>
 <pre><code>(1) {"one":1,"three":3,"two":2}
 </code></pre>
+<h3>Convert from and to std::tuple</h3>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">auto</span> t = std::make_tuple(<span class="pl-c1">false</span>,<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>);
+json <span class="pl-en">j</span>(t);
+std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span>&lt;&lt; j &lt;&lt; std::endl;
+<span class="pl-k">auto</span> t2 = j.as&lt;std::tuple&lt;<span class="pl-k">bool</span>,<span class="pl-k">int</span>,std::string&gt;&gt;();</pre></div>
+<p>Output:</p>
+<pre><code>(1) [false,1,"foo"]
+</code></pre>
 <h3>Convert from and to user defined types (and standard library containers of user defined types)</h3>
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">struct</span> <span class="pl-en">book</span>
 {
