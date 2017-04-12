@@ -9,7 +9,7 @@ The [code repository](https://github.com/danielaparker/jsoncons) and [releases](
 Features:
 
 - Uses the standard C++ input/output streams library
-- Supports conversion from and to the standard library sequence and associative containers
+- Supports conversion from and to the standard library sequence, associative containers and std::tuple
 - Supports conversion from and to user defined types
 - Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
 - Returns the expected results for all tests from [JSONTestSuite](https://github.com/nst/JSONTestSuite)
