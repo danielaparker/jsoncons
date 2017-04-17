@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(n_columns_test)
     json_decoder<ojson> decoder;
     csv_parameters params;
     params.assume_header(true)
-           .column_types({"string","float","float","float","float"});
+           .column_types("string,float,float,float,float");
 
     params.mapping(mapping_type::n_rows);
     std::istringstream is1(bond_yields);
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values)
 
     csv_parameters params;
     params.assume_header(true)
-          .column_types({"boolean","integer","float","string"});
+          .column_types("boolean,integer,float,string");
 
     csv_reader reader(is,decoder,params);
     reader.read();
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_defaults)
 
     csv_parameters params;
     params.assume_header(true) 
-          .column_types({"boolean","integer","float","string"})
+          .column_types("boolean,integer,float,string")
           .column_defaults({"false","0","0.0","\"\""});
 
     csv_reader reader(is,decoder,params);
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_empty_defaults)
 
     csv_parameters params;
     params.assume_header(true)
-          .column_types({"boolean","integer","float","string"})
+          .column_types("boolean,integer,float,string")
           .column_defaults({"","","",""});
 
     csv_reader reader(is,decoder,params);

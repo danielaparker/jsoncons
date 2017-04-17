@@ -26,40 +26,6 @@
 
 namespace jsoncons { namespace csv {
 
-template <class CharT>
-struct json_csv_parser_traits
-{
-#if !defined(JSONCONS_HAS_STRING_VIEW)
-    typedef Basic_string_view_<CharT> string_view_type;
-#else
-    typedef std::basic_string_view<CharT> string_view_type;
-#endif
-
-    static string_view_type string_literal() 
-    {
-        static const CharT data[] = {'s','t','r','i','n','g'};
-        return string_view_type{data,sizeof(data)/sizeof(CharT)};
-    }
-
-    static string_view_type integer_literal() 
-    {
-        static const CharT data[] = {'i','n','t','e','g','e','r'};
-        return string_view_type{data,sizeof(data)/sizeof(CharT)};
-    }
-
-    static string_view_type float_literal() 
-    {
-        static const CharT data[] = {'f','l','o','a','t'};
-        return string_view_type{data,sizeof(data)/sizeof(CharT)};
-    }
-
-    static string_view_type boolean_literal() 
-    {
-        static const CharT data[] = {'b','o','o','l','e','a','n'};
-        return string_view_type{data,sizeof(data)/sizeof(CharT)};
-    }
-};
-
 enum class csv_mode_type 
 {
     initial,

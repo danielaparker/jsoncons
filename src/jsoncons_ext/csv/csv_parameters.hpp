@@ -18,6 +18,40 @@
 
 namespace jsoncons { namespace csv {
 
+template <class CharT>
+struct json_csv_parser_traits
+{
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+    typedef Basic_string_view_<CharT> string_view_type;
+#else
+    typedef std::basic_string_view<CharT> string_view_type;
+#endif
+
+    static string_view_type string_literal() 
+    {
+        static const CharT data[] = {'s','t','r','i','n','g'};
+        return string_view_type{data,sizeof(data)/sizeof(CharT)};
+    }
+
+    static string_view_type integer_literal() 
+    {
+        static const CharT data[] = {'i','n','t','e','g','e','r'};
+        return string_view_type{data,sizeof(data)/sizeof(CharT)};
+    }
+
+    static string_view_type float_literal() 
+    {
+        static const CharT data[] = {'f','l','o','a','t'};
+        return string_view_type{data,sizeof(data)/sizeof(CharT)};
+    }
+
+    static string_view_type boolean_literal() 
+    {
+        static const CharT data[] = {'b','o','o','l','e','a','n'};
+        return string_view_type{data,sizeof(data)/sizeof(CharT)};
+    }
+};
+
 enum class quote_style_type
 {
     all,minimal,none,nonnumeric
@@ -194,6 +228,110 @@ public:
     basic_csv_parameters<CharT>& column_types(const std::vector<std::basic_string<CharT>>& value)
     {
         column_types_ = value;
+        return *this;
+    }
+
+    enum class column_state {sequence,label};
+
+    basic_csv_parameters<CharT>& column_types(const std::basic_string<CharT>& types)
+    {
+        std::vector<std::basic_string<CharT>> column_types;
+
+        column_state state = column_state::sequence;
+        int depth = 0;
+        std::basic_string<CharT> buffer;
+
+        auto p = types.begin();
+        while (p != types.end())
+        {
+            switch (state)
+            {
+            case column_state::sequence:
+                {
+                    switch (*p)
+                    {
+                    case ' ': case '\t':case '\r': case '\n':
+                        ++p;
+                        break;
+                    case '[':
+                        ++depth;
+                        ++p;
+                        break;
+                    case ']':
+                        JSONCONS_ASSERT(depth > 0);
+                        --depth;
+                        ++p;
+                        break;
+                    default:
+                        buffer.clear();
+                        state = column_state::label;
+                        break;
+                    }
+                    break;
+                }
+            case column_state::label:
+                {
+                    switch (*p)
+                    {
+                    case ',':
+                        if (buffer == json_csv_parser_traits<CharT>::string_literal() ||
+                            buffer == json_csv_parser_traits<CharT>::integer_literal() ||
+                            buffer == json_csv_parser_traits<CharT>::float_literal() ||
+                            buffer == json_csv_parser_traits<CharT>::boolean_literal())
+                        {
+                            column_types.push_back(buffer);
+                            buffer.clear();
+                        }
+                        else
+                        {
+                            JSONCONS_ASSERT(false);
+                        }
+                        ++p;
+                        state = column_state::sequence;
+                        break;
+                    case ']':
+                        JSONCONS_ASSERT(depth > 0);
+                        --depth;
+                        if (buffer == json_csv_parser_traits<CharT>::string_literal() ||
+                            buffer == json_csv_parser_traits<CharT>::integer_literal() ||
+                            buffer == json_csv_parser_traits<CharT>::float_literal() ||
+                            buffer == json_csv_parser_traits<CharT>::boolean_literal())
+                        {
+                            column_types.push_back(buffer);
+                            buffer.clear();
+                        }
+                        else
+                        {
+                            JSONCONS_ASSERT(false);
+                        }
+                        ++p;
+                        state = column_state::sequence;
+                        break;
+                    default:
+                        buffer.push_back(*p);
+                        ++p;
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+        if (state == column_state::label)
+        {
+            if (buffer == json_csv_parser_traits<CharT>::string_literal() ||
+                buffer == json_csv_parser_traits<CharT>::integer_literal() ||
+                buffer == json_csv_parser_traits<CharT>::float_literal() ||
+                buffer == json_csv_parser_traits<CharT>::boolean_literal())
+            {
+                column_types.push_back(buffer);
+                buffer.clear();
+            }
+            else
+            {
+                JSONCONS_ASSERT(false);
+            }
+        }
+        column_types_ = column_types;
         return *this;
     }
 
