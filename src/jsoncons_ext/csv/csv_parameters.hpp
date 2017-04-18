@@ -20,7 +20,7 @@ namespace jsoncons { namespace csv {
 
 enum class data_type
 {
-    string_t,integer_t,float_t,boolean_t
+    string_t,integer_t,float_t,boolean_t,repeat_t
 };
 
 template <class CharT>
@@ -289,6 +289,20 @@ public:
                         --depth;
                         ++p;
                         break;
+                    case '*':
+                        {
+                            size_t offset = 0;
+                            size_t level = column_types.size() > 0 ? column_types.back().second: 0;
+                            for (auto it = column_types.rbegin();
+                                 it != column_types.rend() && level == it->second;
+                                 ++it)
+                            {
+                                ++offset;
+                            }
+                            column_types.emplace_back(data_type::repeat_t,offset);
+                            ++p;
+                            break;
+                        }
                     default:
                         buffer.clear();
                         state = column_state::label;
@@ -330,7 +344,6 @@ public:
                         break;
                     case ']':
                         JSONCONS_ASSERT(depth > 0);
-                        --depth;
                         if (buffer == json_csv_parser_traits<CharT>::string_literal()) 
                         {
                             column_types.emplace_back(data_type::string_t,depth);
@@ -355,6 +368,7 @@ public:
                         {
                             JSONCONS_ASSERT(false);
                         }
+                        --depth;
                         ++p;
                         state = column_state::sequence;
                         break;
