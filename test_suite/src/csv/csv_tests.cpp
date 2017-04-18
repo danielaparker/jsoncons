@@ -818,13 +818,13 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped2)
     std::cout << val << std::endl;
 
     BOOST_REQUIRE(params.column_types().size() == 4);
-    BOOST_CHECK(params.column_types()[0].first == data_type::integer_t);
+    BOOST_CHECK(params.column_types()[0].first == csv_column_type::integer_t);
     BOOST_CHECK(params.column_types()[0].second == 0);
-    BOOST_CHECK(params.column_types()[1].first == data_type::integer_t);
+    BOOST_CHECK(params.column_types()[1].first == csv_column_type::integer_t);
     BOOST_CHECK(params.column_types()[1].second == 1);
-    BOOST_CHECK(params.column_types()[2].first == data_type::integer_t);
+    BOOST_CHECK(params.column_types()[2].first == csv_column_type::integer_t);
     BOOST_CHECK(params.column_types()[2].second == 1);
-    BOOST_CHECK(params.column_types()[3].first == data_type::repeat_t);
+    BOOST_CHECK(params.column_types()[3].first == csv_column_type::repeat_t);
     BOOST_CHECK(params.column_types()[3].second == 2);
 
     /*BOOST_CHECK(val.size()==3);
