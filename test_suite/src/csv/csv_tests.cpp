@@ -475,7 +475,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_bool)
 
     csv_parameters params;
     params.column_names({"x","y","z"})
-          .column_types({"boolean","boolean","boolean"})
+          .column_types("boolean,boolean,boolean")
           .header_lines(1);
 
     csv_reader reader(is,decoder,params);

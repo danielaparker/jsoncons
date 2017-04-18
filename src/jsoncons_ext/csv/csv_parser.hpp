@@ -52,11 +52,6 @@ enum class csv_state_type
     done
 };
 
-enum class data_type
-{
-    string_t,integer_t,float_t,boolean_t
-};
-
 template<class CharT>
 class basic_csv_parser : private basic_parsing_context<CharT>
 {
@@ -83,7 +78,7 @@ class basic_csv_parser : private basic_parsing_context<CharT>
     basic_csv_parameters<CharT> parameters_;
     std::vector<std::basic_string<CharT>> column_names_;
     std::vector<std::vector<std::basic_string<CharT>>> column_values_;
-    std::vector<data_type> column_types_;
+    std::vector<std::pair<data_type,size_t>> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
     size_t column_index_;
     basic_json_body_filter<CharT> filter_;
@@ -260,26 +255,7 @@ public:
         }
         if (parameters_.column_types().size() > 0)
         {
-            column_types_.resize(parameters_.column_types().size());
-            for (size_t i = 0; i < parameters_.column_types().size(); ++i)
-            {
-                if (parameters_.column_types()[i] == json_csv_parser_traits<CharT>::string_literal())
-                {
-                    column_types_[i] = data_type::string_t;
-                }
-                else if (parameters_.column_types()[i] == json_csv_parser_traits<CharT>::integer_literal())
-                {
-                    column_types_[i] = data_type::integer_t;
-                }
-                else if (parameters_.column_types()[i] == json_csv_parser_traits<CharT>::float_literal())
-                {
-                    column_types_[i] = data_type::float_t;
-                }
-                else if (parameters_.column_types()[i] == json_csv_parser_traits<CharT>::boolean_literal())
-                {
-                    column_types_[i] = data_type::boolean_t;
-                }
-            }
+            column_types_ = parameters_.column_types();
         }
         if (parameters_.column_defaults().size() > 0)
         {
@@ -694,7 +670,7 @@ private:
     {
         if (column_index < column_types_.size())
         {
-            switch (column_types_[column_index])
+            switch (column_types_[column_index].first)
             {
             case data_type::integer_t:
                 {
