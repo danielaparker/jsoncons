@@ -78,7 +78,7 @@ class basic_csv_parser : private basic_parsing_context<CharT>
     basic_csv_parameters<CharT> parameters_;
     std::vector<std::basic_string<CharT>> column_names_;
     std::vector<std::vector<std::basic_string<CharT>>> column_values_;
-    std::vector<std::pair<data_type,size_t>> column_types_;
+    std::vector<std::pair<csv_column_type,size_t>> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
     size_t column_index_;
     basic_json_body_filter<CharT> filter_;
@@ -690,7 +690,7 @@ private:
     {
         if (column_index - offset_ < column_types_.size())
         {
-            if (column_types_[column_index - offset_].first == data_type::repeat_t)
+            if (column_types_[column_index - offset_].first == csv_column_type::repeat_t)
             {
                 offset_ = offset_ + column_types_[column_index - offset_].second;
                 if (column_index - offset_ + 1 < column_types_.size())
@@ -714,7 +714,7 @@ private:
             }
             switch (column_types_[column_index - offset_].first)
             {
-            case data_type::integer_t:
+            case csv_column_type::integer_t:
                 {
                     std::istringstream iss(value);
                     long long val;
@@ -739,7 +739,7 @@ private:
                     }
                 }
                 break;
-            case data_type::float_t:
+            case csv_column_type::float_t:
                 {
                     std::istringstream iss(value);
                     double val;
@@ -764,7 +764,7 @@ private:
                     }
                 }
                 break;
-            case data_type::boolean_t:
+            case csv_column_type::boolean_t:
                 {
                     if (value.length() == 1 && value[0] == '0')
                     {

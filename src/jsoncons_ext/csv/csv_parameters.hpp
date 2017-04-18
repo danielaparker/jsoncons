@@ -18,7 +18,7 @@
 
 namespace jsoncons { namespace csv {
 
-enum class data_type
+enum class csv_column_type
 {
     string_t,integer_t,float_t,boolean_t,repeat_t
 };
@@ -225,7 +225,7 @@ public:
         return *this;
     }
 
-    std::vector<std::pair<data_type,size_t>> column_types() const
+    std::vector<std::pair<csv_column_type,size_t>> column_types() const
     {
         return column_types_;
     }
@@ -239,19 +239,19 @@ public:
             {
                 if (value[i] == json_csv_parser_traits<CharT>::string_literal())
                 {
-                    column_types_.emplace_back(data_type::string_t,0);
+                    column_types_.emplace_back(csv_column_type::string_t,0);
                 }
                 else if (value[i] == json_csv_parser_traits<CharT>::integer_literal())
                 {
-                    column_types_.emplace_back(data_type::integer_t,0);
+                    column_types_.emplace_back(csv_column_type::integer_t,0);
                 }
                 else if (value[i] == json_csv_parser_traits<CharT>::float_literal())
                 {
-                    column_types_.emplace_back(data_type::float_t,0);
+                    column_types_.emplace_back(csv_column_type::float_t,0);
                 }
                 else if (value[i] == json_csv_parser_traits<CharT>::boolean_literal())
                 {
-                    column_types_.emplace_back(data_type::boolean_t,0);
+                    column_types_.emplace_back(csv_column_type::boolean_t,0);
                 }
             }
         }
@@ -262,7 +262,7 @@ public:
 
     basic_csv_parameters<CharT>& column_types(const std::basic_string<CharT>& types)
     {
-        std::vector<std::pair<data_type,size_t>> column_types;
+        std::vector<std::pair<csv_column_type,size_t>> column_types;
 
         column_state state = column_state::sequence;
         int depth = 0;
@@ -299,7 +299,7 @@ public:
                             {
                                 ++offset;
                             }
-                            column_types.emplace_back(data_type::repeat_t,offset);
+                            column_types.emplace_back(csv_column_type::repeat_t,offset);
                             ++p;
                             break;
                         }
@@ -317,22 +317,22 @@ public:
                     case ',':
                         if (buffer == json_csv_parser_traits<CharT>::string_literal()) 
                         {
-                            column_types.emplace_back(data_type::string_t,depth);
+                            column_types.emplace_back(csv_column_type::string_t,depth);
                             buffer.clear();
                         }
                         else if (buffer == json_csv_parser_traits<CharT>::integer_literal())
                         {
-                            column_types.emplace_back(data_type::integer_t,depth);
+                            column_types.emplace_back(csv_column_type::integer_t,depth);
                             buffer.clear();
                         }
                         else if (buffer == json_csv_parser_traits<CharT>::float_literal())
                         {
-                            column_types.emplace_back(data_type::float_t,depth);
+                            column_types.emplace_back(csv_column_type::float_t,depth);
                             buffer.clear();
                         }
                         else if (buffer == json_csv_parser_traits<CharT>::boolean_literal())
                         {
-                            column_types.emplace_back(data_type::boolean_t,depth);
+                            column_types.emplace_back(csv_column_type::boolean_t,depth);
                             buffer.clear();
                         }
                         else
@@ -346,22 +346,22 @@ public:
                         JSONCONS_ASSERT(depth > 0);
                         if (buffer == json_csv_parser_traits<CharT>::string_literal()) 
                         {
-                            column_types.emplace_back(data_type::string_t,depth);
+                            column_types.emplace_back(csv_column_type::string_t,depth);
                             buffer.clear();
                         }
                         else if (buffer == json_csv_parser_traits<CharT>::integer_literal())
                         {
-                            column_types.emplace_back(data_type::integer_t,depth);
+                            column_types.emplace_back(csv_column_type::integer_t,depth);
                             buffer.clear();
                         }
                         else if (buffer == json_csv_parser_traits<CharT>::float_literal())
                         {
-                            column_types.emplace_back(data_type::float_t,depth);
+                            column_types.emplace_back(csv_column_type::float_t,depth);
                             buffer.clear();
                         }
                         else if (buffer == json_csv_parser_traits<CharT>::boolean_literal())
                         {
-                            column_types.emplace_back(data_type::boolean_t,depth);
+                            column_types.emplace_back(csv_column_type::boolean_t,depth);
                             buffer.clear();
                         }
                         else
@@ -385,22 +385,22 @@ public:
         {
             if (buffer == json_csv_parser_traits<CharT>::string_literal()) 
             {
-                column_types.emplace_back(data_type::string_t,depth);
+                column_types.emplace_back(csv_column_type::string_t,depth);
                 buffer.clear();
             }
             else if (buffer == json_csv_parser_traits<CharT>::integer_literal())
             {
-                column_types.emplace_back(data_type::integer_t,depth);
+                column_types.emplace_back(csv_column_type::integer_t,depth);
                 buffer.clear();
             }
             else if (buffer == json_csv_parser_traits<CharT>::float_literal())
             {
-                column_types.emplace_back(data_type::float_t,depth);
+                column_types.emplace_back(csv_column_type::float_t,depth);
                 buffer.clear();
             }
             else if (buffer == json_csv_parser_traits<CharT>::boolean_literal())
             {
-                column_types.emplace_back(data_type::boolean_t,depth);
+                column_types.emplace_back(csv_column_type::boolean_t,depth);
                 buffer.clear();
             }
             else
@@ -532,7 +532,7 @@ private:
     std::basic_string<CharT> data_types_;
     std::basic_string<CharT> default_values_;
     std::vector<std::basic_string<CharT>> column_names_;
-    std::vector<std::pair<data_type,size_t>> column_types_;
+    std::vector<std::pair<csv_column_type,size_t>> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
 };
 
