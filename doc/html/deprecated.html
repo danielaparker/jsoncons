@@ -544,9 +544,11 @@ json_output_handler class|do_longlong_value(long long value)||Removed, override 
 basic_parsing_context|last_char()|<em>✓</em>|Use current_char()<br>
 json_filter|parent()|<em>✓</em>|Use downstream_handler()<br>
 |input_handler()|<em>✓</em>|Use downstream_handler()<br>
-csv_parameters|<code>header(std::string value)</code>||Use <code>column_names(std::vector&lt;std::string&gt;&gt; value)</code><br>
-|<code>data_types()</code>||Use <code>column_types()</code><br>
-|<code>data_types(std::string value)</code>||Use <code>column_types(std::vector&lt;std::string&gt;&gt; value)</code><br>
+csv_parameters|<code>header(std::string value)</code>||Use <code>column_names(const std::string&amp; value)</code><br>
+|<code>column_names(std::vector&lt;std::string&gt;&gt; value)</code>|<em>✓</em>|Use <code>column_names(const std::string&amp; value)</code><br>
+|<code>data_types(std::string value)</code>||Use <code>column_types(const std::string&amp; value)</code><br>
+|<code>column_types(std::vector&lt;std::string&gt;&gt; value)</code>|<em>✓</em>|Use <code>column_types(const std::string&amp; value)</code><br>
+|<code>column_defaults(std::vector&lt;std::string&gt;&gt; value)</code>|<em>✓</em>|Use <code>column_defaults(const std::string&amp; value)</code><br>
 output_format|<code>array_array_block_option accessor and modifier</code> accessor and modifier|<em>✓</em>|Use <code>array_array_split_lines</code> accessor and modifier<br>
 |<code>array_object_block_option accessor and modifier</code>|<em>✓</em>|Use <code>array_object_split_lines</code> accessor and modifier<br>
 |<code>object_array_block_option accessor and modifier</code>|<em>✓</em>|Use <code>object_array_split_lines</code> accessor and modifier<br>

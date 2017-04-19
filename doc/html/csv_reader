@@ -624,7 +624,7 @@ std::ifstream <span class="pl-en">is</span>(in_file);
 json_decoder&lt;json&gt; decoder;
 
 csv_parameters params;
-params.column_names({<span class="pl-s"><span class="pl-pds">"</span>Country Code<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>})
+params.column_names(<span class="pl-s"><span class="pl-pds">"</span>Country Code,Name<span class="pl-pds">"</span></span>)
       .header_lines(<span class="pl-c1">1</span>);
 
 csv_reader <span class="pl-en">reader</span>(is,decoder,params);
@@ -662,7 +662,7 @@ std::cout &lt;&lt; pretty_print(countries) &lt;&lt; std::endl;</pre></div>
 <div class="highlight highlight-source-c++"><pre>json_decoder&lt;ojson&gt; decoder;
 csv_parameters params;
 params.assume_header(<span class="pl-c1">true</span>)
-       .column_types({<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>float<span class="pl-pds">"</span></span>});
+       .column_types(<span class="pl-s"><span class="pl-pds">"</span>string,float,float,float,float<span class="pl-pds">"</span></span>);
 
 params.mapping(mapping_type::n_rows);
 std::istringstream <span class="pl-en">is1</span>(<span class="pl-s"><span class="pl-pds">"</span>bond_yields.csv<span class="pl-pds">"</span></span>);

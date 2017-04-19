@@ -489,18 +489,18 @@ vertical-align:1px;
 </tr>
 <tr>
 <td>column_names</td>
-<td>A list of strings containing names corresponding to the fields in the file</td>
-<td>{"bool-field","float-field","string-field"}</td>
+<td>A comma separated list of names corresponding to the fields in the file</td>
+<td>"bool-field,float-field,string-field"</td>
 </tr>
 <tr>
 <td>column_types</td>
-<td>A list of strings containing data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean</td>
-<td>{"bool","float","string"}</td>
+<td>A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean</td>
+<td>"bool,float,string"}</td>
 </tr>
 <tr>
 <td>column_defaults</td>
-<td>A list of strings containing default json values corresponding to the columns in the file.</td>
-<td>{"false","0.0",""""}</td>
+<td>A comma separated list of strings containing default json values corresponding to the columns in the file.</td>
+<td>"false,0.0,""""</td>
 </tr>
 <tr>
 <td>max_lines</td>
