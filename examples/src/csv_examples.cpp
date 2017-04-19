@@ -21,7 +21,7 @@ void mapping_types()
     json_decoder<ojson> decoder;
     csv_parameters params;
     params.assume_header(true)
-           .column_types({"string","float","float","float","float"});
+           .column_types("string,float,float,float,float");
 
     // Default
     std::istringstream is1(bond_yields);
@@ -68,7 +68,7 @@ void read_csv_file1()
 
     csv_parameters params;
     params.assume_header(true)
-          .column_types({ "string","string","string","float" });
+          .column_types("string,string,string,float");
     csv_reader reader(is,decoder,params);
     reader.read();
     json val = decoder.get_result();
@@ -85,7 +85,7 @@ void read_write_csv_tasks()
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
-          .column_types({"integer","string","string","string"});
+          .column_types("integer,string,string,string");
     csv_reader reader(is,decoder,params);
     reader.read();
     ojson tasks = decoder.get_result();

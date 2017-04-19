@@ -181,7 +181,7 @@ std::ifstream is(in_file);
 json_decoder<json> decoder;
 
 csv_parameters params;
-params.column_names({"Country Code","Name"})
+params.column_names("Country Code,Name")
       .header_lines(1);
 
 csv_reader reader(is,decoder,params);
@@ -231,7 +231,7 @@ Date,1Y,2Y,3Y,5Y
 json_decoder<ojson> decoder;
 csv_parameters params;
 params.assume_header(true)
-       .column_types({"string","float","float","float","float"});
+       .column_types("string,float,float,float,float");
 
 params.mapping(mapping_type::n_rows);
 std::istringstream is1("bond_yields.csv");

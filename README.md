@@ -486,7 +486,7 @@ int main()
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
-          .column_types({"integer","string","string","string"});
+          .column_types("integer,string,string,string");
     csv_reader reader(is,decoder,params);
     reader.read();
     ojson tasks = decoder.get_result();
