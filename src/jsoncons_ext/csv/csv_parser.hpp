@@ -237,7 +237,7 @@ public:
                     handler_.begin_array(*this);
                     for (const auto& name : column_names_)
                     {
-                        end_value(name,column_index_);
+                        write_value(name,column_index_);
                     }
                     handler_.end_array(*this);
                 }
@@ -514,7 +514,7 @@ all_csv_states:
                 handler_.begin_array(*this);
                 for (const auto& val : column_values_[i])
                 {
-                    end_value(val,i);
+                    write_value(val,i);
                 }
                 handler_.end_array(*this);
             }
@@ -608,7 +608,7 @@ private:
                 }
                 else
                 {
-                    end_value(value_buffer_,column_index_);
+                    write_value(value_buffer_,column_index_);
                 }
                 break;
             case mapping_type::n_objects:
@@ -623,7 +623,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_);
+                            write_value(value_buffer_,column_index_);
                         }
                     }
                 }
@@ -661,7 +661,7 @@ private:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
-                end_value(value_buffer_,column_index_);
+                write_value(value_buffer_,column_index_);
                 break;
             case mapping_type::n_objects:
                 if (!(parameters_.ignore_empty_values() && value_buffer_.size() == 0))
@@ -669,7 +669,7 @@ private:
                     if (column_index_ < column_names_.size())
                     {
                         handler_.name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
-                        end_value(value_buffer_,column_index_);
+                        write_value(value_buffer_,column_index_);
                     }
                 }
                 break;
@@ -686,7 +686,7 @@ private:
         value_buffer_.clear();
     }
 
-    void end_value(string_view_type value, size_t column_index)
+    void before_write_value(size_t column_index)
     {
         if (column_index - offset_ < column_types_.size())
         {
@@ -712,6 +712,14 @@ private:
                 handler_.end_array(*this);
                 level_ = column_types_[column_index - offset_].second;
             }
+        }
+    }
+
+    void write_value(string_view_type value, size_t column_index)
+    {
+        before_write_value(column_index);
+        if (column_index - offset_ < column_types_.size())
+        {
             switch (column_types_[column_index - offset_].first)
             {
             case csv_column_type::integer_t:
