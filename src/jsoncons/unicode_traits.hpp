@@ -238,13 +238,14 @@ is_legal_utf8(Iterator first, size_t length)
     switch (length) {
     default:
         return conv_errc::over_long_utf8_sequence;
-    /* Everything else falls through when "true"... */
     case 4:
         if (((a = (*--srcptr))& 0xC0) != 0x80)
             return conv_errc::expected_continuation_byte;
+        // FALLTHRU
     case 3:
         if (((a = (*--srcptr))& 0xC0) != 0x80)
             return conv_errc::expected_continuation_byte;
+        // FALLTHRU
     case 2:
         if (((a = (*--srcptr))& 0xC0) != 0x80)
             return conv_errc::expected_continuation_byte;
@@ -259,9 +260,11 @@ is_legal_utf8(Iterator first, size_t length)
             default:   if (a < 0x80) return conv_errc::source_illegal;
         }
 
+        // FALLTHRU
     case 1:
         if (static_cast<uint8_t>(*first) >= 0x80 && static_cast<uint8_t>(*first) < 0xC2)
             return conv_errc::source_illegal;
+        // FALLTHRU
     }
     if (static_cast<uint8_t>(*first) > 0xF4) 
         return conv_errc::source_illegal;
@@ -711,11 +714,18 @@ convert(InputIt first, InputIt last,
         uint8_t byte3 = 0;
         uint8_t byte4 = 0;
 
-        switch (bytes_to_write) { // note: everything falls through
-        case 4: byte4 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
-        case 3: byte3 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
-        case 2: byte2 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
-        case 1: byte1 = (uint8_t) (ch | first_byte_mark[bytes_to_write]);
+        switch (bytes_to_write) {
+        case 4:
+            byte4 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+            // FALLTHRU
+        case 3:
+            byte3 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+            // FALLTHRU
+        case 2:
+            byte2 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+            // FALLTHRU
+        case 1:
+            byte1 = (uint8_t) (ch | first_byte_mark[bytes_to_write]);
         }
 
         switch (bytes_to_write) 
@@ -945,10 +955,17 @@ public:
         default:
             return replacement_char;
             break;
-        case 4: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-        case 3: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-        case 2: ch += static_cast<uint8_t>(*it++); ch <<= 6;
-        case 1: ch += static_cast<uint8_t>(*it++);
+        case 4:
+            ch += static_cast<uint8_t>(*it++); ch <<= 6;
+            // FALLTHRU
+        case 3:
+            ch += static_cast<uint8_t>(*it++); ch <<= 6;
+            // FALLTHRU
+        case 2:
+            ch += static_cast<uint8_t>(*it++); ch <<= 6;
+            // FALLTHRU
+        case 1:
+            ch += static_cast<uint8_t>(*it++);
             ch -= offsets_from_utf8[length_ - 1];
             break;
         }
