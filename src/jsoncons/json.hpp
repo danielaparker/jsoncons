@@ -129,7 +129,7 @@ public:
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
 
-    struct variant
+    union variant
     {
         struct base_data
         {
@@ -541,77 +541,208 @@ public:
         };
 
     private:
-        static const size_t data_size = static_max<sizeof(uinteger_data),sizeof(double_data),sizeof(small_string_data), sizeof(string_data), sizeof(array_data), sizeof(object_data)>::value;
-        static const size_t data_align = static_max<JSONCONS_ALIGNOF(uinteger_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(small_string_data),JSONCONS_ALIGNOF(string_data),JSONCONS_ALIGNOF(array_data),JSONCONS_ALIGNOF(object_data)>::value;
+        base_data base_;
+        empty_object_data empty_object_;
+        null_data null_;
+        bool_data bool_;
+        integer_data integer_;
+        uinteger_data uinteger_;
+        double_data double_;
+        small_string_data small_string_;
+        string_data string_;
+        array_data array_;
+        object_data object_;
 
-        typedef typename std::aligned_storage<data_size,data_align>::type data_t;
-
-        data_t data_;
     public:
-        variant()
-        {
-            new(reinterpret_cast<void*>(&data_))empty_object_data();
+        variant() {
+            new(&empty_object_)empty_object_data();
         }
 
         variant(const Allocator& a)
         {
-            new(reinterpret_cast<void*>(&data_))object_data(a);
+            new(&object_)object_data(a);
         }
 
         variant(const variant& val)
         {
-            Init_(val);
+            switch (val.type_id())
+            {
+            case value_type::null_t:
+                new(&null_)null_data();
+                break;
+            case value_type::empty_object_t:
+                new(&empty_object_)empty_object_data();
+                break;
+            case value_type::double_t:
+                new(&double_)double_data(*(val.double_data_cast()));
+                break;
+            case value_type::integer_t:
+                new(&integer_)integer_data(*(val.integer_data_cast()));
+                break;
+            case value_type::uinteger_t:
+                new(&uinteger_)uinteger_data(*(val.uinteger_data_cast()));
+                break;
+            case value_type::bool_t:
+                new(&bool_)bool_data(*(val.bool_data_cast()));
+                break;
+            case value_type::small_string_t:
+                new(&small_string_)small_string_data(*(val.small_string_data_cast()));
+                break;
+            case value_type::string_t:
+                new(&string_)string_data(*(val.string_data_cast()));
+                break;
+            case value_type::object_t:
+                new(&object_)object_data(*(val.object_data_cast()));
+                break;
+            case value_type::array_t:
+                new(&array_)array_data(*(val.array_data_cast()));
+                break;
+            default:
+                break;
+            }
         }
 
-        variant(const variant& val, const Allocator& allocator)
+        variant(const variant& val, const Allocator& a)
         {
-            Init_(val,allocator);
+            switch (val.type_id())
+            {
+            case value_type::null_t:
+            case value_type::empty_object_t:
+            case value_type::double_t:
+            case value_type::integer_t:
+            case value_type::uinteger_t:
+            case value_type::bool_t:
+            case value_type::small_string_t:
+                new(this)variant(val);
+                break;
+            case value_type::string_t:
+                new(&string_)string_data(val.string_,a);
+                break;
+            case value_type::object_t:
+                new(&object_)object_data(val.object_,a);
+                break;
+            case value_type::array_t:
+                new(&array_)array_data(val.array_,a);
+                break;
+            default:
+                break;
+            }
         }
 
-        variant(variant&& val) JSONCONS_NOEXCEPT
+        variant(variant&& val)
         {
-            Init_rv_(std::forward<variant&&>(val));
+            switch (val.type_id())
+            {
+            case value_type::null_t:
+            case value_type::empty_object_t:
+            case value_type::double_t:
+            case value_type::integer_t:
+            case value_type::uinteger_t:
+            case value_type::bool_t:
+            case value_type::small_string_t:
+                new(this)variant(val);
+                break;
+            case value_type::string_t:
+                {
+                    new(&string_)string_data(val.string_.ptr_);
+                    val.string_data_cast()->type_id_ = value_type::null_t;
+                }
+                break;
+            case value_type::object_t:
+                {
+                    new(&object_)object_data(val.object_.ptr_);
+                    val.object_data_cast()->type_id_ = value_type::null_t;
+                }
+                break;
+            case value_type::array_t:
+                {
+                    new(&array_)array_data(val.array_.ptr_);
+                    val.array_data_cast()->type_id_ = value_type::null_t;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
+        ~variant()
+        {
+            switch (type_id())
+            {
+            case value_type::null_t:
+                null_.~null_data();
+                break;
+            case value_type::empty_object_t:
+                empty_object_.~empty_object_data();
+                break;
+            case value_type::double_t:
+                double_.~double_data();
+                break;
+            case value_type::integer_t:
+                integer_.~integer_data();
+                break;
+            case value_type::uinteger_t:
+                uinteger_.~uinteger_data();
+                break;
+            case value_type::bool_t:
+                bool_.~bool_data();
+                break;
+            case value_type::small_string_t:
+                small_string_.~small_string_data();
+                break;
+            case value_type::string_t:
+                string_.~string_data();
+                break;
+            case value_type::object_t:
+                object_.~object_data();
+                break;
+            case value_type::array_t:
+                array_.~array_data();
+                break;
+            default:
+                break;
+            }
         }
 
         variant(variant&& val, const Allocator& allocator) JSONCONS_NOEXCEPT
         {
-            Init_rv_(std::forward<variant&&>(val), allocator,
+            Init_rv_(std::move(val), allocator,
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
         }
 
         explicit variant(null_type)
         {
-            new(reinterpret_cast<void*>(&data_))null_data();
+            new(&null_)null_data();
         }
         explicit variant(bool val)
         {
-            new(reinterpret_cast<void*>(&data_))bool_data(val);
+            new(&bool_)bool_data(val);
         }
         explicit variant(int64_t val)
         {
-            new(reinterpret_cast<void*>(&data_))integer_data(val);
+            new(&integer_)integer_data(val);
         }
         explicit variant(uint64_t val)
         {
-            new(reinterpret_cast<void*>(&data_))uinteger_data(val);
+            new(&uinteger_)uinteger_data(val);
         }
         variant(double val)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val,0);
+            new(&double_)double_data(val,0);
         }
         variant(double val, uint8_t precision)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val,precision);
+            new(&double_)double_data(val,precision);
         }
         variant(const char_type* s, size_t length)
         {
             if (length <= small_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+                new(&small_string_)small_string_data(s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator_type());
+                new(&string_)string_data(s, length, char_allocator_type());
             }
         }
         variant(const char_type* s)
@@ -619,11 +750,11 @@ public:
             size_t length = char_traits_type::length(s);
             if (length <= small_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+                new(&small_string_)small_string_data(s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator_type());
+                new(&string_)string_data(s, length, char_allocator_type());
             }
         }
 
@@ -632,11 +763,11 @@ public:
             size_t length = char_traits_type::length(s);
             if (length <= small_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+                new(&small_string_)small_string_data(s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, alloc);
+                new(&string_)string_data(s, length, alloc);
             }
         }
 
@@ -644,98 +775,41 @@ public:
         {
             if (length <= small_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+                new(&small_string_)small_string_data(s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, alloc);
+                new(&string_)string_data(s, length, alloc);
             }
         }
         variant(const object& val)
         {
-            new(reinterpret_cast<void*>(&data_))object_data(val);
+            new(&object_)object_data(val);
         }
         variant(const object& val, const Allocator& alloc)
         {
-            new(reinterpret_cast<void*>(&data_))object_data(val, alloc);
+            new(&object_)object_data(val, alloc);
         }
         variant(const array& val)
         {
-            new(reinterpret_cast<void*>(&data_))array_data(val);
+            new(&array_)array_data(val);
         }
         variant(const array& val, const Allocator& alloc)
         {
-            new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
+            new(&array_)array_data(val,alloc);
         }
         template<class InputIterator>
         variant(InputIterator first, InputIterator last, const Allocator& a)
         {
-            new(reinterpret_cast<void*>(&data_))array_data(first, last, a);
-        }
-
-        ~variant()
-        {
-            Destroy_();
-        }
-
-        void Destroy_()
-        {
-            switch (type_id())
-            {
-            case value_type::string_t:
-                reinterpret_cast<string_data*>(&data_)->~string_data();
-                break;
-            case value_type::object_t:
-                reinterpret_cast<object_data*>(&data_)->~object_data();
-                break;
-            case value_type::array_t:
-                reinterpret_cast<array_data*>(&data_)->~array_data();
-                break;
-            default:
-                break;
-            }
+            new(&array_)array_data(first, last, a);
         }
 
         variant& operator=(const variant& val)
         {
-            if (this != &val)
+            if(this != &val)
             {
-                Destroy_();
-                switch (val.type_id())
-                {
-                case value_type::null_t:
-                    new(reinterpret_cast<void*>(&data_))null_data();
-                    break;
-                case value_type::empty_object_t:
-                    new(reinterpret_cast<void*>(&data_))empty_object_data();
-                    break;
-                case value_type::double_t:
-                    new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
-                    break;
-                case value_type::integer_t:
-                    new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
-                    break;
-                case value_type::uinteger_t:
-                    new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
-                    break;
-                case value_type::bool_t:
-                    new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
-                    break;
-                case value_type::small_string_t:
-                    new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
-                    break;
-                case value_type::string_t:
-                    new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
-                    break;
-                case value_type::object_t:
-                    new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
-                    break;
-                case value_type::array_t:
-                    new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
-                    break;
-                default:
-                    break;
-                }
+                this->~variant();
+                new(this)variant(val);
             }
             return *this;
         }
@@ -744,81 +818,80 @@ public:
         {
             if (this != &val)
             {
-                Destroy_();
-                new(reinterpret_cast<void*>(&data_))null_data();
-                swap(val);
+                this->~variant();
+                new(this)variant(std::move(val));
             }
             return *this;
         }
 
         value_type type_id() const
         {
-            return reinterpret_cast<const base_data*>(&data_)->type_id_;
+            return base_.type_id_;
         }
 
         const null_data* null_data_cast() const
         {
-            return reinterpret_cast<const null_data*>(&data_);
+            return &null_;
         }
 
         const empty_object_data* empty_object_data_cast() const
         {
-            return reinterpret_cast<const empty_object_data*>(&data_);
+            return &empty_object_;
         }
 
         const bool_data* bool_data_cast() const
         {
-            return reinterpret_cast<const bool_data*>(&data_);
+            return &bool_;
         }
 
         const integer_data* integer_data_cast() const
         {
-            return reinterpret_cast<const integer_data*>(&data_);
+            return &integer_;
         }
 
         const uinteger_data* uinteger_data_cast() const
         {
-            return reinterpret_cast<const uinteger_data*>(&data_);
+            return &uinteger_;
         }
 
         const double_data* double_data_cast() const
         {
-            return reinterpret_cast<const double_data*>(&data_);
+            return &double_;
         }
 
         const small_string_data* small_string_data_cast() const
         {
-            return reinterpret_cast<const small_string_data*>(&data_);
+            return &small_string_;
         }
 
         string_data* string_data_cast()
         {
-            return reinterpret_cast<string_data*>(&data_);
+            return &string_;
         }
 
         const string_data* string_data_cast() const
         {
-            return reinterpret_cast<const string_data*>(&data_);
+            return &string_;
         }
 
         object_data* object_data_cast()
         {
-            return reinterpret_cast<object_data*>(&data_);
+            return &object_;
         }
 
         const object_data* object_data_cast() const
         {
-            return reinterpret_cast<const object_data*>(&data_);
+            return &object_;
         }
 
         array_data* array_data_cast()
         {
-            return reinterpret_cast<array_data*>(&data_);
+            return &array_;
         }
 
         const array_data* array_data_cast() const
         {
-            return reinterpret_cast<const array_data*>(&data_);
+            return &array_;
         }
 
         string_view_type as_string_view() const
@@ -934,348 +1007,13 @@ public:
 
         void swap(variant& rhs) JSONCONS_NOEXCEPT
         {
-            if (this != &rhs)
-            {
-                switch (type_id())
-                {
-                case value_type::string_t:
-                    {
-                        auto ptr = string_data_cast()->ptr_;
-                        switch (rhs.type_id())
-                        {
-                        case value_type::object_t:
-                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
-                            break;
-                        case value_type::array_t:
-                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
-                            break;
-                        case value_type::string_t:
-                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
-                            break;
-                        case value_type::null_t:
-                            new(reinterpret_cast<void*>(&data_))null_data();
-                            break;
-                        case value_type::empty_object_t:
-                            new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            break;
-                        case value_type::double_t:
-                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
-                            break;
-                        case value_type::integer_t:
-                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
-                            break;
-                        case value_type::uinteger_t:
-                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
-                            break;
-                        case value_type::bool_t:
-                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
-                            break;
-                        case value_type::small_string_t:
-                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
-                            break;
-                        default:
-                            break;
-                        }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
-                    }
-                    break;
-                case value_type::object_t:
-                    {
-                        auto ptr = object_data_cast()->ptr_;
-                        switch (rhs.type_id())
-                        {
-                        case value_type::object_t:
-                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
-                            break;
-                        case value_type::array_t:
-                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
-                            break;
-                        case value_type::string_t:
-                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
-                            break;
-                        case value_type::null_t:
-                            new(reinterpret_cast<void*>(&data_))null_data();
-                            break;
-                        case value_type::empty_object_t:
-                            new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            break;
-                        case value_type::double_t:
-                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
-                            break;
-                        case value_type::integer_t:
-                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
-                            break;
-                        case value_type::uinteger_t:
-                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
-                            break;
-                        case value_type::bool_t:
-                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
-                            break;
-                        case value_type::small_string_t:
-                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
-                            break;
-                        default:
-                            break;
-                        }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
-                    }
-                    break;
-                case value_type::array_t:
-                    {
-                        auto ptr = array_data_cast()->ptr_;
-                        switch (rhs.type_id())
-                        {
-                        case value_type::object_t:
-                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
-                            break;
-                        case value_type::array_t:
-                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
-                            break;
-                        case value_type::string_t:
-                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
-                            break;
-                        case value_type::null_t:
-                            new(reinterpret_cast<void*>(&data_))null_data();
-                            break;
-                        case value_type::empty_object_t:
-                            new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            break;
-                        case value_type::double_t:
-                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
-                            break;
-                        case value_type::integer_t:
-                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
-                            break;
-                        case value_type::uinteger_t:
-                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
-                            break;
-                        case value_type::bool_t:
-                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
-                            break;
-                        case value_type::small_string_t:
-                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
-                            break;
-                        default:
-                            break;
-                        }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
-                    }
-                    break;
-                default:
-                    switch (rhs.type_id())
-                    {
-                    case value_type::string_t:
-                        {
-                            auto ptr = rhs.string_data_cast()->ptr_;
-                            switch (type_id())
-                            {
-                            case value_type::null_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
-                                break;
-                            case value_type::empty_object_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
-                                break;
-                            case value_type::double_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
-                                break;
-                            case value_type::integer_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
-                                break;
-                            case value_type::uinteger_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
-                                break;
-                            case value_type::bool_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
-                                break;
-                            case value_type::small_string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
-                                break;
-                            default:
-                                break;
-                            }
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
-                        }
-                        break;
-                    case value_type::object_t:
-                        {
-                            auto ptr = rhs.object_data_cast()->ptr_;
-                            switch (type_id())
-                            {
-                            case value_type::null_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
-                                break;
-                            case value_type::empty_object_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
-                                break;
-                            case value_type::double_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
-                                break;
-                            case value_type::integer_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
-                                break;
-                            case value_type::uinteger_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
-                                break;
-                            case value_type::bool_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
-                                break;
-                            case value_type::small_string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
-                                break;
-                            default:
-                                break;
-                            }
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
-                        }
-                        break;
-                    case value_type::array_t:
-                        {
-                            auto ptr = rhs.array_data_cast()->ptr_;
-                            switch (type_id())
-                            {
-                            case value_type::null_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
-                                break;
-                            case value_type::empty_object_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
-                                break;
-                            case value_type::double_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
-                                break;
-                            case value_type::integer_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
-                                break;
-                            case value_type::uinteger_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
-                                break;
-                            case value_type::bool_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
-                                break;
-                            case value_type::small_string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
-                                break;
-                            default:
-                                break;
-                            }
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
-                        }
-                        break;
-                    default:
-                        {
-                            std::swap(data_,rhs.data_);
-                        }
-                        break;
-                    }
-                }
-            }
+            std::swap(*this, rhs);
         }
     private:
 
-        void Init_(const variant& val)
-        {
-            switch (val.type_id())
-            {
-            case value_type::null_t:
-                new(reinterpret_cast<void*>(&data_))null_data();
-                break;
-            case value_type::empty_object_t:
-                new(reinterpret_cast<void*>(&data_))empty_object_data();
-                break;
-            case value_type::double_t:
-                new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
-                break;
-            case value_type::integer_t:
-                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
-                break;
-            case value_type::uinteger_t:
-                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
-                break;
-            case value_type::bool_t:
-                new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
-                break;
-            case value_type::small_string_t:
-                new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
-                break;
-            case value_type::string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
-                break;
-            case value_type::object_t:
-                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
-                break;
-            case value_type::array_t:
-                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
-                break;
-            default:
-                break;
-            }
-        }
-
-        void Init_(const variant& val, const Allocator& a)
-        {
-            switch (val.type_id())
-            {
-            case value_type::null_t:
-            case value_type::empty_object_t:
-            case value_type::double_t:
-            case value_type::integer_t:
-            case value_type::uinteger_t:
-            case value_type::bool_t:
-            case value_type::small_string_t:
-                Init_(val);
-                break;
-            case value_type::string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
-                break;
-            case value_type::object_t:
-                new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),a);
-                break;
-            case value_type::array_t:
-                new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),a);
-                break;
-            default:
-                break;
-            }
-        }
-
-        void Init_rv_(variant&& val) JSONCONS_NOEXCEPT
-        {
-            switch (val.type_id())
-            {
-            case value_type::null_t:
-            case value_type::empty_object_t:
-            case value_type::double_t:
-            case value_type::integer_t:
-            case value_type::uinteger_t:
-            case value_type::bool_t:
-            case value_type::small_string_t:
-                Init_(val);
-                break;
-            case value_type::string_t:
-                {
-                    new(reinterpret_cast<void*>(&data_))string_data(val.string_data_cast()->ptr_);
-                    val.string_data_cast()->type_id_ = value_type::null_t;
-                }
-                break;
-            case value_type::object_t:
-                {
-                    new(reinterpret_cast<void*>(&data_))object_data(val.object_data_cast()->ptr_);
-                    val.object_data_cast()->type_id_ = value_type::null_t;
-                }
-                break;
-            case value_type::array_t:
-                {
-                    new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
-                    val.array_data_cast()->type_id_ = value_type::null_t;
-                }
-                break;
-            default:
-                break;
-            }
-        }
-
         void Init_rv_(variant&& val, const Allocator& a, std::true_type) JSONCONS_NOEXCEPT
         {
-            Init_rv_(std::forward<variant&&>(val));
+            new(this)variant(std::move(val));
         }
 
         void Init_rv_(variant&& val, const Allocator& a, std::false_type) JSONCONS_NOEXCEPT
@@ -1289,17 +1027,17 @@ public:
             case value_type::uinteger_t:
             case value_type::bool_t:
             case value_type::small_string_t:
-                Init_(std::forward<variant&&>(val));
+                new(this)variant(val);
                 break;
             case value_type::string_t:
                 {
                     if (a == val.string_data_cast()->get_allocator())
                     {
-                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                        new(this)variant(std::move(val));
                     }
                     else
                     {
-                        Init_(val,a);
+                        new(this)variant(val, a);
                     }
                 }
                 break;
@@ -1307,11 +1045,11 @@ public:
                 {
                     if (a == val.object_data_cast()->get_allocator())
                     {
-                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                        new(this)variant(std::move(val));
                     }
                     else
                     {
-                        Init_(val,a);
+                        new(this)variant(val, a);
                     }
                 }
                 break;
@@ -1319,11 +1057,11 @@ public:
                 {
                     if (a == val.array_data_cast()->get_allocator())
                     {
-                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                        new(this)variant(std::move(val));
                     }
                     else
                     {
-                        Init_(val,a);
+                        new(this)variant(val, a);
                     }
                 }
                 break;
