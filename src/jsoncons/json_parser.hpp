@@ -168,12 +168,12 @@ class basic_json_parser : private basic_parsing_context<CharT>
 
     int max_depth_;
     string_to_double<CharT> str_to_double_;
+    uint8_t precision_;
+    size_t literal_index_;
     const CharT* begin_input_;
     const CharT* end_input_;
     const CharT* p_;
     std::pair<const CharT*,size_t> literal_;
-    uint8_t precision_;
-    size_t literal_index_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
