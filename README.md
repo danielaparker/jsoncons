@@ -33,6 +33,13 @@ Extensions:
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
+## What's new on master
+
+- The _json and _ojson literal operators have been moved to the namespace `jsoncons::literals`.
+  Access to these literals now requires
+```c++
+    using namespace jsoncons::literals;    
+```
 ## Get jsoncons
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.
@@ -189,6 +196,8 @@ for (const auto& kvp : book.object_range())
 ### _json and _ojson literal operators
 
 ```c++
+using namespace jsoncons::literals;
+
 json j1 = R"(
 {
     "StartDate" : "2017-03-01",

@@ -11,6 +11,7 @@
 #include <map>
 
 using namespace jsoncons;
+using namespace jsoncons::literals;
 
 BOOST_AUTO_TEST_SUITE(json_literal_operator_tests)
 

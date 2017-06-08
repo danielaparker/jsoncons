@@ -468,7 +468,13 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>master</p>
+<h2>master</h2>
+<ul>
+<li>The <code>_json</code> and <code>_ojson</code> literal operators have been moved to the namespace <code>jsoncons::literals</code>.<br>
+Access to these literals now requires</li>
+</ul>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::literals<span class="pl-k">;</span>    </pre></div>
+<p>Rationale: avoid name clashes with other <code>json</code> libraries</p>
 <ul>
 <li>The name <code>owjson</code> has been deprecated (still works) and changed to <code>wojson</code>. Rationale: naming consistency</li>
 </ul>
@@ -700,7 +706,7 @@ void do_uinteger_value(uint64_t value) override
 <li>json member functions <code>begin_members</code> and <code>end_members</code> have been deprecated, instead use <code>members().begin()</code> and <code>members.end()</code></li>
 <li>json member function <code>has_member</code> has been deprecated, instead use <code>count</code>. Rationale: consistency with C++ containers</li>
 <li>json member function <code>remove_member</code> has been deprecated, instead use <code>remove</code>. Rationale: only member function left with _element or _member suffix</li>
-<li>json_parse_exception renamed to parse_exception, json_parse_exception typedef to parse_exception</li>
+<li>json_parse_exception renamed to parse_error, json_parse_exception typedef to parse_error</li>
 <li>json::parse(std::istream&amp; is) renamed to json::parse_stream. json::parse(std::istream is) is deprecated but still works.</li>
 </ul>
 <h2>0.98.2 Release</h2>

@@ -1,4 +1,12 @@
 master
+------
+
+- The `_json` and `_ojson` literal operators have been moved to the namespace `jsoncons::literals`.
+  Access to these literals now requires
+```c++
+    using namespace jsoncons::literals;    
+```
+Rationale: avoid name clashes with other `json` libraries        
 
 - The name `owjson` has been deprecated (still works) and changed to `wojson`. Rationale: naming consistency
 
