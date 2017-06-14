@@ -223,7 +223,20 @@ std::error_code make_error_code(encoding_errc result)
 {
     return std::error_code(static_cast<int>(result),encoding_error_category());
 }
+}
 
+namespace std {
+    template<>
+    struct is_error_code_enum<unicons::conv_errc> : public true_type
+    {
+    };
+    template<>
+    struct is_error_code_enum<unicons::encoding_errc> : public true_type
+    {
+    };
+}
+
+namespace unicons {
 
 // utf8
 
@@ -1417,17 +1430,6 @@ skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
     }
 }
 
-}
-
-namespace std {
-    template<>
-    struct is_error_code_enum<unicons::conv_errc> : public true_type
-    {
-    };
-    template<>
-    struct is_error_code_enum<unicons::encoding_errc> : public true_type
-    {
-    };
 }
 
 #endif
