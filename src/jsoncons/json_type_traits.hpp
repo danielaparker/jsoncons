@@ -29,13 +29,13 @@ namespace jsoncons {
 template <class Json, class T, class Enable=void>
 struct json_string_type_traits
 {
-    typedef void char_traits_type;
+    typedef void value_type;
 };
 
 template <class Json, class T>
 struct json_string_type_traits<Json, T, typename std::enable_if<std::is_same<typename T::traits_type,typename Json::char_traits_type>::value>::type>
 {
-    typedef typename Json::char_traits_type char_traits_type;
+    typedef typename T::traits_type value_type;
 };
 
 template <class Json, class T, class Enable=void>
@@ -67,7 +67,7 @@ struct is_compatible_string_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_string_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    !std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
+    !std::is_void<typename json_string_type_traits<Json,T>::value_type>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
@@ -78,7 +78,7 @@ struct is_compatible_array_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_array_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    std::is_void<typename json_string_type_traits<Json,T>::char_traits_type>::value && 
+    std::is_void<typename json_string_type_traits<Json,T>::value_type>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
