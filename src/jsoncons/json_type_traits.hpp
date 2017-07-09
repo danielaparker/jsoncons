@@ -26,16 +26,28 @@
 
 namespace jsoncons {
 
-template <class Json, class T, class Enable=void>
-struct json_string_type_traits
+template <class T, class Enable=void>
+struct string_requirement_traits
 {
     typedef void value_type;
 };
 
-template <class Json, class T>
-struct json_string_type_traits<Json, T, typename std::enable_if<std::is_same<typename T::traits_type,typename Json::char_traits_type>::value>::type>
+template <class T>
+struct string_requirement_traits<T, typename std::enable_if<!std::is_void<typename T::traits_type>::value>::type>
 {
     typedef typename T::traits_type value_type;
+};
+
+template <class T, class Enable=void>
+struct map_requirement_traits
+{
+    typedef void value_type;
+};
+
+template <class T>
+struct map_requirement_traits<T, typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type>
+{
+    typedef typename T::mapped_type value_type;
 };
 
 template <class Json, class T, class Enable=void>
@@ -67,7 +79,7 @@ struct is_compatible_string_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_string_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    !std::is_void<typename json_string_type_traits<Json,T>::value_type>::value && 
+    !std::is_void<typename string_requirement_traits<T>::value_type>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
@@ -78,7 +90,8 @@ struct is_compatible_array_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_array_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    std::is_void<typename json_string_type_traits<Json,T>::value_type>::value && 
+    std::is_void<typename map_requirement_traits<T>::value_type>::value && 
+    std::is_void<typename string_requirement_traits<T>::value_type>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
@@ -828,6 +841,25 @@ public:
     }
 };
 
+template<class Json, class T1, class T2>
+struct json_type_traits<Json, std::pair<T1,T2>>
+{
+public:
+    static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+    {
+        return rhs.is_array() && rhs.size() == 2;
+    }
+    
+    static std::pair<T1,T2> as(const Json& json)
+    {
+        return std::make_pair<T1,T2>(json[0].as<T1>(),json[1].as<T2>());
+    }
+    
+    static Json to_json(const std::pair<T1,T2>& value)
+    {
+        return typename Json::array{value.first,value.second};
+    }
+};
 }
 
 #if defined(__GNUC__)

@@ -22,6 +22,14 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_type_traits_stl_suite)
 
+BOOST_AUTO_TEST_CASE(test_json_as_pair)
+{
+    json j = json::array{false,1};
+    auto t = j.as<std::pair<bool,int>>();
+    BOOST_CHECK(std::get<0>(t) == false);
+    BOOST_CHECK(std::get<1>(t) == 1);
+}
+
 BOOST_AUTO_TEST_CASE(test_tuple_to_json)
 {
     auto t = std::make_tuple(false,1,"foo");
