@@ -24,12 +24,12 @@ Member type                         |Definition
 `array_allocator`|Array allocator type
 `object_allocator`|Object allocator 
 `string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
-`kvp_type `|[kvp_type ](kvp_type ) is a class that stores a name and a json value
+`key_value_pair_type`|[key_value_pair_type](key_value_pair_type) is a class that stores a name and a json value
 `null_type`|An alias for `jsoncons::null_type`
 `object`|json object type
 `array`|json array type
-`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [kvp_type ](kvp_type )
-`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [kvp_type ](kvp_type )
+`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_pair_type](key_value_pair_type)
+`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_pair_type](key_value_pair_type)
 `array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `json`
 `const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const json`
 
@@ -43,15 +43,10 @@ Throws [parse_error](parse_error) if parsing fails.
 
     static json parse(std::istream& is)
     static json parse(std::istream& is, 
-                             parse_error_handler& err_handler)
+                      parse_error_handler& err_handler)
 Parses an input stream of JSON text and returns a json object or array value. 
 Throws [parse_error](parse_error) if parsing fails.
 
-    static json parse_file(const std::string& filename)
-    static json parse_file(const std::string& filename, 
-                           parse_error_handler& err_handler)
-Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the `parse` method that takes an `std::istream` instead, imbue your stream with the appropriate facet for handling unicode conversions.
-Throws [parse_error](parse_error) if parsing fails.
 ```c++
 template <class T>
 static json make_array(size_ n, const T& val)

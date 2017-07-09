@@ -470,8 +470,19 @@ vertical-align:1px;
 <body>
 <h2>master</h2>
 <ul>
-<li>The <code>_json</code> and <code>_ojson</code> literal operators have been moved to the namespace <code>jsoncons::literals</code>.<br>
-Access to these literals now requires</li>
+<li>
+<p><code>json_type_traits</code> supports <code>std::pair</code> (convert to/from json array of size 2)</p>
+</li>
+<li>
+<p><code>parse_stream</code> renamed to <code>parse</code> (backwards compatible)</p>
+</li>
+<li>
+<p><code>kvp_type</code> renamed to <code>key_value_pair_type</code> (backwards compatible)</p>
+</li>
+<li>
+<p>The <code>_json</code> and <code>_ojson</code> literal operators have been moved to the namespace <code>jsoncons::literals</code>.<br>
+Access to these literals now requires</p>
+</li>
 </ul>
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::literals<span class="pl-k">;</span>    </pre></div>
 <p>Rationale: avoid name clashes with other <code>json</code> libraries</p>
@@ -768,7 +779,7 @@ former name is deprecated but still works.</p>
 it is arbitrarily large (limited by heap memory.)</p>
 </li>
 <li>
-<p>Modifies <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse_stream</code> behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.</p>
+<p>Modifies <code>json</code> static methods <code>parse_string</code>, <code>parse_file</code>, and <code>parse</code> behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.</p>
 </li>
 </ul>
 <p>Changes to extensions:</p>
@@ -1053,7 +1064,7 @@ boost::gregorian dates.</li>
 <p>make_multi_array makes a multidimensional array with the number of dimensions specified as a template parameter. Replaces make_2d_array and make_3d_array, which are now deprecated.</p>
 </li>
 <li>
-<p>Added support for is&lt;std::vector&gt; and as&lt;std::vector&gt;</p>
+<p>Added support for isstd::vector&lt;T&gt; and asstd::vector&lt;T&gt;</p>
 </li>
 <li>
 <p>Removed JSONCONS_NO_CXX11_RVALUE_REFERENCES, compiler must support move semantics</p>
@@ -1077,7 +1088,7 @@ make_3d_array
 <p>Use make_multi_array&lt;2&gt; and make_multi_array&lt;3&gt; instead</p>
 <pre><code>as_vector
 </code></pre>
-<p>Use as&lt;std::vector&gt; etc. instead</p>
+<p>Use asstd::vector&lt;int&gt; etc. instead</p>
 <pre><code>as_int
 as_uint
 as_char

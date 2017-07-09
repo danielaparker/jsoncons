@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>kvp_type</title>
+<title>key_value_pair_type</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,8 +468,8 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::json::kvp_type </pre></div>
-<p><code>kvp_type</code> stores a key (name) and a json value</p>
+<div class="highlight highlight-source-c++"><pre>jsoncons::json::key_value_pair_type </pre></div>
+<p><code>key_value_pair_type</code> stores a key (name) and a json value</p>
 <h3>Member types</h3>
 <table>
 <thead>

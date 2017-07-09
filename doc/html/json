@@ -511,8 +511,8 @@ vertical-align:1px;
 <td>A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 <a href="http://en.cppreference.com/w/cpp/string/basic_string_view">string view</a> if <code>JSONCONS_HAS_STRING_VIEW</code> is defined in <code>jsoncons_config.hpp</code>, otherwise proxied.</td>
 </tr>
 <tr>
-<td><code>kvp_type</code></td>
-<td><a href="kvp_type">kvp_type </a> is a class that stores a name and a json value</td>
+<td><code>key_value_pair_type</code></td>
+<td><a href="key_value_pair_type">key_value_pair_type</a> is a class that stores a name and a json value</td>
 </tr>
 <tr>
 <td><code>null_type</code></td>
@@ -528,11 +528,11 @@ vertical-align:1px;
 </tr>
 <tr>
 <td><code>object_iterator</code></td>
-<td>A <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to <a href="kvp_type">kvp_type </a></td>
+<td>A <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to <a href="key_value_pair_type">key_value_pair_type</a></td>
 </tr>
 <tr>
 <td><code>const_object_iterator</code></td>
-<td>A const <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to const <a href="kvp_type">kvp_type </a></td>
+<td>A const <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to const <a href="key_value_pair_type">key_value_pair_type</a></td>
 </tr>
 <tr>
 <td><code>array_iterator</code></td>
@@ -548,19 +548,13 @@ static json parse(string_view_type s,
                   parse_error_handler&amp; err_handler)
 </code></pre>
 <p>Parses a string of JSON text and returns a json object or array value.<br>
-Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
-<pre><code>static json parse_stream(std::istream&amp; is)
-static json parse_stream(std::istream&amp; is, 
-                         parse_error_handler&amp; err_handler)
+Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
+<pre><code>static json parse(std::istream&amp; is)
+static json parse(std::istream&amp; is, 
+                  parse_error_handler&amp; err_handler)
 </code></pre>
 <p>Parses an input stream of JSON text and returns a json object or array value.<br>
-Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
-<pre><code>static json parse_file(const std::string&amp; filename)
-static json parse_file(const std::string&amp; filename, 
-                       parse_error_handler&amp; err_handler)
-</code></pre>
-<p>Opens a binary input stream to a JSON unicode file, parsing the file assuming UTF-8, and returns a json object or array value. This method expects that the file contains UTF-8 (or clean 7 bit ASCII), if that is not the case, use the <code>parse</code> method that takes an <code>std::istream</code> instead, imbue your stream with the appropriate facet for handling unicode conversions.<br>
-Throws <a href="parse_exception">parse_exception</a> if parsing fails.</p>
+Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
 <span class="pl-k">static</span> json <span class="pl-en">make_array</span>(size_ n, <span class="pl-k">const</span> T&amp; val)
 

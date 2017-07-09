@@ -28,7 +28,7 @@ public:
     static const int default_stack_size = 1000;
 
     typedef Json json_type;
-    typedef typename Json::kvp_type kvp_type;
+    typedef typename Json::key_value_pair_type key_value_pair_type;
     typedef typename Json::string_type string_type;
     typedef typename Json::key_storage_type key_storage_type;
     typedef typename string_type::allocator_type char_allocator;
@@ -182,7 +182,7 @@ private:
             stack_[stack_offsets_.back()].value_.object_value().insert(
                 std::make_move_iterator(s),
                 std::make_move_iterator(send),
-                [](stack_item&& val){return kvp_type(std::move(val.name_),std::move(val.value_));});
+                [](stack_item&& val){return key_value_pair_type(std::move(val.name_),std::move(val.value_));});
             top_ -= count;
         }
         else

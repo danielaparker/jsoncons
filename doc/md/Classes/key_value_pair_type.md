@@ -1,7 +1,7 @@
 ```c++
-jsoncons::json::kvp_type 
+jsoncons::json::key_value_pair_type 
 ```
-`kvp_type ` stores a key (name) and a json value
+`key_value_pair_type ` stores a key (name) and a json value
 
 ### Member types
 

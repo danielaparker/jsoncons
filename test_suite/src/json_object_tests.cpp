@@ -360,7 +360,7 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_1)
     BOOST_CHECK((*it).value() == json("value2"));
     BOOST_CHECK((*(--it)).value() == json("value1"));
 
-    json::kvp_type  member = *it;
+    json::key_value_pair_type member = *it;
     BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 }
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_2)
 
     BOOST_CHECK((*(--it)).value() == json("value1"));
 
-    json::kvp_type  member = *it;
+    json::key_value_pair_type member = *it;
     BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 }
@@ -421,7 +421,7 @@ BOOST_AUTO_TEST_CASE(test_json_object_iterator_3)
     BOOST_CHECK((*(--it)).value() == json("value1"));
     BOOST_CHECK(it == a.object_range().begin());
 
-    json::kvp_type  member = *it;
+    json::key_value_pair_type member = *it;
     BOOST_CHECK(member.key() == "name1");
     BOOST_CHECK(member.value() == json("value1"));
 

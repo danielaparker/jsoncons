@@ -102,10 +102,11 @@ public:
     using string_storage_type = typename json_traits_type::template string_storage<char_allocator_type>;
 
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
-    typedef key_value_pair<key_storage_type,json_type> kvp_type;
+    typedef key_value_pair<key_storage_type,json_type> key_value_pair_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    typedef kvp_type member_type;
+    typedef key_value_pair_type kvp_type;
+    typedef key_value_pair_type member_type;
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
@@ -113,9 +114,9 @@ public:
 
     typedef json_array<json_type> array;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<kvp_type > kvp_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_pair_type> kvp_allocator_type;
 
-    using object_storage_type = typename json_traits_type::template object_storage<kvp_type , kvp_allocator_type>;
+    using object_storage_type = typename json_traits_type::template object_storage<key_value_pair_type , kvp_allocator_type>;
     typedef json_object<key_storage_type,json_type,json_traits_type::preserve_order> object;
 
 
@@ -3808,7 +3809,7 @@ private:
 };
 
 template <class Json>
-void swap(typename Json::kvp_type & a, typename Json::kvp_type & b)
+void swap(typename Json::key_value_pair_type & a, typename Json::key_value_pair_type & b)
 {
     a.swap(b);
 }

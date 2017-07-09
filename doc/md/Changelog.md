@@ -5,6 +5,8 @@ master
 
 - `parse_stream` renamed to `parse` (backwards compatible)
 
+- `kvp_type` renamed to `key_value_pair_type` (backwards compatible)
+
 - The `_json` and `_ojson` literal operators have been moved to the namespace `jsoncons::literals`.
   Access to these literals now requires
 ```c++
