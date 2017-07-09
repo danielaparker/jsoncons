@@ -1,6 +1,10 @@
 master
 ------
 
+- `json_type_traits` supports `std::pair` (convert to/from json array of size 2)
+
+- `parse_stream` renamed to `parse` (backwards compatible)
+
 - The `_json` and `_ojson` literal operators have been moved to the namespace `jsoncons::literals`.
   Access to these literals now requires
 ```c++
@@ -316,7 +320,7 @@ Enhancements:
 - Adds getter and setter `max_depth` methods to allow setting the maximum JSON parse tree depth if desired, by default
 it is arbitrarily large (limited by heap memory.)
 
-- Modifies `json` static methods `parse_string`, `parse_file`, and `parse_stream` behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  
+- Modifies `json` static methods `parse_string`, `parse_file`, and `parse` behaviour to throw if there are unconsumed non-whitespace characters after reading one JSON text.  
 
 Changes to extensions:
 

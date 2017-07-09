@@ -1968,8 +1968,8 @@ public:
 #endif
     };
 
-    static basic_json parse_stream(std::basic_istream<char_type>& is);
-    static basic_json parse_stream(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler);
+    static basic_json parse(std::basic_istream<char_type>& is);
+    static basic_json parse(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler);
 
     static basic_json parse(string_view_type s)
     {
@@ -3373,13 +3373,13 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    static basic_json parse(std::basic_istream<char_type>& is)
+    static basic_json parse_stream(std::basic_istream<char_type>& is)
     {
-        return parse_stream(is);
+        return parse(is);
     }
-    static basic_json parse(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler)
+    static basic_json parse_stream(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler)
     {
-        return parse_stream(is,err_handler);
+        return parse(is,err_handler);
     }
 
     static basic_json parse_string(const string_type& s)
@@ -3866,14 +3866,14 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::m
 }
 
 template<class CharT,class JsonTraits,class Allocator>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_stream(std::basic_istream<char_type>& is)
+basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse(std::basic_istream<char_type>& is)
 {
     parse_error_handler_type err_handler;
-    return parse_stream(is,err_handler);
+    return parse(is,err_handler);
 }
 
 template<class CharT,class JsonTraits,class Allocator>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse_stream(std::basic_istream<char_type>& is, 
+basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse(std::basic_istream<char_type>& is, 
                                                                                             basic_parse_error_handler<char_type>& err_handler)
 {
     json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;

@@ -41,8 +41,8 @@ Member type                         |Definition
 Parses a string of JSON text and returns a json object or array value. 
 Throws [parse_error](parse_error) if parsing fails.
 
-    static json parse_stream(std::istream& is)
-    static json parse_stream(std::istream& is, 
+    static json parse(std::istream& is)
+    static json parse(std::istream& is, 
                              parse_error_handler& err_handler)
 Parses an input stream of JSON text and returns a json object or array value. 
 Throws [parse_error](parse_error) if parsing fails.

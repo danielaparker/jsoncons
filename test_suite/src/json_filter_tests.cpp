@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
     rename_name_filter filter("price","price2",serializer);
     j.dump(filter);
 
-    json j2 = json::parse_stream(ss);
+    json j2 = json::parse(ss);
     BOOST_CHECK_CLOSE(31.96,j2["store"]["book"][0]["price2"].as<double>(),0.001);
 }
 

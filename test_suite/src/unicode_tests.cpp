@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE( test1 )
 {
     std::istringstream is("{\"unicode_string_1\":\"\\uD800\\uDC00\"}");
 
-    json root = json::parse_stream(is);
+    json root = json::parse(is);
     BOOST_CHECK(root.is_object());
     BOOST_CHECK(root.is<json::object>());
 

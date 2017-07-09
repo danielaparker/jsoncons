@@ -852,7 +852,7 @@ public:
     
     static std::pair<T1,T2> as(const Json& json)
     {
-        return std::make_pair<T1,T2>(json[0].as<T1>(),json[1].as<T2>());
+        return std::make_pair<T1,T2>(json[0]. template as<T1>(),json[1]. template as<T2>());
     }
     
     static Json to_json(const std::pair<T1,T2>& value)

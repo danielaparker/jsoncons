@@ -25,7 +25,7 @@ void wjson_escape_u2()
     std::wstring input = L"[\"\\u007F\\u07FF\\u0800\"]";
     std::wistringstream is(input);
 
-    wjson val = wjson::parse_stream(is);
+    wjson val = wjson::parse(is);
 
     std::wstring s = val[0].as<std::wstring>();
     std::cout << "length=" << s.length() << std::endl;
@@ -55,7 +55,7 @@ void wjson_surrogate_pair()
     std::wstring input = L"[\"\\uD950\\uDF21\"]";
     std::wistringstream is(input);
 
-    wjson val = wjson::parse_stream(is);
+    wjson val = wjson::parse(is);
 
     std::wstring s = val[0].as<std::wstring>();
     std::cout << "length=" << s.length() << std::endl;
