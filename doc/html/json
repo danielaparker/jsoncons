@@ -821,6 +821,8 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 <pre><code>void swap(json&amp; val)
 </code></pre>
 <p>Exchanges the content of the <code>json</code> value with the content of <code>val</code>, which is another <code>json</code> value.</p>
+<p><a href="json_insert_or_assign">insert_or_assign</a><br>
+Inserts a value or assigns to the current value if the key already exists</p>
 <h3>Relational operators</h3>
 <pre><code>bool operator==(const json&amp; rhs) const
 </code></pre>

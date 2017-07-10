@@ -324,6 +324,18 @@ Throws `std::runtime_error` if not an array.
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
 
+[emplace_back](json_emplace_back)
+Constructs a value in place at the end of a json array
+
+[emplace](json_emplace)
+Constructs a value in place before a specified position in a json array
+
+[try_emplace](json_try_emplace)
+Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists
+
+[insert_or_assign](json_insert_or_assign)
+Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists 
+
 ### Relational operators
 
     bool operator==(const json& rhs) const

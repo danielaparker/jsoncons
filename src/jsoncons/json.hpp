@@ -1695,6 +1695,12 @@ public:
         }
 
         template <class T>
+        std::pair<object_iterator,bool> insert_or_assign(string_view_type name, T&& value)
+        {
+            return evaluate().insert_or_assign(name,std::forward<T&&>(value));
+        }
+
+        template <class T>
         void set_(key_storage_type&& name, T&& value)
         {
             evaluate().set_(std::forward<key_storage_type&&>(name),std::forward<T&&>(value));
@@ -1712,6 +1718,12 @@ public:
         object_iterator set(object_iterator hint, string_view_type name, T&& value)
         {
             return evaluate().set(hint, name, std::forward<T&&>(value));
+        }
+
+        template <class T>
+        object_iterator insert_or_assign(object_iterator hint, string_view_type name, T&& value)
+        {
+            return evaluate().insert_or_assign(hint, name, std::forward<T&&>(value));
         }
 
         template <class ... Args>
@@ -1733,9 +1745,9 @@ public:
         }
 
         template <class... Args> 
-        void emplace_back(Args&&... args)
+        json_type& emplace_back(Args&&... args)
         {
-            evaluate_with_default().emplace_back(std::forward<Args>(args)...);
+            return evaluate_with_default().emplace_back(std::forward<Args>(args)...);
         }
 
         template <class T>
@@ -3246,6 +3258,23 @@ public:
         }
     }
 
+    template <class T>
+    std::pair<object_iterator,bool> insert_or_assign(string_view_type name, T&& value)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().insert_or_assign(name, std::forward<T&&>(value));
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+            }
+        }
+    }
+
     template <class ... Args>
     std::pair<object_iterator,bool> try_emplace(string_view_type name, Args&&... args)
     {
@@ -3292,6 +3321,23 @@ public:
         case value_type::object_t:
             return object_value().set(hint, name, std::forward<T&&>(value));
             break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+            }
+        }
+    }
+
+    template <class T>
+    object_iterator insert_or_assign(object_iterator hint, string_view_type name, T&& value)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().insert_or_assign(hint, name, std::forward<T&&>(value));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3380,13 +3426,12 @@ public:
     }
 
     template <class... Args> 
-    void emplace_back(Args&&... args)
+    json_type& emplace_back(Args&&... args)
     {
         switch (var_.type_id())
         {
         case value_type::array_t:
-            array_value().emplace_back(std::forward<Args>(args)...);
-            break;
+            return array_value().emplace_back(std::forward<Args>(args)...);
         default:
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
