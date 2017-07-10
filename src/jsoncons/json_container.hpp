@@ -833,16 +833,15 @@ public:
         }
     }
 
-    template <class U=allocator_type, class... Args>
-        typename std::enable_if<is_stateless<U>::value,std::pair<iterator,bool>>::type 
-    try_emplace(string_view_type name, Args&&... args)
+    template <class... Args>
+    std::pair<iterator,bool> try_emplace(string_view_type name, Args&&... args)
     {
         bool inserted;
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
                                    [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
                                         std::forward<Args>(args)...);
             it = this->members_.begin() + this->members_.size() - 1;
             inserted = true;
@@ -854,7 +853,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                        key_storage_type(name.begin(),name.end()),
+                                        key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
             inserted = true;
         }
@@ -970,9 +969,8 @@ public:
         return it;
     }
 
-    template <class U=allocator_type, class ... Args>
-        typename std::enable_if<is_stateless<U>::value,iterator>::type 
-    try_emplace(iterator hint, string_view_type name, Args&&... args)
+    template <class ... Args>
+    iterator try_emplace(iterator hint, string_view_type name, Args&&... args)
     {
         iterator it;
         if (hint != this->members_.end() && hint->key() <= name)
@@ -988,7 +986,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
                                         std::forward<Args>(args)...);
             it = this->members_.begin() + (this->members_.size() - 1);
         }
@@ -998,7 +996,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                        key_storage_type(name.begin(),name.end()),
+                                        key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
         }
         return it;
@@ -1334,9 +1332,8 @@ public:
         }
     }
 
-    template <class U=allocator_type, class... Args>
-        typename std::enable_if<is_stateless<U>::value,std::pair<iterator,bool>>::type 
-    try_emplace(string_view_type name, Args&&... args)
+    template <class... Args>
+    std::pair<iterator,bool> try_emplace(string_view_type name, Args&&... args)
     {
         bool inserted;
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
@@ -1344,7 +1341,7 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
                                         std::forward<Args>(args)...);
             it = this->members_.begin() + this->members_.size() - 1;
             inserted = true;
@@ -1441,9 +1438,8 @@ public:
         return it;
     }
 
-    template <class U=allocator_type, class ... Args>
-        typename std::enable_if<is_stateless<U>::value,iterator>::type 
-    try_emplace(iterator hint, string_view_type name, Args&&... args)
+    template <class ... Args>
+    iterator try_emplace(iterator hint, string_view_type name, Args&&... args)
     {
         iterator it = hint;
 
@@ -1459,7 +1455,7 @@ public:
         else
         {
             it = this->members_.emplace(it,
-                                        key_storage_type(name.begin(),name.end()),
+                                        key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
         }
         return it;

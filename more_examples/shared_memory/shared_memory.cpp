@@ -55,6 +55,10 @@ int main(int argc, char *argv[])
       j->add(10);
 
       shm_json o(allocator);
+      //o.try_emplace("category", "reference",allocator);
+      //o.try_emplace("author", "Nigel Rees",allocator);
+      //o.try_emplace("title", "Sayings of the Century",allocator);
+      //o.try_emplace("price", 8.95, allocator);
       o.set("category", "reference");
       o.set("author", "Nigel Rees");
       o.set("title", "Sayings of the Century");
