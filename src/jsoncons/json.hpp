@@ -1686,7 +1686,7 @@ public:
             evaluate().erase(name);
         }
 
-       // Remove a member from an object 
+       // set
 
         template <class T>
         void set(string_view_type name, T&& value)
@@ -1700,16 +1700,42 @@ public:
             evaluate().set_(std::forward<key_storage_type&&>(name),std::forward<T&&>(value));
         }
 
+       // emplace
+
+        template <class ... Args>
+        void emplace(string_view_type name, Args&&... args)
+        {
+            evaluate().emplace(name,std::forward<Args>(args)...);
+        }
+
         template <class T>
         object_iterator set(object_iterator hint, string_view_type name, T&& value)
         {
             return evaluate().set(hint, name, std::forward<T&&>(value));
         }
 
+        template <class ... Args>
+        object_iterator emplace_hint(object_iterator hint, string_view_type name, Args&&... args)
+        {
+            return evaluate().set(hint, name, std::forward<Args>(args)...);
+        }
+
         template <class T>
         object_iterator set_(object_iterator hint, key_storage_type&& name, T&& value)
         {
             return evaluate().set_(hint, std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
+        }
+
+        template <class... Args> 
+        array_iterator emplace(const_array_iterator pos, Args&&... args)
+        {
+            evaluate_with_default().emplace(pos, std::forward<Args>(args)...);
+        }
+
+        template <class... Args> 
+        void emplace_back(Args&&... args)
+        {
+            evaluate_with_default().emplace_back(std::forward<Args>(args)...);
         }
 
         template <class T>
@@ -3220,6 +3246,24 @@ public:
         }
     }
 
+    template <class ... Args>
+    void emplace(string_view_type name, Args&&... args)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            object_value().emplace(name, std::forward<Args>(args)...);
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+            }
+        }
+    }
+
     template <class T>
     void set_(key_storage_type&& name, T&& value)
     {
@@ -3245,9 +3289,27 @@ public:
         {
         case value_type::empty_object_t:
             create_object_implicitly();
+            // FALLTHRU
         case value_type::object_t:
             return object_value().set(hint, name, std::forward<T&&>(value));
             break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+            }
+        }
+    }
+
+    template <class ... Args>
+    object_iterator emplace_hint(object_iterator hint, string_view_type name, Args&&... args)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().emplace_hint(hint, name, std::forward<Args>(args)...);
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3262,6 +3324,7 @@ public:
         {
         case value_type::empty_object_t:
             create_object_implicitly();
+            // FALLTHRU
         case value_type::object_t:
             return object_value().set_(hint, std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
             break;
@@ -3294,6 +3357,36 @@ public:
         {
         case value_type::array_t:
             return array_value().add(pos, std::forward<T&&>(value));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    template <class... Args> 
+    array_iterator emplace(const_array_iterator pos, Args&&... args)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::array_t:
+            return array_value().emplace(pos, std::forward<Args>(args)...);
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    template <class... Args> 
+    void emplace_back(Args&&... args)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::array_t:
+            array_value().emplace_back(std::forward<Args>(args)...);
             break;
         default:
             {

@@ -316,6 +316,30 @@ public:
     }
 #endif
 
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+    template <class U=allocator_type, class... Args>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    emplace(const_iterator pos, Args&&... args)
+    {
+        iterator it = elements_.begin() + (pos - elements_.begin());
+        return elements_.emplace(it, std::forward<Args>(args)...);
+    }
+#else
+    template <class U=allocator_type, class... Args>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    emplace(const_iterator pos, Args&&... args)
+    {
+        return elements_.emplace(pos, std::forward<Args>(args)...);
+    }
+#endif
+    template <class U=allocator_type, class... Args>
+        typename std::enable_if<is_stateless<U>::value,void>::type 
+    emplace_back(Args&&... args)
+    {
+        elements_.emplace_back(std::forward<Args>(args)...);
+    }
+
     iterator begin() {return elements_.begin();}
 
     iterator end() {return elements_.end();}
@@ -809,6 +833,29 @@ public:
         }
     }
 
+    template <class U=allocator_type, class... Args>
+        typename std::enable_if<is_stateless<U>::value,void>::type 
+    emplace(string_view_type name, Args&&... args)
+    {
+        auto it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
+                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+        if (it == this->members_.end())
+        {
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
+                                        std::forward<Args>(args)...);
+        }
+        else if (it->key() == name)
+        {
+            it->value(std::forward<Args>(args)...);
+        }
+        else
+        {
+            this->members_.emplace(it,
+                             key_storage_type(name.begin(),name.end()),
+                             std::forward<Args>(args)...);
+        }
+    }
+
     template <class T, class U=allocator_type,
         typename std::enable_if<!is_stateless<U>::value
            >::type* = nullptr>
@@ -914,6 +961,41 @@ public:
             it = this->members_.emplace(it,
                                   key_storage_type(name.begin(),name.end()),
                                   std::forward<T&&>(value));
+        }
+        return it;
+    }
+
+    template <class U=allocator_type, class ... Args>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    emplace_hint(iterator hint, string_view_type name, Args&&... args)
+    {
+        iterator it;
+        if (hint != this->members_.end() && hint->key() <= name)
+        {
+            it = std::lower_bound(hint,this->members_.end(), name, 
+                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+        }
+        else
+        {
+            it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
+                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+        }
+
+        if (it == this->members_.end())
+        {
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
+                                        std::forward<Args>(args)...);
+            it = this->members_.begin() + (this->members_.size() - 1);
+        }
+        else if (it->key() == name)
+        {
+            it->value(Json(std::forward<Args>(args)...));
+        }
+        else
+        {
+            it = this->members_.emplace(it,
+                                        key_storage_type(name.begin(),name.end()),
+                                        std::forward<Args>(args)...);
         }
         return it;
     }
@@ -1248,6 +1330,24 @@ public:
         }
     }
 
+    template <class U=allocator_type, class... Args>
+        typename std::enable_if<is_stateless<U>::value,void>::type 
+    emplace(string_view_type name, Args&&... args)
+    {
+        auto it = std::find_if(this->members_.begin(),this->members_.end(), 
+                               [name](const value_type& a){return a.key() == name;});
+
+        if (it == this->members_.end())
+        {
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
+                                        std::forward<Args>(args)...);
+        }
+        else
+        {
+            it->value(std::forward<Args>(args)...);
+        }
+    }
+
     template <class T, class U=allocator_type,
         typename std::enable_if<!is_stateless<U>::value
            >::type* = nullptr>
@@ -1307,7 +1407,7 @@ public:
         }
     }
 
-    template <class T, class U=allocator_type>
+    template <class U=allocator_type, class T>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
     set(iterator hint, string_view_type name, T&& value)
     {
@@ -1328,6 +1428,31 @@ public:
             it = this->members_.emplace(it,
                                   key_storage_type(name.begin(),name.end()),
                                   std::forward<T&&>(value));
+        }
+        return it;
+    }
+
+    template <class U=allocator_type, class ... Args>
+        typename std::enable_if<is_stateless<U>::value,iterator>::type 
+    emplace_hint(iterator hint, string_view_type name, Args&&... args)
+    {
+        iterator it = hint;
+
+        if (it == this->members_.end())
+        {
+            this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
+                                        std::forward<Args>(args)...);
+            it = this->members_.begin() + (this->members_.size() - 1);
+        }
+        else if (it->key() == name)
+        {
+            it->value(std::forward<Args>(args)...);
+        }
+        else
+        {
+            it = this->members_.emplace(it,
+                                        key_storage_type(name.begin(),name.end()),
+                                        std::forward<Args>(args)...);
         }
         return it;
     }

@@ -74,5 +74,38 @@ BOOST_AUTO_TEST_CASE(test_object)
     o.erase("unit_type");
 }
 
+BOOST_AUTO_TEST_CASE(test_object_emplace)
+{
+    ojson o = ojson::parse(R"(
+    {
+        "street_number" : "100",
+        "street_name" : "Queen St W",
+        "city" : "Toronto",
+        "country" : "Canada"
+    }
+    )");
+
+    o.emplace("postal_code", "M5H 2N2");
+
+    ojson o2 = o;
+    BOOST_CHECK(o == o2);
+
+    ojson o3 = o;
+    o3["street_name"] = "Queen St W";
+    //BOOST_CHECK_EQUAL(o,o3);
+
+    //BOOST_CHECK_EQUAL("Queen St W",o["street_name"].as<std::string>());
+    //BOOST_CHECK_EQUAL(2,o["city"].as<int>());
+    //BOOST_CHECK_EQUAL(4,o["street_number"].as<int>());
+
+    auto it = o.find("country");
+    BOOST_CHECK(it != o.object_range().end());
+    o.emplace_hint(it,"province","Ontario");
+
+    o.emplace("unit_type","O");
+
+    o.erase("unit_type");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
