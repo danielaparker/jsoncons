@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(test_object_emplace)
     }
     )");
 
-    o.emplace("postal_code", "M5H 2N2");
+    o.try_emplace("postal_code", "M5H 2N2");
 
     ojson o2 = o;
     BOOST_CHECK(o == o2);
@@ -100,9 +100,9 @@ BOOST_AUTO_TEST_CASE(test_object_emplace)
 
     auto it = o.find("country");
     BOOST_CHECK(it != o.object_range().end());
-    o.emplace_hint(it,"province","Ontario");
+    o.try_emplace(it,"province","Ontario");
 
-    o.emplace("unit_type","O");
+    o.try_emplace("unit_type","O");
 
     o.erase("unit_type");
 }

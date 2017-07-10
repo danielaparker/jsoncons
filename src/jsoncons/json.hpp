@@ -1703,9 +1703,9 @@ public:
        // emplace
 
         template <class ... Args>
-        void emplace(string_view_type name, Args&&... args)
+        std::pair<object_iterator,bool> try_emplace(string_view_type name, Args&&... args)
         {
-            evaluate().emplace(name,std::forward<Args>(args)...);
+            return evaluate().try_emplace(name,std::forward<Args>(args)...);
         }
 
         template <class T>
@@ -1715,7 +1715,7 @@ public:
         }
 
         template <class ... Args>
-        object_iterator emplace_hint(object_iterator hint, string_view_type name, Args&&... args)
+        object_iterator try_emplace(object_iterator hint, string_view_type name, Args&&... args)
         {
             return evaluate().set(hint, name, std::forward<Args>(args)...);
         }
@@ -3247,7 +3247,7 @@ public:
     }
 
     template <class ... Args>
-    void emplace(string_view_type name, Args&&... args)
+    std::pair<object_iterator,bool> try_emplace(string_view_type name, Args&&... args)
     {
         switch (var_.type_id())
         {
@@ -3255,8 +3255,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            object_value().emplace(name, std::forward<Args>(args)...);
-            break;
+            return object_value().try_emplace(name, std::forward<Args>(args)...);
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3301,7 +3300,7 @@ public:
     }
 
     template <class ... Args>
-    object_iterator emplace_hint(object_iterator hint, string_view_type name, Args&&... args)
+    object_iterator try_emplace(object_iterator hint, string_view_type name, Args&&... args)
     {
         switch (var_.type_id())
         {
@@ -3309,7 +3308,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().emplace_hint(hint, name, std::forward<Args>(args)...);
+            return object_value().try_emplace(hint, name, std::forward<Args>(args)...);
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
