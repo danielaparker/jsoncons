@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_insert_or_assign</title>
+<title>json_try_emplace</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,23 +468,23 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::json::insert_or_assign
+<div class="highlight highlight-source-c++"><pre>jsoncons::json::try_emplace
 
 <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-pair&lt;object_iterator, <span class="pl-k">bool</span>&gt; <span class="pl-en">insert_or_assign</span>(string_view_type key, T&amp;&amp; value); (<span class="pl-c1">1</span>)
+pair&lt;object_iterator, <span class="pl-k">bool</span>&gt; <span class="pl-en">try_emplace</span>(string_view_type key, Args&amp;&amp;... args); (<span class="pl-c1">1</span>)
 
 <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-object_iterator <span class="pl-en">insert_or_assign</span>(const_object_iterator hint, string_view_type key, T&amp;&amp; value); (<span class="pl-c1">2</span>)</pre></div>
+object_iterator <span class="pl-en">try_emplace</span>(const_object_iterator hint, string_view_type key, Args&amp;&amp;... args); (<span class="pl-c1">2</span>)</pre></div>
 <h3>Parameters</h3>
 <pre><code>key
 </code></pre>
-<p>The member name used to look up and, if not found, to insert</p>
-<pre><code>hint        
+<p>The key used both to look up and to insert if not found</p>
+<pre><code>hint
 </code></pre>
-<p>An object iterator that provides a hint where to insert the new json value</p>
-<pre><code>value
+<p>Iterator to the position before which the new element will be inserted</p>
+<pre><code>args        
 </code></pre>
-<p>Value to insert or assign</p>
+<p>Arguments to forward to the constructor of the element</p>
 <h3>Return value</h3>
 <p>(1) returns a pair consisting of first, an iterator to the inserted value<br>
 or the already existing value,<br>

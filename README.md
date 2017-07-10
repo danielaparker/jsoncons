@@ -40,6 +40,10 @@ Extensions:
 ```c++
     using namespace jsoncons::literals;    
 ```
+- `json_type_traits` supports `std::pair` (convert to/from json array of size 2)
+- Added json array functions `emplace_back` and `emplace`, and json object functions `try_emplace`
+  and `insert_or_assign`, which are analagous to the standard library vector and map functions. 
+
 ## Get jsoncons
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.

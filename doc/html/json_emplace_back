@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_insert_or_assign</title>
+<title>json_emplace_back</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,32 +468,19 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::json::insert_or_assign
+<pre><code>jsoncons::json::emplace_back
 
-<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-pair&lt;object_iterator, <span class="pl-k">bool</span>&gt; <span class="pl-en">insert_or_assign</span>(string_view_type key, T&amp;&amp; value); (<span class="pl-c1">1</span>)
-
-<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-object_iterator <span class="pl-en">insert_or_assign</span>(const_object_iterator hint, string_view_type key, T&amp;&amp; value); (<span class="pl-c1">2</span>)</pre></div>
+template&lt;class... Args&gt;
+json_type&amp; emplace_back(Args&amp;&amp;... args);
+</code></pre>
 <h3>Parameters</h3>
-<pre><code>key
+<pre><code>args 
 </code></pre>
-<p>The member name used to look up and, if not found, to insert</p>
-<pre><code>hint        
-</code></pre>
-<p>An object iterator that provides a hint where to insert the new json value</p>
-<pre><code>value
-</code></pre>
-<p>Value to insert or assign</p>
+<p>Arguments to forward to the constructor of the json value</p>
 <h3>Return value</h3>
-<p>(1) returns a pair consisting of first, an iterator to the inserted value<br>
-or the already existing value,<br>
-and second, a bool indicating whether the insertion took place<br>
-(true for insertion, false for no insertion.)</p>
-<p>(2) returns an iterator to the inserted value<br>
-or the already existing value.</p>
+<p>A reference to the emplaced json value.</p>
 <h3>Exceptions</h3>
-<p>Throws <code>std::runtime_error</code> if not a json object.</p>
+<p>Throws <code>std::runtime_error</code> if not a json array.</p>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

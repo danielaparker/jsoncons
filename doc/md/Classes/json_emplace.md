@@ -2,15 +2,27 @@
 jsoncons::json::emplace
 
 template <class... Args>
-pair<array_iterator, bool> emplace(Args&&... args);
+array_iterator emplace(Args&&... args);
 
 template <class... Args>
 object_iterator emplace(const_array_iterator pos, Args&&... args);
 ```
 
+Constructs a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.
+
 ### Parameters
 
     pos
-iterator before which the new json value will be constructed
+Iterator that identifies the position in the array to construct the new json value
+
     args
-arguments to forward to the constructor of the json value
+Arguments to forward to the constructor of the json value
+
+### Return value
+
+Array iterator pointing to the emplaced value.
+
+### Exceptions
+
+Throws `std::runtime_error` if not a json array.
+

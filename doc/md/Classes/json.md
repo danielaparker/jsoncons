@@ -298,6 +298,11 @@ Throws `std::runtime_error` if not an object.
 Requests the removal of unused capacity.
 
     template <class T>
+    void add(T&& val)
+Adds a new json element at the end of a json array. The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
+Throws `std::runtime_error` if not an array.
+
+    template <class T>
     void set(string_view_type name, T&& val)
 Inserts a new member or replaces an existing member in a json object.
 Throws `std::runtime_error` if not an object.
@@ -310,19 +315,11 @@ Returns a `member_iterator` pointing at the member that was inserted or updated
 Throws `std::runtime_error` if not an object.
 
     template <class T>
-    void add(T&& val)
-Adds a new json element at the end of a json array. The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
-Throws `std::runtime_error` if not an array.
-
-    template <class T>
     array_iterator add(const_array_iterator pos, T&& val)
 Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.
 The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
 Returns an `array_iterator` that points to the new value
 Throws `std::runtime_error` if not an array.
-
-    void swap(json& val)
-Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
 
 [emplace_back](json_emplace_back)
 Constructs a value in place at the end of a json array
@@ -335,6 +332,9 @@ Constructs a key-value pair in place in a json object if the key does not exist,
 
 [insert_or_assign](json_insert_or_assign)
 Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists 
+
+    void swap(json& val)
+Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
 
 ### Relational operators
 

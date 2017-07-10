@@ -16,6 +16,9 @@ Rationale: avoid name clashes with other `json` libraries
 
 - The name `owjson` has been deprecated (still works) and changed to `wojson`. Rationale: naming consistency
 
+- Added json array functions `emplace_back` and `emplace`, and json object functions `try_emplace`
+  and `insert_or_assign`, which are analagous to the standard library vector and map functions. 
+
 0.99.7.2
 --------
 

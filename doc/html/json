@@ -795,6 +795,11 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 </code></pre>
 <p>Requests the removal of unused capacity.</p>
 <pre><code>template &lt;class T&gt;
+void add(T&amp;&amp; val)
+</code></pre>
+<p>Adds a new json element at the end of a json array. The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
+Throws <code>std::runtime_error</code> if not an array.</p>
+<pre><code>template &lt;class T&gt;
 void set(string_view_type name, T&amp;&amp; val)
 </code></pre>
 <p>Inserts a new member or replaces an existing member in a json object.<br>
@@ -807,22 +812,23 @@ Insertion time is optimized if <code>hint</code> points to the member that will 
 Returns a <code>member_iterator</code> pointing at the member that was inserted or updated<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
 <pre><code>template &lt;class T&gt;
-void add(T&amp;&amp; val)
-</code></pre>
-<p>Adds a new json element at the end of a json array. The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
-Throws <code>std::runtime_error</code> if not an array.</p>
-<pre><code>template &lt;class T&gt;
 array_iterator add(const_array_iterator pos, T&amp;&amp; val)
 </code></pre>
 <p>Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>
 The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
 Returns an <code>array_iterator</code> that points to the new value<br>
 Throws <code>std::runtime_error</code> if not an array.</p>
+<p><a href="json_emplace_back">emplace_back</a><br>
+Constructs a value in place at the end of a json array</p>
+<p><a href="json_emplace">emplace</a><br>
+Constructs a value in place before a specified position in a json array</p>
+<p><a href="json_try_emplace">try_emplace</a><br>
+Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists</p>
+<p><a href="json_insert_or_assign">insert_or_assign</a><br>
+Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</p>
 <pre><code>void swap(json&amp; val)
 </code></pre>
 <p>Exchanges the content of the <code>json</code> value with the content of <code>val</code>, which is another <code>json</code> value.</p>
-<p><a href="json_insert_or_assign">insert_or_assign</a><br>
-Inserts a value or assigns to the current value if the key already exists</p>
 <h3>Relational operators</h3>
 <pre><code>bool operator==(const json&amp; rhs) const
 </code></pre>
