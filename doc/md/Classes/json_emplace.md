@@ -1,11 +1,16 @@
-```
+```c++
 jsoncons::json::emplace
+
+template <class... Args>
+pair<array_iterator, bool> emplace(Args&&... args);
+
+template <class... Args>
+object_iterator emplace(const_array_iterator pos, Args&&... args);
 ```
 
-```
-template <class T>
-pair<object_iterator, bool> insert_or_assign(string_view_type key, T&& value);
+### Parameters
 
-template <class T>
-object_iterator insert_or_assign(const_object_iterator hint, string_view_type key, T&& value);
-```
+    pos
+iterator before which the new json value will be constructed
+    args
+arguments to forward to the constructor of the json value

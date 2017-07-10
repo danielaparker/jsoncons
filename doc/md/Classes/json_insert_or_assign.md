@@ -1,8 +1,6 @@
-```
+```c++
 jsoncons::json::insert_or_assign
-```
 
-```
 template <class T>
 pair<object_iterator, bool> insert_or_assign(string_view_type key, T&& value);
 
