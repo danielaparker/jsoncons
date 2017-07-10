@@ -487,7 +487,13 @@ Access to these literals now requires</p>
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::literals<span class="pl-k">;</span>    </pre></div>
 <p>Rationale: avoid name clashes with other <code>json</code> libraries</p>
 <ul>
-<li>The name <code>owjson</code> has been deprecated (still works) and changed to <code>wojson</code>. Rationale: naming consistency</li>
+<li>
+<p>The name <code>owjson</code> has been deprecated (still works) and changed to <code>wojson</code>. Rationale: naming consistency</p>
+</li>
+<li>
+<p>Added json array functions <code>emplace_back</code> and <code>emplace</code>, and json object functions <code>try_emplace</code><br>
+and <code>insert_or_assign</code>, which are analagous to the standard library vector and map functions.</p>
+</li>
 </ul>
 <h2>0.99.7.2</h2>
 <p>Bug fix</p>

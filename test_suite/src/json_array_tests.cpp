@@ -151,18 +151,18 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
 
 BOOST_AUTO_TEST_CASE(test_emplace_element_to_array)
 {
-    json arr = json::array();
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.is<json::array>());
-    arr.emplace_back("Toronto");
-    arr.emplace_back("Vancouver");
-    arr.emplace(arr.array_range().begin(),"Montreal");
+    json a = json::array();
+    BOOST_CHECK(a.is_array());
+    BOOST_CHECK(a.is<json::array>());
+    a.emplace_back("Toronto");
+    a.emplace_back("Vancouver");
+    a.emplace(a.array_range().begin(),"Montreal");
 
-    BOOST_CHECK(arr.size() == 3);
+    BOOST_CHECK(a.size() == 3);
 
-    BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
-    BOOST_CHECK(arr[1].as<std::string>() == std::string("Toronto"));
-    BOOST_CHECK(arr[2].as<std::string>() == std::string("Vancouver"));
+    BOOST_CHECK(a[0].as<std::string>() == std::string("Montreal"));
+    BOOST_CHECK(a[1].as<std::string>() == std::string("Toronto"));
+    BOOST_CHECK(a[2].as<std::string>() == std::string("Vancouver"));
 }
 
 BOOST_AUTO_TEST_CASE(test_array_add_pos)

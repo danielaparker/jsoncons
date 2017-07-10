@@ -43,6 +43,7 @@ Extensions:
 - `json_type_traits` supports `std::pair` (convert to/from json array of size 2)
 - Added json array functions `emplace_back` and `emplace`, and json object functions `try_emplace`
   and `insert_or_assign`, which are analagous to the standard library vector and map functions. 
+  See the [json](https://github.com/danielaparker/jsoncons/wiki/json) class documentation.
 
 ## Get jsoncons
 
@@ -74,9 +75,9 @@ using jsoncons::json;
 int main()
 {
     json color_spaces = json::array();
-    color_spaces.add("sRGB");
-    color_spaces.add("AdobeRGB");
-    color_spaces.add("ProPhoto RGB");
+    color_spaces.emplace_back("sRGB");
+    color_spaces.emplace_back("AdobeRGB");
+    color_spaces.emplace_back("ProPhoto RGB");
 
     json image_sizing; // empty object
     image_sizing["Resize To Fit"] = true; // a boolean 

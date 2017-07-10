@@ -494,6 +494,16 @@ and second, a bool indicating whether the insertion took place<br>
 or the already existing value.</p>
 <h3>Exceptions</h3>
 <p>Throws <code>std::runtime_error</code> if not a json object.</p>
+<h3>Example</h3>
+<div class="highlight highlight-source-c++"><pre>json a;
+
+a.try_emplace(<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>,json());
+a.try_emplace(<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>value1<span class="pl-pds">"</span></span>);
+a[<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>].try_emplace(<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>value2<span class="pl-pds">"</span></span>);
+
+std::cout &lt;&lt; a &lt;&lt; std::endl;</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>value1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>:{<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>value2<span class="pl-pds">"</span></span>}}</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

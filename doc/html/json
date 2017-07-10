@@ -800,6 +800,13 @@ void add(T&amp;&amp; val)
 <p>Adds a new json element at the end of a json array. The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
 Throws <code>std::runtime_error</code> if not an array.</p>
 <pre><code>template &lt;class T&gt;
+array_iterator add(const_array_iterator pos, T&amp;&amp; val)
+</code></pre>
+<p>Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>
+The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
+Returns an <code>array_iterator</code> that points to the new value<br>
+Throws <code>std::runtime_error</code> if not an array.</p>
+<pre><code>template &lt;class T&gt;
 void set(string_view_type name, T&amp;&amp; val)
 </code></pre>
 <p>Inserts a new member or replaces an existing member in a json object.<br>
@@ -811,13 +818,6 @@ object_iterator set(object_iterator hint, string_view_type name, T&amp;&amp; val
 Insertion time is optimized if <code>hint</code> points to the member that will precede the inserted member.<br>
 Returns a <code>member_iterator</code> pointing at the member that was inserted or updated<br>
 Throws <code>std::runtime_error</code> if not an object.</p>
-<pre><code>template &lt;class T&gt;
-array_iterator add(const_array_iterator pos, T&amp;&amp; val)
-</code></pre>
-<p>Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>
-The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
-Returns an <code>array_iterator</code> that points to the new value<br>
-Throws <code>std::runtime_error</code> if not an array.</p>
 <p><a href="json_emplace_back">emplace_back</a><br>
 Constructs a value in place at the end of a json array</p>
 <p><a href="json_emplace">emplace</a><br>
@@ -1017,9 +1017,9 @@ std::cout &lt;&lt; obj &lt;&lt; std::endl;</pre></div>
 <div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>}</pre></div>
 <h3>Array</h3>
 <div class="highlight highlight-source-c++"><pre>json arr = json::array();
-arr.add(<span class="pl-c1">10</span>);
-arr.add(<span class="pl-c1">20</span>);
-arr.add(<span class="pl-c1">30</span>);
+arr.emplace_back(<span class="pl-c1">10</span>);
+arr.emplace_back(<span class="pl-c1">20</span>);
+arr.emplace_back(<span class="pl-c1">30</span>);
 
 std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
 <p>Output:</p>

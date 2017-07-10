@@ -33,4 +33,22 @@ or the already existing value.
 
 Throws `std::runtime_error` if not a json object.
 
+### Example
+
+```c++
+json a;
+
+a.try_emplace("object1",json());
+a.try_emplace("field1","value1");
+a["object1"].try_emplace("field2","value2");
+
+std::cout << a << std::endl;
+```
+Output:
+
+```json
+{"field1":"value1","object1":{"field2":"value2"}}
+```
+
+
 

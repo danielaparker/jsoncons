@@ -18,3 +18,19 @@ A reference to the emplaced json value.
 
 Throws `std::runtime_error` if not a json array.
 
+### Example
+
+```c++
+json a = json::array();
+a.emplace_back("Toronto");
+a.emplace_back("Vancouver");
+a.emplace(a.array_range().begin(),"Montreal");
+
+std::cout << a << std::endl;
+```
+Output:
+
+```json
+["Montreal","Toronto","Vancouver"]
+```
+

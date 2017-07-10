@@ -505,6 +505,12 @@ vertical-align:1px;
 Access to these literals now requires</li>
 </ul>
 <div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::literals<span class="pl-k">;</span>    </pre></div>
+<ul>
+<li><code>json_type_traits</code> supports <code>std::pair</code> (convert to/from json array of size 2)</li>
+<li>Added json array functions <code>emplace_back</code> and <code>emplace</code>, and json object functions <code>try_emplace</code><br>
+and <code>insert_or_assign</code>, which are analagous to the standard library vector and map functions.<br>
+See the <a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> class documentation.</li>
+</ul>
 <h2>Get jsoncons</h2>
 <p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
 <p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
@@ -527,9 +533,9 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {
     json color_spaces = <span class="pl-c1">json::array</span>();
-    color_spaces.<span class="pl-c1">add</span>(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
-    color_spaces.<span class="pl-c1">add</span>(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
-    color_spaces.<span class="pl-c1">add</span>(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);
+    color_spaces.<span class="pl-c1">emplace_back</span>(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
+    color_spaces.<span class="pl-c1">emplace_back</span>(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
+    color_spaces.<span class="pl-c1">emplace_back</span>(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);
 
     json image_sizing; <span class="pl-c"><span class="pl-c">//</span> empty object</span>
     image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>; <span class="pl-c"><span class="pl-c">//</span> a boolean </span>

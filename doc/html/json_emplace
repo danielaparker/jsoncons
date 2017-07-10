@@ -487,6 +487,15 @@ object_iterator <span class="pl-en">emplace</span>(const_array_iterator pos, Arg
 <p>Array iterator pointing to the emplaced value.</p>
 <h3>Exceptions</h3>
 <p>Throws <code>std::runtime_error</code> if not a json array.</p>
+<h3>Example</h3>
+<div class="highlight highlight-source-c++"><pre>json a = json::array();
+a.emplace_back(<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>);
+a.emplace_back(<span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>);
+a.emplace(a.array_range().begin(),<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);
+
+std::cout &lt;&lt; a &lt;&lt; std::endl;</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>[<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>]</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
