@@ -322,16 +322,16 @@ Returns a `member_iterator` pointing at the member that was inserted or updated
 Throws `std::runtime_error` if not an object.
 
 [emplace_back](json_emplace_back)
-Constructs a value in place at the end of a json array
+<br>Constructs a value in place at the end of a json array
 
 [emplace](json_emplace)
-Constructs a value in place before a specified position in a json array
+<br>Constructs a value in place before a specified position in a json array
 
 [try_emplace](json_try_emplace)
-Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists
+<br>Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists
 
 [insert_or_assign](json_insert_or_assign)
-Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists 
+<br>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists 
 
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
