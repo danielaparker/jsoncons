@@ -1,14 +1,13 @@
 ```c++
 jsoncons::json
 
+
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
-    typedef typename Json::char_type char_type;
-    typedef typename Json::object object;
-    typedef typename Json::array array;
+    typedef typename Json::allocator_type allocator_type;
 
-    static const bool is_assignable = false;
+    static const bool is_compatible = false;
 
     static bool is(const Json&)
     {
@@ -17,7 +16,9 @@ struct json_type_traits
 
     static T as(const Json& rhs);
 
-    static Json to_json(const T& rhs);
+    static Json to_json(T val);
+
+    static Json to_json(T val, allocator_type allocator);
 };
 ```
 
@@ -25,8 +26,8 @@ struct json_type_traits
 `T`|`is<T>`|`as<T>`|Assignable from `T`
 --------|-----------|--------------|---
 `Json`|`true`|self|<em>&#x2713;</em>
-`object`|`true` if object, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`array`|`true` if array, otherwise `false`|Compile-time error|<em>&#x2713;</em>
+`Json::object`|`true` if object, otherwise `false`|Compile-time error|<em>&#x2713;</em>
+`Json::array`|`true` if array, otherwise `false`|Compile-time error|<em>&#x2713;</em>
 `bool`|`true` if boolean, otherwise `false`|as `bool`|<em>&#x2713;</em>
 `null_type`|`true` if null, otherwise `false`|null value if null, otherwise throws|<em>&#x2713;</em>
 `const char_type*`|`true` if string, otherwise `false`|as `const char_type*`|<em>&#x2713;</em>

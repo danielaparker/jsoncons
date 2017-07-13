@@ -21,16 +21,16 @@ Throws `std::runtime_error` if not a json array.
 ### Example
 
 ```c++
-json a = json::array();
-a.emplace_back("Toronto");
-a.emplace_back("Vancouver");
-a.emplace(a.array_range().begin(),"Montreal");
+json arr = json::array();
+arr.emplace_back(10);
+arr.emplace_back(20);
+arr.emplace_back(30);
 
-std::cout << a << std::endl;
+std::cout << arr << std::endl;
 ```
 Output:
 
 ```json
-["Montreal","Toronto","Vancouver"]
+[10,20,30]
 ```
 
