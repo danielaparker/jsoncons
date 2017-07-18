@@ -37,9 +37,9 @@ BOOST_AUTO_TEST_CASE(test_assign_non_const_cstring)
 
 BOOST_AUTO_TEST_CASE(test_uint8_t)
 {
-    json o;
-
     uint8_t x = 10;
+
+    json o;
     o["u"] = x;
 
     BOOST_CHECK(o["u"].is_number());
@@ -47,6 +47,33 @@ BOOST_AUTO_TEST_CASE(test_uint8_t)
     uint8_t y = o["u"].as<uint8_t>();
 
     BOOST_CHECK(y == 10);
+}
+
+BOOST_AUTO_TEST_CASE(test_float_assignment)
+{
+    float x = 10.5;
+
+    json o;
+    o["float"] = x;
+
+    BOOST_CHECK(o["float"].is_number());
+
+    float y = o["float"].as<float>();
+
+    BOOST_CHECK_CLOSE(10.5,y,0.00001);
+}
+
+BOOST_AUTO_TEST_CASE(test_float)
+{
+    float x = 10.5;
+
+    json o(x);
+
+    BOOST_CHECK(o.is<float>());
+
+    float y = o.as<float>();
+
+    BOOST_CHECK_CLOSE(10.5,y,0.00001);
 }
 
 BOOST_AUTO_TEST_CASE(test_unsupported_type)

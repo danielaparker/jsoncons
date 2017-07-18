@@ -910,7 +910,7 @@ public:
         }
         else if (string_view_type(it->key().data(),it->key().length()) == s)
         {
-            it->value(Json(std::forward<T&&>(value)));
+            it->value(std::forward<T&&>(value));
         }
         else
         {

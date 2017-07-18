@@ -279,14 +279,10 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     {
         return rhs.as_cstring();
     }
-    static Json to_json(const char_type* val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(val));
-    }
-    static Json to_json(const char_type* val, 
-                        const allocator_type& allocator)
-    {
-        return Json(typename Json::variant(val,allocator));
+        return Json(typename Json::variant(std::forward<Args>(args)...));
     }
 };
 
@@ -300,14 +296,10 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     {
         return rhs.is_string();
     }
-    static Json to_json(const char_type *val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(val));
-    }
-    static Json to_json(const char_type *val, 
-                        const allocator_type& allocator)
-    {
-        return Json(typename Json::variant(val,allocator));
+        return Json(typename Json::variant(std::forward<Args>(args)...));
     }
 };
 
@@ -341,13 +333,10 @@ struct json_type_traits<Json, T,
     {
         return static_cast<T>(rhs.as_integer());
     }
-    static Json to_json(T val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(static_cast<int64_t>(val)));
-    }
-    static Json to_json(T val, allocator_type)
-    {
-        return Json(typename Json::variant(static_cast<int64_t>(val)));
+        return Json::from_integer(std::forward<Args>(args)...);
     }
 };
 
@@ -380,14 +369,10 @@ struct json_type_traits<Json, T,
         return static_cast<T>(rhs.as_uinteger());
     }
 
-    static Json to_json(T val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(static_cast<uint64_t>(val)));
-    }
-
-    static Json to_json(T val, allocator_type)
-    {
-        return Json(typename Json::variant(static_cast<uint64_t>(val)));
+        return Json::from_uinteger(std::forward<Args>(args)...);
     }
 };
 
@@ -406,13 +391,10 @@ struct json_type_traits<Json, T,
     {
         return static_cast<T>(rhs.as_double());
     }
-    static Json to_json(T val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(static_cast<double>(val)));
-    }
-    static Json to_json(T val, const allocator_type&)
-    {
-        return Json(typename Json::variant(static_cast<double>(val)));
+        return Json::from_floating_point(std::forward<Args>(args)...);
     }
 };
 
@@ -425,14 +407,10 @@ struct json_type_traits<Json, typename Json::object>
     {
         return rhs.is_object();
     }
-    static Json to_json(const typename Json::object& val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(val));
-    }
-    static Json to_json(const typename Json::object& val, 
-                        const allocator_type& allocator)
-    {
-        return Json(typename Json::variant(val,allocator));
+        return Json(typename Json::variant(std::forward<Args>(args)...));
     }
 };
 
@@ -445,14 +423,10 @@ struct json_type_traits<Json, typename Json::array>
     {
         return rhs.is_array();
     }
-    static Json to_json(const typename Json::array& val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(val));
-    }
-    static Json to_json(const typename Json::array& val, 
-                        const allocator_type& allocator)
-    {
-        return Json(typename Json::variant(val,allocator));
+        return Json(typename Json::variant(std::forward<Args>(args)...));
     }
 };
 
@@ -516,13 +490,10 @@ struct json_type_traits<Json, bool>
     {
         return rhs.as_bool();
     }
-    static Json to_json(bool val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(val));
-    }
-    static Json to_json(bool val, allocator_type)
-    {
-        return Json(typename Json::variant(val));
+        return Json(typename Json::variant(std::forward<Args>(args)...));
     }
 };
 
@@ -542,13 +513,10 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     {
         return rhs.as_bool();
     }
-    static Json to_json(bool val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(val));
-    }
-    static Json to_json(bool val, allocator_type)
-    {
-        return Json(typename Json::variant(val));
+        return Json(typename Json::variant(std::forward<Args>(args)...));
     }
 };
 
@@ -565,14 +533,10 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     {
         return rhs.as_bool();
     }
-    static Json to_json(std::vector<bool>::reference val)
+    template <class ... Args>
+    static Json to_json(Args&&... args)
     {
-        return Json(typename Json::variant(val));
-    }
-    static Json to_json(std::vector<bool>::reference val, 
-                        allocator_type)
-    {
-        return Json(typename Json::variant(val));
+        return Json(typename Json::variant(std::forward<Args>(args)...));
     }
 };
 

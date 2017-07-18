@@ -592,6 +592,10 @@ public:
         {
             new(reinterpret_cast<void*>(&data_))integer_data(val);
         }
+        explicit variant(uint64_t val, const Allocator&)
+        {
+            new(reinterpret_cast<void*>(&data_))uinteger_data(val);
+        }
         explicit variant(uint64_t val)
         {
             new(reinterpret_cast<void*>(&data_))uinteger_data(val);
@@ -3467,17 +3471,32 @@ public:
         return json_type(variant(s.data(),s.length(),allocator));
     }
 
-    static json_type make_integer(int64_t val)
+    static json_type from_integer(int64_t val)
     {
         return json_type(variant(val));
     }
 
-    static json_type make_uinteger(uint64_t val)
+    static json_type from_integer(int64_t val, allocator_type)
     {
         return json_type(variant(val));
     }
 
-    static json_type make_double(double val)
+    static json_type from_uinteger(uint64_t val)
+    {
+        return json_type(variant(val));
+    }
+
+    static json_type from_uinteger(uint64_t val, allocator_type)
+    {
+        return json_type(variant(val));
+    }
+
+    static json_type from_floating_point(double val)
+    {
+        return json_type(variant(val));
+    }
+
+    static json_type from_floating_point(double val, allocator_type)
     {
         return json_type(variant(val));
     }
