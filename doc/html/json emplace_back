@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_try_emplace</title>
+<title>json emplace_back</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,42 +468,28 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::json::try_emplace
+<pre><code>jsoncons::json::emplace_back
 
-<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-pair&lt;object_iterator, <span class="pl-k">bool</span>&gt; <span class="pl-en">try_emplace</span>(string_view_type key, Args&amp;&amp;... args); (<span class="pl-c1">1</span>)
-
-<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-object_iterator <span class="pl-en">try_emplace</span>(const_object_iterator hint, string_view_type key, Args&amp;&amp;... args); (<span class="pl-c1">2</span>)</pre></div>
+template&lt;class... Args&gt;
+json_type&amp; emplace_back(Args&amp;&amp;... args);
+</code></pre>
 <h3>Parameters</h3>
-<pre><code>key
+<pre><code>args 
 </code></pre>
-<p>The key used both to look up and to insert if not found</p>
-<pre><code>hint
-</code></pre>
-<p>Iterator to the position before which the new element will be inserted</p>
-<pre><code>args        
-</code></pre>
-<p>Arguments to forward to the constructor of the element</p>
+<p>Arguments to forward to the constructor of the json value</p>
 <h3>Return value</h3>
-<p>(1) returns a pair consisting of first, an iterator to the inserted value<br>
-or the already existing value,<br>
-and second, a bool indicating whether the insertion took place<br>
-(true for insertion, false for no insertion.)</p>
-<p>(2) returns an iterator to the inserted value<br>
-or the already existing value.</p>
+<p>A reference to the emplaced json value.</p>
 <h3>Exceptions</h3>
-<p>Throws <code>std::runtime_error</code> if not a json object.</p>
+<p>Throws <code>std::runtime_error</code> if not a json array.</p>
 <h3>Example</h3>
-<div class="highlight highlight-source-c++"><pre>json a;
+<div class="highlight highlight-source-c++"><pre>json arr = json::array();
+arr.emplace_back(<span class="pl-c1">10</span>);
+arr.emplace_back(<span class="pl-c1">20</span>);
+arr.emplace_back(<span class="pl-c1">30</span>);
 
-a.try_emplace(<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>,json());
-a.try_emplace(<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>value1<span class="pl-pds">"</span></span>);
-a[<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>].try_emplace(<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>value2<span class="pl-pds">"</span></span>);
-
-std::cout &lt;&lt; a &lt;&lt; std::endl;</pre></div>
+std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
 <p>Output:</p>
-<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>value1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>:{<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>value2<span class="pl-pds">"</span></span>}}</pre></div>
+<div class="highlight highlight-source-json"><pre>[<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

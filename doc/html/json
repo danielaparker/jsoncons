@@ -555,23 +555,12 @@ static json parse(std::istream&amp; is,
 </code></pre>
 <p>Parses an input stream of JSON text and returns a json object or array value.<br>
 Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
-<div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-<span class="pl-k">static</span> json <span class="pl-en">make_array</span>(size_ n, <span class="pl-k">const</span> T&amp; val)
-
-template &lt;class T&gt;
-static json make_array(size_ n, <span class="pl-k">const</span> T&amp; val, 
-                       <span class="pl-k">const</span> allocator_type&amp; alloc = allocator_type())
-
-template &lt;size_t N&gt;
-static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN)
-
-template &lt;size_t N,typename T&gt;
-static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN, <span class="pl-k">const</span> T&amp; val)
-
-template &lt;size_t N,typename T&gt;
-static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN, <span class="pl-k">const</span> T&amp; val, 
-                       <span class="pl-k">const</span> allocator_type&amp; alloc)</pre></div>
-<p>Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.</p>
+<table border="0">
+  <tbody><tr>
+    <td><a href="json%20make_array">make_array</a></td>
+    <td>Makes a multidimensional json array.</td> 
+  </tr>
+</tbody></table>
 <pre><code>static const json&amp; null()
 </code></pre>
 <p>Returns a null value</p>
@@ -662,35 +651,16 @@ Throws <code>std::runtime_error</code> if not an array.</p>
 <pre><code>size_t count(string_view_type name) const
 </code></pre>
 <p>Returns the number of object members that match <code>name</code>.</p>
-<pre><code>template &lt;class T&gt;
-bool is() const noexcept
-</code></pre>
-<p>Returns <code>true</code> if the json value is the same as type <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;X&gt; const noexcept 
-</code></pre>
-<p>Type <code>X</code> is integral: returns <code>true</code> if the json value is integral and within the range of the type <code>X</code>, <code>false</code> otherwise.<br>
-Type <code>X</code> is floating point: returns <code>true</code> if the json value is floating point and within the range of the type <code>X</code>, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;std::string&gt; const noexcept 
-</code></pre>
-<p>Returns <code>true</code> if the json value is of string type, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;bool&gt; const noexcept 
-</code></pre>
-<p>Returns <code>true</code> if the json value is of boolean type, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;json::null_type&gt; const noexcept
-</code></pre>
-<p>Returns <code>true</code> if the json value is null, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;json::object&gt; const noexcept 
-</code></pre>
-<p>Returns <code>true</code> if the json value is an object, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;json::array&gt; const noexcept 
-</code></pre>
-<p>Returns <code>true</code> if the json value is an array, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;X&lt;T&gt;&gt; const noexcept
-</code></pre>
-<p>If the type <code>X</code> is not <code>std::basic_string</code> but otherwise satisfies <a href="http://en.cppreference.com/w/cpp/concept/SequenceContainer">SequenceContainer</a>, <code>is&lt;X&lt;T&gt;&gt;()</code> returns <code>true</code> if the json value is an array and each element is the "same as" type <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.</p>
-<pre><code>bool is&lt;X&lt;std::string,T&gt;&gt; const noexcept
-</code></pre>
-<p>If the type 'X' satisfies <a href="http://en.cppreference.com/w/cpp/concept/AssociativeContainer">AssociativeContainer</a> or <a href="http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer">UnorderedAssociativeContainer</a>, <code>is&lt;X&lt;T&gt;&gt;()</code> returns <code>true</code> if the json value is an object and each mapped value is the "same as" <code>T</code> according to <a href="json_type_traits">json_type_traits</a>, <code>false</code> otherwise.</p>
+<table border="0">
+  <tbody><tr>
+    <td><a href="json%20is">is</a></td>
+    <td>Checks if a json value matches a type.</td> 
+  </tr>
+  <tr>
+    <td><a href="json%20as">as</a></td>
+    <td>Attempts to convert a json value to a value of a type.</td> 
+  </tr>
+</tbody></table>
 <pre><code>bool is_null() const noexcept
 bool is_string() const noexcept
 bool is_number() const noexcept
@@ -702,29 +672,6 @@ bool is_object() const noexcept
 bool is_array() const noexcept
 </code></pre>
 <p>Non-generic versions of <code>is_</code> methods</p>
-<pre><code>template &lt;class T&gt;
-T as() const
-</code></pre>
-<p>Attempts to convert the json value to the template value type using <a href="json_type_traits">json_type_traits</a>.</p>
-<pre><code>X as&lt;X&gt;() const
-</code></pre>
-<p>Type X is integeral: returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.<br>
-Type X is floating point: returns value cast to X if value is integral, returns <code>NaN</code> if value is <code>null</code>, attempts conversion if value is string, otherwise throws.</p>
-<pre><code>as&lt;bool&gt;()
-</code></pre>
-<p>Returns <code>true</code> if value is <code>bool</code> and <code>true</code>, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as <code>true</code>.<br>
-Returns <code>false</code> if value is <code>bool</code> and <code>false</code>, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as <code>false</code>.<br>
-Otherwise throws <code>std::runtime_exception</code></p>
-<pre><code>std::string as&lt;std::string&gt;() const noexcept
-std::string as&lt;std::string&gt;(const char_allocator&amp; allocator) const noexcept
-</code></pre>
-<p>If value is string, returns value, otherwise returns result of <code>dump</code>.</p>
-<pre><code>as&lt;X&lt;T&gt;&gt;()
-</code></pre>
-<p>If the type <code>X</code> is not <code>std::basic_string</code> but otherwise satisfies <a href="http://en.cppreference.com/w/cpp/concept/SequenceContainer">SequenceContainer</a>, <code>as&lt;X&lt;T&gt;&gt;()</code> returns the <code>json</code> value as an <code>X&lt;T&gt;</code> if the <code>json</code> value is an array and each element is convertible to type <code>T</code>, otherwise throws.</p>
-<pre><code>as&lt;X&lt;std::string,T&gt;&gt;()
-</code></pre>
-<p>If the type 'X' satisfies <a href="http://en.cppreference.com/w/cpp/concept/AssociativeContainer">AssociativeContainer</a> or <a href="http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer">UnorderedAssociativeContainer</a>, <code>as&lt;X&lt;std::string,T&gt;&gt;()</code> returns the <code>json</code> value as an <code>X&lt;std::string,T&gt;</code> if the <code>json</code> value is an object and if each member value is convertible to type <code>T</code>, otherwise throws.</p>
 <pre><code>bool as_bool() const
 int64_t as_integer() const
 uint64_t as_uinteger() const
@@ -806,26 +753,28 @@ array_iterator add(const_array_iterator pos, T&amp;&amp; val)
 The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
 Returns an <code>array_iterator</code> that points to the new value<br>
 Throws <code>std::runtime_error</code> if not an array.</p>
-<pre><code>template &lt;class T&gt;
-void set(string_view_type name, T&amp;&amp; val)
-</code></pre>
-<p>Inserts a new member or replaces an existing member in a json object.<br>
-Throws <code>std::runtime_error</code> if not an object.</p>
-<pre><code>template &lt;class T&gt;
-object_iterator set(object_iterator hint, string_view_type name, T&amp;&amp; val)
-</code></pre>
-<p>Inserts a new member or replaces an existing member in a json object.<br>
-Insertion time is optimized if <code>hint</code> points to the member that will precede the inserted member.<br>
-Returns a <code>member_iterator</code> pointing at the member that was inserted or updated<br>
-Throws <code>std::runtime_error</code> if not an object.</p>
-<p><a href="json_emplace_back">emplace_back</a><br>
-Constructs a value in place at the end of a json array</p>
-<p><a href="json_emplace">emplace</a><br>
-Constructs a value in place before a specified position in a json array</p>
-<p><a href="json_try_emplace">try_emplace</a><br>
-Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists</p>
-<p><a href="json_insert_or_assign">insert_or_assign</a><br>
-Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</p>
+<table border="0">
+  <tbody><tr>
+    <td><a href="json%20emplace_back">emplace_back</a></td>
+    <td>Constructs a value in place at the end of a json array</td> 
+  </tr>
+  <tr>
+    <td><a href="json%20emplace">emplace</a></td>
+    <td>Constructs a value in place before a specified position in a json array</td> 
+  </tr>
+  <tr>
+    <td><a href="json%20try_emplace">try_emplace</a></td>
+    <td>Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists</td> 
+  </tr>
+  <tr>
+    <td><a href="json%20insert_or_assign">insert_or_assign</a></td>
+    <td>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</td> 
+  </tr>
+  <tr>
+    <td>set</td>
+    <td>Same as insert_or_assign</td> 
+  </tr>
+</tbody></table>
 <pre><code>void swap(json&amp; val)
 </code></pre>
 <p>Exchanges the content of the <code>json</code> value with the content of <code>val</code>, which is another <code>json</code> value.</p>
@@ -891,62 +840,6 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 </li>
 </ul>
 <h2>Examples</h2>
-<h3>is and as</h3>
-<div class="highlight highlight-source-c++"><pre>    json j = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
-<span class="pl-s">    {</span>
-<span class="pl-s">        "k1" : 2147483647,</span>
-<span class="pl-s">        "k2" : 2147483648,</span>
-<span class="pl-s">        "k3" : -10,</span>
-<span class="pl-s">        "k4" : 10.5,</span>
-<span class="pl-s">        "k5" : true,</span>
-<span class="pl-s">        "k6" : "10.5"</span>
-<span class="pl-s">    }</span>
-<span class="pl-s">    <span class="pl-pds">)"</span></span>);
-
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k1<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">long</span> <span class="pl-k">long</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">signed</span> <span class="pl-k">char</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">uint32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].is&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(7) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(8) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">int</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(9) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">bool</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(10) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k6<span class="pl-pds">"</span></span>].is&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k1<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(3) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k2<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">long</span> <span class="pl-k">long</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(4) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">signed</span> <span class="pl-k">char</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(5) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k3<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">uint32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(6) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].as&lt;<span class="pl-c1">int32_t</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(7) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k4<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(8) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">int</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; std::boolalpha &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(9) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k5<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">bool</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;
-    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(10) <span class="pl-pds">"</span></span> &lt;&lt; j[<span class="pl-s"><span class="pl-pds">"</span>k6<span class="pl-pds">"</span></span>].as&lt;<span class="pl-k">double</span>&gt;() &lt;&lt; <span class="pl-s"><span class="pl-pds">'</span><span class="pl-cce">\n</span><span class="pl-pds">'</span></span>;</pre></div>
-<p>Output:</p>
-<pre><code>(1) true
-(2) false
-(3) true
-(4) true
-(5) false
-(6) false
-(7) true
-(8) false
-(9) true
-(10) false
-
-(1) 2147483647
-(2) -2147483648
-(3) 2147483648
-(4) ÷
-(5) 4294967286
-(6) 10
-(7) 10.5
-(8) 1
-(9) true
-(10) 10.5
-</code></pre>
 <h3>Range-based for loop over members of an object</h3>
 <div class="highlight highlight-source-c++"><pre>json book = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
@@ -1015,15 +908,6 @@ obj[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"
 std::cout &lt;&lt; obj &lt;&lt; std::endl;</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-c1">null</span>}</pre></div>
-<h3>Array</h3>
-<div class="highlight highlight-source-c++"><pre>json arr = json::array();
-arr.emplace_back(<span class="pl-c1">10</span>);
-arr.emplace_back(<span class="pl-c1">20</span>);
-arr.emplace_back(<span class="pl-c1">30</span>);
-
-std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
-<p>Output:</p>
-<div class="highlight highlight-source-json"><pre>[<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
 <h3>Array from std::vector</h3>
 <div class="highlight highlight-source-c++"><pre>std::vector&lt;<span class="pl-k">int</span>&gt; v;
 v.push_back(<span class="pl-c1">10</span>);
@@ -1034,7 +918,7 @@ json <span class="pl-en">arr</span>(v.begin(),v.end());
 
 std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
 <p>Output:</p>
-<div class="highlight highlight-source-c++"><pre>[<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
+<div class="highlight highlight-source-json"><pre>[<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
 <h3>Object iterator</h3>
 <div class="highlight highlight-source-c++"><pre>json obj;
 obj[<span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>;

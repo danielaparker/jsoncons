@@ -3501,7 +3501,7 @@ public:
         return json_type(variant(val));
     }
 
-    static json_type make_bool(bool val)
+    static json_type from_bool(bool val)
     {
         return json_type(variant(val));
     }

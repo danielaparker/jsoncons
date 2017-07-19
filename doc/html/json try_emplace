@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_emplace</title>
+<title>json try_emplace</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,34 +468,45 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::json::emplace
+<div class="highlight highlight-source-c++"><pre>jsoncons::json::try_emplace
 
-<span class="pl-k">template </span>&lt;<span class="pl-k">class</span>... Args&gt;
-array_iterator <span class="pl-en">emplace</span>(Args&amp;&amp;... args);
+<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+pair&lt;object_iterator, <span class="pl-k">bool</span>&gt; <span class="pl-en">try_emplace</span>(string_view_type key, 
+                                        Args&amp;&amp;... args); (<span class="pl-c1">1</span>)
 
-<span class="pl-k">template </span>&lt;<span class="pl-k">class</span>... Args&gt;
-object_iterator <span class="pl-en">emplace</span>(const_array_iterator pos, Args&amp;&amp;... args);</pre></div>
-<p>Constructs a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.</p>
+<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+object_iterator <span class="pl-en">try_emplace</span>(const_object_iterator hint, 
+                            string_view_type key, 
+                            Args&amp;&amp;... args); (<span class="pl-c1">2</span>)</pre></div>
 <h3>Parameters</h3>
-<pre><code>pos
+<pre><code>key
 </code></pre>
-<p>Iterator that identifies the position in the array to construct the new json value</p>
-<pre><code>args
+<p>The key used both to look up and to insert if not found</p>
+<pre><code>hint
 </code></pre>
-<p>Arguments to forward to the constructor of the json value</p>
+<p>Iterator to the position before which the new element will be inserted</p>
+<pre><code>args        
+</code></pre>
+<p>Arguments to forward to the constructor of the element</p>
 <h3>Return value</h3>
-<p>Array iterator pointing to the emplaced value.</p>
+<p>(1) returns a pair consisting of first, an iterator to the inserted value<br>
+or the already existing value,<br>
+and second, a bool indicating whether the insertion took place<br>
+(true for insertion, false for no insertion.)</p>
+<p>(2) returns an iterator to the inserted value<br>
+or the already existing value.</p>
 <h3>Exceptions</h3>
-<p>Throws <code>std::runtime_error</code> if not a json array.</p>
+<p>Throws <code>std::runtime_error</code> if not a json object.</p>
 <h3>Example</h3>
-<div class="highlight highlight-source-c++"><pre>json a = json::array();
-a.emplace_back(<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>);
-a.emplace_back(<span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>);
-a.emplace(a.array_range().begin(),<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);
+<div class="highlight highlight-source-c++"><pre>json a;
+
+a.try_emplace(<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>,json());
+a.try_emplace(<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>value1<span class="pl-pds">"</span></span>);
+a[<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>].try_emplace(<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>value2<span class="pl-pds">"</span></span>);
 
 std::cout &lt;&lt; a &lt;&lt; std::endl;</pre></div>
 <p>Output:</p>
-<div class="highlight highlight-source-json"><pre>[<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>]</pre></div>
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>value1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>object1<span class="pl-pds">"</span></span>:{<span class="pl-s"><span class="pl-pds">"</span>field2<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>value2<span class="pl-pds">"</span></span>}}</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

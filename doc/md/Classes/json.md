@@ -47,25 +47,12 @@ Throws [parse_error](parse_error) if parsing fails.
 Parses an input stream of JSON text and returns a json object or array value. 
 Throws [parse_error](parse_error) if parsing fails.
 
-```c++
-template <class T>
-static json make_array(size_ n, const T& val)
-
-template <class T>
-static json make_array(size_ n, const T& val, 
-                       const allocator_type& alloc = allocator_type())
-
-template <size_t N>
-static json make_array(size_t size1 ... size_t sizeN)
-
-template <size_t N,typename T>
-static json make_array(size_t size1 ... size_t sizeN, const T& val)
-
-template <size_t N,typename T>
-static json make_array(size_t size1 ... size_t sizeN, const T& val, 
-                       const allocator_type& alloc)
-```
-Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
+<table border="0">
+  <tr>
+    <td><a href="json%20make_array">make_array</a></td>
+    <td>Makes a multidimensional json array.</td> 
+  </tr>
+</table>
 
     static const json& null()
 Returns a null value        
@@ -166,11 +153,11 @@ Returns the number of object members that match `name`.
 
 <table border="0">
   <tr>
-    <td><a href="json_is">is</a></td>
+    <td><a href="json%20is">is</a></td>
     <td>Checks if a json value matches a type.</td> 
   </tr>
   <tr>
-    <td><a href="json_as">as</a></td>
+    <td><a href="json%20as">as</a></td>
     <td>Attempts to convert a json value to a value of a type.</td> 
   </tr>
 </table>
@@ -270,23 +257,23 @@ Throws `std::runtime_error` if not an array.
 
 <table border="0">
   <tr>
-    <td><a href="json_emplace_back">emplace_back</a></td>
+    <td><a href="json%20emplace_back">emplace_back</a></td>
     <td>Constructs a value in place at the end of a json array</td> 
   </tr>
   <tr>
-    <td><a href="json_emplace">emplace</a></td>
+    <td><a href="json%20emplace">emplace</a></td>
     <td>Constructs a value in place before a specified position in a json array</td> 
   </tr>
   <tr>
-    <td><a href="json_try_emplace">try_emplace</a></td>
+    <td><a href="json%20try_emplace">try_emplace</a></td>
     <td>Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists</td> 
   </tr>
   <tr>
-    <td><a href="json_insert_or_assign">insert_or_assign</a></td>
+    <td><a href="json%20insert_or_assign">insert_or_assign</a></td>
     <td>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</td> 
   </tr>
   <tr>
-    <td><a href="json_insert_or_assign">set</a></td>
+    <td>set</td>
     <td>Same as insert_or_assign</td> 
   </tr>
 </table>

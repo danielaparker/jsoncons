@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json_emplace_back</title>
+<title>json make_array</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,28 +468,81 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<pre><code>jsoncons::json::emplace_back
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+<span class="pl-k">static</span> json <span class="pl-en">make_array</span>(size_ n, <span class="pl-k">const</span> T&amp; val)
 
-template&lt;class... Args&gt;
-json_type&amp; emplace_back(Args&amp;&amp;... args);
-</code></pre>
-<h3>Parameters</h3>
-<pre><code>args 
-</code></pre>
-<p>Arguments to forward to the constructor of the json value</p>
-<h3>Return value</h3>
-<p>A reference to the emplaced json value.</p>
-<h3>Exceptions</h3>
-<p>Throws <code>std::runtime_error</code> if not a json array.</p>
-<h3>Example</h3>
-<div class="highlight highlight-source-c++"><pre>json a = json::array();
-a.emplace_back(<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>);
-a.emplace_back(<span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>);
-a.emplace(a.array_range().begin(),<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>);
+template &lt;class T&gt;
+static json make_array(size_ n, <span class="pl-k">const</span> T&amp; val, 
+                       <span class="pl-k">const</span> allocator_type&amp; alloc = allocator_type())
 
-std::cout &lt;&lt; a &lt;&lt; std::endl;</pre></div>
+template &lt;size_t N&gt;
+static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN)
+
+template &lt;size_t N,typename T&gt;
+static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN, <span class="pl-k">const</span> T&amp; val)
+
+template &lt;size_t N,typename T&gt;
+static json make_array(<span class="pl-c1">size_t</span> size1 ... <span class="pl-c1">size_t</span> sizeN, <span class="pl-k">const</span> T&amp; val, 
+                       <span class="pl-k">const</span> allocator_type&amp; alloc)</pre></div>
+<p>Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.</p>
+<h2>Examples</h2>
+<h3>Make an array of size 10 initialized with zeros</h3>
+<div class="highlight highlight-source-c++"><pre>json a = json::make_array&lt;<span class="pl-c1">1</span>&gt;(<span class="pl-c1">10</span>,<span class="pl-c1">0</span>);
+    a[<span class="pl-c1">1</span>] = <span class="pl-c1">1</span>;
+    a[<span class="pl-c1">2</span>] = <span class="pl-c1">2</span>;
+std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
 <p>Output:</p>
-<div class="highlight highlight-source-json"><pre>[<span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>]</pre></div>
+<div class="highlight highlight-source-json"><pre>    [<span class="pl-c1">0</span>,<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>,<span class="pl-c1">0</span>]</pre></div>
+<h3>Make a two dimensional array of size 3x4 initialized with zeros</h3>
+<div class="highlight highlight-source-c++"><pre>json a = json::make_array&lt;<span class="pl-c1">2</span>&gt;(<span class="pl-c1">3</span>,<span class="pl-c1">4</span>,<span class="pl-c1">0</span>);
+a[<span class="pl-c1">0</span>][<span class="pl-c1">0</span>] = <span class="pl-s"><span class="pl-pds">"</span>Tenor<span class="pl-pds">"</span></span>;
+a[<span class="pl-c1">0</span>][<span class="pl-c1">1</span>] = <span class="pl-s"><span class="pl-pds">"</span>ATM vol<span class="pl-pds">"</span></span>;
+a[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>] = <span class="pl-s"><span class="pl-pds">"</span>25-d-MS<span class="pl-pds">"</span></span>;
+a[<span class="pl-c1">0</span>][<span class="pl-c1">3</span>] = <span class="pl-s"><span class="pl-pds">"</span>25-d-RR<span class="pl-pds">"</span></span>;
+a[<span class="pl-c1">1</span>][<span class="pl-c1">0</span>] = <span class="pl-s"><span class="pl-pds">"</span>1Y<span class="pl-pds">"</span></span>;
+a[<span class="pl-c1">1</span>][<span class="pl-c1">1</span>] = <span class="pl-c1">0.20</span>;
+a[<span class="pl-c1">1</span>][<span class="pl-c1">2</span>] = <span class="pl-c1">0.009</span>;
+a[<span class="pl-c1">1</span>][<span class="pl-c1">3</span>] = -<span class="pl-c1">0.006</span>;
+a[<span class="pl-c1">2</span>][<span class="pl-c1">0</span>] = <span class="pl-s"><span class="pl-pds">"</span>2Y<span class="pl-pds">"</span></span>;
+a[<span class="pl-c1">2</span>][<span class="pl-c1">1</span>] = <span class="pl-c1">0.18</span>;
+a[<span class="pl-c1">2</span>][<span class="pl-c1">2</span>] = <span class="pl-c1">0.009</span>;
+a[<span class="pl-c1">2</span>][<span class="pl-c1">3</span>] = -<span class="pl-c1">0.005</span>;
+
+std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>[
+    [<span class="pl-s"><span class="pl-pds">"</span>Tenor<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ATM vol<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>25-d-MS<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>25-d-RR<span class="pl-pds">"</span></span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>1Y<span class="pl-pds">"</span></span>,<span class="pl-c1">0.2</span>,<span class="pl-c1">0.009</span>,<span class="pl-c1">-0.006</span>],
+    [<span class="pl-s"><span class="pl-pds">"</span>2Y<span class="pl-pds">"</span></span>,<span class="pl-c1">0.18</span>,<span class="pl-c1">0.009</span>,<span class="pl-c1">-0.005</span>]
+]</pre></div>
+<h3>Make a three dimensional array of size 4x3x2 initialized with zeros</h3>
+<div class="highlight highlight-source-c++"><pre>json a = json::make_array&lt;<span class="pl-c1">3</span>&gt;(<span class="pl-c1">4</span>,<span class="pl-c1">3</span>,<span class="pl-c1">2</span>,<span class="pl-c1">0</span>);
+a[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>][<span class="pl-c1">0</span>] = <span class="pl-c1">2</span>;
+a[<span class="pl-c1">0</span>][<span class="pl-c1">2</span>][<span class="pl-c1">1</span>] = <span class="pl-c1">3</span>;
+std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>[
+    [
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>],
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>],
+        [<span class="pl-c1">2</span>,<span class="pl-c1">3</span>]
+    ],
+    [
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>],
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>],
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>]
+    ],
+    [
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>],
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>],
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>]
+    ],
+    [
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>],
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>],
+        [<span class="pl-c1">0</span>,<span class="pl-c1">0</span>]
+    ]
+]</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
