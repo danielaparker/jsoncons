@@ -92,11 +92,11 @@ for (const auto& book : booklist.array_range())
 json& book = booklist[1];
 
 //Loop through the book's name-value pairs using a range-based for loop    
-for (const auto& kvp : book.object_range())
+for (const auto& kv : book.object_range())
 {
-    std::cout << kvp.key()
+    std::cout << kv.key()
               << ","
-              << kvp.value() << std::endl;
+              << kv.value() << std::endl;
 }
 
 auto it = book.find("author");
@@ -339,11 +339,11 @@ for (const auto& book : booklist.array_range())
 wjson& book = booklist[1];
 
 //Loop through the book's name-value pairs using a range-based for loop    
-for (const auto& kvp : book.object_range())
+for (const auto& kv : book.object_range())
 {
-    std::wcout << kvp.key()
+    std::wcout << kv.key()
                << L","
-               << kvp.value() << std::endl;
+               << kv.value() << std::endl;
 }
 
 auto it = book.find(L"author");

@@ -121,6 +121,32 @@ void make_empty_array()
     std::cout << pretty_print(a) << std::endl;
 }
 
+void array_range_based_for_loop()
+{
+    json book1;    
+    book1["category"] = "Fiction";
+    book1["title"] = "A Wild Sheep Chase: A Novel";
+    book1["author"] = "Haruki Murakami";
+
+    json book2;    
+    book2["category"] = "History";
+    book2["title"] = "Charlie Wilson's War";
+    book2["author"] = "George Crile";
+
+    json book3;    
+    book3["category"] = "Fiction";
+    book3["title"] = "Kafka on the Shore";
+    book3["author"] = "Haruki Murakami";
+
+    // Constructing a json array with an initializer-list 
+    json booklist = json::array{book1, book2, book3};    
+
+    for (const auto& book: booklist.array_range())
+    {
+        std::cout << book["title"].as<std::string>() << std::endl;
+    } 
+}
+
 void make_1_dimensional_array_1()
 {
     std::cout << "1 dimensional array 1" <<std::endl;
@@ -190,6 +216,7 @@ void array_examples()
     reserve_array_capacity();
     accessing_a_json_value_as_a_vector();
     make_empty_array();
+    array_range_based_for_loop();
     make_1_dimensional_array_1();
     make_1_dimensional_array_2();
     make_2_dimensional_array();

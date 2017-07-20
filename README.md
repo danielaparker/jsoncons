@@ -192,10 +192,10 @@ json book = json::object{
     {"price", 25.17}
 };
 
-for (const auto& kvp : book.object_range())
+for (const auto& kv : book.object_range())
 {
-    std::cout << kvp.key() << "=" 
-              << kvp.value() << std::endl;
+    std::cout << kv.key() << "=" 
+              << kv.value() << std::endl;
 }
 ```
 ### _json and _ojson literal operators

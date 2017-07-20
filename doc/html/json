@@ -615,16 +615,16 @@ json&amp; operator=(const T&amp; rhs)
 <pre><code>json&amp; operator=(const char_type* rhs)
 </code></pre>
 <h3>Ranges and Iterators</h3>
-<pre><code>range&lt;object_iterator&gt; object_range();  
-range&lt;const_object_iterator&gt; object_range() const;  
-</code></pre>
-<p>Returns a "range" defined by <code>begin()</code> and <code>end()</code> over the members of a <code>json</code> object<br>
-Throws <code>std::runtime_error</code> if not an object.</p>
-<pre><code>range&lt;array_iterator&gt; array_range();
-range&lt;const_array_iterator&gt; array_range() const;
-</code></pre>
-<p>Returns a "range" defined by <code>begin()</code> and <code>end()</code> over the elements of a <code>json</code> array<br>
-Throws <code>std::runtime_error</code> if not an array.</p>
+<table border="0">
+  <tbody><tr>
+    <td><a href="json%20array_range">array_range</a></td>
+    <td>Returns a "range" that supports a range-based for loop over the elements of a `json` array.</td> 
+  </tr>
+  <tr>
+    <td><a href="json%20object_range">obect_range</a></td>
+    <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `json` object.</td> 
+  </tr>
+</tbody></table>
 <h3>Capacity</h3>
 <pre><code>size_t size() const noexcept
 </code></pre>
@@ -840,49 +840,8 @@ std::ostream&amp; pretty_print(const json&amp; val, const serialization_options&
 </li>
 </ul>
 <h2>Examples</h2>
-<h3>Range-based for loop over members of an object</h3>
-<div class="highlight highlight-source-c++"><pre>json book = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
-<span class="pl-s">{</span>
-<span class="pl-s">    "category" : "Fiction",</span>
-<span class="pl-s">    "title" : "Pulp",</span>
-<span class="pl-s">    "author" : "Charles Bukowski",</span>
-<span class="pl-s">    "date" : "2004-07-08",</span>
-<span class="pl-s">    "price" : 22.48,</span>
-<span class="pl-s">    "isbn" : "1852272007"  </span>
-<span class="pl-s">}</span>
-<span class="pl-s"><span class="pl-pds">)"</span></span>);
-
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; kvp: book.object_range())
-{
-    std::cout &lt;&lt; kvp.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>:<span class="pl-pds">"</span></span> &lt;&lt; kvp.<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;string&gt;() &lt;&lt; std::endl;
-} </pre></div>
-<h3>Range-based for loop over elements of an array</h3>
-<div class="highlight highlight-source-c++"><pre>json book1;    
-book1[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>;
-book1[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>A Wild Sheep Chase: A Novel<span class="pl-pds">"</span></span>;
-book1[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
-
-json book2;    
-book2[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>History<span class="pl-pds">"</span></span>;
-book2[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Charlie Wilson's War<span class="pl-pds">"</span></span>;
-book2[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>George Crile<span class="pl-pds">"</span></span>;
-
-json book3;    
-book3[<span class="pl-s"><span class="pl-pds">"</span>category<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Fiction<span class="pl-pds">"</span></span>;
-book3[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Kafka on the Shore<span class="pl-pds">"</span></span>;
-book3[<span class="pl-s"><span class="pl-pds">"</span>author<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Haruki Murakami<span class="pl-pds">"</span></span>;
-
-<span class="pl-c"><span class="pl-c">//</span> Constructing a json array with an initializer-list </span>
-json booklist = json::array{book1, book2, book3};    
-
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; book: booklist.array_range())
-{
-    std::cout &lt;&lt; book[<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>].<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::end;
-} 
-   
-### Accessors <span class="pl-k">and</span> defaults
-```c++
-json val;
+<h3>Accessors and defaults</h3>
+<div class="highlight highlight-source-c++"><pre>json val;
 
 val[<span class="pl-s"><span class="pl-pds">"</span>field1<span class="pl-pds">"</span></span>] = <span class="pl-c1">1</span>;
 val[<span class="pl-s"><span class="pl-pds">"</span>field3<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>;
@@ -919,31 +878,6 @@ json <span class="pl-en">arr</span>(v.begin(),v.end());
 std::cout &lt;&lt; arr &lt;&lt; std::endl;</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>[<span class="pl-c1">10</span>,<span class="pl-c1">20</span>,<span class="pl-c1">30</span>]</pre></div>
-<h3>Object iterator</h3>
-<div class="highlight highlight-source-c++"><pre>json obj;
-obj[<span class="pl-s"><span class="pl-pds">"</span>city<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>;
-obj[<span class="pl-s"><span class="pl-pds">"</span>province<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Ontario<span class="pl-pds">"</span></span>;
-obj[<span class="pl-s"><span class="pl-pds">"</span>country<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>Canada<span class="pl-pds">"</span></span>;
-
-<span class="pl-k">for</span> (<span class="pl-k">auto</span> it = obj.object_range().begin(); it != obj.object_range().end(); ++it)
-{
-    std::cout &lt;&lt; it-&gt;<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> &lt;&lt; it-&gt;<span class="pl-c1">value</span>().<span class="pl-smi">as</span>&lt;std::string&gt;() &lt;&lt; std::endl;
-}</pre></div>
-<p>Output:</p>
-<div class="highlight highlight-source-c++"><pre>city=Toronto
-country=Canada
-province=Ontario</pre></div>
-<h3>Array iterator</h3>
-<div class="highlight highlight-source-c++"><pre>json arr = json::array{<span class="pl-s"><span class="pl-pds">"</span>Toronto<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Vancouver<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Montreal<span class="pl-pds">"</span></span>};
-
-<span class="pl-k">for</span> (<span class="pl-k">auto</span> it = arr.array_range().begin(); it != arr.array_range().end(); ++it)
-{
-    std::cout &lt;&lt; it-&gt;as&lt;std::string&gt;() &lt;&lt; std::endl;
-}</pre></div>
-<p>Output:</p>
-<div class="highlight highlight-source-json"><pre>Toronto
-Vancouver 
-Montreal</pre></div>
 <h3>Constructing json structures</h3>
 <div class="highlight highlight-source-c++"><pre>json root;
 

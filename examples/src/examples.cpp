@@ -216,6 +216,25 @@ void mulitple_json_objects()
     }
 }
 
+void object_range_based_for_loop()
+{
+    json j = json::parse(R"(
+{
+    "category" : "Fiction",
+    "title" : "Pulp",
+    "author" : "Charles Bukowski",
+    "date" : "2004-07-08",
+    "price" : 22.48,
+    "isbn" : "1852272007"  
+}
+)");
+
+    for (const auto& kv : j.object_range())
+    {
+        std::cout << kv.key() << " => " << kv.value().as<std::string>() << std::endl;
+    }
+}
+
 void more_examples()
 {
     json file_settings = json::object{
@@ -271,6 +290,8 @@ int main()
 {
     try
     {
+        object_range_based_for_loop();
+
         json_is_as_examples();
 
         basics_examples();

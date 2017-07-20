@@ -1286,13 +1286,13 @@ public:
     iterator find(string_view_type name)
     {
         return std::find_if(this->members_.begin(),this->members_.end(), 
-                            [name](const value_type& kvp){return kvp.key() == name;});
+                            [name](const value_type& kv){return kv.key() == name;});
     }
 
     const_iterator find(string_view_type name) const
     {
         return std::find_if(this->members_.begin(),this->members_.end(), 
-                            [name](const value_type& kvp){return kvp.key() == name;});
+                            [name](const value_type& kv){return kv.key() == name;});
     }
 
     void erase(iterator first, iterator last) 
@@ -1303,7 +1303,7 @@ public:
     void erase(string_view_type name) 
     {
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
-                              [name](const value_type& kvp){return kvp.key() == name;});
+                              [name](const value_type& kv){return kv.key() == name;});
         if (it != this->members_.end())
         {
             this->members_.erase(it);

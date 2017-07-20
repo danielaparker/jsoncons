@@ -114,10 +114,10 @@ Ivan Passer, Cutter's Way
 Loop through the members of the third book element, using a range-based for loop
 
 ```c++
-for (const auto& kvp : books[2].object_range())
+for (const auto& kv : books[2].object_range())
 {
-    std::cout << kvp.key() << "=" 
-              << kvp.value() << std::endl;
+    std::cout << kv.key() << "=" 
+              << kv.value() << std::endl;
 }
 ```
 

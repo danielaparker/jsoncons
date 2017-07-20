@@ -228,10 +228,10 @@ public:
                 }
 
                 // calculate size for each member
-                for (const auto& kvp: jval.object_range())
+                for (const auto& kv: jval.object_range())
                 {
-                    n += calculate_string_size(kvp.key());
-                    n += calculate_size(kvp.value());
+                    n += calculate_string_size(kv.key());
+                    n += calculate_size(kv.value());
                 }
                 break;
             }
@@ -464,10 +464,10 @@ public:
                 }
 
                 // append each element
-                for (const auto& kvp: jval.object_range())
+                for (const auto& kv: jval.object_range())
                 {
-                    encode_string(kvp.key());
-                    encode_(kvp.value());
+                    encode_string(kv.key());
+                    encode_(kv.value());
                 }
                 break;
             }

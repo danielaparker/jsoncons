@@ -113,15 +113,16 @@ Assigns the templated value to a `json` variable using [json_type_traits](json_t
 
 ### Ranges and Iterators
 
-    range<object_iterator> object_range();  
-    range<const_object_iterator> object_range() const;  
-Returns a "range" defined by `begin()` and `end()` over the members of a `json` object      
-Throws `std::runtime_error` if not an object.
-
-    range<array_iterator> array_range();
-    range<const_array_iterator> array_range() const;
-Returns a "range" defined by `begin()` and `end()` over the elements of a `json` array      
-Throws `std::runtime_error` if not an array.
+<table border="0">
+  <tr>
+    <td><a href="json%20array_range">array_range</a></td>
+    <td>Returns a "range" that supports a range-based for loop over the elements of a `json` array.</td> 
+  </tr>
+  <tr>
+    <td><a href="json%20object_range">obect_range</a></td>
+    <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `json` object.</td> 
+  </tr>
+</table>
 
 ### Capacity
 
@@ -344,50 +345,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - [wojson](wojson) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Examples
-
-### Range-based for loop over members of an object
-```c++
-json book = json::parse(R"(
-{
-    "category" : "Fiction",
-    "title" : "Pulp",
-    "author" : "Charles Bukowski",
-    "date" : "2004-07-08",
-    "price" : 22.48,
-    "isbn" : "1852272007"  
-}
-)");
-
-for (const auto& kvp: book.object_range())
-{
-    std::cout << kvp.key() << ":" << kvp.value().as<string>() << std::endl;
-} 
-```
-### Range-based for loop over elements of an array
-```c++
-json book1;    
-book1["category"] = "Fiction";
-book1["title"] = "A Wild Sheep Chase: A Novel";
-book1["author"] = "Haruki Murakami";
-
-json book2;    
-book2["category"] = "History";
-book2["title"] = "Charlie Wilson's War";
-book2["author"] = "George Crile";
-
-json book3;    
-book3["category"] = "Fiction";
-book3["title"] = "Kafka on the Shore";
-book3["author"] = "Haruki Murakami";
-
-// Constructing a json array with an initializer-list 
-json booklist = json::array{book1, book2, book3};    
-
-for (const auto& book: booklist.array_range())
-{
-    std::cout << book["title"].as<std::string>() << std::end;
-} 
-   
+  
 ### Accessors and defaults
 ```c++
 json val;
@@ -437,39 +395,6 @@ std::cout << arr << std::endl;
 Output: 
 ```json
 [10,20,30]
-```
-### Object iterator
-```c++
-json obj;
-obj["city"] = "Toronto";
-obj["province"] = "Ontario";
-obj["country"] = "Canada";
-
-for (auto it = obj.object_range().begin(); it != obj.object_range().end(); ++it)
-{
-    std::cout << it->key() << "=" << it->value().as<std::string>() << std::endl;
-}
-```
-Output:
-```c++
-city=Toronto
-country=Canada
-province=Ontario
-```
-### Array iterator
-```c++
-json arr = json::array{"Toronto", "Vancouver", "Montreal"};
-
-for (auto it = arr.array_range().begin(); it != arr.array_range().end(); ++it)
-{
-    std::cout << it->as<std::string>() << std::endl;
-}
-```
-Output:
-```json
-Toronto
-Vancouver 
-Montreal
 ```
 ### Constructing json structures
 ```c++
