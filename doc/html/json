@@ -741,20 +741,12 @@ Throws <code>std::runtime_error</code> if not an object.</p>
 <pre><code>void shrink_to_fit()
 </code></pre>
 <p>Requests the removal of unused capacity.</p>
-<pre><code>template &lt;class T&gt;
-void add(T&amp;&amp; val)
-</code></pre>
-<p>Adds a new json element at the end of a json array. The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
-Throws <code>std::runtime_error</code> if not an array.</p>
-<pre><code>template &lt;class T&gt;
-array_iterator add(const_array_iterator pos, T&amp;&amp; val)
-</code></pre>
-<p>Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.<br>
-The argument <code>val</code> is forwarded to the <code>json</code> constructor as <code>std::forward&lt;T&gt;(val)</code>.<br>
-Returns an <code>array_iterator</code> that points to the new value<br>
-Throws <code>std::runtime_error</code> if not an array.</p>
 <table border="0">
   <tbody><tr>
+    <td><a href="json%20add">add</a></td>
+    <td>Adds a value to a json array</td> 
+  </tr>
+  <tr>
     <td><a href="json%20emplace_back">emplace_back</a></td>
     <td>Constructs a value in place at the end of a json array</td> 
   </tr>
