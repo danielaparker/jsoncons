@@ -500,14 +500,10 @@ public:
         return value_;
     }
 
-    void value(const ValueT& value)
+    template <class T>
+    void value(T&& value)
     {
-        value_ = value;
-    }
-
-    void value(ValueT&& value)
-    {
-        value_ = std::forward<ValueT&&>(value);
+        value_ = std::forward<T&&>(value);
     }
 
     void swap(key_value_pair& member)
