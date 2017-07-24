@@ -63,20 +63,32 @@ int main()
     image_sizing["Resize What"] = "long_edge"; // a string
     image_sizing["Dimension 1"] = 9.84; // a double
     
-    json file_export;
+    json export_settings;
 
     // create "File Format Options" as an object and put "Color Spaces" in it
-    file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces); 
+    export_settings["File Format Options"]["Color Spaces"] = std::move(color_spaces); 
 
-    file_export["Image Sizing"] = std::move(image_sizing);
+    export_settings["Image Sizing"] = std::move(image_sizing);
 
-    std::cout << "(1)\n" << pretty_print(file_export) << "\n\n";
+    // Write to stream
+    std::ofstream os("export_settings.json");
+    os << export_settings;
 
-    const json& val = file_export["Image Sizing"];
+    // Read from stream
+    std::ifstream is("export_settings.json");
+    json j = json::parse(is);
 
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    // Get reference to object member
+    const json& val = j["Image Sizing"];
+
+    // Access member as double
     std::cout << "(2) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
 
-    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2","n/a") << "\n";
+    // Try access member with default
+    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n";
 }
 ```
 Output:
@@ -96,7 +108,7 @@ Output:
 
 (2) Dimension 1 = 9.84
 
-(3) Dimension 2 = n/a
+(3) Dimension 2 = 0.0
 ```
 
 ## Building the test suite and examples with CMake

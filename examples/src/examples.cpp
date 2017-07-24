@@ -249,7 +249,6 @@ void more_examples()
     image_sizing.set("Resize Unit", "pixels");  // a string
     image_sizing.set("Resize What", "long_edge");  // a string
     image_sizing.set("Dimension 1",9.84);  // a double
-    image_sizing.set("Dimension 2",json::null());  // a null value
     std::cout << pretty_print(image_sizing) << std::endl;
 
     json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
@@ -259,16 +258,33 @@ void more_examples()
     color_spaces.add("AdobeRGB");
     color_spaces.add("ProPhoto RGB");
 
-    json file_export;
-    file_export["File Format Options"]["Color Spaces"] = std::move(color_spaces);
-    file_export["File Format Options"]["Image Formats"] = std::move(image_formats);
-    file_export["File Settings"] = std::move(file_settings);
-    file_export["Image Sizing"] = std::move(image_sizing);
-    std::cout << pretty_print(file_export) << std::endl;
+    json export_settings;
+    export_settings["File Format Options"]["Color Spaces"] = std::move(color_spaces);
+    export_settings["File Format Options"]["Image Formats"] = std::move(image_formats);
+    export_settings["File Settings"] = std::move(file_settings);
+    export_settings["Image Sizing"] = std::move(image_sizing);
+    std::cout << pretty_print(export_settings) << std::endl;
 
-    size_t n = 10, m = 3;
-    std::vector<size_t> x(n, m);
-    x[5] = 3;
+    // Write to stream
+    std::ofstream os("export_settings.json");
+    os << export_settings;
+
+    // Read from stream
+    std::ifstream is("export_settings.json");
+    json j = json::parse(is);
+
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    // Get reference to object member
+    const json& val = j["Image Sizing"];
+
+    // Access member as double
+    std::cout << "(2) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
+
+    // Try access member with default
+    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n\n";
+
 }
 
 void parse_exception_example()
