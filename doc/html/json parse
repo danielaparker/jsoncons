@@ -481,6 +481,7 @@ static json parse(std::istream&amp; is,
 <p>Parses an input stream of JSON text and returns a json object or array value.<br>
 Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
 <h2>Examples</h2>
+<h3>Parse from stream</h3>
 <p>Input example.json:</p>
 <div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>File Format Options<span class="pl-pds">"</span></span>:{<span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>:[<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>]}}</pre></div>
 <div class="highlight highlight-source-c++"><pre>std::ifstream <span class="pl-en">is</span>(<span class="pl-s"><span class="pl-pds">"</span>example.json<span class="pl-pds">"</span></span>);
@@ -493,6 +494,18 @@ std::cout &lt;&lt; pretty_print(j) &lt;&lt; std::endl;</pre></div>
         <span class="pl-s"><span class="pl-pds">"</span>Color Spaces<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>]
     }
 }</pre></div>
+<h3>Parse from string</h3>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">try</span> 
+{
+    json val = <span class="pl-c1">json::parse</span>(<span class="pl-s"><span class="pl-pds">"</span>[1,2,3,4,]<span class="pl-pds">"</span></span>);
+} 
+<span class="pl-k">catch</span>(<span class="pl-k">const</span> jsoncons::parse_error&amp; e) 
+{
+    std::cout &lt;&lt; e.<span class="pl-c1">what</span>() &lt;&lt; std::endl;
+}</pre></div>
+<p>Output:</p>
+<pre><code>Extra comma at line 1 and column 10
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

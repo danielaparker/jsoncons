@@ -23,13 +23,13 @@ Makes a multidimensional array with the number of dimensions specified as a temp
 ### Make an array of size 10 initialized with zeros
 ```c++
 json a = json::make_array<1>(10,0);
-    a[1] = 1;
-    a[2] = 2;
+a[1] = 1;
+a[2] = 2;
 std::cout << pretty_print(a) << std::endl;
 ```
 Output:
 ```json
-    [0,1,2,0,0,0,0,0,0,0]
+[0,1,2,0,0,0,0,0,0,0]
 ```
 ### Make a two dimensional array of size 3x4 initialized with zeros
 ```c++

@@ -26,6 +26,8 @@ If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cp
 
 ## Examples
 
+### Accessing integral, floating point, and boolean values
+
 ```c++
 json j = json::parse(R"(
 {
@@ -63,5 +65,25 @@ Output:
 (8) 1
 (9) true
 (10) 10.5
+```
+
+### Accessing a `json` value as a `std::vector`
+```c++
+std::string s = "{\"my-array\" : [1,2,3,4]}";
+json val = json::parse(s);
+std::vector<int> v = val["my-array"].as<std::vector<int>>();
+for (size_t i = 0; i < v.size(); ++i)
+{
+    if (i > 0)
+    {
+        std::cout << ",";
+    }
+    std::cout << v[i]; 
+}
+std::cout << std::endl;
+```
+Output:
+```
+1,2,3,4
 ```
 

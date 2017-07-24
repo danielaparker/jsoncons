@@ -8,8 +8,6 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [Basics](Basics)
 
-[Arrays](Arrays)
-
 [Type Extensibility](Type%20Extensibility)
 
 [Custom Allocators](Custom%20Allocators)
