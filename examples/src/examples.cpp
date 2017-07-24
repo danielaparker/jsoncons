@@ -263,7 +263,6 @@ void more_examples()
     export_settings["File Format Options"]["Image Formats"] = std::move(image_formats);
     export_settings["File Settings"] = std::move(file_settings);
     export_settings["Image Sizing"] = std::move(image_sizing);
-    std::cout << pretty_print(export_settings) << std::endl;
 
     // Write to stream
     std::ofstream os("export_settings.json");
