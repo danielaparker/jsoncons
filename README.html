@@ -468,52 +468,18 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h1>jsoncons: a C++ library for json construction</h1>
-<p>jsoncons is a C++ library for the construction of <a href="http://www.json.org">JavaScript Object Notation (JSON)</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world.</p>
+<p>jsoncons is a modern C++, header-only library for constructing <a href="http://www.json.org">JSON</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world.</p>
 <p>jsoncons uses some features that are new to C++ 11, including <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported for that compiler.</p>
 <p>The <a href="https://github.com/danielaparker/jsoncons">code repository</a> and <a href="https://github.com/danielaparker/jsoncons/releases">releases</a> are on github. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a></p>
-<p>Features:</p>
-<ul>
-<li>Uses the standard C++ input/output streams library</li>
-<li>Supports conversion from and to the standard library sequence containers, associative containers, and std::tuple</li>
-<li>Supports conversion from and to user defined types</li>
-<li>Passes all tests from <a href="http://www.json.org/JSON_checker/">JSON_checker</a> except <code>fail1.json</code>, which is allowed in <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a></li>
-<li>Returns the expected results for all tests from <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a></li>
-<li>Supports object members sorted alphabetically by name or in original order</li>
-<li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li>
-<li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
-<li>Correctly handles surrogate pairs in \uXXXX escape sequences</li>
-<li>Supports event based JSON parsing and serializing with user defined input and output handlers</li>
-<li>Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */</li>
-<li>Parses files with duplicate names but uses only the last entry</li>
-<li>Supports optional escaping of the solidus (/) character</li>
-<li>Supports Nan, Inf and -Inf replacement</li>
-<li>Supports reading a sequence of JSON texts from a stream</li>
-<li>Supports optional escaping of non-ascii UTF-8 octets</li>
-<li>Supports conversion from and to user defined types</li>
-<li>Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired</li>
-</ul>
 <p>Extensions:</p>
 <ul>
 <li>The <a href="#user-content-ext_jsonpath">jsonpath</a> extension supports search using <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>.  It also supports search and replace using JsonPath expressions.</li>
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="#user-content-ext_msgpack">msgpack</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
-<h2>What's new on master</h2>
-<ul>
-<li>The _json and _ojson literal operators have been moved to the namespace <code>jsoncons::literals</code>.<br>
-Access to these literals now requires</li>
-</ul>
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::literals<span class="pl-k">;</span>    </pre></div>
-<ul>
-<li><code>json_type_traits</code> supports <code>std::pair</code> (convert to/from json array of size 2)</li>
-<li>Added json array functions <code>emplace_back</code> and <code>emplace</code>, and json object functions <code>try_emplace</code><br>
-and <code>insert_or_assign</code>, which are analagous to the standard library vector and map functions.<br>
-See the <a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> class documentation.</li>
-</ul>
 <h2>Get jsoncons</h2>
-<p>The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.</p>
-<p>To install the jsoncons library, download the zip file, unpack the release, under <code>src</code> find the directory <code>jsoncons</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
+<p>Download the <a href="https://github.com/danielaparker/jsoncons/releases">latest release</a> and unpack the zip file. Find the directory <code>jsoncons</code> under <code>src</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
+<p>Or, download the latest code on master.</p>
 <h2>How to use it</h2>
 <ul>
 <li>For a quick guide, see <a href="http://danielaparker.github.io/jsoncons">jsoncons: a C++ library for json construction</a>.</li>
@@ -632,10 +598,10 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
     {<span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>, <span class="pl-c1">25.17</span>}
 };
 
-<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; kvp : book.object_range())
+<span class="pl-k">for</span> (<span class="pl-k">const</span> <span class="pl-k">auto</span>&amp; kv : book.object_range())
 {
-    std::cout &lt;&lt; kvp.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
-              &lt;&lt; kvp.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
+    std::cout &lt;&lt; kv.<span class="pl-c1">key</span>() &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>=<span class="pl-pds">"</span></span> 
+              &lt;&lt; kv.<span class="pl-c1">value</span>() &lt;&lt; std::endl;
 }</pre></div>
 <h3>_json and _ojson literal operators</h3>
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::literals<span class="pl-k">;</span>
