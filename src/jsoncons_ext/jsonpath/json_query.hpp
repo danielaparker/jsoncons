@@ -89,7 +89,7 @@ void json_replace(Json& root, typename Json::string_view_type path, T&& new_valu
 {
     jsonpath_evaluator<Json,Json&,Json*> evaluator;
     evaluator.evaluate(root,path.data(),path.length());
-    evaluator.replace(std::forward<T&&>(new_value));
+    evaluator.replace(std::forward<T>(new_value));
 }
 
 enum class jp_state 

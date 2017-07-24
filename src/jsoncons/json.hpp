@@ -571,12 +571,12 @@ public:
 
         variant(variant&& val) JSONCONS_NOEXCEPT
         {
-            Init_rv_(std::forward<variant&&>(val));
+            Init_rv_(std::forward<variant>(val));
         }
 
         variant(variant&& val, const Allocator& allocator) JSONCONS_NOEXCEPT
         {
-            Init_rv_(std::forward<variant&&>(val), allocator,
+            Init_rv_(std::forward<variant>(val), allocator,
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
         }
 
@@ -1280,7 +1280,7 @@ public:
 
         void Init_rv_(variant&& val, const Allocator& a, std::true_type) JSONCONS_NOEXCEPT
         {
-            Init_rv_(std::forward<variant&&>(val));
+            Init_rv_(std::forward<variant>(val));
         }
 
         void Init_rv_(variant&& val, const Allocator& a, std::false_type) JSONCONS_NOEXCEPT
@@ -1294,13 +1294,13 @@ public:
             case value_type::uinteger_t:
             case value_type::bool_t:
             case value_type::small_string_t:
-                Init_(std::forward<variant&&>(val));
+                Init_(std::forward<variant>(val));
                 break;
             case value_type::string_t:
                 {
                     if (a == val.string_data_cast()->get_allocator())
                     {
-                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                        Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
                     else
                     {
@@ -1312,7 +1312,7 @@ public:
                 {
                     if (a == val.object_data_cast()->get_allocator())
                     {
-                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                        Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
                     else
                     {
@@ -1324,7 +1324,7 @@ public:
                 {
                     if (a == val.array_data_cast()->get_allocator())
                     {
-                        Init_rv_(std::forward<variant&&>(val), a, std::true_type());
+                        Init_rv_(std::forward<variant>(val), a, std::true_type());
                     }
                     else
                     {
@@ -1351,7 +1351,7 @@ public:
         json_proxy& operator = (const json_proxy& other) = delete; 
 
         json_proxy(ParentT& parent, key_storage_type&& name)
-            : parent_(parent), key_(std::forward<key_storage_type&&>(name))
+            : parent_(parent), key_(std::forward<key_storage_type>(name))
         {
         }
 
@@ -1582,7 +1582,7 @@ public:
         template <class T>
         json_proxy& operator=(T&& val) 
         {
-            parent_.evaluate_with_default().set_(std::move(key_), std::forward<T&&>(val));
+            parent_.evaluate_with_default().set_(std::move(key_), std::forward<T>(val));
             return *this;
         }
 
@@ -1695,19 +1695,19 @@ public:
         template <class T>
         std::pair<object_iterator,bool> set(string_view_type name, T&& value)
         {
-            return evaluate().set(name,std::forward<T&&>(value));
+            return evaluate().set(name,std::forward<T>(value));
         }
 
         template <class T>
         std::pair<object_iterator,bool> insert_or_assign(string_view_type name, T&& value)
         {
-            return evaluate().insert_or_assign(name,std::forward<T&&>(value));
+            return evaluate().insert_or_assign(name,std::forward<T>(value));
         }
 
         template <class T>
         void set_(key_storage_type&& name, T&& value)
         {
-            evaluate().set_(std::forward<key_storage_type&&>(name),std::forward<T&&>(value));
+            evaluate().set_(std::forward<key_storage_type>(name),std::forward<T>(value));
         }
 
        // emplace
@@ -1721,13 +1721,13 @@ public:
         template <class T>
         object_iterator set(object_iterator hint, string_view_type name, T&& value)
         {
-            return evaluate().set(hint, name, std::forward<T&&>(value));
+            return evaluate().set(hint, name, std::forward<T>(value));
         }
 
         template <class T>
         object_iterator insert_or_assign(object_iterator hint, string_view_type name, T&& value)
         {
-            return evaluate().insert_or_assign(hint, name, std::forward<T&&>(value));
+            return evaluate().insert_or_assign(hint, name, std::forward<T>(value));
         }
 
         template <class ... Args>
@@ -1739,7 +1739,7 @@ public:
         template <class T>
         object_iterator set_(object_iterator hint, key_storage_type&& name, T&& value)
         {
-            return evaluate().set_(hint, std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
+            return evaluate().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(value));
         }
 
         template <class... Args> 
@@ -1757,13 +1757,13 @@ public:
         template <class T>
         void add(T&& value)
         {
-            evaluate_with_default().add(std::forward<T&&>(value));
+            evaluate_with_default().add(std::forward<T>(value));
         }
 
         template <class T>
         array_iterator add(const_array_iterator pos, T&& value)
         {
-            return evaluate_with_default().add(pos, std::forward<T&&>(value));
+            return evaluate_with_default().add(pos, std::forward<T>(value));
         }
 
         template <class SAllocator>
@@ -1978,7 +1978,7 @@ public:
 
         void add(size_t index, json_type&& value)
         {
-            evaluate_with_default().add(index, std::forward<json_type&&>(value));
+            evaluate_with_default().add(index, std::forward<json_type>(value));
         }
 
         bool has_member(const key_storage_type& name) const
@@ -2224,7 +2224,7 @@ public:
     }
 
     basic_json(array&& other)
-        : var_(std::forward<array&&>(other))
+        : var_(std::forward<array>(other))
     {
     }
 
@@ -2234,7 +2234,7 @@ public:
     }
 
     basic_json(object&& other)
-        : var_(std::forward<object&&>(other))
+        : var_(std::forward<object>(other))
     {
     }
 
@@ -3091,7 +3091,7 @@ public:
         {
         case value_type::empty_object_t:
             {
-                return json_type(std::forward<T&&>(default_val));
+                return json_type(std::forward<T>(default_val));
             }
         case value_type::object_t:
             {
@@ -3102,7 +3102,7 @@ public:
                 }
                 else
                 {
-                    return json_type(std::forward<T&&>(default_val));
+                    return json_type(std::forward<T>(default_val));
                 }
             }
         default:
@@ -3253,7 +3253,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().insert_or_assign(name, std::forward<T&&>(value));
+            return object_value().insert_or_assign(name, std::forward<T>(value));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3270,7 +3270,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().insert_or_assign(name, std::forward<T&&>(value));
+            return object_value().insert_or_assign(name, std::forward<T>(value));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3304,7 +3304,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            object_value().set_(std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
+            object_value().set_(std::forward<key_storage_type>(name), std::forward<T>(value));
             break;
         default:
             {
@@ -3322,7 +3322,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().insert_or_assign(hint, name, std::forward<T&&>(value));
+            return object_value().insert_or_assign(hint, name, std::forward<T>(value));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3339,7 +3339,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().insert_or_assign(hint, name, std::forward<T&&>(value));
+            return object_value().insert_or_assign(hint, name, std::forward<T>(value));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3373,7 +3373,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().set_(hint, std::forward<key_storage_type&&>(name), std::forward<T&&>(value));
+            return object_value().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(value));
             break;
         default:
             {
@@ -3388,7 +3388,7 @@ public:
         switch (var_.type_id())
         {
         case value_type::array_t:
-            array_value().add(std::forward<T&&>(value));
+            array_value().add(std::forward<T>(value));
             break;
         default:
             {
@@ -3403,7 +3403,7 @@ public:
         switch (var_.type_id())
         {
         case value_type::array_t:
-            return array_value().add(pos, std::forward<T&&>(value));
+            return array_value().add(pos, std::forward<T>(value));
             break;
         default:
             {
@@ -3713,7 +3713,7 @@ public:
     void add(size_t index, json_type&& value){
         switch (var_.type_id()){
         case value_type::array_t:
-            array_value().add(index, std::forward<json_type&&>(value));
+            array_value().add(index, std::forward<json_type>(value));
             break;
         default:
             {

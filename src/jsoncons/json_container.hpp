@@ -288,7 +288,7 @@ public:
                 >::type* = nullptr>
     void add(T&& value)
     {
-        elements_.emplace_back(Json(std::forward<T&&>(value)));
+        elements_.emplace_back(Json(std::forward<T>(value)));
     }
 
     template <class T, class U=allocator_type,
@@ -296,7 +296,7 @@ public:
                 >::type* = nullptr>
     void add(T&& value)
     {
-        elements_.emplace_back(std::forward<T&&>(value),get_allocator());
+        elements_.emplace_back(std::forward<T>(value),get_allocator());
     }
 
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
@@ -306,14 +306,14 @@ public:
     add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.emplace(it, Json(std::forward<T&&>(value)));
+        return elements_.emplace(it, Json(std::forward<T>(value)));
     }
 #else
     template <class T, class U=allocator_type>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
     add(const_iterator pos, T&& value)
     {
-        return elements_.emplace(pos, Json(std::forward<T&&>(value)));
+        return elements_.emplace(pos, Json(std::forward<T>(value)));
     }
 #endif
 
@@ -462,8 +462,8 @@ public:
     }
 
     key_value_pair(key_storage_type&& name, ValueT&& val)
-        : key_(std::forward<key_storage_type&&>(name)), 
-          value_(std::forward<ValueT&&>(val))
+        : key_(std::forward<key_storage_type>(name)), 
+          value_(std::forward<ValueT>(val))
     {
     }
 
@@ -481,7 +481,7 @@ public:
     key_value_pair(key_storage_type&& name, 
                    T&& val, 
                    const allocator_type& allocator)
-        : key_(std::forward<key_storage_type&&>(name)), value_(std::forward<T&&>(val), allocator)
+        : key_(std::forward<key_storage_type>(name)), value_(std::forward<T>(val), allocator)
     {
     }
 
@@ -503,7 +503,7 @@ public:
     template <class T>
     void value(T&& value)
     {
-        value_ = std::forward<T&&>(value);
+        value_ = std::forward<T>(value);
     }
 
     void swap(key_value_pair& member)
@@ -649,7 +649,7 @@ public:
     }
 
     json_object(json_object&& val)
-        : Json_object_<KeyT,Json>(std::forward<json_object&&>(val))
+        : Json_object_<KeyT,Json>(std::forward<json_object>(val))
     {
     }
 
@@ -659,7 +659,7 @@ public:
     }
 
     json_object(json_object&& val,const allocator_type& allocator)
-        : Json_object_<KeyT,Json>(std::forward<json_object&&>(val),allocator)
+        : Json_object_<KeyT,Json>(std::forward<json_object>(val),allocator)
     {
     }
 
@@ -816,20 +816,20 @@ public:
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
-                                        std::forward<T&&>(value));
+                                        std::forward<T>(value));
             inserted = true;
             it = this->members_.begin() + this->members_.size() - 1;
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T&&>(value));
+            it->value(std::forward<T>(value));
             inserted = false; // assigned
         }
         else
         {
             it = this->members_.emplace(it,
                                         key_storage_type(name.begin(),name.end()),
-                                        std::forward<T&&>(value));
+                                        std::forward<T>(value));
             inserted = true;
         }
         return std::make_pair(it,inserted);
@@ -845,20 +845,20 @@ public:
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
-                                        std::forward<T&&>(value),get_allocator());
+                                        std::forward<T>(value),get_allocator());
             inserted = true;
             it = this->members_.begin() + this->members_.size() - 1;
         }
         else if (it->key() == name)
         {
-            it->value(Json(std::forward<T&&>(value), get_allocator()));
+            it->value(Json(std::forward<T>(value), get_allocator()));
             inserted = false; // assigned
         }
         else
         {
             it = this->members_.emplace(it,
                                         key_storage_type(name.begin(),name.end(), get_allocator()),
-                                        std::forward<T&&>(value),get_allocator());
+                                        std::forward<T>(value),get_allocator());
             inserted = true;
         }
         return std::make_pair(it,inserted);
@@ -901,18 +901,18 @@ public:
                                    [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                                  std::forward<T&&>(value));
+            this->members_.emplace_back(std::forward<key_storage_type>(name), 
+                                  std::forward<T>(value));
         }
         else if (string_view_type(it->key().data(),it->key().length()) == s)
         {
-            it->value(std::forward<T&&>(value));
+            it->value(std::forward<T>(value));
         }
         else
         {
             this->members_.emplace(it,
-                             std::forward<key_storage_type&&>(name),
-                             std::forward<T&&>(value));
+                             std::forward<key_storage_type>(name),
+                             std::forward<T>(value));
         }
     }
 
@@ -926,18 +926,18 @@ public:
                                    [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                                  std::forward<T&&>(value),get_allocator() );
+            this->members_.emplace_back(std::forward<key_storage_type>(name), 
+                                  std::forward<T>(value),get_allocator() );
         }
         else if (string_view_type(it->key().data(), it->key().length()) == s)
         {
-            it->value(Json(std::forward<T&&>(value),get_allocator() ));
+            it->value(Json(std::forward<T>(value),get_allocator() ));
         }
         else
         {
             this->members_.emplace(it,
-                             std::forward<key_storage_type&&>(name),
-                             std::forward<T&&>(value),get_allocator() );
+                             std::forward<key_storage_type>(name),
+                             std::forward<T>(value),get_allocator() );
         }
     }
 
@@ -960,18 +960,18 @@ public:
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
-                                        std::forward<T&&>(value));
+                                        std::forward<T>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T&&>(value));
+            it->value(std::forward<T>(value));
         }
         else
         {
             it = this->members_.emplace(it,
                                         key_storage_type(name.begin(),name.end()),
-                                        std::forward<T&&>(value));
+                                        std::forward<T>(value));
         }
         return it;
     }
@@ -995,18 +995,18 @@ public:
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
-                                        std::forward<T&&>(value),get_allocator());
+                                        std::forward<T>(value),get_allocator());
             it = this->members_.begin() + (this->members_.size() - 1);
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T&&>(value),get_allocator());
+            it->value(std::forward<T>(value),get_allocator());
         }
         else
         {
             it = this->members_.emplace(it,
                                         key_storage_type(name.begin(),name.end(), get_allocator()),
-                                        std::forward<T&&>(value),get_allocator());
+                                        std::forward<T>(value),get_allocator());
         }
         return it;
     }
@@ -1063,19 +1063,19 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                                  std::forward<T&&>(value));
+            this->members_.emplace_back(std::forward<key_storage_type>(name), 
+                                  std::forward<T>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
         else if (string_view_type(it->key().data(), it->key().length()) == s)
         {
-            it->value(Json(std::forward<T&&>(value)));
+            it->value(Json(std::forward<T>(value)));
         }
         else
         {
             it = this->members_.emplace(it,
-                                  std::forward<key_storage_type&&>(name),
-                                  std::forward<T&&>(value));
+                                  std::forward<key_storage_type>(name),
+                                  std::forward<T>(value));
         }
         return it;
     }
@@ -1099,19 +1099,19 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                                  std::forward<T&&>(value),get_allocator() );
+            this->members_.emplace_back(std::forward<key_storage_type>(name), 
+                                  std::forward<T>(value),get_allocator() );
             it = this->members_.begin() + (this->members_.size() - 1);
         }
         else if (string_view_type(it->key().data(), it->key().length()) == s)
         {
-            it->value(Json(std::forward<T&&>(value),get_allocator() ));
+            it->value(Json(std::forward<T>(value),get_allocator() ));
         }
         else
         {
             it = this->members_.emplace(it,
-                                  std::forward<key_storage_type&&>(name),
-                                  std::forward<T&&>(value),get_allocator() );
+                                  std::forward<key_storage_type>(name),
+                                  std::forward<T>(value),get_allocator() );
         }
         return it;
     }
@@ -1170,7 +1170,7 @@ public:
     }
 
     json_object(json_object&& val)
-        : Json_object_<KeyT,Json>(std::forward<json_object&&>(val))
+        : Json_object_<KeyT,Json>(std::forward<json_object>(val))
     {
     }
 
@@ -1180,7 +1180,7 @@ public:
     }
 
     json_object(json_object&& val,const allocator_type& allocator) 
-        : Json_object_<KeyT,Json>(std::forward<json_object&&>(val),allocator)
+        : Json_object_<KeyT,Json>(std::forward<json_object>(val),allocator)
     {
     }
 
@@ -1331,13 +1331,13 @@ public:
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
-                                        std::forward<T&&>(value));
+                                        std::forward<T>(value));
             it = this->members_.begin() + this->members_.size() - 1;
             inserted = true;
         }
         else
         {
-            it->value(Json(std::forward<T&&>(value)));
+            it->value(Json(std::forward<T>(value)));
             inserted = false; // assigned
         }
         return std::make_pair(it,inserted);
@@ -1354,13 +1354,13 @@ public:
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end(),get_allocator()), 
-                                        std::forward<T&&>(value),get_allocator());
+                                        std::forward<T>(value),get_allocator());
             it = this->members_.begin() + this->members_.size() - 1;
             inserted = true;
         }
         else
         {
-            it->value(Json(std::forward<T&&>(value),get_allocator()));
+            it->value(Json(std::forward<T>(value),get_allocator()));
             inserted = false; // assigned
         }
         return std::make_pair(it,inserted);
@@ -1399,12 +1399,12 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                                  std::forward<T&&>(value));
+            this->members_.emplace_back(std::forward<key_storage_type>(name), 
+                                  std::forward<T>(value));
         }
         else
         {
-            it->value(Json(std::forward<T&&>(value)));
+            it->value(Json(std::forward<T>(value)));
         }
     }
 
@@ -1419,12 +1419,12 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                                  std::forward<T&&>(value),get_allocator());
+            this->members_.emplace_back(std::forward<key_storage_type>(name), 
+                                  std::forward<T>(value),get_allocator());
         }
         else
         {
-            it->value(Json(std::forward<T&&>(value),get_allocator()));
+            it->value(Json(std::forward<T>(value),get_allocator()));
         }
     }
 
@@ -1437,18 +1437,18 @@ public:
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
-                                  std::forward<T&&>(value));
+                                  std::forward<T>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
         else if (it->key() == name)
         {
-            it->value(Json(std::forward<T&&>(value)));
+            it->value(Json(std::forward<T>(value)));
         }
         else
         {
             it = this->members_.emplace(it,
                                   key_storage_type(name.begin(),name.end(), get_allocator()),
-                                  std::forward<T&&>(value));
+                                  std::forward<T>(value));
         }
         return it;
     }
@@ -1462,18 +1462,18 @@ public:
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
-                                  std::forward<T&&>(value), get_allocator());
+                                  std::forward<T>(value), get_allocator());
             it = this->members_.begin() + (this->members_.size() - 1);
         }
         else if (it->key() == name)
         {
-            it->value(Json(std::forward<T&&>(value), get_allocator()));
+            it->value(Json(std::forward<T>(value), get_allocator()));
         }
         else
         {
             it = this->members_.emplace(it,
                                   key_storage_type(name.begin(),name.end(), get_allocator()),
-                                  std::forward<T&&>(value), get_allocator());
+                                  std::forward<T>(value), get_allocator());
         }
         return it;
     }
@@ -1509,19 +1509,19 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                                  std::forward<T&&>(value));
+            this->members_.emplace_back(std::forward<key_storage_type>(name), 
+                                  std::forward<T>(value));
             it = this->members_.begin() + (this->members_.size() - 1);
         }
         else if (it->key() == name)
         {
-            it->value(Json(std::forward<T&&>(value)));
+            it->value(Json(std::forward<T>(value)));
         }
         else
         {
             it = this->members_.emplace(it,
-                                  std::forward<key_storage_type&&>(name),
-                                  std::forward<T&&>(value));
+                                  std::forward<key_storage_type>(name),
+                                  std::forward<T>(value));
         }
         return it;
     }
@@ -1534,19 +1534,19 @@ public:
 
         if (it == this->members_.end())
         {
-            this->members_.emplace_back(std::forward<key_storage_type&&>(name), 
-                                  std::forward<T&&>(value), get_allocator());
+            this->members_.emplace_back(std::forward<key_storage_type>(name), 
+                                  std::forward<T>(value), get_allocator());
             it = this->members_.begin() + (this->members_.size() - 1);
         }
         else if (it->key() == name)
         {
-            it->value(Json(std::forward<T&&>(value), get_allocator()));
+            it->value(Json(std::forward<T>(value), get_allocator()));
         }
         else
         {
             it = this->members_.emplace(it,
-                                  std::forward<key_storage_type&&>(name),
-                                  std::forward<T&&>(value), get_allocator());
+                                  std::forward<key_storage_type>(name),
+                                  std::forward<T>(value), get_allocator());
         }
         return it;
     }
