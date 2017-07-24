@@ -5,8 +5,7 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 Features:
 
 - Uses the standard C++ input/output streams library
-- Supports conversion from and to the standard library sequence containers, associative containers, and std::tuple
-- Supports conversion from and to user defined types
+- Supports conversion from and to the standard library sequence containers, associative containers, std::pair, and std::tuple
 - Supports conversion from and to user defined types
 - Supports object members sorted alphabetically by name or in original order
 - Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
