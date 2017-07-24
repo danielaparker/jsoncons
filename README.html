@@ -513,9 +513,9 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {
     json color_spaces = <span class="pl-c1">json::array</span>();
-    color_spaces.<span class="pl-c1">emplace_back</span>(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
-    color_spaces.<span class="pl-c1">emplace_back</span>(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
-    color_spaces.<span class="pl-c1">emplace_back</span>(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);
+    color_spaces.<span class="pl-c1">add</span>(<span class="pl-s"><span class="pl-pds">"</span>sRGB<span class="pl-pds">"</span></span>);
+    color_spaces.<span class="pl-c1">add</span>(<span class="pl-s"><span class="pl-pds">"</span>AdobeRGB<span class="pl-pds">"</span></span>);
+    color_spaces.<span class="pl-c1">add</span>(<span class="pl-s"><span class="pl-pds">"</span>ProPhoto RGB<span class="pl-pds">"</span></span>);
 
     json image_sizing; <span class="pl-c"><span class="pl-c">//</span> empty object</span>
     image_sizing[<span class="pl-s"><span class="pl-pds">"</span>Resize To Fit<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>; <span class="pl-c"><span class="pl-c">//</span> a boolean </span>
