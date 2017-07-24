@@ -3516,16 +3516,6 @@ public:
         return json_type(variant(o,allocator));
     }
 
-    static basic_json make_2d_array(size_t m, size_t n);
-
-    template <class T>
-    static basic_json make_2d_array(size_t m, size_t n, T val);
-
-    static basic_json make_3d_array(size_t m, size_t n, size_t k);
-
-    template <class T>
-    static basic_json make_3d_array(size_t m, size_t n, size_t k, T val);
-
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     static basic_json parse_stream(std::basic_istream<char_type>& is)
@@ -3966,58 +3956,6 @@ template <class Json>
 void swap(typename Json::key_value_pair_type & a, typename Json::key_value_pair_type & b)
 {
     a.swap(b);
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::make_2d_array(size_t m, size_t n)
-{
-    basic_json<CharT,JsonTraits,Allocator> a = basic_json<CharT,JsonTraits,Allocator>::array();
-    a.resize(m);
-    for (size_t i = 0; i < a.size(); ++i)
-    {
-        a[i] = basic_json<CharT,JsonTraits,Allocator>::make_array(n);
-    }
-    return a;
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-template<class T>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::make_2d_array(size_t m, size_t n, T val)
-{
-    basic_json<CharT,JsonTraits,Allocator> v;
-    v = val;
-    basic_json<CharT,JsonTraits,Allocator> a = make_array(m);
-    for (size_t i = 0; i < a.size(); ++i)
-    {
-        a[i] = basic_json<CharT,JsonTraits,Allocator>::make_array(n, v);
-    }
-    return a;
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::make_3d_array(size_t m, size_t n, size_t k)
-{
-    basic_json<CharT,JsonTraits,Allocator> a = basic_json<CharT,JsonTraits,Allocator>::array();
-    a.resize(m);
-    for (size_t i = 0; i < a.size(); ++i)
-    {
-        a[i] = basic_json<CharT,JsonTraits,Allocator>::make_2d_array(n, k);
-    }
-    return a;
-}
-
-template<class CharT,class JsonTraits,class Allocator>
-template<class T>
-basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::make_3d_array(size_t m, size_t n, size_t k, T val)
-{
-    basic_json<CharT,JsonTraits,Allocator> v;
-    v = val;
-    basic_json<CharT,JsonTraits,Allocator> a = make_array(m);
-    for (size_t i = 0; i < a.size(); ++i)
-    {
-        a[i] = basic_json<CharT,JsonTraits,Allocator>::make_2d_array(n, k, v);
-    }
-    return a;
 }
 
 template<class CharT,class JsonTraits,class Allocator>
