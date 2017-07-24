@@ -1,31 +1,8 @@
-# jsoncons: a C++ library for json construction
-
-jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. 
+jsoncons is modern C++, header-only library for constructing [JSON](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. 
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler.
 
 The [code repository](https://github.com/danielaparker/jsoncons) and [releases](https://github.com/danielaparker/jsoncons/releases) are on github. It is distributed under the [Boost Software License](http://www.boost.org/users/license.html)
-
-Features:
-
-- Uses the standard C++ input/output streams library
-- Supports conversion from and to the standard library sequence containers, associative containers, and std::tuple
-- Supports conversion from and to user defined types
-- Passes all tests from [JSON_checker](http://www.json.org/JSON_checker/) except `fail1.json`, which is allowed in [RFC7159](http://www.ietf.org/rfc/rfc7159.txt)
-- Returns the expected results for all tests from [JSONTestSuite](https://github.com/nst/JSONTestSuite)
-- Supports object members sorted alphabetically by name or in original order
-- Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
-- Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
-- Correctly handles surrogate pairs in \uXXXX escape sequences
-- Supports event based JSON parsing and serializing with user defined input and output handlers
-- Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */
-- Parses files with duplicate names but uses only the last entry
-- Supports optional escaping of the solidus (/) character
-- Supports Nan, Inf and -Inf replacement
-- Supports reading a sequence of JSON texts from a stream
-- Supports optional escaping of non-ascii UTF-8 octets
-- Supports conversion from and to user defined types
-- Handles JSON texts of arbitrarily large depth of nesting, a limit can be set if desired
 
 Extensions:
 
@@ -33,23 +10,11 @@ Extensions:
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
-## What's new on master
-
-- The _json and _ojson literal operators have been moved to the namespace `jsoncons::literals`.
-  Access to these literals now requires
-```c++
-    using namespace jsoncons::literals;    
-```
-- `json_type_traits` supports `std::pair` (convert to/from json array of size 2)
-- Added json array functions `emplace_back` and `emplace`, and json object functions `try_emplace`
-  and `insert_or_assign`, which are analagous to the standard library vector and map functions. 
-  See the [json](https://github.com/danielaparker/jsoncons/wiki/json) class documentation.
-
 ## Get jsoncons
 
-The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. The accompanying test suite uses boost, but not the library itself.
+Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Find the directory `jsoncons` under `src`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
-To install the jsoncons library, download the zip file, unpack the release, under `src` find the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
+Or, download the latest code on master.
 
 ## How to use it
 
