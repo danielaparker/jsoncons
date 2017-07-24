@@ -10,8 +10,8 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
 &#160;|add(size_t index, json&& val)|<em>&#x2713;</em>|Use add(array_iterator pos, json&& val)
 &#160;|remove_range(size_t from_index, size_t to_index)|<em>&#x2713;</em>|erase(array_iterator first, array_iterator last)
 &#160;|remove(const std::string& name)|<em>&#x2713;</em>|Use erase(const std::string& name)
-&#160;|parse(std::istream& is)|<em>&#x2713;</em>|Use parse_stream(std::istream& is)
-&#160;|parse(std::istream& is, parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse_stream(std::istream& is, parse_error_handler& err_handler)
+&#160;|parse_stream(std::istream& is)|<em>&#x2713;</em>|Use parse(std::istream& is)
+&#160;|parse_stream(std::istream& is, parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse(std::istream& is, parse_error_handler& err_handler)
 &#160;|as_int() const|<em>&#x2713;</em>|Use `as<int>`
 &#160;|as_uint() const|<em>&#x2713;</em>|Use `as<unsigned int>`
 &#160;|as_long() const|<em>&#x2713;</em>|Use `as<long>`
