@@ -1,5 +1,5 @@
-master
-------
+0.99.7.3
+--------
 
 - `json_type_traits` supports `std::pair` (convert to/from json array of size 2)
 
