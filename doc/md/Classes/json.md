@@ -35,19 +35,11 @@ Member type                         |Definition
 
 ### Static member functions
 
-    static json parse(string_view_type s)
-    static json parse(string_view_type s, 
-                      parse_error_handler& err_handler)
-Parses a string of JSON text and returns a json object or array value. 
-Throws [parse_error](parse_error) if parsing fails.
-
-    static json parse(std::istream& is)
-    static json parse(std::istream& is, 
-                      parse_error_handler& err_handler)
-Parses an input stream of JSON text and returns a json object or array value. 
-Throws [parse_error](parse_error) if parsing fails.
-
 <table border="0">
+  <tr>
+    <td><a href="json%20parse">parse</a></td>
+    <td>Parses JSON.</td> 
+  </tr>
   <tr>
     <td><a href="json%20make_array">make_array</a></td>
     <td>Makes a multidimensional json array.</td> 
