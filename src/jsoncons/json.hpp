@@ -923,7 +923,10 @@ public:
                 break;
             case value_type::small_string_t:
             case value_type::string_t:
-                return as_string_view() == rhs.as_string_view();
+                if (rhs_id == value_type::small_string_t || rhs_id == value_type::string_t)
+                {
+                    return as_string_view() == rhs.as_string_view();
+                }
                 break;
             default:
                 break;

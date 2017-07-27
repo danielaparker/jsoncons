@@ -141,6 +141,15 @@ BOOST_AUTO_TEST_CASE(test_empty_object_equal)
     BOOST_CHECK(json(json::object()) == json());
 }
 
+BOOST_AUTO_TEST_CASE(test_string_not_equals_empty_object)
+{
+    json o1("42");
+    json o2;
+
+    BOOST_CHECK(o1 != o2);
+    BOOST_CHECK(o2 != o1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
