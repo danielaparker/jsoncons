@@ -394,7 +394,7 @@ public:
             }
         }
         std::cout << "--- End Stack ---" << std::endl;
-        Json result = Json::array();
+        Json result = typename Json::array();
 
         if (stack_.size() > 0)
         {
