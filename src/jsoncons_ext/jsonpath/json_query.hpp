@@ -19,6 +19,8 @@
 
 namespace jsoncons { namespace jsonpath {
 
+enum class result_type {value,path};
+
 template<class CharT>
 bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* positive)
 {
@@ -77,7 +79,7 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
 }
 
 template<class Json>
-Json json_query(const Json& root, typename Json::string_view_type path)
+Json json_query(const Json& root, typename Json::string_view_type path, result_type type = result_type::value)
 {
     jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
     evaluator.evaluate(root,path.data(),path.length());
@@ -126,6 +128,7 @@ private:
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
     typedef std::vector<json_pointer> node_set;
+    typedef std::vector<std::string> path_node_set;
 
     static string_view_type length_literal() 
     {
@@ -353,9 +356,11 @@ private:
     bool undefined_end_;
     size_t step_;
     bool positive_step_;
-    std::vector<node_set> stack_;
     bool recursive_descent_;
-    std::vector<json_pointer> nodes_;
+    node_set nodes_;
+    std::vector<node_set> stack_;
+    path_node_set path_nodes_;
+    std::vector<path_node_set> path_stack_;
     std::vector<std::shared_ptr<Json>> temp_json_values_;
     size_t line_;
     size_t column_;
@@ -380,13 +385,22 @@ public:
 
     Json get_values() const
     {
-        Json result = Json::make_array();
+        std::cout << "--- Begin Stack ---" << std::endl;
+        for (const auto& s : stack_)
+        {
+            for (const auto& p : s)
+            {
+                std::cout << pretty_print(*p) << std::endl;
+            }
+        }
+        std::cout << "--- End Stack ---" << std::endl;
+        Json result = Json::array();
 
         if (stack_.size() > 0)
         {
-            for (size_t i = 0; i < stack_.back().size(); ++i)
+            result.reserve(stack_.back().size());
+            for (json_pointer p : stack_.back())
             {
-                json_pointer p = stack_.back()[i];
                 result.add(*p);
             }
         }
