@@ -946,7 +946,7 @@ public:
                     s.push_back('.');
                     s.push_back('[');
                     s.push_back('\'');
-                    s.append(it->name());
+                    s.append(it->key());
                     s.push_back('\'');
                     s.push_back(']');
                     nodes_.emplace_back(std::move(s),std::addressof(it->value()));
