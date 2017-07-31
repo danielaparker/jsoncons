@@ -79,6 +79,46 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
 }
 
 template<class Json>
+struct PathConstructor
+{
+    typedef typename Json::char_type char_type;
+    typedef typename Json::string_view_type string_view_type;
+    typedef typename Json::string_type string_type;
+
+    string_type operator()(const string_type& path, size_t index) const
+    {
+        char_type buf[255];
+        char_type* p = buf;
+        do
+        {
+            *p++ = static_cast<char_type>(48 + index % 10);
+        } while (index /= 10);
+
+        string_type s;
+        s.append(path);
+        s.push_back('[');
+        while (--p >= buf)
+        {
+            s.push_back(*p);
+        }
+        s.push_back(']');
+        return s;
+    }
+
+    string_type operator()(const string_type& path, string_view_type sv) const
+    {
+        string_type s;
+        s.append(path);
+        s.push_back('[');
+        s.push_back('\'');
+        s.append(sv);
+        s.push_back('\'');
+        s.push_back(']');
+        return s;
+    }
+};
+
+template<class Json>
 Json json_query(const Json& root, typename Json::string_view_type path, result_type type = result_type::value)
 {
     jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
@@ -134,7 +174,7 @@ private:
     typedef typename Json::string_view_type string_view_type;
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
-    typedef std::pair<std::string,json_pointer> node_type;
+    typedef std::pair<string_type,json_pointer> node_type;
     typedef std::vector<node_type> node_set;
 
     static string_view_type length_literal() 
@@ -149,7 +189,7 @@ private:
         virtual ~selector()
         {
         }
-        virtual void select(const string_type& path, json_reference& val, 
+        virtual void select(const string_type& path, json_reference val, 
                             node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
@@ -163,7 +203,7 @@ private:
         {
         }
 
-        void select(const string_type& path, json_reference& val, 
+        void select(const string_type& path, json_reference val, 
                     node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             auto index = result_.eval(val);
@@ -172,12 +212,7 @@ private:
                 size_t start = index. template as<size_t>();
                 if (val.is_array() && start < val.size())
                 {
-                    string_type s;
-                    s.append(path);
-                    s.push_back('[');
-                    s.append(std::to_string(start));
-                    s.push_back(']');
-                    nodes.emplace_back(std::move(s),std::addressof(val[start]));
+                    nodes.emplace_back(PathConstructor<Json>()(path,start),std::addressof(val[start]));
                 }
             }
             else if (index.is_string())
@@ -198,7 +233,7 @@ private:
         {
         }
 
-        void select(const string_type& path, json_reference& val, node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
+        void select(const string_type& path, json_reference val, node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
         {
             if (val.is_array())
             {
@@ -206,12 +241,7 @@ private:
                 {
                     if (result_.exists(val[i]))
                     {
-                        string_type s;
-                        s.append(path);
-                        s.push_back('[');
-                        s.append(std::to_string(i));
-                        s.push_back(']');
-                        nodes.emplace_back(std::move(s),std::addressof(val[i]));
+                        nodes.emplace_back(PathConstructor<Json>()(path,i),std::addressof(val[i]));
                     }
                 }
             }
@@ -236,20 +266,13 @@ private:
         {
         }
 
-        void select(const string_type& path, json_reference& val,
+        void select(const string_type& path, json_reference val,
             node_set& nodes,
             std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             if (val.is_object() && val.count(name_) > 0)
             {
-                string_type s;
-                s.append(path);
-                s.push_back('[');
-                s.push_back('\'');
-                s.append(name_);
-                s.push_back('\'');
-                s.push_back(']');
-                nodes.emplace_back(std::move(s),std::addressof(val.at(name_)));
+                nodes.emplace_back(PathConstructor<Json>()(path,name_),std::addressof(val.at(name_)));
             }
             else if (val.is_array())
             {
@@ -259,13 +282,14 @@ private:
                     size_t index = positive_start_ ? pos : val.size() - pos;
                     if (index < val.size())
                     {
-                        string_type s;
-                        s.append(path);
-                        s.push_back('[');
-                        s.append(std::to_string(index));
-                        s.push_back(']');
-                        nodes.emplace_back(std::move(s),std::addressof(val[index]));
+                        nodes.emplace_back(PathConstructor<Json>()(path,index),std::addressof(val[index]));
                     }
+                }
+                else if (name_ == length_literal() && val.size() > 0)
+                {
+                    auto temp = std::make_shared<Json>(val.size());
+                    temp_json_values.push_back(temp);
+                    nodes.emplace_back(PathConstructor<Json>()(path,name_),temp.get());
                 }
             }
             else if (val.is_string())
@@ -278,15 +302,17 @@ private:
                     auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
-                        string_type s;
-                        s.append(path);
-                        s.push_back('[');
-                        s.append(std::to_string(index));
-                        s.push_back(']');
                         auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
                         temp_json_values.push_back(temp);
-                        nodes.emplace_back(std::move(s),temp.get());
+                        nodes.emplace_back(PathConstructor<Json>()(path,index),temp.get());
                     }
+                }
+                else if (name_ == length_literal() && sv.size() > 0)
+                {
+                    size_t count = unicons::u32_length(sv.begin(),sv.end());
+                    auto temp = std::make_shared<Json>(count);
+                    temp_json_values.push_back(temp);
+                    nodes.emplace_back(PathConstructor<Json>()(path,name_),temp.get());
                 }
             }
         }
@@ -313,9 +339,10 @@ private:
         {
         }
 
-        void select(const string_type& path, json_reference& val,
-            node_set& nodes,
-            std::vector<std::shared_ptr<Json>>&) override
+        void select(const string_type& path, 
+                    json_reference val,
+                    node_set& nodes,
+                    std::vector<std::shared_ptr<Json>>&) override
         {
             if (positive_step_)
             {
@@ -327,7 +354,7 @@ private:
             }
         }
 
-        void end_array_slice1(const string_type& path, json_reference& val, node_set& nodes)
+        void end_array_slice1(const string_type& path, json_reference val, node_set& nodes)
         {
             if (val.is_array())
             {
@@ -345,13 +372,13 @@ private:
                 {
                     if (j < val.size())
                     {
-                        nodes.emplace_back(string_type{},std::addressof(val[j]));
+                        nodes.emplace_back(PathConstructor<Json>()(path,j),std::addressof(val[j]));
                     }
                 }
             }
         }
 
-        void end_array_slice2(const string_type& path, json_reference& val, node_set& nodes)
+        void end_array_slice2(const string_type& path, json_reference val, node_set& nodes)
         {
             if (val.is_array())
             {
@@ -372,7 +399,7 @@ private:
                     j -= step_;
                     if (j < val.size())
                     {
-                        nodes.emplace_back(string_type{},std::addressof(val[j]));
+                        nodes.emplace_back(PathConstructor<Json>()(path,j),std::addressof(val[j]));
                     }
                 }
             }
@@ -941,26 +968,14 @@ public:
             {
                 for (auto it = p->array_range().begin(); it != p->array_range().end(); ++it)
                 {
-                    string_type s;
-                    s.append(path);
-                    s.push_back('[');
-                    s.append(std::to_string(it - p->array_range().begin()));
-                    s.push_back(']');
-                    nodes_.emplace_back(std::move(s),std::addressof(*it));
+                    nodes_.emplace_back(PathConstructor<Json>()(path,it - p->array_range().begin()),std::addressof(*it));
                 }
             }
             else if (p->is_object())
             {
                 for (auto it = p->object_range().begin(); it != p->object_range().end(); ++it)
                 {
-                    string_type s;
-                    s.append(path);
-                    s.push_back('[');
-                    s.push_back('\'');
-                    s.append(it->key());
-                    s.push_back('\'');
-                    s.push_back(']');
-                    nodes_.emplace_back(std::move(s),std::addressof(it->value()));
+                    nodes_.emplace_back(PathConstructor<Json>()(path,it->key()),std::addressof(it->value()));
                 }
             }
 
@@ -974,29 +989,19 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                apply_unquoted_string(stack_.back()[i], name);
+                apply_unquoted_string(stack_.back()[i].first, *(stack_.back()[i].second), name);
             }
         }
         buffer_.clear();
     }
 
-    void apply_unquoted_string(node_type context, string_view_type name)
+    void apply_unquoted_string(const string_type& path, json_reference val, string_view_type name)
     {
-        const auto& path = context.first;
-        json_reference val = *(context.second);
-
         if (val.is_object())
         {
             if (val.count(name) > 0)
             {
-                string_type s;
-                s.append(path);
-                s.push_back('[');
-                s.push_back('\'');
-                s.append(name);
-                s.push_back('\'');
-                s.push_back(']');
-                nodes_.emplace_back(std::move(s),std::addressof(val.at(name)));
+                nodes_.emplace_back(PathConstructor<Json>()(path,name),std::addressof(val.at(name)));
             }
             if (recursive_descent_)
             {
@@ -1004,7 +1009,7 @@ public:
                 {
                     if (it->value().is_object() || it->value().is_array())
                     {
-                        apply_unquoted_string(std::make_pair(path,std::addressof(it->value())), name);
+                        apply_unquoted_string(path, it->value(), name);
                     }
                 }
             }
@@ -1017,24 +1022,14 @@ public:
                 size_t index = positive_start_ ? pos : val.size() - pos;
                 if (index < val.size())
                 {
-                    string_type s;
-                    s.append(path);
-                    s.push_back('[');
-                    s.append(std::to_string(index));
-                    s.push_back(']');
-                    nodes_.emplace_back(std::move(s),std::addressof(val[index]));
+                    nodes_.emplace_back(PathConstructor<Json>()(path,index),std::addressof(val[index]));
                 }
             }
             else if (name == length_literal() && val.size() > 0)
             {
                 auto temp = std::make_shared<Json>(val.size());
                 temp_json_values_.push_back(temp);
-                string_type s;
-                s.append(path);
-                s.push_back('[');
-                //s.append(val.size());
-                s.push_back(']');
-                nodes_.emplace_back(std::move(s),temp.get());
+                nodes_.emplace_back(PathConstructor<Json>()(path,name),temp.get());
             }
             if (recursive_descent_)
             {
@@ -1042,33 +1037,31 @@ public:
                 {
                     if (it->is_object() || it->is_array())
                     {
-                        apply_unquoted_string(std::make_pair(path,std::addressof(*it)), name);
+                        apply_unquoted_string(path, *it, name);
                     }
                 }
             }
         }
         else if (val.is_string())
         {
-            string_view_type s = val.as_string_view();
+            string_view_type sv = val.as_string_view();
             size_t pos = 0;
             if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
             {
-                auto sequence = unicons::sequence_at(s.data(), s.data() + s.size(), pos);
+                auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), pos);
                 if (sequence.length() > 0)
                 {
                     auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
                     temp_json_values_.push_back(temp);
-                    string_type str;
-                    nodes_.emplace_back(std::move(str),temp.get());
+                    nodes_.emplace_back(PathConstructor<Json>()(path,pos),temp.get());
                 }
             }
-            else if (name == length_literal() && s.size() > 0)
+            else if (name == length_literal() && sv.size() > 0)
             {
-                size_t count = unicons::u32_length(s.begin(),s.end());
+                size_t count = unicons::u32_length(sv.begin(),sv.end());
                 auto temp = std::make_shared<Json>(count);
                 temp_json_values_.push_back(temp);
-                string_type str;
-                nodes_.emplace_back(std::move(str),temp.get());
+                nodes_.emplace_back(PathConstructor<Json>()(path,name),temp.get());
             }
         }
     }
@@ -1085,7 +1078,7 @@ public:
         }
     }
 
-    void apply_selectors(const string_type& path, json_reference& val)
+    void apply_selectors(const string_type& path, json_reference val)
     {
         for (const auto& selector : selectors_)
         {

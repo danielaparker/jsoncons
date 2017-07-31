@@ -16,7 +16,8 @@ Vitaliy Gusev (reported error in json object operator[size_t i])
 Alex Merry (reported errors with "typename" keyword experienced with gcc and providing 
 fixes for 0.95.)
 
-Ignatov Serguei (reported issues experienced with gcc for 0.95 and 0.96 candidate and helped fix them)
+Ignatov Serguei (reported issues experienced with gcc for 0.95 and 
+0.96 candidate and helped fix them)
 
 Milan Burda for fix for clang build error
 
@@ -26,8 +27,12 @@ Tom Bass for assistance with clang build errors
 
 Andrey Alifanov and Amit Naik for failing test cases for JSON Path
 
-Yuri Plaksyuk for contributing an extension to JsonPath to allow filter expressions over a single object. 
+Yuri Plaksyuk for contributing an extension to JsonPath to allow filter 
+expressions over a single object. 
 
 Nikolay Amiantov for fixing compilation errors and warnings by GCC and 
 Clang, adding read support for std::array and, most appreciated,
 adding Travis CI configuration.
+
+jakalx contributed fix for operator== throws when comparing a string 
+against an empty object

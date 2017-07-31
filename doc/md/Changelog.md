@@ -1,3 +1,16 @@
+master
+------
+
+Bug fixes
+
+- Fixed operator== throws when comparing a string against an empty object
+- Fixed jsonpath issue with array 'length' (a.length worked but not a['length'])
+
+New features:
+
+- jsonpath `json_query` now supports returning normalized paths (with
+  optional return_type::path parameter)
+
 0.99.7.3
 --------
 

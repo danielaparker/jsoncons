@@ -94,11 +94,57 @@ const json expected = json::parse(R"(
     std::string path = "$.store.book.0.category[0,2]";
 
     json result = json_query(store,path,result_type::path);
-    std::cout << pretty_print(result) << std::endl;
     BOOST_CHECK_EQUAL(expected,result);
 
     //json result2 = json_query(store,path,result_type::value);
     //std::cout << pretty_print(result2) << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_array_length)
+{
+
+const json expected = json::parse(R"(
+[
+    "$['store']['book']['length']"
+]
+)");
+
+    std::string path = "$.store.book.length";
+    json result = json_query(store,path,result_type::path);
+    BOOST_CHECK_EQUAL(expected,result);
+
+    std::string path2 = "$.store.book['length']";
+    json result2 = json_query(store, path, result_type::path);
+    BOOST_CHECK_EQUAL(expected, result2);
+}
+
+BOOST_AUTO_TEST_CASE(test_price_filter)
+{
+
+const json expected = json::parse(R"(
+[
+    "$['store']['book'][0]['title']",
+    "$['store']['book'][2]['title']"
+]
+)");
+
+    std::string path = "$.store.book[?(@.price < 10)].title";
+    json result = json_query(store,path,result_type::path);
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_length_expression)
+{
+
+const json expected = json::parse(R"(
+[
+     "$['store']['book'][3]['title']"
+]
+)");
+
+    std::string path = "$.store.book[(@.length-1)].title";
+    json result = json_query(store,path,result_type::path);
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
