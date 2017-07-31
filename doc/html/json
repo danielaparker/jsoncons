@@ -543,20 +543,12 @@ vertical-align:1px;
 <td>A const <a href="http://en.cppreference.com/w/cpp/concept/RandomAccessIterator">RandomAccessIterator</a> to <code>const json</code></td>
 </tr></tbody></table>
 <h3>Static member functions</h3>
-<pre><code>static json parse(string_view_type s)
-static json parse(string_view_type s, 
-                  parse_error_handler&amp; err_handler)
-</code></pre>
-<p>Parses a string of JSON text and returns a json object or array value.<br>
-Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
-<pre><code>static json parse(std::istream&amp; is)
-static json parse(std::istream&amp; is, 
-                  parse_error_handler&amp; err_handler)
-</code></pre>
-<p>Parses an input stream of JSON text and returns a json object or array value.<br>
-Throws <a href="parse_error">parse_error</a> if parsing fails.</p>
 <table border="0">
   <tbody><tr>
+    <td><a href="json%20parse">parse</a></td>
+    <td>Parses JSON.</td> 
+  </tr>
+  <tr>
     <td><a href="json%20make_array">make_array</a></td>
     <td>Makes a multidimensional json array.</td> 
   </tr>
@@ -759,12 +751,8 @@ Throws <code>std::runtime_error</code> if not an object.</p>
     <td>Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists</td> 
   </tr>
   <tr>
-    <td><a href="json%20insert_or_assign">insert_or_assign</a></td>
+    <td><a href="json%20set">set</a></td>
     <td>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</td> 
-  </tr>
-  <tr>
-    <td>set</td>
-    <td>Same as insert_or_assign</td> 
   </tr>
 </tbody></table>
 <pre><code>void swap(json&amp; val)
