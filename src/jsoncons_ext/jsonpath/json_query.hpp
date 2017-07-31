@@ -83,7 +83,14 @@ Json json_query(const Json& root, typename Json::string_view_type path, result_t
 {
     jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
     evaluator.evaluate(root,path.data(),path.length());
-    return evaluator.get_values();
+    if (type == result_type::value)
+    {
+        return evaluator.get_values();
+    }
+    else
+    {
+        return evaluator.get_normalized_paths();
+    }
 }
 
 template<class Json, class T>
@@ -385,15 +392,6 @@ public:
 
     Json get_values() const
     {
-        std::cout << "--- Begin Stack ---" << std::endl;
-        for (const auto& s : stack_)
-        {
-            for (const auto& p : s)
-            {
-                std::cout << pretty_print(*p) << std::endl;
-            }
-        }
-        std::cout << "--- End Stack ---" << std::endl;
         Json result = typename Json::array();
 
         if (stack_.size() > 0)
@@ -402,6 +400,21 @@ public:
             for (json_pointer p : stack_.back())
             {
                 result.add(*p);
+            }
+        }
+        return result;
+    }
+
+    Json get_normalized_paths() const
+    {
+        Json result = typename Json::array();
+
+        if (path_stack_.size() > 0)
+        {
+            result.reserve(path_stack_.back().size());
+            for (const auto& p : path_stack_.back())
+            {
+                result.add(p);
             }
         }
         return result;
@@ -494,6 +507,13 @@ public:
                         node_set v;
                         v.push_back(std::addressof(root));
                         stack_.push_back(v);
+
+                        path_node_set u;
+                        string_type s;
+                        s.push_back('$');
+                        u.push_back(std::move(s));
+                        path_stack_.push_back(std::move(u));
+
                         state_ = jp_state::expect_dot_or_left_bracket;
                     }
                     break;
@@ -899,6 +919,16 @@ public:
             {
                 for (auto it = p->array_range().begin(); it != p->array_range().end(); ++it)
                 {
+                    string_type s;
+                    if (path_stack_.back().size() > i)
+                    {
+                        s.append(path_stack_.back()[i]);
+                    }
+                    s.push_back('.');
+                    s.push_back('[');
+                    s.append(std::to_string(it - p->array_range().begin()));
+                    s.push_back(']');
+                    path_nodes_.push_back(std::move(s));
                     nodes_.push_back(std::addressof(*it));
                 }
             }
@@ -906,6 +936,18 @@ public:
             {
                 for (auto it = p->object_range().begin(); it != p->object_range().end(); ++it)
                 {
+                    string_type s;
+                    if (path_stack_.back().size() > i)
+                    {
+                        s.append(path_stack_.back()[i]);
+                    }
+                    s.push_back('.');
+                    s.push_back('[');
+                    s.push_back('\'');
+                    s.append(it->name());
+                    s.push_back('\'');
+                    s.push_back(']');
+                    path_nodes_.push_back(std::move(s));
                     nodes_.push_back(std::addressof(it->value()));
                 }
             }
@@ -920,7 +962,7 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                apply_unquoted_string(*(stack_.back()[i]), name);
+                apply_unquoted_string(*(stack_.back()[i]), i, name);
             }
         }
         buffer_.clear();
@@ -932,6 +974,13 @@ public:
         {
             if (context.count(name) > 0)
             {
+                string_type s;
+                s.push_back('[');
+                s.push_back('\'');
+                s.append(name);
+                s.push_back('\'');
+                s.push_back(']');
+                path_nodes_.push_back(std::move(s));
                 nodes_.push_back(std::addressof(context.at(name)));
             }
             if (recursive_descent_)
@@ -953,6 +1002,11 @@ public:
                 size_t index = positive_start_ ? pos : context.size() - pos;
                 if (index < context.size())
                 {
+                    string_type s;
+                    s.push_back('[');
+                    s.append(std::to_string(index));
+                    s.push_back(']');
+                    path_nodes_.push_back(std::move(s));
                     nodes_.push_back(std::addressof(context[index]));
                 }
             }
@@ -960,6 +1014,7 @@ public:
             {
                 auto temp = std::make_shared<Json>(context.size());
                 temp_json_values_.push_back(temp);
+                path_nodes_.push_back(string_type{});
                 nodes_.push_back(temp.get());
             }
             if (recursive_descent_)
@@ -984,6 +1039,7 @@ public:
                 {
                     auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
                     temp_json_values_.push_back(temp);
+                    path_nodes_.push_back(string_type{});
                     nodes_.push_back(temp.get());
                 }
             }
@@ -992,6 +1048,104 @@ public:
                 size_t count = unicons::u32_length(s.begin(),s.end());
                 auto temp = std::make_shared<Json>(count);
                 temp_json_values_.push_back(temp);
+                path_nodes_.push_back(string_type{});
+                nodes_.push_back(temp.get());
+            }
+        }
+    }
+
+    void apply_unquoted_string(json_reference context, size_t i, string_view_type name)
+    {
+        if (context.is_object())
+        {
+            if (context.count(name) > 0)
+            {
+                string_type s;
+                if (path_stack_.back().size() > i)
+                {
+                    s.append(path_stack_.back()[i]);
+                    std::cout << path_stack_.back()[i] << std::endl;
+                }
+                s.push_back('.');
+                s.push_back('[');
+                s.push_back('\'');
+                s.append(name);
+                s.push_back('\'');
+                s.push_back(']');
+                path_nodes_.push_back(std::move(s));
+                nodes_.push_back(std::addressof(context.at(name)));
+            }
+            if (recursive_descent_)
+            {
+                for (auto it = context.object_range().begin(); it != context.object_range().end(); ++it)
+                {
+                    if (it->value().is_object() || it->value().is_array())
+                    {
+                        apply_unquoted_string(it->value(), name);
+                    }
+                }
+            }
+        }
+        else if (context.is_array())
+        {
+            size_t pos = 0;
+            if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
+            {
+                size_t index = positive_start_ ? pos : context.size() - pos;
+                if (index < context.size())
+                {
+                    string_type s;
+                    if (path_stack_.back().size() > i)
+                    {
+                        s.append(path_stack_.back()[i]);
+                    }
+                    s.push_back('.');
+                    s.push_back('[');
+                    s.append(std::to_string(index));
+                    s.push_back(']');
+                    path_nodes_.push_back(std::move(s));
+                    nodes_.push_back(std::addressof(context[index]));
+                }
+            }
+            else if (name == length_literal() && context.size() > 0)
+            {
+                auto temp = std::make_shared<Json>(context.size());
+                temp_json_values_.push_back(temp);
+                path_nodes_.push_back(string_type{});
+                nodes_.push_back(temp.get());
+            }
+            if (recursive_descent_)
+            {
+                for (auto it = context.array_range().begin(); it != context.array_range().end(); ++it)
+                {
+                    if (it->is_object() || it->is_array())
+                    {
+                        apply_unquoted_string(*it, name);
+                    }
+                }
+            }
+        }
+        else if (context.is_string())
+        {
+            string_view_type s = context.as_string_view();
+            size_t pos = 0;
+            if (try_string_to_index(name.data(),name.size(),&pos, &positive_start_))
+            {
+                auto sequence = unicons::sequence_at(s.data(), s.data() + s.size(), pos);
+                if (sequence.length() > 0)
+                {
+                    auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
+                    temp_json_values_.push_back(temp);
+                    path_nodes_.push_back(string_type{});
+                    nodes_.push_back(temp.get());
+                }
+            }
+            else if (name == length_literal() && s.size() > 0)
+            {
+                size_t count = unicons::u32_length(s.begin(),s.end());
+                auto temp = std::make_shared<Json>(count);
+                temp_json_values_.push_back(temp);
+                path_nodes_.push_back(string_type{});
                 nodes_.push_back(temp.get());
             }
         }
@@ -1003,9 +1157,40 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                apply_selectors(*(stack_.back()[i]));
+                apply_selectors(*(stack_.back()[i]),i);
             }
             selectors_.clear();
+        }
+    }
+
+    void apply_selectors(json_reference context, size_t i)
+    {
+        for (const auto& selector : selectors_)
+        {
+            selector->select(context,nodes_,temp_json_values_);
+        }
+        if (recursive_descent_)
+        {
+            if (context.is_object())
+            {
+                for (auto it = context.object_range().begin(); it != context.object_range().end(); ++it)
+                {
+                    if (it->value().is_object() || it->value().is_array())
+                    {
+                        apply_selectors(it->value());
+                    }
+                }
+            }
+            else if (context.is_array())
+            {
+                for (auto it = context.array_range().begin(); it != context.array_range().end(); ++it)
+                {
+                    if (it->is_object() || it->is_array())
+                    {
+                        apply_selectors(*it);
+                    }
+                }
+            }
         }
     }
 
@@ -1043,7 +1228,9 @@ public:
     void transfer_nodes()
     {
         stack_.push_back(nodes_);
+        path_stack_.push_back(path_nodes_);
         nodes_.clear();
+        path_nodes_.clear();
         recursive_descent_ = false;
     }
 
