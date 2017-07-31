@@ -68,20 +68,17 @@ const json store = json::parse(R"(
 
 BOOST_AUTO_TEST_CASE(test_normalized_paths)
 {
-//[
-//   "$['store']['book'][0]['category']"
-//]
+
+const json expected = json::parse(R"(
+[
+   "$['store']['book'][0]['category']"
+]
+)");
+
     std::string path = "$.store.book[0].category";
 
-    std::cout << path << std::endl;
-
-    json result1 = json_query(store,path,result_type::value);
-
-    std::cout << pretty_print(result1) << std::endl;
-
-    json result2 = json_query(store,"$.store.book[0].category",result_type::path);
-
-    std::cout << pretty_print(result2) << std::endl;
+    json result = json_query(store,"$.store.book[0].category",result_type::path);
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

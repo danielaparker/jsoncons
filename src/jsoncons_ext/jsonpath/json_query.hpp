@@ -174,7 +174,6 @@ private:
                 {
                     string_type s;
                     s.append(path);
-                    s.push_back('.');
                     s.push_back('[');
                     s.append(std::to_string(start));
                     s.push_back(']');
@@ -203,11 +202,16 @@ private:
         {
             if (val.is_array())
             {
-                for (json_reference element : val.array_range())
+                for (size_t i = 0; i < val.size(); ++i)
                 {
-                    if (result_.exists(element))
+                    if (result_.exists(val[i]))
                     {
-                        nodes.emplace_back(path,std::addressof(element));
+                        string_type s;
+                        s.append(path);
+                        s.push_back('[');
+                        s.append(std::to_string(i));
+                        s.push_back(']');
+                        nodes.emplace_back(std::move(s),std::addressof(val[i]));
                     }
                 }
             }
@@ -238,7 +242,14 @@ private:
         {
             if (val.is_object() && val.count(name_) > 0)
             {
-                nodes.emplace_back(path,std::addressof(val.at(name_)));
+                string_type s;
+                s.append(path);
+                s.push_back('[');
+                s.push_back('\'');
+                s.append(name_);
+                s.push_back('\'');
+                s.push_back(']');
+                nodes.emplace_back(std::move(s),std::addressof(val.at(name_)));
             }
             else if (val.is_array())
             {
@@ -248,7 +259,12 @@ private:
                     size_t index = positive_start_ ? pos : val.size() - pos;
                     if (index < val.size())
                     {
-                        nodes.emplace_back(path,std::addressof(val[index]));
+                        string_type s;
+                        s.append(path);
+                        s.push_back('[');
+                        s.append(std::to_string(index));
+                        s.push_back(']');
+                        nodes.emplace_back(std::move(s),std::addressof(val[index]));
                     }
                 }
             }
@@ -922,7 +938,6 @@ public:
                 {
                     string_type s;
                     s.append(path);
-                    s.push_back('.');
                     s.push_back('[');
                     s.append(std::to_string(it - p->array_range().begin()));
                     s.push_back(']');
@@ -935,7 +950,6 @@ public:
                 {
                     string_type s;
                     s.append(path);
-                    s.push_back('.');
                     s.push_back('[');
                     s.push_back('\'');
                     s.append(it->key());
@@ -972,7 +986,6 @@ public:
             {
                 string_type s;
                 s.append(path);
-                s.push_back('.');
                 s.push_back('[');
                 s.push_back('\'');
                 s.append(name);
@@ -1001,7 +1014,6 @@ public:
                 {
                     string_type s;
                     s.append(path);
-                    s.push_back('.');
                     s.push_back('[');
                     s.append(std::to_string(index));
                     s.push_back(']');
@@ -1014,7 +1026,6 @@ public:
                 temp_json_values_.push_back(temp);
                 string_type s;
                 s.append(path);
-                s.push_back('.');
                 s.push_back('[');
                 //s.append(val.size());
                 s.push_back(']');
