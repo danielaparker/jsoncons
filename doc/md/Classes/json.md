@@ -254,12 +254,8 @@ Requests the removal of unused capacity.
     <td>Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists</td> 
   </tr>
   <tr>
-    <td><a href="json%20insert_or_assign">insert_or_assign</a></td>
+    <td><a href="json%20set">set</a></td>
     <td>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</td> 
-  </tr>
-  <tr>
-    <td>set</td>
-    <td>Same as insert_or_assign</td> 
   </tr>
 </table>
 
