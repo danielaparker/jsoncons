@@ -119,11 +119,11 @@ struct PathConstructor
 };
 
 template<class Json>
-Json json_query(const Json& root, typename Json::string_view_type path, result_type type = result_type::value)
+Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value)
 {
     jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
     evaluator.evaluate(root,path.data(),path.length());
-    if (type == result_type::value)
+    if (result_t == result_type::value)
     {
         return evaluator.get_values();
     }

@@ -473,9 +473,27 @@ vertical-align:1px;
 <h3>Header</h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
 
+<span class="pl-k">enum</span> <span class="pl-k">class</span> <span class="pl-en">result_type</span> {value,path};
+
 <span class="pl-k">template</span>&lt;Json&gt;
 Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&amp; root, 
-                <span class="pl-k">typename</span> Json::string_view_type path);</pre></div>
+                <span class="pl-k">typename</span> Json::string_view_type path,
+                result_type <span class="pl-c1">result_t</span> = result_type::value);</pre></div>
+<h3>Parameters</h3>
+<table>
+  <tbody><tr>
+    <td>root</td>
+    <td>JSON value</td> 
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>JSONPath expression string</td> 
+  </tr>
+  <tr>
+    <td>result_t</td>
+    <td>Indicates whether results are matching values (the default) or normalized path expressions</td> 
+  </tr>
+</tbody></table>
 <p><a href="http://goessner.net/articles/JsonPath/">JsonPath</a> is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document.</p>
 <p>Stefan Goessner's javascript implemention returns <code>false</code> in case of no match, but in a note he suggests an alternative is to return an empty array. The <code>jsoncons</code> implementation takes that alternative and returns an empty array in case of no match.</p>
 <h3>Stefan Goessner's JsonPath</h3>
@@ -572,8 +590,8 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
 <td>Left and right</td>
 </tr>
 <tr>
-<td><code>||</code></td>
-<td>Left or right</td>
+<td>`</td>
+<td></td>
 </tr>
 <tr>
 <td><code>==</code></td>
@@ -600,8 +618,8 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
 <td>Left is greater than or equal to right</td>
 </tr>
 <tr>
-<td>'=<del>'    |Left matches regular expression [?(@.author =</del> /Evelyn.*?/)]</td>
-<td></td>
+<td>'=~'</td>
+<td>Left matches regular expression [?(@.author =~ /Evelyn.*?/)]</td>
 </tr></tbody></table>
 <p>Unary operators</p>
 <table>
@@ -669,8 +687,8 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
 </tr>
 <tr>
 <td>8</td>
-<td><code>||</code></td>
-<td>Left</td>
+<td>`</td>
+<td></td>
 </tr></tbody></table>
 <h3>Examples</h3>
 <p>The examples below use the JSON text from <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> (store.json).</p>
@@ -818,9 +836,9 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <td></td>
 </tr>
 <tr>
-<td><code>$.store.book[ ?((@.author == 'Nigel Rees') || (@.author == 'Evelyn Waugh')) ].title</code></td>
-<td>The titles of all books by Nigel Rees and Evelyn Waugh</td>
+<td>`$.store.book[ ?((@.author == 'Nigel Rees')</td>
 <td></td>
+<td>(@.author == 'Evelyn Waugh')) ].title`</td>
 </tr>
 <tr>
 <td><code>$.store.book[?(@.author =~ /Evelyn.*?/)]</code></td>

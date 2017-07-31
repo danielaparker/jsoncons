@@ -7,10 +7,30 @@ Returns a `json` array of `json` values selected from a root `json` structure.
 ```c++
 #include <jsoncons/jsonpath/json_query.hpp>
 
+enum class result_type {value,path};
+
 template<Json>
 Json json_query(const Json& root, 
-                typename Json::string_view_type path);
+                typename Json::string_view_type path,
+                result_type result_t = result_type::value);
 ```
+### Parameters
+
+<table>
+  <tr>
+    <td>root</td>
+    <td>JSON value</td> 
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>JSONPath expression string</td> 
+  </tr>
+  <tr>
+    <td>result_t</td>
+    <td>Indicates whether results are matching values (the default) or normalized path expressions</td> 
+  </tr>
+</table>
+
 [JsonPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 
 Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
