@@ -81,6 +81,26 @@ const json expected = json::parse(R"(
     BOOST_CHECK_EQUAL(expected,result);
 }
 
+BOOST_AUTO_TEST_CASE(test_string_index)
+{
+
+const json expected = json::parse(R"(
+[
+   "$['store']['book'][0]['category'][0]",
+   "$['store']['book'][0]['category'][2]"
+]
+)");
+
+    std::string path = "$.store.book.0.category[0,2]";
+
+    json result = json_query(store,path,result_type::path);
+    std::cout << pretty_print(result) << std::endl;
+    BOOST_CHECK_EQUAL(expected,result);
+
+    //json result2 = json_query(store,path,result_type::value);
+    //std::cout << pretty_print(result2) << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

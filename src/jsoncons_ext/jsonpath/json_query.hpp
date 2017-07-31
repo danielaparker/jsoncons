@@ -271,16 +271,21 @@ private:
             else if (val.is_string())
             {
                 size_t pos = 0;
-                string_view_type s = val.as_string_view();
+                string_view_type sv = val.as_string_view();
                 if (try_string_to_index(name_.data(), name_.size(), &pos, &positive_start_))
                 {
-                    size_t index = positive_start_ ? pos : s.size() - pos;
-                    auto sequence = unicons::sequence_at(s.data(), s.data() + s.size(), index);
+                    size_t index = positive_start_ ? pos : sv.size() - pos;
+                    auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
                     if (sequence.length() > 0)
                     {
+                        string_type s;
+                        s.append(path);
+                        s.push_back('[');
+                        s.append(std::to_string(index));
+                        s.push_back(']');
                         auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
                         temp_json_values.push_back(temp);
-                        nodes.emplace_back(path,temp.get());
+                        nodes.emplace_back(std::move(s),temp.get());
                     }
                 }
             }
