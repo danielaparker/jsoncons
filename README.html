@@ -813,7 +813,7 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 
     <span class="pl-c"><span class="pl-c">//</span> Normalized path expressions</span>
     json result2 = <span class="pl-c1">json_query</span>(booklist, <span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.author =~ /Evelyn.*?/)]<span class="pl-pds">"</span></span>, 
-                   result_type::path);
+                              result_type::path);
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; <span class="pl-c1">pretty_print</span>(result2) &lt;&lt; std::endl;
 
     <span class="pl-c"><span class="pl-c">//</span> Change the price of "Moby Dick"</span>

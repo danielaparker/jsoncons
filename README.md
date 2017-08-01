@@ -414,7 +414,7 @@ int main()
 
     // Normalized path expressions
     json result2 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", 
-                   result_type::path);
+                              result_type::path);
     std::cout << "(2)\n" << pretty_print(result2) << std::endl;
 
     // Change the price of "Moby Dick"
