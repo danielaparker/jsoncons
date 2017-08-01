@@ -288,7 +288,7 @@ public:
                 >::type* = nullptr>
     void add(T&& value)
     {
-        elements_.emplace_back(Json(std::forward<T>(value)));
+        elements_.emplace_back(std::forward<T>(value));
     }
 
     template <class T, class U=allocator_type,
@@ -306,14 +306,14 @@ public:
     add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
-        return elements_.emplace(it, Json(std::forward<T>(value)));
+        return elements_.emplace(it, std::forward<T>(value));
     }
 #else
     template <class T, class U=allocator_type>
         typename std::enable_if<is_stateless<U>::value,iterator>::type 
     add(const_iterator pos, T&& value)
     {
-        return elements_.emplace(pos, Json(std::forward<T>(value)));
+        return elements_.emplace(pos, std::forward<T>(value));
     }
 #endif
 
