@@ -47,6 +47,7 @@ Results for [JSONTestSuite](https://github.com/nst/JSONTestSuite) and [JSON_chec
 
 ```c++
 #include <iostream>
+#include <fstream>
 #include <jsoncons/json.hpp>
 
 // For convenience
