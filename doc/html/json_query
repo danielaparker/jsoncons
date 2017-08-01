@@ -497,9 +497,9 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
 <h3>Return value</h3>
 <p>Returns a <code>json</code> array containing either values or normalized path expressions matching the input path expression.<br>
 Returns an empty array if there is no match.</p>
+<h2>Stefan Goessner's JsonPath</h2>
 <p><a href="http://goessner.net/articles/JsonPath/">JsonPath</a> is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document.</p>
 <p>Stefan Goessner's javascript implemention returns <code>false</code> in case of no match, but in a note he suggests an alternative is to return an empty array. The <code>jsoncons</code> implementation takes that alternative and returns an empty array in case of no match.</p>
-<h3>Stefan Goessner's JsonPath</h3>
 <p>Unlike XML, the root of a JSON text is usually an anonymous object or array, so JSONPath identifies the outermost level of the text with the symbol $.</p>
 <p>JSONPath expressions can use the dot–notation</p>
 <pre><code>$.store.book.0.title

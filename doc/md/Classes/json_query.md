@@ -35,12 +35,12 @@ Json json_query(const Json& root,
 
 Returns a `json` array containing either values or normalized path expressions matching the input path expression. 
 Returns an empty array if there is no match.
+    
+## Stefan Goessner's JsonPath
 
 [JsonPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 
 Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
-    
-### Stefan Goessner's JsonPath
 
 Unlike XML, the root of a JSON text is usually an anonymous object or array, so JSONPath identifies the outermost level of the text with the symbol $.
 
@@ -88,7 +88,7 @@ Operator|       Description
 `+`     |Left plus right
 `-`     |Left minus right
 `&&`    |Left and right
-`||`    |Left or right
+&#124;&#124;    |Left or right
 `==`    |Left is equal to right 
 `!=`    |Left is not equal to right
 `<`     |Left is less than right
@@ -115,7 +115,7 @@ Precedence|Operator|Associativity
 5 |`<` `>` `<=` `>=`|Left 
 6 |`==` `!=`        |Left 
 7 |`&&`             |Left 
-8 |`||`             |Left 
+8 |&#124;&#124;             |Left 
 
 ## Examples
 

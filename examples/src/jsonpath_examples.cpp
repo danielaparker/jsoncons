@@ -38,6 +38,10 @@ void json_query_examples()
     // All authors and titles of books
     json result6 = json_query(booklist, "$['store']['book']..['author','title']");
     std::cout << "(6)\n" << pretty_print(result6) << std::endl;
+
+    // Normalized path expressions
+    json result7 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", result_type::path);
+    std::cout << "(7)\n" << pretty_print(result7) << std::endl;
 }
 
 void json_replace_example1()

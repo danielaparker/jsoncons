@@ -412,9 +412,14 @@ int main()
     json result1 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
     std::cout << "(1)\n" << pretty_print(result1) << std::endl;
 
+    // Normalized path expressions
+    json result2 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", 
+                   result_type::path);
+    std::cout << "(2)\n" << pretty_print(result2) << std::endl;
+
     // Change the price of "Moby Dick"
     json_replace(booklist,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
-    std::cout << "(2)\n" << pretty_print(booklist) << std::endl;
+    std::cout << "(3)\n" << pretty_print(booklist) << std::endl;
 
 }
 ```
@@ -430,6 +435,10 @@ Output:
     }
 ]
 (2)
+[
+    "$['store']['book'][1]"
+]
+(3)
 {
     "store": {
         "book": [
