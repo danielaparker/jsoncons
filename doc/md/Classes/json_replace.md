@@ -14,6 +14,22 @@ void json_replace(Json& root,
                   typename Json::string_view_type path, 
                   T&& new_value)
 ```
+### Parameters
+
+<table>
+  <tr>
+    <td>root</td>
+    <td>JSON value</td> 
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>JSONPath expression string</td> 
+  </tr>
+  <tr>
+    <td>new_value</td>
+    <td>The value to use as replacement</td> 
+  </tr>
+</table>
 
 ## Examples
 

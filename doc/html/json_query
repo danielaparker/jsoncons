@@ -469,7 +469,7 @@ vertical-align:1px;
 </head>
 <body>
 <div class="highlight highlight-source-c++"><pre>jsoncons::jsonpath::json_query</pre></div>
-<p>Returns a <code>json</code> array of <code>json</code> values selected from a root <code>json</code> structure.</p>
+<p>Returns a <code>json</code> array of values or normalized path expressions selected from a root <code>json</code> structure.</p>
 <h3>Header</h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
 
@@ -494,6 +494,9 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
     <td>Indicates whether results are matching values (the default) or normalized path expressions</td> 
   </tr>
 </tbody></table>
+<h3>Return value</h3>
+<p>Returns a <code>json</code> array containing either values or normalized path expressions matching the input path expression.<br>
+Returns an empty array if there is no match.</p>
 <p><a href="http://goessner.net/articles/JsonPath/">JsonPath</a> is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document.</p>
 <p>Stefan Goessner's javascript implemention returns <code>false</code> in case of no match, but in a note he suggests an alternative is to return an empty array. The <code>jsoncons</code> implementation takes that alternative and returns an empty array in case of no match.</p>
 <h3>Stefan Goessner's JsonPath</h3>
@@ -690,7 +693,7 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
 <td>`</td>
 <td></td>
 </tr></tbody></table>
-<h3>Examples</h3>
+<h2>Examples</h2>
 <p>The examples below use the JSON text from <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> (store.json).</p>
 <pre><code>{ "store": {
     "book": [ 
@@ -724,22 +727,24 @@ Json <span class="pl-en">json_query</span>(<span class="pl-k">const</span> Json&
   }
 }
 </code></pre>
+<h3>Return values</h3>
 <p>Our first example returns all authors whose books are cheaper than $10.</p>
-<pre><code>#include &lt;jsoncons/json.hpp&gt;
-#include &lt;jsoncons_ext/jsonpath/json_query.hpp&gt;
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/jsonpath/json_query.hpp<span class="pl-pds">&gt;</span></span>
 
-using namespace jsoncons;
-using namespace jsoncons::jsonpath;
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::jsonpath<span class="pl-k">;</span>
 
-json root = json::parse_file("store.json");
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    json root = <span class="pl-c1">json::parse_file</span>(<span class="pl-s"><span class="pl-pds">"</span>store.json<span class="pl-pds">"</span></span>);
 
-json result = json_query(root,"$.store.book[?(@.price &lt; 10)].author");
+    json result = <span class="pl-c1">json_query</span>(root,<span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.price &lt; 10)].author<span class="pl-pds">"</span></span>);
 
-std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
-</code></pre>
-<p>The result is</p>
-<pre><code>["Nigel Rees","Herman Melville"]
-</code></pre>
+    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(result) &lt;&lt; std::endl;
+}</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>[<span class="pl-s"><span class="pl-pds">"</span>Nigel Rees<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Herman Melville<span class="pl-pds">"</span></span>]</pre></div>
 <p>A list of sample JSON paths and results follows.</p>
 <table>
 <thead>
@@ -860,6 +865,22 @@ std::cout &lt;&lt; pretty_print(result) &lt;&lt; std::endl;
 <td>All authors and titles of books in the store</td>
 <td></td>
 </tr></tbody></table>
+<h3>Return normalized path expressions</h3>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::jsonpath<span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::string path = <span class="pl-s"><span class="pl-pds">"</span>$.store.book[?(@.price &lt; 10)].title<span class="pl-pds">"</span></span>;
+    json result = <span class="pl-c1">json_query</span>(store,path,result_type::path);
+
+    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(result) &lt;&lt; std::endl;
+}</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>[
+    <span class="pl-s"><span class="pl-pds">"</span>$['store']['book'][0]['title']<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>$['store']['book'][2]['title']<span class="pl-pds">"</span></span>
+]</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

@@ -476,6 +476,21 @@ vertical-align:1px;
 <span class="pl-k">void</span> <span class="pl-en">json_replace</span>(Json&amp; root, 
                   <span class="pl-k">typename</span> Json::string_view_type path, 
                   T&amp;&amp; new_value)</pre></div>
+<h3>Parameters</h3>
+<table>
+  <tbody><tr>
+    <td>root</td>
+    <td>JSON value</td> 
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>JSONPath expression string</td> 
+  </tr>
+  <tr>
+    <td>new_value</td>
+    <td>The value to use as replacement</td> 
+  </tr>
+</tbody></table>
 <h2>Examples</h2>
 <h3>Change the price of a book</h3>
 <p>Example file (store.json):</p>
