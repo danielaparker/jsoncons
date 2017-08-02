@@ -16,6 +16,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
+using namespace jsoncons::jsonpath::detail;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_filter_tests)
 

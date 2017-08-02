@@ -21,6 +21,33 @@ namespace jsoncons { namespace jsonpath {
 
 enum class result_type {value,path};
 
+template<class Json>
+Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value)
+{
+    if (result_t == result_type::value)
+    {
+        detail::jsonpath_evaluator<Json,const Json&,const Json*,detail::VoidPathConstructor<Json>> evaluator;
+        evaluator.evaluate(root,path.data(),path.length());
+        return evaluator.get_values();
+    }
+    else
+    {
+        detail::jsonpath_evaluator<Json,const Json&,const Json*,detail::PathConstructor<Json>> evaluator;
+        evaluator.evaluate(root,path.data(),path.length());
+        return evaluator.get_normalized_paths();
+    }
+}
+
+template<class Json, class T>
+void json_replace(Json& root, typename Json::string_view_type path, T&& new_value)
+{
+    detail::jsonpath_evaluator<Json,Json&,Json*,detail::VoidPathConstructor<Json>> evaluator;
+    evaluator.evaluate(root,path.data(),path.length());
+    evaluator.replace(std::forward<T>(new_value));
+}
+
+namespace detail {
+
 template<class CharT>
 bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* positive)
 {
@@ -78,69 +105,6 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
     }
 }
 
-template<class Json>
-struct PathConstructor
-{
-    typedef typename Json::char_type char_type;
-    typedef typename Json::string_view_type string_view_type;
-    typedef typename Json::string_type string_type;
-
-    string_type operator()(const string_type& path, size_t index) const
-    {
-        char_type buf[255];
-        char_type* p = buf;
-        do
-        {
-            *p++ = static_cast<char_type>(48 + index % 10);
-        } while (index /= 10);
-
-        string_type s;
-        s.append(path);
-        s.push_back('[');
-        while (--p >= buf)
-        {
-            s.push_back(*p);
-        }
-        s.push_back(']');
-        return s;
-    }
-
-    string_type operator()(const string_type& path, string_view_type sv) const
-    {
-        string_type s;
-        s.append(path);
-        s.push_back('[');
-        s.push_back('\'');
-        s.append(sv);
-        s.push_back('\'');
-        s.push_back(']');
-        return s;
-    }
-};
-
-template<class Json>
-Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value)
-{
-    jsonpath_evaluator<Json,const Json&,const Json*> evaluator;
-    evaluator.evaluate(root,path.data(),path.length());
-    if (result_t == result_type::value)
-    {
-        return evaluator.get_values();
-    }
-    else
-    {
-        return evaluator.get_normalized_paths();
-    }
-}
-
-template<class Json, class T>
-void json_replace(Json& root, typename Json::string_view_type path, T&& new_value)
-{
-    jsonpath_evaluator<Json,Json&,Json*> evaluator;
-    evaluator.evaluate(root,path.data(),path.length());
-    evaluator.replace(std::forward<T>(new_value));
-}
-
 enum class jp_state 
 {
     start,
@@ -163,7 +127,8 @@ enum class jp_state
 
 template<class Json,
          class JsonReference=const Json&,
-         class JsonPointer=const Json*>
+         class JsonPointer=const Json*,
+         class PathCons=PathConstructor<Json>>
 class jsonpath_evaluator : private basic_parsing_context<typename Json::char_type>
 {
 private:
@@ -212,7 +177,7 @@ private:
                 size_t start = index. template as<size_t>();
                 if (val.is_array() && start < val.size())
                 {
-                    nodes.emplace_back(PathConstructor<Json>()(path,start),std::addressof(val[start]));
+                    nodes.emplace_back(PathCons()(path,start),std::addressof(val[start]));
                 }
             }
             else if (index.is_string())
@@ -241,7 +206,7 @@ private:
                 {
                     if (result_.exists(val[i]))
                     {
-                        nodes.emplace_back(PathConstructor<Json>()(path,i),std::addressof(val[i]));
+                        nodes.emplace_back(PathCons()(path,i),std::addressof(val[i]));
                     }
                 }
             }
@@ -272,7 +237,7 @@ private:
         {
             if (val.is_object() && val.count(name_) > 0)
             {
-                nodes.emplace_back(PathConstructor<Json>()(path,name_),std::addressof(val.at(name_)));
+                nodes.emplace_back(PathCons()(path,name_),std::addressof(val.at(name_)));
             }
             else if (val.is_array())
             {
@@ -282,14 +247,14 @@ private:
                     size_t index = positive_start_ ? pos : val.size() - pos;
                     if (index < val.size())
                     {
-                        nodes.emplace_back(PathConstructor<Json>()(path,index),std::addressof(val[index]));
+                        nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
                     }
                 }
                 else if (name_ == length_literal() && val.size() > 0)
                 {
                     auto temp = std::make_shared<Json>(val.size());
                     temp_json_values.push_back(temp);
-                    nodes.emplace_back(PathConstructor<Json>()(path,name_),temp.get());
+                    nodes.emplace_back(PathCons()(path,name_),temp.get());
                 }
             }
             else if (val.is_string())
@@ -304,7 +269,7 @@ private:
                     {
                         auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
                         temp_json_values.push_back(temp);
-                        nodes.emplace_back(PathConstructor<Json>()(path,index),temp.get());
+                        nodes.emplace_back(PathCons()(path,index),temp.get());
                     }
                 }
                 else if (name_ == length_literal() && sv.size() > 0)
@@ -312,7 +277,7 @@ private:
                     size_t count = unicons::u32_length(sv.begin(),sv.end());
                     auto temp = std::make_shared<Json>(count);
                     temp_json_values.push_back(temp);
-                    nodes.emplace_back(PathConstructor<Json>()(path,name_),temp.get());
+                    nodes.emplace_back(PathCons()(path,name_),temp.get());
                 }
             }
         }
@@ -372,7 +337,7 @@ private:
                 {
                     if (j < val.size())
                     {
-                        nodes.emplace_back(PathConstructor<Json>()(path,j),std::addressof(val[j]));
+                        nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
                     }
                 }
             }
@@ -399,7 +364,7 @@ private:
                     j -= step_;
                     if (j < val.size())
                     {
-                        nodes.emplace_back(PathConstructor<Json>()(path,j),std::addressof(val[j]));
+                        nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
                     }
                 }
             }
@@ -968,14 +933,14 @@ public:
             {
                 for (auto it = p->array_range().begin(); it != p->array_range().end(); ++it)
                 {
-                    nodes_.emplace_back(PathConstructor<Json>()(path,it - p->array_range().begin()),std::addressof(*it));
+                    nodes_.emplace_back(PathCons()(path,it - p->array_range().begin()),std::addressof(*it));
                 }
             }
             else if (p->is_object())
             {
                 for (auto it = p->object_range().begin(); it != p->object_range().end(); ++it)
                 {
-                    nodes_.emplace_back(PathConstructor<Json>()(path,it->key()),std::addressof(it->value()));
+                    nodes_.emplace_back(PathCons()(path,it->key()),std::addressof(it->value()));
                 }
             }
 
@@ -1001,7 +966,7 @@ public:
         {
             if (val.count(name) > 0)
             {
-                nodes_.emplace_back(PathConstructor<Json>()(path,name),std::addressof(val.at(name)));
+                nodes_.emplace_back(PathCons()(path,name),std::addressof(val.at(name)));
             }
             if (recursive_descent_)
             {
@@ -1022,14 +987,14 @@ public:
                 size_t index = positive_start_ ? pos : val.size() - pos;
                 if (index < val.size())
                 {
-                    nodes_.emplace_back(PathConstructor<Json>()(path,index),std::addressof(val[index]));
+                    nodes_.emplace_back(PathCons()(path,index),std::addressof(val[index]));
                 }
             }
             else if (name == length_literal() && val.size() > 0)
             {
                 auto temp = std::make_shared<Json>(val.size());
                 temp_json_values_.push_back(temp);
-                nodes_.emplace_back(PathConstructor<Json>()(path,name),temp.get());
+                nodes_.emplace_back(PathCons()(path,name),temp.get());
             }
             if (recursive_descent_)
             {
@@ -1053,7 +1018,7 @@ public:
                 {
                     auto temp = std::make_shared<Json>(sequence.begin(),sequence.length());
                     temp_json_values_.push_back(temp);
-                    nodes_.emplace_back(PathConstructor<Json>()(path,pos),temp.get());
+                    nodes_.emplace_back(PathCons()(path,pos),temp.get());
                 }
             }
             else if (name == length_literal() && sv.size() > 0)
@@ -1061,7 +1026,7 @@ public:
                 size_t count = unicons::u32_length(sv.begin(),sv.end());
                 auto temp = std::make_shared<Json>(count);
                 temp_json_values_.push_back(temp);
-                nodes_.emplace_back(PathConstructor<Json>()(path,name),temp.get());
+                nodes_.emplace_back(PathCons()(path,name),temp.get());
             }
         }
     }
@@ -1132,6 +1097,8 @@ public:
     }
 
 };
+
+}
 
 }}
 
