@@ -491,6 +491,7 @@ vertical-align:1px;
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="#user-content-ext_msgpack">msgpack</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
+<p>Planned new features are listed on the <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a></p>
 <h2>Get jsoncons</h2>
 <p>Download the <a href="https://github.com/danielaparker/jsoncons/releases">latest release</a> and unpack the zip file. Find the directory <code>jsoncons</code> under <code>src</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
 <p>Or, download the latest code on <a href="https://github.com/danielaparker/jsoncons/archive/master.zip">master</a>.</p>
@@ -505,6 +506,7 @@ vertical-align:1px;
 Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and <a href="http://www.json.org/JSON_checker/">JSON_checker</a> tests may be found <a href="https://danielaparker.github.io/json_benchmarks/">here</a>.</p>
 <h2>A simple program using jsoncons</h2>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>fstream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-c"><span class="pl-c">//</span> For convenience</span>
@@ -603,7 +605,7 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 {
     json val = <span class="pl-c1">json::parse</span>(<span class="pl-s"><span class="pl-pds">"</span>[1,2,3,4,]<span class="pl-pds">"</span></span>);
 } 
-<span class="pl-k">catch</span>(<span class="pl-k">const</span> std::exception&amp; e) 
+<span class="pl-k">catch</span>(<span class="pl-k">const</span> parse_error&amp; e) 
 {
     std::cout &lt;&lt; e.<span class="pl-c1">what</span>() &lt;&lt; std::endl;
 }</pre></div>
@@ -683,7 +685,7 @@ std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
         [<span class="pl-c1">23.0</span>,<span class="pl-c1">24.0</span>]
     ]
 ]</pre></div>
-<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/Arrays">Arrays</a> for details</p>
+<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json-make_array">make_array</a> for details</p>
 <h3>Convert from and to standard library sequence containers</h3>
 <div class="highlight highlight-source-c++"><pre>std::vector&lt;<span class="pl-k">int</span>&gt; v{<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">4</span>};
 json <span class="pl-en">j</span>(v);

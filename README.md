@@ -156,7 +156,7 @@ try
 {
     json val = json::parse("[1,2,3,4,]");
 } 
-catch(const std::exception& e) 
+catch(const parse_error& e) 
 {
     std::cout << e.what() << std::endl;
 }
@@ -253,7 +253,7 @@ Output:
     ]
 ]
 ```
-See [Arrays](https://github.com/danielaparker/jsoncons/wiki/Arrays) for details
+See [make_array](https://github.com/danielaparker/jsoncons/wiki/json-make_array) for details
 
 ### Convert from and to standard library sequence containers
 
