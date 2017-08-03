@@ -1024,18 +1024,51 @@ public:
     }
 };
 
+
 template <class Json>
 class jsonpath_filter_parser
 {
     typedef typename Json::string_type string_type;
+    typedef typename Json::string_view_type string_view_type;
     typedef typename Json::char_type char_type;
 
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;
+
     size_t line_;
     size_t column_;
 
     static const operator_properties<Json> op_properties_[];
+
+    class functions
+    {
+        static string_view_type max_literal() 
+        {
+            static const char_type data[] = {'m','a','x'};
+            return string_view_type{data,sizeof(data)/sizeof(char_type)};
+        }
+
+        const std::map<string_type,std::function<Json(const term<Json>&)>> functions_ =
+        {
+            {
+                "max",[](const term<Json>& a) 
+                      {
+                          double v = (std::numeric_limits<int64_t>::min)(); 
+                          for (const auto& elem : a.array_range())
+                          {
+                              double x = elem.as<double>();
+                              if (x > v)
+                              {
+                                  x = v;
+                              }
+                          }
+                          return v;
+                      }
+            }
+        };
+    };
+
+    functions functions_;
 
 public:
     jsonpath_filter_parser()
@@ -1316,6 +1349,19 @@ public:
                         column_ = 1;
                         state = pre_line_break_state;
                         break;
+                    case '(':
+                    {
+                        auto it = functions_.find(buffer);
+                        if (it == functions_.end())
+                        {
+                            throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,line_,column_);
+                        }
+                        add_token(token<Json>(1, true, it->second));
+                        state = filter_state::expect_function_argument;
+                        ++p;
+                        ++column_;
+                        break;
+                    }
                     case '<':
                     case '>':
                     case '!':
