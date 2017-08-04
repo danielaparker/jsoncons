@@ -892,7 +892,7 @@ const json source = json::parse(R"(
     BOOST_CHECK(j["b"] == json(2));
     BOOST_CHECK(j["c"] == json(3));
 
-    std::cout << "(1)\n" << j << std::endl;
+    //std::cout << j << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_ojson_merge)
@@ -917,7 +917,7 @@ const ojson source = ojson::parse(R"(
     BOOST_CHECK(j["b"] == ojson(2));
     BOOST_CHECK(j["c"] == ojson(3));
 
-    std::cout << "(1)\n" << j << std::endl;
+    //std::cout << j << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
