@@ -257,6 +257,11 @@ Requests the removal of unused capacity.
     <td><a href="json%20set">set</a></td>
     <td>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</td> 
   </tr>
+  <tr>
+    <td><a href="json%20merge">merge</a></td>
+    <td>Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object, 
+then that member is not copied.</td> 
+  </tr>
 </table>
 
     void swap(json& val)

@@ -4,8 +4,8 @@ jsoncons::json::merge
 void merge(const json& source);
 ```
 
-Copies each element in source into *this. If there is an element in *this with key equivalent to the key of an element from source, 
-then that element is not copied. 
+Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object, 
+then that member is not copied. 
 
 ### Parameters
 
