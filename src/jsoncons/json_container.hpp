@@ -901,7 +901,7 @@ public:
         }
         else
         {
-            iterator pos = members_.begin() + (it - members_.begin());
+            iterator pos = this->members_.begin() + (it - this->members_.begin());
             it = this->members_.emplace(pos,
                                         key_storage_type(name.begin(),name.end()),
                                         std::forward<Args>(args)...);
@@ -930,7 +930,7 @@ public:
         }
         else
         {
-            iterator pos = members_.begin() + (it - members_.begin());
+            iterator pos = this->members_.begin() + (it - this->members_.begin());
             it = this->members_.emplace(pos,
                                         key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
@@ -966,7 +966,7 @@ public:
         }
         else
         {
-            iterator pos = members_.begin() + (it - members_.begin());
+            iterator pos = this->members_.begin() + (it - this->members_.begin());
             it = this->members_.emplace(pos,
                                         key_storage_type(name.begin(),name.end()),
                                         std::forward<Args>(args)...);
@@ -1001,7 +1001,7 @@ public:
         }
         else
         {
-            iterator pos = members_.begin() + (it - members_.begin());
+            iterator pos = this->members_.begin() + (it - this->members_.begin());
             it = this->members_.emplace(pos,
                                         key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
