@@ -806,17 +806,17 @@ public:
         this->members_.erase(this->members_.begin(),it.base());
     }
 
-    void merge(const json_object& o)
+    void merge(const json_object& source)
     {
-        for (auto it = o.begin(); it != o.end(); ++it)
+        for (auto it = source.begin(); it != source.end(); ++it)
         {
             try_emplace(it->key(),it->value(),get_allocator());
         }
     }
 
-    void merge(iterator hint, const json_object& o)
+    void merge(iterator hint, const json_object& source)
     {
-        for (auto it = o.begin(); it != o.end(); ++it)
+        for (auto it = source.begin(); it != source.end(); ++it)
         {
             try_emplace(hint, it->key(),it->value(),get_allocator());
         }
@@ -901,7 +901,8 @@ public:
         }
         else
         {
-            it = this->members_.emplace(it,
+            iterator pos = members_.begin() + (it - members_.begin());
+            it = this->members_.emplace(pos,
                                         key_storage_type(name.begin(),name.end()),
                                         std::forward<Args>(args)...);
             inserted = true;
@@ -929,7 +930,8 @@ public:
         }
         else
         {
-            it = this->members_.emplace(it,
+            iterator pos = members_.begin() + (it - members_.begin());
+            it = this->members_.emplace(pos,
                                         key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
             inserted = true;
@@ -964,7 +966,8 @@ public:
         }
         else
         {
-            it = this->members_.emplace(it,
+            iterator pos = members_.begin() + (it - members_.begin());
+            it = this->members_.emplace(pos,
                                         key_storage_type(name.begin(),name.end()),
                                         std::forward<Args>(args)...);
         }
@@ -998,7 +1001,8 @@ public:
         }
         else
         {
-            it = this->members_.emplace(it,
+            iterator pos = members_.begin() + (it - members_.begin());
+            it = this->members_.emplace(pos,
                                         key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
         }
@@ -1447,17 +1451,17 @@ public:
         return std::make_pair(it,inserted);
     }
 
-    void merge(const json_object& o)
+    void merge(const json_object& source)
     {
-        for (auto it = o.begin(); it != o.end(); ++it)
+        for (auto it = source.begin(); it != source.end(); ++it)
         {
             try_emplace(it->key(),it->value(),get_allocator());
         }
     }
 
-    void merge(iterator hint, const json_object& o)
+    void merge(iterator hint, const json_object& source)
     {
-        for (auto it = o.begin(); it != o.end(); ++it)
+        for (auto it = source.begin(); it != source.end(); ++it)
         {
             try_emplace(hint, it->key(),it->value(),get_allocator());
         }

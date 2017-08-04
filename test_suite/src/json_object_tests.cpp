@@ -872,50 +872,52 @@ BOOST_AUTO_TEST_CASE(test_set_override)
 
 BOOST_AUTO_TEST_CASE(test_json_merge)
 {
-json j1 = json::parse(R"(
+json j = json::parse(R"(
 {
     "a" : 1,
     "b" : 2
 }
 )");
 
-const json j2 = json::parse(R"(
+const json source = json::parse(R"(
 {
     "a" : 2,
     "c" : 3
 }
 )");
 
-    j1.merge(j2);
-    BOOST_CHECK(j1.size() == 3);
-    BOOST_CHECK(j1["a"] == json(1));
-    BOOST_CHECK(j1["b"] == json(2));
-    BOOST_CHECK(j1["c"] == json(3));
+    j.merge(source);
+    BOOST_CHECK(j.size() == 3);
+    BOOST_CHECK(j["a"] == json(1));
+    BOOST_CHECK(j["b"] == json(2));
+    BOOST_CHECK(j["c"] == json(3));
 
+    std::cout << "(1)\n" << j << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_ojson_merge)
 {
-ojson j1 = ojson::parse(R"(
+ojson j = ojson::parse(R"(
 {
     "a" : 1,
     "b" : 2
 }
 )");
 
-const ojson j2 = ojson::parse(R"(
+const ojson source = ojson::parse(R"(
 {
     "a" : 2,
     "c" : 3
 }
 )");
 
-    j1.merge(j2);
-    BOOST_CHECK(j1.size() == 3);
-    BOOST_CHECK(j1["a"] == ojson(1));
-    BOOST_CHECK(j1["b"] == ojson(2));
-    BOOST_CHECK(j1["c"] == ojson(3));
+    j.merge(source);
+    BOOST_CHECK(j.size() == 3);
+    BOOST_CHECK(j["a"] == ojson(1));
+    BOOST_CHECK(j["b"] == ojson(2));
+    BOOST_CHECK(j["c"] == ojson(3));
 
+    std::cout << "(1)\n" << j << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
