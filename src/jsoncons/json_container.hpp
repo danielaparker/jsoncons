@@ -808,9 +808,7 @@ public:
 
     // merge
 
-    template <class A=allocator_type>
-    typename std::enable_if<is_stateless<A>::value,void>::type 
-    merge(const json_object& source)
+    void merge(const json_object& source)
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
@@ -818,15 +816,16 @@ public:
         }
     }
 
-    template <class A=allocator_type>
-    typename std::enable_if<!is_stateless<A>::value,void>::type 
-    merge(iterator hint, const json_object& source)
+    void merge(iterator hint, const json_object& source)
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
-            try_emplace(hint, it->key(),it->value(),get_allocator());
+            try_emplace(hint, it->key(),it->value());
         }
     }
+
+    // insert_or_assign
+
     template <class T, class A=allocator_type>
     typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
     insert_or_assign(string_view_type name, T&& value)
@@ -1407,6 +1406,8 @@ public:
         this->members_.erase(it,this->members_.end());
     }
 
+    // insert_or_assign
+
     template <class T, class A=allocator_type>
     typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
     insert_or_assign(string_view_type name, T&& value)
@@ -1455,9 +1456,7 @@ public:
 
     // merge
 
-    template <class A=allocator_type>
-    typename std::enable_if<is_stateless<A>::value,void>::type 
-    merge(const json_object& source)
+    void merge(const json_object& source)
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
@@ -1465,13 +1464,11 @@ public:
         }
     }
 
-    template <class A=allocator_type>
-    typename std::enable_if<!is_stateless<A>::value,void>::type 
-    merge(iterator hint, const json_object& source)
+    void merge(iterator hint, const json_object& source)
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
-            try_emplace(hint, it->key(),it->value(),get_allocator());
+            try_emplace(hint, it->key(),it->value());
         }
     }
 
