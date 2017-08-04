@@ -806,15 +806,21 @@ public:
         this->members_.erase(this->members_.begin(),it.base());
     }
 
-    void merge(const json_object& source)
+    // merge
+
+    template <class A=allocator_type>
+    typename std::enable_if<is_stateless<A>::value,void>::type 
+    merge(const json_object& source)
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
-            try_emplace(it->key(),it->value(),get_allocator());
+            try_emplace(it->key(),it->value());
         }
     }
 
-    void merge(iterator hint, const json_object& source)
+    template <class A=allocator_type>
+    typename std::enable_if<!is_stateless<A>::value,void>::type 
+    merge(iterator hint, const json_object& source)
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
@@ -901,8 +907,7 @@ public:
         }
         else
         {
-            iterator pos = this->members_.begin() + (it - this->members_.begin());
-            it = this->members_.emplace(pos,
+            it = this->members_.emplace(it,
                                         key_storage_type(name.begin(),name.end()),
                                         std::forward<Args>(args)...);
             inserted = true;
@@ -930,8 +935,7 @@ public:
         }
         else
         {
-            iterator pos = this->members_.begin() + (it - this->members_.begin());
-            it = this->members_.emplace(pos,
+            it = this->members_.emplace(it,
                                         key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
             inserted = true;
@@ -966,8 +970,7 @@ public:
         }
         else
         {
-            iterator pos = this->members_.begin() + (it - this->members_.begin());
-            it = this->members_.emplace(pos,
+            it = this->members_.emplace(it,
                                         key_storage_type(name.begin(),name.end()),
                                         std::forward<Args>(args)...);
         }
@@ -1001,8 +1004,7 @@ public:
         }
         else
         {
-            iterator pos = this->members_.begin() + (it - this->members_.begin());
-            it = this->members_.emplace(pos,
+            it = this->members_.emplace(it,
                                         key_storage_type(name.begin(),name.end(), get_allocator()),
                                         std::forward<Args>(args)...);
         }
@@ -1451,15 +1453,21 @@ public:
         return std::make_pair(it,inserted);
     }
 
-    void merge(const json_object& source)
+    // merge
+
+    template <class A=allocator_type>
+    typename std::enable_if<is_stateless<A>::value,void>::type 
+    merge(const json_object& source)
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
-            try_emplace(it->key(),it->value(),get_allocator());
+            try_emplace(it->key(),it->value());
         }
     }
 
-    void merge(iterator hint, const json_object& source)
+    template <class A=allocator_type>
+    typename std::enable_if<!is_stateless<A>::value,void>::type 
+    merge(iterator hint, const json_object& source)
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
