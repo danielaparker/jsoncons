@@ -1693,6 +1693,20 @@ public:
             evaluate().erase(name);
         }
 
+        // merge
+
+        template <class T>
+        void merge(const json_type& j)
+        {
+            return evaluate().merge(j);
+        }
+
+        template <class T>
+        void merge(object_iterator hint, const json_type& j)
+        {
+            return evaluate().merge(hint, j);
+        }
+
        // set
 
         template <class T>
@@ -3312,6 +3326,40 @@ public:
         default:
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to call set on a value that is not an object");
+            }
+        }
+    }
+
+    // merge
+
+    void merge(const json_type& j)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().merge(j.object_value());
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge a value that is not an object");
+            }
+        }
+    }
+
+    void merge(object_iterator hint, const json_type& j)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().merge(hint, j.object_value());
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge a value that is not an object");
             }
         }
     }

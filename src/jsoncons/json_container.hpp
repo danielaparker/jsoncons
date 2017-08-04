@@ -806,6 +806,21 @@ public:
         this->members_.erase(this->members_.begin(),it.base());
     }
 
+    void merge(const json_object& o)
+    {
+        for (auto it = o.begin(); it != o.end(); ++it)
+        {
+            try_emplace(it->key(),it->value(),get_allocator());
+        }
+    }
+
+    void merge(iterator hint, const json_object& o)
+    {
+        for (auto it = o.begin(); it != o.end(); ++it)
+        {
+            try_emplace(hint, it->key(),it->value(),get_allocator());
+        }
+    }
     template <class T, class U=allocator_type>
     typename std::enable_if<is_stateless<U>::value,std::pair<iterator,bool>>::type
     insert_or_assign(string_view_type name, T&& value)
@@ -1000,7 +1015,7 @@ public:
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T>(value),get_allocator());
+            it->value(Json(std::forward<T>(value),get_allocator()));
         }
         else
         {
@@ -1364,6 +1379,22 @@ public:
             inserted = false; // assigned
         }
         return std::make_pair(it,inserted);
+    }
+
+    void merge(const json_object& o)
+    {
+        for (auto it = o.begin(); it != o.end(); ++it)
+        {
+            try_emplace(it->key(),it->value(),get_allocator());
+        }
+    }
+
+    void merge(iterator hint, const json_object& o)
+    {
+        for (auto it = o.begin(); it != o.end(); ++it)
+        {
+            try_emplace(hint, it->key(),it->value(),get_allocator());
+        }
     }
 
     template <class... Args>
