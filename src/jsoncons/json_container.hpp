@@ -1542,7 +1542,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::find_if(this->members_.begin(),this->members_.end(), 
-                                    [](const value_type& a){return a.key() == it->key();});
+                                    [it](const value_type& a){return a.key() == it->key();});
             if (pos == this->members_.end() )
             {
                 hint = this->members_.emplace(hint,*it);
