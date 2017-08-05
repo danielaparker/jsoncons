@@ -949,6 +949,7 @@ json j = json::parse(R"(
     "b" : [1,2,3]
 }
 )");
+    json j2 = j;
 
 json source = json::parse(R"(
 {
@@ -957,11 +958,23 @@ json source = json::parse(R"(
 }
 )");
 
+json expected = json::parse(R"(
+{
+    "a" : "1",
+    "b" : [1,2,3],
+    "c" : [4,5,6]
+}
+)");
+
+    json source2 = source;
+
     j.merge(std::move(source));
     BOOST_CHECK(j.size() == 3);
-    BOOST_CHECK(j["a"] == json("1"));
-    //BOOST_CHECK(j["b"] == json("2"));
-    //BOOST_CHECK(j["c"] == json("3"));
+    BOOST_CHECK_EQUAL(expected,j);
+
+    j2.merge(std::move(source2));
+    BOOST_CHECK(j2.size() == 3);
+    BOOST_CHECK_EQUAL(expected,j2);
 
     std::cout << source << std::endl;
 }
@@ -974,6 +987,7 @@ ojson j = ojson::parse(R"(
     "d" : [1,2,3]
 }
 )");
+ojson j2 = j;
 
 ojson source = ojson::parse(R"(
 {
@@ -982,36 +996,12 @@ ojson source = ojson::parse(R"(
 }
 )");
 
-    j.merge(std::move(source));
-    BOOST_CHECK(j.size() == 3);
-    BOOST_CHECK(j["a"] == ojson("1"));
-    //BOOST_CHECK(j["b"] == ojson("2"));
-    //BOOST_CHECK(j["c"] == ojson("3"));
-
-    std::cout << "(1)\n" << j << std::endl;
-    std::cout << "(2)\n" << source << std::endl;
-}
-
-BOOST_AUTO_TEST_CASE(test_ojson_merge_move_pos)
-{
-ojson j = ojson::parse(R"(
-{
-    "a" : "1",
-    "d" : [1,2,3]
-}
-)");
-
-ojson source = ojson::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+ojson source2 = source;
 
 ojson expected = ojson::parse(R"(
 {
-    "a" : "1",
     "d" : [1,2,3],
+    "a" : "1",
     "c" : [4,5,6]
 }
 )");
@@ -1019,6 +1009,10 @@ ojson expected = ojson::parse(R"(
     j.merge(std::move(source));
     BOOST_CHECK(j.size() == 3);
     BOOST_CHECK_EQUAL(expected,j);
+
+    j2.merge(j2.object_range().begin(),std::move(source2));
+    BOOST_CHECK(j2.size() == 3);
+    BOOST_CHECK_EQUAL(expected,j2);
 
     std::cout << "(1)\n" << j << std::endl;
     std::cout << "(2)\n" << source << std::endl;
