@@ -1701,7 +1701,11 @@ public:
             return evaluate().merge(source);
         }
 
-        template <class T>
+        void merge(json_type&& source)
+        {
+            return evaluate().merge(std::forward<T>(source));
+        }
+
         void merge(object_iterator hint, const json_type& source)
         {
             return evaluate().merge(hint, source);
@@ -3341,6 +3345,22 @@ public:
             // FALLTHRU
         case value_type::object_t:
             return object_value().merge(source.object_value());
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge a value that is not an object");
+            }
+        }
+    }
+
+    void merge(json_type&& source)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().merge(std::move(source.object_value()));
         default:
             {
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge a value that is not an object");
