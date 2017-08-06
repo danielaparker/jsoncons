@@ -253,7 +253,7 @@ Output:
     ]
 ]
 ```
-See [make_array](https://github.com/danielaparker/jsoncons/wiki/json-make_array) for details
+See [json::make_array](https://github.com/danielaparker/jsoncons/wiki/json-make_array) for details
 
 ### Merge key-value pairs from another json object
 ```c++
@@ -282,7 +282,8 @@ Output:
     "c": [4,5,6]
 }
 ```
-See [json::merge](https://github.com/danielaparker/jsoncons/wiki/json%20merge) for details.
+See [json::merge](https://github.com/danielaparker/jsoncons/wiki/json%20merge) 
+and [json::merge_or_update](https://github.com/danielaparker/jsoncons/wiki/json%20merge_or_update) for details.
 
 ### Convert from and to standard library sequence containers
 

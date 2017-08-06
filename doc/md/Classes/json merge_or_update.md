@@ -1,28 +1,27 @@
 ```c++
-jsoncons::json::merge
+jsoncons::json::merge_or_update
 ```
 
 <table>
   <tr>
-    <td><code>void merge(const json& source)</code></td>
+    <td><code>void merge_or_update(const json& source)</code></td>
     <td>(1)</td> 
   </tr>
   <tr>
-    <td><code>void merge(json&& source)</code></td>
+    <td><code>void merge_or_update(json&& source)</code></td>
     <td>(2)</td> 
   </tr>
   <tr>
-    <td><code>void merge(object_iterator hint, const json& source)</code></td>
+    <td><code>void merge_or_update(object_iterator hint, const json& source)</code></td>
     <td>(3)</td> 
   </tr>
   <tr>
-    <td><code>void merge(object_iterator hint, json&& source)</code></td>
+    <td><code>void merge_or_update(object_iterator hint, json&& source)</code></td>
     <td>(4)</td> 
   </tr>
 </table>
 
-Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object, 
-then that member is not copied. 
+Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.
 
 ### Parameters
 
@@ -43,7 +42,7 @@ Throws `std::runtime_error` if source or *this are not json objects.
 
 ## Examples
 
-### Merge `json`
+### Merge or update `json`
 
 ```c++
 json j = json::parse(R"(
@@ -60,13 +59,13 @@ const json source = json::parse(R"(
 }
 )");
 
-j1.merge(source);
+j1.merge_or_update(source);
 
 std::cout << j << endl;
 ```
 Output:
 
 ```json
-{"a":1,"b":2,"c":3}
+{"a":2,"b":2,"c":3}
 ```
 
