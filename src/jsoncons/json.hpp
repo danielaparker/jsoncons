@@ -1695,7 +1695,6 @@ public:
 
         // merge
 
-        template <class T>
         void merge(const json_type& source)
         {
             return evaluate().merge(source);
@@ -1703,7 +1702,7 @@ public:
 
         void merge(json_type&& source)
         {
-            return evaluate().merge(std::forward<T>(source));
+            return evaluate().merge(std::forward<json_type>(source));
         }
 
         void merge(object_iterator hint, const json_type& source)
