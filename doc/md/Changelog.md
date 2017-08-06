@@ -9,10 +9,13 @@ Bug fixes
 New features:
 
 - jsonpath `json_query` now supports returning normalized paths (with
-  optional return_type::path parameter)
+  optional `return_type::path` parameter)
 
-- Added json::merge function for copying key-value pairs from source json object 
-  into json object 
+- New `json::merge` function that inserts another json object's key-value pairs 
+  into a json object, if they don't already exist.
+
+- New `json::merge_or_update` function that inserts another json object's key-value 
+  pairs into a json object, or assigns them if they already exist.
 
 0.99.7.3
 --------
