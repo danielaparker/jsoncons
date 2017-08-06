@@ -282,6 +282,7 @@ Output:
     "c": [4,5,6]
 }
 ```
+See [json::merge](https://github.com/danielaparker/jsoncons/wiki/json%20merge) for details.
 
 ### Convert from and to standard library sequence containers
 
