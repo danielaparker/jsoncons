@@ -259,8 +259,7 @@ Requests the removal of unused capacity.
   </tr>
   <tr>
     <td><a href="json%20merge">merge</a></td>
-    <td>Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object, 
-then that member is not copied.</td> 
+    <td>Merges another json object's key-value pairs into a json object, if it does doesn't already contain an element with an equivalent key.
   </tr>
 </table>
 
