@@ -10,4 +10,4 @@ The `wjson_serializer` class is an instantiation of the `basic_json_serializer` 
 
 ### Interface
 
-The interface is the same as [json_serializer](json_serializer), substituting wide character instantiations of classes - `std::wstring`, etc. - for narrow character ones.
+The interface is the same as [json_serializer](json_serializer), substituting wide character instantiations of classes - `std::wstring`, etc. - for utf8 character ones.

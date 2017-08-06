@@ -8,7 +8,7 @@ Features:
 - Supports conversion from and to the standard library sequence containers, associative containers, std::pair, and std::tuple
 - Supports conversion from and to user defined types
 - Supports object members sorted alphabetically by name or in original order
-- Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
+- Implements parsing and serializing JSON text in UTF-8 for utf8 character strings and streams
 - Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
 - Supports event based JSON parsing and serializing with user defined input and output handlers
 - Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */
@@ -139,9 +139,9 @@ typedef basic_json<char,
 ```
 The library includes four instantiations of `basic_json`:
 
-- [json](https://github.com/danielaparker/jsoncons/wiki/json) constructs a narrow character json value that sorts name-value members alphabetically
+- [json](https://github.com/danielaparker/jsoncons/wiki/json) constructs a utf8 character json value that sorts name-value members alphabetically
 
-- [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) constructs a narrow character json value that preserves the original name-value insertion order
+- [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) constructs a utf8 character json value that preserves the original name-value insertion order
 
 - [wjson](https://github.com/danielaparker/jsoncons/wiki/wjson) constructs a wide character json value that sorts name-value members alphabetically
 
@@ -254,6 +254,35 @@ Output:
 ]
 ```
 See [make_array](https://github.com/danielaparker/jsoncons/wiki/json-make_array) for details
+
+### Merge key-value pairs from another json object
+```c++
+json j = json::parse(R"(
+{
+    "a" : "1",
+    "b" : [1,2,3]
+}
+)");
+
+json source = json::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+j.merge(std::move(source));
+std::cout << pretty_print(j) << std::endl;
+```
+Output:
+```json
+{
+    "a": "1",
+    "b": [1,2,3],
+    "c": [4,5,6]
+}
+```
+See [json::merge](https://github.com/danielaparker/jsoncons/wiki/json%20merge) for details.
 
 ### Convert from and to standard library sequence containers
 

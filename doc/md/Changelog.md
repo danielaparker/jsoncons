@@ -11,6 +11,9 @@ New features:
 - jsonpath `json_query` now supports returning normalized paths (with
   optional return_type::path parameter)
 
+- Added json::merge function for copying key-value pairs from source json object 
+  into json object 
+
 0.99.7.3
 --------
 
