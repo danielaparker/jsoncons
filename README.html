@@ -686,6 +686,29 @@ std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
     ]
 ]</pre></div>
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json-make_array">make_array</a> for details</p>
+<h3>Merge key-value pairs from another json object</h3>
+<div class="highlight highlight-source-c++"><pre>json j = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "a" : "1",</span>
+<span class="pl-s">    "b" : [1,2,3]</span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
+
+json source = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "a" : "2",</span>
+<span class="pl-s">    "c" : [4,5,6]</span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>);
+
+j.merge(std::move(source));
+std::cout &lt;&lt; pretty_print(j) &lt;&lt; std::endl;</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>],
+    <span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>: [<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>]
+}</pre></div>
 <h3>Convert from and to standard library sequence containers</h3>
 <div class="highlight highlight-source-c++"><pre>std::vector&lt;<span class="pl-k">int</span>&gt; v{<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">4</span>};
 json <span class="pl-en">j</span>(v);

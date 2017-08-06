@@ -255,6 +255,34 @@ Output:
 ```
 See [make_array](https://github.com/danielaparker/jsoncons/wiki/json-make_array) for details
 
+### Merge key-value pairs from another json object
+```c++
+json j = json::parse(R"(
+{
+    "a" : "1",
+    "b" : [1,2,3]
+}
+)");
+
+json source = json::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+j.merge(std::move(source));
+std::cout << pretty_print(j) << std::endl;
+```
+Output:
+```json
+{
+    "a": "1",
+    "b": [1,2,3],
+    "c": [4,5,6]
+}
+```
+
 ### Convert from and to standard library sequence containers
 
 ```c++

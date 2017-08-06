@@ -13,7 +13,7 @@
 using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_object_tests)
-#if 0
+
 BOOST_AUTO_TEST_CASE(test_last_wins_unique_sequence_1)
 {
     std::vector<std::string> u = {"a","c","a"};
@@ -905,7 +905,6 @@ const json expected = json::parse(R"(
 
     //std::cout << j << std::endl;
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(test_ojson_merge)
 {
@@ -971,12 +970,13 @@ json expected = json::parse(R"(
     j.merge(std::move(source));
     BOOST_CHECK(j.size() == 3);
     BOOST_CHECK_EQUAL(expected,j);
+    std::cout << pretty_print(j) << std::endl;
 
     j2.merge(std::move(source2));
     BOOST_CHECK(j2.size() == 3);
     BOOST_CHECK_EQUAL(expected,j2);
 
-    std::cout << source << std::endl;
+    //std::cout << source << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_ojson_merge_move)
@@ -1014,8 +1014,8 @@ ojson expected = ojson::parse(R"(
     BOOST_CHECK(j2.size() == 3);
     BOOST_CHECK_EQUAL(expected,j2);
 
-    std::cout << "(1)\n" << j << std::endl;
-    std::cout << "(2)\n" << source << std::endl;
+    //std::cout << "(1)\n" << j << std::endl;
+    //std::cout << "(2)\n" << source << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
