@@ -1710,6 +1710,33 @@ public:
             return evaluate().merge(hint, source);
         }
 
+        void merge(object_iterator hint, json_type&& source)
+        {
+            return evaluate().merge(hint, std::forward<json_type>(source));
+        }
+
+        // merge_or_update
+
+        void merge_or_update(const json_type& source)
+        {
+            return evaluate().merge_or_update(source);
+        }
+
+        void merge_or_update(json_type&& source)
+        {
+            return evaluate().merge_or_update(std::forward<json_type>(source));
+        }
+
+        void merge_or_update(object_iterator hint, const json_type& source)
+        {
+            return evaluate().merge_or_update(hint, source);
+        }
+
+        void merge_or_update(object_iterator hint, json_type&& source)
+        {
+            return evaluate().merge_or_update(hint, std::forward<json_type>(source));
+        }
+
        // set
 
         template <class T>
@@ -3382,6 +3409,90 @@ public:
             }
         }
     }
+
+    void merge(object_iterator hint, json_type&& source)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().merge(hint, std::move(source.object_value()));
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge a value that is not an object");
+            }
+        }
+    }
+
+    // merge_or_update
+
+    void merge_or_update(const json_type& source)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().merge_or_update(source.object_value());
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge_or_update a value that is not an object");
+            }
+        }
+    }
+
+    void merge_or_update(json_type&& source)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().merge_or_update(std::move(source.object_value()));
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge_or_update a value that is not an object");
+            }
+        }
+    }
+
+    void merge_or_update(object_iterator hint, const json_type& source)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().merge_or_update(hint, source.object_value());
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge_or_update a value that is not an object");
+            }
+        }
+    }
+
+    void merge_or_update(object_iterator hint, json_type&& source)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            create_object_implicitly();
+            // FALLTHRU
+        case value_type::object_t:
+            return object_value().merge_or_update(hint, std::move(source.object_value()));
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to merge_or_update a value that is not an object");
+            }
+        }
+    }
+
+    // set
 
     template <class T>
     object_iterator set(object_iterator hint, string_view_type name, T&& value)
