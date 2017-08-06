@@ -756,9 +756,12 @@ Throws <code>std::runtime_error</code> if not an object.</p>
   </tr>
   <tr>
     <td><a href="json%20merge">merge</a></td>
-    <td>Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object, 
-then that member is not copied.</td> 
-  </tr>
+    <td>Inserts another json object's key-value pairs into a json object, if they don't already exist.
+  </td></tr>
+  <tr>
+    <td><a href="json%20merge_or_update">merge_or_update</a></td>
+    <td>Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.
+  </td></tr>
 </tbody></table>
 <pre><code>void swap(json&amp; val)
 </code></pre>

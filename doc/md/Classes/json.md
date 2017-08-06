@@ -259,7 +259,11 @@ Requests the removal of unused capacity.
   </tr>
   <tr>
     <td><a href="json%20merge">merge</a></td>
-    <td>Merges another json object's key-value pairs into a json object, if it does doesn't already contain an element with an equivalent key.
+    <td>Inserts another json object's key-value pairs into a json object, if they don't already exist.
+  </tr>
+  <tr>
+    <td><a href="json%20merge_or_update">merge_or_update</a></td>
+    <td>Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.
   </tr>
 </table>
 

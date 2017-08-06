@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>json merge</title>
+<title>json merge_or_update</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,27 +468,26 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::json::merge</pre></div>
+<div class="highlight highlight-source-c++"><pre>jsoncons::json::merge_or_update</pre></div>
 <table>
   <tbody><tr>
-    <td><code>void merge(const json&amp; source)</code></td>
+    <td><code>void merge_or_update(const json&amp; source)</code></td>
     <td>(1)</td> 
   </tr>
   <tr>
-    <td><code>void merge(json&amp;&amp; source)</code></td>
+    <td><code>void merge_or_update(json&amp;&amp; source)</code></td>
     <td>(2)</td> 
   </tr>
   <tr>
-    <td><code>void merge(object_iterator hint, const json&amp; source)</code></td>
+    <td><code>void merge_or_update(object_iterator hint, const json&amp; source)</code></td>
     <td>(3)</td> 
   </tr>
   <tr>
-    <td><code>void merge(object_iterator hint, json&amp;&amp; source)</code></td>
+    <td><code>void merge_or_update(object_iterator hint, json&amp;&amp; source)</code></td>
     <td>(4)</td> 
   </tr>
 </tbody></table>
-<p>Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object,<br>
-then that member is not copied.</p>
+<p>Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.</p>
 <h3>Parameters</h3>
 <table>
   <tbody><tr>
@@ -501,7 +500,7 @@ then that member is not copied.</p>
 <h3>Exceptions</h3>
 <p>Throws <code>std::runtime_error</code> if source or *this are not json objects.</p>
 <h2>Examples</h2>
-<h3>Merge <code>json</code></h3>
+<h3>Merge or update <code>json</code></h3>
 <div class="highlight highlight-source-c++"><pre>json j = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
 <span class="pl-s">    "a" : 1,</span>
@@ -516,11 +515,11 @@ then that member is not copied.</p>
 <span class="pl-s">}</span>
 <span class="pl-s"><span class="pl-pds">)"</span></span>);
 
-j1.merge(source);
+j1.merge_or_update(source);
 
 std::cout &lt;&lt; j &lt;&lt; endl;</pre></div>
 <p>Output:</p>
-<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>}</pre></div>
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>}</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
