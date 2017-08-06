@@ -13,4 +13,4 @@ The wserialization_options class is an instantiation of the basic_serialization_
 
 ### Interface
 
-The interface is the same as [serialization_options](serialization_options), substituting wide character instantiations of classes - `std::wstring`, etc. - for narrow character ones.
+The interface is the same as [serialization_options](serialization_options), substituting wide character instantiations of classes - `std::wstring`, etc. - for utf8 character ones.

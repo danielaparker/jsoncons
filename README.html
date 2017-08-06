@@ -476,7 +476,7 @@ vertical-align:1px;
 <li>Supports conversion from and to the standard library sequence containers, associative containers, std::pair, and std::tuple</li>
 <li>Supports conversion from and to user defined types</li>
 <li>Supports object members sorted alphabetically by name or in original order</li>
-<li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li>
+<li>Implements parsing and serializing JSON text in UTF-8 for utf8 character strings and streams</li>
 <li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
 <li>Supports event based JSON parsing and serializing with user defined input and output handlers</li>
 <li>Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */</li>
@@ -587,10 +587,10 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <p>The library includes four instantiations of <code>basic_json</code>:</p>
 <ul>
 <li>
-<p><a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> constructs a narrow character json value that sorts name-value members alphabetically</p>
+<p><a href="https://github.com/danielaparker/jsoncons/wiki/json">json</a> constructs a utf8 character json value that sorts name-value members alphabetically</p>
 </li>
 <li>
-<p><a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> constructs a narrow character json value that preserves the original name-value insertion order</p>
+<p><a href="https://github.com/danielaparker/jsoncons/wiki/ojson">ojson</a> constructs a utf8 character json value that preserves the original name-value insertion order</p>
 </li>
 <li>
 <p><a href="https://github.com/danielaparker/jsoncons/wiki/wjson">wjson</a> constructs a wide character json value that sorts name-value members alphabetically</p>

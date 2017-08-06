@@ -10,5 +10,5 @@ The `wjson_reader` class is an instantiation of the `basic_json_reader` class te
 
 ### Interface
 
-The interface is the same as [json_reader](json_reader), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for narrow character ones.
+The interface is the same as [json_reader](json_reader), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for utf8 character ones.
 

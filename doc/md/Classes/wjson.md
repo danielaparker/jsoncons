@@ -15,13 +15,13 @@ The `jsoncons` library will always rebind the supplied allocator from the templa
 ```
 ### Interface
 
-The interface is the same as [json](json), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for narrow character ones.
+The interface is the same as [json](json), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for utf8 character ones.
 
 ### See also
 
 - [wojson](wojson) constructs a wide character json value that preserves the original insertion order of an object's name/value pairs
 
-- [json](json) constructs a narrow character json value that sorts name-value members alphabetically
+- [json](json) constructs a utf8 character json value that sorts name-value members alphabetically
 
-- [ojson](ojson) constructs a narrow character json value that preserves the original insertion order of an object's name/value pairs
+- [ojson](ojson) constructs a utf8 character json value that preserves the original insertion order of an object's name/value pairs
 
