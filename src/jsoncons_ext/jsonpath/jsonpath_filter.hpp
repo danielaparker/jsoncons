@@ -1056,15 +1056,32 @@ class jsonpath_filter_parser
         const function_dictionary functions_ =
         {
             {
-                "max",[](const term<Json>& term) 
+                "max",[](const term<Json>& term)
                       {
                           Json a = term.evaluate_single_node();
 
-                          double v = std::numeric_limits<double>::lowest(); 
+                          double v = std::numeric_limits<double>::lowest();
                           for (const auto& elem : a.array_range())
                           {
                               double x = elem. template as<double>();
                               if (x > v)
+                              {
+                                  v = x;
+                              }
+                          }
+                          return v;
+                      }
+            },
+            {
+                "min",[](const term<Json>& term) 
+                      {
+                          Json a = term.evaluate_single_node();
+
+                          double v = (std::numeric_limits<double>::max)(); 
+                          for (const auto& elem : a.array_range())
+                          {
+                              double x = elem. template as<double>();
+                              if (x < v)
                               {
                                   v = x;
                               }
@@ -1181,15 +1198,12 @@ public:
         }
     }
 
-    void init()
+    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
     {
         output_stack_.clear();
         operator_stack_.clear();
-        filter_stack_.clear();
-    }
+        state_stack_.clear();
 
-    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
-    {
         string_type buffer;
 
         int depth = 0;

@@ -1122,9 +1122,27 @@ BOOST_AUTO_TEST_CASE(test_max_pre)
 BOOST_AUTO_TEST_CASE(test_max)
 {
     std::string path = "$.store.book[?(@.price < max($.store.book[*].price))].title";
-    json result = json_query(store,path);
 
-    std::cout << result << std::endl;
+    json expected = json::parse(R"(
+["Sayings of the Century","Sword of Honour","Moby Dick"]
+    )");
+
+    json result = json_query(store,path);
+    BOOST_CHECK_EQUAL(expected,result);
+
+    //std::cout << result << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_min)
+{
+    std::string path = "$.store.book[?(@.price > min($.store.book[*].price))].title";
+
+    json expected = json::parse(R"(
+["Sword of Honour","Moby Dick","The Lord of the Rings"]
+    )");
+
+    json result = json_query(store,path);
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
