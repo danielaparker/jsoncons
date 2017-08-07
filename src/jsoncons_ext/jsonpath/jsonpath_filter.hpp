@@ -18,14 +18,7 @@
 #include <jsoncons/json.hpp>
 #include "jsonpath_error_category.hpp"
 
-namespace jsoncons { namespace jsonpath {
-
-enum class result_type {value,path};
-
-template<class Json>
-Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value);
-
-namespace detail {
+namespace jsoncons { namespace jsonpath { namespace detail {
 
 template<class Json>
 struct PathConstructor
@@ -1253,7 +1246,9 @@ public:
                             try
                             {
                                 // path, parse against root, get value
-                                auto result = json_query(root,buffer);
+                                jsonpath_evaluator<Json,const Json&,const Json*,detail::VoidPathConstructor<Json>> evaluator;
+                                evaluator.evaluate(root,buffer.data(),buffer.length());
+                                auto result = evaluator.get_values();
                                 add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(result)));
                             }
                             catch (const parse_error& e)

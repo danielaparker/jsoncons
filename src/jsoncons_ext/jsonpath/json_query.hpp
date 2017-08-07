@@ -19,8 +19,10 @@
 
 namespace jsoncons { namespace jsonpath {
 
+enum class result_type {value,path};
+
 template<class Json>
-Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t /*= result_type::value*/)
+Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value)
 {
     if (result_t == result_type::value)
     {
@@ -103,7 +105,7 @@ bool try_string_to_index(const CharT *s, size_t length, size_t* value, bool* pos
     }
 }
 
-enum class jp_state 
+enum class path_state 
 {
     start,
     cr,
@@ -371,7 +373,7 @@ private:
 
     basic_default_parse_error_handler<char_type> default_err_handler_;
     basic_parse_error_handler<char_type> *err_handler_;
-    jp_state state_;
+    path_state state_;
     string_type buffer_;
     size_t start_;
     bool positive_start_;
@@ -394,7 +396,7 @@ private:
 public:
     jsonpath_evaluator()
         : err_handler_(&default_err_handler_),
-          state_(jp_state::start),
+          state_(path_state::start),
           start_(0), positive_start_(true), 
           end_(0), positive_end_(true), undefined_end_(false),
           step_(0), positive_step_(true),
@@ -472,7 +474,7 @@ public:
                   size_t length,
                   std::error_code& ec)
     {
-        jp_state pre_line_break_state = jp_state::start;
+        path_state pre_line_break_state = path_state::start;
 
         begin_input_ = path;
         end_input_ = path + length;
@@ -480,7 +482,7 @@ public:
 
         line_ = 1;
         column_ = 1;
-        state_ = jp_state::start;
+        state_ = path_state::start;
 
         recursive_descent_ = false;
 
@@ -490,7 +492,7 @@ public:
         {
             switch (state_)
             {
-            case jp_state::cr:
+            case path_state::cr:
                 ++line_;
                 column_ = 1;
                 switch (*p_)
@@ -505,12 +507,12 @@ public:
                     break;
                 }
                 break;
-            case jp_state::lf:
+            case path_state::lf:
                 ++line_;
                 column_ = 1;
                 state_ = pre_line_break_state;
                 break;
-            case jp_state::start: 
+            case path_state::start: 
                 switch (*p_)
                 {
                 case ' ':case '\t':
@@ -524,7 +526,7 @@ public:
                         v.emplace_back(std::move(s),std::addressof(root));
                         stack_.push_back(v);
 
-                        state_ = jp_state::expect_dot_or_left_bracket;
+                        state_ = path_state::expect_dot_or_left_bracket;
                     }
                     break;
                 default:
@@ -535,21 +537,21 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::dot:
+            case path_state::dot:
                 switch (*p_)
                 {
                 case '.':
                     recursive_descent_ = true;
                     ++p_;
                     ++column_;
-                    state_ = jp_state::expect_unquoted_name_or_left_bracket;
+                    state_ = path_state::expect_unquoted_name_or_left_bracket;
                     break;
                 default:
-                    state_ = jp_state::expect_unquoted_name_or_left_bracket;
+                    state_ = path_state::expect_unquoted_name_or_left_bracket;
                     break;
                 }
                 break;
-            case jp_state::expect_unquoted_name_or_left_bracket:
+            case path_state::expect_unquoted_name_or_left_bracket:
                 switch (*p_)
                 {
                 case '.':
@@ -559,31 +561,31 @@ public:
                 case '*':
                     end_all();
                     transfer_nodes();
-                    state_ = jp_state::expect_dot_or_left_bracket;
+                    state_ = path_state::expect_dot_or_left_bracket;
                     ++p_;
                     ++column_;
                     break;
                 case '[':
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     ++p_;
                     ++column_;
                     break;
                 default:
                     buffer_.clear();
-                    state_ = jp_state::unquoted_name;
+                    state_ = path_state::unquoted_name;
                     break;
                 }
                 break;
-            case jp_state::expect_dot_or_left_bracket: 
+            case path_state::expect_dot_or_left_bracket: 
                 switch (*p_)
                 {
                 case ' ':case '\t':
                     break;
                 case '.':
-                    state_ = jp_state::dot;
+                    state_ = path_state::dot;
                     break;
                 case '[':
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     break;
                 default:
                     err_handler_->fatal_error(jsonpath_parser_errc::expected_separator, *this);
@@ -593,16 +595,16 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::expect_comma_or_right_bracket:
+            case path_state::expect_comma_or_right_bracket:
                 switch (*p_)
                 {
                 case ',':
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     break;
                 case ']':
                     apply_selectors();
                     transfer_nodes();
-                    state_ = jp_state::expect_dot_or_left_bracket;
+                    state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 case ' ':case '\t':
                     break;
@@ -614,7 +616,7 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::left_bracket:
+            case path_state::left_bracket:
                 switch (*p_)
                 {
                 case ' ':case '\t':
@@ -629,7 +631,7 @@ public:
                         line_ = parser.line();
                         column_ = parser.column();
                         selectors_.push_back(std::make_shared<expr_selector>(result));
-                        state_ = jp_state::expect_comma_or_right_bracket;
+                        state_ = path_state::expect_comma_or_right_bracket;
                     }
                     break;
                 case '?':
@@ -640,41 +642,41 @@ public:
                         line_ = parser.line();
                         column_ = parser.column();
                         selectors_.push_back(std::make_shared<filter_selector>(result));
-                        state_ = jp_state::expect_comma_or_right_bracket;
+                        state_ = path_state::expect_comma_or_right_bracket;
                     }
                     break;                   
                 case ':':
                     clear_index();
-                    state_ = jp_state::left_bracket_end;
+                    state_ = path_state::left_bracket_end;
                     ++p_;
                     ++column_;
                     break;
                 case '*':
                     end_all();
-                    state_ = jp_state::expect_comma_or_right_bracket;
+                    state_ = path_state::expect_comma_or_right_bracket;
                     ++p_;
                     ++column_;
                     break;
                 case '\'':
-                    state_ = jp_state::left_bracket_single_quoted_string;
+                    state_ = path_state::left_bracket_single_quoted_string;
                     ++p_;
                     ++column_;
                     break;
                 case '\"':
-                    state_ = jp_state::left_bracket_double_quoted_string;
+                    state_ = path_state::left_bracket_double_quoted_string;
                     ++p_;
                     ++column_;
                     break;
                 default:
                     clear_index();
                     buffer_.push_back(*p_);
-                    state_ = jp_state::left_bracket_start;
+                    state_ = path_state::left_bracket_start;
                     ++p_;
                     ++column_;
                     break;
                 }
                 break;
-            case jp_state::left_bracket_start:
+            case path_state::left_bracket_start:
                 switch (*p_)
                 {
                 case ':':
@@ -684,19 +686,19 @@ public:
                         ec = jsonpath_parser_errc::expected_index;
                         return;
                     }
-                    state_ = jp_state::left_bracket_end;
+                    state_ = path_state::left_bracket_end;
                     break;
                 case ',':
                     selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     break;
                 case ']':
                     selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     apply_selectors();
                     transfer_nodes();
-                    state_ = jp_state::expect_dot_or_left_bracket;
+                    state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 default:
                     buffer_.push_back(*p_);
@@ -705,42 +707,42 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::left_bracket_end:
+            case path_state::left_bracket_end:
                 switch (*p_)
                 {
                 case '-':
                     positive_end_ = false;
-                    state_ = jp_state::left_bracket_end2;
+                    state_ = path_state::left_bracket_end2;
                     break;
                 case ':':
                     step_ = 0;
-                    state_ = jp_state::left_bracket_step;
+                    state_ = path_state::left_bracket_step;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     undefined_end_ = false;
                     end_ = static_cast<size_t>(*p_-'0');
-                    state_ = jp_state::left_bracket_end2;
+                    state_ = path_state::left_bracket_end2;
                     break;
                 case ',':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     break;
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors();
                     transfer_nodes();
-                    state_ = jp_state::expect_dot_or_left_bracket;
+                    state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::left_bracket_end2:
+            case path_state::left_bracket_end2:
                 switch (*p_)
                 {
                 case ':':
                     step_ = 0;
-                    state_ = jp_state::left_bracket_step;
+                    state_ = path_state::left_bracket_step;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     undefined_end_ = false;
@@ -748,44 +750,44 @@ public:
                     break;
                 case ',':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     break;
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors();
                     transfer_nodes();
-                    state_ = jp_state::expect_dot_or_left_bracket;
+                    state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::left_bracket_step:
+            case path_state::left_bracket_step:
                 switch (*p_)
                 {
                 case '-':
                     positive_step_ = false;
-                    state_ = jp_state::left_bracket_step2;
+                    state_ = path_state::left_bracket_step2;
                     break;
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     step_ = static_cast<size_t>(*p_-'0');
-                    state_ = jp_state::left_bracket_step2;
+                    state_ = path_state::left_bracket_step2;
                     break;
                 case ',':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     break;
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors();
                     transfer_nodes();
-                    state_ = jp_state::expect_dot_or_left_bracket;
+                    state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::left_bracket_step2:
+            case path_state::left_bracket_step2:
                 switch (*p_)
                 {
                 case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
@@ -793,48 +795,48 @@ public:
                     break;
                 case ',':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     break;
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors();
                     transfer_nodes();
-                    state_ = jp_state::expect_dot_or_left_bracket;
+                    state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::unquoted_name: 
+            case path_state::unquoted_name: 
                 switch (*p_)
                 {
                 case '[':
                     apply_unquoted_string(buffer_);
                     transfer_nodes();
                     start_ = 0;
-                    state_ = jp_state::left_bracket;
+                    state_ = path_state::left_bracket;
                     break;
                 case '.':
                     apply_unquoted_string(buffer_);
                     transfer_nodes();
-                    state_ = jp_state::dot;
+                    state_ = path_state::dot;
                     break;
                 case ' ':case '\t':
                     apply_unquoted_string(buffer_);
                     transfer_nodes();
-                    state_ = jp_state::expect_dot_or_left_bracket;
+                    state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 case '\r':
                     apply_unquoted_string(buffer_);
                     transfer_nodes();
-                    pre_line_break_state = jp_state::expect_dot_or_left_bracket;
-                    state_= jp_state::cr;
+                    pre_line_break_state = path_state::expect_dot_or_left_bracket;
+                    state_= path_state::cr;
                     break;
                 case '\n':
                     apply_unquoted_string(buffer_);
                     transfer_nodes();
-                    pre_line_break_state = jp_state::expect_dot_or_left_bracket;
-                    state_= jp_state::lf;
+                    pre_line_break_state = path_state::expect_dot_or_left_bracket;
+                    state_= path_state::lf;
                     break;
                 default:
                     buffer_.push_back(*p_);
@@ -843,13 +845,13 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::left_bracket_single_quoted_string: 
+            case path_state::left_bracket_single_quoted_string: 
                 switch (*p_)
                 {
                 case '\'':
                     selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
-                    state_ = jp_state::expect_comma_or_right_bracket;
+                    state_ = path_state::expect_comma_or_right_bracket;
                     break;
                 case '\\':
                     buffer_.push_back(*p_);
@@ -867,13 +869,13 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case jp_state::left_bracket_double_quoted_string: 
+            case path_state::left_bracket_double_quoted_string: 
                 switch (*p_)
                 {
                 case '\"':
                     selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
-                    state_ = jp_state::expect_comma_or_right_bracket;
+                    state_ = path_state::expect_comma_or_right_bracket;
                     break;
                 case '\\':
                     buffer_.push_back(*p_);
@@ -899,7 +901,7 @@ public:
         }
         switch (state_)
         {
-        case jp_state::unquoted_name: 
+        case path_state::unquoted_name: 
             {
                 apply_unquoted_string(buffer_);
                 transfer_nodes();
