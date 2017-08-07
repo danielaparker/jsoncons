@@ -470,10 +470,13 @@ vertical-align:1px;
 <body>
 <ul>
 <li>
-<p>Support <a href="https://raw.githubusercontent.com/arineng/jcr/07/draft-newton-json-content-rules.txt">JSON Content Rules v07</a> for schema validation in <code>jsoncons_ext</code></p>
+<p>Support <a href="https://datatracker.ietf.org/doc/draft-newton-json-content-rules/">JSON Content Rules</a> for schema validation in <code>jsoncons_ext</code></p>
 </li>
 <li>
-<p>Revisit error codes, parsing_context, and opportunities for error recovery.</p>
+<p>Support round() function for floating point numbers</p>
+</li>
+<li>
+<p>Enhanced error recovery</p>
 </li>
 </ul>
 </body>
