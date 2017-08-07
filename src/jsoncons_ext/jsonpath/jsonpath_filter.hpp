@@ -100,7 +100,8 @@ enum class filter_state
     path,
     value,
     oper,
-    function_argument
+    function_argument,
+    done
 };
 
 enum class token_type 
@@ -998,7 +999,6 @@ public:
 
     Json eval(const Json& context_node)
     {
-        std::cout << context_node << std::endl;
         try
         {
             auto t = evaluate(context_node,tokens_);
@@ -1194,8 +1194,7 @@ public:
 
         int depth = 0;
         filter_state state = filter_state::start;
-        bool done = false;
-        while (!done && p < end_expr)
+        while (p < end_expr && state != filter_state::done)
         {
             switch (state)
             {
@@ -1236,12 +1235,11 @@ public:
                     add_token(token<Json>(token_type::lparen));
                     break;
                 case ')':
-                    std::cout << "start )" << std::endl;
                     state = filter_state::expect_path_or_value_or_unary_op;
                     add_token(token<Json>(token_type::rparen));
                     if (--depth == 0)
                     {
-                        done = true;
+                        state = filter_state::done;
                     }
                     break;
                 }
@@ -1499,8 +1497,7 @@ public:
                         add_token(token<Json>(token_type::rparen));
                         if (--depth == 0)
                         {
-                            state = filter_state::start;
-                            done = true;
+                            state = filter_state::done;
                         }
                         else
                         {
@@ -1656,8 +1653,7 @@ public:
                     add_token(token<Json>(token_type::rparen));
                     if (--depth == 0)
                     {
-                        done = true;
-                        state = filter_state::start;
+                        state = filter_state::done;
                     }
                     ++p;
                     ++column_;
@@ -1686,12 +1682,10 @@ public:
                     ++column_;
                     break;
                 case ')':
-                    std::cout << "expect_oper_or_right_round_bracket ) " << depth << std::endl;
                     add_token(token<Json>(token_type::rparen));
                     if (--depth == 0)
                     {
-                        done = true;
-                        state = filter_state::start;
+                        state = filter_state::done;
                         ++p; // fix
                     }
                     break;
@@ -1732,8 +1726,7 @@ public:
                     add_token(token<Json>(token_type::rparen));
                     if (--depth == 0)
                     {
-                        done = true;
-                        state = filter_state::start;
+                        state = filter_state::done;
                     }
                     else 
                     {
@@ -1779,8 +1772,7 @@ public:
                     }
                     if (--depth == 0)
                     {
-                        state = filter_state::start;
-                        done = true;
+                        state = filter_state::done;
                     }
                     else
                     {
