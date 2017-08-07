@@ -1036,6 +1036,7 @@ class jsonpath_filter_parser
 
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;
+    std::vector<filter_state> state_stack_;
 
     size_t line_;
     size_t column_;
@@ -1111,6 +1112,22 @@ public:
         return parse(root, p,p+length, end_ptr);
     }
 
+    void push_state(filter_state state)
+    {
+        state_stack_.push_back(state);
+    }
+
+    filter_state pop_state()
+    {
+        if (state_stack_.empty())
+        {
+            throw std::runtime_error("Invalid state");
+        }
+        filter_state state = state_stack_.back();
+        state_stack_.pop_back();
+        return state;
+    }
+
     void add_token(token<Json> token)
     {
         if (token.is_operand())
@@ -1164,13 +1181,16 @@ public:
         }
     }
 
-    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
+    void init()
     {
         output_stack_.clear();
         operator_stack_.clear();
+        filter_stack_.clear();
+    }
 
+    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
+    {
         string_type buffer;
-        filter_state pre_line_break_state = filter_state::start;
 
         int depth = 0;
         filter_state state = filter_state::start;
@@ -1185,26 +1205,29 @@ public:
                 switch (*p)
                 {
                 case '\n':
-                    state = pre_line_break_state;
+                    state = pop_state();
                     ++p;
                     ++column_;
                     break;
                 default:
-                    state = pre_line_break_state;
+                    state = pop_state();
                     break;
                 }
                 break;
             case filter_state::lf:
                 ++line_;
                 column_ = 1;
-                state = pre_line_break_state;
+                state = pop_state();
                 break;
             case filter_state::start:
                 switch (*p)
                 {
                 case '\r':
+                    push_state(state);
+                    state = filter_state::cr;
+                    break;
                 case '\n':
-                    pre_line_break_state = state;
+                    push_state(state);
                     state = filter_state::lf;
                     break;
                 case '(':
@@ -1230,14 +1253,13 @@ public:
                     switch (*p)
                     {
                     case '\r':
+                        push_state(state);
+                        state = filter_state::cr;
+                        break;
                     case '\n':
-                        {
-                            ++line_;
-                            column_ = 1;
-                            pre_line_break_state = state;
-                            state = filter_state::lf;
-                            break;
-                        }
+                        push_state(state);
+                        state = filter_state::lf;
+                        break;
                     case ' ':case '\t':
                         break;
                     case ')':
@@ -1271,13 +1293,13 @@ public:
                 switch (*p)
                 {
                 case '\r':
+                    push_state(state);
+                    state = filter_state::cr;
+                    break;
                 case '\n':
-                    {
-                        ++line_;
-                        column_ = 1;
-                        state = pre_line_break_state;
-                        break;
-                    }
+                    push_state(state);
+                    state = filter_state::lf;
+                    break;
                 case ' ':case '\t':
                     break;
                 case '!':
@@ -1499,12 +1521,6 @@ public:
                 {
                     switch (*p)
                     {                   
-                    case '\r':
-                    case '\n':
-                        ++line_;
-                        column_ = 1;
-                        state = pre_line_break_state;
-                        break;
                     case '\\':
                         buffer.push_back(*p);
                         if (p+1 < end_expr)
@@ -1544,12 +1560,6 @@ public:
                 {
                     switch (*p)
                     {                   
-                    case '\r':
-                    case '\n':
-                        ++line_;
-                        column_ = 1;
-                        state = pre_line_break_state;
-                        break;
                     case '\\':
                         buffer.push_back(*p);
                         if (p+1 < end_expr)
@@ -1589,10 +1599,14 @@ public:
                 switch (*p)
                 {
                 case '\r':
+                    push_state(state);
+                    state = filter_state::cr;
+                    ++p;
+                    break;
                 case '\n':
-                    ++line_;
-                    column_ = 1;
-                    state = pre_line_break_state;
+                    push_state(state);
+                    state = filter_state::lf;
+                    ++p;
                     break;
                 case ' ':case '\t':
                     ++p;
@@ -1658,10 +1672,14 @@ public:
                 switch (*p)
                 {
                 case '\r':
+                    push_state(state);
+                    state = filter_state::cr;
+                    ++p;
+                    break;
                 case '\n':
-                    ++line_;
-                    column_ = 1;
-                    state = pre_line_break_state;
+                    push_state(state);
+                    state = filter_state::lf;
+                    ++p;
                     break;
                 case ' ':case '\t':
                     ++p;
@@ -1701,10 +1719,12 @@ public:
                 switch (*p)
                 {
                 case '\r':
+                    push_state(state);
+                    state = filter_state::cr;
+                    break;
                 case '\n':
-                    ++line_;
-                    column_ = 1;
-                    state = pre_line_break_state;
+                    push_state(state);
+                    state = filter_state::lf;
                     break;
                 case ' ':case '\t':
                     break;
@@ -1730,12 +1750,6 @@ public:
             case filter_state::path: 
                 switch (*p)
                 {
-                case '\r':
-                case '\n':
-                    ++line_;
-                    column_ = 1;
-                    state = pre_line_break_state;
-                    break;
                 case '<':
                 case '>':
                 case '!':
@@ -1786,10 +1800,12 @@ public:
                 switch (*p)
                 {
                 case '\r':
+                    push_state(state);
+                    state = filter_state::cr;
+                    break;
                 case '\n':
-                    ++line_;
-                    column_ = 1;
-                    state = pre_line_break_state;
+                    push_state(state);
+                    state = filter_state::lf;
                     break;
                 case ' ':case '\t':
                     break;
@@ -1807,12 +1823,6 @@ public:
                 {
                     switch (*p)
                     {                   
-                    case '\r':
-                    case '\n':
-                        ++line_;
-                        column_ = 1;
-                        state = pre_line_break_state;
-                        break;
                     case '/':
                         //if (buffer.length() > 0)
                         {
