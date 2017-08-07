@@ -24,6 +24,45 @@ using namespace jsoncons::jsonpath;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_tests)
 
+const json store = json::parse(R"(
+{
+    "store": {
+        "book": [
+            {
+                "category": "reference",
+                "author": "Nigel Rees",
+                "title": "Sayings of the Century",
+                "price": 8.95
+            },
+            {
+                "category": "fiction",
+                "author": "Evelyn Waugh",
+                "title": "Sword of Honour",
+                "price": 12.99
+            },
+            {
+                "category": "fiction",
+                "author": "Herman Melville",
+                "title": "Moby Dick",
+                "isbn": "0-553-21311-3",
+                "price": 8.99
+            },
+            {
+                "category": "fiction",
+                "author": "J. R. R. Tolkien",
+                "title": "The Lord of the Rings",
+                "isbn": "0-395-19395-8",
+                "price": 22.99
+            }
+        ],
+        "bicycle": {
+            "color": "red",
+            "price": 19.95
+        }
+    }
+}
+)");
+
 struct jsonpath_fixture
 {
     static const char* store_text()
@@ -1071,6 +1110,21 @@ BOOST_AUTO_TEST_CASE(test_replace)
     BOOST_CHECK_CLOSE(30.9,j["store"]["book"][0]["price"].as<double>(),0.001);
 
     //std::cout << ("2\n") << pretty_print(j) << std::endl;
+}
+BOOST_AUTO_TEST_CASE(test_max_pre)
+{
+    std::string path = "$.store.book[*].price";
+    json result = json_query(store,path);
+
+    std::cout << result << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_max)
+{
+    std::string path = "$.store.book[?(@.price < max($.store.book[*].price))].title";
+    json result = json_query(store,path);
+
+    std::cout << result << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

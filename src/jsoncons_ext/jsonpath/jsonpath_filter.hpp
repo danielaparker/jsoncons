@@ -99,7 +99,8 @@ enum class filter_state
     unquoted_text,
     path,
     value,
-    oper
+    oper,
+    function_argument
 };
 
 enum class token_type 
@@ -997,6 +998,7 @@ public:
 
     Json eval(const Json& context_node)
     {
+        std::cout << context_node << std::endl;
         try
         {
             auto t = evaluate(context_node,tokens_);
@@ -1042,30 +1044,44 @@ class jsonpath_filter_parser
 
     class functions
     {
+        typedef std::map<string_type,std::function<Json(const term<Json>&)>> function_dictionary;
+
         static string_view_type max_literal() 
         {
             static const char_type data[] = {'m','a','x'};
             return string_view_type{data,sizeof(data)/sizeof(char_type)};
         }
 
-        const std::map<string_type,std::function<Json(const term<Json>&)>> functions_ =
+        const function_dictionary functions_ =
         {
             {
-                "max",[](const term<Json>& a) 
+                "max",[](const term<Json>& term) 
                       {
-                          double v = (std::numeric_limits<int64_t>::min)(); 
+                          Json a = term.evaluate_single_node();
+
+                          double v = std::numeric_limits<double>::lowest(); 
                           for (const auto& elem : a.array_range())
                           {
                               double x = elem.as<double>();
                               if (x > v)
                               {
-                                  x = v;
+                                  v = x;
                               }
                           }
                           return v;
                       }
             }
         };
+
+    public:
+        typename function_dictionary::const_iterator find(const string_type& key) const
+        {
+            return functions_.find(key);
+        }
+        typename function_dictionary::const_iterator end() const
+        {
+            return functions_.end();
+        }
     };
 
     functions functions_;
@@ -1090,9 +1106,9 @@ public:
         return column_;
     }
 
-    jsonpath_filter_expr<Json> parse(const char_type* p, size_t length, const char_type** end_ptr)
+    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, size_t length, const char_type** end_ptr)
     {
-        return parse(p,p+length, end_ptr);
+        return parse(root, p,p+length, end_ptr);
     }
 
     void add_token(token<Json> token)
@@ -1148,7 +1164,7 @@ public:
         }
     }
 
-    jsonpath_filter_expr<Json> parse(const char_type* p, const char_type* end_expr, const char_type** end_ptr)
+    jsonpath_filter_expr<Json> parse(const Json& root, const char_type* p, const char_type* end_expr, const char_type** end_ptr)
     {
         output_stack_.clear();
         operator_stack_.clear();
@@ -1197,6 +1213,7 @@ public:
                     add_token(token<Json>(token_type::lparen));
                     break;
                 case ')':
+                    std::cout << "start )" << std::endl;
                     state = filter_state::expect_path_or_value_or_unary_op;
                     add_token(token<Json>(token_type::rparen));
                     if (--depth == 0)
@@ -1207,6 +1224,46 @@ public:
                 }
                 ++p;
                 ++column_;
+                break;
+            case filter_state::function_argument:
+                {
+                    switch (*p)
+                    {
+                    case '\r':
+                    case '\n':
+                        {
+                            ++line_;
+                            column_ = 1;
+                            pre_line_break_state = state;
+                            state = filter_state::lf;
+                            break;
+                        }
+                    case ' ':case '\t':
+                        break;
+                    case ')':
+                        if (buffer.length() > 0)
+                        {
+                            try
+                            {
+                                // path, parse against root, get value
+                                auto result = json_query(root,buffer);
+                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(result)));
+                            }
+                            catch (const parse_error& e)
+                            {
+                                throw parse_error(e.code(),line_,column_);
+                            }
+                            buffer.clear();
+                            state = filter_state::expect_oper_or_right_round_bracket;
+                        }
+                        break;
+                    default: 
+                        buffer.push_back(*p);
+                        break;
+                    }
+                    ++p;
+                    ++column_;
+                }
                 break;
             case filter_state::oper:
                 switch (*p)
@@ -1357,7 +1414,8 @@ public:
                             throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,line_,column_);
                         }
                         add_token(token<Json>(1, true, it->second));
-                        state = filter_state::expect_function_argument;
+                        state = filter_state::function_argument;
+                        buffer.clear();
                         ++p;
                         ++column_;
                         break;
@@ -1614,11 +1672,13 @@ public:
                     ++column_;
                     break;
                 case ')':
+                    std::cout << "expect_oper_or_right_round_bracket ) " << depth << std::endl;
                     add_token(token<Json>(token_type::rparen));
                     if (--depth == 0)
                     {
                         done = true;
                         state = filter_state::start;
+                        ++p; // fix
                     }
                     break;
                 case '<':

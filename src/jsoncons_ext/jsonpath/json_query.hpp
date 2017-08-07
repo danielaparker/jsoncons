@@ -626,7 +626,8 @@ public:
                 case '(':
                     {
                         jsonpath_filter_parser<Json> parser(line_,column_);
-                        auto result = parser.parse(p_,end_input_,&p_);
+                        auto result = parser.parse(root, p_,end_input_,&p_);
+                        std::cout << "1 " << *p_ << std::endl;
                         line_ = parser.line();
                         column_ = parser.column();
                         selectors_.push_back(std::make_shared<expr_selector>(result));
@@ -636,7 +637,8 @@ public:
                 case '?':
                     {
                         jsonpath_filter_parser<Json> parser(line_,column_);
-                        auto result = parser.parse(p_,end_input_,&p_);
+                        auto result = parser.parse(root,p_,end_input_,&p_);
+                        std::cout << "2 " << *p_ << std::endl;
                         line_ = parser.line();
                         column_ = parser.column();
                         selectors_.push_back(std::make_shared<filter_selector>(result));
