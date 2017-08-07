@@ -18,7 +18,14 @@
 #include <jsoncons/json.hpp>
 #include "jsonpath_error_category.hpp"
 
-namespace jsoncons { namespace jsonpath { namespace detail {
+namespace jsoncons { namespace jsonpath 
+
+enum class result_type {value,path};
+
+template<class Json>
+Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value);
+
+{ namespace detail {
 
 template<class Json>
 struct PathConstructor
@@ -1276,6 +1283,8 @@ public:
                         state = pre_line_break_state;
                         break;
                     }
+                case ' ':case '\t':
+                    break;
                 case '!':
                     {
                         if (p+1  < end_expr && *(p+1) == '=')
@@ -1387,8 +1396,6 @@ public:
                         add_token(token<Json>(op_properties_[binary_operators::div]));
                         break;
                     }
-                case ' ':case '\t':
-                    break;
                 default:
                     throw parse_error(jsonpath_parser_errc::invalid_filter,line_,column_);
                     break;
@@ -1400,12 +1407,23 @@ public:
                 {
                     switch (*p)
                     {
-                    case '\r':
-                    case '\n':
-                        ++line_;
-                        column_ = 1;
-                        state = pre_line_break_state;
-                        break;
+                    case ' ':case '\t':
+                        if (buffer.length() > 0)
+                        {
+                            try
+                            {
+                                auto val = Json::parse(buffer);
+                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
+                            }
+                            catch (const parse_error& e)
+                            {
+                                throw parse_error(e.code(),line_,column_);
+                            }
+                            buffer.clear();
+                        }
+                        ++p;
+                        ++column_;
+                        break; 
                     case '(':
                     {
                         auto it = functions_.find(buffer);
@@ -1474,23 +1492,6 @@ public:
                         ++p;
                         ++column_;
                         break;
-                    case ' ':case '\t':
-                        if (buffer.length() > 0)
-                        {
-                            try
-                            {
-                                auto val = Json::parse(buffer);
-                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(val)));
-                            }
-                            catch (const parse_error& e)
-                            {
-                                throw parse_error(e.code(),line_,column_);
-                            }
-                            buffer.clear();
-                        }
-                        ++p;
-                        ++column_;
-                        break; 
                     default: 
                         buffer.push_back(*p);
                         ++p;
@@ -1598,6 +1599,10 @@ public:
                     column_ = 1;
                     state = pre_line_break_state;
                     break;
+                case ' ':case '\t':
+                    ++p;
+                    ++column_;
+                    break;
                 case '!':
                 {
                     std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return b.exclaim();};
@@ -1617,10 +1622,6 @@ public:
                 case '@':
                     buffer.push_back(*p);
                     state = filter_state::path;
-                    ++p;
-                    ++column_;
-                    break;
-                case ' ':case '\t':
                     ++p;
                     ++column_;
                     break;
@@ -1795,10 +1796,10 @@ public:
                     column_ = 1;
                     state = pre_line_break_state;
                     break;
+                case ' ':case '\t':
+                    break;
                 case '/':
                     state = filter_state::regex;
-                    break;
-                case ' ':case '\t':
                     break;
                 default: 
                     throw parse_error(jsonpath_parser_errc::invalid_filter_expected_slash,line_,column_);

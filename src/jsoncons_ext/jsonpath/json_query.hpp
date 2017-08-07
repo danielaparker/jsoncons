@@ -19,8 +19,6 @@
 
 namespace jsoncons { namespace jsonpath {
 
-enum class result_type {value,path};
-
 template<class Json>
 Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value)
 {
