@@ -1043,20 +1043,14 @@ class jsonpath_filter_parser
 
     static const operator_properties<Json> op_properties_[];
 
-    class functions
+    class function_table
     {
         typedef std::map<string_type,std::function<Json(const term<Json>&)>> function_dictionary;
-
-        static string_view_type max_literal() 
-        {
-            static const char_type data[] = {'m','a','x'};
-            return string_view_type{data,sizeof(data)/sizeof(char_type)};
-        }
 
         const function_dictionary functions_ =
         {
             {
-                "max",[](const term<Json>& term)
+                string_type({'m','a','x'}),[](const term<Json>& term)
                       {
                           Json a = term.evaluate_single_node();
 
@@ -1073,7 +1067,7 @@ class jsonpath_filter_parser
                       }
             },
             {
-                "min",[](const term<Json>& term) 
+                string_type({'m','i','n'}),[](const term<Json>& term) 
                       {
                           Json a = term.evaluate_single_node();
 
@@ -1102,7 +1096,7 @@ class jsonpath_filter_parser
         }
     };
 
-    functions functions_;
+    function_table functions_;
 
 public:
     jsonpath_filter_parser()
