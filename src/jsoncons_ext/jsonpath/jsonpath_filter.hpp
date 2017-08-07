@@ -1062,7 +1062,7 @@ class jsonpath_filter_parser
                           double v = std::numeric_limits<double>::lowest(); 
                           for (const auto& elem : a.array_range())
                           {
-                              double x = elem.as<double>();
+                              double x = elem. template as<double>();
                               if (x > v)
                               {
                                   v = x;
