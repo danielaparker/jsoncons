@@ -23,6 +23,19 @@ Extensions:
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
+## What's new on master
+
+- jsonpath `json_query` now supports returning normalized paths (with
+  optional `return_type::path` parameter)
+
+- New `json::merge` function that inserts another json object's key-value pairs 
+  into a json object, if they don't already exist.
+
+- New `json::merge_or_update` function that inserts another json object's key-value 
+  pairs into a json object, or assigns them if they already exist.
+
+- New jsonpath `max` and `min` aggregate functions over numeric values
+
 Planned new features are listed on the [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap)
 
 ## Get jsoncons

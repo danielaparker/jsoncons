@@ -17,6 +17,8 @@ New features:
 - New `json::merge_or_update` function that inserts another json object's key-value 
   pairs into a json object, or assigns them if they already exist.
 
+- New jsonpath `max` and `min` aggregate functions over numeric values
+
 0.99.7.3
 --------
 

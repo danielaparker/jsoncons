@@ -593,8 +593,8 @@ Returns an empty array if there is no match.</p>
 <td>Left and right</td>
 </tr>
 <tr>
-<td>`</td>
-<td></td>
+<td><code>||</code></td>
+<td>Left or right</td>
 </tr>
 <tr>
 <td><code>==</code></td>
@@ -634,15 +634,13 @@ Returns an empty array if there is no match.</p>
 </thead>
 <tbody>
 <tr>
-<td>!</td>
+<td><code>!</code></td>
 <td>Not right</td>
+</tr>
+<tr>
+<td><code>-</code></td>
+<td>Negates right</td>
 </tr></tbody></table>
-<ul>
-<li>
-<pre><code>  |Negates right
-</code></pre>
-</li>
-</ul>
 <p>Operator precedence</p>
 <table>
 <thead>
@@ -690,8 +688,32 @@ Returns an empty array if there is no match.</p>
 </tr>
 <tr>
 <td>8</td>
-<td>`</td>
-<td></td>
+<td><code>||</code></td>
+<td>Left</td>
+</tr></tbody></table>
+<h3>Aggregate Functions</h3>
+<p>Functions can be called inside filter expressions. The input to an aggregate function is the value of a JSONPath expression.</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Description</th>
+<th>Result</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>min()</td>
+<td>Provides the minimum value of an array of numbers</td>
+<td>double</td>
+<td>$.store.book[?(@.price &lt; max($.store.book[*].price))].title</td>
+</tr>
+<tr>
+<td>max()</td>
+<td>Provides the maximum value of an array of numbers</td>
+<td>double</td>
+<td>$.store.book[?(@.price &gt; min($.store.book[*].price))].title</td>
 </tr></tbody></table>
 <h2>Examples</h2>
 <p>The examples below use the JSON text from <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a> (store.json).</p>
@@ -863,6 +885,16 @@ Returns an empty array if there is no match.</p>
 <tr>
 <td><code>$['store']['book']..['author','title']</code></td>
 <td>All authors and titles of books in the store</td>
+<td></td>
+</tr>
+<tr>
+<td><code>$.store.book[?(@.price &lt; max($.store.book[*].price))].title</code></td>
+<td>The titles of all books that are priced less than the most expensive book in the store</td>
+<td></td>
+</tr>
+<tr>
+<td><code>$.store.book[?(@.price &gt; min($.store.book[*].price))].title</code></td>
+<td>The titles of all books that are priced higher than the cheapest book in the store</td>
 <td></td>
 </tr></tbody></table>
 <h3>Return normalized path expressions</h3>

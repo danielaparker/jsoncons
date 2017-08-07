@@ -88,7 +88,7 @@ Operator|       Description
 `+`     |Left plus right
 `-`     |Left minus right
 `&&`    |Left and right
-&#124;&#124;    |Left or right
+<code>&#124;&#124;</code>    |Left or right
 `==`    |Left is equal to right 
 `!=`    |Left is not equal to right
 `<`     |Left is less than right
@@ -101,8 +101,8 @@ Unary operators
 
 Operator|       Description
 --------|--------------------------------
-!       |Not right
--       |Negates right
+`!`     |Not right
+`-`     |Negates right
 
 Operator precedence
 
@@ -115,7 +115,16 @@ Precedence|Operator|Associativity
 5 |`<` `>` `<=` `>=`|Left 
 6 |`==` `!=`        |Left 
 7 |`&&`             |Left 
-8 |&#124;&#124;             |Left 
+8 |<code>&#124;&#124;</code>             |Left 
+
+### Aggregate Functions
+
+Functions can be called inside filter expressions. The input to an aggregate function is the value of a JSONPath expression.
+
+Function|Description|Result|Example
+----------|--------|-------|---
+min()|Provides the minimum value of an array of numbers|double|$.store.book[?(@.price < max($.store.book[*].price))].title
+max()|Provides the maximum value of an array of numbers|double|$.store.book[?(@.price > min($.store.book[*].price))].title
 
 ## Examples
 
@@ -203,6 +212,8 @@ JSONPath |Result|Notes
 `$.store.book[?((@.author =~ /evelyn.*?/i))]`|All books whose author's name starts with Evelyn, evelyn etc.|`i` indicates case insensitive
 `$.store.book[?(!(@.author =~ /Evelyn.*?/))]`|All books whose author's name does not start with Evelyn
 `$['store']['book']..['author','title']`|All authors and titles of books in the store
+`$.store.book[?(@.price < max($.store.book[*].price))].title`|The titles of all books that are priced less than the most expensive book in the store
+`$.store.book[?(@.price > min($.store.book[*].price))].title`|The titles of all books that are priced higher than the cheapest book in the store
 
 ### Return normalized path expressions
 

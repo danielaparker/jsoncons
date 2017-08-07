@@ -491,6 +491,24 @@ vertical-align:1px;
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="#user-content-ext_msgpack">msgpack</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
+<h2>What's new on master</h2>
+<ul>
+<li>
+<p>jsonpath <code>json_query</code> now supports returning normalized paths (with<br>
+optional <code>return_type::path</code> parameter)</p>
+</li>
+<li>
+<p>New <code>json::merge</code> function that inserts another json object's key-value pairs<br>
+into a json object, if they don't already exist.</p>
+</li>
+<li>
+<p>New <code>json::merge_or_update</code> function that inserts another json object's key-value<br>
+pairs into a json object, or assigns them if they already exist.</p>
+</li>
+<li>
+<p>New jsonpath <code>max</code> and <code>min</code> aggregate functions over numeric values</p>
+</li>
+</ul>
 <p>Planned new features are listed on the <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a></p>
 <h2>Get jsoncons</h2>
 <p>Download the <a href="https://github.com/danielaparker/jsoncons/releases">latest release</a> and unpack the zip file. Find the directory <code>jsoncons</code> under <code>src</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
@@ -685,7 +703,7 @@ std::cout &lt;&lt; pretty_print(a) &lt;&lt; std::endl;</pre></div>
         [<span class="pl-c1">23.0</span>,<span class="pl-c1">24.0</span>]
     ]
 ]</pre></div>
-<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json-make_array">make_array</a> for details</p>
+<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json-make_array">json::make_array</a> for details</p>
 <h3>Merge key-value pairs from another json object</h3>
 <div class="highlight highlight-source-c++"><pre>json j = json::parse(<span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
@@ -709,7 +727,8 @@ std::cout &lt;&lt; pretty_print(j) &lt;&lt; std::endl;</pre></div>
     <span class="pl-s"><span class="pl-pds">"</span>b<span class="pl-pds">"</span></span>: [<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>],
     <span class="pl-s"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span>: [<span class="pl-c1">4</span>,<span class="pl-c1">5</span>,<span class="pl-c1">6</span>]
 }</pre></div>
-<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json%20merge">json::merge</a> for details.</p>
+<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/json%20merge">json::merge</a><br>
+and <a href="https://github.com/danielaparker/jsoncons/wiki/json%20merge_or_update">json::merge_or_update</a> for details.</p>
 <h3>Convert from and to standard library sequence containers</h3>
 <div class="highlight highlight-source-c++"><pre>std::vector&lt;<span class="pl-k">int</span>&gt; v{<span class="pl-c1">1</span>, <span class="pl-c1">2</span>, <span class="pl-c1">3</span>, <span class="pl-c1">4</span>};
 json <span class="pl-en">j</span>(v);
