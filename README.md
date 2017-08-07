@@ -25,15 +25,15 @@ Extensions:
 
 ## What's new on master
 
-- jsonpath `json_query` now supports returning normalized paths (with
+- New support for normalized paths in [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) (with
   optional `return_type::path` parameter)
 
 - New jsonpath `max` and `min` aggregate functions over numeric values
 
-- New `json::merge` function that inserts another json object's key-value pairs 
+- New [json::merge](https://github.com/danielaparker/jsoncons/wiki/json-merge) function that inserts another json object's key-value pairs 
   into a json object, if they don't already exist.
 
-- New `json::merge_or_update` function that inserts another json object's key-value 
+- New [json::merge_or_update](https://github.com/danielaparker/jsoncons/wiki/json-merge_or_update) function that inserts another json object's key-value 
   pairs into a json object, or assigns them if they already exist.
 
 Planned new features are listed on the [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap)
