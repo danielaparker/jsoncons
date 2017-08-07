@@ -1,6 +1,6 @@
 jsoncons is a modern C++, header-only library for constructing [JSON](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
+jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
 
 Features:
 
@@ -24,6 +24,8 @@ Extensions:
 - The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 ## What's new on master
+
+- Visual Studio 2013 is no longer supported
 
 - [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) optionally returns normalized paths (with
   optional `return_type::path` parameter)

@@ -464,8 +464,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter3)
     BOOST_CHECK_EQUAL(expected,result);
 }
 
-
-
 BOOST_AUTO_TEST_CASE(test_jsonpath_book_isbn)
 {
     jsonpath_fixture fixture;
@@ -1111,6 +1109,7 @@ BOOST_AUTO_TEST_CASE(test_replace)
 
     //std::cout << ("2\n") << pretty_print(j) << std::endl;
 }
+
 BOOST_AUTO_TEST_CASE(test_max_pre)
 {
     std::string path = "$.store.book[*].price";
@@ -1142,6 +1141,20 @@ BOOST_AUTO_TEST_CASE(test_min)
     )");
 
     json result = json_query(store,path);
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_ws1)
+{
+    json result = json_query(store,"$..book[ ?(( @.price > 8 ) && (@.price < 12)) ].author");
+
+    json expected = json::parse(R"(
+[
+   "Nigel Rees",
+   "Herman Melville"
+]
+)");
+
     BOOST_CHECK_EQUAL(expected,result);
 }
 

@@ -469,7 +469,7 @@ vertical-align:1px;
 </head>
 <body>
 <p>jsoncons is a modern C++, header-only library for constructing <a href="http://www.json.org">JSON</a>. It supports parsing a JSON file or string into a <code>json</code> value, building a <code>json</code> value in C++ code, and serializing a <code>json</code> value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. It is distributed under the <a href="http://www.boost.org/users/license.html">Boost Software License</a>.</p>
-<p>jsoncons uses some features that are new to C++ 11, including <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2013, MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported for that compiler.</p>
+<p>jsoncons uses some features that are new to C++ 11, including <a href="http://thbecker.net/articles/rvalue_references/section_02.html">move semantics</a> and the <a href="http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer">AllocatorAwareContainer</a> concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that <code>std::regex</code> isn't fully implemented in GCC 4.8., so <code>jsoncons_ext/jsonpath</code> regular expression filters aren't supported for that compiler.</p>
 <p>Features:</p>
 <ul>
 <li>Uses the standard C++ input/output streams library</li>
@@ -493,6 +493,9 @@ vertical-align:1px;
 </ul>
 <h2>What's new on master</h2>
 <ul>
+<li>
+<p>Visual Studio 2013 is no longer supported</p>
+</li>
 <li>
 <p><a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a> optionally returns normalized paths (with<br>
 optional <code>return_type::path</code> parameter)</p>
