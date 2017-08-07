@@ -863,7 +863,7 @@ Returns an empty array if there is no match.</p>
 <td></td>
 </tr>
 <tr>
-<td>`$.store.book[ ?((@.author == 'Nigel Rees')</td>
+<td><code>$.store.book[ ?((@.author == 'Nigel Rees')</code></td>
 <td></td>
 <td>(@.author == 'Evelyn Waugh')) ].title`</td>
 </tr>
