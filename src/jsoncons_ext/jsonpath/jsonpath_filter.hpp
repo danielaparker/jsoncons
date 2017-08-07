@@ -18,14 +18,14 @@
 #include <jsoncons/json.hpp>
 #include "jsonpath_error_category.hpp"
 
-namespace jsoncons { namespace jsonpath 
+namespace jsoncons { namespace jsonpath {
 
 enum class result_type {value,path};
 
 template<class Json>
 Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value);
 
-{ namespace detail {
+namespace detail {
 
 template<class Json>
 struct PathConstructor

@@ -20,7 +20,7 @@
 namespace jsoncons { namespace jsonpath {
 
 template<class Json>
-Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value)
+Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t /*= result_type::value*/)
 {
     if (result_t == result_type::value)
     {
