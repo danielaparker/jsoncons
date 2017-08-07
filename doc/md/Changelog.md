@@ -1,12 +1,16 @@
 master
 ------
 
+Changes
+
+- Visual Studio 2013 is no longer supported (jsonpath uses string initilizer lists)
+
 Bug fixes
 
 - Fixed operator== throws when comparing a string against an empty object
 - Fixed jsonpath issue with array 'length' (a.length worked but not a['length'])
 
-New features:
+New features
 
 - jsonpath `json_query` now supports returning normalized paths (with
   optional `return_type::path` parameter)
