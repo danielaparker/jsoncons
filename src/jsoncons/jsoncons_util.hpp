@@ -26,6 +26,7 @@
 #include <memory>
 #include <iterator>
 #include <exception>
+#include <initializer_list>
 
 #if defined(JSONCONS_HAS_STRING_VIEW)
 #include <string_view>

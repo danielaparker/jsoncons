@@ -244,11 +244,6 @@ public:
     }
 };
 
-namespace binary_operators
-{
-enum{regex=0,mult=1,div=2,plus=3,minus=4,lt=5,lte=6,gt=7,gte=8,eq=9,ne=10,ampamp=11,pipepipe=12};
-}
-
 template <class Json>
 struct operator_properties
 {
@@ -1096,7 +1091,40 @@ class jsonpath_filter_parser
         }
     };
 
+    class binary_operator_table
+    {
+        typedef std::map<string_type,operator_properties<Json>> binary_operator_map;
+
+        const binary_operator_map operators =
+        {
+            {string_type({'=','~'}),{2,false,[](const term<Json>& a, const term<Json>& b) {return a.regex_term(b); }}},
+            {string_type({'*'}),{3,false,[](const term<Json>& a, const term<Json>& b) {return a.mult_term(b); }}},
+            {string_type({'/'}),{3,false,[](const term<Json>& a, const term<Json>& b) {return a.div_term(b); }}},
+            {string_type({'+'}),{4,false,[](const term<Json>& a, const term<Json>& b) {return a.plus_term(b); }}},
+            {string_type({'-'}),{4,false,[](const term<Json>& a, const term<Json>& b) {return a.minus_term(b); }}},
+            {string_type({'<'}),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b); }}},
+            {string_type({'<','='}),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b) || a.eq_term(b); }}},
+            {string_type({'>'}),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b); }}},
+            {string_type({'>','='}),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b) || a.eq_term(b); }}},
+            {string_type({'=','='}),{6,false,[](const term<Json>& a, const term<Json>& b) {return a.eq_term(b); }}},
+            {string_type({'!','='}),{6,false,[](const term<Json>& a, const term<Json>& b) {return a.ne_term(b); }}},
+            {string_type({'&','&'}),{7,false,[](const term<Json>& a, const term<Json>& b) {return a.ampamp_term(b); }}},
+            {string_type({'|','|'}),{8,false,[](const term<Json>& a, const term<Json>& b) {return a.pipepipe_term(b); }}}
+        };
+
+    public:
+        typename binary_operator_map::const_iterator find(const string_type& key) const
+        {
+            return operators.find(key);
+        }
+        typename binary_operator_map::const_iterator end() const
+        {
+            return operators.end();
+        }
+    };
+
     function_table functions_;
+    binary_operator_table binary_operators_;
 
 public:
     jsonpath_filter_parser()
@@ -1298,133 +1326,51 @@ public:
             case filter_state::oper:
                 switch (*p)
                 {
-                case '\r':
-                    push_state(state);
-                    state = filter_state::cr;
-                    break;
-                case '\n':
-                    push_state(state);
-                    state = filter_state::lf;
-                    break;
-                case ' ':case '\t':
-                    break;
-                case '!':
+                case '~':
                     {
-                        if (p+1  < end_expr && *(p+1) == '=')
+                        buffer.push_back(*p);
+                        ++p;
+                        ++column_;
+                        auto it = binary_operators_.find(buffer);
+                        if (it == binary_operators_.end())
                         {
-                            ++p;
-                            ++column_;
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                            add_token(token<Json>(op_properties_[binary_operators::ne]));
+                            throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator, line_, column_);
                         }
-                        else
-                        {
-                            throw parse_error(jsonpath_parser_errc::unexpected_operator,line_,column_);
-                        }
-                        break;
+                        buffer.clear();
+                        add_token(token<Json>(it->second));
+                        state = filter_state::expect_regex;
                     }
+                    break;
+                case '=':
                 case '&':
-                    {
-                        if (p+1  < end_expr && *(p+1) == '&')
-                        {
-                            ++p;
-                            ++column_;
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                            add_token(token<Json>(op_properties_[binary_operators::ampamp]));
-                        }
-                        break;
-                    }
                 case '|':
                     {
-                        if (p+1  < end_expr && *(p+1) == '|')
+                        buffer.push_back(*p);
+                        ++p;
+                        ++column_;
+                        auto it = binary_operators_.find(buffer);
+                        if (it == binary_operators_.end())
                         {
-                            ++p;
-                            ++column_;
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                            add_token(token<Json>(op_properties_[binary_operators::pipepipe]));
+                            throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator, line_, column_);
                         }
-                        break;
-                    }
-                case '=':
-                    {
-                        if (p+1  < end_expr && *(p+1) == '=')
-                        {
-                            ++p;
-                            ++column_;
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                            add_token(token<Json>(op_properties_[binary_operators::eq]));
-                        }
-                        else if (p+1  < end_expr && *(p+1) == '~')
-                        {
-                            ++p;
-                            ++column_;
-                            state = filter_state::expect_regex;
-                            add_token(token<Json>(op_properties_[binary_operators::regex]));
-                        }
-                        break;
-                    }
-                case '>':
-                    {
-                        if (p+1  < end_expr && *(p+1) == '=')
-                        {
-                            ++p;
-                            ++column_;
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                            add_token(token<Json>(op_properties_[binary_operators::gte]));
-                        }
-                        else
-                        {
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                            add_token(token<Json>(op_properties_[binary_operators::gt]));
-                        }
-                        break;
-                    }
-                case '<':
-                    {
-                        if (p+1  < end_expr && *(p+1) == '=')
-                        {
-                            ++p;
-                            ++column_;
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                            add_token(token<Json>(op_properties_[binary_operators::lte]));
-                        }
-                        else
-                        {
-                            state = filter_state::expect_path_or_value_or_unary_op;
-                            add_token(token<Json>(op_properties_[binary_operators::lt]));
-                        }
-                        break;
-                    }
-                case '+':
-                    {
+                        buffer.clear();
+                        add_token(token<Json>(it->second));
                         state = filter_state::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(op_properties_[binary_operators::plus]));
-                        break;
                     }
-                case '-':
-                    {
-                        state = filter_state::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(op_properties_[binary_operators::minus]));
-                        break;
-                    }
-                case '*':
-                    {
-                        state = filter_state::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(op_properties_[binary_operators::mult]));
-                        break;
-                    }
-                case '/':
-                    {
-                        state = filter_state::expect_path_or_value_or_unary_op;
-                        add_token(token<Json>(op_properties_[binary_operators::div]));
-                        break;
-                    }
+                    break;
                 default:
-                    throw parse_error(jsonpath_parser_errc::invalid_filter,line_,column_);
+                    {
+                        auto it = binary_operators_.find(buffer);
+                        if (it == binary_operators_.end())
+                        {
+                            throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator, line_, column_);
+                        }
+                        buffer.clear();
+                        add_token(token<Json>(it->second));
+                        state = filter_state::expect_path_or_value_or_unary_op;
+                    }
                     break;
                 }
-                ++p;
-                ++column_;
                 break;
             case filter_state::unquoted_text: 
                 {
@@ -1485,7 +1431,10 @@ public:
                                 }
                                 buffer.clear();
                             }
+                            buffer.push_back(*p);
                             state = filter_state::oper;
+                            ++p;
+                            ++column_;
                         }
                         break;
                     case ')':
@@ -1708,8 +1657,10 @@ public:
                 case '*':
                 case '/':
                     {
+                        buffer.push_back(*p);
                         state = filter_state::oper;
-                        // don't increment p
+                        ++p;
+                        ++column_;
                     }
                     break;
                 default: 
@@ -1767,8 +1718,10 @@ public:
                             add_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
                             buffer.clear();
                         }
+                        buffer.push_back(*p);
+                        ++p;
+                        ++column_;
                         state = filter_state::oper;
-                        // don't increment
                     }
                     break;
                 case ')':
