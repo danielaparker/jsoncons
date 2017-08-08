@@ -29,7 +29,7 @@ Extensions:
 
 - json::is<T>() and json::as<T>() accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
   This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
-  looked up from a registry. See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility#Eg2), Example 2. 
+  looked up from a registry. See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility), Example 2. 
 
 - [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) optionally returns normalized paths (with
   optional `return_type::path` parameter)
