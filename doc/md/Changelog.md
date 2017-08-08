@@ -12,16 +12,20 @@ Bug fixes
 
 New features
 
+- json::is<T>() and json::as<T>() accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
+  This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
+  looked up from a registry. See [Type Extensibility](https://github.com/danielaparker/jsoncons), Example 2. 
+
 - jsonpath `json_query` now supports returning normalized paths (with
   optional `return_type::path` parameter)
+
+- New jsonpath `max` and `min` aggregate functions over numeric values
 
 - New `json::merge` function that inserts another json object's key-value pairs 
   into a json object, if they don't already exist.
 
 - New `json::merge_or_update` function that inserts another json object's key-value 
   pairs into a json object, or assigns them if they already exist.
-
-- New jsonpath `max` and `min` aggregate functions over numeric values
 
 0.99.7.3
 --------

@@ -8,6 +8,7 @@
 #define JSONCONS_JSONPATH_FILTER_HPP
 
 #include <string>
+#include <map>
 #include <sstream>
 #include <vector>
 #include <istream>

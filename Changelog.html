@@ -481,8 +481,16 @@ vertical-align:1px;
 <p>New features</p>
 <ul>
 <li>
+<p>json::is() and json::as() accept template packs, which they forward to the <code>json_type_traits</code> <code>is</code> and <code>as</code> functions.<br>
+This allows user defined <code>json_type_traits</code> implementations to resolve, for instance, a name into a C++ object<br>
+looked up from a registry. See <a href="https://github.com/danielaparker/jsoncons">Type Extensibility</a>, Example 2.</p>
+</li>
+<li>
 <p>jsonpath <code>json_query</code> now supports returning normalized paths (with<br>
 optional <code>return_type::path</code> parameter)</p>
+</li>
+<li>
+<p>New jsonpath <code>max</code> and <code>min</code> aggregate functions over numeric values</p>
 </li>
 <li>
 <p>New <code>json::merge</code> function that inserts another json object's key-value pairs<br>
@@ -491,9 +499,6 @@ into a json object, if they don't already exist.</p>
 <li>
 <p>New <code>json::merge_or_update</code> function that inserts another json object's key-value<br>
 pairs into a json object, or assigns them if they already exist.</p>
-</li>
-<li>
-<p>New jsonpath <code>max</code> and <code>min</code> aggregate functions over numeric values</p>
 </li>
 </ul>
 <h2>0.99.7.3</h2>

@@ -15,6 +15,7 @@ void container_examples();
 void wjson_examples();
 void serialization_examples();
 void type_extensibility_examples();
+void type_extensibility_examples2();
 void ojson_examples();
 void unicode_examples();
 void csv_examples();
@@ -305,7 +306,7 @@ int main()
 {
     try
     {
-        object_range_based_for_loop();
+        /* object_range_based_for_loop();
 
         json_is_as_examples();
 
@@ -337,13 +338,15 @@ int main()
 
         parse_exception_example();
 
-        type_extensibility_examples();
+        type_extensibility_examples();*/
 
-        json_filter_examples();
+        type_extensibility_examples2();
+
+        /*json_filter_examples();
 
         jsonpath_examples();
 
-        msgpack_examples();
+        msgpack_examples();*/
 
     }
     catch (const std::exception& e)

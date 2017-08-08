@@ -4,11 +4,11 @@ In the `json` class, constructors, accessors and modifiers are templated, for ex
 template <class T>
 json(const T& val)
 
-template<class T>
-bool is() const
+template<class T, class... Args>
+bool is(Args&&... args) const
 
-template<class T>
-T as() const
+template<class T, class... Args>
+T as(Args&&... args) const
 
 template <class T>
 basic_json& operator=(const T& val)
@@ -27,6 +27,10 @@ struct json_type_traits;
 ```
 
 If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `add`, and `set` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
+
+Note that the json::is<T>() and json::as<T>() functions accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
+This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
+looked up from a registry, as illustrated in Example 2 below.
 
 ### Example 1. Convert to/from user defined type
 
@@ -142,7 +146,155 @@ Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12
 ```
 
-### Example 2. Convert to/from `boost::gregorian::date`
+### Example 2. User defined types that require lookup to resolve
+
+This example takes advantage of the fact that we can pass
+parameters to `json::is()` and `json::as()`, which forward them to
+the `json_type_traits` functions.
+
+```c++
+#include <string>
+#include <unordered_map>
+#include <memory>
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::literals;
+
+class Employee
+{
+    std::string name_;
+public:
+    Employee(const std::string& name)
+        : name_(name)
+    {
+    }
+    const std::string& name() const
+    {
+        return name_;
+    }
+    virtual ~Employee() = default;
+    virtual double calculatePay() const = 0;
+};
+
+class HourlyEmployee : public Employee
+{
+public:
+    HourlyEmployee(const std::string& name)
+        : Employee(name)
+    {
+    }
+    double calculatePay() const override
+    {
+        return 10000;
+    }
+};
+
+class CommissionedEmployee : public Employee
+{
+public:
+    CommissionedEmployee(const std::string& name)
+        : Employee(name)
+    {
+    }
+    double calculatePay() const override
+    {
+        return 20000;
+    }
+};
+
+class EmployeeRegistry
+{
+    typedef std::unordered_map<std::string,std::shared_ptr<Employee>> employee_map;
+    employee_map employees_;
+public:
+    EmployeeRegistry()
+    {
+        employees_.try_emplace("John Smith",std::make_shared<HourlyEmployee>("John Smith"));
+        employees_.try_emplace("Jane Doe",std::make_shared<CommissionedEmployee>("Jane Doe"));
+    }
+
+    bool contains(const std::string& name) const
+    {
+        return employees_.count(name) > 0; 
+    }
+
+    std::shared_ptr<Employee> get(const std::string& name) const
+    {
+        auto it = employees_.find(name);
+        if (it == employees_.end())
+        {
+            throw std::runtime_error("Employee not found");
+        }
+        return it->second; 
+    }
+};
+
+namespace jsoncons
+{
+    template<class Json>
+    struct json_type_traits<Json, std::shared_ptr<Employee>>
+    {
+        static bool is(const Json& rhs, const EmployeeRegistry& registry) noexcept
+        {
+            return rhs.is_string() && registry.contains(rhs.as<std::string>());
+        }
+        static std::shared_ptr<Employee> as(const Json& rhs, 
+                                            const EmployeeRegistry& registry)
+        {
+            return registry.get(rhs.as<std::string>());
+        }
+        static Json to_json(std::shared_ptr<Employee> val)
+        {
+            Json j(val->name());
+            return j;
+        }
+    };
+};
+
+int main()
+{
+    json j = R"(
+    {
+        "EmployeeName" : "John Smith"
+    }
+    )"_json;
+
+    EmployeeRegistry registry;
+
+    std::shared_ptr<Employee> employee = j["EmployeeName"].as<std::shared_ptr<Employee>>(registry);
+
+    std::cout << "(1) " << employee->name() << " => " 
+              << employee->calculatePay() << std::endl;
+
+    // Using defaults
+    std::shared_ptr<Employee> salesRep = j.get_with_default<json>("SalesRep","Jane Doe")
+                                          .as<std::shared_ptr<Employee>>(registry);
+
+    std::cout << "(2) " << salesRep->name() << " => " 
+              << salesRep->calculatePay() << std::endl;
+
+    json j2;
+    j2["EmployeeName"] = employee;
+    j2["SalesRep"] = salesRep;
+
+    std::cout << "(3)\n" << pretty_print(j2) << std::endl;
+}
+```
+
+Output:
+
+```json
+(1) John Smith => 10000
+(2) Jane Doe => 20000
+(3)
+{
+    "EmployeeName": "John Smith",
+    "SalesRep": "Jane Doe"
+}
+```
+
+### Example 3. Convert to/from `boost::gregorian::date`
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -225,7 +377,7 @@ Observation dates:
 2014-Feb-28
 ``` 
 
-### Example 3. Convert to/from `boost::numeric::ublas::matrix<T>`
+### Example 4. Convert to/from `boost::numeric::ublas::matrix<T>`
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -236,7 +388,7 @@ namespace jsoncons
     template <class Json,class T>
     struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
     {
-        static bool is(const Json& val) JSONCONS_NOEXCEPT
+        static bool is(const Json& val) noexcept
         {
             if (!val.is_array())
             {

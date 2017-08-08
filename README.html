@@ -497,6 +497,11 @@ vertical-align:1px;
 <p>Visual Studio 2013 is no longer supported</p>
 </li>
 <li>
+<p>json::is() and json::as() accept template packs, which they forward to the <code>json_type_traits</code> <code>is</code> and <code>as</code> functions.<br>
+This allows user defined <code>json_type_traits</code> implementations to resolve, for instance, a name into a C++ object<br>
+looked up from a registry. See <a href="https://github.com/danielaparker/jsoncons">Type Extensibility</a>, Example 2.</p>
+</li>
+<li>
 <p><a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a> optionally returns normalized paths (with<br>
 optional <code>return_type::path</code> parameter)</p>
 </li>
