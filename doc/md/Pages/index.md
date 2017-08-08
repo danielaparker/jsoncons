@@ -729,58 +729,125 @@ In the json class, constructors, accessors and modifiers are templated, for exam
 template <class T>
 json(const T& val)
 
-template<class T>
-bool is() const
+template<class T, class... Args>
+bool is(Args&&... args) const
 
-template<class T>
-T as() const
+template<class T, class... Args>
+T as(Args&&... args) const
 
 template <class T>
 basic_json& operator=(const T& val)
 
 template <class T>
-void add(const T& val)
+void add(T&& val)
+
+template <class T>
+void set(string_view_type name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
-This `json_type_traits` template is extensible, you, the user, can extend `json_type_traits` in the `jsoncons` namespace with your own types. 
-For example, you can provide a specialization of `json_type_traits` for a `book` class, and then transfer book objects or
-standard library collections of book objects to and from `json` values.
+If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `add`, and `set` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
+
+Note that the json::is<T>() and json::as<T>() functions accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
+This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
+looked up from a registry, as illustrated below.
+
 
 ```c++
-struct book
+#include <string>
+#include <unordered_map>
+#include <memory>
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::literals;
+
+class Employee
 {
-    std::string author;
-    std::string title;
-    double price;
+    std::string name_;
+public:
+    Employee(const std::string& name)
+        : name_(name)
+    {
+    }
+    virtual ~Employee() = default;
+    const std::string& name() const
+    {
+        return name_;
+    }
+    virtual double calculatePay() const = 0;
+};
+
+class HourlyEmployee : public Employee
+{
+public:
+    HourlyEmployee(const std::string& name)
+        : Employee(name)
+    {
+    }
+    double calculatePay() const override
+    {
+        return 10000;
+    }
+};
+
+class CommissionedEmployee : public Employee
+{
+public:
+    CommissionedEmployee(const std::string& name)
+        : Employee(name)
+    {
+    }
+    double calculatePay() const override
+    {
+        return 20000;
+    }
+};
+
+class EmployeeRegistry
+{
+    typedef std::unordered_map<std::string,std::shared_ptr<Employee>> employee_map;
+    employee_map employees_;
+public:
+    EmployeeRegistry()
+    {
+        employees_.try_emplace("John Smith",std::make_shared<HourlyEmployee>("John Smith"));
+        employees_.try_emplace("Jane Doe",std::make_shared<CommissionedEmployee>("Jane Doe"));
+    }
+
+    bool contains(const std::string& name) const
+    {
+        return employees_.count(name) > 0; 
+    }
+
+    std::shared_ptr<Employee> get(const std::string& name) const
+    {
+        auto it = employees_.find(name);
+        if (it == employees_.end())
+        {
+            throw std::runtime_error("Employee not found");
+        }
+        return it->second; 
+    }
 };
 
 namespace jsoncons
 {
     template<class Json>
-    struct json_type_traits<Json, book>
+    struct json_type_traits<Json, std::shared_ptr<Employee>>
     {
-        static bool is(const Json& rhs) noexcept
+        static bool is(const Json& rhs, const EmployeeRegistry& registry) noexcept
         {
-            return rhs.is_object() &&
-                   rhs.has_key("author") && 
-                   rhs.has_key("title") && 
-                   rhs.has_key("price");
+            return rhs.is_string() && registry.contains(rhs.as<std::string>());
         }
-        static book as(const Json& rhs)
+        static std::shared_ptr<Employee> as(const Json& rhs, 
+                                            const EmployeeRegistry& registry)
         {
-            book val;
-            val.author = rhs["author"]. template as<std::string>();
-            val.title = rhs["title"]. template as<std::string>();
-            val.price = rhs["price"]. template as<double>();
-            return val;
+            return registry.get(rhs.as<std::string>());
         }
-        static Json to_json(const book& val)
+        static Json to_json(std::shared_ptr<Employee> val)
         {
-            Json j;
-            j["author"] = val.author;
-            j["title"] = val.title;
-            j["price"] = val.price;
+            Json j(val->name());
             return j;
         }
     };
@@ -788,71 +855,45 @@ namespace jsoncons
 
 int main()
 {
-    book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
-
-    json j = book1;
-
-    std::cout << "(1) " << std::boolalpha << j.is<book>() << "\n\n";
-
-    std::cout << "(2) " << pretty_print(j) << "\n\n";
-
-    book temp = j.as<book>();
-    std::cout << "(3) " << temp.author << "," 
-                        << temp.title << "," 
-                        << temp.price << "\n\n";
-
-    book book2{"Charles Bukowski", "Women: A Novel", 12.0};
-
-    std::vector<book> book_array{book1, book2};
-
-    json ja = book_array;
-
-    std::cout << "(4) " << std::boolalpha 
-                        << ja.is<std::vector<book>>() << "\n\n";
-
-    std::cout << "(5)\n" << pretty_print(ja) << "\n\n";
-
-    auto book_list = ja.as<std::list<book>>();
-
-    std::cout << "(6)" << std::endl;
-    for (auto b : book_list)
+    json j = R"(
     {
-        std::cout << b.author << ", " 
-                  << b.title << ", " 
-                  << b.price << std::endl;
+        "EmployeeName" : "John Smith"
     }
+    )"_json;
+
+    EmployeeRegistry registry;
+
+    std::shared_ptr<Employee> employee = j["EmployeeName"].as<std::shared_ptr<Employee>>(registry);
+
+    std::cout << "(1) " << employee->name() << " => " 
+              << employee->calculatePay() << std::endl;
+
+    // j does not have a key "SalesRep", so get_with_default returns "Jane Doe"
+    // The template parameter is explicitly specified as json, to return a json string
+    // json::as is then applied to the returned json string  
+    std::shared_ptr<Employee> salesRep = j.get_with_default<json>("SalesRep","Jane Doe")
+                                          .as<std::shared_ptr<Employee>>(registry);
+
+    std::cout << "(2) " << salesRep->name() << " => " 
+              << salesRep->calculatePay() << std::endl;
+
+    json j2;
+    j2["EmployeeName"] = employee;
+    j2["SalesRep"] = salesRep;
+
+    std::cout << "(3)\n" << pretty_print(j2) << std::endl;
 }
-``` 
-Output:
 ```
-(1) true
 
-(2) {
-    "author": "Haruki Murakami",
-    "price": 25.17,
-    "title": "Kafka on the Shore"
+Output:
+
+```json
+(1) John Smith => 10000
+(2) Jane Doe => 20000
+(3)
+{
+    "EmployeeName": "John Smith",
+    "SalesRep": "Jane Doe"
 }
-
-(3) Haruki Murakami,Kafka on the Shore,25.17
-
-(4) true
-
-(5)
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 12.0,
-        "title": "Women: A Novel"
-    }
-]
-
-(6)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Women: A Novel, 12
 ```
 
