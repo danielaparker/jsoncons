@@ -1,7 +1,8 @@
 ```c++
 jsoncons::json::is
-template <class T>
-bool is() const noexcept
+
+template <class T, class... Args>
+bool is(Args&&... args) const noexcept
 ```
 Returns `true` if the json value is the same as type `T` according to [json_type_traits](json_type_traits), `false` otherwise.  
 

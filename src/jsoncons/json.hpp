@@ -1473,10 +1473,10 @@ public:
             evaluate().resize(n,val);
         }
 
-        template<class T>
-        bool is() const
+        template<class T, class... Args>
+        bool is(Args&&... args) const
         {
-            return evaluate().template is<T>();
+            return evaluate().template is<T>(std::forward<Args>(args)...);
         }
 
         bool is_string() const JSONCONS_NOEXCEPT
@@ -2647,10 +2647,10 @@ public:
         }
     }
 
-    template<class T>
-    bool is() const
+    template<class T, class... Args>
+    bool is(Args&&... args) const
     {
-        return json_type_traits<json_type,T>::is(*this);
+        return json_type_traits<json_type,T>::is(*this,std::forward<Args>(args)...);
     }
 
     bool is_string() const JSONCONS_NOEXCEPT

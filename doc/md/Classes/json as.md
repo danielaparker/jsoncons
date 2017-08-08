@@ -1,7 +1,8 @@
 ```c++
-jsoncons::json::is
-template <class T>
-T as() const
+jsoncons::json::as
+
+template <class T, class... Args>
+T as(Args&&... args) const
 ```
 Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits).
 
