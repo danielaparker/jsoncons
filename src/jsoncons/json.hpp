@@ -1545,10 +1545,10 @@ public:
             return evaluate().as_string(options,allocator);
         }
 
-        template<class T>
-        T as() const
+        template<class T, class... Args>
+        T as(Args&&... args) const
         {
-            return evaluate().template as<T>();
+            return evaluate().template as<T>(std::forward<Args>(args)...);
         }
 
         template<class T>
@@ -2790,10 +2790,10 @@ public:
         }
     }
 
-    template<class T>
-    T as() const
+    template<class T, class... Args>
+    T as(Args&&... args) const
     {
-        return json_type_traits<json_type,T>::as(*this);
+        return json_type_traits<json_type,T>::as(*this,std::forward<Args>(args)...);
     }
 
     template<class T>
