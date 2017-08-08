@@ -267,7 +267,9 @@ int main()
     std::cout << "(1) " << employee->name() << " => " 
               << employee->calculatePay() << std::endl;
 
-    // Using defaults
+    // j does not have a key "SalesRep", so get_with_default returns "Jane Doe"
+    // The template parameter is explicitly specified as json, to return a json string
+    // json::as is then applied to the returned json string  
     std::shared_ptr<Employee> salesRep = j.get_with_default<json>("SalesRep","Jane Doe")
                                           .as<std::shared_ptr<Employee>>(registry);
 
