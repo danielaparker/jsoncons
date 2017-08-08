@@ -621,11 +621,11 @@ the <code>json_type_traits</code> functions.</p>
         : name_(name)
     {
     }
+    <span class="pl-k">virtual</span> <span class="pl-en">~Employee</span>() = <span class="pl-k">default</span>;
     <span class="pl-k">const</span> std::string&amp; <span class="pl-en">name</span>() <span class="pl-k">const</span>
     {
         <span class="pl-k">return</span> name_;
     }
-    <span class="pl-k">virtual</span> <span class="pl-en">~Employee</span>() = <span class="pl-k">default</span>;
     <span class="pl-k">virtual</span> <span class="pl-k">double</span> <span class="pl-en">calculatePay</span>() <span class="pl-k">const</span> = 0;
 };
 

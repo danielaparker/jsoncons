@@ -169,11 +169,11 @@ public:
         : name_(name)
     {
     }
+    virtual ~Employee() = default;
     const std::string& name() const
     {
         return name_;
     }
-    virtual ~Employee() = default;
     virtual double calculatePay() const = 0;
 };
 
