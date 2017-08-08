@@ -32,6 +32,7 @@ Note that the json::is<T>() and json::as<T>() functions accept template packs, w
 This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
 looked up from a registry, as illustrated in Example 2 below.
 
+<div id="Eg1"/>
 ### Example 1. Convert to/from user defined type
 
 You can provide a specialization of `json_type_traits` for a `book` class, and then transfer book objects or
@@ -146,6 +147,7 @@ Haruki Murakami, Kafka on the Shore, 25.17
 Charles Bukowski, Women: A Novel, 12
 ```
 
+<div id="Eg2"/>
 ### Example 2. User defined types that require lookup to resolve
 
 This example takes advantage of the fact that we can pass
