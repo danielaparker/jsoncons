@@ -18,6 +18,7 @@
 #include <fstream>
 #include <limits>
 #include <type_traits>
+#include <jsoncons/jsoncons_util.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -39,30 +40,6 @@ struct json_type_traits
 
 namespace detail {
 
-template <class T, class Enable=void>
-struct string_requirement_traits
-{
-    typedef void value_type;
-};
-
-template <class T>
-struct string_requirement_traits<T, typename std::enable_if<!std::is_void<typename T::traits_type>::value>::type>
-{
-    typedef typename T::traits_type value_type;
-};
-
-template <class T, class Enable=void>
-struct map_requirement_traits
-{
-    typedef void value_type;
-};
-
-template <class T>
-struct map_requirement_traits<T, typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type>
-{
-    typedef typename T::mapped_type value_type;
-};
-
 // is_incompatible
 template<class Json, class T, class Enable = void>
 struct is_incompatible : std::false_type {};
@@ -81,7 +58,7 @@ struct is_compatible_string_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_string_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    !std::is_void<typename string_requirement_traits<T>::value_type>::value && 
+    detail::is_string_like<T>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
@@ -92,8 +69,7 @@ struct is_compatible_array_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_array_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    std::is_void<typename map_requirement_traits<T>::value_type>::value && 
-    std::is_void<typename string_requirement_traits<T>::value_type>::value && 
+    detail::is_vector_like<T>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
@@ -311,9 +287,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
 
 template<class Json, class T>
 struct json_type_traits<Json, T,
-                        typename std::enable_if<std::is_integral<T>::value &&
-                        std::is_signed<T>::value &&
-                        !std::is_same<T,bool>::value
+                        typename std::enable_if<detail::is_integer_like<T>::value
 >::type>
 {
     typedef typename Json::allocator_type allocator_type;
@@ -346,9 +320,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, class T>
 struct json_type_traits<Json, T,
-                        typename std::enable_if<std::is_integral<T>::value &&
-                        std::is_unsigned<T>::value &&
-                        !std::is_same<T,bool>::value
+                        typename std::enable_if<detail::is_uinteger_like<T>::value
 >::type >
 {
     typedef typename Json::allocator_type allocator_type;

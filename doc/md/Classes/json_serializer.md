@@ -21,7 +21,7 @@ The `json_serializer` class is an instantiation of the `basic_json_serializer` c
 Constructs a new serializer that writes to the specified output stream.
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, bool indenting)
+    json_serializer(std::ostream& os, bool pprint)
 Constructs a new serializer that writes to the specified output stream.
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
@@ -29,7 +29,7 @@ You must ensure that the output stream exists as long as does `json_serializer`,
 Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, const serialization_options& options, bool indenting)
+    json_serializer(std::ostream& os, const serialization_options& options, bool pprint)
 Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 

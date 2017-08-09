@@ -84,11 +84,90 @@ struct is_stateless
       std::is_empty<T>::value)>
 {};
 
+// type traits extensions
+
 template<class Pointer> inline
 typename std::pointer_traits<Pointer>::element_type* to_plain_pointer(Pointer ptr)
 {       
     return (std::addressof(*ptr));
 }
+namespace detail {
+
+// is_string_like
+
+template <class T, class Enable=void>
+struct is_string_like : std::false_type {};
+
+template <class T>
+struct is_string_like<T, 
+                      typename std::enable_if<!std::is_void<typename T::traits_type>::value
+>::type> : std::true_type {};
+
+// is_integer_like
+
+template <class T, class Enable=void>
+struct is_integer_like : std::false_type {};
+
+template <class T>
+struct is_integer_like<T, 
+                       typename std::enable_if<std::is_integral<T>::value && 
+                       std::is_signed<T>::value && 
+                       !std::is_same<T,bool>::value>::type> : std::true_type {};
+
+// is_uinteger_like
+
+template <class T, class Enable=void>
+struct is_uinteger_like : std::false_type {};
+
+template <class T>
+struct is_uinteger_like<T, 
+                        typename std::enable_if<std::is_integral<T>::value && 
+                        !std::is_signed<T>::value && 
+                        !std::is_same<T,bool>::value>::type> : std::true_type {};
+
+// is_floating_point_like
+
+template <class T, class Enable=void>
+struct is_floating_point_like : std::false_type {};
+
+template <class T>
+struct is_floating_point_like<T, 
+                              typename std::enable_if<std::is_floating_point<T>::value>::type> : std::true_type {};
+
+// is_map_like
+
+template <class T, class Enable=void>
+struct is_map_like : std::false_type {};
+
+template <class T>
+struct is_map_like<T, 
+                   typename typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type> 
+    : std::true_type {};
+
+// is_array_like
+template<class T>
+struct is_array_like : std::false_type {};
+
+template<class E, size_t N>
+struct is_array_like<std::array<E, N>> : std::true_type {};
+
+// is_vector_like
+
+template <class T, class Enable=void>
+struct is_vector_like : std::false_type {};
+
+template <class T>
+struct is_vector_like<T, 
+                      typename std::enable_if<!std::is_void<typename T::value_type>::value &&
+                                              !is_array_like<T>::value && 
+                                              !is_string_like<T>::value && 
+                                              !is_map_like<T>::value 
+>::type> 
+    : std::true_type {};
+
+}
+
+// to_plain_pointer
 
 template<class T> inline
 T * to_plain_pointer(T * ptr)

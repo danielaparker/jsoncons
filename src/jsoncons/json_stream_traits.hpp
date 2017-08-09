@@ -18,129 +18,17 @@
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_serializer.hpp>
+#include <jsoncons/jsoncons_util.hpp>
 
 namespace jsoncons {
 
 template <class CharT, class T, class Enable = void>
 struct json_stream_traits
 {
-    static const bool is_compatible = false;
-
     static void encode(const T&, basic_json_output_handler<CharT>&)
     {
     }
 };
-
-namespace detail {
-
-// string_requirement_traits
-
-template <class T, class Enable=void>
-struct string_requirement_traits
-{
-    typedef void value_type;
-};
-
-template <class T>
-struct string_requirement_traits<T, typename std::enable_if<!std::is_void<typename T::traits_type>::value>::type>
-{
-    typedef typename T::traits_type value_type;
-};
-
-// is_json_integer
-
-template <class T, class Enable=void>
-struct is_json_integer : std::false_type {};
-
-template <class T>
-struct is_json_integer<T, 
-                       typename std::enable_if<std::is_integral<T>::value && 
-                       std::is_signed<T>::value && 
-                       !std::is_same<T,bool>::value>::type> : std::true_type {};
-
-// is_json_uinteger
-
-template <class T, class Enable=void>
-struct is_json_uinteger : std::false_type {};
-
-template <class T>
-struct is_json_uinteger<T, 
-                        typename std::enable_if<std::is_integral<T>::value && 
-                        !std::is_signed<T>::value && 
-                        !std::is_same<T,bool>::value>::type> : std::true_type {};
-
-// is_json_floating_point
-
-template <class T, class Enable=void>
-struct is_json_floating_point : std::false_type {};
-
-template <class T>
-struct is_json_floating_point<T, 
-                              typename std::enable_if<std::is_floating_point<T>::value>::type> : std::true_type {};
-
-// map_requirement_traits
-
-template <class T, class Enable=void>
-struct map_requirement_traits
-{
-    typedef void value_type;
-};
-
-template <class T>
-struct map_requirement_traits<T, typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type>
-{
-    typedef typename T::mapped_type value_type;
-};
-
-// is_incompatible
-template<class CharT, class T, class Enable = void>
-struct is_incompatible : std::false_type {};
-
-// is_incompatible
-template<class CharT, class T>
-struct is_incompatible<CharT,T,
-    typename std::enable_if<!std::integral_constant<bool, json_stream_traits<CharT, T>::is_compatible>::value>::type
-> : std::true_type {};
-
-// is_compatible_string_type
-template<class CharT, class T, class Enable=void>
-struct is_compatible_string_type : std::false_type {};
-
-template<class CharT, class T>
-struct is_compatible_string_type<CharT,T, 
-    typename std::enable_if<!std::is_void<typename string_requirement_traits<T>::value_type>::value && 
-    !is_incompatible<CharT,typename std::iterator_traits<typename T::iterator>::value_type>::value
->::type> : std::true_type {};
-
-// is_compatible_array_type
-template<class CharT, class T, class Enable=void>
-struct is_compatible_array_type : std::false_type {};
-
-template<class CharT, class T>
-struct is_compatible_array_type<CharT,T, 
-    typename std::enable_if<std::is_void<typename map_requirement_traits<T>::value_type>::value && 
-    std::is_void<typename string_requirement_traits<T>::value_type>::value && 
-    !is_incompatible<CharT,typename std::iterator_traits<typename T::iterator>::value_type>::value
->::type> : std::true_type {};
-
-// is_compatible_object_type
-template<class CharT, class T, class Enable=void>
-struct is_compatible_object_type : std::false_type {};
-
-template<class CharT, class T>
-struct is_compatible_object_type<CharT,T, 
-                       typename std::enable_if<
-    !is_incompatible<CharT,typename T::mapped_type>::value
->::type> : std::true_type {};
-
-// is_std_array
-template<class T>
-struct is_std_array : std::false_type {};
-
-template<class E, size_t N>
-struct is_std_array<std::array<E, N>> : std::true_type {};
-
-}
 
 template <class CharT, class T>
 void dump(const T& val, basic_json_output_handler<CharT>& handler)
@@ -157,11 +45,35 @@ void dump(const T& val, std::basic_ostream<CharT>& os)
     dump(val, serializer);
 }
 
+template <class CharT, class T>
+void dump(const T& val, const basic_serialization_options<CharT>& options,
+          std::basic_ostream<CharT>& os)
+{
+    basic_json_serializer<CharT> serializer(os, options);
+    dump(val, serializer);
+}
+
+template <class CharT, class T>
+void dump(const T& val, bool pprint,
+          std::basic_ostream<CharT>& os)
+{
+    basic_json_serializer<CharT> serializer(os, pprint);
+    dump(val, serializer);
+}
+
+template <class CharT, class T>
+void dump(const T& val, const basic_serialization_options<CharT>& options, bool pprint,
+          std::basic_ostream<CharT>& os)
+{
+    basic_json_serializer<CharT> serializer(os, options, pprint);
+    dump(val, serializer);
+}
+
 // integer
 
 template<class CharT, class T>
 struct json_stream_traits<CharT, T,
-                          typename std::enable_if<detail::is_json_integer<T>::value
+                          typename std::enable_if<detail::is_integer_like<T>::value
 >::type>
 {
     static void encode(T val, basic_json_output_handler<CharT>& handler)
@@ -174,7 +86,7 @@ struct json_stream_traits<CharT, T,
 
 template<class CharT, class T>
 struct json_stream_traits<CharT, T,
-                          typename std::enable_if<detail::is_json_uinteger<T>::value
+                          typename std::enable_if<detail::is_uinteger_like<T>::value
 >::type>
 {
     static void encode(T val, basic_json_output_handler<CharT>& handler)
@@ -187,7 +99,7 @@ struct json_stream_traits<CharT, T,
 
 template<class CharT, class T>
 struct json_stream_traits<CharT, T,
-                          typename std::enable_if<detail::is_json_floating_point<T>::value
+                          typename std::enable_if<detail::is_floating_point_like<T>::value
 >::type>
 {
     static void encode(T val, basic_json_output_handler<CharT>& handler)
@@ -211,7 +123,8 @@ struct json_stream_traits<CharT, bool>
 
 template<class CharT, class T>
 struct json_stream_traits<CharT, T,
-    typename std::enable_if<detail::is_compatible_string_type<CharT,T>::value>::type>
+    typename std::enable_if<detail::is_string_like<T>::value
+>::type>
 {
     static void encode(const T& val, basic_json_output_handler<CharT>& handler)
     {
@@ -223,7 +136,8 @@ struct json_stream_traits<CharT, T,
 
 template<class CharT, class T>
 struct json_stream_traits<CharT, T,
-    typename std::enable_if<detail::is_compatible_array_type<CharT,T>::value && !detail::is_std_array<T>::value>::type>
+    typename std::enable_if<detail::is_vector_like<T>::value
+>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
 
@@ -242,7 +156,8 @@ struct json_stream_traits<CharT, T,
 
 template<class CharT, class T>
 struct json_stream_traits<CharT, T,
-    typename std::enable_if<detail::is_compatible_object_type<CharT,T>::value>::type>
+    typename std::enable_if<detail::is_map_like<T>::value
+>::type>
 {
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
