@@ -141,7 +141,7 @@ struct is_map_like : std::false_type {};
 
 template <class T>
 struct is_map_like<T, 
-                   typename typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type> 
+                   typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type> 
     : std::true_type {};
 
 // is_array_like

@@ -39,43 +39,31 @@ line and column information is provided in the [parsing_context](parsing_context
 Send end JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_end_array`.
 
-    void name(const std::string& value, const parsing_context& context)
+    void name(string_view_type name, const basic_parsing_context<CharT>& context)
 Send name event for a name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter.  Uses `do_name`.
 
-    void name(const CharT* p, size_t length, const parsing_context& context)
-Send name event for a name-value pair. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter.  Uses `do_name`.
-
-    void value(const std::string& value, const parsing_context& context)
+    void string_value(string_view_type value, const basic_parsing_context<CharT>& context) 
 Send character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
 
-    void value(const CharT* p, size_t length, const parsing_context& context)
-Send character data event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
-
-    void value(const CharT* p, const parsing_context& context)
-Send a null terminated string event. Contextual information including
-line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_string_value`.
-
-    void value(long long value, const parsing_context& context)
+    void integer_value(int64_t value, const basic_parsing_context<CharT>& context)
 Send signed integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_integer_value`.
 
-    void value(unsigned long long value, const parsing_context& context)
+    void uinteger_value(uint64_t value, const basic_parsing_context<CharT>& context)
 Send non-negative integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_uinteger_value`.
 
-    void value(double value, const parsing_context& context)
+    void double_value(double value, uint8_t precision, const basic_parsing_context<CharT>& context)
 Send floating point value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_double_value`.
 
-    void value(bool value, const parsing_context& context)
+    void bool_value(bool value, const basic_parsing_context<CharT>& context) 
 Send boolean value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_bool_value`.
 
-    void value(const parsing_context& context)
+    void null_value(const basic_parsing_context<CharT>& context) 
 Send null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context) parameter. Uses `do_null_value`.
 

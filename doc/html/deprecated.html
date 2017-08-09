@@ -794,6 +794,12 @@ vertical-align:1px;
 <td>Removed, override do_double_value(double value, uint8_t precision, const basic_parsing_context&amp; context)</td>
 </tr>
 <tr>
+<td> </td>
+<td><code>value(value,context)</code></td>
+<td><em>✓</em></td>
+<td>Use <code>string_value(value,context)</code>, <code>integer_value(value,context)</code>, <code>uinteger_value(value,context)</code>, <code>double_value(value,precision,context)</code>, <code>bool_value(value,context)</code>, <code>null_value(context)</code></td>
+</tr>
+<tr>
 <td>json_output_handler class</td>
 <td>do_longlong_value(long long value)</td>
 <td></td>
@@ -810,6 +816,12 @@ vertical-align:1px;
 <td>do_double_value(double value)</td>
 <td></td>
 <td>Removed, override do_double_value(double value, uint8_t precision)</td>
+</tr>
+<tr>
+<td> </td>
+<td><code>value(value)</code></td>
+<td><em>✓</em></td>
+<td>Use <code>string_value(value)</code>, <code>integer_value(value)</code>, <code>uinteger_value(value)</code>, <code>double_value(value,precision=0)</code>, <code>bool_value(value)</code>, <code>null_value(context)</code></td>
 </tr>
 <tr>
 <td>basic_parsing_context</td>

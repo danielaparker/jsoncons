@@ -58,9 +58,11 @@ json_reader|max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
 json_input_handler class|do_longlong_value(long long value, const parsing_context& context)||Override do_integer_value(int64_t value, const parsing_context& context)
 &#160;|do_ulonglong_value(unsigned long long value, const parsing_context& context)||Removed, override do_uinteger_value(uint64_t value, const parsing_context& context)
 &#160;|do_double_value(double value, const basic_parsing_context<CharT>& context)||Removed, override do_double_value(double value, uint8_t precision, const basic_parsing_context<CharT>& context)
+&#160;|`value(value,context)`|<em>&#x2713;</em>|Use `string_value(value,context)`, `integer_value(value,context)`, `uinteger_value(value,context)`, `double_value(value,precision,context)`, `bool_value(value,context)`, `null_value(context)`
 json_output_handler class|do_longlong_value(long long value)||Removed, override do_integer_value(int64_t value)
 &#160;|do_ulonglong_value(unsigned long long value)||Removed, override do_uinteger_value(uint64_t value)
 &#160;|do_double_value(double value)||Removed, override do_double_value(double value, uint8_t precision)
+&#160;|`value(value)`|<em>&#x2713;</em>|Use `string_value(value)`, `integer_value(value)`, `uinteger_value(value)`, `double_value(value,precision=0)`, `bool_value(value)`, `null_value(context)`
 basic_parsing_context|last_char()|<em>&#x2713;</em>|Use current_char()
 json_filter|parent()|<em>&#x2713;</em>|Use downstream_handler()
 &#160;|input_handler()|<em>&#x2713;</em>|Use downstream_handler()

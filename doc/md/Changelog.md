@@ -5,6 +5,12 @@ Changes
 
 - Visual Studio 2013 is no longer supported (jsonpath uses string initilizer lists)
 
+- `json_input_handler` overloaded functions value(value,context)` have been deprecated.
+  Instead use `string_value(value,context)`, `integer_value(value,context)`, `uinteger_value(value,context)`, `double_value(value,precision,context)`, `bool_value(value,context)` and `null_value(context)`
+
+- `json_output_handler` overloaded functions value(value)` have been deprecated.
+  Instead use `string_value(value)`, `integer_value(value)`, `uinteger_value(value)`, `double_value(value,precision=0)`, `bool_value(value)` and `null_value(context)`
+
 Bug fixes
 
 - Fixed operator== throws when comparing a string against an empty object

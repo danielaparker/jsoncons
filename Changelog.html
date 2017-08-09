@@ -471,7 +471,15 @@ vertical-align:1px;
 <h2>master</h2>
 <p>Changes</p>
 <ul>
-<li>Visual Studio 2013 is no longer supported (jsonpath uses string initilizer lists)</li>
+<li>
+<p>Visual Studio 2013 is no longer supported (jsonpath uses string initilizer lists)</p>
+</li>
+<li>
+<p><code>json_input_handler</code> overloaded functions value(value,context)<code>have been deprecated. Instead use</code>string_value(value,context)<code>,</code>integer_value(value,context)<code>,</code>uinteger_value(value,context)<code>,</code>double_value(value,precision,context)<code>,</code>bool_value(value,context)<code>and</code>null_value(context)`</p>
+</li>
+<li>
+<p><code>json_output_handler</code> overloaded functions value(value)<code>have been deprecated. Instead use</code>string_value(value)<code>,</code>integer_value(value)<code>,</code>uinteger_value(value)<code>,</code>double_value(value,precision=0)<code>,</code>bool_value(value)<code>and</code>null_value(context)`</p>
+</li>
 </ul>
 <p>Bug fixes</p>
 <ul>

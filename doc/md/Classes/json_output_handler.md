@@ -36,31 +36,25 @@ Output begin JSON array event. Uses `do_begin_array`.
     void end_array()
 Output end JSON array event. Uses `do_end_array`.
 
-    void name(const std::string& value)
+    void name(string_view_type name)
 Output name event for a name-value pair. Uses `do_name`.
 
-    void name(const CharT* p, size_t length)
-Output name event for a name-value pair. Uses `do_name`.
-
-    void value(const CharT* p)
-Send a null terminated string event.
-
-    void value(const std::string& value)
+    void string_value(string_view_type value) 
 Output character data event. Uses `do_string_value`.
 
-    void value(long long value)
+    void integer_value(int64_t value) 
 Output signed integer event. Uses `do_integer_value`.
 
-    void value(unsigned long long value)
+    void uinteger_value(uint64_t value) 
 Output non-negative integer event. Uses `do_uinteger_value`.
 
-    void value(double value, uint8_t precision = 0)
+    void double_value(double value, uint8_t precision = 0) 
 Output floating point value event. Uses `do_double_value`.
 
-    void value(bool value)
+    void bool_value(bool value) 
 Output boolean value event. Uses `do_bool_value`.
 
-    void value(null_type)
+    void null_value() 
 Output null value event. Uses `do_null_value`.
 
 ### Private implementation methods

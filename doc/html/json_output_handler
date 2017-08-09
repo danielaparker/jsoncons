@@ -506,31 +506,25 @@ vertical-align:1px;
 <pre><code>void end_array()
 </code></pre>
 <p>Output end JSON array event. Uses <code>do_end_array</code>.</p>
-<pre><code>void name(const std::string&amp; value)
+<pre><code>void name(string_view_type name)
 </code></pre>
 <p>Output name event for a name-value pair. Uses <code>do_name</code>.</p>
-<pre><code>void name(const CharT* p, size_t length)
-</code></pre>
-<p>Output name event for a name-value pair. Uses <code>do_name</code>.</p>
-<pre><code>void value(const CharT* p)
-</code></pre>
-<p>Send a null terminated string event.</p>
-<pre><code>void value(const std::string&amp; value)
+<pre><code>void string_value(string_view_type value) 
 </code></pre>
 <p>Output character data event. Uses <code>do_string_value</code>.</p>
-<pre><code>void value(long long value)
+<pre><code>void integer_value(int64_t value) 
 </code></pre>
 <p>Output signed integer event. Uses <code>do_integer_value</code>.</p>
-<pre><code>void value(unsigned long long value)
+<pre><code>void uinteger_value(uint64_t value) 
 </code></pre>
 <p>Output non-negative integer event. Uses <code>do_uinteger_value</code>.</p>
-<pre><code>void value(double value, uint8_t precision = 0)
+<pre><code>void double_value(double value, uint8_t precision = 0) 
 </code></pre>
 <p>Output floating point value event. Uses <code>do_double_value</code>.</p>
-<pre><code>void value(bool value)
+<pre><code>void bool_value(bool value) 
 </code></pre>
 <p>Output boolean value event. Uses <code>do_bool_value</code>.</p>
-<pre><code>void value(null_type)
+<pre><code>void null_value() 
 </code></pre>
 <p>Output null value event. Uses <code>do_null_value</code>.</p>
 <h3>Private implementation methods</h3>
