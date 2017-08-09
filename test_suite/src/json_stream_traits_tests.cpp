@@ -5,6 +5,7 @@
 #include <jsoncons/json_stream_traits.hpp>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <utility>
 #include <ctime>
 #include <cstdint>
