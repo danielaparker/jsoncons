@@ -66,6 +66,40 @@ public:
         do_name(name, context);
     }
 
+// new
+
+    void string_value(string_view_type value, const basic_parsing_context<CharT>& context) 
+    {
+        do_string_value(value, context);
+    }
+
+    void integer_value(int64_t value, const basic_parsing_context<CharT>& context)
+    {
+        do_integer_value(value,context);
+    }
+
+    void uinteger_value(uint64_t value, const basic_parsing_context<CharT>& context)
+    {
+        do_uinteger_value(value,context);
+    }
+
+    void double_value(double value, uint8_t precision, const basic_parsing_context<CharT>& context)
+    {
+        do_double_value(value, precision, context);
+    }
+
+    void bool_value(bool value, const basic_parsing_context<CharT>& context) 
+    {
+        do_bool_value(value,context);
+    }
+
+    void null_value(const basic_parsing_context<CharT>& context) 
+    {
+        do_null_value(context);
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
     void name(const CharT* p, size_t length, const basic_parsing_context<CharT>& context) 
     {
         do_name(string_view_type(p, length), context);
@@ -135,6 +169,7 @@ public:
     {
         do_null_value(context);
     }
+#endif
 
 private:
     virtual void do_begin_json() = 0;

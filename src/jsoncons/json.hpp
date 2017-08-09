@@ -2453,22 +2453,22 @@ public:
         {
         case value_type::small_string_t:
         case value_type::string_t:
-            handler.value(as_string_view());
+            handler.string_value(as_string_view());
             break;
         case value_type::double_t:
-            handler.value(var_.double_data_cast()->value(), var_.double_data_cast()->precision());
+            handler.double_value(var_.double_data_cast()->value(), var_.double_data_cast()->precision());
             break;
         case value_type::integer_t:
-            handler.value(var_.integer_data_cast()->value());
+            handler.integer_value(var_.integer_data_cast()->value());
             break;
         case value_type::uinteger_t:
-            handler.value(var_.uinteger_data_cast()->value());
+            handler.uinteger_value(var_.uinteger_data_cast()->value());
             break;
         case value_type::bool_t:
-            handler.value(var_.bool_data_cast()->value());
+            handler.bool_value(var_.bool_data_cast()->value());
             break;
         case value_type::null_t:
-            handler.value(null_type());
+            handler.null_value();
             break;
         case value_type::empty_object_t:
             handler.begin_object();
@@ -2480,7 +2480,7 @@ public:
                 const object& o = object_value();
                 for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
-                    handler.name((it->key()).data(),it->key().length());
+                    handler.name(string_view_type((it->key()).data(),it->key().length()));
                     it->value().dump_body(handler);
                 }
                 handler.end_object();

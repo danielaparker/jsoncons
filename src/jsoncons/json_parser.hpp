@@ -151,6 +151,7 @@ template<class CharT>
 class basic_json_parser : private basic_parsing_context<CharT>
 {
     static const int default_initial_stack_capacity_ = 100;
+    typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
 
     basic_default_parse_error_handler<CharT> default_err_handler_;
 
@@ -1649,7 +1650,7 @@ public:
                 }
                 if (literal_index_ == literal_.second)
                 {
-                    handler_.value(true, *this);
+                    handler_.bool_value(true, *this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
@@ -1678,7 +1679,7 @@ public:
                 }
                 if (literal_index_ == literal_.second)
                 {
-                    handler_.value(false, *this);
+                    handler_.bool_value(false, *this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
@@ -1707,7 +1708,7 @@ public:
                 }
                 if (literal_index_ == literal_.second)
                 {
-                    handler_.value(null_type(), *this);
+                    handler_.null_value(*this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
@@ -1872,7 +1873,7 @@ private:
             double d = str_to_double_(string_buffer_.data(), precision_);
             if (is_negative_)
                 d = -d;
-            handler_.value(d, static_cast<uint8_t>(precision_), *this);
+            handler_.double_value(d, static_cast<uint8_t>(precision_), *this);
         }
         catch (...)
         {
@@ -1881,7 +1882,7 @@ private:
                 ec = json_parser_errc::invalid_number;
                 return;
             }
-            handler_.value(null_type(), *this); // recovery
+            handler_.null_value(*this); // recovery
         }
         string_buffer_.clear();
         is_negative_ = false;
@@ -1913,14 +1914,14 @@ private:
             int64_t d;
             if (try_string_to_integer(is_negative_, string_buffer_.data(), string_buffer_.length(),d))
             {
-                handler_.value(d, *this);
+                handler_.integer_value(d, *this);
             }
             else
             {
                 try
                 {
                     double d2 = str_to_double_(string_buffer_.data(), string_buffer_.length());
-                    handler_.value(-d2, static_cast<uint8_t>(string_buffer_.length()), *this);
+                    handler_.double_value(-d2, static_cast<uint8_t>(string_buffer_.length()), *this);
                 }
                 catch (...)
                 {
@@ -1929,7 +1930,7 @@ private:
                         ec = json_parser_errc::invalid_number;
                         return;
                     }
-                    handler_.value(null_type(), *this);
+                    handler_.null_value(*this);
                 }
             }
         }
@@ -1938,14 +1939,14 @@ private:
             uint64_t d;
             if (try_string_to_uinteger(string_buffer_.data(), string_buffer_.length(),d))
             {
-                handler_.value(d, *this);
+                handler_.uinteger_value(d, *this);
             }
             else
             {
                 try
                 {
                     double d2 = str_to_double_(string_buffer_.data(),string_buffer_.length());
-                    handler_.value(d2, static_cast<uint8_t>(string_buffer_.length()), *this);
+                    handler_.double_value(d2, static_cast<uint8_t>(string_buffer_.length()), *this);
                 }
                 catch (...)
                 {
@@ -1954,7 +1955,7 @@ private:
                         ec = json_parser_errc::invalid_number;
                         return;
                     }
-                    handler_.value(null_type(), *this);
+                    handler_.null_value(*this);
                 }
             }
         }
@@ -2077,17 +2078,17 @@ private:
         switch (parent())
         {
         case parse_state::member_name:
-            handler_.name(s, length, *this);
+            handler_.name(string_view_type(s, length), *this);
             state_ = pop_state();
             state_ = parse_state::expect_colon;
             break;
         case parse_state::object:
         case parse_state::array:
-            handler_.value(s, length, *this);
+            handler_.string_value(string_view_type(s, length), *this);
             state_ = parse_state::expect_comma_or_end;
             break;
         case parse_state::root:
-            handler_.value(s, length, *this);
+            handler_.string_value(string_view_type(s, length), *this);
             state_ = parse_state::done;
             handler_.end_json();
             break;

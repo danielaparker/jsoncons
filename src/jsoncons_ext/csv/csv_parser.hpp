@@ -510,7 +510,7 @@ all_csv_states:
             handler_.begin_object(*this);
             for (size_t i = 0; i < column_values_.size(); ++i)
             {
-                handler_.name(column_names_[i].data(),column_names_[i].size(),*this);
+                handler_.name(string_view_type(column_names_[i].data(),column_names_[i].size()),*this);
                 handler_.begin_array(*this);
                 for (const auto& val : column_values_[i])
                 {
@@ -604,7 +604,7 @@ private:
             case mapping_type::n_rows:
                 if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                 {
-                    handler_.value(jsoncons::null_type(),*this);
+                    handler_.null_value(*this);
                 }
                 else
                 {
@@ -616,10 +616,10 @@ private:
                 {
                     if (column_index_ < column_names_.size())
                     {
-                        handler_.name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
+                        handler_.name(column_names_[column_index_], *this);
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.value(jsoncons::null_type(),*this);
+                            handler_.null_value(*this);
                         }
                         else
                         {
@@ -668,7 +668,7 @@ private:
                 {
                     if (column_index_ < column_names_.size())
                     {
-                        handler_.name(column_names_[column_index_].data(), column_names_[column_index_].length(), *this);
+                        handler_.name(column_names_[column_index_], *this);
                         end_value(value_buffer_,column_index_);
                     }
                 }
@@ -717,11 +717,11 @@ private:
             case csv_column_type::integer_t:
                 {
                     std::istringstream iss(value);
-                    long long val;
+                    int64_t val;
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler_.value(val, *this);
+                        handler_.integer_value(val, *this);
                     }
                     else
                     {
@@ -734,7 +734,7 @@ private:
                         }
                         else
                         {
-                            handler_.value(null_type(), *this);
+                            handler_.null_value(*this);
                         }
                     }
                 }
@@ -746,7 +746,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler_.value(val, 0, *this);
+                        handler_.double_value(val, 0, *this);
                     }
                     else
                     {
@@ -759,7 +759,7 @@ private:
                         }
                         else
                         {
-                            handler_.value(null_type(), *this);
+                            handler_.null_value(*this);
                         }
                     }
                 }
@@ -768,19 +768,19 @@ private:
                 {
                     if (value.length() == 1 && value[0] == '0')
                     {
-                        handler_.value(false, *this);
+                        handler_.bool_value(false, *this);
                     }
                     else if (value.length() == 1 && value[0] == '1')
                     {
-                        handler_.value(true, *this);
+                        handler_.bool_value(true, *this);
                     }
                     else if (value.length() == 5 && ((value[0] == 'f' || value[0] == 'F') && (value[1] == 'a' || value[1] == 'A') && (value[2] == 'l' || value[2] == 'L') && (value[3] == 's' || value[3] == 'S') && (value[4] == 'e' || value[4] == 'E')))
                     {
-                        handler_.value(false, *this);
+                        handler_.bool_value(false, *this);
                     }
                     else if (value.length() == 4 && ((value[0] == 't' || value[0] == 'T') && (value[1] == 'r' || value[1] == 'R') && (value[2] == 'u' || value[2] == 'U') && (value[3] == 'e' || value[3] == 'E')))
                     {
-                        handler_.value(true, *this);
+                        handler_.bool_value(true, *this);
                     }
                     else
                     {
@@ -793,7 +793,7 @@ private:
                         }
                         else
                         {
-                            handler_.value(null_type(), *this);
+                            handler_.null_value(*this);
                         }
                     }
                 }
@@ -801,7 +801,7 @@ private:
             default:
                 if (value.length() > 0)
                 {
-                    handler_.value(value.data(), value.length(), *this);
+                    handler_.string_value(value, *this);
                 }
                 else
                 {
@@ -814,7 +814,7 @@ private:
                     }
                     else
                     {
-                        handler_.value("", *this);
+                        handler_.string_value(string_view_type(), *this);
                     }
                 }
                 break;  
@@ -822,7 +822,7 @@ private:
         }
         else
         {
-            handler_.value(value.data(), value.length(), *this);
+            handler_.string_value(value, *this);
         }
     }
 

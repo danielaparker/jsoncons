@@ -101,6 +101,38 @@ public:
         do_name(name);
     }
 
+    void string_value(string_view_type value) 
+    {
+        do_string_value(value);
+    }
+
+    void integer_value(int64_t value) 
+    {
+        do_integer_value(value);
+    }
+
+    void uinteger_value(uint64_t value) 
+    {
+        do_uinteger_value(value);
+    }
+
+    void double_value(double value, uint8_t precision = 0) 
+    {
+        do_double_value(value, precision);
+    }
+
+    void bool_value(bool value) 
+    {
+        do_bool_value(value);
+    }
+
+    void null_value() 
+    {
+        do_null_value();
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
     void name(const CharT* p, size_t length) 
     {
         do_name(string_view_type(p, length));
@@ -165,6 +197,7 @@ public:
     {
         do_null_value();
     }
+#endif
 
 private:
 
