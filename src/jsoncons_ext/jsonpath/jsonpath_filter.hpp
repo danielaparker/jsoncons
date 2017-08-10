@@ -16,6 +16,7 @@
 #include <memory>
 #include <regex>
 #include <functional>
+#include <cmath> 
 #include <jsoncons/json.hpp>
 #include "jsonpath_error_category.hpp"
 
@@ -256,11 +257,23 @@ struct operator_properties
 };
 
 template <class Json>
+struct function_properties
+{
+    typedef std::function<Json(const term<Json>&)> function_type;
+
+    size_t precedence_level;
+    bool is_right_associative;
+    bool is_aggregate;
+    function_type op;
+};
+
+template <class Json>
 class token
 {
     token_type type_;
     size_t precedence_level_;
     bool is_right_associative_;
+    bool is_aggregate_;
     std::shared_ptr<term<Json>> operand_ptr_;
     std::function<Json(const term<Json>&)> unary_operator_;
     std::function<Json(const term<Json>&, const term<Json>&)> operator_;
@@ -279,11 +292,11 @@ public:
     }
 
     token(token_type type)
-        : type_(type),precedence_level_(0),is_right_associative_(false)
+        : type_(type),precedence_level_(0),is_right_associative_(false),is_aggregate_(false)
     {
     }
     token(token_type type, std::shared_ptr<term<Json>> term_ptr)
-        : type_(type),precedence_level_(0),is_right_associative_(false),operand_ptr_(term_ptr)
+        : type_(type),precedence_level_(0),is_right_associative_(false),is_aggregate_(false),operand_ptr_(term_ptr)
     {
     }
     token(size_t precedence_level, 
@@ -291,40 +304,32 @@ public:
           std::function<Json(const term<Json>&)> unary_operator)
         : type_(token_type::unary_operator), 
           precedence_level_(precedence_level), 
-          is_right_associative_(is_right_associative), 
+          is_right_associative_(is_right_associative),
+          is_aggregate_(false), 
           unary_operator_(unary_operator)
     {
     }
     token(const operator_properties<Json>& properties)
         : type_(token_type::binary_operator), 
           precedence_level_(properties.precedence_level), 
-          is_right_associative_(properties.is_right_associative), 
+          is_right_associative_(properties.is_right_associative),
+          is_aggregate_(false), 
           operator_(properties.op)
     {
     }
-    token(const token& t)
-        : type_(t.type_), 
-          precedence_level_(t.precedence_level_),
-          is_right_associative_(t.is_right_associative_),
-          operand_ptr_(t.operand_ptr_),
-          unary_operator_(t.unary_operator_),
-          operator_(t.operator_)
+    token(const function_properties<Json>& properties)
+        : type_(token_type::unary_operator), 
+          precedence_level_(properties.precedence_level), 
+          is_right_associative_(properties.is_right_associative), 
+          is_aggregate_(properties.is_aggregate),
+          unary_operator_(properties.op)
     {
     }
+    token(const token& t) = default;
+    token(token&& t) = default;
 
-    token<Json>& operator=(const token<Json>& val)
-    {
-        if (this != &val)
-        {
-            type_ = val.type_;
-            precedence_level_ = val.precedence_level_;
-            is_right_associative_ = val.is_right_associative_;
-            operand_ptr_ = val.operand_ptr_;
-            unary_operator_ = val.unary_operator_;
-            operator_ = val.operator_;
-        }
-        return *this;
-    }
+    token<Json>& operator=(const token<Json>& val) = default;
+    token<Json>& operator=(token<Json>&& val) = default;
 
     bool is_operator() const
     {
@@ -364,6 +369,11 @@ public:
     bool is_right_associative() const
     {
         return is_right_associative_;
+    }
+
+    bool is_aggregate() const
+    {
+        return is_aggregate_;
     }
 
     const term<Json>& operand()
@@ -1041,12 +1051,12 @@ class jsonpath_filter_parser
 
     class function_table
     {
-        typedef std::map<string_type,std::function<Json(const term<Json>&)>> function_dictionary;
+        typedef std::map<string_type,function_properties<Json>> function_dictionary;
 
         const function_dictionary functions_ =
         {
             {
-                string_type({'m','a','x'}),[](const term<Json>& term)
+                string_type({'m','a','x'}),{1,true,true,[](const term<Json>& term)
                       {
                           Json a = term.evaluate_single_node();
 
@@ -1061,9 +1071,10 @@ class jsonpath_filter_parser
                           }
                           return v;
                       }
+                }
             },
             {
-                string_type({'m','i','n'}),[](const term<Json>& term) 
+                string_type({'m','i','n'}),{1,true,true,[](const term<Json>& term) 
                       {
                           Json a = term.evaluate_single_node();
 
@@ -1078,10 +1089,12 @@ class jsonpath_filter_parser
                           }
                           return v;
                       }
+                }
             }
         };
 
     public:
+
         typename function_dictionary::const_iterator find(const string_type& key) const
         {
             return functions_.find(key);
@@ -1300,17 +1313,24 @@ public:
                     case ')':
                         if (buffer.length() > 0)
                         {
-                            try
+                            if (operator_stack_.back().is_aggregate())
                             {
-                                // path, parse against root, get value
-                                jsonpath_evaluator<Json,const Json&,const Json*,detail::VoidPathConstructor<Json>> evaluator;
-                                evaluator.evaluate(root,buffer.data(),buffer.length());
-                                auto result = evaluator.get_values();
-                                add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(result)));
+                                try
+                                {
+                                    // path, parse against root, get value
+                                    jsonpath_evaluator<Json,const Json&,const Json*,detail::VoidPathConstructor<Json>> evaluator;
+                                    evaluator.evaluate(root,buffer.data(),buffer.length());
+                                    auto result = evaluator.get_values();
+                                    add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(result)));
+                                }
+                                catch (const parse_error& e)
+                                {
+                                    throw parse_error(e.code(),line_,column_);
+                                }
                             }
-                            catch (const parse_error& e)
+                            else
                             {
-                                throw parse_error(e.code(),line_,column_);
+                                add_token(token<Json>(token_type::operand,std::make_shared<path_term<Json>>(buffer)));
                             }
                             buffer.clear();
                             state = filter_state::expect_oper_or_right_round_bracket;
@@ -1401,7 +1421,7 @@ public:
                         {
                             throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,line_,column_);
                         }
-                        add_token(token<Json>(1, true, it->second));
+                        add_token(token<Json>(it->second));
                         state = filter_state::function_argument;
                         buffer.clear();
                         ++p;
