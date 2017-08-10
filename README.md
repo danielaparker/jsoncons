@@ -376,7 +376,7 @@ std::list<book> l = j.as<std::list<book>>();
 
 See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility) for details.
 
-### Stream supported C++ values directly to JSON output, governed by `json_stream_traits` 
+### Serialize C++ objects directly to JSON formatted streams, governed by `json_stream_traits` 
 
 ```c++
 #include <iostream>
