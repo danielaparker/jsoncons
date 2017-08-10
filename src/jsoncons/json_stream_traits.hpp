@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/serialization_options.hpp>
@@ -132,6 +133,15 @@ struct json_stream_traits<CharT, T,
     }
 };
 
+template<class CharT>
+struct json_stream_traits<CharT, typename type_wrapper<CharT>::const_pointer_type>
+{
+    static void encode(typename type_wrapper<CharT>::const_pointer_type val, basic_json_output_handler<CharT>& handler)
+    {
+        handler.string_value(val);
+    }
+};
+
 // sequence container (except string and array)
 
 template<class CharT, class T>
@@ -171,6 +181,60 @@ struct json_stream_traits<CharT, T,
             json_stream_traits<CharT, mapped_type>::encode(it->second,handler);
         }
         handler.end_object();
+    }
+};
+
+namespace detail { namespace streaming {
+
+template<size_t Pos, class CharT, class Tuple>
+struct tuple_helper
+{
+    using element_type = typename std::tuple_element<std::tuple_size<Tuple>::value - Pos, Tuple>::type;
+    using next = tuple_helper<Pos - 1, CharT, Tuple>;
+    
+    static void encode(const Tuple& tuple, basic_json_output_handler<CharT>& handler)
+    {
+        json_stream_traits<CharT, element_type>::encode(std::get<std::tuple_size<Tuple>::value - Pos>(tuple),handler);
+        next::encode(tuple, handler);
+    }
+};
+
+template<class CharT, class Tuple>
+struct tuple_helper<0, CharT, Tuple>
+{
+    static void encode(const Tuple&, basic_json_output_handler<CharT>&)
+    {
+    }
+};
+
+}}
+
+template<class CharT, typename... E>
+struct json_stream_traits<CharT, std::tuple<E...>>
+{
+private:
+    using helper = detail::streaming::tuple_helper<sizeof...(E), CharT, std::tuple<E...>>;
+
+public:
+    static void encode(const std::tuple<E...>& value, basic_json_output_handler<CharT>& handler)
+    {
+        handler.begin_array();
+        helper::encode(value, handler);
+        handler.end_array();
+    }
+};
+
+template<class CharT, class T1, class T2>
+struct json_stream_traits<CharT, std::pair<T1,T2>>
+{
+public:
+   
+    static void encode(const std::pair<T1,T2>& value, basic_json_output_handler<CharT>& handler)
+    {
+        handler.begin_array();
+        json_stream_traits<CharT,T1>::encode(value.first, handler);
+        json_stream_traits<CharT,T2>::encode(value.second, handler);
+        handler.end_array();
     }
 };
 

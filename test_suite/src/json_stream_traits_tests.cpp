@@ -86,6 +86,36 @@ BOOST_AUTO_TEST_CASE(test_map_string)
     std::cout << oss.str() << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_tuple_bool_string_integer)
+{
+    std::ostringstream oss;
+
+    auto val = std::make_tuple(false,std::string("foo"),1);
+    dump(val,oss);
+
+    std::cout << oss.str() << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_tuple_bool_charptr_integer)
+{
+    std::ostringstream oss;
+
+    auto val = std::make_tuple(false,"foo",1);
+    dump(val,oss);
+
+    std::cout << oss.str() << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_pair)
+{
+    std::ostringstream oss;
+
+    auto val = std::make_pair(false,"foo");
+    dump(val,oss);
+
+    std::cout << oss.str() << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
