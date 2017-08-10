@@ -53,9 +53,11 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
 
 ### Return value
 
-None
+None 
     
 ### Examples
+
+#### Map with string-tuple pairs
 
 ```c++
 #include <iostream>
