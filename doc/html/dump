@@ -516,7 +516,7 @@ void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</
 </tbody></table>
 <h3>Return value</h3>
 <p>None</p>
-<h3>Serialize C++ values directly to JSON formatted stream, governed by <code>json_stream_traits</code></h3>
+<h3>Examples</h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>map<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>tuple<span class="pl-pds">&gt;</span></span>

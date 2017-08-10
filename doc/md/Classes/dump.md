@@ -55,7 +55,7 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
 
 None
     
-### Serialize C++ values directly to JSON formatted stream, governed by `json_stream_traits` 
+### Examples
 
 ```c++
 #include <iostream>
