@@ -135,21 +135,6 @@ Output:
 (3) Dimension 2 = 0.0
 ```
 
-## Building the test suite and examples with CMake
-
-[CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
-```
-sudo apt-get install cmake
-```
-
-Instructions for building the test suite with CMake may be found in
-
-    jsoncons/test_suite/build/cmake/README.txt
-
-Instructions for building the examples with CMake may be found in
-
-    jsoncons/examples/build/cmake/README.txt
-
 ## About jsoncons::basic_json
 
 The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different character types, different policies for ordering name-value pairs, etc.
@@ -721,6 +706,21 @@ Output:
 ```
 
 See [encode_message_pack](https://github.com/danielaparker/jsoncons/wiki/encode_message_pack) and [decode_message_pack](https://github.com/danielaparker/jsoncons/wiki/decode_message_pack) for details.
+
+## Building the test suite and examples with CMake
+
+[CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
+```
+sudo apt-get install cmake
+```
+
+Instructions for building the test suite with CMake may be found in
+
+    jsoncons/test_suite/build/cmake/README.txt
+
+Instructions for building the examples with CMake may be found in
+
+    jsoncons/examples/build/cmake/README.txt
 
 ## Acknowledgements
 

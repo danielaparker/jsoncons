@@ -598,16 +598,6 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 (<span class="pl-c1">2</span>) Dimension <span class="pl-c1">1</span> = <span class="pl-c1">9.84</span>
 
 (<span class="pl-c1">3</span>) Dimension <span class="pl-c1">2</span> = <span class="pl-c1">0.0</span></pre></div>
-<h2>Building the test suite and examples with CMake</h2>
-<p><a href="https://cmake.org/">CMake</a> is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a <a href="https://cmake.org/download/">Windows Installer package</a>. On Linux it is usually available as a package, e.g., on Ubuntu,</p>
-<pre><code>sudo apt-get install cmake
-</code></pre>
-<p>Instructions for building the test suite with CMake may be found in</p>
-<pre><code>jsoncons/test_suite/build/cmake/README.txt
-</code></pre>
-<p>Instructions for building the examples with CMake may be found in</p>
-<pre><code>jsoncons/examples/build/cmake/README.txt
-</code></pre>
 <h2>About jsoncons::basic_json</h2>
 <p>The jsoncons library provides a <code>basic_json</code> class template, which is the generalization of a <code>json</code> value for different character types, different policies for ordering name-value pairs, etc.</p>
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">typedef</span> basic_json&lt;<span class="pl-k">char</span>,
@@ -1091,6 +1081,16 @@ project_id,task_name,task_start,task_finish
     }
 ]</pre></div>
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/encode_message_pack">encode_message_pack</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/decode_message_pack">decode_message_pack</a> for details.</p>
+<h2>Building the test suite and examples with CMake</h2>
+<p><a href="https://cmake.org/">CMake</a> is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a <a href="https://cmake.org/download/">Windows Installer package</a>. On Linux it is usually available as a package, e.g., on Ubuntu,</p>
+<pre><code>sudo apt-get install cmake
+</code></pre>
+<p>Instructions for building the test suite with CMake may be found in</p>
+<pre><code>jsoncons/test_suite/build/cmake/README.txt
+</code></pre>
+<p>Instructions for building the examples with CMake may be found in</p>
+<pre><code>jsoncons/examples/build/cmake/README.txt
+</code></pre>
 <h2>Acknowledgements</h2>
 <p>Special thanks to our <a href="https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt">contributors</a></p></div></div></div>
 </body>
