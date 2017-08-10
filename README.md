@@ -27,7 +27,7 @@ Extensions:
 
 - Visual Studio 2013 is no longer supported
 
-- [dump(https://github.com/danielaparker/jsoncons/wiki/dump)] function that serializes c++ objects directly to JSON formatted stream, governed by `json_stream_traits` 
+- [dump](https://github.com/danielaparker/jsoncons/wiki/dump) function that serializes c++ objects directly to JSON formatted stream, governed by `json_stream_traits` 
 
 - json::is<T>() and json::as<T>() accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
   This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
