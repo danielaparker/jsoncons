@@ -402,6 +402,7 @@ int main()
     dump(employees,std::cout,true);
 }
 ```
+```
 Output:
 (1)
 {"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}

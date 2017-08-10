@@ -813,51 +813,48 @@ std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) Again, with pretty print<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; std::endl; 
     <span class="pl-c1">dump</span>(employees,std::cout,<span class="pl-c1">true</span>);
 }</pre></div>
-<p>Output:<br>
-(1)<br>
-{"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}</p>
-<p>(2) Again, with pretty print<br>
-{<br>
-"Jane Doe": ["Commission","Sales",20000.0],<br>
-"John Smith": ["Hourly","Software Engineer",10000.0]<br>
-}</p>
-<pre><code>
-### Filter json names and values
+<pre><code>Output:
+(1)
+{"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
 
-You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/wiki/rename_name_filter)
-
-```c++
-#include &lt;sstream&gt;
-#include &lt;jsoncons/json.hpp&gt;
-#include &lt;jsoncons/json_filter.hpp&gt;
-
-using namespace jsoncons;
-
-int main()
+(2) Again, with pretty print
 {
-    std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
-
-    json_serializer serializer(std::cout);
-
-    // Filters can be chained
-    rename_name_filter filter2("fifth", "fourth", serializer);
-    rename_name_filter filter1("fourth", "third", filter2);
-
-    // A filter can be passed to any function that takes
-    // a json_input_handler ...
-    std::cout &lt;&lt; "(1) ";
-    std::istringstream is(s);
-    json_reader reader(is, filter1);
-    reader.read();
-    std::cout &lt;&lt; std::endl;
-
-    // or a json_output_handler    
-    std::cout &lt;&lt; "(2) ";
-    ojson j = ojson::parse(s);
-    j.dump(filter1);
-    std::cout &lt;&lt; std::endl;
+    "Jane Doe": ["Commission","Sales",20000.0],
+    "John Smith": ["Hourly","Software Engineer",10000.0]
 }
 </code></pre>
+<h3>Filter json names and values</h3>
+<p>You can rename object member names with the built in filter <a href="https://github.com/danielaparker/jsoncons/wiki/rename_name_filter">rename_name_filter</a></p>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sstream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_filter.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::string s = <span class="pl-s"><span class="pl-pds">R"(</span>{"first":1,"second":2,"fourth":3,"fifth":4}<span class="pl-pds">)"</span></span>;    
+
+    json_serializer <span class="pl-smi">serializer</span>(std::cout);
+
+    <span class="pl-c"><span class="pl-c">//</span> Filters can be chained</span>
+    rename_name_filter <span class="pl-smi">filter2</span>(<span class="pl-s"><span class="pl-pds">"</span>fifth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, serializer);
+    rename_name_filter <span class="pl-smi">filter1</span>(<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>, filter2);
+
+    <span class="pl-c"><span class="pl-c">//</span> A filter can be passed to any function that takes</span>
+    <span class="pl-c"><span class="pl-c">//</span> a json_input_handler ...</span>
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1) <span class="pl-pds">"</span></span>;
+    std::istringstream <span class="pl-smi">is</span>(s);
+    json_reader <span class="pl-smi">reader</span>(is, filter1);
+    reader.<span class="pl-c1">read</span>();
+    std::cout &lt;&lt; std::endl;
+
+    <span class="pl-c"><span class="pl-c">//</span> or a json_output_handler    </span>
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) <span class="pl-pds">"</span></span>;
+    ojson j = <span class="pl-c1">ojson::parse</span>(s);
+    j.<span class="pl-c1">dump</span>(filter1);
+    std::cout &lt;&lt; std::endl;
+}</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>(<span class="pl-c1">1</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}
 (<span class="pl-c1">2</span>) {<span class="pl-s"><span class="pl-pds">"</span>first<span class="pl-pds">"</span></span>:<span class="pl-c1">1</span>,<span class="pl-s"><span class="pl-pds">"</span>second<span class="pl-pds">"</span></span>:<span class="pl-c1">2</span>,<span class="pl-s"><span class="pl-pds">"</span>third<span class="pl-pds">"</span></span>:<span class="pl-c1">3</span>,<span class="pl-s"><span class="pl-pds">"</span>fourth<span class="pl-pds">"</span></span>:<span class="pl-c1">4</span>}</pre></div>
