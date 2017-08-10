@@ -27,6 +27,8 @@ Extensions:
 
 - Visual Studio 2013 is no longer supported
 
+- Stream supported c++ values directly to JSON output, governed by `json_stream_traits`
+
 - json::is<T>() and json::as<T>() accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
   This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
   looked up from a registry. See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility), Example 2. 
@@ -373,6 +375,49 @@ std::list<book> l = j.as<std::list<book>>();
 ```
 
 See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility) for details.
+
+### Stream supported C++ values directly to JSON output, governed by `json_stream_traits` 
+
+```c++
+#include <iostream>
+#include <map>
+#include <tuple>
+#include <jsoncons/json_stream_traits.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::map<std::string,std::tuple<std::string,std::string,double>> employees = 
+    { 
+        {"John Smith",{"Hourly","Software Engineer",10000}},
+        {"Jane Doe",{"Commission","Sales",20000}}
+    };
+
+    std::cout << "(1)\n" << std::endl; 
+    dump(employees,std::cout);
+    std::cout << "\n\n";
+
+    std::cout << "(2) Again, with pretty print\n" << std::endl; 
+    dump(employees,std::cout,true);
+}
+```
+```
+Output:
+(1)
+```
+```json
+{"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
+```
+```
+(2) Again, with pretty print
+```
+```json
+{
+    "Jane Doe": ["Commission","Sales",20000.0],
+    "John Smith": ["Hourly","Software Engineer",10000.0]
+}
+```
 
 ### Filter json names and values
 

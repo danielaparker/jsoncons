@@ -497,6 +497,9 @@ vertical-align:1px;
 <p>Visual Studio 2013 is no longer supported</p>
 </li>
 <li>
+<p>Stream supported c++ values directly to JSON output, governed by <code>json_stream_traits</code></p>
+</li>
+<li>
 <p>json::is() and json::as() accept template packs, which they forward to the <code>json_type_traits</code> <code>is</code> and <code>as</code> functions.<br>
 This allows user defined <code>json_type_traits</code> implementations to resolve, for instance, a name into a C++ object<br>
 looked up from a registry. See <a href="https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility">Type Extensibility</a>, Example 2.</p>
@@ -787,6 +790,39 @@ json j = v;
 
 std::list&lt;book&gt; l = j.as&lt;std::list&lt;book&gt;&gt;();</pre></div>
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility">Type Extensibility</a> for details.</p>
+<h3>Stream supported C++ values directly to JSON output, governed by <code>json_stream_traits</code></h3>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>map<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>tuple<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_stream_traits.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::map&lt;std::string,std::tuple&lt;std::string,std::string,<span class="pl-k">double</span>&gt;&gt; employees = 
+    { 
+        {<span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>,{<span class="pl-s"><span class="pl-pds">"</span>Hourly<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Software Engineer<span class="pl-pds">"</span></span>,<span class="pl-c1">10000</span>}},
+        {<span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>,{<span class="pl-s"><span class="pl-pds">"</span>Commission<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Sales<span class="pl-pds">"</span></span>,<span class="pl-c1">20000</span>}}
+    };
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; std::endl; 
+    <span class="pl-c1">dump</span>(employees,std::cout);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) Again, with pretty print<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; std::endl; 
+    <span class="pl-c1">dump</span>(employees,std::cout,<span class="pl-c1">true</span>);
+}</pre></div>
+<pre><code>Output:
+(1)
+</code></pre>
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>:[<span class="pl-s"><span class="pl-pds">"</span>Commission<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Sales<span class="pl-pds">"</span></span>,<span class="pl-c1">20000.0</span>],<span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>:[<span class="pl-s"><span class="pl-pds">"</span>Hourly<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Software Engineer<span class="pl-pds">"</span></span>,<span class="pl-c1">10000.0</span>]}</pre></div>
+<pre><code>(2) Again, with pretty print
+</code></pre>
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>Commission<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Sales<span class="pl-pds">"</span></span>,<span class="pl-c1">20000.0</span>],
+    <span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>Hourly<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Software Engineer<span class="pl-pds">"</span></span>,<span class="pl-c1">10000.0</span>]
+}</pre></div>
 <h3>Filter json names and values</h3>
 <p>You can rename object member names with the built in filter <a href="https://github.com/danielaparker/jsoncons/wiki/rename_name_filter">rename_name_filter</a></p>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sstream<span class="pl-pds">&gt;</span></span>

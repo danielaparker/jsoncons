@@ -55,16 +55,15 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
 }
 
 template <class CharT, class T>
-void dump(const T& val, bool pprint,
-          std::basic_ostream<CharT>& os)
+void dump(const T& val, std::basic_ostream<CharT>& os, bool pprint)
 {
     basic_json_serializer<CharT> serializer(os, pprint);
     dump(val, serializer);
 }
 
 template <class CharT, class T>
-void dump(const T& val, const basic_serialization_options<CharT>& options, bool pprint,
-          std::basic_ostream<CharT>& os)
+void dump(const T& val, const basic_serialization_options<CharT>& options,
+          std::basic_ostream<CharT>& os, bool pprint)
 {
     basic_json_serializer<CharT> serializer(os, options, pprint);
     dump(val, serializer);

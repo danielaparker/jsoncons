@@ -22,6 +22,7 @@ void csv_examples();
 void jsonpath_examples();
 void json_is_as_examples();
 void msgpack_examples();
+void streaming_examples();
 
 void first_example_a()
 {
@@ -338,15 +339,17 @@ int main()
 
         parse_exception_example();
 
-        type_extensibility_examples();*/
+        type_extensibility_examples();
 
         type_extensibility_examples2();
 
-        /*json_filter_examples();
+        json_filter_examples();
 
         jsonpath_examples();
 
         msgpack_examples();*/
+
+        streaming_examples();
 
     }
     catch (const std::exception& e)
