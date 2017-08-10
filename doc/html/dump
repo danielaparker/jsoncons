@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Home</title>
+<title>dump</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,41 +468,87 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<p>All core jsoncons classes and functions are in namespace <code>jsoncons</code>.</p>
-<h3>Core</h3>
-<h4>Streaming</h4>
-<p><a href="dump">dump</a></p>
-<p><a href="json_input_handler">json_input_handler</a></p>
-<p><a href="json_output_handler">json_output_handler</a><br>
-<a href="json_serializer">json_serializer</a><br>
-<a href="serialization_options">serialization_options</a></p>
-<p><a href="json_filter">json_filter</a><br>
-<a href="rename_name_filter">rename_name_filter</a></p>
-<p><a href="wjson_serializer">wjson_serializer</a><br>
-<a href="wserialization_options">wserialization_options</a></p>
-<h4>json Container</h4>
-<p><a href="json">json</a><br>
-<a href="json_reader">json_reader</a><br>
-<a href="json_decoder">json_decoder</a></p>
-<p><a href="ojson">ojson</a></p>
-<p><a href="wjson">wjson</a><br>
-<a href="wjson_reader">wjson_reader</a></p>
-<p><a href="wojson">wojson</a></p>
-<h3>Extensions</h3>
-<h4>csv</h4>
-<p><a href="csv_reader">csv_reader</a></p>
-<p><a href="csv_serializer">csv_serializer</a></p>
-<h4>jsonpath</h4>
-<p><a href="json_query">json_query</a></p>
-<p><a href="json_replace">json_replace</a></p>
-<h4>msgpack</h4>
-<p><a href="encode_message_pack">encode_message_pack</a></p>
-<p><a href="decode_message_pack">decode_message_pack</a></p>
-<h3>Tutorials</h3>
-<p><a href="Basics">Basics</a></p>
-<p><a href="Type%20Extensibility">Type Extensibility</a></p>
-<p><a href="Custom%20Allocators">Custom Allocators</a></p>
-<p><a href="Unicode%20support">Unicode support</a></p>
+<div class="highlight highlight-source-c++"><pre>jsoncons::dump</pre></div>
+<p>Serialize C++ object as a JSON formatted stream, governed by <code>json_stream_traits</code></p>
+<h3>Header</h3>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_stream_traits.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">CharT</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
+<span class="pl-k">void</span> <span class="pl-en">dump</span>(<span class="pl-k">const</span> T&amp; val, basic_json_output_handler&lt;CharT&gt;&amp; handler)
+
+template &lt;class CharT, class T&gt;
+void dump(<span class="pl-k">const</span> T&amp; val, std::basic_ostream&lt;CharT&gt;&amp; os)
+
+template &lt;class CharT, class T&gt;
+void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</span> basic_serialization_options&lt;CharT&gt;&amp; options,
+          std::basic_ostream&lt;CharT&gt;&amp; os)
+
+template &lt;class CharT, class T&gt;
+void dump(<span class="pl-k">const</span> T&amp; val, std::basic_ostream&lt;CharT&gt;&amp; os, <span class="pl-k">bool</span> pprint)
+
+template &lt;class CharT, class T&gt;
+void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</span> basic_serialization_options&lt;CharT&gt;&amp; options,
+          std::basic_ostream&lt;CharT&gt;&amp; os, <span class="pl-k">bool</span> pprint)
+
+</pre></div>
+<h3>Parameters</h3>
+<table>
+  <tbody><tr>
+    <td>val</td>
+    <td>C++ object</td> 
+  </tr>
+  <tr>
+    <td>handler</td>
+    <td>JSON output handler</td> 
+  </tr>
+  <tr>
+    <td>options</td>
+    <td>Serialization options</td> 
+  </tr>
+  <tr>
+    <td>os</td>
+    <td>Output stream</td> 
+  </tr>
+  <tr>
+    <td>pprint</td>
+    <td><code>true</code> to pretty print, otherwise <code>false</code></td> 
+  </tr>
+</tbody></table>
+<h3>Return value</h3>
+<p>None</p>
+<h3>Serialize C++ values directly to JSON formatted stream, governed by <code>json_stream_traits</code></h3>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>map<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>tuple<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_stream_traits.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::map&lt;std::string,std::tuple&lt;std::string,std::string,<span class="pl-k">double</span>&gt;&gt; employees = 
+    { 
+        {<span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>,{<span class="pl-s"><span class="pl-pds">"</span>Hourly<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Software Engineer<span class="pl-pds">"</span></span>,<span class="pl-c1">10000</span>}},
+        {<span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>,{<span class="pl-s"><span class="pl-pds">"</span>Commission<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Sales<span class="pl-pds">"</span></span>,<span class="pl-c1">20000</span>}}
+    };
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(1)<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; std::endl; 
+    <span class="pl-c1">dump</span>(employees,std::cout);
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>;
+
+    std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) Again, with pretty print<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; std::endl; 
+    <span class="pl-c1">dump</span>(employees,std::cout,<span class="pl-c1">true</span>);
+}</pre></div>
+<pre><code>Output:
+(1)
+{"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
+
+(2) Again, with pretty print
+{
+    "Jane Doe": ["Commission","Sales",20000.0],
+    "John Smith": ["Hourly","Software Engineer",10000.0]
+}
+</code></pre>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

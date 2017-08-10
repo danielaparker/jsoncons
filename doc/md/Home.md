@@ -1,36 +1,33 @@
 All core jsoncons classes and functions are in namespace `jsoncons`.  
 
-### Roadmap
+### Core
 
-[Roadmap](Roadmap)
+#### Streaming
 
-### Tutorials
+[dump](dump)
 
-[Basics](Basics)
+[json_input_handler](json_input_handler)  
 
-[Type Extensibility](Type%20Extensibility)
-
-[Custom Allocators](Custom%20Allocators)
-
-[Unicode support](Unicode%20support)
-
-### Classes
-
-[json](json)  
+[json_output_handler](json_output_handler)  
 [json_serializer](json_serializer)  
 [serialization_options](serialization_options)  
-[json_reader](json_reader)  
 
-[json_decoder](json_decoder)  
 [json_filter](json_filter)  
 [rename_name_filter](rename_name_filter)  
 
-[wjson](wjson)  
 [wjson_serializer](wjson_serializer)  
 [wserialization_options](wserialization_options)  
-[wjson_reader](wjson_reader)  
+
+#### json Container
+
+[json](json)  
+[json_reader](json_reader)  
+[json_decoder](json_decoder)  
 
 [ojson](ojson)  
+
+[wjson](wjson)  
+[wjson_reader](wjson_reader)  
 
 [wojson](wojson)  
 
@@ -53,4 +50,14 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [encode_message_pack](encode_message_pack)
 
 [decode_message_pack](decode_message_pack)
+
+### Tutorials
+
+[Basics](Basics)
+
+[Type Extensibility](Type%20Extensibility)
+
+[Custom Allocators](Custom%20Allocators)
+
+[Unicode support](Unicode%20support)
 
