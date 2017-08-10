@@ -402,17 +402,11 @@ int main()
     dump(employees,std::cout,true);
 }
 ```
-```
 Output:
 (1)
-```
-```json
 {"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
-```
-```
+
 (2) Again, with pretty print
-```
-```json
 {
     "Jane Doe": ["Commission","Sales",20000.0],
     "John Smith": ["Hourly","Software Engineer",10000.0]
