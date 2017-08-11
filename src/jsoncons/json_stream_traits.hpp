@@ -275,18 +275,6 @@ public:
     }
 };
 
-template<class CharT, class T>
-struct json_stream_traits<CharT, std::unique_ptr<T>>
-{
-public:
-   
-    static void encode(std::unique_ptr<T> p, basic_json_output_handler<CharT>& handler)
-    {
-        json_stream_traits<CharT,T>::encode(*p, handler);
-    }
-};
-
-
 }
 
 #if defined(__GNUC__)
