@@ -8,24 +8,30 @@ Serialize C++ object as a JSON formatted stream, governed by `json_stream_traits
 #include <jsoncons/json_stream_traits.hpp>
 
 template <class CharT, class T>
-void dump(const T& val, basic_json_output_handler<CharT>& handler)
+void dump(const T& val, basic_json_output_handler<CharT>& handler) (1)
 
 template <class CharT, class T>
-void dump(const T& val, std::basic_ostream<CharT>& os)
+void dump_body(const T& val, basic_json_output_handler<CharT>& handler) (2)
 
 template <class CharT, class T>
-void dump(const T& val, const basic_serialization_options<CharT>& options,
-          std::basic_ostream<CharT>& os)
-
-template <class CharT, class T>
-void dump(const T& val, std::basic_ostream<CharT>& os, bool pprint)
+void dump(const T& val, std::basic_ostream<CharT>& os) (3)
 
 template <class CharT, class T>
 void dump(const T& val, const basic_serialization_options<CharT>& options,
-          std::basic_ostream<CharT>& os, bool pprint)
+          std::basic_ostream<CharT>& os) (4)
 
+template <class CharT, class T>
+void dump(const T& val, std::basic_ostream<CharT>& os, bool pprint) (5)
 
+template <class CharT, class T>
+void dump(const T& val, const basic_serialization_options<CharT>& options,
+          std::basic_ostream<CharT>& os, bool pprint) (6)
 ```
+
+(1) Calls `begin_json()` on `handler`, applies `json_stream_traits` to serialize `val` tp JSON output stream, and calls `end_json()` on `handler`.
+
+(2) Applies `json_stream_traits` to serialize `val` to JSON output stream, but does not call begin_json() and `end_json()`.
+
 ### Parameters
 
 <table>
@@ -83,8 +89,8 @@ int main()
     dump(employees,std::cout,true);
 }
 ```
-```
 Output:
+```
 (1)
 {"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
 
@@ -94,4 +100,137 @@ Output:
     "John Smith": ["Hourly","Software Engineer",10000.0]
 }
 ```
+    
+#### Contain JSON output in an object
+
+```c++
+#include <iostream>
+#include <map>
+#include <tuple>
+#include <jsoncons/json_stream_traits.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::map<std::string,std::tuple<std::string,std::string,double>> employees = 
+    { 
+        {"John Smith",{"Hourly","Software Engineer",10000}},
+        {"Jane Doe",{"Commission","Sales",20000}}
+    };
+
+    // `true` means pretty print
+    json_serializer serializer(std::cout, true); 
+
+    serializer.begin_json();       
+    serializer.begin_object();       
+    serializer.name("Employees");       
+    dump_body(employees, serializer);
+    serializer.end_object();       
+    serializer.end_json();       
+}
+```
+Output:
+```json
+{
+    "Employees": {
+        "Jane Doe": ["Commission","Sales",20000.0],
+        "John Smith": ["Hourly","Software Engineer",10000.0]
+    }
+}
+```
+    
+#### Extending `json_stream_traits`
+
+```c++
+class Employee
+{
+    std::string name_;
+public:
+    Employee(const std::string& name)
+        : name_(name)
+    {
+    }
+    virtual ~Employee() = default;
+    const std::string& name() const
+    {
+        return name_;
+    }
+    virtual double calculatePay() const = 0;
+};
+
+class HourlyEmployee : public Employee
+{
+public:
+    HourlyEmployee(const std::string& name)
+        : Employee(name)
+    {
+    }
+    double calculatePay() const override
+    {
+        return 10000;
+    }
+};
+
+class CommissionedEmployee : public Employee
+{
+public:
+    CommissionedEmployee(const std::string& name)
+        : Employee(name)
+    {
+    }
+    double calculatePay() const override
+    {
+        return 20000;
+    }
+};
+
+namespace jsoncons
+{
+    template <>
+    struct json_stream_traits<char,Employee>
+    {
+        static void encode(const Employee& val, json_output_handler& handler)
+        {
+            handler.begin_object();
+            handler.name("Name");
+            handler.string_value(val.name());
+            handler.name("Pay");
+            handler.double_value(val.calculatePay());
+            handler.end_object();
+        }
+    };
+};
+
+int main()
+{
+    std::shared_ptr<Employee> j1 = std::make_shared<HourlyEmployee>("John Smith");
+    std::shared_ptr<Employee> j2 = std::make_shared<CommissionedEmployee>("Jane Doe");
+
+    // `true` means pretty print
+    json_serializer serializer(std::cout, true); 
+
+    serializer.begin_json();       
+    serializer.begin_array();       
+    dump_body(j1, serializer);
+    dump_body(j2, serializer);
+    serializer.end_array();       
+    serializer.end_json();       
+}
+```
+Output:
+```json
+[
+    {
+        "Name": "John Smith",
+        "Pay": 10000.0
+    },
+    {
+        "Name": "Jane Doe",
+        "Pay": 20000.0
+    }
+]
+```
+
+
 

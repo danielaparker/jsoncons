@@ -41,6 +41,12 @@ void dump(const T& val, basic_json_output_handler<CharT>& handler)
 }
 
 template <class CharT, class T>
+void dump_body(const T& val, basic_json_output_handler<CharT>& handler)
+{
+    json_stream_traits<CharT,T>::encode(val,handler);
+}
+
+template <class CharT, class T>
 void dump(const T& val, std::basic_ostream<CharT>& os)
 {
     basic_json_serializer<CharT> serializer(os);

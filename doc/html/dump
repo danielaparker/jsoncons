@@ -474,23 +474,26 @@ vertical-align:1px;
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_stream_traits.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">template </span>&lt;<span class="pl-k">class</span> <span class="pl-en">CharT</span>, <span class="pl-k">class</span> <span class="pl-en">T</span>&gt;
-<span class="pl-k">void</span> <span class="pl-en">dump</span>(<span class="pl-k">const</span> T&amp; val, basic_json_output_handler&lt;CharT&gt;&amp; handler)
+<span class="pl-k">void</span> <span class="pl-en">dump</span>(<span class="pl-k">const</span> T&amp; val, basic_json_output_handler&lt;CharT&gt;&amp; handler) (<span class="pl-c1">1</span>)
 
 template &lt;class CharT, class T&gt;
-void dump(<span class="pl-k">const</span> T&amp; val, std::basic_ostream&lt;CharT&gt;&amp; os)
+void dump_body(<span class="pl-k">const</span> T&amp; val, basic_json_output_handler&lt;CharT&gt;&amp; handler) (<span class="pl-c1">2</span>)
 
 template &lt;class CharT, class T&gt;
-void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</span> basic_serialization_options&lt;CharT&gt;&amp; options,
-          std::basic_ostream&lt;CharT&gt;&amp; os)
-
-template &lt;class CharT, class T&gt;
-void dump(<span class="pl-k">const</span> T&amp; val, std::basic_ostream&lt;CharT&gt;&amp; os, <span class="pl-k">bool</span> pprint)
+void dump(<span class="pl-k">const</span> T&amp; val, std::basic_ostream&lt;CharT&gt;&amp; os) (<span class="pl-c1">3</span>)
 
 template &lt;class CharT, class T&gt;
 void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</span> basic_serialization_options&lt;CharT&gt;&amp; options,
-          std::basic_ostream&lt;CharT&gt;&amp; os, <span class="pl-k">bool</span> pprint)
+          std::basic_ostream&lt;CharT&gt;&amp; os) (<span class="pl-c1">4</span>)
 
-</pre></div>
+template &lt;class CharT, class T&gt;
+void dump(<span class="pl-k">const</span> T&amp; val, std::basic_ostream&lt;CharT&gt;&amp; os, <span class="pl-k">bool</span> pprint) (<span class="pl-c1">5</span>)
+
+template &lt;class CharT, class T&gt;
+void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</span> basic_serialization_options&lt;CharT&gt;&amp; options,
+          std::basic_ostream&lt;CharT&gt;&amp; os, <span class="pl-k">bool</span> pprint) (<span class="pl-c1">6</span>)</pre></div>
+<p>(1) Calls <code>begin_json()</code> on <code>handler</code>, applies <code>json_stream_traits</code> to serialize <code>val</code> tp JSON output stream, and calls <code>end_json()</code> on <code>handler</code>.</p>
+<p>(2) Applies <code>json_stream_traits</code> to serialize <code>val</code> to JSON output stream, but does not call begin_json() and <code>end_json()</code>.</p>
 <h3>Parameters</h3>
 <table>
   <tbody><tr>
@@ -517,6 +520,7 @@ void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</
 <h3>Return value</h3>
 <p>None</p>
 <h3>Examples</h3>
+<h4>Map with string-tuple pairs</h4>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>map<span class="pl-pds">&gt;</span></span>
 #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>tuple<span class="pl-pds">&gt;</span></span>
@@ -539,8 +543,8 @@ void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</
     std::cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>(2) Again, with pretty print<span class="pl-cce">\n</span><span class="pl-pds">"</span></span> &lt;&lt; std::endl; 
     <span class="pl-c1">dump</span>(employees,std::cout,<span class="pl-c1">true</span>);
 }</pre></div>
-<pre><code>Output:
-(1)
+<p>Output:</p>
+<pre><code>(1)
 {"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
 
 (2) Again, with pretty print
@@ -549,6 +553,125 @@ void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</
     "John Smith": ["Hourly","Software Engineer",10000.0]
 }
 </code></pre>
+<h4>Contain JSON output in an object</h4>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>map<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>tuple<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_stream_traits.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::map&lt;std::string,std::tuple&lt;std::string,std::string,<span class="pl-k">double</span>&gt;&gt; employees = 
+    { 
+        {<span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>,{<span class="pl-s"><span class="pl-pds">"</span>Hourly<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Software Engineer<span class="pl-pds">"</span></span>,<span class="pl-c1">10000</span>}},
+        {<span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>,{<span class="pl-s"><span class="pl-pds">"</span>Commission<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Sales<span class="pl-pds">"</span></span>,<span class="pl-c1">20000</span>}}
+    };
+
+    <span class="pl-c"><span class="pl-c">//</span> `true` means pretty print</span>
+    json_serializer <span class="pl-smi">serializer</span>(std::cout, <span class="pl-c1">true</span>); 
+
+    serializer.<span class="pl-c1">begin_json</span>();       
+    serializer.<span class="pl-c1">begin_object</span>();       
+    serializer.<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>Employees<span class="pl-pds">"</span></span>);       
+    <span class="pl-c1">dump_body</span>(employees, serializer);
+    serializer.<span class="pl-c1">end_object</span>();       
+    serializer.<span class="pl-c1">end_json</span>();       
+}</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>Employees<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>Commission<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Sales<span class="pl-pds">"</span></span>,<span class="pl-c1">20000.0</span>],
+        <span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>Hourly<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>Software Engineer<span class="pl-pds">"</span></span>,<span class="pl-c1">10000.0</span>]
+    }
+}</pre></div>
+<h4>Extending <code>json_stream_traits</code></h4>
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">class</span> <span class="pl-en">Employee</span>
+{
+    std::string name_;
+<span class="pl-k">public:</span>
+    <span class="pl-en">Employee</span>(<span class="pl-k">const</span> std::string&amp; name)
+        : name_(name)
+    {
+    }
+    <span class="pl-k">virtual</span> <span class="pl-en">~Employee</span>() = <span class="pl-k">default</span>;
+    <span class="pl-k">const</span> std::string&amp; <span class="pl-en">name</span>() <span class="pl-k">const</span>
+    {
+        <span class="pl-k">return</span> name_;
+    }
+    <span class="pl-k">virtual</span> <span class="pl-k">double</span> <span class="pl-en">calculatePay</span>() <span class="pl-k">const</span> = 0;
+};
+
+<span class="pl-k">class</span> <span class="pl-en">HourlyEmployee</span> : <span class="pl-k">public</span> <span class="pl-en">Employee</span>
+{
+<span class="pl-k">public:</span>
+    <span class="pl-en">HourlyEmployee</span>(<span class="pl-k">const</span> std::string&amp; name)
+        : Employee(name)
+    {
+    }
+    <span class="pl-k">double</span> <span class="pl-en">calculatePay</span>() <span class="pl-k">const</span> <span class="pl-k">override</span>
+    {
+        <span class="pl-k">return</span> <span class="pl-c1">10000</span>;
+    }
+};
+
+<span class="pl-k">class</span> <span class="pl-en">CommissionedEmployee</span> : <span class="pl-k">public</span> <span class="pl-en">Employee</span>
+{
+<span class="pl-k">public:</span>
+    <span class="pl-en">CommissionedEmployee</span>(<span class="pl-k">const</span> std::string&amp; name)
+        : Employee(name)
+    {
+    }
+    <span class="pl-k">double</span> <span class="pl-en">calculatePay</span>() <span class="pl-k">const</span> <span class="pl-k">override</span>
+    {
+        <span class="pl-k">return</span> <span class="pl-c1">20000</span>;
+    }
+};
+
+<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>
+{
+    <span class="pl-k">template </span>&lt;&gt;
+    <span class="pl-k">struct</span> <span class="pl-en">json_stream_traits</span>&lt;<span class="pl-k">char</span>,Employee&gt;
+    {
+        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">encode</span>(<span class="pl-k">const</span> Employee&amp; val, json_output_handler&amp; handler)
+        {
+            handler.<span class="pl-c1">begin_object</span>();
+            handler.<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>);
+            handler.<span class="pl-c1">string_value</span>(val.<span class="pl-c1">name</span>());
+            handler.<span class="pl-c1">name</span>(<span class="pl-s"><span class="pl-pds">"</span>Pay<span class="pl-pds">"</span></span>);
+            handler.<span class="pl-c1">double_value</span>(val.<span class="pl-c1">calculatePay</span>());
+            handler.<span class="pl-c1">end_object</span>();
+        }
+    };
+};
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::shared_ptr&lt;Employee&gt; <span class="pl-c1">j1</span> = std::make_shared&lt;HourlyEmployee&gt;(<span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>);
+    std::shared_ptr&lt;Employee&gt; j2 = std::make_shared&lt;CommissionedEmployee&gt;(<span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>);
+
+    <span class="pl-c"><span class="pl-c">//</span> `true` means pretty print</span>
+    json_serializer <span class="pl-smi">serializer</span>(std::cout, <span class="pl-c1">true</span>); 
+
+    serializer.<span class="pl-c1">begin_json</span>();       
+    serializer.<span class="pl-c1">begin_array</span>();       
+    <span class="pl-c1">dump_body</span>(<span class="pl-c1">j1</span>, serializer);
+    <span class="pl-c1">dump_body</span>(j2, serializer);
+    serializer.<span class="pl-c1">end_array</span>();       
+    serializer.<span class="pl-c1">end_json</span>();       
+}</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>[
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Pay<span class="pl-pds">"</span></span>: <span class="pl-c1">10000.0</span>
+    },
+    {
+        <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>,
+        <span class="pl-s"><span class="pl-pds">"</span>Pay<span class="pl-pds">"</span></span>: <span class="pl-c1">20000.0</span>
+    }
+]</pre></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

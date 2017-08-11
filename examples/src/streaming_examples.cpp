@@ -87,18 +87,47 @@ void streaming_example1()
 
     std::cout << "(2) Again, with pretty print\n" << std::endl; 
     dump(employees,std::cout,true);
+
+    std::cout << "\n\n";
+}
+
+void streaming_example2()
+{
+    std::map<std::string,std::tuple<std::string,std::string,double>> employees = 
+    { 
+        {"John Smith",{"Hourly","Software Engineer",10000}},
+        {"Jane Doe",{"Commission","Sales",20000}}
+    };
+
+    // `true` means pretty print
+    json_serializer serializer(std::cout, true); 
+
+    serializer.begin_json();       
+    serializer.begin_object();       
+    serializer.name("Employees");       
+    dump_body(employees, serializer);
+    serializer.end_object();       
+    serializer.end_json();       
+
+    std::cout << "\n\n";
 }
 
 
-void streaming_example2()
+void streaming_example3()
 {
     std::shared_ptr<Employee> j1 = std::make_shared<HourlyEmployee>("John Smith");
     std::shared_ptr<Employee> j2 = std::make_shared<CommissionedEmployee>("Jane Doe");
 
-    std::cout << "\n\n";
-    dump(j1,std::cout,true);
-    std::cout << "\n\n";
-    dump(j2,std::cout, true);
+    // `true` means pretty print
+    json_serializer serializer(std::cout, true); 
+
+    serializer.begin_json();       
+    serializer.begin_array();       
+    dump_body(j1, serializer);
+    dump_body(j2, serializer);
+    serializer.end_array();       
+    serializer.end_json();       
+
     std::cout << "\n\n";
 }
 
@@ -108,6 +137,7 @@ void streaming_examples()
 
     streaming_example1();
     streaming_example2();
+    streaming_example3();
 
     std::cout << std::endl;
 }
