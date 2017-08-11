@@ -492,7 +492,7 @@ void dump(<span class="pl-k">const</span> T&amp; val, std::basic_ostream&lt;Char
 template &lt;class CharT, class T&gt;
 void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</span> basic_serialization_options&lt;CharT&gt;&amp; options,
           std::basic_ostream&lt;CharT&gt;&amp; os, <span class="pl-k">bool</span> pprint) (<span class="pl-c1">6</span>)</pre></div>
-<p>(1) Calls <code>begin_json()</code> on <code>handler</code>, applies <code>json_stream_traits</code> to serialize <code>val</code> tp JSON output stream, and calls <code>end_json()</code> on <code>handler</code>.</p>
+<p>(1) Calls <code>begin_json()</code> on <code>handler</code>, applies <code>json_stream_traits</code> to serialize <code>val</code> to JSON output stream, and calls <code>end_json()</code> on <code>handler</code>.</p>
 <p>(2) Applies <code>json_stream_traits</code> to serialize <code>val</code> to JSON output stream, but does not call begin_json() and <code>end_json()</code>.</p>
 <h3>Parameters</h3>
 <table>
@@ -519,6 +519,11 @@ void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</
 </tbody></table>
 <h3>Return value</h3>
 <p>None</p>
+<h3>See also</h3>
+<ul>
+<li><a href="json_output_handler">json_output_handler</a></li>
+<li><a href="serialization_options">serialization_options</a></li>
+</ul>
 <h3>Examples</h3>
 <h4>Map with string-tuple pairs</h4>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>iostream<span class="pl-pds">&gt;</span></span>

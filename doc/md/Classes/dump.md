@@ -28,7 +28,7 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
           std::basic_ostream<CharT>& os, bool pprint) (6)
 ```
 
-(1) Calls `begin_json()` on `handler`, applies `json_stream_traits` to serialize `val` tp JSON output stream, and calls `end_json()` on `handler`.
+(1) Calls `begin_json()` on `handler`, applies `json_stream_traits` to serialize `val` to JSON output stream, and calls `end_json()` on `handler`.
 
 (2) Applies `json_stream_traits` to serialize `val` to JSON output stream, but does not call begin_json() and `end_json()`.
 
@@ -60,6 +60,11 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
 ### Return value
 
 None 
+
+### See also
+
+- [json_output_handler](json_output_handler)
+- [serialization_options](serialization_options)
     
 ### Examples
 
