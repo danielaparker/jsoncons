@@ -2,6 +2,7 @@
 // Distributed under Boost license
 
 #include <boost/test/unit_test.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json_stream_traits.hpp>
 #include <sstream>
 #include <vector>
@@ -10,9 +11,48 @@
 #include <ctime>
 #include <cstdint>
 
+using boost::numeric::ublas::matrix;
+
+namespace jsoncons
+{
+    template <>
+    struct json_stream_traits<char,matrix<double>>
+    {
+        static void encode(const matrix<double>& val, json_output_handler& handler)
+        {
+            handler.begin_array();
+            for (size_t i = 0; i < val.size1(); ++i)
+            {
+                handler.begin_array();
+                for (size_t j = 0; j < val.size2(); ++j)
+                {
+                    handler.double_value(val(i, j),0);
+                }
+                handler.end_array();
+            }
+            handler.end_array();
+        }
+    };
+};
+
 using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_stream_traits_tests)
+
+BOOST_AUTO_TEST_CASE(test_matrix)
+{
+    std::ostringstream oss;
+
+    matrix<double> A(2, 2);
+    A(0, 0) = 1;
+    A(0, 1) = 2;
+    A(1, 0) = 3;
+    A(1, 1) = 4;
+
+    dump(A,oss,true);
+
+    std::cout << oss.str() << std::endl;
+}
 
 BOOST_AUTO_TEST_CASE(test_uinteger)
 {

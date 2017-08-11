@@ -469,7 +469,7 @@ vertical-align:1px;
 </head>
 <body>
 <div class="highlight highlight-source-c++"><pre>jsoncons::dump</pre></div>
-<p>Serialize C++ object as a JSON formatted stream, governed by <code>json_stream_traits</code></p>
+<p>Serialize C++ object to a JSON formatted stream, governed by <code>json_stream_traits</code></p>
 <h3>Header</h3>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_stream_traits.hpp<span class="pl-pds">&gt;</span></span>
 
@@ -670,6 +670,56 @@ void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</
         <span class="pl-s"><span class="pl-pds">"</span>Name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>,
         <span class="pl-s"><span class="pl-pds">"</span>Pay<span class="pl-pds">"</span></span>: <span class="pl-c1">20000.0</span>
     }
+]</pre></div>
+<h4>Serialize <code>boost::numeric::ublas::matrix&lt;double&gt;</code> to a JSON formatted stream</h4>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>boost/numeric/ublas/matrix.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json_stream_traits.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>sstream<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> boost::numeric::ublas::matrix;
+
+<span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>
+{
+    <span class="pl-k">template </span>&lt;&gt;
+    <span class="pl-k">struct</span> <span class="pl-en">json_stream_traits</span>&lt;<span class="pl-k">char</span>,matrix&lt;<span class="pl-k">double</span>&gt;&gt;
+    {
+        <span class="pl-k">static</span> <span class="pl-k">void</span> <span class="pl-en">encode</span>(<span class="pl-k">const</span> matrix&lt;<span class="pl-k">double</span>&gt;&amp; val, json_output_handler&amp; handler)
+        {
+            handler.<span class="pl-c1">begin_array</span>();
+            <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> i = <span class="pl-c1">0</span>; i &lt; val.<span class="pl-c1">size1</span>(); ++i)
+            {
+                handler.<span class="pl-c1">begin_array</span>();
+                <span class="pl-k">for</span> (<span class="pl-c1">size_t</span> j = <span class="pl-c1">0</span>; j &lt; val.<span class="pl-c1">size2</span>(); ++j)
+                {
+                    handler.<span class="pl-c1">double_value</span>(<span class="pl-c1">val</span>(i, j),<span class="pl-c1">0</span>);
+                }
+                handler.<span class="pl-c1">end_array</span>();
+            }
+            handler.<span class="pl-c1">end_array</span>();
+        }
+    };
+};
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    std::ostringstream oss;
+
+    matrix&lt;<span class="pl-k">double</span>&gt; <span class="pl-c1">A</span>(<span class="pl-c1">2</span>, <span class="pl-c1">2</span>);
+    <span class="pl-c1">A</span>(<span class="pl-c1">0</span>, <span class="pl-c1">0</span>) = <span class="pl-c1">1</span>;
+    <span class="pl-c1">A</span>(<span class="pl-c1">0</span>, <span class="pl-c1">1</span>) = <span class="pl-c1">2</span>;
+    <span class="pl-c1">A</span>(<span class="pl-c1">1</span>, <span class="pl-c1">0</span>) = <span class="pl-c1">3</span>;
+    <span class="pl-c1">A</span>(<span class="pl-c1">1</span>, <span class="pl-c1">1</span>) = <span class="pl-c1">4</span>;
+
+    <span class="pl-c1">dump</span>(A,oss,<span class="pl-c1">true</span>);
+
+    std::cout &lt;&lt; oss.<span class="pl-c1">str</span>() &lt;&lt; std::endl;
+}</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>[
+    [<span class="pl-c1">1.0</span>,<span class="pl-c1">2.0</span>],
+    [<span class="pl-c1">3.0</span>,<span class="pl-c1">4.0</span>]
 ]</pre></div>
 </body>
 </html>
