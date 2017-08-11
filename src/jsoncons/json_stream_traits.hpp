@@ -16,6 +16,7 @@
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <memory>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_serializer.hpp>
@@ -234,6 +235,28 @@ public:
         json_stream_traits<CharT,T1>::encode(value.first, handler);
         json_stream_traits<CharT,T2>::encode(value.second, handler);
         handler.end_array();
+    }
+};
+
+template<class CharT, class T>
+struct json_stream_traits<CharT, std::shared_ptr<T>>
+{
+public:
+   
+    static void encode(std::shared_ptr<T> p, basic_json_output_handler<CharT>& handler)
+    {
+        json_stream_traits<CharT,T>::encode(*p, handler);
+    }
+};
+
+template<class CharT, class T>
+struct json_stream_traits<CharT, std::unique_ptr<T>>
+{
+public:
+   
+    static void encode(std::unique_ptr<T> p, basic_json_output_handler<CharT>& handler)
+    {
+        json_stream_traits<CharT,T>::encode(*p, handler);
     }
 };
 
