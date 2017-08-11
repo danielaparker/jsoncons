@@ -648,18 +648,12 @@ void dump(<span class="pl-k">const</span> T&amp; val, <span class="pl-k">const</
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {
-    std::shared_ptr&lt;Employee&gt; <span class="pl-c1">j1</span> = std::make_shared&lt;HourlyEmployee&gt;(<span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>);
-    std::shared_ptr&lt;Employee&gt; j2 = std::make_shared&lt;CommissionedEmployee&gt;(<span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>);
+    std::vector&lt;std::shared_ptr&lt;Employee&gt;&gt; employees; 
 
-    <span class="pl-c"><span class="pl-c">//</span> `true` means pretty print</span>
-    json_serializer <span class="pl-smi">serializer</span>(std::cout, <span class="pl-c1">true</span>); 
+    employees.<span class="pl-c1">push_back</span>(std::make_shared&lt;HourlyEmployee&gt;(<span class="pl-s"><span class="pl-pds">"</span>John Smith<span class="pl-pds">"</span></span>));
+    employees.<span class="pl-c1">push_back</span>(std::make_shared&lt;CommissionedEmployee&gt;(<span class="pl-s"><span class="pl-pds">"</span>Jane Doe<span class="pl-pds">"</span></span>));
 
-    serializer.<span class="pl-c1">begin_json</span>();       
-    serializer.<span class="pl-c1">begin_array</span>();       
-    <span class="pl-c1">dump_body</span>(<span class="pl-c1">j1</span>, serializer);
-    <span class="pl-c1">dump_body</span>(j2, serializer);
-    serializer.<span class="pl-c1">end_array</span>();       
-    serializer.<span class="pl-c1">end_json</span>();       
+    <span class="pl-c1">dump</span>(employees,std::cout,<span class="pl-c1">true</span>);
 }</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>[
