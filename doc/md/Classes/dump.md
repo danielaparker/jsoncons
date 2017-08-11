@@ -204,18 +204,12 @@ namespace jsoncons
 
 int main()
 {
-    std::shared_ptr<Employee> j1 = std::make_shared<HourlyEmployee>("John Smith");
-    std::shared_ptr<Employee> j2 = std::make_shared<CommissionedEmployee>("Jane Doe");
+    std::vector<std::shared_ptr<Employee>> employees; 
 
-    // `true` means pretty print
-    json_serializer serializer(std::cout, true); 
+    employees.push_back(std::make_shared<HourlyEmployee>("John Smith"));
+    employees.push_back(std::make_shared<CommissionedEmployee>("Jane Doe"));
 
-    serializer.begin_json();       
-    serializer.begin_array();       
-    dump_body(j1, serializer);
-    dump_body(j2, serializer);
-    serializer.end_array();       
-    serializer.end_json();       
+    dump(employees,std::cout,true);
 }
 ```
 Output:
