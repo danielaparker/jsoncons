@@ -56,6 +56,16 @@ BOOST_AUTO_TEST_CASE(test_vector)
     std::cout << oss.str() << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_array)
+{
+    std::ostringstream oss;
+
+    std::array<double,4> v{1,2,3,4};
+    dump(v,oss);
+
+    std::cout << oss.str() << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(test_vector_of_vector)
 {
     std::ostringstream oss;

@@ -15,6 +15,7 @@
 #include <iostream>
 #include <string>
 #include <tuple>
+#include <array>
 #include <type_traits>
 #include <memory>
 #include <jsoncons/json_output_handler.hpp>
@@ -168,6 +169,25 @@ struct json_stream_traits<CharT, T,
     }
 };
 
+// std::array
+
+template<class CharT, class T, size_t N>
+struct json_stream_traits<CharT, std::array<T,N>>
+{
+    typedef typename std::array<T,N>::value_type value_type;
+public:
+   
+    static void encode(const std::array<T, N>& val, basic_json_output_handler<CharT>& handler)
+    {
+        handler.begin_array();
+        for (auto it = std::begin(val); it != std::end(val); ++it)
+        {
+            json_stream_traits<CharT,value_type>::encode(*it,handler);
+        }
+        handler.end_array();
+    }
+};
+
 // associative container
 
 template<class CharT, class T>
@@ -265,6 +285,7 @@ public:
         json_stream_traits<CharT,T>::encode(*p, handler);
     }
 };
+
 
 }
 
