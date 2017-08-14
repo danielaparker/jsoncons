@@ -93,14 +93,6 @@
 #  endif
 #endif
 
-
-#ifdef __cplusplus
-#  define CONST_CAST(t, v)  const_cast<t>(v)
-#else
-/* C-style const_cast without triggering a warning with -Wcast-qual */
-#  define CONST_CAST(t, v)  (t)(uintptr_t)(v)
-#endif
-
 #ifdef __GNUC__
 #ifndef likely
 #  define likely(x)     __builtin_expect(!!(x), 1)
