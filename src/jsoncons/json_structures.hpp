@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_CONTAINER_HPP
-#define JSONCONS_JSON_CONTAINER_HPP
+#ifndef JSONCONS_JSON_STRUCTURES_HPP
+#define JSONCONS_JSON_STRUCTURES_HPP
 
 #include <string>
 #include <vector>
