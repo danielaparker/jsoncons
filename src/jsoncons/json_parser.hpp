@@ -153,6 +153,7 @@ class basic_json_parser : private basic_parsing_context<CharT>
     static const int default_initial_stack_capacity_ = 100;
     typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
 
+    basic_null_json_input_handler<CharT> default_input_handler_;
     basic_default_parse_error_handler<CharT> default_err_handler_;
 
     basic_json_input_handler<CharT>& handler_;
@@ -184,6 +185,52 @@ class basic_json_parser : private basic_parsing_context<CharT>
     basic_json_parser& operator=(const basic_json_parser&) = delete;
 
 public:
+
+    basic_json_parser()
+       : handler_(default_input_handler_),
+         err_handler_(default_err_handler_),
+         cp_(0),
+         cp2_(0),
+         is_negative_(false),
+         line_(1),
+         column_(1),
+         nesting_depth_(0), 
+         initial_stack_capacity_(default_initial_stack_capacity_),
+         precision_(0), 
+         literal_index_(0),
+         begin_input_(nullptr),
+         end_input_(nullptr),
+         p_(nullptr),
+         state_(parse_state::start)
+    {
+        max_depth_ = (std::numeric_limits<int>::max)();
+
+        state_stack_.reserve(initial_stack_capacity_);
+        push_state(parse_state::root);
+    }
+
+    basic_json_parser(basic_parse_error_handler<CharT>& err_handler)
+       : handler_(default_input_handler_),
+         err_handler_(err_handler),
+         cp_(0),
+         cp2_(0),
+         is_negative_(false),
+         line_(1),
+         column_(1),
+         nesting_depth_(0), 
+         initial_stack_capacity_(default_initial_stack_capacity_),
+         precision_(0), 
+         literal_index_(0),
+         begin_input_(nullptr),
+         end_input_(nullptr),
+         p_(nullptr),
+         state_(parse_state::start)
+    {
+        max_depth_ = (std::numeric_limits<int>::max)();
+
+        state_stack_.reserve(initial_stack_capacity_);
+        push_state(parse_state::root);
+    }
 
     basic_json_parser(basic_json_input_handler<CharT>& handler)
        : handler_(handler),
