@@ -20,19 +20,19 @@ namespace jsoncons
     template<class Json>
     struct json_type_traits<Json, book>
     {
-        static bool is(const Json& rhs) JSONCONS_NOEXCEPT
+        static bool is(const Json& j) JSONCONS_NOEXCEPT
         {
-            return rhs.is_object() &&
-                   rhs.has_key("author") && 
-                   rhs.has_key("title") && 
-                   rhs.has_key("price");
+            return j.is_object() &&
+                   j.has_key("author") && 
+                   j.has_key("title") && 
+                   j.has_key("price");
         }
-        static book as(const Json& rhs)
+        static book as(const Json& j)
         {
             book val;
-            val.author = rhs["author"]. template as<std::string>();
-            val.title = rhs["title"]. template as<std::string>();
-            val.price = rhs["price"]. template as<double>();
+            val.author = j["author"]. template as<std::string>();
+            val.title = j["title"]. template as<std::string>();
+            val.price = j["price"]. template as<double>();
             return val;
         }
         static Json to_json(const book& val)

@@ -83,14 +83,14 @@ namespace jsoncons
     template<class Json>
     struct json_type_traits<Json, std::shared_ptr<Employee>>
     {
-        static bool is(const Json& rhs, const EmployeeRegistry& registry) noexcept
+        static bool is(const Json& j, const EmployeeRegistry& registry) noexcept
         {
-            return rhs.is_string() && registry.contains(rhs.as<std::string>());
+            return j.is_string() && registry.contains(j.as<std::string>());
         }
-        static std::shared_ptr<Employee> as(const Json& rhs, 
+        static std::shared_ptr<Employee> as(const Json& j, 
                                             const EmployeeRegistry& registry)
         {
-            return registry.get(rhs.as<std::string>());
+            return registry.get(j.as<std::string>());
         }
         static Json to_json(std::shared_ptr<Employee> val)
         {
