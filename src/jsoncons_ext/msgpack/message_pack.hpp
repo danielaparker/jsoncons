@@ -16,7 +16,7 @@
 #include <limits>
 #include <cassert>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/binary_util.hpp>
+#include <jsoncons_ext/detail/binary_utilities.hpp>
 
 namespace jsoncons { namespace msgpack {
   
@@ -301,31 +301,31 @@ public:
                     if (val <= (std::numeric_limits<int8_t>::max)())
                     {
                         // positive fixnum stores 7-bit positive integer
-                        to_big_endian<int64_t, sizeof(int8_t)>()(val,v_);
+                        detail::binary::to_big_endian<int8_t>()(static_cast<int8_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
                         // uint 8 stores a 8-bit unsigned integer
                         v_.push_back(msgpack_format::uint8_cd);
-                        to_big_endian<int64_t, sizeof(uint8_t)>()(val,v_);
+                        detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
                         // uint 16 stores a 16-bit big-endian unsigned integer
                         v_.push_back(msgpack_format::uint16_cd);
-                        to_big_endian<int64_t, sizeof(uint16_t)>()(val,v_);
+                        detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
                         // uint 32 stores a 32-bit big-endian unsigned integer
                         v_.push_back(msgpack_format::uint32_cd);
-                        to_big_endian<int64_t, sizeof(uint32_t)>()(val,v_);
+                        detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
-                        // uint 64 stores a 64-bit big-endian unsigned integer
-                        v_.push_back(msgpack_format::uint64_cd);
-                        to_big_endian<int64_t, sizeof(uint64_t)>()(val,v_);
+                        // int 64 stores a 64-bit big-endian signed integer
+                        v_.push_back(msgpack_format::int64_cd);
+                        detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(val),v_);
                     }
                 }
                 else
@@ -333,31 +333,31 @@ public:
                     if (val >= -32)
                     {
                         // negative fixnum stores 5-bit negative integer
-                        v_.push_back(static_cast<uint8_t>((val)));
+                        v_.push_back(static_cast<int8_t>((val)));
                     }
                     else if (val >= (std::numeric_limits<int8_t>::min)() && val <= (std::numeric_limits<int8_t>::max)())
                     {
                         // int 8 stores a 8-bit signed integer
                         v_.push_back(msgpack_format::int8_cd);
-                        to_big_endian<uint64_t, sizeof(uint8_t)>()(val,v_);
+                        detail::binary::to_big_endian<int8_t>()(static_cast<int8_t>(val),v_);
                     }
                     else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
                     {
                         // int 16 stores a 16-bit big-endian signed integer
                         v_.push_back(msgpack_format::int16_cd);
-                        to_big_endian<int64_t, sizeof(uint16_t)>()(val,v_);
+                        detail::binary::to_big_endian<int16_t>()(static_cast<int16_t>(val),v_);
                     }
                     else if (val >= (std::numeric_limits<int32_t>::min)() && val <= (std::numeric_limits<int32_t>::max)())
                     {
                         // int 32 stores a 32-bit big-endian signed integer
                         v_.push_back(msgpack_format::int32_cd);
-                        to_big_endian<int64_t, sizeof(uint32_t)>()(val,v_);
+                        detail::binary::to_big_endian<int32_t>()(static_cast<int32_t>(val),v_);
                     }
                     else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
                     {
                         // int 64 stores a 64-bit big-endian signed integer
                         v_.push_back(msgpack_format::int64_cd);
-                        to_big_endian<int64_t, sizeof(uint64_t)>()(val,v_);
+                        detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(val),v_);
                     }
                 }
                 break;
@@ -381,19 +381,19 @@ public:
                 {
                     // uint 16 stores a 16-bit big-endian unsigned integer
                     v_.push_back(msgpack_format::uint16_cd);
-                    to_big_endian<uint64_t, sizeof(uint16_t)>()(val,v_);
+                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // uint 32 stores a 32-bit big-endian unsigned integer
                     v_.push_back(msgpack_format::uint32_cd);
-                    to_big_endian<uint64_t, sizeof(uint32_t)>()(val,v_);
+                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint64_t>::max)())
                 {
                     // uint 64 stores a 64-bit big-endian unsigned integer
                     v_.push_back(msgpack_format::uint64_cd);
-                    to_big_endian<uint64_t, sizeof(uint64_t)>()(val,v_);
+                    detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(val),v_);
                 }
                 break;
             }
@@ -402,7 +402,7 @@ public:
             {
                 // float 64
                 v_.push_back(msgpack_format::float64_cd);
-                to_big_endian<double,sizeof(double)>()(jval.as_double(),v_);
+                detail::binary::to_big_endian<double>()(jval.as_double(),v_);
                 break;
             }
 
@@ -425,13 +425,13 @@ public:
                 {
                     // array 16
                     v_.push_back(msgpack_format::array16_cd);
-                    to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
+                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // array 32
                     v_.push_back(msgpack_format::array32_cd);
-                    to_big_endian<uint64_t, sizeof(uint32_t)>()(length,v_);
+                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
                 }
 
                 // append each element
@@ -454,13 +454,13 @@ public:
                 {
                     // map 16
                     v_.push_back(msgpack_format::map16_cd );
-                    to_big_endian<uint64_t, sizeof(uint16_t)>()(static_cast<uint16_t>(length),v_);
+                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= 4294967295)
                 {
                     // map 32
                     v_.push_back(msgpack_format::map32_cd );
-                    to_big_endian<uint64_t, sizeof(uint32_t)>()(length,v_);
+                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
                 }
 
                 // append each element
@@ -506,13 +506,13 @@ public:
         {
             // str 16 stores a byte array whose length is upto (2^16)-1 bytes
             v_.push_back(msgpack_format::str16_cd);
-            to_big_endian<size_t, sizeof(uint16_t)>()(length, v_);
+            detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length), v_);
         }
         else if (length <= (std::numeric_limits<uint32_t>::max)())
         {
             // str 32 stores a byte array whose length is upto (2^32)-1 bytes
             v_.push_back(msgpack_format::str32_cd);
-            to_big_endian<size_t, sizeof(uint32_t)>()(length,v_);
+            detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
         }
 
         for (size_t i = 0; i < length; ++i)
@@ -534,13 +534,13 @@ std::vector<uint8_t> encode_message_pack(const Json& jval)
 template<class Json>
 class Decode_message_pack_
 {
-    std::vector<uint8_t>::const_iterator begin_;
-    std::vector<uint8_t>::const_iterator end_;
-    std::vector<uint8_t>::const_iterator it_;
+    const uint8_t* begin_;
+    const uint8_t* end_;
+    const uint8_t* it_;
 public:
     typedef typename Json::char_type char_type;
 
-    Decode_message_pack_(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
+    Decode_message_pack_(const uint8_t* begin, const uint8_t* end)
         : begin_(begin), end_(end), it_(begin)
     {
     }
@@ -548,7 +548,7 @@ public:
     Json decode()
     {
         // store && increment index
-        std::vector<uint8_t>::const_iterator pos = it_++;
+        const uint8_t* pos = it_++;
 
         if (*pos <= 0xbf)
         {
@@ -586,7 +586,7 @@ public:
             {
                 // fixstr
                 const size_t len = *pos & 0x1f;
-                const uint8_t* first = &(*(pos + 1));
+                const uint8_t* first = &(*it_);
                 const uint8_t* last = first + len;
                 it_ += len; 
 
@@ -623,79 +623,77 @@ public:
                 }
                 case msgpack_format::float32_cd: 
                 {
-                    // reverse byte order
-                    float res;
-                    for (size_t byte = 0; byte < sizeof(float); ++byte)
-                    {
-                        reinterpret_cast<uint8_t*>(&res)[sizeof(float) - byte - 1] = *(pos + 1 + byte);
-                    }
+                    float res = detail::binary::from_big_endian<float>()(it_,end_);
                     it_ += sizeof(float); 
                     return res;
                 }
 
                 case msgpack_format::float64_cd: 
                 {
-                    // reverse byte order
-                    double res;
-                    for (size_t byte = 0; byte < sizeof(double); ++byte)
-                    {
-                        reinterpret_cast<uint8_t*>(&res)[sizeof(double) - byte - 1] = *(pos + 1 + byte);
-                    }
+                    double res = detail::binary::from_big_endian<double>()(it_,end_);
                     it_ += sizeof(double); 
                     return res;
                 }
 
                 case msgpack_format::uint8_cd: 
                 {
-                    it_ += 1; 
-                    return from_big_endian<uint8_t>(pos,end_);
+                    auto x = detail::binary::from_big_endian<uint8_t>()(it_,end_);
+                    it_ += sizeof(uint8_t); 
+                    return Json(x);
                 }
 
                 case msgpack_format::uint16_cd: 
                 {
-                    it_ += 2; 
-                    return from_big_endian<uint16_t>(pos,end_);
+                    auto x = detail::binary::from_big_endian<uint16_t>()(it_,end_);
+                    it_ += sizeof(uint16_t); 
+                    return x;
                 }
 
                 case msgpack_format::uint32_cd: 
                 {
-                    it_ += 4; 
-                    return from_big_endian<uint32_t>(pos,end_);
+                    auto x = detail::binary::from_big_endian<uint32_t>()(it_,end_);
+                    it_ += sizeof(uint32_t); 
+                    return x;
                 }
 
                 case msgpack_format::uint64_cd: 
                 {
-                    it_ += 8; 
-                    return from_big_endian<uint64_t>(pos,end_);
+                    auto x = detail::binary::from_big_endian<uint64_t>()(it_,end_);
+                    it_ += sizeof(uint64_t); 
+                    return x;
                 }
 
                 case msgpack_format::int8_cd: 
                 {
-                    it_ += 1; 
-                    return from_big_endian<int8_t>(pos,end_);
+                    auto x = detail::binary::from_big_endian<int8_t>()(it_,end_);
+                    it_ += sizeof(int8_t); 
+                    return Json(x);
                 }
 
                 case msgpack_format::int16_cd: 
                 {
-                    it_ += 2; 
-                    return from_big_endian<int16_t>(pos,end_);
+                    auto x = detail::binary::from_big_endian<int16_t>()(it_,end_);
+                    it_ += sizeof(int16_t); 
+                    return x;
                 }
 
                 case msgpack_format::int32_cd: 
                 {
-                    it_ += 4; 
-                    return from_big_endian<int32_t>(pos,end_);
+                    auto x = detail::binary::from_big_endian<int32_t>()(it_,end_);
+                    it_ += sizeof(int32_t); 
+                    return x;
                 }
 
                 case msgpack_format::int64_cd: 
                 {
-                    it_ += 8; 
-                    return from_big_endian<int64_t>(pos,end_);
+                    auto x = detail::binary::from_big_endian<int64_t>()(it_,end_);
+                    it_ += sizeof(int64_t); 
+                    return x;
                 }
 
                 case msgpack_format::str8_cd: 
                 {
-                    const auto len = from_big_endian<uint8_t>(pos,end_);
+                    const auto len = detail::binary::from_big_endian<int8_t>()(it_,end_);
                     const uint8_t* first = &(*(pos + 2));
                     const uint8_t* last = first + len;
                     it_ += len+1; 
@@ -712,7 +710,7 @@ public:
 
                 case msgpack_format::str16_cd: 
                 {
-                    const auto len = from_big_endian<uint16_t>(pos,end_);
+                    const auto len = detail::binary::from_big_endian<int16_t>()(it_,end_);
                     const uint8_t* first = &(*(pos + 3));
                     const uint8_t* last = first + len;
                     it_ += len + 2; 
@@ -729,7 +727,7 @@ public:
 
                 case msgpack_format::str32_cd: 
                 {
-                    const auto len = from_big_endian<uint32_t>(pos,end_);
+                    const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
                     const uint8_t* first = &(*(pos + 5));
                     const uint8_t* last = first + len;
                     it_ += len + 4; 
@@ -747,7 +745,7 @@ public:
                 case msgpack_format::array16_cd: 
                 {
                     Json result = typename Json::array();
-                    const auto len = from_big_endian<uint16_t>(pos,end_);
+                    const auto len = detail::binary::from_big_endian<int16_t>()(it_,end_);
                     it_ += 2; 
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
@@ -760,7 +758,7 @@ public:
                 case msgpack_format::array32_cd: 
                 {
                     Json result = typename Json::array();
-                    const auto len = from_big_endian<uint32_t>(pos,end_);
+                    const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
                     it_ += 4; 
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
@@ -773,7 +771,7 @@ public:
                 case msgpack_format::map16_cd : 
                 {
                     Json result = typename Json::object();
-                    const auto len = from_big_endian<uint16_t>(pos,end_);
+                    const auto len = detail::binary::from_big_endian<int16_t>()(it_,end_);
                     it_ += 2; 
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
@@ -787,7 +785,7 @@ public:
                 case msgpack_format::map32_cd : 
                 {
                     Json result = typename Json::object();
-                    const auto len = from_big_endian<uint32_t>(pos,end_);
+                    const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
                     it_ += 4; 
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
@@ -810,7 +808,7 @@ public:
 template<class Json>
 Json decode_message_pack(const std::vector<uint8_t>& v)
 {
-    Decode_message_pack_<Json> decoder(v.begin(),v.end());
+    Decode_message_pack_<Json> decoder(v.data(),v.data()+v.size());
     return decoder.decode();
 }
 
