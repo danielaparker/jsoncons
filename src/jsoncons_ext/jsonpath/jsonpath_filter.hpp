@@ -529,8 +529,8 @@ class value_term : public term<Json>
     Json value_;
 public:
     template <class T>
-    value_term(const T& value)
-        : value_(value)
+    value_term(const T& val)
+        : value_(val)
     {
     }
 

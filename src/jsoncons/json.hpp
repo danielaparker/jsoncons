@@ -1740,21 +1740,21 @@ public:
        // set
 
         template <class T>
-        std::pair<object_iterator,bool> set(string_view_type name, T&& value)
+        std::pair<object_iterator,bool> set(string_view_type name, T&& val)
         {
-            return evaluate().set(name,std::forward<T>(value));
+            return evaluate().set(name,std::forward<T>(val));
         }
 
         template <class T>
-        std::pair<object_iterator,bool> insert_or_assign(string_view_type name, T&& value)
+        std::pair<object_iterator,bool> insert_or_assign(string_view_type name, T&& val)
         {
-            return evaluate().insert_or_assign(name,std::forward<T>(value));
+            return evaluate().insert_or_assign(name,std::forward<T>(val));
         }
 
         template <class T>
-        void set_(key_storage_type&& name, T&& value)
+        void set_(key_storage_type&& name, T&& val)
         {
-            evaluate().set_(std::forward<key_storage_type>(name),std::forward<T>(value));
+            evaluate().set_(std::forward<key_storage_type>(name),std::forward<T>(val));
         }
 
        // emplace
@@ -1766,15 +1766,15 @@ public:
         }
 
         template <class T>
-        object_iterator set(object_iterator hint, string_view_type name, T&& value)
+        object_iterator set(object_iterator hint, string_view_type name, T&& val)
         {
-            return evaluate().set(hint, name, std::forward<T>(value));
+            return evaluate().set(hint, name, std::forward<T>(val));
         }
 
         template <class T>
-        object_iterator insert_or_assign(object_iterator hint, string_view_type name, T&& value)
+        object_iterator insert_or_assign(object_iterator hint, string_view_type name, T&& val)
         {
-            return evaluate().insert_or_assign(hint, name, std::forward<T>(value));
+            return evaluate().insert_or_assign(hint, name, std::forward<T>(val));
         }
 
         template <class ... Args>
@@ -1784,9 +1784,9 @@ public:
         }
 
         template <class T>
-        object_iterator set_(object_iterator hint, key_storage_type&& name, T&& value)
+        object_iterator set_(object_iterator hint, key_storage_type&& name, T&& val)
         {
-            return evaluate().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(value));
+            return evaluate().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(val));
         }
 
         template <class... Args> 
@@ -1802,15 +1802,15 @@ public:
         }
 
         template <class T>
-        void add(T&& value)
+        void add(T&& val)
         {
-            evaluate_with_default().add(std::forward<T>(value));
+            evaluate_with_default().add(std::forward<T>(val));
         }
 
         template <class T>
-        array_iterator add(const_array_iterator pos, T&& value)
+        array_iterator add(const_array_iterator pos, T&& val)
         {
-            return evaluate_with_default().add(pos, std::forward<T>(value));
+            return evaluate_with_default().add(pos, std::forward<T>(val));
         }
 
         template <class SAllocator>
@@ -3292,7 +3292,7 @@ public:
     }
 
     template <class T>
-    std::pair<object_iterator,bool> set(string_view_type name, T&& value)
+    std::pair<object_iterator,bool> set(string_view_type name, T&& val)
     {
         switch (var_.type_id())
         {
@@ -3300,7 +3300,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().insert_or_assign(name, std::forward<T>(value));
+            return object_value().insert_or_assign(name, std::forward<T>(val));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3309,7 +3309,7 @@ public:
     }
 
     template <class T>
-    std::pair<object_iterator,bool> insert_or_assign(string_view_type name, T&& value)
+    std::pair<object_iterator,bool> insert_or_assign(string_view_type name, T&& val)
     {
         switch (var_.type_id())
         {
@@ -3317,7 +3317,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().insert_or_assign(name, std::forward<T>(value));
+            return object_value().insert_or_assign(name, std::forward<T>(val));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3343,7 +3343,7 @@ public:
     }
 
     template <class T>
-    void set_(key_storage_type&& name, T&& value)
+    void set_(key_storage_type&& name, T&& val)
     {
         switch (var_.type_id())
         {
@@ -3351,7 +3351,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            object_value().set_(std::forward<key_storage_type>(name), std::forward<T>(value));
+            object_value().set_(std::forward<key_storage_type>(name), std::forward<T>(val));
             break;
         default:
             {
@@ -3495,7 +3495,7 @@ public:
     // set
 
     template <class T>
-    object_iterator set(object_iterator hint, string_view_type name, T&& value)
+    object_iterator set(object_iterator hint, string_view_type name, T&& val)
     {
         switch (var_.type_id())
         {
@@ -3503,7 +3503,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().insert_or_assign(hint, name, std::forward<T>(value));
+            return object_value().insert_or_assign(hint, name, std::forward<T>(val));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3512,7 +3512,7 @@ public:
     }
 
     template <class T>
-    object_iterator insert_or_assign(object_iterator hint, string_view_type name, T&& value)
+    object_iterator insert_or_assign(object_iterator hint, string_view_type name, T&& val)
     {
         switch (var_.type_id())
         {
@@ -3520,7 +3520,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().insert_or_assign(hint, name, std::forward<T>(value));
+            return object_value().insert_or_assign(hint, name, std::forward<T>(val));
         default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
@@ -3546,7 +3546,7 @@ public:
     }
 
     template <class T>
-    object_iterator set_(object_iterator hint, key_storage_type&& name, T&& value)
+    object_iterator set_(object_iterator hint, key_storage_type&& name, T&& val)
     {
         switch (var_.type_id())
         {
@@ -3554,7 +3554,7 @@ public:
             create_object_implicitly();
             // FALLTHRU
         case value_type::object_t:
-            return object_value().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(value));
+            return object_value().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(val));
             break;
         default:
             {
@@ -3564,12 +3564,12 @@ public:
     }
 
     template <class T>
-    void add(T&& value)
+    void add(T&& val)
     {
         switch (var_.type_id())
         {
         case value_type::array_t:
-            array_value().add(std::forward<T>(value));
+            array_value().add(std::forward<T>(val));
             break;
         default:
             {
@@ -3579,12 +3579,12 @@ public:
     }
 
     template <class T>
-    array_iterator add(const_array_iterator pos, T&& value)
+    array_iterator add(const_array_iterator pos, T&& val)
     {
         switch (var_.type_id())
         {
         case value_type::array_t:
-            return array_value().add(pos, std::forward<T>(value));
+            return array_value().add(pos, std::forward<T>(val));
             break;
         default:
             {
