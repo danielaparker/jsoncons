@@ -151,7 +151,7 @@ Output:
 Extra comma at line 1 and column 10
 ```
 
-### Validation
+### Validation without parse exceptions
 
 ```c++
 std::string s = R"(
