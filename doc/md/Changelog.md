@@ -14,9 +14,9 @@ Changes
   Instead use `string_value(value)`, `integer_value(value)`, `uinteger_value(value)`,
   `double_value(value,precision=0)`, `bool_value(value)` and `null_value(context)`
 
-- For consistency, the names `message_pack.hpp`, `encode_message_pack` and
-  `decode_message_pack` have been deprecated and replaced with `msgpack.hpp`,
-  `encode_msgpack` and `decode_msg_pack`
+- For consistency, the names `jsoncons_ext/msgpack/message_pack.hpp`, 
+  `encode_message_pack` and `decode_message_pack` have been deprecated and 
+  replaced with `jsoncons_ext/msgpack/msgpack.hpp`, `encode_msgpack` and `decode_msg_pack`
 
 Bug fixes
 
