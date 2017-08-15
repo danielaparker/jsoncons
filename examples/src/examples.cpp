@@ -303,11 +303,34 @@ void parse_exception_example()
     }
 }
 
+void validation_example()
+{
+    std::string s = R"(
+{
+    "StartDate" : "2017-03-01",
+    "MaturityDate" "2020-12-30"          
+}
+    )";
+    std::stringstream is(s);
+
+    json_reader reader(is);
+
+    std::error_code ec;
+    reader.read(ec);
+    if (ec)
+    {
+        std::cout << ec.message() 
+                  << " on line " << reader.line_number()
+                  << " and column " << reader.column_number()
+                  << std::endl;
+    }
+}
+
 int main()
 {
     try
     {
-        object_range_based_for_loop();
+/*        object_range_based_for_loop();
 
         json_is_as_examples();
 
@@ -350,7 +373,8 @@ int main()
         msgpack_examples();
 
         streaming_examples();
-
+*/
+        validation_example();
     }
     catch (const std::exception& e)
     {

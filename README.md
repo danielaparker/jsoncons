@@ -171,6 +171,34 @@ Output:
 ```
 Extra comma at line 1 and column 10
 ```
+
+### Validation
+
+```c++
+std::string s = R"(
+{
+    "StartDate" : "2017-03-01",
+    "MaturityDate" "2020-12-30"          
+}
+)";
+std::stringstream is(s);
+
+json_reader reader(is);
+
+std::error_code ec;
+reader.read(ec);
+if (ec)
+{
+    std::cout << ec.message() 
+              << " on line " << reader.line_number()
+              << " and column " << reader.column_number()
+              << std::endl;
+}
+```
+Output:
+```
+Expected name separator ':' on line 4 and column 20
+```
 ### Range-based for loops with arrays
 
 ```c++
@@ -202,12 +230,6 @@ for (const auto& kv : book.object_range())
 ```c++
 using namespace jsoncons::literals;
 
-json j1 = R"(
-{
-    "StartDate" : "2017-03-01",
-    "MaturityDate" : "2020-12-30"          
-}
-)"_json;
 
 ojson j2 = R"(
 {

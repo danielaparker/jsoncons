@@ -631,6 +631,29 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <p>Output:</p>
 <pre><code>Extra comma at line 1 and column 10
 </code></pre>
+<h3>Validation</h3>
+<div class="highlight highlight-source-c++"><pre>std::string s = <span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "StartDate" : "2017-03-01",</span>
+<span class="pl-s">    "MaturityDate" "2020-12-30"          </span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>;
+std::stringstream <span class="pl-en">is</span>(s);
+
+json_reader <span class="pl-en">reader</span>(is);
+
+std::error_code ec;
+reader.read(ec);
+<span class="pl-k">if</span> (ec)
+{
+    std::cout &lt;&lt; ec.<span class="pl-c1">message</span>() 
+              &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> on line <span class="pl-pds">"</span></span> &lt;&lt; reader.<span class="pl-c1">line_number</span>()
+              &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> and column <span class="pl-pds">"</span></span> &lt;&lt; reader.<span class="pl-c1">column_number</span>()
+              &lt;&lt; std::endl;
+}</pre></div>
+<p>Output:</p>
+<pre><code>Expected name separator ':' on line 4 and column 20
+</code></pre>
 <h3>Range-based for loops with arrays</h3>
 <div class="highlight highlight-source-c++"><pre>json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};
 
@@ -653,12 +676,6 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <h3>_json and _ojson literal operators</h3>
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::literals<span class="pl-k">;</span>
 
-json j1 = <span class="pl-s"><span class="pl-pds">R"(</span></span>
-<span class="pl-s">{</span>
-<span class="pl-s">    "StartDate" : "2017-03-01",</span>
-<span class="pl-s">    "MaturityDate" : "2020-12-30"          </span>
-<span class="pl-s">}</span>
-<span class="pl-s"><span class="pl-pds">)"</span></span>_json;
 
 ojson j2 = <span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
