@@ -661,7 +661,7 @@ Example file (book.json):
 ```
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/message_pack.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::msgpack;
@@ -673,18 +673,18 @@ int main()
     is >> j1;
 
     // Encode ojson to MessagePack
-    std::vector<uint8_t> v = encode_message_pack(j1);
+    std::vector<uint8_t> v = encode_msgpack(j1);
 
     // Decode MessagePack to ojson 
-    ojson j2 = decode_message_pack<ojson>(v);
+    ojson j2 = decode_msgpack<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
 
     // or to json (now alphabetically sorted)
-    json j3 = decode_message_pack<json>(v);
+    json j3 = decode_msgpack<json>(v);
 
     // or to wjson (converts from utf8 to wide characters)
-    wjson j4 = decode_message_pack<wjson>(v);
+    wjson j4 = decode_msgpack<wjson>(v);
 }
 ```
 Output:
@@ -705,7 +705,7 @@ Output:
 ]
 ```
 
-See [encode_message_pack](https://github.com/danielaparker/jsoncons/wiki/encode_message_pack) and [decode_message_pack](https://github.com/danielaparker/jsoncons/wiki/decode_message_pack) for details.
+See [encode_msgpack](https://github.com/danielaparker/jsoncons/wiki/encode_msgpack) and [decode_msgpack](https://github.com/danielaparker/jsoncons/wiki/decode_msgpack) for details.
 
 ## Building the test suite and examples with CMake
 

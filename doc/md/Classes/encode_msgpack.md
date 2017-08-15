@@ -1,14 +1,14 @@
 ```c++
-jsoncons::msgpack::encode_message_pack
+jsoncons::msgpack::encode_msgpack
 ```
 Encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 ### Header
 ```c++
-#include <jsoncons/msgpack/message_pack.hpp>
+#include <jsoncons/msgpack/msgpack.hpp>
 
 template<class Json>
-std::vector<uint8_t> encode_message_pack(const Json& jval)
+std::vector<uint8_t> encode_msgpack(const Json& jval)
 ```
 
 ### Examples
@@ -17,7 +17,7 @@ std::vector<uint8_t> encode_message_pack(const Json& jval)
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/message_pack.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::msgpack;
@@ -50,9 +50,9 @@ int main()
     j1["min float"] = -(std::numeric_limits<float>::max)();
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
-    std::vector<uint8_t> v = encode_message_pack(j1);
+    std::vector<uint8_t> v = encode_msgpack(j1);
 
-    ojson j2 = decode_message_pack<ojson>(v);
+    ojson j2 = decode_msgpack<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
 }
@@ -89,6 +89,6 @@ Output:
 
 ### See also
 
-- [decode_message_pack](decode_message_pack) decodes a [MessagePack](http://msgpack.org/index.html) binary serialization format to a json value.
+- [decode_msgpack](decode_msgpack) decodes a [MessagePack](http://msgpack.org/index.html) binary serialization format to a json value.
 
 

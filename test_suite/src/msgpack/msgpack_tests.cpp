@@ -7,7 +7,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/message_pack.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -76,11 +76,11 @@ BOOST_AUTO_TEST_CASE(message_pack_test)
     j1["An array"] = ja;
 
     size_t calculated_size = Encode_message_pack_<json>::calculate_size(j1);
-    std::vector<uint8_t> v = encode_message_pack(j1);
+    std::vector<uint8_t> v = encode_msgpack(j1);
     BOOST_CHECK(calculated_size == v.size());
     BOOST_CHECK(calculated_size == v.capacity());
 
-    json j2 = decode_message_pack<json>(v);
+    json j2 = decode_msgpack<json>(v);
 
     BOOST_CHECK_EQUAL(j1,j2);
 } 
@@ -144,11 +144,11 @@ BOOST_AUTO_TEST_CASE(message_pack_test2)
     j1[L"An array"] = ja;
 
     size_t calculated_size = Encode_message_pack_<wjson>::calculate_size(j1);
-    std::vector<uint8_t> v = encode_message_pack(j1);
+    std::vector<uint8_t> v = encode_msgpack(j1);
     BOOST_CHECK(calculated_size == v.size());
     BOOST_CHECK(calculated_size == v.capacity());
 
-    wjson j2 = decode_message_pack<wjson>(v);
+    wjson j2 = decode_msgpack<wjson>(v);
 
     BOOST_CHECK(j1 == j2);
 }

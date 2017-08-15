@@ -47,9 +47,9 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### msgpack
 
-[encode_message_pack](encode_message_pack)
+[encode_msgpack](encode_msgpack)
 
-[decode_message_pack](decode_message_pack)
+[decode_msgpack](decode_msgpack)
 
 ### Tutorials
 

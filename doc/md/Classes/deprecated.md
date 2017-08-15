@@ -75,3 +75,7 @@ output_format|`array_array_block_option accessor and modifier` accessor and modi
 &#160;|`array_object_block_option accessor and modifier`|<em>&#x2713;</em>|Use `array_object_split_lines` accessor and modifier
 &#160;|`object_array_block_option accessor and modifier`|<em>&#x2713;</em>|Use `object_array_split_lines` accessor and modifier
 &#160;|`object_object_block_option accessor and modifier`|<em>&#x2713;</em>|Use `object_object_split_lines` accessor and modifier
+msgpack|`jsoncons_ext/msgpack/message_pack.hpp` header file|<em>&#x2713;</em>|Use `jsoncons_ext/msgpack/msgpack.hpp`
+&#160;|`encode_message_pack`|<em>&#x2713;</em>|Use `encode_msgpack`
+&#160;|`decode_message_pack`|<em>&#x2713;</em>|Use `decode_msgpack`
+

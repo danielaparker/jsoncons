@@ -3,7 +3,7 @@
 
 #include <string>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/message_pack.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::msgpack;
@@ -25,19 +25,19 @@ ojson j1 = ojson::parse(R"(
 ]
 )");
 
-    std::vector<uint8_t> v = jsoncons::msgpack::encode_message_pack(j1);
+    std::vector<uint8_t> v = jsoncons::msgpack::encode_msgpack(j1);
 
-    ojson j2 = decode_message_pack<ojson>(v);
+    ojson j2 = decode_msgpack<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
 
-    json j3 = decode_message_pack<json>(v);
+    json j3 = decode_msgpack<json>(v);
 
     std::cout << pretty_print(j3) << std::endl;
 
     std::cout << std::endl;
 
-    wjson j4 = decode_message_pack<wjson>(v);
+    wjson j4 = decode_msgpack<wjson>(v);
 
     std::wcout << pretty_print(j4) << std::endl;
 
@@ -72,9 +72,9 @@ void message_pack_example2()
     j1["min float"] = -(std::numeric_limits<float>::max)();
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
-    std::vector<uint8_t> v = encode_message_pack(j1);
+    std::vector<uint8_t> v = encode_msgpack(j1);
 
-    ojson j2 = decode_message_pack<ojson>(v);
+    ojson j2 = decode_msgpack<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
 
