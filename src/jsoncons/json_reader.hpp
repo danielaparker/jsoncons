@@ -42,6 +42,29 @@ class basic_json_reader
 
 public:
 
+    basic_json_reader(std::basic_istream<CharT>& is)
+        : parser_(),
+          is_(is),
+          eof_(false),
+          buffer_length_(0),
+          buffer_capacity_(default_max_buffer_length),
+          begin_(true)
+    {
+        buffer_.resize(buffer_capacity_);
+    }
+
+    basic_json_reader(std::basic_istream<CharT>& is,
+                      basic_parse_error_handler<CharT>& err_handler)
+       : parser_(err_handler),
+         is_(is),
+         eof_(false),
+         buffer_length_(0),
+         buffer_capacity_(default_max_buffer_length),
+         begin_(true)
+    {
+        buffer_.resize(buffer_capacity_);
+    }
+
     basic_json_reader(std::basic_istream<CharT>& is,
                       basic_json_input_handler<CharT>& handler)
         : parser_(handler),
