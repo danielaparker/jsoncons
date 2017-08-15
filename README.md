@@ -23,27 +23,6 @@ Extensions:
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
-## What's new on master
-
-- Visual Studio 2013 is no longer supported
-
-- [dump](https://github.com/danielaparker/jsoncons/wiki/dump) function that serializes c++ objects directly to JSON formatted stream, governed by `json_stream_traits` 
-
-- json::is<T>() and json::as<T>() accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
-  This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
-  looked up from a registry. See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility), Example 2. 
-
-- [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) optionally returns normalized paths (with
-  optional `return_type::path` parameter)
-
-- jsonpath `max` and `min` aggregate functions over numeric values
-
-- [json::merge](https://github.com/danielaparker/jsoncons/wiki/json-merge) function that inserts another json object's key-value pairs 
-  into a json object, if they don't already exist.
-
-- [json::merge_or_update](https://github.com/danielaparker/jsoncons/wiki/json-merge_or_update) function that inserts another json object's key-value 
-  pairs into a json object, or assigns them if they already exist.
-
 Planned new features are listed on the [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap)
 
 ## Get jsoncons

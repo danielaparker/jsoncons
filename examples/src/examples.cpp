@@ -330,7 +330,7 @@ int main()
 {
     try
     {
-/*        object_range_based_for_loop();
+        object_range_based_for_loop();
 
         json_is_as_examples();
 
@@ -373,7 +373,7 @@ int main()
         msgpack_examples();
 
         streaming_examples();
-*/
+
         validation_example();
     }
     catch (const std::exception& e)
