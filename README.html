@@ -1040,7 +1040,7 @@ project_id,task_name,task_start,task_finish
     }
 ]</pre></div>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/msgpack/message_pack.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/msgpack/msgpack.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::msgpack<span class="pl-k">;</span>
@@ -1052,18 +1052,18 @@ project_id,task_name,task_start,task_finish
     is &gt;&gt; <span class="pl-c1">j1</span>;
 
     <span class="pl-c"><span class="pl-c">//</span> Encode ojson to MessagePack</span>
-    std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; v = <span class="pl-c1">encode_message_pack</span>(<span class="pl-c1">j1</span>);
+    std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; v = <span class="pl-c1">encode_msgpack</span>(<span class="pl-c1">j1</span>);
 
     <span class="pl-c"><span class="pl-c">//</span> Decode MessagePack to ojson </span>
-    ojson j2 = decode_message_pack&lt;ojson&gt;(v);
+    ojson j2 = decode_msgpack&lt;ojson&gt;(v);
 
     std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(j2) &lt;&lt; std::endl;
 
     <span class="pl-c"><span class="pl-c">//</span> or to json (now alphabetically sorted)</span>
-    json j3 = decode_message_pack&lt;json&gt;(v);
+    json j3 = decode_msgpack&lt;json&gt;(v);
 
     <span class="pl-c"><span class="pl-c">//</span> or to wjson (converts from utf8 to wide characters)</span>
-    wjson j4 = decode_message_pack&lt;wjson&gt;(v);
+    wjson j4 = decode_msgpack&lt;wjson&gt;(v);
 }</pre></div>
 <p>Output:</p>
 <div class="highlight highlight-source-json"><pre>[
@@ -1080,7 +1080,7 @@ project_id,task_name,task_start,task_finish
         <span class="pl-s"><span class="pl-pds">"</span>price<span class="pl-pds">"</span></span>: <span class="pl-c1">12.99</span>
     }
 ]</pre></div>
-<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/encode_message_pack">encode_message_pack</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/decode_message_pack">decode_message_pack</a> for details.</p>
+<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/encode_msgpack">encode_msgpack</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/decode_msgpack">decode_msgpack</a> for details.</p>
 <h2>Building the test suite and examples with CMake</h2>
 <p><a href="https://cmake.org/">CMake</a> is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a <a href="https://cmake.org/download/">Windows Installer package</a>. On Linux it is usually available as a package, e.g., on Ubuntu,</p>
 <pre><code>sudo apt-get install cmake
