@@ -1,6 +1,6 @@
-master
+0.99.8
 ------
-
+ 
 Changes
 
 - Visual Studio 2013 is no longer supported (jsonpath uses string initilizer lists)

@@ -491,35 +491,6 @@ vertical-align:1px;
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="#user-content-ext_msgpack">msgpack</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
 </ul>
-<h2>What's new on master</h2>
-<ul>
-<li>
-<p>Visual Studio 2013 is no longer supported</p>
-</li>
-<li>
-<p><a href="https://github.com/danielaparker/jsoncons/wiki/dump">dump</a> function that serializes c++ objects directly to JSON formatted stream, governed by <code>json_stream_traits</code></p>
-</li>
-<li>
-<p>json::is() and json::as() accept template packs, which they forward to the <code>json_type_traits</code> <code>is</code> and <code>as</code> functions.<br>
-This allows user defined <code>json_type_traits</code> implementations to resolve, for instance, a name into a C++ object<br>
-looked up from a registry. See <a href="https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility">Type Extensibility</a>, Example 2.</p>
-</li>
-<li>
-<p><a href="https://github.com/danielaparker/jsoncons/wiki/json_query">json_query</a> optionally returns normalized paths (with<br>
-optional <code>return_type::path</code> parameter)</p>
-</li>
-<li>
-<p>jsonpath <code>max</code> and <code>min</code> aggregate functions over numeric values</p>
-</li>
-<li>
-<p><a href="https://github.com/danielaparker/jsoncons/wiki/json-merge">json::merge</a> function that inserts another json object's key-value pairs<br>
-into a json object, if they don't already exist.</p>
-</li>
-<li>
-<p><a href="https://github.com/danielaparker/jsoncons/wiki/json-merge_or_update">json::merge_or_update</a> function that inserts another json object's key-value<br>
-pairs into a json object, or assigns them if they already exist.</p>
-</li>
-</ul>
 <p>Planned new features are listed on the <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a></p>
 <h2>Get jsoncons</h2>
 <p>Download the <a href="https://github.com/danielaparker/jsoncons/releases">latest release</a> and unpack the zip file. Find the directory <code>jsoncons</code> under <code>src</code>, and copy it to your <code>include</code> directory. If you wish to use extensions, copy the <code>jsoncons_ext</code> directory as well.</p>
@@ -631,6 +602,29 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <p>Output:</p>
 <pre><code>Extra comma at line 1 and column 10
 </code></pre>
+<h3>Validation without parse exceptions</h3>
+<div class="highlight highlight-source-c++"><pre>std::string s = <span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">{</span>
+<span class="pl-s">    "StartDate" : "2017-03-01",</span>
+<span class="pl-s">    "MaturityDate" "2020-12-30"          </span>
+<span class="pl-s">}</span>
+<span class="pl-s"><span class="pl-pds">)"</span></span>;
+std::stringstream <span class="pl-en">is</span>(s);
+
+json_reader <span class="pl-en">reader</span>(is);
+
+std::error_code ec;
+reader.read(ec);
+<span class="pl-k">if</span> (ec)
+{
+    std::cout &lt;&lt; ec.<span class="pl-c1">message</span>() 
+              &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> on line <span class="pl-pds">"</span></span> &lt;&lt; reader.<span class="pl-c1">line_number</span>()
+              &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span> and column <span class="pl-pds">"</span></span> &lt;&lt; reader.<span class="pl-c1">column_number</span>()
+              &lt;&lt; std::endl;
+}</pre></div>
+<p>Output:</p>
+<pre><code>Expected name separator ':' on line 4 and column 20
+</code></pre>
 <h3>Range-based for loops with arrays</h3>
 <div class="highlight highlight-source-c++"><pre>json j = json::array{<span class="pl-c1">1</span>,<span class="pl-c1">2</span>,<span class="pl-c1">3</span>,<span class="pl-c1">4</span>};
 
@@ -653,12 +647,6 @@ Results for <a href="https://github.com/nst/JSONTestSuite">JSONTestSuite</a> and
 <h3>_json and _ojson literal operators</h3>
 <div class="highlight highlight-source-c++"><pre><span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::literals<span class="pl-k">;</span>
 
-json j1 = <span class="pl-s"><span class="pl-pds">R"(</span></span>
-<span class="pl-s">{</span>
-<span class="pl-s">    "StartDate" : "2017-03-01",</span>
-<span class="pl-s">    "MaturityDate" : "2020-12-30"          </span>
-<span class="pl-s">}</span>
-<span class="pl-s"><span class="pl-pds">)"</span></span>_json;
 
 ojson j2 = <span class="pl-s"><span class="pl-pds">R"(</span></span>
 <span class="pl-s">{</span>
