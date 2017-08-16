@@ -309,8 +309,7 @@ public:
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
-                        // uint 16 stores a 16-bit big-endian unsigned integer
-                        v_.push_back(cbor_format::uint16_cd);
+                        v_.push_back(0x19);
                         detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
@@ -375,8 +374,7 @@ public:
                 }
                 else if (val <= (std::numeric_limits<uint16_t>::max)())
                 {
-                    // uint 16 stores a 16-bit big-endian unsigned integer
-                    v_.push_back(cbor_format::uint16_cd);
+                    v_.push_back(0x19);
                     detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint32_t>::max)())

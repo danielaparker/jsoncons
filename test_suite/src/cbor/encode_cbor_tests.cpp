@@ -37,6 +37,8 @@ BOOST_AUTO_TEST_CASE(cbor_encoder_test)
     check_encode({'\x0a'},json(10U));
     check_encode({'\x17'},json(23U));
     check_encode({'\x18','\x18'},json(24U));
+    check_encode({'\x18',u'\xff'},json(255U));
+    check_encode({'\x19','\x01','\x00'},json(256U));
 
 }
 
