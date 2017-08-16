@@ -22,11 +22,13 @@ BOOST_AUTO_TEST_SUITE(cbor_tests)
 void check_encode(const std::vector<uint8_t>& expected, const json& j)
 {
     std::vector<uint8_t> result = encode_cbor(j);
-    BOOST_TEST_INFO(j.to_string());
-    BOOST_REQUIRE(expected.size() == result.size());
-    for (size_t i = 0; i < expected.size(); ++i)
+    BOOST_TEST_CONTEXT(j.to_string())
     {
-        BOOST_REQUIRE_EQUAL(expected[i],result[i]);
+        BOOST_REQUIRE(expected.size() == result.size());
+        for (size_t i = 0; i < expected.size(); ++i)
+        {
+            BOOST_REQUIRE_EQUAL(expected[i], result[i]);
+        }
     }
 }
 
@@ -37,8 +39,10 @@ BOOST_AUTO_TEST_CASE(cbor_encoder_test)
     check_encode({'\x0a'},json(10U));
     check_encode({'\x17'},json(23U));
     check_encode({'\x18','\x18'},json(24U));
-    check_encode({'\x18',u'\xff'},json(255U));
+    check_encode({'\x18',U'\xff'},json(255U));
     check_encode({'\x19','\x01','\x00'},json(256U));
+    check_encode({'\x19',U'\xff',U'\xff'},json(65535U));
+    check_encode({'\x1a',0,1,'\x00','\x00'},json(65536U));
 
 }
 

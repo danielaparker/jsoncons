@@ -314,14 +314,12 @@ public:
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
-                        // uint 32 stores a 32-bit big-endian unsigned integer
-                        v_.push_back(cbor_format::uint32_cd);
+                        v_.push_back(0x1a);
                         detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
-                        // int 64 stores a 64-bit big-endian signed integer
-                        v_.push_back(cbor_format::int64_cd);
+                        v_.push_back(0x1b);
                         detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(val),v_);
                     }
                 }
@@ -379,14 +377,12 @@ public:
                 }
                 else if (val <= (std::numeric_limits<uint32_t>::max)())
                 {
-                    // uint 32 stores a 32-bit big-endian unsigned integer
-                    v_.push_back(cbor_format::uint32_cd);
+                    v_.push_back(0x1a);
                     detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint64_t>::max)())
                 {
-                    // uint 64 stores a 64-bit big-endian unsigned integer
-                    v_.push_back(cbor_format::uint64_cd);
+                    v_.push_back(0x1b);
                     detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(val),v_);
                 }
                 break;
