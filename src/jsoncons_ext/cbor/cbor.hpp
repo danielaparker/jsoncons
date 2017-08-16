@@ -298,15 +298,13 @@ public:
                 int64_t val = jval.as_integer();
                 if (val >= 0)
                 {
-                    if (val <= (std::numeric_limits<int8_t>::max)())
+                    if (val <= 0x17)
                     {
-                        // positive fixnum stores 7-bit positive integer
-                        detail::binary::to_big_endian<int8_t>()(static_cast<int8_t>(val),v_);
+                        detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
-                        // uint 8 stores a 8-bit unsigned integer
-                        v_.push_back(cbor_format::uint8_cd);
+                        v_.push_back(0x18);
                         detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
@@ -366,16 +364,14 @@ public:
         case value_type::uinteger_t:
             {
                 uint64_t val = jval.as_uinteger();
-                if (val <= (std::numeric_limits<int8_t>::max)())
+                if (val <= 0x17)
                 {
-                    // positive fixnum stores 7-bit positive integer
-                    v_.push_back(static_cast<uint8_t>((val)));
+                    detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint8_t>::max)())
                 {
-                    // uint 8 stores a 8-bit unsigned integer
-                    v_.push_back(cbor_format::uint8_cd);
-                    v_.push_back(static_cast<uint8_t>((val)));
+                    v_.push_back(0x18);
+                    detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint16_t>::max)())
                 {
