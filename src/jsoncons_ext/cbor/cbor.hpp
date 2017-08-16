@@ -325,34 +325,30 @@ public:
                 }
                 else
                 {
-                    if (val >= -32)
+                    const auto posnum = -1 - val;
+                    if (val >= -24)
                     {
-                        // negative fixnum stores 5-bit negative integer
-                        v_.push_back(static_cast<int8_t>((val)));
+                        v_.push_back(static_cast<uint8_t>(0x20 + posnum));
                     }
-                    else if (val >= (std::numeric_limits<int8_t>::min)() && val <= (std::numeric_limits<int8_t>::max)())
+                    else if (posnum <= (std::numeric_limits<uint8_t>::max)())
                     {
-                        // int 8 stores a 8-bit signed integer
-                        v_.push_back(cbor_format::int8_cd);
-                        detail::binary::to_big_endian<int8_t>()(static_cast<int8_t>(val),v_);
+                        v_.push_back(0x38);
+                        detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(posnum),v_);
                     }
-                    else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
+                    else if (posnum <= (std::numeric_limits<uint16_t>::max)())
                     {
-                        // int 16 stores a 16-bit big-endian signed integer
-                        v_.push_back(cbor_format::int16_cd);
-                        detail::binary::to_big_endian<int16_t>()(static_cast<int16_t>(val),v_);
+                        v_.push_back(0x39);
+                        detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(posnum),v_);
                     }
-                    else if (val >= (std::numeric_limits<int32_t>::min)() && val <= (std::numeric_limits<int32_t>::max)())
+                    else if (posnum <= (std::numeric_limits<uint32_t>::max)())
                     {
-                        // int 32 stores a 32-bit big-endian signed integer
-                        v_.push_back(cbor_format::int32_cd);
-                        detail::binary::to_big_endian<int32_t>()(static_cast<int32_t>(val),v_);
+                        v_.push_back(0x3a);
+                        detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(posnum),v_);
                     }
-                    else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
+                    else if (posnum <= (std::numeric_limits<int64_t>::max)())
                     {
-                        // int 64 stores a 64-bit big-endian signed integer
-                        v_.push_back(cbor_format::int64_cd);
-                        detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(val),v_);
+                        v_.push_back(0x3b);
+                        detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(posnum),v_);
                     }
                 }
                 break;

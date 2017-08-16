@@ -31,6 +31,7 @@ void check_encode(const std::vector<uint8_t>& expected, const json& j)
 
 BOOST_AUTO_TEST_CASE(cbor_encoder_test)
 {
+    // unsigned integer
     check_encode({'\x00'},json(0U));
     check_encode({'\x01'},json(1U));
     check_encode({'\x0a'},json(10U));
@@ -40,6 +41,36 @@ BOOST_AUTO_TEST_CASE(cbor_encoder_test)
     check_encode({'\x19','\x01','\x00'},json(256U));
     check_encode({'\x19',U'\xff',U'\xff'},json(65535U));
     check_encode({'\x1a',0,1,'\x00','\x00'},json(65536U));
+    check_encode({'\x1a',U'\xff',U'\xff',U'\xff',U'\xff'},json(4294967295U));
+    check_encode({'\x1b',0,0,0,1,0,0,0,0},json(4294967296U));
+    check_encode({'\x1b',U'\xff',U'\xff',U'\xff',U'\xff',U'\xff',U'\xff',U'\xff',U'\xff'},json(std::numeric_limits<uint64_t>::max()));
+
+    // positive signed integer
+    check_encode({'\x00'},json(0));
+    check_encode({'\x01'},json(1));
+    check_encode({'\x0a'},json(10));
+    check_encode({'\x17'},json(23));
+    check_encode({'\x18','\x18'},json(24));
+    check_encode({'\x18',U'\xff'},json(255));
+    check_encode({'\x19','\x01','\x00'},json(256));
+    check_encode({'\x19',U'\xff',U'\xff'},json(65535));
+    check_encode({'\x1a',0,1,'\x00','\x00'},json(65536));
+    check_encode({'\x1a',U'\xff',U'\xff',U'\xff',U'\xff'},json(4294967295));
+    check_encode({'\x1b',0,0,0,1,0,0,0,0},json(4294967296));
+    check_encode({'\x1b',U'\x7f',U'\xff',U'\xff',U'\xff',U'\xff',U'\xff',U'\xff',U'\xff'},json(std::numeric_limits<int64_t>::max()));
+
+    // negative integers
+    check_encode({'\x20'},json(-1));
+    check_encode({'\x21'},json(-2));
+    check_encode({'\x37'},json(-24));
+    check_encode({'\x38','\x18'},json(-25));
+    check_encode({'\x38',U'\xff'},json(-256));
+    check_encode({'\x39','\x01','\x00'},json(-257));
+    check_encode({'\x39',U'\xff',U'\xff'},json(-65536));
+    check_encode({'\x3a',0,1,'\x00','\x00'},json(-65537));
+    check_encode({'\x3a',U'\xff',U'\xff',U'\xff',U'\xff'},json(-4294967296));
+    check_encode({'\x3b',0,0,0,1,0,0,0,0},json(-4294967297));
+
 
 }
 
