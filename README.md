@@ -8,7 +8,7 @@ Features:
 - Supports conversion from and to the standard library sequence containers, associative containers, std::pair, and std::tuple
 - Supports conversion from and to user defined types
 - Supports object members sorted alphabetically by name or in original order
-- Implements parsing and serializing JSON text in UTF-8 for utf8 character strings and streams
+- Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
 - Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
 - Supports event based JSON parsing and serializing with user defined input and output handlers
 - Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */
