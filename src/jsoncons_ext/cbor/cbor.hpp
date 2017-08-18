@@ -20,30 +20,6 @@
 
 namespace jsoncons { namespace cbor {
   
-namespace cbor_format
-{
-    const uint8_t nil_cd = 0xc0;
-    const uint8_t false_cd = 0xc2;
-    const uint8_t true_cd = 0xc3;
-    const uint8_t float32_cd = 0xca;
-    const uint8_t float64_cd = 0xcb;
-    const uint8_t uint8_cd = 0xcc;
-    const uint8_t uint16_cd = 0xcd;
-    const uint8_t uint32_cd = 0xce;
-    const uint8_t uint64_cd = 0xcf;
-    const uint8_t int8_cd = 0xd0;
-    const uint8_t int16_cd = 0xd1;
-    const uint8_t int32_cd = 0xd2;
-    const uint8_t int64_cd = 0xd3;
-    const uint8_t str8_cd = 0xd9;
-    const uint8_t str16_cd = 0xda;
-    const uint8_t str32_cd = 0xdb;
-    const uint8_t array16_cd = 0xdc;
-    const uint8_t array32_cd = 0xdd;
-    const uint8_t map16_cd = 0xde;
-    const uint8_t map32_cd = 0xdf;
-}
-
 template<class Json>
 class Encode_cbor_
 {
@@ -281,15 +257,13 @@ public:
         {
             case value_type::null_t:
             {
-                // nil
-                v_.push_back(cbor_format::nil_cd);
+                v_.push_back(0xf6);
                 break;
             }
 
             case value_type::bool_t:
             {
-                // true and false
-                v_.push_back(jval.as_bool() ? cbor_format::true_cd : cbor_format::false_cd );
+                v_.push_back(jval.as_bool() ? 0xf5 : 0xf4);
                 break;
             }
 
@@ -386,8 +360,7 @@ public:
 
             case value_type::double_t:
             {
-                // float 64
-                v_.push_back(cbor_format::float64_cd);
+                v_.push_back(0xfb);
                 detail::binary::to_big_endian<double>()(jval.as_double(),v_);
                 break;
             }
@@ -402,22 +375,29 @@ public:
             case value_type::array_t:
             {
                 const auto length = jval.array_value().size();
-                if (length <= 15)
+                if (length <= 0x17)
                 {
-                    // fixarray
-                    v_.push_back(static_cast<uint8_t>(0x90 | length));
+                    v_.push_back(static_cast<uint8_t>(0xa0 + length));
                 }
-                else if (length <= (std::numeric_limits<uint16_t>::max)())
+                else if (length <= 0xff)
                 {
-                    // array 16
-                    v_.push_back(cbor_format::array16_cd);
+                    v_.push_back(0xb8);
+                    v_.push_back(static_cast<uint8_t>(length));
+                }
+                else if (length <= 0xffff)
+                {
+                    v_.push_back(0xb9);
                     detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
                 }
-                else if (length <= (std::numeric_limits<uint32_t>::max)())
+                else if (length <= 0xffffffff)
                 {
-                    // array 32
-                    v_.push_back(cbor_format::array32_cd);
+                    v_.push_back(0xba);
                     detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
+                }
+                else if (length <= 0xffffffffffffffff)
+                {
+                    v_.push_back(0xbb);
+                    detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(length),v_);
                 }
 
                 // append each element
@@ -431,22 +411,29 @@ public:
             case value_type::object_t:
             {
                 const auto length = jval.object_value().size();
-                if (length <= 15)
+                if (length <= 0x17)
                 {
-                    // fixmap
-                    v_.push_back(static_cast<uint8_t>(0x80 | (length & 0xf)));
+                    v_.push_back(static_cast<uint8_t>(0xa0 + length));
                 }
-                else if (length <= 65535)
+                else if (length <= 0xff)
                 {
-                    // map 16
-                    v_.push_back(cbor_format::map16_cd );
+                    v_.push_back(0xb8);
+                    v_.push_back(static_cast<uint8_t>(length));
+                }
+                else if (length <= 0xffff)
+                {
+                    v_.push_back(0xb9);
                     detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
                 }
-                else if (length <= 4294967295)
+                else if (length <= 0xffffffff)
                 {
-                    // map 32
-                    v_.push_back(cbor_format::map32_cd );
+                    v_.push_back(0xba);
                     detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
+                }
+                else if (length <= 0xffffffffffffffff)
+                {
+                    v_.push_back(0xbb);
+                    detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(length),v_);
                 }
 
                 // append each element
@@ -477,28 +464,30 @@ public:
         }
 
         const size_t length = target.length();
-        if (length <= 31)
+        if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            v_.push_back(static_cast<uint8_t>(0xa0 | length));
+            v_.push_back(static_cast<uint8_t>(0x60 + length));
         }
-        else if (length <= (std::numeric_limits<uint8_t>::max)())
+        else if (length <= 0xff)
         {
-            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            v_.push_back(cbor_format::str8_cd);
+            v_.push_back(0x78);
             v_.push_back(static_cast<uint8_t>(length));
         }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
+        else if (length <= 0xffff)
         {
-            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            v_.push_back(cbor_format::str16_cd);
+            v_.push_back(0x79);
             detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length), v_);
         }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
+        else if (length <= 0xffffffff)
         {
-            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            v_.push_back(cbor_format::str32_cd);
-            detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
+            v_.push_back(0x7a);
+            detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length), v_);
+        }
+        else if (length <= 0xffffffffffffffff)
+        {
+            v_.push_back(0x7b);
+            detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(length),v_);
         }
 
         for (size_t i = 0; i < length; ++i)
@@ -528,259 +517,436 @@ public:
     {
         // store && increment index
         const uint8_t* pos = it_++;
-
-        if (*pos <= 0xbf)
+        switch (*pos)
         {
-            if (*pos <= 0x7f) 
-            {
-                // positive fixint
+            case 0x00:
+            case 0x01:
+            case 0x02:
+            case 0x03:
+            case 0x04:
+            case 0x05:
+            case 0x06:
+            case 0x07:
+            case 0x08:
+            case 0x09:
+            case 0x0a:
+            case 0x0b:
+            case 0x0c:
+            case 0x0d:
+            case 0x0e:
+            case 0x0f:
+            case 0x10:
+            case 0x11:
+            case 0x12:
+            case 0x13:
+            case 0x14:
+            case 0x15:
+            case 0x16:
+            case 0x17:
                 return Json(*pos);
-            }
-            else if (*pos <= 0x8f) 
-            {
-                // fixmap
-                Json result;
-                const size_t len = *pos & 0x0f;
-                result.reserve(len);
-                for (size_t i = 0; i < len; ++i)
-                {
-                    auto j = decode();
-                    result.set(j.as_string_view(),decode());
-                }
-                return result;
-            }
-            else if (*pos <= 0x9f) 
-            {
-                // fixarray
-                Json result = typename Json::array();
-                const size_t len = *pos & 0x0f;
-                result.reserve(len);
-                for (size_t i = 0; i < len; ++i)
-                {
-                    result.add(decode());
-                }
-                return result;
-            }
-            else 
-            {
-                // fixstr
-                const size_t len = *pos & 0x1f;
-                const uint8_t* first = &(*it_);
-                const uint8_t* last = first + len;
-                it_ += len; 
 
-                std::basic_string<char_type> target;
-                auto result = unicons::convert(
-                    first, last,std::back_inserter(target),unicons::conv_flags::strict);
-                if (result.first != unicons::conv_errc::ok)
-                {
-                    JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
-                }
-                return Json(target);
-            }
-        }
-        else if (*pos >= 0xe0) 
-        {
-            // negative fixint
-            return static_cast<int8_t>(*pos);
-        }
-        else
-        {
-            switch (*pos)
-            {
-                case cbor_format::nil_cd: 
-                {
-                    return Json(null_type());
-                }
-                case cbor_format::true_cd:
-                {
-                    return Json(true);
-                }
-                case cbor_format::false_cd:
-                {
-                    return Json(false);
-                }
-                case cbor_format::float32_cd: 
-                {
-                    float res = detail::binary::from_big_endian<float>()(it_,end_);
-                    it_ += sizeof(float); 
-                    return res;
-                }
-
-                case cbor_format::float64_cd: 
-                {
-                    double res = detail::binary::from_big_endian<double>()(it_,end_);
-                    it_ += sizeof(double); 
-                    return res;
-                }
-
-                case cbor_format::uint8_cd: 
+            case 0x18: // Unsigned integer (one-byte uint8_t follows)
                 {
                     auto x = detail::binary::from_big_endian<uint8_t>()(it_,end_);
                     it_ += sizeof(uint8_t); 
                     return Json(x);
                 }
 
-                case cbor_format::uint16_cd: 
+            case 0x19: // Unsigned integer (two-byte uint16_t follows)
                 {
                     auto x = detail::binary::from_big_endian<uint16_t>()(it_,end_);
                     it_ += sizeof(uint16_t); 
-                    return x;
-                }
-
-                case cbor_format::uint32_cd: 
-                {
-                    auto x = detail::binary::from_big_endian<uint32_t>()(it_,end_);
-                    it_ += sizeof(uint32_t); 
-                    return x;
-                }
-
-                case cbor_format::uint64_cd: 
-                {
-                    auto x = detail::binary::from_big_endian<uint64_t>()(it_,end_);
-                    it_ += sizeof(uint64_t); 
-                    return x;
-                }
-
-                case cbor_format::int8_cd: 
-                {
-                    auto x = detail::binary::from_big_endian<int8_t>()(it_,end_);
-                    it_ += sizeof(int8_t); 
                     return Json(x);
                 }
 
-                case cbor_format::int16_cd: 
+            case 0x1a: // Unsigned integer (four-byte uint32_t follows)
                 {
-                    auto x = detail::binary::from_big_endian<int16_t>()(it_,end_);
-                    it_ += sizeof(int16_t); 
-                    return x;
+                    auto x = detail::binary::from_big_endian<uint32_t>()(it_,end_);
+                    it_ += sizeof(uint32_t); 
+                    return Json(x);
                 }
 
-                case cbor_format::int32_cd: 
+            case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
                 {
-                    auto x = detail::binary::from_big_endian<int32_t>()(it_,end_);
-                    it_ += sizeof(int32_t); 
-                    return x;
+                    auto x = detail::binary::from_big_endian<uint64_t>()(it_,end_);
+                    it_ += sizeof(uint64_t); 
+                    return Json(x);
                 }
 
-                case cbor_format::int64_cd: 
+            // Negative integer -1-0x00..-1-0x17 (-1..-24)
+            case 0x20:
+            case 0x21:
+            case 0x22:
+            case 0x23:
+            case 0x24:
+            case 0x25:
+            case 0x26:
+            case 0x27:
+            case 0x28:
+            case 0x29:
+            case 0x2a:
+            case 0x2b:
+            case 0x2c:
+            case 0x2d:
+            case 0x2e:
+            case 0x2f:
+            case 0x30:
+            case 0x31:
+            case 0x32:
+            case 0x33:
+            case 0x34:
+            case 0x35:
+            case 0x36:
+            case 0x37:
+                return Json(static_cast<int8_t>(0x20 - 1 - *pos));
+
+            case 0x38: // Negative integer (one-byte uint8_t follows)
+            {
+                // must be uint8_t !
+                auto x = detail::binary::from_big_endian<uint8_t>()(it_,end_);
+                it_ += sizeof(uint8_t); 
+                return Json(static_cast<int64_t>(-1) - x);
+            }
+
+            case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
+            {
+                auto x = detail::binary::from_big_endian<uint16_t>()(it_,end_);
+                it_ += sizeof(uint16_t); 
+                return Json(static_cast<int64_t>(-1) - x);
+            }
+
+            case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
+            {
+                auto x = detail::binary::from_big_endian<uint32_t>()(it_,end_);
+                it_ += sizeof(uint32_t); 
+                return Json(static_cast<int64_t>(-1) - x);
+            }
+
+            case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
+            {
+                auto x = detail::binary::from_big_endian<uint64_t>()(it_,end_);
+                it_ += sizeof(uint64_t); 
+                return Json(static_cast<int64_t>(-1) - static_cast<int64_t>(x));
+            }
+
+            // UTF-8 string (0x00..0x17 bytes follow)
+            case 0x60:
+            case 0x61:
+            case 0x62:
+            case 0x63:
+            case 0x64:
+            case 0x65:
+            case 0x66:
+            case 0x67:
+            case 0x68:
+            case 0x69:
+            case 0x6a:
+            case 0x6b:
+            case 0x6c:
+            case 0x6d:
+            case 0x6e:
+            case 0x6f:
+            case 0x70:
+            case 0x71:
+            case 0x72:
+            case 0x73:
+            case 0x74:
+            case 0x75:
+            case 0x76:
+            case 0x77:
                 {
-                    auto x = detail::binary::from_big_endian<int64_t>()(it_,end_);
-                    it_ += sizeof(int64_t); 
-                    return x;
+                    return get_string(*pos & 0x1f);
                 }
-
-                case cbor_format::str8_cd: 
+            case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
                 {
-                    const auto len = detail::binary::from_big_endian<int8_t>()(it_,end_);
-                    const uint8_t* first = &(*(pos + 2));
-                    const uint8_t* last = first + len;
-                    it_ += len+1; 
-
-                    std::basic_string<char_type> target;
-                    auto result = unicons::convert(
-                        first, last,std::back_inserter(target),unicons::conv_flags::strict);
-                    if (result.first != unicons::conv_errc::ok)
+                    const auto len = detail::binary::from_big_endian<uint8_t>()(it_,end_);
+                    it_ += sizeof(uint8_t); 
+                    return get_string(len);               
+                }
+            case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
+                {
+                    const auto len = detail::binary::from_big_endian<uint16_t>()(it_,end_);
+                    it_ += sizeof(uint16_t); 
+                    return get_string(len);               
+                }
+            case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
+                {
+                    const auto len = detail::binary::from_big_endian<uint32_t>()(it_,end_);
+                    it_ += sizeof(uint32_t); 
+                    return get_string(len);               
+                }
+            case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
+                {
+                    const auto len = detail::binary::from_big_endian<uint64_t>()(it_,end_);
+                    it_ += sizeof(uint64_t); 
+                    return get_string(len);               
+                }
+            case 0x7f: // UTF-8 string (indefinite length)
+            {
+                std::string s;
+                while (*it_ != 0xff)
+                {
+                    if (it_ == end_)
                     {
-                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                        JSONCONS_THROW_EXCEPTION(std::invalid_argument,"eof");
                     }
-                    return target;
+                    Json j = decode();
+                    s.append(j.as_string());
                 }
+                //++it_;
+                
+                return s;
+            }
 
-                case cbor_format::str16_cd: 
+            // array (0x00..0x17 data items follow)
+            case 0x80:
+            case 0x81:
+            case 0x82:
+            case 0x83:
+            case 0x84:
+            case 0x85:
+            case 0x86:
+            case 0x87:
+            case 0x88:
+            case 0x89:
+            case 0x8a:
+            case 0x8b:
+            case 0x8c:
+            case 0x8d:
+            case 0x8e:
+            case 0x8f:
+            case 0x90:
+            case 0x91:
+            case 0x92:
+            case 0x93:
+            case 0x94:
+            case 0x95:
+            case 0x96:
+            case 0x97:
+            {
+                return get_cbor_array(*pos & 0x1f);
+            }
+
+            case 0x98: // array (one-byte uint8_t for n follows)
+            {
+                const auto len = detail::binary::from_big_endian<uint8_t>()(it_,end_);
+                it_ += sizeof(uint8_t); 
+                return get_cbor_array(len);
+            }
+
+            case 0x99: // array (two-byte uint16_t for n follow)
+            {
+                const auto len = detail::binary::from_big_endian<uint16_t>()(it_,end_);
+                it_ += sizeof(uint16_t); 
+                return get_cbor_array(len);
+            }
+
+            case 0x9a: // array (four-byte uint32_t for n follow)
+            {
+                const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
+                it_ += sizeof(uint32_t); 
+                return get_cbor_array(len);
+            }
+
+            case 0x9b: // array (eight-byte uint64_t for n follow)
+            {
+                const auto len = detail::binary::from_big_endian<int64_t>()(it_,end_);
+                it_ += sizeof(uint64_t); 
+                return get_cbor_array(len);
+            }
+
+            case 0x9f: // array (indefinite length)
+            {
+                Json result = typename Json::array();
+                while (*pos != 0xff)
                 {
-                    const auto len = detail::binary::from_big_endian<int16_t>()(it_,end_);
-                    const uint8_t* first = &(*(pos + 3));
-                    const uint8_t* last = first + len;
-                    it_ += len + 2; 
-
-                    std::basic_string<char_type> target;
-                    auto result = unicons::convert(
-                        first, last,std::back_inserter(target),unicons::conv_flags::strict);
-                    if (result.first != unicons::conv_errc::ok)
-                    {
-                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
-                    }
-                    return target;
+                    result.add(decode());
+                    pos = it_;
                 }
+                return result;
+            }
 
-                case cbor_format::str32_cd: 
+            // map (0x00..0x17 pairs of data items follow)
+            case 0xa0:
+            case 0xa1:
+            case 0xa2:
+            case 0xa3:
+            case 0xa4:
+            case 0xa5:
+            case 0xa6:
+            case 0xa7:
+            case 0xa8:
+            case 0xa9:
+            case 0xaa:
+            case 0xab:
+            case 0xac:
+            case 0xad:
+            case 0xae:
+            case 0xaf:
+            case 0xb0:
+            case 0xb1:
+            case 0xb2:
+            case 0xb3:
+            case 0xb4:
+            case 0xb5:
+            case 0xb6:
+            case 0xb7:
+            {
+                return get_cbor_object(*pos & 0x1f);
+            }
+
+            case 0xb8: // map (one-byte uint8_t for n follows)
+            {
+                const auto len = detail::binary::from_big_endian<uint8_t>()(it_,end_);
+                it_ += sizeof(uint8_t); 
+                return get_cbor_object(len);
+            }
+
+            case 0xb9: // map (two-byte uint16_t for n follow)
+            {
+                const auto len = detail::binary::from_big_endian<uint16_t>()(it_,end_);
+                it_ += sizeof(uint16_t); 
+                return get_cbor_object(len);
+            }
+
+            case 0xba: // map (four-byte uint32_t for n follow)
+            {
+                const auto len = detail::binary::from_big_endian<uint32_t>()(it_,end_);
+                it_ += sizeof(uint32_t); 
+                return get_cbor_object(len);
+            }
+
+            case 0xbb: // map (eight-byte uint64_t for n follow)
+            {
+                const auto len = detail::binary::from_big_endian<uint64_t>()(it_,end_);
+                it_ += sizeof(uint64_t); 
+                return get_cbor_object(len);
+            }
+
+            case 0xbf: // map (indefinite length)
+            {
+                Json result = typename Json::object();
+                while (*pos != 0xff)
                 {
-                    const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
-                    const uint8_t* first = &(*(pos + 5));
-                    const uint8_t* last = first + len;
-                    it_ += len + 4; 
-
-                    std::basic_string<char_type> target;
-                    auto result = unicons::convert(
-                        first, last,std::back_inserter(target),unicons::conv_flags::strict);
-                    if (result.first != unicons::conv_errc::ok)
-                    {
-                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
-                    }
-                    return target;
+                    auto j = decode();
+                    result.set(j.as_string_view(),decode());
+                    pos = it_;
                 }
+                return result;
+            }
 
-                case cbor_format::array16_cd: 
+            case 0xf4: // false
+            {
+                return Json(false);
+            }
+
+            case 0xf5: // true
+            {
+                return Json(true);
+            }
+
+            case 0xf6: // null
+            {
+                return Json::null();
+            }
+/*
+            case 0xf9: // Half-Precision Float (two-byte IEEE 754)
+            {
+
+                const int byte1 = get();
+                check_eof();
+                const int byte2 = get();
+                check_eof();
+
+                // code from RFC 7049, Appendix D, Figure 3:
+                // As half-precision floating-point numbers were only added
+                // to IEEE 754 in 2008, today's programming platforms often
+                // still only have limited support for them. It is very
+                // easy to include at least decoding support for them even
+                // without such support. An example of a small decoder for
+                // half-precision floating-point numbers in the C language
+                // is shown in Fig. 3.
+                const int half = (byte1 << 8) + byte2;
+                const int exp = (half >> 10) & 0x1f;
+                const int mant = half & 0x3ff;
+                double val;
+                if (exp == 0)
                 {
-                    Json result = typename Json::array();
-                    const auto len = detail::binary::from_big_endian<int16_t>()(it_,end_);
-                    it_ += 2; 
-                    result.reserve(len);
-                    for (size_t i = 0; i < len; ++i)
-                    {
-                        result.add(decode());
-                    }
-                    return result;
+                    val = std::ldexp(mant, -24);
                 }
-
-                case cbor_format::array32_cd: 
+                else if (exp != 31)
                 {
-                    Json result = typename Json::array();
-                    const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
-                    it_ += 4; 
-                    result.reserve(len);
-                    for (size_t i = 0; i < len; ++i)
-                    {
-                        result.add(decode());
-                    }
-                    return result;
+                    val = std::ldexp(mant + 1024, exp - 25);
                 }
-
-                case cbor_format::map16_cd : 
+                else
                 {
-                    Json result = typename Json::object();
-                    const auto len = detail::binary::from_big_endian<int16_t>()(it_,end_);
-                    it_ += 2; 
-                    result.reserve(len);
-                    for (size_t i = 0; i < len; ++i)
-                    {
-                        auto j = decode();
-                        result.set(j.as_string_view(),decode());
-                    }
-                    return result;
+                    val = (mant == 0) ? std::numeric_limits<double>::infinity()
+                          : std::numeric_limits<double>::quiet_NaN();
                 }
+                return (half & 0x8000) != 0 ? -val : val;
+            }
+*/
+            case 0xfa: // Single-Precision Float (four-byte IEEE 754)
+            {
+                const auto val = detail::binary::from_big_endian<float>()(it_,end_);
+                it_ += sizeof(float); 
+                return Json(val);
+            }
 
-                case cbor_format::map32_cd : 
-                {
-                    Json result = typename Json::object();
-                    const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
-                    it_ += 4; 
-                    result.reserve(len);
-                    for (size_t i = 0; i < len; ++i)
-                    {
-                        auto key = decode().as_string_view();
-                        result.set(key,decode());
-                    }
-                    return result;
-                }
+            case 0xfb: // Double-Precision Float (eight-byte IEEE 754)
+            {
+                const auto val = detail::binary::from_big_endian<double>()(it_,end_);
+                it_ += sizeof(double); 
+                return Json(val);
+            }
 
-                default:
-                {
-                    JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a message pack at position %s", std::to_string(end_-pos));
-                }
+            default: // anything else (0xFF is handled inside the other types)
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a cbor at position %s", std::to_string(end_-pos));
             }
         }
+    }
+
+    template<typename T>
+    Json get_string(const T len)
+    {
+        const uint8_t* first = it_;
+        const uint8_t* last = it_ + len;
+        it_ += len; 
+
+        std::basic_string<char_type> target;
+        auto result = unicons::convert(
+            first, last,std::back_inserter(target),unicons::conv_flags::strict);
+        if (result.first != unicons::conv_errc::ok)
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+        }
+        return target;
+    }
+
+    template<typename T>
+    Json get_cbor_array(const T len)
+    {
+        Json result = typename Json::array();
+        result.reserve(len);
+        for (T i = 0; i < len; ++i)
+        {
+            result.add(decode());
+        }
+        return result;
+    }
+
+    template<typename T>
+    Json get_cbor_object(const T len)
+    {
+        Json result = typename Json::object();
+        result.reserve(len);
+        for (T i = 0; i < len; ++i)
+        {
+            auto j = decode();
+            result.set(j.as_string_view(),decode());
+        }
+        return result;
     }
 };
 

@@ -738,7 +738,7 @@ public:
                 case msgpack_format::array16_cd: 
                 {
                     Json result = typename Json::array();
-                    const auto len = detail::binary::from_big_endian<int16_t>()(it_,end_);
+                    const auto len = detail::binary::from_big_endian<uint16_t>()(it_,end_);
                     it_ += 2; 
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
@@ -751,7 +751,7 @@ public:
                 case msgpack_format::array32_cd: 
                 {
                     Json result = typename Json::array();
-                    const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
+                    const auto len = detail::binary::from_big_endian<uint32_t>()(it_,end_);
                     it_ += 4; 
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
@@ -763,9 +763,9 @@ public:
 
                 case msgpack_format::map16_cd : 
                 {
-                    Json result = typename Json::object();
-                    const auto len = detail::binary::from_big_endian<int16_t>()(it_,end_);
+                    const auto len = detail::binary::from_big_endian<uint16_t>()(it_,end_);
                     it_ += 2; 
+                    Json result = typename Json::object();
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
@@ -778,7 +778,7 @@ public:
                 case msgpack_format::map32_cd : 
                 {
                     Json result = typename Json::object();
-                    const auto len = detail::binary::from_big_endian<int32_t>()(it_,end_);
+                    const auto len = detail::binary::from_big_endian<uint32_t>()(it_,end_);
                     it_ += 4; 
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)

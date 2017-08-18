@@ -71,6 +71,22 @@ BOOST_AUTO_TEST_CASE(cbor_encoder_test)
     check_encode({'\x3a',U'\xff',U'\xff',U'\xff',U'\xff'},json(-4294967296));
     check_encode({'\x3b',0,0,0,1,0,0,0,0},json(-4294967297));
 
+    // null, true, false
+    check_encode({U'\xf6'},json::null());
+    check_encode({U'\xf5'},json(true));
+    check_encode({U'\xf4'},json(false));
+
+    // floating point
+    check_encode({U'\xfb',0,0,0,0,0,0,0,0},json(0.0));
+    check_encode({U'\xfb',U'\xbf',U'\xf0',0,0,0,0,0,0},json(-1.0));
+    check_encode({U'\xfb',U'\xc1',U'\x6f',U'\xff',U'\xff',U'\xe0',0,0,0},json(-16777215.0));
+
+    // string
+    check_encode({U'\x60'},json(""));
+    check_encode({U'\x61',' '},json(" "));
+    check_encode({U'\x78','\x18','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
+                 json("123456789012345678901234"));
+
 
 }
 
