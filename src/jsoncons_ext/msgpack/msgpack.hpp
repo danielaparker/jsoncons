@@ -301,31 +301,31 @@ public:
                     if (val <= (std::numeric_limits<int8_t>::max)())
                     {
                         // positive fixnum stores 7-bit positive integer
-                        detail::binary::to_big_endian<int8_t>()(static_cast<int8_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<int8_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
                         // uint 8 stores a 8-bit unsigned integer
                         v_.push_back(msgpack_format::uint8_cd);
-                        detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
                         // uint 16 stores a 16-bit big-endian unsigned integer
                         v_.push_back(msgpack_format::uint16_cd);
-                        detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<uint16_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
                         // uint 32 stores a 32-bit big-endian unsigned integer
                         v_.push_back(msgpack_format::uint32_cd);
-                        detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<uint32_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
                         // int 64 stores a 64-bit big-endian signed integer
                         v_.push_back(msgpack_format::int64_cd);
-                        detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<int64_t>(val),v_);
                     }
                 }
                 else
@@ -339,25 +339,25 @@ public:
                     {
                         // int 8 stores a 8-bit signed integer
                         v_.push_back(msgpack_format::int8_cd);
-                        detail::binary::to_big_endian<int8_t>()(static_cast<int8_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<int8_t>(val),v_);
                     }
                     else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
                     {
                         // int 16 stores a 16-bit big-endian signed integer
                         v_.push_back(msgpack_format::int16_cd);
-                        detail::binary::to_big_endian<int16_t>()(static_cast<int16_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<int16_t>(val),v_);
                     }
                     else if (val >= (std::numeric_limits<int32_t>::min)() && val <= (std::numeric_limits<int32_t>::max)())
                     {
                         // int 32 stores a 32-bit big-endian signed integer
                         v_.push_back(msgpack_format::int32_cd);
-                        detail::binary::to_big_endian<int32_t>()(static_cast<int32_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<int32_t>(val),v_);
                     }
                     else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
                     {
                         // int 64 stores a 64-bit big-endian signed integer
                         v_.push_back(msgpack_format::int64_cd);
-                        detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<int64_t>(val),v_);
                     }
                 }
                 break;
@@ -381,19 +381,19 @@ public:
                 {
                     // uint 16 stores a 16-bit big-endian unsigned integer
                     v_.push_back(msgpack_format::uint16_cd);
-                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // uint 32 stores a 32-bit big-endian unsigned integer
                     v_.push_back(msgpack_format::uint32_cd);
-                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint64_t>::max)())
                 {
                     // uint 64 stores a 64-bit big-endian unsigned integer
                     v_.push_back(msgpack_format::uint64_cd);
-                    detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint64_t>(val),v_);
                 }
                 break;
             }
@@ -402,7 +402,7 @@ public:
             {
                 // float 64
                 v_.push_back(msgpack_format::float64_cd);
-                detail::binary::to_big_endian<double>()(jval.as_double(),v_);
+                detail::binary::to_big_endian(jval.as_double(),v_);
                 break;
             }
 
@@ -425,13 +425,13 @@ public:
                 {
                     // array 16
                     v_.push_back(msgpack_format::array16_cd);
-                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= (std::numeric_limits<uint32_t>::max)())
                 {
                     // array 32
                     v_.push_back(msgpack_format::array32_cd);
-                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(length),v_);
                 }
 
                 // append each element
@@ -454,13 +454,13 @@ public:
                 {
                     // map 16
                     v_.push_back(msgpack_format::map16_cd );
-                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= 4294967295)
                 {
                     // map 32
                     v_.push_back(msgpack_format::map32_cd );
-                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(length),v_);
                 }
 
                 // append each element
@@ -506,13 +506,13 @@ public:
         {
             // str 16 stores a byte array whose length is upto (2^16)-1 bytes
             v_.push_back(msgpack_format::str16_cd);
-            detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length), v_);
+            detail::binary::to_big_endian(static_cast<uint16_t>(length), v_);
         }
         else if (length <= (std::numeric_limits<uint32_t>::max)())
         {
             // str 32 stores a byte array whose length is upto (2^32)-1 bytes
             v_.push_back(msgpack_format::str32_cd);
-            detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
+            detail::binary::to_big_endian(static_cast<uint32_t>(length),v_);
         }
 
         for (size_t i = 0; i < length; ++i)

@@ -167,100 +167,72 @@ static inline unsigned short encode_half(double val)
 
 // to_big_endian
 
-template<typename T, class Enable=void>
-struct to_big_endian
+template<typename T>
+typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint8_t),void>::type
+to_big_endian(T val, std::vector<uint8_t>& v)
 {
-};
+    v.push_back(static_cast<uint8_t>((val) & 0xff));
+}
 
 template<typename T>
-struct to_big_endian<T,
-               typename std::enable_if<std::is_integral<T>::value && 
-               sizeof(T) == sizeof(uint8_t)
->::type>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint16_t),void>::type
+to_big_endian(T val, std::vector<uint8_t>& v)
 {
-    inline void operator()(T val, std::vector<uint8_t>& v)
+    T x = JSONCONS_BINARY_FROM_BE16(val);
+
+    uint8_t where[sizeof(T)];
+    memcpy(where, &x, sizeof(T));
+
+    for (auto e : where)
     {
-        v.push_back(static_cast<uint8_t>((val) & 0xff));
+        v.push_back(e);
     }
-};
+}
 
 template<typename T>
-struct to_big_endian<T,
-               typename std::enable_if<std::is_integral<T>::value && 
-               sizeof(T) == sizeof(uint16_t)
->::type>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint32_t),void>::type
+to_big_endian(T val, std::vector<uint8_t>& v)
 {
-    inline void operator()(T val, std::vector<uint8_t>& v)
+    T x = JSONCONS_BINARY_FROM_BE32(val);
+
+    uint8_t where[sizeof(T)];
+    memcpy(where, &x, sizeof(T));
+
+    for (auto e : where)
     {
-        T x = JSONCONS_BINARY_FROM_BE16(val);
-
-        uint8_t where[sizeof(T)];
-        memcpy(where, &x, sizeof(T));
-
-        for (auto e : where)
-        {
-            v.push_back(e);
-        }
+        v.push_back(e);
     }
-};
+}
 
 template<typename T>
-struct to_big_endian<T,
-               typename std::enable_if<std::is_integral<T>::value && 
-               sizeof(T) == sizeof(uint32_t)
->::type>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint64_t),void>::type
+to_big_endian(T val, std::vector<uint8_t>& v)
 {
-    inline void operator()(T val, std::vector<uint8_t>& v)
+    T x = JSONCONS_BINARY_FROM_BE64(val);
+
+    uint8_t where[sizeof(T)];
+    memcpy(where, &x, sizeof(T));
+
+    for (auto e : where)
     {
-        T x = JSONCONS_BINARY_FROM_BE32(val);
-
-        uint8_t where[sizeof(T)];
-        memcpy(where, &x, sizeof(T));
-
-        for (auto e : where)
-        {
-            v.push_back(e);
-        }
+        v.push_back(e);
     }
-};
+}
 
-template<typename T>
-struct to_big_endian<T,
-               typename std::enable_if<std::is_integral<T>::value && 
-               sizeof(T) == sizeof(uint64_t)
->::type>
+inline
+void to_big_endian(float val, std::vector<uint8_t>& v)
 {
-    inline void operator()(T val, std::vector<uint8_t>& v)
-    {
-        T x = JSONCONS_BINARY_FROM_BE64(val);
+    to_big_endian(*reinterpret_cast<uint32_t*>(&val), v);
+}
 
-        uint8_t where[sizeof(T)];
-        memcpy(where, &x, sizeof(T));
-
-        for (auto e : where)
-        {
-            v.push_back(e);
-        }
-    }
-};
-
-template<>
-struct to_big_endian<float>
+inline
+void to_big_endian(double val, std::vector<uint8_t>& v)
 {
-    inline void operator()(float val, std::vector<uint8_t>& v)
-    {
-        to_big_endian<uint64_t>()(*(uint32_t*)&val, v);
-    }
-};
-
-template<>
-struct to_big_endian<double>
-{
-    inline void operator()(double val, std::vector<uint8_t>& v)
-    {
-        to_big_endian<uint64_t>()(*(uint64_t*)&val, v);
-    }
-};
+    to_big_endian(*reinterpret_cast<uint64_t*>(&val), v);
+}
 
 // from_big_endian
 

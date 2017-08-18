@@ -274,27 +274,27 @@ public:
                 {
                     if (val <= 0x17)
                     {
-                        detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
                         v_.push_back(0x18);
-                        detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
                         v_.push_back(0x19);
-                        detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<uint16_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
                         v_.push_back(0x1a);
-                        detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<uint32_t>(val),v_);
                     }
                     else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
                         v_.push_back(0x1b);
-                        detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<int64_t>(val),v_);
                     }
                 }
                 else
@@ -307,22 +307,22 @@ public:
                     else if (posnum <= (std::numeric_limits<uint8_t>::max)())
                     {
                         v_.push_back(0x38);
-                        detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(posnum),v_);
+                        detail::binary::to_big_endian(static_cast<uint8_t>(posnum),v_);
                     }
                     else if (posnum <= (std::numeric_limits<uint16_t>::max)())
                     {
                         v_.push_back(0x39);
-                        detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(posnum),v_);
+                        detail::binary::to_big_endian(static_cast<uint16_t>(posnum),v_);
                     }
                     else if (posnum <= (std::numeric_limits<uint32_t>::max)())
                     {
                         v_.push_back(0x3a);
-                        detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(posnum),v_);
+                        detail::binary::to_big_endian(static_cast<uint32_t>(posnum),v_);
                     }
                     else if (posnum <= (std::numeric_limits<int64_t>::max)())
                     {
                         v_.push_back(0x3b);
-                        detail::binary::to_big_endian<int64_t>()(static_cast<int64_t>(posnum),v_);
+                        detail::binary::to_big_endian(static_cast<int64_t>(posnum),v_);
                     }
                 }
                 break;
@@ -333,27 +333,27 @@ public:
                 uint64_t val = jval.as_uinteger();
                 if (val <= 0x17)
                 {
-                    detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint8_t>::max)())
                 {
                     v_.push_back(0x18);
-                    detail::binary::to_big_endian<uint8_t>()(static_cast<uint8_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint16_t>::max)())
                 {
                     v_.push_back(0x19);
-                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint32_t>::max)())
                 {
                     v_.push_back(0x1a);
-                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(val),v_);
                 }
                 else if (val <= (std::numeric_limits<uint64_t>::max)())
                 {
                     v_.push_back(0x1b);
-                    detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint64_t>(val),v_);
                 }
                 break;
             }
@@ -361,7 +361,7 @@ public:
             case value_type::double_t:
             {
                 v_.push_back(0xfb);
-                detail::binary::to_big_endian<double>()(jval.as_double(),v_);
+                detail::binary::to_big_endian(jval.as_double(),v_);
                 break;
             }
 
@@ -387,17 +387,17 @@ public:
                 else if (length <= 0xffff)
                 {
                     v_.push_back(0x99);
-                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= 0xffffffff)
                 {
                     v_.push_back(0x9a);
-                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(length),v_);
                 }
                 else if (length <= 0xffffffffffffffff)
                 {
                     v_.push_back(0x9b);
-                    detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint64_t>(length),v_);
                 }
 
                 // append each element
@@ -423,17 +423,17 @@ public:
                 else if (length <= 0xffff)
                 {
                     v_.push_back(0xb9);
-                    detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= 0xffffffff)
                 {
                     v_.push_back(0xba);
-                    detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(length),v_);
                 }
                 else if (length <= 0xffffffffffffffff)
                 {
                     v_.push_back(0xbb);
-                    detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(length),v_);
+                    detail::binary::to_big_endian(static_cast<uint64_t>(length),v_);
                 }
 
                 // append each element
@@ -477,17 +477,17 @@ public:
         else if (length <= 0xffff)
         {
             v_.push_back(0x79);
-            detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length), v_);
+            detail::binary::to_big_endian(static_cast<uint16_t>(length), v_);
         }
         else if (length <= 0xffffffff)
         {
             v_.push_back(0x7a);
-            detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length), v_);
+            detail::binary::to_big_endian(static_cast<uint32_t>(length), v_);
         }
         else if (length <= 0xffffffffffffffff)
         {
             v_.push_back(0x7b);
-            detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(length),v_);
+            detail::binary::to_big_endian(static_cast<uint64_t>(length),v_);
         }
 
         for (size_t i = 0; i < length; ++i)
