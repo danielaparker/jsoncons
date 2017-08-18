@@ -236,100 +236,69 @@ void to_big_endian(double val, std::vector<uint8_t>& v)
 
 // from_big_endian
 
-template<typename T, class Enable=void>
-struct from_big_endian
+template<class T>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint8_t),T>::type
+from_big_endian(const uint8_t* it, const uint8_t* end)
 {
-};
+    if (it + sizeof(T) > end)
+    {
+        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
+    }
+    return static_cast<T>(*(it));
+}
 
 template<class T>
-struct from_big_endian<T,
-               typename std::enable_if<std::is_integral<T>::value && 
-               sizeof(T) == sizeof(uint8_t)
->::type>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint16_t),T>::type
+from_big_endian(const uint8_t* it, const uint8_t* end)
 {
-    T operator()(const uint8_t* it, const uint8_t* end)
+    if (it + sizeof(T) > end)
     {
-        if (it + sizeof(T) > end)
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
-        }
-        return static_cast<T>(*(it));
+        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
     }
-};
+    return JSONCONS_BINARY_TO_BE16(*reinterpret_cast<const uint16_t*>(it));
+}
 
 template<class T>
-struct from_big_endian<T,
-               typename std::enable_if<std::is_integral<T>::value && 
-               sizeof(T) == sizeof(uint16_t)
->::type>
+typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
+from_big_endian(const uint8_t* it, const uint8_t* end)
 {
-    T operator()(const uint8_t* it, const uint8_t* end)
+    if (it + sizeof(T) > end)
     {
-        if (it + sizeof(T) > end)
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
-        }
-        return JSONCONS_BINARY_TO_BE16(*reinterpret_cast<const uint16_t*>(it));
+        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
     }
-};
+    return JSONCONS_BINARY_TO_BE32(*reinterpret_cast<const uint32_t*>(it));
+}
 
 template<class T>
-struct from_big_endian<T,
-               typename std::enable_if<std::is_integral<T>::value && 
-               sizeof(T) == sizeof(uint32_t)
->::type>
+typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint64_t),T>::type
+from_big_endian(const uint8_t* it, const uint8_t* end)
 {
-    T operator()(const uint8_t* it, const uint8_t* end)
+    if (it + sizeof(T) > end)
     {
-        if (it + sizeof(T) > end)
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
-        }
-        return JSONCONS_BINARY_TO_BE32(*reinterpret_cast<const uint32_t*>(it));
+        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
     }
-};
+    return JSONCONS_BINARY_TO_BE64(*reinterpret_cast<const uint64_t*>(it));
+}
 
 template<class T>
-struct from_big_endian<T,
-               typename std::enable_if<std::is_integral<T>::value && 
-               sizeof(T) == sizeof(uint64_t)
->::type>
+typename std::enable_if<std::is_floating_point<T>::value && 
+sizeof(T) == sizeof(uint32_t),T>::type
+from_big_endian(const uint8_t* it, const uint8_t* end)
 {
-    T operator()(const uint8_t* it, const uint8_t* end)
-    {
-        if (it + sizeof(T) > end)
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
-        }
-        return JSONCONS_BINARY_TO_BE64(*reinterpret_cast<const uint64_t*>(it));
-    }
-};
+    uint32_t data = from_big_endian<uint32_t>(it,end);
+    return *reinterpret_cast<T*>(&data);
+}
 
 template<class T>
-struct from_big_endian<T,
-               typename std::enable_if<std::is_floating_point<T>::value && 
-               sizeof(T) == sizeof(uint32_t)
->::type>
+typename std::enable_if<std::is_floating_point<T>::value && 
+sizeof(T) == sizeof(uint64_t),T>::type
+from_big_endian(const uint8_t* it, const uint8_t* end)
 {
-    T operator()(const uint8_t* it, const uint8_t* end)
-    {
-        uint32_t data = from_big_endian<uint32_t>()(it,end);
-        return *reinterpret_cast<T*>(&data);
-    }
-};
-
-template<class T>
-struct from_big_endian<T,
-               typename std::enable_if<std::is_floating_point<T>::value && 
-               sizeof(T) == sizeof(uint64_t)
->::type>
-{
-    T operator()(const uint8_t* it, const uint8_t* end)
-    {
-        uint64_t data = from_big_endian<uint64_t>()(it,end);
-        return *reinterpret_cast<T*>(&data);
-    }
-};
+    uint64_t data = from_big_endian<uint64_t>(it,end);
+    return *reinterpret_cast<T*>(&data);
+}
 
 }}}
 
