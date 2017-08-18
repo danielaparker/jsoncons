@@ -377,26 +377,26 @@ public:
                 const auto length = jval.array_value().size();
                 if (length <= 0x17)
                 {
-                    v_.push_back(static_cast<uint8_t>(0xa0 + length));
+                    v_.push_back(static_cast<uint8_t>(0x80 + length));
                 }
                 else if (length <= 0xff)
                 {
-                    v_.push_back(0xb8);
+                    v_.push_back(0x98);
                     v_.push_back(static_cast<uint8_t>(length));
                 }
                 else if (length <= 0xffff)
                 {
-                    v_.push_back(0xb9);
+                    v_.push_back(0x99);
                     detail::binary::to_big_endian<uint16_t>()(static_cast<uint16_t>(length),v_);
                 }
                 else if (length <= 0xffffffff)
                 {
-                    v_.push_back(0xba);
+                    v_.push_back(0x9a);
                     detail::binary::to_big_endian<uint32_t>()(static_cast<uint32_t>(length),v_);
                 }
                 else if (length <= 0xffffffffffffffff)
                 {
-                    v_.push_back(0xbb);
+                    v_.push_back(0x9b);
                     detail::binary::to_big_endian<uint64_t>()(static_cast<uint64_t>(length),v_);
                 }
 

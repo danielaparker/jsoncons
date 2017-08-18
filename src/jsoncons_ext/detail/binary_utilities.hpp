@@ -116,6 +116,8 @@
 #  pragma GCC optimize("-ffunction-sections")
 #endif
 
+namespace jsoncons { namespace detail { namespace binary {
+
 static inline bool add_check_overflow(size_t v1, size_t v2, size_t *r)
 {
 #if ((defined(__GNUC__) && (__GNUC__ >= 5)) && !defined(__INTEL_COMPILER)) || __has_builtin(__builtin_add_overflow)
@@ -162,8 +164,6 @@ static inline unsigned short encode_half(double val)
     return (unsigned short)(sign | ((exp + 15) << 10) | mant);
 #endif
 }
-
-namespace jsoncons { namespace detail { namespace binary {
 
 // to_big_endian
 
