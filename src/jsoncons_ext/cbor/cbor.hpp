@@ -655,31 +655,71 @@ public:
             case 0x76:
             case 0x77:
                 {
-                    return get_string(*pos & 0x1f);
+                    std::string s = get_string(*pos & 0x1f);
+                    std::basic_string<char_type> target;
+                    auto result = unicons::convert(
+                        s.begin(),s.end(),std::back_inserter(target),unicons::conv_flags::strict);
+                    if (result.first != unicons::conv_errc::ok)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                    }
+                    return Json(target);
                 }
             case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
                 {
                     const auto len = detail::binary::from_big_endian<uint8_t>()(it_,end_);
                     it_ += sizeof(uint8_t); 
-                    return get_string(len);               
+                    std::string s = get_string(len);               
+                    std::basic_string<char_type> target;
+                    auto result = unicons::convert(
+                        s.begin(),s.end(),std::back_inserter(target),unicons::conv_flags::strict);
+                    if (result.first != unicons::conv_errc::ok)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                    }
+                    return Json(target);
                 }
             case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
                 {
                     const auto len = detail::binary::from_big_endian<uint16_t>()(it_,end_);
                     it_ += sizeof(uint16_t); 
-                    return get_string(len);               
+                    std::string s = get_string(len);               
+                    std::basic_string<char_type> target;
+                    auto result = unicons::convert(
+                        s.begin(),s.end(),std::back_inserter(target),unicons::conv_flags::strict);
+                    if (result.first != unicons::conv_errc::ok)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                    }
+                    return Json(target);
                 }
             case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
                 {
                     const auto len = detail::binary::from_big_endian<uint32_t>()(it_,end_);
                     it_ += sizeof(uint32_t); 
-                    return get_string(len);               
+                    std::string s = get_string(len);               
+                    std::basic_string<char_type> target;
+                    auto result = unicons::convert(
+                        s.begin(),s.end(),std::back_inserter(target),unicons::conv_flags::strict);
+                    if (result.first != unicons::conv_errc::ok)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                    }
+                    return Json(target);
                 }
             case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
                 {
                     const auto len = detail::binary::from_big_endian<uint64_t>()(it_,end_);
                     it_ += sizeof(uint64_t); 
-                    return get_string(len);               
+                    std::string s =  get_string(len);               
+                    std::basic_string<char_type> target;
+                    auto result = unicons::convert(
+                        s.begin(),s.end(),std::back_inserter(target),unicons::conv_flags::strict);
+                    if (result.first != unicons::conv_errc::ok)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                    }
+                    return Json(target);
                 }
             case 0x7f: // UTF-8 string (indefinite length)
             {
@@ -690,12 +730,17 @@ public:
                     {
                         JSONCONS_THROW_EXCEPTION(std::invalid_argument,"eof");
                     }
-                    Json j = decode();
-                    s.append(j.as_string());
+                    std::string ss = get_string();
+                    s.append(std::move(ss));
                 }
-                //++it_;
-                
-                return s;
+                std::basic_string<char_type> target;
+                auto result = unicons::convert(
+                    s.begin(),s.end(),std::back_inserter(target),unicons::conv_flags::strict);
+                if (result.first != unicons::conv_errc::ok)
+                {
+                    JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
+                }
+                return Json(target);
             }
 
             // array (0x00..0x17 data items follow)
@@ -907,21 +952,78 @@ public:
         }
     }
 
+    std::string get_string()
+    {
+        const uint8_t* pos = it_++;
+        switch (*pos)
+        {
+            // UTF-8 string (0x00..0x17 bytes follow)
+            case 0x60:
+            case 0x61:
+            case 0x62:
+            case 0x63:
+            case 0x64:
+            case 0x65:
+            case 0x66:
+            case 0x67:
+            case 0x68:
+            case 0x69:
+            case 0x6a:
+            case 0x6b:
+            case 0x6c:
+            case 0x6d:
+            case 0x6e:
+            case 0x6f:
+            case 0x70:
+            case 0x71:
+            case 0x72:
+            case 0x73:
+            case 0x74:
+            case 0x75:
+            case 0x76:
+            case 0x77:
+                {
+                    return get_string(*pos & 0x1f);
+                }
+            case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
+                {
+                    const auto len = detail::binary::from_big_endian<uint8_t>()(it_,end_);
+                    it_ += sizeof(uint8_t); 
+                    return get_string(len);               
+                }
+            case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
+                {
+                    const auto len = detail::binary::from_big_endian<uint16_t>()(it_,end_);
+                    it_ += sizeof(uint16_t); 
+                    return get_string(len);               
+                }
+            case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
+                {
+                    const auto len = detail::binary::from_big_endian<uint32_t>()(it_,end_);
+                    it_ += sizeof(uint32_t); 
+                    return get_string(len);               
+                }
+            case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
+                {
+                    const auto len = detail::binary::from_big_endian<uint64_t>()(it_,end_);
+                    it_ += sizeof(uint64_t); 
+                    return get_string(len);               
+                }
+            default: // anything else (0xFF is handled inside the other types)
+            {
+                JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a cbor at position %s", std::to_string(end_-pos));
+            }
+        }
+    }
+
     template<typename T>
-    Json get_string(const T len)
+    std::string get_string(const T len)
     {
         const uint8_t* first = it_;
         const uint8_t* last = it_ + len;
         it_ += len; 
 
-        std::basic_string<char_type> target;
-        auto result = unicons::convert(
-            first, last,std::back_inserter(target),unicons::conv_flags::strict);
-        if (result.first != unicons::conv_errc::ok)
-        {
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
-        }
-        return target;
+        return std::string(first,last);
     }
 
     template<typename T>
