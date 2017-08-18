@@ -5,7 +5,7 @@ Decodes a [MessagePack](http://msgpack.org/index.html) binary serialization form
 
 ### Header
 ```c++
-#include <jsoncons/msgpack/msgpack.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
 
 template<class Json>
 Json decode_msgpack(const std::vector<uint8_t>& v)

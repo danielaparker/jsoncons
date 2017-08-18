@@ -129,7 +129,8 @@ static inline bool add_check_overflow(size_t v1, size_t v2, size_t *r)
 #endif
 }
 
-static inline unsigned short encode_half(double val)
+inline 
+uint16_t encode_half(double val)
 {
 #ifdef __F16C__
     return _cvtss_sh(val, 3);
@@ -161,7 +162,33 @@ static inline unsigned short encode_half(double val)
     }
 
     /* safe cast here as bit operations above guarantee not to overflow */
-    return (unsigned short)(sign | ((exp + 15) << 10) | mant);
+    return (uint16_t)(sign | ((exp + 15) << 10) | mant);
+#endif
+}
+
+/* this function was copied & adapted from RFC 7049 Appendix D */
+inline 
+double decode_half(uint16_t half)
+{
+#ifdef __F16C__
+    return _cvtsh_ss(half);
+#else
+    int exp = (half >> 10) & 0x1f;
+    int mant = half & 0x3ff;
+    double val;
+    if (exp == 0) 
+    {
+        val = ldexp(mant, -24);
+    }
+    else if (exp != 31) 
+    {
+        val = ldexp(mant + 1024, exp - 25);
+    } 
+    else
+    {
+        val = mant == 0 ? INFINITY : NAN;
+    }
+    return half & 0x8000 ? -val : val;
 #endif
 }
 

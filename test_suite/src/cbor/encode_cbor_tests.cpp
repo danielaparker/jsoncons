@@ -97,7 +97,11 @@ BOOST_AUTO_TEST_CASE(cbor_arrays_and_maps)
 
     check_encode({U'\x81','\0'},json::parse("[0]"));
     check_encode({U'\x82','\0','\0'},json::array({0,0}));
+    check_encode({U'\x82',U'\x81','\0','\0'}, json::parse("[[0],0]"));
     check_encode({U'\x81','\x65','H','e','l','l','o'},json::parse("[\"Hello\"]"));
+
+    check_encode({U'\xa1','\x62','o','c',U'\x81','\0'}, json::parse("{\"oc\": [0]}"));
+    check_encode({U'\xa1','\x62','o','c',U'\x84','\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

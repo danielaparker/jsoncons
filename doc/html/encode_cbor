@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>encode_msgpack</title>
+<title>encode_cbor</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,20 +468,20 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::msgpack::encode_msgpack</pre></div>
-<p>Encodes a json value to the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
+<div class="highlight highlight-source-c++"><pre>jsoncons::cbor::encode_cbor</pre></div>
+<p>Encodes a json value to the <a href="http://cbor.io/">cbor</a> binary serialization format.</p>
 <h3>Header</h3>
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/msgpack/msgpack.hpp<span class="pl-pds">&gt;</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/cbor/cbor.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
-std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; <span class="pl-en">encode_msgpack</span>(<span class="pl-k">const</span> Json&amp; jval)</pre></div>
+std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; <span class="pl-en">encode_cbor</span>(<span class="pl-k">const</span> Json&amp; jval)</pre></div>
 <h3>Examples</h3>
-<h2>MessagePack example</h2>
+<h2>cbor example</h2>
 <div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/msgpack/msgpack.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/cbor/cbor.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::msgpack<span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::cbor<span class="pl-k">;</span>
 
 <span class="pl-k">int</span> <span class="pl-en">main</span>()
 {
@@ -511,9 +511,9 @@ std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; <span class="pl-en">encode
     <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min float<span class="pl-pds">"</span></span>] = -(std::numeric_limits&lt;<span class="pl-k">float</span>&gt;::max)();
     <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>Key too long for small string optimization<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>String too long for small string optimization<span class="pl-pds">"</span></span>;
 
-    std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; v = <span class="pl-c1">encode_msgpack</span>(<span class="pl-c1">j1</span>);
+    std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; v = <span class="pl-c1">encode_cbor</span>(<span class="pl-c1">j1</span>);
 
-    ojson j2 = decode_msgpack&lt;ojson&gt;(v);
+    ojson j2 = decode_cbor&lt;ojson&gt;(v);
 
     std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(j2) &lt;&lt; std::endl;
 }</pre></div>
@@ -546,7 +546,7 @@ std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; <span class="pl-en">encode
 }</pre></div>
 <h3>See also</h3>
 <ul>
-<li><a href="decode_msgpack">decode_msgpack</a> decodes a <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format to a json value.</li>
+<li><a href="decode_cbor">decode_cbor</a> decodes a <a href="http://cbor.io/">cbor</a> binary serialization format to a json value.</li>
 </ul>
 </body>
 </html>

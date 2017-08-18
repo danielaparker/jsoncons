@@ -515,10 +515,10 @@ public:
 
     Json decode()
     {
-        // store && increment index
         const uint8_t* pos = it_++;
         switch (*pos)
         {
+            // Integer 0x00..0x17 (0..23)
             case 0x00:
             case 0x01:
             case 0x02:
@@ -545,28 +545,32 @@ public:
             case 0x17:
                 return Json(*pos);
 
-            case 0x18: // Unsigned integer (one-byte uint8_t follows)
+            // Unsigned integer (one-byte uint8_t follows)
+            case 0x18: 
                 {
                     auto x = detail::binary::from_big_endian<uint8_t>(it_,end_);
                     it_ += sizeof(uint8_t); 
                     return Json(x);
                 }
 
-            case 0x19: // Unsigned integer (two-byte uint16_t follows)
+            // Unsigned integer (two-byte uint16_t follows)
+            case 0x19: 
                 {
                     auto x = detail::binary::from_big_endian<uint16_t>(it_,end_);
                     it_ += sizeof(uint16_t); 
                     return Json(x);
                 }
 
-            case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+            // Unsigned integer (four-byte uint32_t follows)
+            case 0x1a: 
                 {
                     auto x = detail::binary::from_big_endian<uint32_t>(it_,end_);
                     it_ += sizeof(uint32_t); 
                     return Json(x);
                 }
 
-            case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+            // Unsigned integer (eight-byte uint64_t follows)
+            case 0x1b: 
                 {
                     auto x = detail::binary::from_big_endian<uint64_t>(it_,end_);
                     it_ += sizeof(uint64_t); 
@@ -600,29 +604,32 @@ public:
             case 0x37:
                 return Json(static_cast<int8_t>(0x20 - 1 - *pos));
 
-            case 0x38: // Negative integer (one-byte uint8_t follows)
+            // Negative integer (one-byte uint8_t follows)
+            case 0x38: 
             {
-                // must be uint8_t !
                 auto x = detail::binary::from_big_endian<uint8_t>(it_,end_);
                 it_ += sizeof(uint8_t); 
                 return Json(static_cast<int64_t>(-1) - x);
             }
 
-            case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
+            // Negative integer -1-n (two-byte uint16_t follows)
+            case 0x39: 
             {
                 auto x = detail::binary::from_big_endian<uint16_t>(it_,end_);
                 it_ += sizeof(uint16_t); 
                 return Json(static_cast<int64_t>(-1) - x);
             }
 
-            case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
+            // Negative integer -1-n (four-byte uint32_t follows)
+            case 0x3a: 
             {
                 auto x = detail::binary::from_big_endian<uint32_t>(it_,end_);
                 it_ += sizeof(uint32_t); 
                 return Json(static_cast<int64_t>(-1) - x);
             }
 
-            case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
+            // Negative integer -1-n (eight-byte uint64_t follows)
+            case 0x3b: 
             {
                 auto x = detail::binary::from_big_endian<uint64_t>(it_,end_);
                 it_ += sizeof(uint64_t); 
@@ -665,7 +672,8 @@ public:
                     }
                     return Json(target);
                 }
-            case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
+            // UTF-8 string (one-byte uint8_t for n follows)
+            case 0x78: 
                 {
                     const auto len = detail::binary::from_big_endian<uint8_t>(it_,end_);
                     it_ += sizeof(uint8_t); 
@@ -679,7 +687,8 @@ public:
                     }
                     return Json(target);
                 }
-            case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
+            // UTF-8 string (two-byte uint16_t for n follow)
+            case 0x79: 
                 {
                     const auto len = detail::binary::from_big_endian<uint16_t>(it_,end_);
                     it_ += sizeof(uint16_t); 
@@ -693,7 +702,8 @@ public:
                     }
                     return Json(target);
                 }
-            case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
+            // UTF-8 string (four-byte uint32_t for n follow)
+            case 0x7a: 
                 {
                     const auto len = detail::binary::from_big_endian<uint32_t>(it_,end_);
                     it_ += sizeof(uint32_t); 
@@ -707,7 +717,8 @@ public:
                     }
                     return Json(target);
                 }
-            case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
+            // UTF-8 string (eight-byte uint64_t for n follow)
+            case 0x7b: 
                 {
                     const auto len = detail::binary::from_big_endian<uint64_t>(it_,end_);
                     it_ += sizeof(uint64_t); 
@@ -721,7 +732,8 @@ public:
                     }
                     return Json(target);
                 }
-            case 0x7f: // UTF-8 string (indefinite length)
+            // UTF-8 string (indefinite length)
+            case 0x7f: 
             {
                 std::string s;
                 while (*it_ != 0xff)
@@ -772,35 +784,40 @@ public:
                 return get_cbor_array(*pos & 0x1f);
             }
 
-            case 0x98: // array (one-byte uint8_t for n follows)
+            // array (one-byte uint8_t for n follows)
+            case 0x98: 
             {
                 const auto len = detail::binary::from_big_endian<uint8_t>(it_,end_);
                 it_ += sizeof(uint8_t); 
                 return get_cbor_array(len);
             }
 
-            case 0x99: // array (two-byte uint16_t for n follow)
+            // array (two-byte uint16_t for n follow)
+            case 0x99: 
             {
                 const auto len = detail::binary::from_big_endian<uint16_t>(it_,end_);
                 it_ += sizeof(uint16_t); 
                 return get_cbor_array(len);
             }
 
-            case 0x9a: // array (four-byte uint32_t for n follow)
+            // array (four-byte uint32_t for n follow)
+            case 0x9a: 
             {
                 const auto len = detail::binary::from_big_endian<int32_t>(it_,end_);
                 it_ += sizeof(uint32_t); 
                 return get_cbor_array(len);
             }
 
-            case 0x9b: // array (eight-byte uint64_t for n follow)
+            // array (eight-byte uint64_t for n follow)
+            case 0x9b: 
             {
                 const auto len = detail::binary::from_big_endian<int64_t>(it_,end_);
                 it_ += sizeof(uint64_t); 
                 return get_cbor_array(len);
             }
 
-            case 0x9f: // array (indefinite length)
+            // array (indefinite length)
+            case 0x9f: 
             {
                 Json result = typename Json::array();
                 while (*pos != 0xff)
@@ -840,35 +857,40 @@ public:
                 return get_cbor_object(*pos & 0x1f);
             }
 
-            case 0xb8: // map (one-byte uint8_t for n follows)
+            // map (one-byte uint8_t for n follows)
+            case 0xb8: 
             {
                 const auto len = detail::binary::from_big_endian<uint8_t>(it_,end_);
                 it_ += sizeof(uint8_t); 
                 return get_cbor_object(len);
             }
 
-            case 0xb9: // map (two-byte uint16_t for n follow)
+            // map (two-byte uint16_t for n follow)
+            case 0xb9: 
             {
                 const auto len = detail::binary::from_big_endian<uint16_t>(it_,end_);
                 it_ += sizeof(uint16_t); 
                 return get_cbor_object(len);
             }
 
-            case 0xba: // map (four-byte uint32_t for n follow)
+            // map (four-byte uint32_t for n follow)
+            case 0xba: 
             {
                 const auto len = detail::binary::from_big_endian<uint32_t>(it_,end_);
                 it_ += sizeof(uint32_t); 
                 return get_cbor_object(len);
             }
 
-            case 0xbb: // map (eight-byte uint64_t for n follow)
+            // map (eight-byte uint64_t for n follow)
+            case 0xbb: 
             {
                 const auto len = detail::binary::from_big_endian<uint64_t>(it_,end_);
                 it_ += sizeof(uint64_t); 
                 return get_cbor_object(len);
             }
 
-            case 0xbf: // map (indefinite length)
+            // map (indefinite length)
+            case 0xbf: 
             {
                 Json result = typename Json::object();
                 while (*pos != 0xff)
@@ -880,72 +902,52 @@ public:
                 return result;
             }
 
-            case 0xf4: // false
+            // False
+            case 0xf4: 
             {
                 return Json(false);
             }
 
-            case 0xf5: // true
+            // True
+            case 0xf5: 
             {
                 return Json(true);
             }
 
-            case 0xf6: // null
+            // Null
+            case 0xf6: 
             {
                 return Json::null();
             }
-/*
-            case 0xf9: // Half-Precision Float (two-byte IEEE 754)
+
+            // Half-Precision Float (two-byte IEEE 754)
+            case 0xf9: 
             {
+                uint16_t x = detail::binary::from_big_endian<uint16_t>(it_,end_);
+                it_ += sizeof(uint16_t); 
 
-                const int byte1 = get();
-                check_eof();
-                const int byte2 = get();
-                check_eof();
+                double val = detail::binary::decode_half(x);
 
-                // code from RFC 7049, Appendix D, Figure 3:
-                // As half-precision floating-point numbers were only added
-                // to IEEE 754 in 2008, today's programming platforms often
-                // still only have limited support for them. It is very
-                // easy to include at least decoding support for them even
-                // without such support. An example of a small decoder for
-                // half-precision floating-point numbers in the C language
-                // is shown in Fig. 3.
-                const int half = (byte1 << 8) + byte2;
-                const int exp = (half >> 10) & 0x1f;
-                const int mant = half & 0x3ff;
-                double val;
-                if (exp == 0)
-                {
-                    val = std::ldexp(mant, -24);
-                }
-                else if (exp != 31)
-                {
-                    val = std::ldexp(mant + 1024, exp - 25);
-                }
-                else
-                {
-                    val = (mant == 0) ? std::numeric_limits<double>::infinity()
-                          : std::numeric_limits<double>::quiet_NaN();
-                }
-                return (half & 0x8000) != 0 ? -val : val;
+                return Json(val);
             }
-*/
-            case 0xfa: // Single-Precision Float (four-byte IEEE 754)
+
+            // Single-Precision Float (four-byte IEEE 754) 
+            case 0xfa: 
             {
                 const auto val = detail::binary::from_big_endian<float>(it_,end_);
                 it_ += sizeof(float); 
                 return Json(val);
             }
 
-            case 0xfb: // Double-Precision Float (eight-byte IEEE 754)
+            //  Double-Precision Float (eight-byte IEEE 754)
+            case 0xfb: 
             {
                 const auto val = detail::binary::from_big_endian<double>(it_,end_);
                 it_ += sizeof(double); 
                 return Json(val);
             }
 
-            default: // anything else (0xFF is handled inside the other types)
+            default: 
             {
                 JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a cbor at position %s", std::to_string(end_-pos));
             }

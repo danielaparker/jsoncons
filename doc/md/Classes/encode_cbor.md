@@ -1,26 +1,26 @@
 ```c++
-jsoncons::msgpack::encode_msgpack
+jsoncons::cbor::encode_cbor
 ```
-Encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+Encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
 
 ### Header
 ```c++
-#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class Json>
-std::vector<uint8_t> encode_msgpack(const Json& jval)
+std::vector<uint8_t> encode_cbor(const Json& jval)
 ```
 
 ### Examples
 
-## MessagePack example
+## cbor example
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpack;
+using namespace jsoncons::cbor;
 
 int main()
 {
@@ -50,9 +50,9 @@ int main()
     j1["min float"] = -(std::numeric_limits<float>::max)();
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
-    std::vector<uint8_t> v = encode_msgpack(j1);
+    std::vector<uint8_t> v = encode_cbor(j1);
 
-    ojson j2 = decode_msgpack<ojson>(v);
+    ojson j2 = decode_cbor<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
 }
@@ -89,6 +89,6 @@ Output:
 
 ### See also
 
-- [decode_msgpack](decode_msgpack) decodes a [MessagePack](http://msgpack.org/index.html) binary serialization format to a json value.
+- [decode_cbor](decode_cbor) decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
 
 

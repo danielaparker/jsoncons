@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>encode_msgpack</title>
+<title>decode_cbor</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -468,85 +468,16 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<div class="highlight highlight-source-c++"><pre>jsoncons::msgpack::encode_msgpack</pre></div>
-<p>Encodes a json value to the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
+<div class="highlight highlight-source-c++"><pre>jsoncons::cbor::decode_cbor</pre></div>
+<p>Decodes a <a href="http://cbor.io/">cbor</a> binary serialization format to a json value.</p>
 <h3>Header</h3>
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/msgpack/msgpack.hpp<span class="pl-pds">&gt;</span></span>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/cbor/cbor.hpp<span class="pl-pds">&gt;</span></span>
 
 <span class="pl-k">template</span>&lt;<span class="pl-k">class</span> <span class="pl-en">Json</span>&gt;
-std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; <span class="pl-en">encode_msgpack</span>(<span class="pl-k">const</span> Json&amp; jval)</pre></div>
-<h3>Examples</h3>
-<h2>MessagePack example</h2>
-<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/msgpack/msgpack.hpp<span class="pl-pds">&gt;</span></span>
-
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
-<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::msgpack<span class="pl-k">;</span>
-
-<span class="pl-k">int</span> <span class="pl-en">main</span>()
-{
-    ojson <span class="pl-c1">j1</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>zero<span class="pl-pds">"</span></span>] = <span class="pl-c1">0</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>] = <span class="pl-c1">1</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>] = <span class="pl-c1">2</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>null<span class="pl-pds">"</span></span>] = <span class="pl-c1">null_type</span>();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>true<span class="pl-pds">"</span></span>] = <span class="pl-c1">true</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>false<span class="pl-pds">"</span></span>] = <span class="pl-c1">false</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max int64_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int64_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max uint64_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">uint64_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min int64_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int64_t</span>&gt;::min)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max int32_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int32_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max uint32_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">uint32_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min int32_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int32_t</span>&gt;::min)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max int16_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int16_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max uint16_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">uint16_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min int16_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int16_t</span>&gt;::min)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max int8_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int8_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max uint8_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">uint8_t</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min int8_t<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-c1">int8_t</span>&gt;::min)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max double<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-k">double</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min double<span class="pl-pds">"</span></span>] = -(std::numeric_limits&lt;<span class="pl-k">double</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>max float<span class="pl-pds">"</span></span>] = (std::numeric_limits&lt;<span class="pl-k">float</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>zero float<span class="pl-pds">"</span></span>] = <span class="pl-c1">0.0</span>;
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>min float<span class="pl-pds">"</span></span>] = -(std::numeric_limits&lt;<span class="pl-k">float</span>&gt;::max)();
-    <span class="pl-c1">j1</span>[<span class="pl-s"><span class="pl-pds">"</span>Key too long for small string optimization<span class="pl-pds">"</span></span>] = <span class="pl-s"><span class="pl-pds">"</span>String too long for small string optimization<span class="pl-pds">"</span></span>;
-
-    std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; v = <span class="pl-c1">encode_msgpack</span>(<span class="pl-c1">j1</span>);
-
-    ojson j2 = decode_msgpack&lt;ojson&gt;(v);
-
-    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(j2) &lt;&lt; std::endl;
-}</pre></div>
-<p>Output:</p>
-<div class="highlight highlight-source-json"><pre>{
-    <span class="pl-s"><span class="pl-pds">"</span>zero<span class="pl-pds">"</span></span>: <span class="pl-c1">0</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>one<span class="pl-pds">"</span></span>: <span class="pl-c1">1</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>two<span class="pl-pds">"</span></span>: <span class="pl-c1">2</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>null<span class="pl-pds">"</span></span>: <span class="pl-c1">null</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>true<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>false<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max int64_t<span class="pl-pds">"</span></span>: <span class="pl-c1">9223372036854775807</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max uint64_t<span class="pl-pds">"</span></span>: <span class="pl-c1">18446744073709551615</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min int64_t<span class="pl-pds">"</span></span>: <span class="pl-c1">-9223372036854775808</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max int32_t<span class="pl-pds">"</span></span>: <span class="pl-c1">2147483647</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max uint32_t<span class="pl-pds">"</span></span>: <span class="pl-c1">4294967295</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min int32_t<span class="pl-pds">"</span></span>: <span class="pl-c1">-2147483648</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max int16_t<span class="pl-pds">"</span></span>: <span class="pl-c1">32767</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max uint16_t<span class="pl-pds">"</span></span>: <span class="pl-c1">65535</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min int16_t<span class="pl-pds">"</span></span>: <span class="pl-c1">-32768</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max int8_t<span class="pl-pds">"</span></span>: <span class="pl-c1">127</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max uint8_t<span class="pl-pds">"</span></span>: <span class="pl-c1">255</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min int8_t<span class="pl-pds">"</span></span>: <span class="pl-c1">-128</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max double<span class="pl-pds">"</span></span>: <span class="pl-c1">1.79769313486232e+308</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min double<span class="pl-pds">"</span></span>: <span class="pl-c1">-1.79769313486232e+308</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>max float<span class="pl-pds">"</span></span>: <span class="pl-c1">3.40282346638529e+038</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>zero float<span class="pl-pds">"</span></span>: <span class="pl-c1">0.0</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>min float<span class="pl-pds">"</span></span>: <span class="pl-c1">-3.40282346638529e+038</span>,
-    <span class="pl-s"><span class="pl-pds">"</span>Key too long for small string optimization<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>String too long for small string optimization<span class="pl-pds">"</span></span>
-}</pre></div>
+Json <span class="pl-en">decode_cbor</span>(<span class="pl-k">const</span> std::vector&lt;<span class="pl-c1">uint8_t</span>&gt;&amp; v)</pre></div>
 <h3>See also</h3>
 <ul>
-<li><a href="decode_msgpack">decode_msgpack</a> decodes a <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format to a json value.</li>
+<li><a href="encode_cbor">encode_cbor</a> encodes a json value to the <a href="http://cbor.io/">cbor</a> binary serialization format.</li>
 </ul>
 </body>
 </html>
