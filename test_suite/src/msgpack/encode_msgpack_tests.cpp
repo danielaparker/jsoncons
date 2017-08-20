@@ -17,7 +17,7 @@
 using namespace jsoncons;
 using namespace jsoncons::msgpack;
 
-BOOST_AUTO_TEST_SUITE(msgpack_tests)
+BOOST_AUTO_TEST_SUITE(encode_msgpack_tests)
 
 void check_encode(const std::vector<uint8_t>& expected, const json& j)
 {
@@ -40,7 +40,7 @@ void check_encode(const std::vector<uint8_t>& expected, const json& j)
     }
 }
 
-BOOST_AUTO_TEST_CASE(msgpack_encoder_test)
+BOOST_AUTO_TEST_CASE(encode_msgpack_test)
 {
     // positive fixint 0x00 - 0x7f
     check_encode({0x00},json(0U));
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(msgpack_encoder_test)
 
 }
 
-BOOST_AUTO_TEST_CASE(msgpack_arrays_and_maps)
+BOOST_AUTO_TEST_CASE(encode_msgpack_arrays_and_maps)
 {
     // fixarray
     check_encode({0x90},json::array());
