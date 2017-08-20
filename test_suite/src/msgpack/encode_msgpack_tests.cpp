@@ -22,6 +22,10 @@ BOOST_AUTO_TEST_SUITE(msgpack_tests)
 void check_encode(const std::vector<uint8_t>& expected, const json& j)
 {
     std::vector<uint8_t> result = encode_msgpack(j);
+    if (expected.size() != result.size())
+    {
+        std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;
+    }
     BOOST_REQUIRE_MESSAGE(expected.size() == result.size(), j.to_string());
     for (size_t i = 0; i < expected.size(); ++i)
     {
@@ -91,10 +95,18 @@ BOOST_AUTO_TEST_CASE(msgpack_encoder_test)
     check_encode({0xcb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
 
     // string
-    check_encode({0xd9},json(""));
-    check_encode({0xd9,' '},json(" "));
-    check_encode({0xd9,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
-                 json("123456789012345678901234"));
+    check_encode({0xa0},json(""));
+    check_encode({0xa1,' '},json(" "));
+    check_encode({0xbf,'1','2','3','4','5','6','7','8','9','0',
+                       '1','2','3','4','5','6','7','8','9','0',
+                       '1','2','3','4','5','6','7','8','9','0',
+                       '1'},
+                 json("1234567890123456789012345678901"));
+    check_encode({0xd9,0x20,'1','2','3','4','5','6','7','8','9','0',
+                            '1','2','3','4','5','6','7','8','9','0',
+                            '1','2','3','4','5','6','7','8','9','0',
+                            '1','2'},
+                 json("12345678901234567890123456789012"));
 
 
 }

@@ -86,11 +86,8 @@ BOOST_AUTO_TEST_CASE(cbor_decode_test)
     check_decode({0xfb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
 
     // string
-    std::cout << "check 1" << std::endl;
     check_decode({0x60},json(""));
-    std::cout << "check 2" << std::endl;
     check_decode({0x61,' '},json(" "));
-    std::cout << "check 3" << std::endl;
     check_decode({0x78,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
                  json("123456789012345678901234"));
 
