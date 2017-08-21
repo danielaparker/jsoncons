@@ -476,7 +476,7 @@ vertical-align:1px;
 <li>Supports conversion from and to the standard library sequence containers, associative containers, std::pair, and std::tuple</li>
 <li>Supports conversion from and to user defined types</li>
 <li>Supports object members sorted alphabetically by name or in original order</li>
-<li>Implements parsing and serializing JSON text in UTF-8 for utf8 character strings and streams</li>
+<li>Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams</li>
 <li>Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters</li>
 <li>Supports event based JSON parsing and serializing with user defined input and output handlers</li>
 <li>Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */</li>
@@ -490,7 +490,7 @@ vertical-align:1px;
 <li>The <a href="#user-content-ext_jsonpath">jsonpath</a> extension supports search using <a href="http://goessner.net/articles/JsonPath/">Stefan Goessner's JsonPath</a>.  It also supports search and replace using JsonPath expressions.</li>
 <li>The <a href="#user-content-ext_csv">csv</a> extension supports reading (writing) JSON values from (to) CSV files</li>
 <li>The <a href="#user-content-ext_msgpack">msgpack</a> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</li>
-<li>The [cbor] extension supports encoding to and decoding from the <a href="http://cbor.io/">cbor</a> binary serialization format.</li>
+<li>The <a href="#user-content-ext_cbor">cbor</a> extension supports encoding to and decoding from the <a href="http://cbor.io/">cbor</a> binary serialization format.</li>
 </ul>
 <p>Planned new features are listed on the <a href="https://github.com/danielaparker/jsoncons/wiki/Roadmap">roadmap</a></p>
 <h2>Get jsoncons</h2>
@@ -1011,7 +1011,7 @@ project_id,task_name,task_start,task_finish
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/csv_reader">csv_reader</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/csv_serializer">csv_serializer</a> for details.</p>
 <div id="user-content-ext_msgpack">
 <h3>msgpack</h3>
-<p>The <code>msgpack</code> extension supports encoding to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
+<p>The <code>msgpack</code> extension supports encoding json to and decoding from the <a href="http://msgpack.org/index.html">MessagePack</a> binary serialization format.</p>
 <h4>MessagePack example</h4>
 <p>Example file (book.json):</p>
 <div class="highlight highlight-source-json"><pre>[
@@ -1070,6 +1070,51 @@ project_id,task_name,task_start,task_finish
     }
 ]</pre></div>
 <p>See <a href="https://github.com/danielaparker/jsoncons/wiki/encode_msgpack">encode_msgpack</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/decode_msgpack">decode_msgpack</a> for details.</p>
+<div id="user-content-ext_cbor">
+<h3>cbor</h3>
+<p>The <code>cbor</code> extension supports encoding json to and decoding from the <a href="http://cbor.io/">cbor</a> binary serialization format.</p>
+<h4>cbor reputon example</h4>
+<p>This example illustrates encoding a <a href="https://tools.ietf.org/rfc/rfc7071.txt">Reputation Interchange</a> data object to and from cbor.</p>
+<div class="highlight highlight-source-c++"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons/json.hpp<span class="pl-pds">&gt;</span></span>
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>jsoncons_ext/cbor/cbor.hpp<span class="pl-pds">&gt;</span></span>
+
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span><span class="pl-k">;</span>
+<span class="pl-k">using</span> <span class="pl-k">namespace</span> <span class="pl-en">jsoncons</span>::cbor<span class="pl-k">;</span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>()
+{
+    ojson <span class="pl-c1">j1</span> = <span class="pl-c1">ojson::parse</span>(<span class="pl-s"><span class="pl-pds">R"(</span></span>
+<span class="pl-s">    {</span>
+<span class="pl-s">       "application": "hiking",</span>
+<span class="pl-s">       "reputons": [</span>
+<span class="pl-s">       {</span>
+<span class="pl-s">           "rater": "HikingAsylum.example.com",</span>
+<span class="pl-s">           "assertion": "is-good",</span>
+<span class="pl-s">           "rated": "sk",</span>
+<span class="pl-s">           "rating": 0.90</span>
+<span class="pl-s">         }</span>
+<span class="pl-s">       ]</span>
+<span class="pl-s">    }</span>
+<span class="pl-s">    <span class="pl-pds">)"</span></span>);
+
+    std::vector&lt;<span class="pl-c1">uint8_t</span>&gt; v = <span class="pl-c1">encode_cbor</span>(<span class="pl-c1">j1</span>);
+
+    ojson j2 = decode_cbor&lt;ojson&gt;(v);
+    std::cout &lt;&lt; <span class="pl-c1">pretty_print</span>(j2) &lt;&lt; std::endl;
+}</pre></div>
+<p>Output:</p>
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>application<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>hiking<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>reputons<span class="pl-pds">"</span></span>: [
+        {
+            <span class="pl-s"><span class="pl-pds">"</span>rater<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>HikingAsylum.example.com<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>assertion<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>is-good<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>rated<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>sk<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>rating<span class="pl-pds">"</span></span>: <span class="pl-c1">0.9</span>
+        }
+    ]
+}</pre></div>
+<p>See <a href="https://github.com/danielaparker/jsoncons/wiki/encode_cbor">encode_cbor</a> and <a href="https://github.com/danielaparker/jsoncons/wiki/decode_cbor">decode_cbor</a> for details.</p>
 <h2>Building the test suite and examples with CMake</h2>
 <p><a href="https://cmake.org/">CMake</a> is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a <a href="https://cmake.org/download/">Windows Installer package</a>. On Linux it is usually available as a package, e.g., on Ubuntu,</p>
 <pre><code>sudo apt-get install cmake
@@ -1081,7 +1126,7 @@ project_id,task_name,task_start,task_finish
 <pre><code>jsoncons/examples/build/cmake/README.txt
 </code></pre>
 <h2>Acknowledgements</h2>
-<p>Special thanks to our <a href="https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt">contributors</a></p></div></div></div>
+<p>Special thanks to our <a href="https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt">contributors</a></p></div></div></div></div>
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

@@ -45,7 +45,7 @@ namespace msgpack_format
 }
 
 template<class Json>
-class Encode_message_pack_
+class Encode_msgpack_
 {
     std::vector<uint8_t> v_;
 public:
@@ -113,22 +113,22 @@ public:
                         // negative fixnum stores 5-bit negative integer
                         ++n;
                     }
-                    else if (val >= (std::numeric_limits<int8_t>::min)() && val <= (std::numeric_limits<int8_t>::max)())
+                    else if (val >= (std::numeric_limits<int8_t>::min)())
                     {
                         // int 8 stores a 8-bit signed integer
                         n += (1 + sizeof(uint8_t));
                     }
-                    else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
+                    else if (val >= (std::numeric_limits<int16_t>::min)())
                     {
                         // int 16 stores a 16-bit big-endian signed integer
                         n += (1 + sizeof(uint16_t));
                     }
-                    else if (val >= (std::numeric_limits<int32_t>::min)() && val <= INT32_MAX)
+                    else if (val >= (std::numeric_limits<int32_t>::min)())
                     {
                         // int 32 stores a 32-bit big-endian signed integer
                         n += (1 + sizeof(uint32_t));
                     }
-                    else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
+                    else if (val >= (std::numeric_limits<int64_t>::min)())
                     {
                         // int 64 stores a 64-bit big-endian signed integer
                         n += (1 + sizeof(uint64_t));
@@ -335,25 +335,25 @@ public:
                         // negative fixnum stores 5-bit negative integer
                         v_.push_back(static_cast<int8_t>((val)));
                     }
-                    else if (val >= (std::numeric_limits<int8_t>::min)() && val <= (std::numeric_limits<int8_t>::max)())
+                    else if (val >= (std::numeric_limits<int8_t>::min)())
                     {
                         // int 8 stores a 8-bit signed integer
                         v_.push_back(msgpack_format::int8_cd);
                         detail::binary::to_big_endian(static_cast<int8_t>(val),v_);
                     }
-                    else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
+                    else if (val >= (std::numeric_limits<int16_t>::min)())
                     {
                         // int 16 stores a 16-bit big-endian signed integer
                         v_.push_back(msgpack_format::int16_cd);
                         detail::binary::to_big_endian(static_cast<int16_t>(val),v_);
                     }
-                    else if (val >= (std::numeric_limits<int32_t>::min)() && val <= (std::numeric_limits<int32_t>::max)())
+                    else if (val >= (std::numeric_limits<int32_t>::min)())
                     {
                         // int 32 stores a 32-bit big-endian signed integer
                         v_.push_back(msgpack_format::int32_cd);
                         detail::binary::to_big_endian(static_cast<int32_t>(val),v_);
                     }
-                    else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
+                    else if (val >= (std::numeric_limits<int64_t>::min)())
                     {
                         // int 64 stores a 64-bit big-endian signed integer
                         v_.push_back(msgpack_format::int64_cd);
@@ -525,7 +525,7 @@ public:
 // decode_msgpack
 
 template<class Json>
-class Decode_message_pack_
+class Decode_msgpack_
 {
     const uint8_t* begin_;
     const uint8_t* end_;
@@ -533,7 +533,7 @@ class Decode_message_pack_
 public:
     typedef typename Json::char_type char_type;
 
-    Decode_message_pack_(const uint8_t* begin, const uint8_t* end)
+    Decode_msgpack_(const uint8_t* begin, const uint8_t* end)
         : begin_(begin), end_(end), it_(begin)
     {
     }
@@ -801,14 +801,14 @@ public:
 template<class Json>
 std::vector<uint8_t> encode_msgpack(const Json& j)
 {
-    Encode_message_pack_<Json> encoder;
+    Encode_msgpack_<Json> encoder;
     return encoder.encode(j);
 }
 
 template<class Json>
 Json decode_msgpack(const std::vector<uint8_t>& v)
 {
-    Decode_message_pack_<Json> decoder(v.data(),v.data()+v.size());
+    Decode_msgpack_<Json> decoder(v.data(),v.data()+v.size());
     return decoder.decode();
 }
 

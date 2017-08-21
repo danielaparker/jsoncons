@@ -22,7 +22,7 @@ Extensions:
 - The [jsonpath](#user-content-ext_jsonpath) extension supports search using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
 - The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
 - The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
-- The cbor extension supports encoding to and decoding from the [cbor](http://cbor.io/) binary serialization format.
+- The [cbor](#user-content-ext_cbor) extension supports encoding to and decoding from the [cbor](http://cbor.io/) binary serialization format.
 
 Planned new features are listed on the [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap)
 
@@ -640,7 +640,7 @@ See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) and 
 
 ### msgpack
 
-The `msgpack` extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+The `msgpack` extension supports encoding json to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 #### MessagePack example
 
@@ -708,6 +708,62 @@ Output:
 ```
 
 See [encode_msgpack](https://github.com/danielaparker/jsoncons/wiki/encode_msgpack) and [decode_msgpack](https://github.com/danielaparker/jsoncons/wiki/decode_msgpack) for details.
+
+<div id="ext_cbor"/>
+
+### cbor
+
+The `cbor` extension supports encoding json to and decoding from the [cbor](http://cbor.io/) binary serialization format.
+
+#### cbor reputon example
+
+This example illustrates encoding a [Reputation Interchange](https://tools.ietf.org/rfc/rfc7071.txt) data object to and from cbor.
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::cbor;
+
+int main()
+{
+    ojson j1 = ojson::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+       {
+           "rater": "HikingAsylum.example.com",
+           "assertion": "is-good",
+           "rated": "sk",
+           "rating": 0.90
+         }
+       ]
+    }
+    )");
+
+    std::vector<uint8_t> v = encode_cbor(j1);
+
+    ojson j2 = decode_cbor<ojson>(v);
+    std::cout << pretty_print(j2) << std::endl;
+}
+```
+Output:
+```json
+{
+    "application": "hiking",
+    "reputons": [
+        {
+            "rater": "HikingAsylum.example.com",
+            "assertion": "is-good",
+            "rated": "sk",
+            "rating": 0.9
+        }
+    ]
+}
+```
+
+See [encode_cbor](https://github.com/danielaparker/jsoncons/wiki/encode_cbor) and [decode_cbor](https://github.com/danielaparker/jsoncons/wiki/decode_cbor) for details.
 
 ## Building the test suite and examples with CMake
 

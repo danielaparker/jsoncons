@@ -22,14 +22,20 @@ BOOST_AUTO_TEST_SUITE(decode_msgpack_tests)
 void check_decode(const std::vector<uint8_t>& v, const json& expected)
 {
     json result = decode_msgpack<json>(v);
-    BOOST_REQUIRE_MESSAGE(expected.size() == result.size(), expected.to_string());
-    for (size_t i = 0; i < expected.size(); ++i)
-    {
-       BOOST_REQUIRE_MESSAGE(expected[i] == result[i], expected.to_string());
-    }
+    BOOST_REQUIRE_MESSAGE(expected == result, expected.to_string());
 }
 
-BOOST_AUTO_TEST_CASE(decode_msgpack_test)
+void print_msgpack(const json j)
+{
+    auto v = encode_msgpack(j);
+    for (auto b : v)
+    {
+        std::cout << std::hex << (int)b << ','; 
+    }
+    std::cout << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(decode_number_msgpack_test)
 {
     // positive fixint 0x00 - 0x7f
     check_decode({0x00},json(0U));
@@ -66,12 +72,12 @@ BOOST_AUTO_TEST_CASE(decode_msgpack_test)
     check_decode({0xff},json(-1)); //
 
     // negative integers
-    check_decode({0xd1,0xff,0x00},json(-256));
-    //check_decode({0xd1,0x01,0x00},json(-257));
-    //check_decode({0x39,0xff,0xff},json(-65536));
-    //check_decode({0x3a,0,1,0x00,0x00},json(-65537));
-    //check_decode({0x3a,0xff,0xff,0xff,0xff},json(-4294967296));
-    //check_decode({0x3b,0,0,0,1,0,0,0,0},json(-4294967297));
+    check_decode({0xd1,0xff,0},json(-256));
+    check_decode({0xd1,0xfe,0xff},json(-257));
+    check_decode({0xd2,0xff,0xff,0,0},json(-65536));
+    check_decode({0xd2,0xff,0xfe,0xff,0xff},json(-65537));
+    check_decode({0xd3,0xff,0xff,0xff,0xff,0,0,0,0},json(-4294967296));
+    check_decode({0xd3,0xff,0xff,0xff,0xfe,0xff,0xff,0xff,0xff},json(-4294967297));
 
     // null, true, false
     check_decode({0xc0},json::null()); // 

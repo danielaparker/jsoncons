@@ -7,7 +7,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -15,11 +15,11 @@
 #include <limits>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpack;
+using namespace jsoncons::cbor;
 
-BOOST_AUTO_TEST_SUITE(msgpack_tests)
+BOOST_AUTO_TEST_SUITE(cbor_tests)
 
-BOOST_AUTO_TEST_CASE(msgpack_test)
+BOOST_AUTO_TEST_CASE(cbor_test)
 {
     json j1;
     j1["zero"] = 0;
@@ -75,17 +75,17 @@ BOOST_AUTO_TEST_CASE(msgpack_test)
 
     j1["An array"] = ja;
 
-    size_t calculated_size = Encode_msgpack_<json>::calculate_size(j1);
-    std::vector<uint8_t> v = encode_msgpack(j1);
-    BOOST_CHECK(calculated_size == v.size());
-    BOOST_CHECK(calculated_size == v.capacity());
+    size_t calculated_size = Encode_cbor_<json>::calculate_size(j1);
+    std::vector<uint8_t> v = encode_cbor(j1);
+    //BOOST_CHECK(calculated_size == v.size());
+    //BOOST_CHECK(calculated_size == v.capacity());
 
-    json j2 = decode_msgpack<json>(v);
+    json j2 = decode_cbor<json>(v);
 
     BOOST_CHECK_EQUAL(j1,j2);
 } 
 
-BOOST_AUTO_TEST_CASE(msgpack_test2)
+BOOST_AUTO_TEST_CASE(cbor_test2)
 {
     wjson j1;
     j1[L"zero"] = 0;
@@ -143,14 +143,37 @@ BOOST_AUTO_TEST_CASE(msgpack_test2)
 
     j1[L"An array"] = ja;
 
-    size_t calculated_size = Encode_msgpack_<wjson>::calculate_size(j1);
-    std::vector<uint8_t> v = encode_msgpack(j1);
-    BOOST_CHECK(calculated_size == v.size());
-    BOOST_CHECK(calculated_size == v.capacity());
+    //size_t calculated_size = Encode_cbor_<wjson>::calculate_size(j1);
+    std::vector<uint8_t> v = encode_cbor(j1);
+    //BOOST_CHECK(calculated_size == v.size());
+    //BOOST_CHECK(calculated_size == v.capacity());
 
-    wjson j2 = decode_msgpack<wjson>(v);
+    wjson j2 = decode_cbor<wjson>(v);
 
     BOOST_CHECK(j1 == j2);
+}
+
+BOOST_AUTO_TEST_CASE(cbor_reputon_test)
+{
+ojson j1 = ojson::parse(R"(
+{
+   "application": "hiking",
+   "reputons": [
+   {
+       "rater": "HikingAsylum.example.com",
+       "assertion": "is-good",
+       "rated": "sk",
+       "rating": 0.90
+     }
+   ]
+}
+)");
+
+    std::vector<uint8_t> v = encode_cbor(j1);
+
+    ojson j2 = decode_cbor<ojson>(v);
+    BOOST_CHECK(j1 == j2);
+    //std::cout << pretty_print(j2) << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
