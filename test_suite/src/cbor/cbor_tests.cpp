@@ -77,8 +77,8 @@ BOOST_AUTO_TEST_CASE(cbor_test)
 
     size_t calculated_size = Encode_cbor_<json>::calculate_size(j1);
     std::vector<uint8_t> v = encode_cbor(j1);
-    //BOOST_CHECK(calculated_size == v.size());
-    //BOOST_CHECK(calculated_size == v.capacity());
+    BOOST_CHECK(calculated_size == v.size());
+    BOOST_CHECK(calculated_size == v.capacity());
 
     json j2 = decode_cbor<json>(v);
 
@@ -143,10 +143,10 @@ BOOST_AUTO_TEST_CASE(cbor_test2)
 
     j1[L"An array"] = ja;
 
-    //size_t calculated_size = Encode_cbor_<wjson>::calculate_size(j1);
+    size_t calculated_size = Encode_cbor_<wjson>::calculate_size(j1);
     std::vector<uint8_t> v = encode_cbor(j1);
-    //BOOST_CHECK(calculated_size == v.size());
-    //BOOST_CHECK(calculated_size == v.capacity());
+    BOOST_CHECK(calculated_size == v.size());
+    BOOST_CHECK(calculated_size == v.capacity());
 
     wjson j2 = decode_cbor<wjson>(v);
 

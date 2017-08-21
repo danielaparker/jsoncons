@@ -57,57 +57,57 @@ public:
                 int64_t val = jval.as_integer();
                 if (val >= 0)
                 {
-                    if (val <= (std::numeric_limits<int8_t>::max)())
+                    if (val <= 0x17)
                     {
                         ++n;
                     }
                     else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
-                        // uint 8 stores a 8-bit unsigned integer
-                        n += (1 + sizeof(uint8_t));
+                        ++n;
+                        n += sizeof(uint8_t);
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
-                        // uint 16 stores a 16-bit big-endian unsigned integer
-                        n += (1 + sizeof(uint16_t));
+                        ++n;
+                        n += sizeof(uint16_t);
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
-                        // uint 32 stores a 32-bit big-endian unsigned integer
-                        n += (1 + sizeof(uint32_t));
+                        ++n;
+                        n += sizeof(uint32_t);
                     }
                     else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
-                        // uint 64 stores a 64-bit big-endian unsigned integer
-                        n += (1 + sizeof(uint64_t));
+                        ++n;
+                        n += sizeof(uint64_t);
                     }
                 }
                 else
                 {
-                    if (val >= -32)
+                    const auto posnum = -1 - val;
+                    if (val >= -24)
                     {
-                        // negative fixnum stores 5-bit negative integer
                         ++n;
                     }
-                    else if (val >= (std::numeric_limits<int8_t>::min)() && val <= (std::numeric_limits<int8_t>::max)())
+                    else if (posnum <= (std::numeric_limits<uint8_t>::max)())
                     {
-                        // int 8 stores a 8-bit signed integer
-                        n += (1 + sizeof(uint8_t));
+                        ++n;
+                        ++n;
                     }
-                    else if (val >= (std::numeric_limits<int16_t>::min)() && val <= (std::numeric_limits<int16_t>::max)())
+                    else if (posnum <= (std::numeric_limits<uint16_t>::max)())
                     {
-                        // int 16 stores a 16-bit big-endian signed integer
-                        n += (1 + sizeof(uint16_t));
+                        ++n;
+                        n += sizeof(uint16_t);
                     }
-                    else if (val >= (std::numeric_limits<int32_t>::min)() && val <= INT32_MAX)
+                    else if (posnum <= (std::numeric_limits<uint32_t>::max)())
                     {
-                        // int 32 stores a 32-bit big-endian signed integer
-                        n += (1 + sizeof(uint32_t));
+                        ++n;
+                        n += sizeof(uint32_t);
                     }
-                    else if (val >= (std::numeric_limits<int64_t>::min)() && val <= (std::numeric_limits<int64_t>::max)())
+                    else if (posnum <= (std::numeric_limits<int64_t>::max)())
                     {
-                        // int 64 stores a 64-bit big-endian signed integer
-                        n += (1 + sizeof(uint64_t));
+                        ++n;
+                        n += sizeof(int64_t);
                     }
                 }
                 break;
@@ -116,37 +116,37 @@ public:
         case value_type::uinteger_t:
             {
                 uint64_t val = jval.as_uinteger();
-                if (val <= (std::numeric_limits<int8_t>::max)())
+                if (val <= 0x17)
                 {
-                    // positive fixnum stores 7-bit positive integer
                     ++n;
                 }
                 else if (val <= (std::numeric_limits<uint8_t>::max)())
                 {
-                    n += (1 + sizeof(uint8_t));
+                    ++n;
+                    n += sizeof(uint8_t);
                 }
                 else if (val <= (std::numeric_limits<uint16_t>::max)())
                 {
-                    // uint 16 stores a 16-bit big-endian unsigned integer
-                    n += (1 + sizeof(uint16_t));
+                    ++n;
+                    n += sizeof(uint16_t);
                 }
                 else if (val <= (std::numeric_limits<uint32_t>::max)())
                 {
-                    // uint 32 stores a 32-bit big-endian unsigned integer
-                    n += (1 + sizeof(uint32_t));
+                    ++n;
+                    n += sizeof(uint32_t);
                 }
                 else if (val <= (std::numeric_limits<uint64_t>::max)())
                 {
-                    // uint 64 stores a 64-bit big-endian unsigned integer
-                    n += (1 + sizeof(uint64_t));
+                    ++n;
+                    n += sizeof(uint64_t);
                 }
                 break;
             }
 
             case value_type::double_t:
             {
-                // float 64
-                n += (1 + sizeof(double));
+                ++n;
+                n += sizeof(double);
                 break;
             }
 
@@ -160,20 +160,29 @@ public:
             case value_type::array_t:
             {
                 const auto length = jval.array_value().size();
-                if (length <= 15)
+                if (length <= 0x17)
                 {
-                    // fixarray
-                    n += sizeof(uint8_t);
+                    ++n;
                 }
-                else if (length <= (std::numeric_limits<uint16_t>::max)())
+                else if (length <= 0xff)
                 {
-                    // array 16
-                    n += 1 + sizeof(uint16_t);
+                    ++n;
+                    ++n;
                 }
-                else if (length <= (std::numeric_limits<uint32_t>::max)())
+                else if (length <= 0xffff)
                 {
-                    // array 32
-                    n += 1 + sizeof(uint32_t);
+                    ++n;
+                    n += sizeof(uint16_t);
+                }
+                else if (length <= 0xffffffff)
+                {
+                    ++n;
+                    n += sizeof(uint32_t);
+                }
+                else if (length <= 0xffffffffffffffff)
+                {
+                    ++n;
+                    n += sizeof(uint64_t);
                 }
 
                 // calculate size for each element
@@ -187,20 +196,29 @@ public:
             case value_type::object_t:
             {
                 const auto length = jval.object_value().size();
-                if (length <= 15)
+                if (length <= 0x17)
                 {
-                    // fixmap
-                    n += sizeof(uint8_t);
+                    ++n;
                 }
-                else if (length <= 65535)
+                else if (length <= 0xff)
                 {
-                    // map 16
-                    n += 1 + sizeof(uint16_t);
+                    ++n;
+                    ++n;
                 }
-                else if (length <= 4294967295)
+                else if (length <= 0xffff)
                 {
-                    // map 32
-                    n += 1 + sizeof(uint32_t);
+                    ++n;
+                    n += sizeof(uint16_t);
+                }
+                else if (length <= 0xffffffff)
+                {
+                    ++n;
+                    n += sizeof(uint32_t);
+                }
+                else if (length <= 0xffffffffffffffff)
+                {
+                    ++n;
+                    n += sizeof(uint64_t);
                 }
 
                 // calculate size for each member
@@ -225,25 +243,31 @@ public:
         size_t n = 0;
 
         const size_t length = unicons::u8_length(sv.begin(),sv.end());
-        if (length <= 31)
+
+        if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
+            ++n;
+        }
+        else if (length <= 0xff)
+        {
+            ++n;
             n += sizeof(uint8_t);
         }
-        else if (length <= (std::numeric_limits<uint8_t>::max)())
+        else if (length <= 0xffff)
         {
-            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            n += 1 + sizeof(uint8_t);
+            ++n;
+            n += sizeof(uint16_t);
         }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
+        else if (length <= 0xffffffff)
         {
-            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            n += 1 + sizeof(uint16_t);
+            ++n;
+            n += sizeof(uint32_t);
         }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
+        else if (length <= 0xffffffffffffffff)
         {
-            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            n += 1 + sizeof(uint32_t);
+            ++n;
+            n += sizeof(uint64_t);
         }
 
         n += length;
