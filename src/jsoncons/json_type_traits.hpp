@@ -831,7 +831,7 @@ struct json_type_traits<Json, std::valarray<T>>
             std::valarray<T> v(j.size());
             for (size_t i = 0; i < j.size(); ++i)
             {
-                v[i] = j[i].as<T>();
+                v[i] = j[i].template as<T>();
             }
             return v;
         }
