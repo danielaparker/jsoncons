@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BINARY_MSGPACK_HPP
-#define JSONCONS_BINARY_MSGPACK_HPP
+#ifndef JSONCONS_MSGPACK_MSGPACK_HPP
+#define JSONCONS_MSGPACK_MSGPACK_HPP
 
 #include <string>
 #include <sstream>
@@ -48,7 +48,6 @@ template<class Json>
 class Encode_msgpack_
 {
 public:
-    typedef typename Json::char_type char_type;
     typedef typename Json::string_view_type string_view_type;
 
     static size_t calculate_size(const Json& jval)
@@ -267,7 +266,7 @@ public:
         return n;
     }
 
-    void encode(const Json& jval, std::vector<uint8_t>& v)
+    static void encode(const Json& jval, std::vector<uint8_t>& v)
     {
         switch (jval.type_id())
         {
@@ -471,7 +470,7 @@ public:
         }
     }
 
-    void encode_string(string_view_type sv, std::vector<uint8_t>& v)
+    static void encode_string(string_view_type sv, std::vector<uint8_t>& v)
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
@@ -793,11 +792,10 @@ public:
 template<class Json>
 std::vector<uint8_t> encode_msgpack(const Json& j)
 {
-    Encode_msgpack_<Json> encoder;
     std::vector<uint8_t> v;
-    v.reserve(encoder.calculate_size(j));
+    v.reserve(Encode_msgpack_<Json>::calculate_size(j));
 
-    encoder.encode(j,v);
+    Encode_msgpack_<Json>::encode(j,v);
     return v;
 }
 
