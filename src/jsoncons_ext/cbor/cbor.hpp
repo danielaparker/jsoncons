@@ -23,17 +23,9 @@ namespace jsoncons { namespace cbor {
 template<class Json>
 class Encode_cbor_
 {
-    std::vector<uint8_t> v_;
 public:
     typedef typename Json::char_type char_type;
     typedef typename Json::string_view_type string_view_type;
-
-    std::vector<uint8_t> encode(const Json& jval)
-    {
-        v_.reserve(calculate_size(jval));
-        encode_(jval);
-        return std::move(v_);
-    }
 
     static size_t calculate_size(const Json& jval)
     {
@@ -275,19 +267,19 @@ public:
         return n;
     }
 
-    void encode_(const Json& jval)
+    void encode(const Json& jval, std::vector<uint8_t>& v)
     {
         switch (jval.type_id())
         {
             case value_type::null_t:
             {
-                v_.push_back(0xf6);
+                v.push_back(0xf6);
                 break;
             }
 
             case value_type::bool_t:
             {
-                v_.push_back(jval.as_bool() ? 0xf5 : 0xf4);
+                v.push_back(jval.as_bool() ? 0xf5 : 0xf4);
                 break;
             }
 
@@ -298,27 +290,27 @@ public:
                 {
                     if (val <= 0x17)
                     {
-                        detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
+                        detail::binary::to_big_endian(static_cast<uint8_t>(val),v);
                     }
                     else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
-                        v_.push_back(0x18);
-                        detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
+                        v.push_back(0x18);
+                        detail::binary::to_big_endian(static_cast<uint8_t>(val),v);
                     }
                     else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
-                        v_.push_back(0x19);
-                        detail::binary::to_big_endian(static_cast<uint16_t>(val),v_);
+                        v.push_back(0x19);
+                        detail::binary::to_big_endian(static_cast<uint16_t>(val),v);
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
-                        v_.push_back(0x1a);
-                        detail::binary::to_big_endian(static_cast<uint32_t>(val),v_);
+                        v.push_back(0x1a);
+                        detail::binary::to_big_endian(static_cast<uint32_t>(val),v);
                     }
                     else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
-                        v_.push_back(0x1b);
-                        detail::binary::to_big_endian(static_cast<int64_t>(val),v_);
+                        v.push_back(0x1b);
+                        detail::binary::to_big_endian(static_cast<int64_t>(val),v);
                     }
                 }
                 else
@@ -326,27 +318,27 @@ public:
                     const auto posnum = -1 - val;
                     if (val >= -24)
                     {
-                        v_.push_back(static_cast<uint8_t>(0x20 + posnum));
+                        v.push_back(static_cast<uint8_t>(0x20 + posnum));
                     }
                     else if (posnum <= (std::numeric_limits<uint8_t>::max)())
                     {
-                        v_.push_back(0x38);
-                        detail::binary::to_big_endian(static_cast<uint8_t>(posnum),v_);
+                        v.push_back(0x38);
+                        detail::binary::to_big_endian(static_cast<uint8_t>(posnum),v);
                     }
                     else if (posnum <= (std::numeric_limits<uint16_t>::max)())
                     {
-                        v_.push_back(0x39);
-                        detail::binary::to_big_endian(static_cast<uint16_t>(posnum),v_);
+                        v.push_back(0x39);
+                        detail::binary::to_big_endian(static_cast<uint16_t>(posnum),v);
                     }
                     else if (posnum <= (std::numeric_limits<uint32_t>::max)())
                     {
-                        v_.push_back(0x3a);
-                        detail::binary::to_big_endian(static_cast<uint32_t>(posnum),v_);
+                        v.push_back(0x3a);
+                        detail::binary::to_big_endian(static_cast<uint32_t>(posnum),v);
                     }
                     else if (posnum <= (std::numeric_limits<int64_t>::max)())
                     {
-                        v_.push_back(0x3b);
-                        detail::binary::to_big_endian(static_cast<int64_t>(posnum),v_);
+                        v.push_back(0x3b);
+                        detail::binary::to_big_endian(static_cast<int64_t>(posnum),v);
                     }
                 }
                 break;
@@ -357,42 +349,42 @@ public:
                 uint64_t val = jval.as_uinteger();
                 if (val <= 0x17)
                 {
-                    detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
+                    detail::binary::to_big_endian(static_cast<uint8_t>(val),v);
                 }
                 else if (val <= (std::numeric_limits<uint8_t>::max)())
                 {
-                    v_.push_back(0x18);
-                    detail::binary::to_big_endian(static_cast<uint8_t>(val),v_);
+                    v.push_back(0x18);
+                    detail::binary::to_big_endian(static_cast<uint8_t>(val),v);
                 }
                 else if (val <= (std::numeric_limits<uint16_t>::max)())
                 {
-                    v_.push_back(0x19);
-                    detail::binary::to_big_endian(static_cast<uint16_t>(val),v_);
+                    v.push_back(0x19);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(val),v);
                 }
                 else if (val <= (std::numeric_limits<uint32_t>::max)())
                 {
-                    v_.push_back(0x1a);
-                    detail::binary::to_big_endian(static_cast<uint32_t>(val),v_);
+                    v.push_back(0x1a);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(val),v);
                 }
                 else if (val <= (std::numeric_limits<uint64_t>::max)())
                 {
-                    v_.push_back(0x1b);
-                    detail::binary::to_big_endian(static_cast<uint64_t>(val),v_);
+                    v.push_back(0x1b);
+                    detail::binary::to_big_endian(static_cast<uint64_t>(val),v);
                 }
                 break;
             }
 
             case value_type::double_t:
             {
-                v_.push_back(0xfb);
-                detail::binary::to_big_endian(jval.as_double(),v_);
+                v.push_back(0xfb);
+                detail::binary::to_big_endian(jval.as_double(),v);
                 break;
             }
 
             case value_type::small_string_t:
             case value_type::string_t:
             {
-                encode_string(jval.as_string_view());
+                encode_string(jval.as_string_view(), v);
                 break;
             }
 
@@ -401,33 +393,33 @@ public:
                 const auto length = jval.array_value().size();
                 if (length <= 0x17)
                 {
-                    v_.push_back(static_cast<uint8_t>(0x80 + length));
+                    v.push_back(static_cast<uint8_t>(0x80 + length));
                 }
                 else if (length <= 0xff)
                 {
-                    v_.push_back(0x98);
-                    v_.push_back(static_cast<uint8_t>(length));
+                    v.push_back(0x98);
+                    v.push_back(static_cast<uint8_t>(length));
                 }
                 else if (length <= 0xffff)
                 {
-                    v_.push_back(0x99);
-                    detail::binary::to_big_endian(static_cast<uint16_t>(length),v_);
+                    v.push_back(0x99);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(length),v);
                 }
                 else if (length <= 0xffffffff)
                 {
-                    v_.push_back(0x9a);
-                    detail::binary::to_big_endian(static_cast<uint32_t>(length),v_);
+                    v.push_back(0x9a);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(length),v);
                 }
                 else if (length <= 0xffffffffffffffff)
                 {
-                    v_.push_back(0x9b);
-                    detail::binary::to_big_endian(static_cast<uint64_t>(length),v_);
+                    v.push_back(0x9b);
+                    detail::binary::to_big_endian(static_cast<uint64_t>(length),v);
                 }
 
                 // append each element
                 for (const auto& el : jval.array_range())
                 {
-                    encode_(el);
+                    encode(el,v);
                 }
                 break;
             }
@@ -437,34 +429,34 @@ public:
                 const auto length = jval.object_value().size();
                 if (length <= 0x17)
                 {
-                    v_.push_back(static_cast<uint8_t>(0xa0 + length));
+                    v.push_back(static_cast<uint8_t>(0xa0 + length));
                 }
                 else if (length <= 0xff)
                 {
-                    v_.push_back(0xb8);
-                    v_.push_back(static_cast<uint8_t>(length));
+                    v.push_back(0xb8);
+                    v.push_back(static_cast<uint8_t>(length));
                 }
                 else if (length <= 0xffff)
                 {
-                    v_.push_back(0xb9);
-                    detail::binary::to_big_endian(static_cast<uint16_t>(length),v_);
+                    v.push_back(0xb9);
+                    detail::binary::to_big_endian(static_cast<uint16_t>(length),v);
                 }
                 else if (length <= 0xffffffff)
                 {
-                    v_.push_back(0xba);
-                    detail::binary::to_big_endian(static_cast<uint32_t>(length),v_);
+                    v.push_back(0xba);
+                    detail::binary::to_big_endian(static_cast<uint32_t>(length),v);
                 }
                 else if (length <= 0xffffffffffffffff)
                 {
-                    v_.push_back(0xbb);
-                    detail::binary::to_big_endian(static_cast<uint64_t>(length),v_);
+                    v.push_back(0xbb);
+                    detail::binary::to_big_endian(static_cast<uint64_t>(length),v);
                 }
 
                 // append each element
                 for (const auto& kv: jval.object_range())
                 {
-                    encode_string(kv.key());
-                    encode_(kv.value());
+                    encode_string(kv.key(), v);
+                    encode(kv.value(),v);
                 }
                 break;
             }
@@ -476,7 +468,7 @@ public:
         }
     }
 
-    void encode_string(string_view_type sv)
+    void encode_string(string_view_type sv, std::vector<uint8_t>& v)
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
@@ -491,32 +483,32 @@ public:
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            v_.push_back(static_cast<uint8_t>(0x60 + length));
+            v.push_back(static_cast<uint8_t>(0x60 + length));
         }
         else if (length <= 0xff)
         {
-            v_.push_back(0x78);
-            v_.push_back(static_cast<uint8_t>(length));
+            v.push_back(0x78);
+            v.push_back(static_cast<uint8_t>(length));
         }
         else if (length <= 0xffff)
         {
-            v_.push_back(0x79);
-            detail::binary::to_big_endian(static_cast<uint16_t>(length), v_);
+            v.push_back(0x79);
+            detail::binary::to_big_endian(static_cast<uint16_t>(length), v);
         }
         else if (length <= 0xffffffff)
         {
-            v_.push_back(0x7a);
-            detail::binary::to_big_endian(static_cast<uint32_t>(length), v_);
+            v.push_back(0x7a);
+            detail::binary::to_big_endian(static_cast<uint32_t>(length), v);
         }
         else if (length <= 0xffffffffffffffff)
         {
-            v_.push_back(0x7b);
-            detail::binary::to_big_endian(static_cast<uint64_t>(length),v_);
+            v.push_back(0x7b);
+            detail::binary::to_big_endian(static_cast<uint64_t>(length),v);
         }
 
         for (size_t i = 0; i < length; ++i)
         {
-            v_.push_back(target.data()[i]);
+            v.push_back(target.data()[i]);
         }
     }
 };
@@ -1082,7 +1074,11 @@ template<class Json>
 std::vector<uint8_t> encode_cbor(const Json& j)
 {
     Encode_cbor_<Json> encoder;
-    return encoder.encode(j);
+    std::vector<uint8_t> v;
+    v.reserve(encoder.calculate_size(j));
+
+    encoder.encode(j,v);
+    return v;
 }
 
 template<class Json>
