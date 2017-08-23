@@ -10,6 +10,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <valarray>
 #include <exception>
 #include <cstdlib>
 #include <cstring>
@@ -798,6 +799,51 @@ public:
     static Json to_json(const std::pair<T1,T2>& val)
     {
         return typename Json::array{val.first,val.second};
+    }
+};
+
+// std::valarray
+
+template<class Json, class T>
+struct json_type_traits<Json, std::valarray<T>>
+{
+    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    {
+        bool result = j.is_array();
+        if (result)
+        {
+            for (auto e : j.array_range())
+            {
+                if (!e.template is<T>())
+                {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    
+    static std::valarray<T> as(const Json& j)
+    {
+        if (j.is_array())
+        {
+            std::valarray<T> v(j.size());
+            for (size_t i = 0; i < j.size(); ++i)
+            {
+                v[i] = j[i].as<T>();
+            }
+            return v;
+        }
+        else
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempt to cast json non-array to array");
+        }
+    }
+    
+    static Json to_json(const std::valarray<T>& val)
+    {
+        return Json(std::begin(val), std::end(val));
     }
 };
 
