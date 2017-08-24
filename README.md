@@ -261,7 +261,7 @@ Output:
     ]
 ]
 ```
-See [json::make_array](docs/Classes/json-make_array) for details
+See [json::make_array](docs/Classes/json-make_array.md) for details
 
 ### Merge key-value pairs from another json object
 ```c++
@@ -290,8 +290,8 @@ Output:
     "c": [4,5,6]
 }
 ```
-See [json::merge](docs/Classes/json%20merge) 
-and [json::merge_or_update](docs/Classes/json%20merge_or_update) for details.
+See [json::merge](docs/Classes/json%20merge.md) 
+and [json::merge_or_update](docs/Classes/json%20merge_or_update.md) for details.
 
 ### Convert from and to standard library sequence containers
 
@@ -361,7 +361,7 @@ json j = v;
 std::list<book> l = j.as<std::list<book>>();
 ```
 
-See [Type Extensibility](docs/Classes/Type%20Extensibility) for details.
+See [Type Extensibility](docs/Classes/Type%20Extensibility.md) for details.
 
 ### Serialize C++ objects directly to JSON formatted streams, governed by `json_stream_traits` 
 
@@ -403,7 +403,7 @@ Output:
 
 ### Filter json names and values
 
-You can rename object member names with the built in filter [rename_name_filter](docs/Classes/rename_name_filter)
+You can rename object member names with the built in filter [rename_name_filter](docs/Classes/rename_name_filter.md)
 
 ```c++
 #include <sstream>
@@ -442,7 +442,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [json_filter](docs/Classes/json_filter) for details.
+Or define and use your own filters. See [json_filter](docs/Classes/json_filter.md) for details.
 
 ## Extensions
 
@@ -545,7 +545,7 @@ Output:
 }
 ```
 
-See [json_query](docs/Classes/json_query), [json_replace](docs/Classes/json_replace), and [Basics](docs/Tutorials/Basics) for details.
+See [json_query](docs/Classes/json_query.md), [json_replace](docs/Classes/json_replace.md), and [Basics](docs/Tutorials/Basics.md) for details.
 
 <div id="ext_csv"/>
 
@@ -634,7 +634,7 @@ project_id,task_name,task_start,task_finish
 4002,task2,05/01/2003,
 ```
 
-See [csv_reader](docs/Classes/csv_reader) and [csv_serializer](docs/Classes/csv_serializer) for details.
+See [csv_reader](docs/Classes/csv_reader.md) and [csv_serializer](docs/Classes/csv_serializer.md) for details.
 
 <div id="ext_msgpack"/>
 
@@ -707,7 +707,7 @@ Output:
 ]
 ```
 
-See [encode_msgpack](docs/Classes/encode_msgpack) and [decode_msgpack](docs/Classes/decode_msgpack) for details.
+See [encode_msgpack](docs/Classes/encode_msgpack.md) and [decode_msgpack](docs/Classes/decode_msgpack.md) for details.
 
 <div id="ext_cbor"/>
 
@@ -763,7 +763,7 @@ Output:
 }
 ```
 
-See [encode_cbor](docs/Classes/encode_cbor) and [decode_cbor](docs/Classes/decode_cbor) for details.
+See [encode_cbor](docs/Classes/encode_cbor.md) and [decode_cbor](docs/Classes/decode_cbor.md) for details.
 
 ## Building the test suite and examples with CMake
 
