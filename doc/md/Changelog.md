@@ -1,3 +1,12 @@
+master
+------
+
+New features
+
+- cbor extension supports encoding to and decoding from the cbor binary serialization format.
+
+- `json_type_traits` supports `std::valarray`
+
 0.99.8
 ------
  
