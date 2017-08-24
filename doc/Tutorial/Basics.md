@@ -1,6 +1,6 @@
 ## Examples
 
-The examples below illustrate the use of the [json](https://github.com/danielaparker/jsoncons/wiki/json) class and [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query) function.
+The examples below illustrate the use of the [json](../Classes/json.md) class and [json_query](../Classes/json_query.md) function.
 
 ### json construction
 

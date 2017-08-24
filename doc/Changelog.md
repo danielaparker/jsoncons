@@ -279,7 +279,7 @@ Fixes:
 
 New features
 
-- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/). See example below and [documentation](https://github.com/danielaparker/jsoncons/wiki/json_query).
+- Supports [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).
 - json member function `find` added
 - json member function `count` added
 - json array range accessor `elements()` added, which supports range-based for loops over json arrays, and replaces `begin_elements` and `end_elements`

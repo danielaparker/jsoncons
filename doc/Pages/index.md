@@ -27,7 +27,7 @@
 <div id="A1"/>
 ### Preliminaries
 
-jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. Consult the wiki for the latest [documentation and tutorials](https://github.com/danielaparker/jsoncons/wiki) and [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap). 
+jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. For more information, consult the latest [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/doc/Roadmap.md). 
 
 jsoncons uses some features that are new to C++ 11, particularly [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler.
 
@@ -413,7 +413,7 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [serialization_options](https://github.com/danielaparker/jsoncons/wiki/serialization_options), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [serialization_options](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/serialization_options.md), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
 ```c++
 serialization_options options;
@@ -464,7 +464,7 @@ produces
 <div id="A7"/>
 ### Filters
 
-You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/wiki/rename_name_filter)
+You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/rename_name_filter.md)
 
 ```c++
 #include <sstream>
@@ -503,7 +503,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/wiki/json_filter) for details.
+Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/json_filter.md) for details.
 <div id="A8"/>
 ### JsonPath
 
@@ -610,22 +610,22 @@ Output:
 <div id="A9"/>
 ### About jsoncons::json
 
-The [json](https://github.com/danielaparker/jsoncons/wiki/json) class is an instantiation of the `basic_json` class template that uses `char` as the character type
+The [json](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/json.md) class is an instantiation of the `basic_json` class template that uses `char` as the character type
 and sorts object members in alphabetically order.
 ```c++
 typedef basic_json<char,
                    JsonTraits = json_traits<char>,
                    Allocator = std::allocator<char>> json;
 ```
-If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) instead.
+If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/ojson.md) instead.
 
-The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/wiki/wjson)
+The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/blob/master/Classes/doc/wjson.md)
 ```c++
 typedef basic_json<wchar_t,
                    JsonTraits = json_traits<wchar_t>,
                    Allocator = std::allocator<wchar_t>> wjson;
 ```
-If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/wiki/wojson) instead.
+If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/wojson.md) instead.
 
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 ```c++
@@ -664,7 +664,7 @@ which prints
 <div id="A11"/>
 ### ojson and wojson
 
-The [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) ([wojson](https://github.com/danielaparker/jsoncons/wiki/wojson)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
+The [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/ojson.md) ([wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/wojson.md)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
 ```c++
 ojson o = ojson::parse(R"(
 {

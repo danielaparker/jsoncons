@@ -42,7 +42,7 @@ Returns a reference to the JSON handler that sends json events to downstream han
 
 ## Examples
 
-### Rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/wiki/rename_name_filter)
+### Rename object member names with the built in filter [rename_name_filter](rename_name_filter.md)
 
 ```c++
 #include <sstream>
