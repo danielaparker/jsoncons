@@ -4,7 +4,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### Streaming
 
-[dump](Classes/dump.md)
+[dump](dump)
 
 [json_input_handler](json_input_handler)  
 
