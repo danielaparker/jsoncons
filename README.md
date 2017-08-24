@@ -24,7 +24,7 @@ Extensions:
 - The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 - The [cbor](#user-content-ext_cbor) extension supports encoding to and decoding from the [cbor](http://cbor.io/) binary serialization format.
 
-Planned new features are listed on the [roadmap](https://github.com/danielaparker/jsoncons/wiki/Roadmap)
+Planned new features are listed on the [roadmap](docs/Roadmap.md)
 
 ## Get jsoncons
 
@@ -35,9 +35,9 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 ## How to use it
 
 - For a quick guide, see [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). 
-- Consult the [tutorials and reference](https://github.com/danielaparker/jsoncons/wiki) for the details. 
+- Consult the [tutorials and reference](docs/Home.md) for the details. 
 
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](https://github.com/danielaparker/jsoncons/wiki/deprecated) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](docs/Classes/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
 ## Benchmarks
 
@@ -125,13 +125,13 @@ typedef basic_json<char,
 ```
 The library includes four instantiations of `basic_json`:
 
-- [json](https://github.com/danielaparker/jsoncons/wiki/json) constructs a utf8 character json value that sorts name-value members alphabetically
+- [json](docs/Classes/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
 
-- [ojson](https://github.com/danielaparker/jsoncons/wiki/ojson) constructs a utf8 character json value that preserves the original name-value insertion order
+- [ojson](docs/Classes/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
 
-- [wjson](https://github.com/danielaparker/jsoncons/wiki/wjson) constructs a wide character json value that sorts name-value members alphabetically
+- [wjson](docs/Classes/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
 
-- [wojson](https://github.com/danielaparker/jsoncons/wiki/wojson) constructs a wide character json value that preserves the original name-value insertion order
+- [wojson](docs/Classes/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Features
 
@@ -261,7 +261,7 @@ Output:
     ]
 ]
 ```
-See [json::make_array](https://github.com/danielaparker/jsoncons/wiki/json-make_array) for details
+See [json::make_array](docs/Classes/json-make_array) for details
 
 ### Merge key-value pairs from another json object
 ```c++
@@ -290,8 +290,8 @@ Output:
     "c": [4,5,6]
 }
 ```
-See [json::merge](https://github.com/danielaparker/jsoncons/wiki/json%20merge) 
-and [json::merge_or_update](https://github.com/danielaparker/jsoncons/wiki/json%20merge_or_update) for details.
+See [json::merge](docs/Classes/json%20merge) 
+and [json::merge_or_update](docs/Classes/json%20merge_or_update) for details.
 
 ### Convert from and to standard library sequence containers
 
@@ -361,7 +361,7 @@ json j = v;
 std::list<book> l = j.as<std::list<book>>();
 ```
 
-See [Type Extensibility](https://github.com/danielaparker/jsoncons/wiki/Type%20Extensibility) for details.
+See [Type Extensibility](docs/Classes/Type%20Extensibility) for details.
 
 ### Serialize C++ objects directly to JSON formatted streams, governed by `json_stream_traits` 
 
@@ -403,7 +403,7 @@ Output:
 
 ### Filter json names and values
 
-You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/wiki/rename_name_filter)
+You can rename object member names with the built in filter [rename_name_filter](docs/Classes/rename_name_filter)
 
 ```c++
 #include <sstream>
@@ -442,7 +442,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/wiki/json_filter) for details.
+Or define and use your own filters. See [json_filter](docs/Classes/json_filter) for details.
 
 ## Extensions
 
@@ -545,7 +545,7 @@ Output:
 }
 ```
 
-See [json_query](https://github.com/danielaparker/jsoncons/wiki/json_query), [json_replace](https://github.com/danielaparker/jsoncons/wiki/json_replace), and [Basics](https://github.com/danielaparker/jsoncons/wiki/Basics) for details.
+See [json_query](docs/Classes/json_query), [json_replace](docs/Classes/json_replace), and [Basics](docs/Tutorials/Basics) for details.
 
 <div id="ext_csv"/>
 
@@ -634,7 +634,7 @@ project_id,task_name,task_start,task_finish
 4002,task2,05/01/2003,
 ```
 
-See [csv_reader](https://github.com/danielaparker/jsoncons/wiki/csv_reader) and [csv_serializer](https://github.com/danielaparker/jsoncons/wiki/csv_serializer) for details.
+See [csv_reader](docs/Classes/csv_reader) and [csv_serializer](docs/Classes/csv_serializer) for details.
 
 <div id="ext_msgpack"/>
 
@@ -707,7 +707,7 @@ Output:
 ]
 ```
 
-See [encode_msgpack](https://github.com/danielaparker/jsoncons/wiki/encode_msgpack) and [decode_msgpack](https://github.com/danielaparker/jsoncons/wiki/decode_msgpack) for details.
+See [encode_msgpack](docs/Classes/encode_msgpack) and [decode_msgpack](docs/Classes/decode_msgpack) for details.
 
 <div id="ext_cbor"/>
 
@@ -763,7 +763,7 @@ Output:
 }
 ```
 
-See [encode_cbor](https://github.com/danielaparker/jsoncons/wiki/encode_cbor) and [decode_cbor](https://github.com/danielaparker/jsoncons/wiki/decode_cbor) for details.
+See [encode_cbor](docs/Classes/encode_cbor) and [decode_cbor](docs/Classes/decode_cbor) for details.
 
 ## Building the test suite and examples with CMake
 
