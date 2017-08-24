@@ -58,15 +58,15 @@ using namespace examples::streaming;
 namespace jsoncons
 {
     template <>
-    struct json_stream_traits<char,Employee>
+    struct json_stream_traits<char,std::shared_ptr<Employee>>
     {
-        static void encode(const Employee& val, json_output_handler& handler)
+        static void encode(const std::shared_ptr<Employee>& val, json_output_handler& handler)
         {
             handler.begin_object();
             handler.name("Name");
-            handler.string_value(val.name());
+            handler.string_value(val->name());
             handler.name("Pay");
-            handler.double_value(val.calculatePay());
+            handler.double_value(val->calculatePay());
             handler.end_object();
         }
     };

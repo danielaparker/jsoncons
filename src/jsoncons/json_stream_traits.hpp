@@ -264,6 +264,7 @@ public:
     }
 };
 
+#if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT, class T>
 struct json_stream_traits<CharT, std::shared_ptr<T>>
 {
@@ -274,6 +275,7 @@ public:
         json_stream_traits<CharT,T>::encode(*p, handler);
     }
 };
+#endif
 
 }
 
