@@ -14,7 +14,7 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 ### Base classes
 
-[json_input_handler](json_input_handler)
+[json_input_handler](json_input_handler.md)
 
 ### Member types
 
@@ -103,7 +103,7 @@ Example address book file (`address-book.json`):
 
 Suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separated part. 
 
-You can achieve the desired result by subclassing the [json_filter](json_filter) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_input_handler](json_input_handler) (which in this example will forward them to a [json_serializer](json_serializer).) 
+You can achieve the desired result by subclassing the [json_filter](json_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_input_handler](json_input_handler.md) (which in this example will forward them to a [json_serializer](json_serializer.md).) 
 ```c++
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -163,7 +163,7 @@ private:
     std::string member_name_;
 };
 ```
-Configure a [name_fix_up_filter](name_fix_up_filter) to emit json events to a [json_serializer](json_serializer). 
+Configure a [rename_name_filter](rename_name_filter.md) to emit json events to a [json_serializer](json_serializer.md). 
 ```c++
 std::ofstream os("output/new-address-book.json");
 json_serializer serializer(os, true);

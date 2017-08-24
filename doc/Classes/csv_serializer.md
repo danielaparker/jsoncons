@@ -1,7 +1,7 @@
 ```c++
 jsoncons::csv::csv_serializer
 ```
-The `csv_serializer` class is an instantiation of the `basic_csv_serializer` class template that uses `char` as the character type.  It implements [json_output_handler](json_output_handler) and supports formatting a JSON value as a [CSV file](http://tools.ietf.org/html/rfc4180).
+The `csv_serializer` class is an instantiation of the `basic_csv_serializer` class template that uses `char` as the character type.  It implements [json_output_handler](json_output_handler.md) and supports formatting a JSON value as a [CSV file](http://tools.ietf.org/html/rfc4180).
 
 `csv_serializer` is noncopyable and nonmoveable.
 
@@ -13,13 +13,13 @@ The `csv_serializer` class is an instantiation of the `basic_csv_serializer` cla
 
     csv_serializer(std::ostream& os)
 Constructs a `csv_serializer` that is associated with an output stream
-`os`. Uses default [csv_parameters](csv_parameters).
+`os`. Uses default [csv_parameters](csv_parameters.md).
 You must ensure that the output stream exists as long as does `csv_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
     csv_serializer(std::ostream& os,
                    const csv_parameters& params)
 Constructs a `csv_serializer` that is associated with an output stream
-`os` and [csv_parameters](csv_parameters).
+`os` and [csv_parameters](csv_parameters.md).
 You must ensure that the output stream exists as long as does `csv_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
 ### Member functions

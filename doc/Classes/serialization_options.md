@@ -67,10 +67,10 @@ Sets replacement text for negative infinity.
     serialization_options& precision(uint8_t prec)
 
     serialization_options& object_object_split_lines(line_split_kind value)
-For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind).
+For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
     serialization_options& array_object_split_lines(line_split_kind value)
-For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind).
+For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
     serialization_options& object_array_split_lines(line_split_kind value)
 For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind).

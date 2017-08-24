@@ -63,8 +63,8 @@ None
 
 ### See also
 
-- [json_output_handler](json_output_handler)
-- [serialization_options](serialization_options)
+- [json_output_handler](json_output_handler.md)
+- [serialization_options](serialization_options.md)
     
 ### Examples
 

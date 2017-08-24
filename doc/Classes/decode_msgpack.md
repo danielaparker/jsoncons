@@ -13,6 +13,6 @@ Json decode_msgpack(const std::vector<uint8_t>& v)
 
 ### See also
 
-- [encode_msgpack](encode_msgpack) encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+- [encode_msgpack](encode_msgpack.md) encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 

@@ -12,7 +12,7 @@ json_decoder
 
 ### Base classes
 
-[json_input_handler](json_input_handler)
+[json_input_handler](json_input_handler.md)
 
 ### Member types
 

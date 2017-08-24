@@ -3,7 +3,7 @@ jsoncons::json_serializer
 
 typedef basic_json_serializer<char> json_serializer
 ```
-The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses `char` as the character type. It implements [json_output_handler](json_output_handler) and supports pretty print serialization.
+The `json_serializer` class is an instantiation of the `basic_json_serializer` class template that uses `char` as the character type. It implements [json_output_handler](json_output_handler.md) and supports pretty print serialization.
 
 `json_serializer` is noncopyable and nonmoveable.
 
@@ -13,7 +13,7 @@ The `json_serializer` class is an instantiation of the `basic_json_serializer` c
 
 ### Implemented interfaces
 
-[json_output_handler](json_output_handler)
+[json_output_handler](json_output_handler.md)
 
 ### Constructors
 
@@ -26,11 +26,11 @@ Constructs a new serializer that writes to the specified output stream.
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
     json_serializer(std::ostream& os, const serialization_options& options)
-Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options).
+Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
     json_serializer(std::ostream& os, const serialization_options& options, bool pprint)
-Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options).
+Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
 ### Destructor

@@ -4,7 +4,7 @@ jsoncons::json::as
 template <class T, class... Args>
 T as(Args&&... args) const
 ```
-Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits).
+Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits.md).
 
     X as<X>() const
 Type X is integeral: returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.

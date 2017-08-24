@@ -13,6 +13,6 @@ Json decode_cbor(const std::vector<uint8_t>& v)
 
 ### See also
 
-- [encode_cbor](encode_cbor) encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
+- [encode_cbor](encode_cbor.md) encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
 
 

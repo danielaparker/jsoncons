@@ -4,7 +4,7 @@ jsoncons::json::is
 template <class T, class... Args>
 bool is(Args&&... args) const noexcept
 ```
-Returns `true` if the json value is the same as type `T` according to [json_type_traits](json_type_traits), `false` otherwise.  
+Returns `true` if the json value is the same as type `T` according to [json_type_traits](json_type_traits.md), `false` otherwise.  
 
     bool is<X> const noexcept 
 Type `X` is integral: returns `true` if the json value is integral and within the range of the type `X`, `false` otherwise.  
@@ -26,10 +26,10 @@ Returns `true` if the json value is an object, `false` otherwise.
 Returns `true` if the json value is an array, `false` otherwise.  
 
     bool is<X<T>> const noexcept
-If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `is<X<T>>()` returns `true` if the json value is an array and each element is the "same as" type `T` according to [json_type_traits](json_type_traits), `false` otherwise.
+If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `is<X<T>>()` returns `true` if the json value is an array and each element is the "same as" type `T` according to [json_type_traits](json_type_traits.md), `false` otherwise.
 
     bool is<X<std::string,T>> const noexcept
-If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `is<X<T>>()` returns `true` if the json value is an object and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits), `false` otherwise.
+If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `is<X<T>>()` returns `true` if the json value is an object and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits.md), `false` otherwise.
 
 
 ## Examples

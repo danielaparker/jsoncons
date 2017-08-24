@@ -5,7 +5,7 @@ typedef basic_json<char,
                    JsonTraits = json_traits<char>,
                    Allocator = std::allocator<char>> json
 ```
-The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. If you want to preserve the original insertion order, use [ojson](ojson) instead.
+The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. If you want to preserve the original insertion order, use [ojson](ojson.md) instead.
 
 The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
@@ -74,7 +74,7 @@ Move with allocator
 
     template <class T>
     json(const T& val, const allocator_type& allocator=allocator_type())
-Constructs a `json` value for types supported in [json_type_traits](json_type_traits).
+Constructs a `json` value for types supported in [json_type_traits](json_type_traits.md).
 
     template <class T>
     json(const CharT* val, const allocator_type& allocator=allocator_type())
@@ -99,7 +99,7 @@ Assigns a new `json` value to a `json` variable, replacing it's current contents
 
     template <class T>
     json& operator=(const T& rhs)
-Assigns the templated value to a `json` variable using [json_type_traits](json_type_traits).
+Assigns the templated value to a `json` variable using [json_type_traits](json_type_traits.md).
 
     json& operator=(const char_type* rhs)
 
@@ -287,7 +287,7 @@ Inserts json value into string using default serialization_options.
     template <class SAllocator>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
               const serialization_options& options) const
-Inserts json value into string using specified [serialization_options](serialization_options).
+Inserts json value into string using specified [serialization_options](serialization_options.md).
 
     void dump(basic_json_output_handler<char_type>& output_handler) const
 Calls `begin_json()` on `output_handler`, emits json value to `output_handler`, and calls `end_json()` on `output_handler`.
@@ -296,10 +296,10 @@ Calls `begin_json()` on `output_handler`, emits json value to `output_handler`, 
 Inserts json value into stream with default serialization options.
 
     void dump(std::ostream<CharT> os, const serialization_options& options) const
-Inserts json value into stream using specified [serialization_options](serialization_options).
+Inserts json value into stream using specified [serialization_options](serialization_options.md).
 
     void dump_body(json_output_handler& handler) const
-Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler), such as a [json_serializer](json_serializer).
+Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler.md), such as a [json_serializer](json_serializer.md).
 
 ### Non member functions
 
@@ -311,26 +311,26 @@ Inserts json value into stream.
 
     std::ostream& print(const json& val)  
     std::ostream& print(const json& val, const serialization_options<CharT>& options)  
-Inserts json value into stream using the specified [serialization_options](serialization_options) if supplied.
+Inserts json value into stream using the specified [serialization_options](serialization_options.md) if supplied.
 
     std::ostream& pretty_print(const json& val)  
     std::ostream& pretty_print(const json& val, const serialization_options<CharT>& options)  
-Inserts json value into stream using the specified [serialization_options](serialization_options) if supplied.
+Inserts json value into stream using the specified [serialization_options](serialization_options.md) if supplied.
 
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
 
 ### Deprecated names
 
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated) for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
 
 ### See also
 
-- [ojson](ojson) constructs a json value that preserves the original name-value insertion order
+- [ojson](ojson.md) constructs a json value that preserves the original name-value insertion order
 
-- [wjson](wjson) constructs a wide character json value that sorts name-value members alphabetically
+- [wjson](wjson.md) constructs a wide character json value that sorts name-value members alphabetically
 
-- [wojson](wojson) constructs a wide character json value that preserves the original name-value insertion order
+- [wojson](wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Examples
   
