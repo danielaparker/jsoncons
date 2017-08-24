@@ -24,7 +24,7 @@ Extensions:
 - The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 - The [cbor](#user-content-ext_cbor) extension supports encoding to and decoding from the [cbor](http://cbor.io/) binary serialization format.
 
-Planned new features are listed on the [roadmap](docs/Roadmap.md)
+Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
 ## Get jsoncons
 
@@ -35,9 +35,9 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 ## How to use it
 
 - For a quick guide, see [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). 
-- Consult the [tutorials and reference](docs/Home.md) for the details. 
+- Consult the [tutorials and reference](doc/Home.md) for the details. 
 
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](docs/Classes/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/Classes/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
 ## Benchmarks
 
@@ -125,13 +125,13 @@ typedef basic_json<char,
 ```
 The library includes four instantiations of `basic_json`:
 
-- [json](docs/Classes/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
+- [json](doc/Classes/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
 
-- [ojson](docs/Classes/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
+- [ojson](doc/Classes/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
 
-- [wjson](docs/Classes/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
+- [wjson](doc/Classes/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
 
-- [wojson](docs/Classes/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
+- [wojson](doc/Classes/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Features
 
@@ -261,7 +261,7 @@ Output:
     ]
 ]
 ```
-See [json::make_array](docs/Classes/json-make_array.md) for details
+See [json::make_array](doc/Classes/json-make_array.md) for details
 
 ### Merge key-value pairs from another json object
 ```c++
@@ -290,8 +290,8 @@ Output:
     "c": [4,5,6]
 }
 ```
-See [json::merge](docs/Classes/json%20merge.md) 
-and [json::merge_or_update](docs/Classes/json%20merge_or_update.md) for details.
+See [json::merge](doc/Classes/json%20merge.md) 
+and [json::merge_or_update](doc/Classes/json%20merge_or_update.md) for details.
 
 ### Convert from and to standard library sequence containers
 
@@ -361,7 +361,7 @@ json j = v;
 std::list<book> l = j.as<std::list<book>>();
 ```
 
-See [Type Extensibility](docs/Classes/Type%20Extensibility.md) for details.
+See [Type Extensibility](doc/Classes/Type%20Extensibility.md) for details.
 
 ### Serialize C++ objects directly to JSON formatted streams, governed by `json_stream_traits` 
 
@@ -403,7 +403,7 @@ Output:
 
 ### Filter json names and values
 
-You can rename object member names with the built in filter [rename_name_filter](docs/Classes/rename_name_filter.md)
+You can rename object member names with the built in filter [rename_name_filter](doc/Classes/rename_name_filter.md)
 
 ```c++
 #include <sstream>
@@ -442,7 +442,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [json_filter](docs/Classes/json_filter.md) for details.
+Or define and use your own filters. See [json_filter](doc/Classes/json_filter.md) for details.
 
 ## Extensions
 
@@ -545,7 +545,7 @@ Output:
 }
 ```
 
-See [json_query](docs/Classes/json_query.md), [json_replace](docs/Classes/json_replace.md), and [Basics](docs/Tutorials/Basics.md) for details.
+See [json_query](doc/Classes/json_query.md), [json_replace](doc/Classes/json_replace.md), and [Basics](doc/Tutorials/Basics.md) for details.
 
 <div id="ext_csv"/>
 
@@ -634,7 +634,7 @@ project_id,task_name,task_start,task_finish
 4002,task2,05/01/2003,
 ```
 
-See [csv_reader](docs/Classes/csv_reader.md) and [csv_serializer](docs/Classes/csv_serializer.md) for details.
+See [csv_reader](doc/Classes/csv_reader.md) and [csv_serializer](doc/Classes/csv_serializer.md) for details.
 
 <div id="ext_msgpack"/>
 
@@ -707,7 +707,7 @@ Output:
 ]
 ```
 
-See [encode_msgpack](docs/Classes/encode_msgpack.md) and [decode_msgpack](docs/Classes/decode_msgpack.md) for details.
+See [encode_msgpack](doc/Classes/encode_msgpack.md) and [decode_msgpack](doc/Classes/decode_msgpack.md) for details.
 
 <div id="ext_cbor"/>
 
@@ -763,7 +763,7 @@ Output:
 }
 ```
 
-See [encode_cbor](docs/Classes/encode_cbor.md) and [decode_cbor](docs/Classes/decode_cbor.md) for details.
+See [encode_cbor](doc/Classes/encode_cbor.md) and [decode_cbor](doc/Classes/decode_cbor.md) for details.
 
 ## Building the test suite and examples with CMake
 
