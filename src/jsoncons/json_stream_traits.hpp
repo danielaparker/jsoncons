@@ -25,26 +25,31 @@
 
 namespace jsoncons {
 
-template <class CharT, class T, class Enable = void>
+//json_stream_traits
+
+template <class T, class Enable = void>
 struct json_stream_traits
 {
+    template <class CharT>
     static void encode(const T&, basic_json_output_handler<CharT>&)
     {
     }
 };
 
+// dump
+
 template <class CharT, class T>
 void dump(const T& val, basic_json_output_handler<CharT>& handler)
 {
     handler.begin_json();
-    json_stream_traits<CharT,T>::encode(val,handler);
+    json_stream_traits<T>::encode(val,handler);
     handler.end_json();
 }
 
 template <class CharT, class T>
 void dump_body(const T& val, basic_json_output_handler<CharT>& handler)
 {
-    json_stream_traits<CharT,T>::encode(val,handler);
+    json_stream_traits<T>::encode(val,handler);
 }
 
 template <class CharT, class T>
@@ -79,11 +84,12 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
 
 // integer
 
-template<class CharT, class T>
-struct json_stream_traits<CharT, T,
+template<class T>
+struct json_stream_traits<T,
                           typename std::enable_if<detail::is_integer_like<T>::value
 >::type>
 {
+    template <class CharT>
     static void encode(T val, basic_json_output_handler<CharT>& handler)
     {
         handler.integer_value(val);
@@ -92,11 +98,12 @@ struct json_stream_traits<CharT, T,
 
 // uinteger
 
-template<class CharT, class T>
-struct json_stream_traits<CharT, T,
+template<class T>
+struct json_stream_traits<T,
                           typename std::enable_if<detail::is_uinteger_like<T>::value
 >::type>
 {
+    template <class CharT>
     static void encode(T val, basic_json_output_handler<CharT>& handler)
     {
         handler.uinteger_value(val);
@@ -105,11 +112,12 @@ struct json_stream_traits<CharT, T,
 
 // double
 
-template<class CharT, class T>
-struct json_stream_traits<CharT, T,
+template<class T>
+struct json_stream_traits<T,
                           typename std::enable_if<detail::is_floating_point_like<T>::value
 >::type>
 {
+    template <class CharT>
     static void encode(T val, basic_json_output_handler<CharT>& handler)
     {
         handler.double_value(val);
@@ -118,9 +126,10 @@ struct json_stream_traits<CharT, T,
 
 // bool
 
-template<class CharT>
-struct json_stream_traits<CharT, bool>
+template<>
+struct json_stream_traits<bool>
 {
+    template <class CharT>
     static void encode(bool val, basic_json_output_handler<CharT>& handler)
     {
         handler.bool_value(val);
@@ -129,41 +138,44 @@ struct json_stream_traits<CharT, bool>
 
 // string
 
-template<class CharT, class T>
-struct json_stream_traits<CharT, T,
+template<class T>
+struct json_stream_traits<T,
     typename std::enable_if<detail::is_string_like<T>::value
 >::type>
 {
+    template <class CharT>
     static void encode(const T& val, basic_json_output_handler<CharT>& handler)
     {
         handler.string_value(val);
     }
 };
 
-template<class CharT>
-struct json_stream_traits<CharT, typename type_wrapper<CharT>::const_pointer_type>
+/*template<>
+struct json_stream_traits<typename type_wrapper<CharT>::const_pointer_type>
 {
+    template <class CharT>
     static void encode(typename type_wrapper<CharT>::const_pointer_type val, basic_json_output_handler<CharT>& handler)
     {
         handler.string_value(val);
     }
-};
+};*/
 
 // sequence container (except string and array)
 
-template<class CharT, class T>
-struct json_stream_traits<CharT, T,
+template<class T>
+struct json_stream_traits<T,
     typename std::enable_if<detail::is_vector_like<T>::value
 >::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
 
+    template <class CharT>
     static void encode(const T& val, basic_json_output_handler<CharT>& handler)
     {
         handler.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            json_stream_traits<CharT,value_type>::encode(*it,handler);
+            json_stream_traits<value_type>::encode(*it,handler);
         }
         handler.end_array();
     }
@@ -171,18 +183,19 @@ struct json_stream_traits<CharT, T,
 
 // std::array
 
-template<class CharT, class T, size_t N>
-struct json_stream_traits<CharT, std::array<T,N>>
+template<class T, size_t N>
+struct json_stream_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;
 public:
    
+    template <class CharT>
     static void encode(const std::array<T, N>& val, basic_json_output_handler<CharT>& handler)
     {
         handler.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            json_stream_traits<CharT,value_type>::encode(*it,handler);
+            json_stream_traits<value_type>::encode(*it,handler);
         }
         handler.end_array();
     }
@@ -190,21 +203,22 @@ public:
 
 // associative container
 
-template<class CharT, class T>
-struct json_stream_traits<CharT, T,
+template<class T>
+struct json_stream_traits<T,
     typename std::enable_if<detail::is_map_like<T>::value
 >::type>
 {
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
 
+    template <class CharT>
     static void encode(const T& val, basic_json_output_handler<CharT>& handler)
     {
         handler.begin_object();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             handler.name(it->first);
-            json_stream_traits<CharT, mapped_type>::encode(it->second,handler);
+            json_stream_traits<mapped_type>::encode(it->second,handler);
         }
         handler.end_object();
     }
@@ -212,22 +226,24 @@ struct json_stream_traits<CharT, T,
 
 namespace detail { namespace streaming {
 
-template<size_t Pos, class CharT, class Tuple>
+template<size_t Pos, class Tuple>
 struct tuple_helper
 {
     using element_type = typename std::tuple_element<std::tuple_size<Tuple>::value - Pos, Tuple>::type;
-    using next = tuple_helper<Pos - 1, CharT, Tuple>;
+    using next = tuple_helper<Pos - 1, Tuple>;
     
+    template <class CharT>
     static void encode(const Tuple& tuple, basic_json_output_handler<CharT>& handler)
     {
-        json_stream_traits<CharT, element_type>::encode(std::get<std::tuple_size<Tuple>::value - Pos>(tuple),handler);
+        json_stream_traits<element_type>::encode(std::get<std::tuple_size<Tuple>::value - Pos>(tuple),handler);
         next::encode(tuple, handler);
     }
 };
 
-template<class CharT, class Tuple>
-struct tuple_helper<0, CharT, Tuple>
+template<class Tuple>
+struct tuple_helper<0, Tuple>
 {
+    template <class CharT>
     static void encode(const Tuple&, basic_json_output_handler<CharT>&)
     {
     }
@@ -235,13 +251,14 @@ struct tuple_helper<0, CharT, Tuple>
 
 }}
 
-template<class CharT, typename... E>
-struct json_stream_traits<CharT, std::tuple<E...>>
+template<typename... E>
+struct json_stream_traits<std::tuple<E...>>
 {
 private:
-    using helper = detail::streaming::tuple_helper<sizeof...(E), CharT, std::tuple<E...>>;
+    using helper = detail::streaming::tuple_helper<sizeof...(E), std::tuple<E...>>;
 
 public:
+    template <class CharT>
     static void encode(const std::tuple<E...>& value, basic_json_output_handler<CharT>& handler)
     {
         handler.begin_array();
@@ -250,29 +267,31 @@ public:
     }
 };
 
-template<class CharT, class T1, class T2>
-struct json_stream_traits<CharT, std::pair<T1,T2>>
+template<class T1, class T2>
+struct json_stream_traits<std::pair<T1,T2>>
 {
 public:
    
+    template <class CharT>
     static void encode(const std::pair<T1,T2>& value, basic_json_output_handler<CharT>& handler)
     {
         handler.begin_array();
-        json_stream_traits<CharT,T1>::encode(value.first, handler);
-        json_stream_traits<CharT,T2>::encode(value.second, handler);
+        json_stream_traits<T1>::encode(value.first, handler);
+        json_stream_traits<T2>::encode(value.second, handler);
         handler.end_array();
     }
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-template<class CharT, class T>
-struct json_stream_traits<CharT, std::shared_ptr<T>>
+template<class T>
+struct json_stream_traits<std::shared_ptr<T>>
 {
 public:
    
+    template <class CharT>
     static void encode(std::shared_ptr<T> p, basic_json_output_handler<CharT>& handler)
     {
-        json_stream_traits<CharT,T>::encode(*p, handler);
+        json_stream_traits<T>::encode(*p, handler);
     }
 };
 #endif

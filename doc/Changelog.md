@@ -11,6 +11,10 @@ Documentation
 
 - Documentation is now in the repository itself. Please see the README.md file
 
+Changed
+
+- Removed `CharT` template parameter from `json_stream_traits`
+
 0.99.8
 ------
  

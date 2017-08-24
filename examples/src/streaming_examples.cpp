@@ -58,7 +58,7 @@ using namespace examples::streaming;
 namespace jsoncons
 {
     template <>
-    struct json_stream_traits<char,std::shared_ptr<Employee>>
+    struct json_stream_traits<std::shared_ptr<Employee>>
     {
         static void encode(const std::shared_ptr<Employee>& val, json_output_handler& handler)
         {

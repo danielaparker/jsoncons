@@ -193,7 +193,7 @@ public:
 namespace jsoncons
 {
     template <>
-    struct json_stream_traits<char,std::shared_ptr<Employee>>
+    struct json_stream_traits<std::shared_ptr<Employee>>
     {
         static void encode(const std::shared_ptr<Employee>& val, json_output_handler& handler)
         {
@@ -243,7 +243,7 @@ using boost::numeric::ublas::matrix;
 namespace jsoncons
 {
     template <>
-    struct json_stream_traits<char,matrix<double>>
+    struct json_stream_traits<matrix<double>>
     {
         static void encode(const matrix<double>& val, json_output_handler& handler)
         {
