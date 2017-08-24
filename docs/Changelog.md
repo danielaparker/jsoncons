@@ -7,6 +7,10 @@ New features
 
 - `json_type_traits` supports `std::valarray`
 
+Documentation
+
+- Documentation is now in the repository itself. Please see the README.md file
+
 0.99.8
 ------
  
