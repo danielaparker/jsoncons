@@ -2,6 +2,19 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 ### Core
 
+#### json Container
+
+[json](Classes/json.md)  
+[json_reader](Classes/json_reader.md)  
+[json_decoder](Classes/json_decoder.md)  
+
+[ojson](Classes/ojson.md)  
+
+[wjson](Classes/wjson.md)  
+[wjson_reader](Classes/wjson_reader.md)  
+
+[wojson](Classes/wojson.md)  
+
 #### Streaming
 
 [dump](Classes/dump.md)
@@ -17,19 +30,6 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [wjson_serializer](Classes/wjson_serializer.md)  
 [wserialization_options](Classes/wserialization_options.md)  
-
-#### json Container
-
-[json](Classes/json.md)  
-[json_reader](Classes/json_reader.md)  
-[json_decoder](Classes/json_decoder.md)  
-
-[ojson](Classes/ojson.md)  
-
-[wjson](Classes/wjson.md)  
-[wjson_reader](Classes/wjson_reader.md)  
-
-[wojson](Classes/wojson.md)  
 
 ### Extensions
 
