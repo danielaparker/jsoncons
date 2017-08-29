@@ -1110,8 +1110,10 @@ public:
             case tt::string_string:
                 {
                     auto ptr = string_data_cast()->ptr_;
-                    new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
-                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    string_data_cast()->ptr_ = rhs.string_data_cast()->ptr_;
+                    rhs.string_data_cast()->ptr_ = ptr;
+                    //new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                    //new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
                     break;
                 }
             case tt::string_array:
@@ -1188,8 +1190,10 @@ public:
             case tt::array_array:
                 {
                     auto ptr = array_data_cast()->ptr_;
-                    new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
-                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    array_data_cast()->ptr_ = rhs.array_data_cast()->ptr_;
+                    rhs.array_data_cast()->ptr_ = ptr;
+                    //new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                    //new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
                     break;
                 }
             case tt::array_emptyobj:
@@ -1295,8 +1299,10 @@ public:
             case tt::object_object:
                 {
                     auto ptr = object_data_cast()->ptr_;
-                    new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
-                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    object_data_cast()->ptr_ = rhs.object_data_cast()->ptr_;
+                    rhs.object_data_cast()->ptr_ = ptr;
+                    //new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                    //new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
                     break;
                 }
             default:
