@@ -1112,8 +1112,6 @@ public:
                     auto ptr = string_data_cast()->ptr_;
                     string_data_cast()->ptr_ = rhs.string_data_cast()->ptr_;
                     rhs.string_data_cast()->ptr_ = ptr;
-                    //new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
-                    //new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
                     break;
                 }
             case tt::string_array:
@@ -1192,8 +1190,6 @@ public:
                     auto ptr = array_data_cast()->ptr_;
                     array_data_cast()->ptr_ = rhs.array_data_cast()->ptr_;
                     rhs.array_data_cast()->ptr_ = ptr;
-                    //new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
-                    //new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
                     break;
                 }
             case tt::array_emptyobj:
@@ -1301,8 +1297,6 @@ public:
                     auto ptr = object_data_cast()->ptr_;
                     object_data_cast()->ptr_ = rhs.object_data_cast()->ptr_;
                     rhs.object_data_cast()->ptr_ = ptr;
-                    //new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
-                    //new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
                     break;
                 }
             default:
