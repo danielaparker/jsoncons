@@ -871,10 +871,7 @@ public:
                 return true;
             }
 
-            const value_type lhs_id = type_id();
-            const value_type rhs_id = rhs.type_id();
-
-            switch (t_by_t[(size_t)lhs_id][(size_t)rhs_id])
+            switch (t_by_t[(size_t)type_id()][(size_t)rhs.type_id()])
             {
             case tt::null_null:
                 return true;
@@ -928,240 +925,384 @@ public:
 
         void swap(variant& rhs) JSONCONS_NOEXCEPT
         {
-            if (this != &rhs)
+            if (this == &rhs)
             {
-                switch (type_id())
-                {
-                case value_type::string_t:
-                    {
-                        auto ptr = string_data_cast()->ptr_;
-                        switch (rhs.type_id())
-                        {
-                        case value_type::object_t:
-                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
-                            break;
-                        case value_type::array_t:
-                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
-                            break;
-                        case value_type::string_t:
-                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
-                            break;
-                        case value_type::null_t:
-                            new(reinterpret_cast<void*>(&data_))null_data();
-                            break;
-                        case value_type::empty_object_t:
-                            new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            break;
-                        case value_type::double_t:
-                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
-                            break;
-                        case value_type::integer_t:
-                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
-                            break;
-                        case value_type::uinteger_t:
-                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
-                            break;
-                        case value_type::bool_t:
-                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
-                            break;
-                        case value_type::small_string_t:
-                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
-                            break;
-                        default:
-                            break;
-                        }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
-                    }
-                    break;
-                case value_type::object_t:
-                    {
-                        auto ptr = object_data_cast()->ptr_;
-                        switch (rhs.type_id())
-                        {
-                        case value_type::object_t:
-                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
-                            break;
-                        case value_type::array_t:
-                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
-                            break;
-                        case value_type::string_t:
-                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
-                            break;
-                        case value_type::null_t:
-                            new(reinterpret_cast<void*>(&data_))null_data();
-                            break;
-                        case value_type::empty_object_t:
-                            new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            break;
-                        case value_type::double_t:
-                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
-                            break;
-                        case value_type::integer_t:
-                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
-                            break;
-                        case value_type::uinteger_t:
-                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
-                            break;
-                        case value_type::bool_t:
-                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
-                            break;
-                        case value_type::small_string_t:
-                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
-                            break;
-                        default:
-                            break;
-                        }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
-                    }
-                    break;
-                case value_type::array_t:
-                    {
-                        auto ptr = array_data_cast()->ptr_;
-                        switch (rhs.type_id())
-                        {
-                        case value_type::object_t:
-                            new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
-                            break;
-                        case value_type::array_t:
-                            new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
-                            break;
-                        case value_type::string_t:
-                            new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
-                            break;
-                        case value_type::null_t:
-                            new(reinterpret_cast<void*>(&data_))null_data();
-                            break;
-                        case value_type::empty_object_t:
-                            new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            break;
-                        case value_type::double_t:
-                            new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
-                            break;
-                        case value_type::integer_t:
-                            new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
-                            break;
-                        case value_type::uinteger_t:
-                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
-                            break;
-                        case value_type::bool_t:
-                            new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
-                            break;
-                        case value_type::small_string_t:
-                            new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
-                            break;
-                        default:
-                            break;
-                        }
-                        new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
-                    }
-                    break;
-                default:
-                    switch (rhs.type_id())
-                    {
-                    case value_type::string_t:
-                        {
-                            auto ptr = rhs.string_data_cast()->ptr_;
-                            switch (type_id())
-                            {
-                            case value_type::null_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
-                                break;
-                            case value_type::empty_object_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
-                                break;
-                            case value_type::double_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
-                                break;
-                            case value_type::integer_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
-                                break;
-                            case value_type::uinteger_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
-                                break;
-                            case value_type::bool_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
-                                break;
-                            case value_type::small_string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
-                                break;
-                            default:
-                                break;
-                            }
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
-                        }
-                        break;
-                    case value_type::object_t:
-                        {
-                            auto ptr = rhs.object_data_cast()->ptr_;
-                            switch (type_id())
-                            {
-                            case value_type::null_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
-                                break;
-                            case value_type::empty_object_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
-                                break;
-                            case value_type::double_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
-                                break;
-                            case value_type::integer_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
-                                break;
-                            case value_type::uinteger_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
-                                break;
-                            case value_type::bool_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
-                                break;
-                            case value_type::small_string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
-                                break;
-                            default:
-                                break;
-                            }
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
-                        }
-                        break;
-                    case value_type::array_t:
-                        {
-                            auto ptr = rhs.array_data_cast()->ptr_;
-                            switch (type_id())
-                            {
-                            case value_type::null_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))null_data();
-                                break;
-                            case value_type::empty_object_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))empty_object_data();
-                                break;
-                            case value_type::double_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))double_data(*(double_data_cast()));
-                                break;
-                            case value_type::integer_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))integer_data(*(integer_data_cast()));
-                                break;
-                            case value_type::uinteger_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))uinteger_data(*(uinteger_data_cast()));
-                                break;
-                            case value_type::bool_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))bool_data(*(bool_data_cast()));
-                                break;
-                            case value_type::small_string_t:
-                                new(reinterpret_cast<void*>(&rhs.data_))small_string_data(*(small_string_data_cast()));
-                                break;
-                            default:
-                                break;
-                            }
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
-                        }
-                        break;
-                    default:
-                        {
-                            std::swap(data_,rhs.data_);
-                        }
-                        break;
-                    }
-                }
+                return;
             }
+
+            switch (t_by_t[(size_t)type_id()][(size_t)rhs.type_id()])
+            {
+            // null_
+            case tt::null_string:
+                {
+                    auto ptr = rhs.string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))null_data();
+                    new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                    break;
+                }
+            case tt::null_array:
+                {
+                    auto ptr = rhs.array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))null_data();
+                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                    break;
+                }
+            case tt::null_object:
+                {
+                    auto ptr = rhs.object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))null_data();
+                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                    break;
+                }
+            // bool_
+            case tt::bool_string:
+                {
+                    auto ptr = rhs.string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))bool_data(*bool_data_cast());
+                    new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                    break;
+                }
+            case tt::bool_array:
+                {
+                    auto ptr = rhs.array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))bool_data(*bool_data_cast());
+                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                    break;
+                }
+            case tt::bool_object:
+                {
+                    auto ptr = rhs.object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))bool_data(*bool_data_cast());
+                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                    break;
+                }
+            // integer_
+            case tt::integer_string:
+                {
+                    auto ptr = rhs.string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))integer_data(*integer_data_cast());
+                    new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                    break;
+                }
+            case tt::integer_array:
+                {
+                    auto ptr = rhs.array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))integer_data(*integer_data_cast());
+                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                    break;
+                }
+            case tt::integer_object:
+                {
+                    auto ptr = rhs.object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))integer_data(*integer_data_cast());
+                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                    break;
+                }
+            // uinteger_
+            case tt::uinteger_string:
+                {
+                    auto ptr = rhs.string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))uinteger_data(*uinteger_data_cast());
+                    new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                    break;
+                }
+            case tt::uinteger_array:
+                {
+                    auto ptr = rhs.array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))uinteger_data(*uinteger_data_cast());
+                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                    break;
+                }
+            case tt::uinteger_object:
+                {
+                    auto ptr = rhs.object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))uinteger_data(*uinteger_data_cast());
+                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                    break;
+                }
+            // double_
+            case tt::double_string:
+                {
+                    auto ptr = rhs.string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))double_data(*double_data_cast());
+                    new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                    break;
+                }
+            case tt::double_array:
+                {
+                    auto ptr = rhs.array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))double_data(*double_data_cast());
+                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                    break;
+                }
+            case tt::double_object:
+                {
+                    auto ptr = rhs.object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))double_data(*double_data_cast());
+                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                    break;
+                }
+            // smallstr_
+            case tt::smallstr_string:
+                {
+                    auto ptr = rhs.string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))small_string_data(*small_string_data_cast());
+                    new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                    break;
+                }
+            case tt::smallstr_array:
+                {
+                    auto ptr = rhs.array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))small_string_data(*small_string_data_cast());
+                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                    break;
+                }
+            case tt::smallstr_object:
+                {
+                    auto ptr = rhs.object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))small_string_data(*small_string_data_cast());
+                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                    break;
+                }
+            // string_
+            case tt::string_null:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))null_data();
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_bool:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_integer:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_uinteger:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_double:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_smallstr:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_string:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_array:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_emptyobj:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))empty_object_data();
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            case tt::string_object:
+                {
+                    auto ptr = string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))string_data(ptr);
+                    break;
+                }
+            // array_
+            case tt::array_null:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))null_data();
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_bool:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_integer:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_uinteger:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_double:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_smallstr:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_string:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_array:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_emptyobj:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))empty_object_data();
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            case tt::array_object:
+                {
+                    auto ptr = array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))array_data(ptr);
+                    break;
+                }
+            // emptyobj_
+            case tt::emptyobj_string:
+                {
+                    auto ptr = rhs.string_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))empty_object_data();
+                    new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                    break;
+                }
+            case tt::emptyobj_array:
+                {
+                    auto ptr = rhs.array_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))empty_object_data();
+                    new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                    break;
+                }
+            case tt::emptyobj_object:
+                {
+                    auto ptr = rhs.object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&(rhs.data_)))empty_object_data();
+                    new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                    break;
+                }
+            // object_
+            case tt::object_null:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))null_data();
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_bool:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))bool_data(*(rhs.bool_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_integer:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))integer_data(*(rhs.integer_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_uinteger:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))uinteger_data(*(rhs.uinteger_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_double:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))double_data(*(rhs.double_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_smallstr:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))small_string_data(*(rhs.small_string_data_cast()));
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_string:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))string_data(rhs.string_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_array:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))array_data(rhs.array_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_emptyobj:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))empty_object_data();
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            case tt::object_object:
+                {
+                    auto ptr = object_data_cast()->ptr_;
+                    new(reinterpret_cast<void*>(&data_))object_data(rhs.object_data_cast()->ptr_);
+                    new(reinterpret_cast<void*>(&(rhs.data_)))object_data(ptr);
+                    break;
+                }
+            default:
+                std::swap(data_,rhs.data_);
+                break;
+            }          
         }
     private:
 
