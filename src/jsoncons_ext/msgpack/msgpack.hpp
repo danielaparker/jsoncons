@@ -373,7 +373,7 @@ public:
                 result.reserve(len);
                 for (size_t i = 0; i < len; ++i)
                 {
-                    result.add(decode());
+                    result.push_back(decode());
                 }
                 return result;
             }
@@ -545,7 +545,7 @@ public:
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
-                        result.add(decode());
+                        result.push_back(decode());
                     }
                     return result;
                 }
@@ -558,7 +558,7 @@ public:
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
-                        result.add(decode());
+                        result.push_back(decode());
                     }
                     return result;
                 }

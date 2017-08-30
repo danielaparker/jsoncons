@@ -3721,7 +3721,7 @@ public:
         switch (var_.type_id())
         {
         case value_type::array_t:
-            array_value().add(std::forward<T>(val));
+            array_value().push_back(std::forward<T>(val));
             break;
         default:
             {
@@ -3736,7 +3736,7 @@ public:
         switch (var_.type_id())
         {
         case value_type::array_t:
-            array_value().add(std::forward<T>(val));
+            array_value().push_back(std::forward<T>(val));
             break;
         default:
             {
@@ -3751,7 +3751,7 @@ public:
         switch (var_.type_id())
         {
         case value_type::array_t:
-            return array_value().add(pos, std::forward<T>(val));
+            return array_value().insert(pos, std::forward<T>(val));
             break;
         default:
             {
@@ -3766,7 +3766,7 @@ public:
         switch (var_.type_id())
         {
         case value_type::array_t:
-            return array_value().add(pos, std::forward<T>(val));
+            return array_value().insert(pos, std::forward<T>(val));
             break;
         default:
             {
@@ -4056,32 +4056,6 @@ public:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned long");
-        }
-    }
-
-    void add(size_t index, const json_type& value)
-    {
-        switch (var_.type_id())
-        {
-        case value_type::array_t:
-            array_value().add(index, value);
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
-            }
-        }
-    }
-
-    void add(size_t index, json_type&& value){
-        switch (var_.type_id()){
-        case value_type::array_t:
-            array_value().add(index, std::forward<json_type>(value));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
-            }
         }
     }
 
