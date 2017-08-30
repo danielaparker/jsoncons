@@ -1,15 +1,18 @@
-```c++
-jsoncons::cbor::encode_cbor
-```
+### jsoncons::cbor::encode_cbor
+
 Encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class Json>
 std::vector<uint8_t> encode_cbor(const Json& jval)
 ```
+
+#### See also
+
+- [decode_cbor](decode_cbor) decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
 
 ### Examples
 
@@ -86,9 +89,5 @@ Output:
     "Key too long for small string optimization": "String too long for small string optimization"
 }
 ```
-
-### See also
-
-- [decode_cbor](decode_cbor) decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
 
 

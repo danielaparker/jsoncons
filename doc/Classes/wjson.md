@@ -1,6 +1,6 @@
-```c++
-jsoncons::wjson
+### jsoncons::wjson
 
+```c++
 typedef basic_json<wchar_t,
                    JsonTraits = json_traits<wchar_t>,
                    Allocator = std::allocator<wchar_t>> wjson
@@ -9,15 +9,15 @@ The `wjson` class is an instantiation of the `basic_json` class template that us
 
 The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/json.hpp>
 ```
-### Interface
+#### Interface
 
 The interface is the same as [json](json), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for utf8 character ones.
 
-### See also
+#### See also
 
 - [wojson](wojson.md) constructs a wide character json value that preserves the original insertion order of an object's name/value pairs
 

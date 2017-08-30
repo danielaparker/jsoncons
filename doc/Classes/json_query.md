@@ -1,9 +1,8 @@
-```c++
-jsoncons::jsonpath::json_query
-```
+### jsoncons::jsonpath::json_query
+
 Returns a `json` array of values or normalized path expressions selected from a root `json` structure.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/jsonpath/json_query.hpp>
 
@@ -14,7 +13,7 @@ Json json_query(const Json& root,
                 typename Json::string_view_type path,
                 result_type result_t = result_type::value);
 ```
-### Parameters
+#### Parameters
 
 <table>
   <tr>
@@ -31,7 +30,7 @@ Json json_query(const Json& root,
   </tr>
 </table>
 
-### Return value
+#### Return value
 
 Returns a `json` array containing either values or normalized path expressions matching the input path expression. 
 Returns an empty array if there is no match.
@@ -117,7 +116,7 @@ Precedence|Operator|Associativity
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code>             |Left 
 
-### Aggregate Functions
+#### Aggregate Functions
 
 Functions can be called inside filter expressions. The input to an aggregate function is the value of a JSONPath expression.
 
@@ -126,7 +125,7 @@ Function|Description|Result|Example
 min()|Provides the minimum value of an array of numbers|double|$.store.book[?(@.price < max($.store.book[*].price))].title
 max()|Provides the maximum value of an array of numbers|double|$.store.book[?(@.price > min($.store.book[*].price))].title
 
-## Examples
+### Examples
 
 The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (store.json).
 
@@ -162,7 +161,7 @@ The examples below use the JSON text from [Stefan Goessner's JsonPath](http://go
       }
     }
 
-### Return values
+#### Return values
 
 Our first example returns all authors whose books are cheaper than $10. 
 ```c++    
@@ -215,7 +214,7 @@ JSONPath |Result|Notes
 `$.store.book[?(@.price < max($.store.book[*].price))].title`|The titles of all books that are priced less than the most expensive book in the store
 `$.store.book[?(@.price > min($.store.book[*].price))].title`|The titles of all books that are priced higher than the cheapest book in the store
 
-### Return normalized path expressions
+#### Return normalized path expressions
 
 ```c++
 using namespace jsoncons;

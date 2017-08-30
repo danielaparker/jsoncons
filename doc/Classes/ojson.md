@@ -1,6 +1,6 @@
-```c++
-jsoncons::ojson
+### jsoncons::ojson
 
+```c++
 typedef basic_json<char,
                    JsonTraits = o_json_traits<char>,
                    Allocator = std::allocator<char>> ojson
@@ -9,11 +9,11 @@ The `ojson` class is an instantiation of the `basic_json` class template that us
 
 The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
-### Header
+#### Header
 
     #include <jsoncons/json.hpp>
 
-### Interface
+#### Interface
 
 The interface is the same as [json](json), with these provisos:
 
@@ -21,7 +21,7 @@ The interface is the same as [json](json), with these provisos:
 
 - In `ojson`, the `set` members that just take a name and a value always insert the member at the end.
 
-### See also
+#### See also
 
 - [json](json) constructs a json value that sorts name-value members alphabetically
 
@@ -29,7 +29,7 @@ The interface is the same as [json](json), with these provisos:
 
 - [wojson](wojson.md) constructs a wide character json value that preserves the original insertion order of an object's name/value pairs
 
-## Examples
+### Examples
 ```c++
 ojson o = ojson::parse(R"(
 {

@@ -1,9 +1,8 @@
-```c++
-jsoncons::jsonpath::json_replace
-```
- Searches for all values that match a JsonPath expression and replaces them with the specified value
+### jsoncons::jsonpath::json_replace
 
-### Header
+Searches for all values that match a JsonPath expression and replaces them with the specified value
+
+#### Header
 ```c++
 #include <jsoncons/jsonpath/json_query.hpp>
 ```
@@ -14,7 +13,7 @@ void json_replace(Json& root,
                   typename Json::string_view_type path, 
                   T&& new_value)
 ```
-### Parameters
+#### Parameters
 
 <table>
   <tr>
@@ -31,9 +30,9 @@ void json_replace(Json& root,
   </tr>
 </table>
 
-## Examples
+### Examples
 
-### Change the price of a book
+#### Change the price of a book
 
 Example file (store.json):
 ```json

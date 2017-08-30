@@ -1,6 +1,6 @@
-```c++
-jsoncons::parse_error_handler
+### jsoncons::parse_error_handler
 
+```c++
 typedef basic_parse_error_handler<char> parse_error_handler
 ```
 
@@ -9,15 +9,15 @@ customized error handling, you must implement this abstract class
 and pass it in the constructor of [json_reader](json_reader.md). The `read` method 
 will then report all warnings and errors through this interface.
 
-### Header
+#### Header
 
     #include <jsoncons/json_error_handler.hpp>
 
-### Destructor
+#### Destructor
 
     virtual ~json_error_handler()
 
-### Public interface methods
+#### Public interface methods
 
     void error(std::error_code ec,
                const parsing_context& context) throw (parse_error) = 0
@@ -27,7 +27,7 @@ Called for recoverable errors. Calls `do_error`, if `do_error` returns `true`, t
                      const parsing_context& context) throw (parse_error) = 0
 Called for unrecoverable errors. Calls `do_fatal_error` and throws a [parse_error](parse_error.md).
 
-### Private virtual implementation methods
+#### Private virtual implementation methods
 
     virtual bool do_error(std::error_code ec,
                           const parsing_context& context) = 0

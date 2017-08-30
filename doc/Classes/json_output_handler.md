@@ -1,22 +1,22 @@
-```c++
-jsoncons::json_output_handler
+### jsoncons::json_output_handler
 
+```c++
 typedef basic_json_output_handler<char> json_output_handler
 ```
 
 The `json_output_handler` class is an instantiation of the `basic_json_output_handler` class template that uses `char` as the character type. It is a pure virtual class that defines an interface for a JSON writer.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/json_output_handler.hpp>
 ```
-### Member types
+#### Member types
 
 Member type                         |Definition
 ------------------------------------|------------------------------
 `string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
 
-### Public interface methods
+#### Public interface methods
 
     void begin_json()
 Output begin JSON document event. Uses `do_begin_json`.
@@ -57,7 +57,7 @@ Output boolean value event. Uses `do_bool_value`.
     void null_value() 
 Output null value event. Uses `do_null_value`.
 
-### Private implementation methods
+#### Private implementation methods
 
     virtual void do_begin_json()
 Receive begin JSON document event

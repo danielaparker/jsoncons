@@ -1,7 +1,6 @@
+### jsoncons::json_type_traits
+
 ```c++
-jsoncons::json
-
-
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
@@ -22,7 +21,7 @@ struct json_type_traits
 };
 ```
 
-## Specializations
+### Specializations
 `T`|`is<T>`|`as<T>`|Assignable from `T`
 --------|-----------|--------------|---
 `Json`|`true`|self|<em>&#x2713;</em>
@@ -50,7 +49,7 @@ struct json_type_traits
 STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
 STL associative container e.g. std::map|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
 
-## Extensibility
+### Extensibility
 
 You can interact with a new type using `is<T>`, `as<T>`, construction and assignment by extending `json_type_traits` in the `jsoncons` namespace.
 

@@ -1,14 +1,16 @@
-    jsoncons::parsing_context
+### jsoncons::parsing_context
 
-    typedef basic_parsing_context<char> parsing_context
+```c++
+typedef basic_parsing_context<char> parsing_context
+```
 
 Provides contextual information for the element being parsed. This information may be used for error reporting.
 
-### Header
+#### Header
 
     #include <jsoncons/parse_error_handler.hpp>
 
-### Public interface methods
+#### Public interface methods
 
     size_t line_number() const
 Returns the line number for the text being parsed.
@@ -21,7 +23,7 @@ Column numbers start at 1.
     char current_char() const
 Returns the current character in the input stream
     
-### Private virtual implementation methods
+#### Private virtual implementation methods
     
     virtual size_t do_line_number() const = 0
 
@@ -29,7 +31,7 @@ Returns the current character in the input stream
 
     virtual char do_current_char() const = 0
     
-### Deprecated methods
+#### Deprecated methods
 
     char last_char() const 
 Returns the last character consumed by the parser

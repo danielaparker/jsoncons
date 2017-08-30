@@ -1,31 +1,31 @@
-```c++
-jsoncons::json_decoder
+### jsoncons::json_decoder
 
+```c++
 template <class Json>
 json_decoder
 ```
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/json_decoder.hpp>
 ```
 
-### Base classes
+#### Base classes
 
 [json_input_handler](json_input_handler.md)
 
-### Member types
+#### Member types
 
 Member type                         |Definition
 ------------------------------------|------------------------------
 `json_type`|Json
 `allocator_type`|Json::allocator_type
 
-### Constructors
+#### Constructors
 
     json_decoder(const allocator_type allocator = allocator_type())
 
-### Member functions
+#### Member functions
 
     allocator_type get_allocator() const
 Returns the allocator associated with the json value.

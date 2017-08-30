@@ -1,9 +1,8 @@
-```c++
-jsoncons::msgpack::encode_msgpack
-```
+### jsoncons::msgpack::encode_msgpack
+
 Encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
@@ -11,9 +10,13 @@ template<class Json>
 std::vector<uint8_t> encode_msgpack(const Json& jval)
 ```
 
+#### See also
+
+- [decode_msgpack](decode_msgpack) decodes a [MessagePack](http://msgpack.org/index.html) binary serialization format to a json value.
+
 ### Examples
 
-## MessagePack example
+#### MessagePack example
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -86,9 +89,5 @@ Output:
     "Key too long for small string optimization": "String too long for small string optimization"
 }
 ```
-
-### See also
-
-- [decode_msgpack](decode_msgpack) decodes a [MessagePack](http://msgpack.org/index.html) binary serialization format to a json value.
 
 

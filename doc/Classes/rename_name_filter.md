@@ -1,22 +1,22 @@
-```c++
-jsoncons::rename_name_filter
+### jsoncons::rename_name_filter
 
+```c++
 typedef basic_rename_name_filter<char> rename_name_filter;
 ```
 The `rename_name_filter` class is an instantiation of the `basic_rename_name_filter` class template that uses `char` as the character type. 
 
 Renames object member names. 
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/json_filter.hpp>
 ```
 
-### Base classes
+#### Base classes
 
 [json_filter](json_filter.md)
 
-### Constructors
+#### Constructors
 
     rename_name_filter(const std::string& name,
                        const std::string& new_name,
@@ -26,9 +26,9 @@ Renames object member names.
                        const std::string& new_name,
                        json_input_handler& handler)
 
-## Examples
+### Examples
 
-### Rename object member names
+#### Rename object member names
 
 ```c++
 #include <jsoncons/json.hpp>

@@ -1,6 +1,6 @@
-```c++
-jsoncons::json_filter
+### jsoncons::json_filter
 
+```c++
 typedef basic_json_filter<char> json_filter
 ```
 
@@ -8,21 +8,21 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 `json_filter` is noncopyable and nonmoveable.
 
-### Header
+#### Header
 
     #include <jsoncons/json_filter.hpp>
 
-### Base classes
+#### Base classes
 
 [json_input_handler](json_input_handler.md)
 
-### Member types
+#### Member types
 
 Member type                         |Definition
 ------------------------------------|------------------------------
 `string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
 
-### Constructors
+#### Constructors
 
     json_filter(json_input_handler& handler)
 All JSON events that pass through the `json_filter` go to the specified `json_input_handler` (i.e. another filter.)
@@ -32,7 +32,7 @@ You must ensure that the `handler` exists as long as does `json_filter`, as `jso
 All JSON events that pass through the `json_filter` go to the specified `json_output_handler`.
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 
-### Accessors
+#### Accessors
 
     operator json_output_handler&() 
 Adapts a `json_filter` to a `json_output_handler`
@@ -40,9 +40,9 @@ Adapts a `json_filter` to a `json_output_handler`
     json_input_handler& downstream_handler()
 Returns a reference to the JSON handler that sends json events to downstream handlers. 
 
-## Examples
+### Examples
 
-### Rename object member names with the built in filter [rename_name_filter](rename_name_filter.md)
+#### Rename object member names with the built in filter [rename_name_filter](rename_name_filter.md)
 
 ```c++
 #include <sstream>
@@ -82,7 +82,7 @@ Output:
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
 
-### Fix up names in an address book JSON file
+#### Fix up names in an address book JSON file
 
 Example address book file (`address-book.json`):
 ```json

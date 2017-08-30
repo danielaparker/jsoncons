@@ -1,21 +1,21 @@
+### jsoncons::json_input_handler
+
 ```c++
-jsoncons::json_input_handler
-```
 typedef basic_json_input_handler<char> json_input_handler
 
 The `json_input_handler` class is an instantiation of the `basic_json_input_handler` class template that uses `char` as the character type. It defines an interface for a listener to JSON events.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/json_input_handler.hpp>
 ```
-### Member types
+#### Member types
 
 Member type                         |Definition
 ------------------------------------|------------------------------
 `string_view_type`|A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied.  
 
-### Public interface methods
+#### Public interface methods
 
     void begin_json()
 Send begin JSON document event. Uses `do_begin_json`.
@@ -67,7 +67,7 @@ line and column information is provided in the [parsing_context](parsing_context
 Send null value event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_null_value`.
 
-### Private virtual implementation methods
+#### Private virtual implementation methods
 
     virtual void do_begin_json()
 Receive begin JSON document event

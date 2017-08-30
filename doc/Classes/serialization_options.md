@@ -1,6 +1,6 @@
-```c++
-jsoncons::serialization_options
+### jsoncons::serialization_options
 
+```c++
 typedef basic_serialization_options<char> serialization_options
 ```
 The `serialization_options` class is an instantiation of the `basic_serialization_options` class template that uses `char` as the character type.
@@ -9,11 +9,11 @@ The default floating point formatting produces digits in decimal format if possi
 
 When parsing text, the precision of the fractional number is retained, and used for subsequent serialization, to allow round-trip.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/serialization_options.hpp>
 ```
-### Member constants
+#### Member constants
 
     default_precision
 The default precision is 15
@@ -21,12 +21,12 @@ The default precision is 15
     default_indent
 The default indent is 4
 
-### Constructors
+#### Constructors
 
     serialization_options()
 Constructs an `serialization_options` with default values. 
 
-### Accessors
+#### Accessors
 
     int indent() const
 Returns the level of indentation, the default is 4
@@ -49,7 +49,7 @@ The default is "null"
     std::string neg_inf_replacement() const 
 The default is "null"
 
-### Modifiers
+#### Modifiers
 
     serialization_options& indent(int value)
 
@@ -78,34 +78,34 @@ For an array whose parent is an object, set whether that array is split on a new
     serialization_options& array_array_split_lines(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind).
 
-## Examples
+### Examples
 
-### Default NaN, inf and -inf replacement
+#### Default NaN, inf and -inf replacement
 ```c++
-    json obj;
-    obj["field1"] = std::sqrt(-1.0);
-    obj["field2"] = 1.79e308*1000;
-    obj["field3"] = -1.79e308*1000;
-    std::cout << obj << std::endl;
+json obj;
+obj["field1"] = std::sqrt(-1.0);
+obj["field2"] = 1.79e308*1000;
+obj["field3"] = -1.79e308*1000;
+std::cout << obj << std::endl;
 ```
 Output:
 ```json
-    {"field1":null,"field2":null,"field3":null}
+{"field1":null,"field2":null,"field3":null}
 ```
-### User specified `Nan`, `Inf` and `-Inf` replacement
+#### User specified `Nan`, `Inf` and `-Inf` replacement
 
 ```c++
-    json obj;
-    obj["field1"] = std::sqrt(-1.0);
-    obj["field2"] = 1.79e308*1000;
-    obj["field3"] = -1.79e308*1000;
+json obj;
+obj["field1"] = std::sqrt(-1.0);
+obj["field2"] = 1.79e308*1000;
+obj["field3"] = -1.79e308*1000;
 
-    serialization_options options;
-    format.nan_replacement("null");        // default is "null"
-    format.pos_inf_replacement("1e9999");  // default is "null"
-    format.neg_inf_replacement("-1e9999"); // default is "null"
+serialization_options options;
+format.nan_replacement("null");        // default is "null"
+format.pos_inf_replacement("1e9999");  // default is "null"
+format.neg_inf_replacement("-1e9999"); // default is "null"
 
-    std::cout << pretty_print(obj,options) << std::endl;
+std::cout << pretty_print(obj,options) << std::endl;
 ```
 
 Output:
@@ -117,7 +117,7 @@ Output:
     }
 ```
 
-### Object-array block formatting
+#### Object-array block formatting
 
 ```c++
     json val;
@@ -189,7 +189,7 @@ Multi line
 }
 ```
 
-### Array-array block formatting
+#### Array-array block formatting
 
 ```c++
     json val;

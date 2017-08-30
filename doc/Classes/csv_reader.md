@@ -1,16 +1,14 @@
-```c++
-jsoncons::csv::csv_reader
-```
+### jsoncons::csv::csv_reader
 
 The `csv_reader` class is an instantiation of the `basic_csv_reader` class template that uses `char` as the character type. It reads a [CSV file](http://tools.ietf.org/html/rfc4180) and produces JSON parse events.
 
 `csv_reader` is noncopyable and nonmoveable.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons_ext/csv/csv_reader.hpp>
 ```
-### Constructors
+#### Constructors
 
     csv_reader(std::istream& is,
                json_input_handler& handler)
@@ -46,7 +44,7 @@ JSON events, the specified [parse_error_handler](parse_error_handler.md),
 and [csv_parameters](csv_parameters.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
-### Member functions
+#### Member functions
 
     bool eof() const
 Returns `true` when there is no more data to be read from the stream, `false` otherwise
@@ -61,7 +59,7 @@ Throws [parse_error](parse_error.md) if parsing fails.
 
 ### Examples
 
-### Reading a comma delimted file into an array of json values
+#### Reading a comma delimted file into an array of json values
 
 #### Comma delimited input file 
 ```
@@ -99,7 +97,7 @@ std::cout << pretty_print(countries) << std::endl;
     ["WLF","WALLIS & FUTUNA ISLANDS"]
 ]
 ```
-### Reading a tab delimted file into an array of json objects
+#### Reading a tab delimted file into an array of json objects
 
 #### Tab delimited input file
 ```
@@ -214,7 +212,7 @@ std::cout << pretty_print(countries) << std::endl;
 ```
 
 
-### Reading a comma delimited file with different mapping options
+#### Reading a comma delimited file with different mapping options
 
 #### Input
 

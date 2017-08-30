@@ -1,6 +1,6 @@
-```c++
-jsoncons::json
+### jsoncons::json
 
+```c++
 typedef basic_json<char,
                    JsonTraits = json_traits<char>,
                    Allocator = std::allocator<char>> json
@@ -9,12 +9,12 @@ The `json` class is an instantiation of the `basic_json` class template that use
 
 The `jsoncons` library will always rebind the supplied allocator from the template parameter to internal data structures.
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/json.hpp>
 ```
 
-### Member types
+#### Member types
 
 Member type                         |Definition
 ------------------------------------|------------------------------
@@ -49,7 +49,7 @@ Member type                         |Definition
     static const json& null()
 Returns a null value        
 
-### Constructors
+#### Constructors
 
     json()
 Constructs an empty json object. 
@@ -86,12 +86,12 @@ Constructs a `json` value for string literals.
 
 Constructs a json array with the elements in the range [first,last).
 
-### Destructor
+#### Destructor
 
     ~json()
 Destroys all values and deletes all memory allocated for strings, arrays, and objects.
 
-### Assignment operator
+#### Assignment operator
 
     json& operator=(const json& rhs)
     json& operator=(json&& rhs) noexcept
@@ -103,7 +103,7 @@ Assigns the templated value to a `json` variable using [json_type_traits](json_t
 
     json& operator=(const char_type* rhs)
 
-### Ranges and Iterators
+#### Ranges and Iterators
 
 <table border="0">
   <tr>
@@ -116,7 +116,7 @@ Assigns the templated value to a `json` variable using [json_type_traits](json_t
   </tr>
 </table>
 
-### Capacity
+#### Capacity
 
     size_t size() const noexcept
 Returns the number of elements in a json array, or the number of members in a json object, or `zero`
@@ -136,7 +136,7 @@ Resizes a json array so that it contains `n` elements.
     void resize(size_t n, const json& val)
 Resizes a json array so that it contains `n` elements that are initialized to `val`. 
 
-### Accessors
+#### Accessors
 
     bool has_key(string_view_type name) const
 Returns `true` if an object has a member with the given `name`, otherwise `false`.    
@@ -216,7 +216,7 @@ Throws `std::runtime_error` if not an object.
                                       const char_type* default_val) const
 Make `get_with_default` do the right thing for string literals.
 
-### Modifiers
+#### Modifiers
 
     void clear()
 Remove all elements from an array or object value, otherwise do nothing
@@ -278,7 +278,7 @@ Requests the removal of unused capacity.
     void swap(json& val)
 Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
 
-### Relational operators
+#### Relational operators
 
     bool operator==(const json& rhs) const
 Returns `true` if two json objects compare equal, `false` otherwise.
@@ -286,7 +286,7 @@ Returns `true` if two json objects compare equal, `false` otherwise.
     bool operator!=(const json& rhs) const
 Returns `true` if two json objects do not compare equal, `false` otherwise.
 
-### Serialization
+#### Serialization
 
     template <class SAllocator>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
@@ -309,7 +309,7 @@ Inserts json value into stream using specified [serialization_options](serializa
     void dump_body(json_output_handler& handler) const
 Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler.md), such as a [json_serializer](json_serializer.md).
 
-### Non member functions
+#### Non member functions
 
     std::istream& operator>> (std::istream& os, json& val)
 Reads a `json` value from a stream.
@@ -328,11 +328,11 @@ Inserts json value into stream using the specified [serialization_options](seria
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`
 
-### Deprecated names
+#### Deprecated names
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro JSONCONS_NO_DEPRECATED, which is recommended for new code.
 
-### See also
+#### See also
 
 - [ojson](ojson.md) constructs a json value that preserves the original name-value insertion order
 
@@ -340,9 +340,9 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - [wojson](wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
-## Examples
+### Examples
   
-### Accessors and defaults
+#### Accessors and defaults
 ```c++
 json val;
 
@@ -367,7 +367,7 @@ x2=20
 x3=Toronto
 x4=San Francisco
 ```
-### Nulls
+#### Nulls
 ```c++
 json obj;
 obj["field1"] = json::null();
@@ -377,7 +377,7 @@ Output:
 ```json
 {"field1":null}
 ```
-### Array from std::vector
+#### Array from std::vector
 ```c++
 std::vector<int> v;
 v.push_back(10);
@@ -392,7 +392,7 @@ Output:
 ```json
 [10,20,30]
 ```
-### Constructing json structures
+#### Constructing json structures
 ```c++
 json root;
 

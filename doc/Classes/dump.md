@@ -1,9 +1,8 @@
-```c++
-jsoncons::dump
-```
+### jsoncons::dump
+
 Serialize C++ object to a JSON formatted stream, governed by `json_stream_traits`
 
-### Header
+#### Header
 ```c++
 #include <jsoncons/json_stream_traits.hpp>
 
@@ -32,7 +31,7 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
 
 (2) Applies `json_stream_traits` to serialize `val` to JSON output stream, but does not call begin_json() and `end_json()`.
 
-### Parameters
+#### Parameters
 
 <table>
   <tr>
@@ -57,11 +56,11 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
   </tr>
 </table>
 
-### Return value
+#### Return value
 
 None 
 
-### See also
+#### See also
 
 - [json_output_handler](json_output_handler.md)
 - [serialization_options](serialization_options.md)

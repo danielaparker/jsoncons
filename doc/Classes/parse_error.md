@@ -1,7 +1,6 @@
-```c++
-jsoncons::parse_error
-```
-### Header
+### jsoncons::parse_error
+
+#### Header
 
     #include <jsoncons/parse_error_handler.hpp>
 
@@ -9,7 +8,7 @@ jsoncons::parse_error
 
 std::exception
 
-### Constructors
+#### Constructors
 
     parse_error(std::error_code ec,
                     size_t line,
@@ -17,7 +16,7 @@ std::exception
 
     parse_error(const parse_error& other)
 
-### Member functions
+#### Member functions
 
     const std::error_code code() const
 Returns a message for this exception
