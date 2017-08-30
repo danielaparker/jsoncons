@@ -1,13 +1,21 @@
-    template <class T>
-    array_iterator insert(const_array_iterator pos, T&& val)
+### jsoncons::json::insert
+
+```c++
+template <class T>
+array_iterator insert(const_array_iterator pos, T&& val)
+```
 Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.
 The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
 Returns an `array_iterator` that points to the new value
 Throws `std::runtime_error` if not an array.
 
-## Examples
+#### See also
 
-### Creating an array of elements 
+- [push_back](json%20push_back)
+
+### Examples
+
+#### Creating an array of elements 
 ```c++
 json cities = json::array();       // an empty array
 std::cout << cities << std::endl;  // output is "[]"
@@ -24,7 +32,7 @@ Output:
 []
 ["Montreal","Toronto","Vancouver"]
 ```
-### Creating an array of elements with reserved storage 
+#### Creating an array of elements with reserved storage 
 ```c++
 json cities = json::array();  
 cities.reserve(10);  // storage is reserved

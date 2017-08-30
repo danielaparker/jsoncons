@@ -26,6 +26,16 @@ Extensions:
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
+## What's new on master
+
+New `json` functions `push_back` and `insert` have been added for appending values 
+to the end of a `json` array and inserting values at a specifed position.
+
+While these functions provide the same functionality as the existing
+`json::add` function, they have the advantage of following the naming conventions 
+of the C++ library, and have been given prominence in the examples and documentation 
+(`add` is still supported.)
+
 ## Get jsoncons
 
 Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Find the directory `jsoncons` under `src`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 

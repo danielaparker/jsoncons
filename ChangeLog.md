@@ -1,3 +1,16 @@
+master
+------
+
+New features
+
+- Added `json` functions `push_back` and `insert` for appending values 
+  to the end of a `json` array and inserting values at a specifed position
+
+Rationale: While these functions provide the same functionality as the existing
+`json::add` function, they have the advantage of following the naming conventions 
+of the C++ library, and have been given prominence in the examples and documentation 
+(`add` is still supported.)
+
 0.99.8.1
 --------
 
@@ -9,7 +22,8 @@ New features
 
 Documentation
 
-- Documentation is now in the repository itself. Please see the README.md file
+- Documentation is now in the repository itself. Please see the documentation
+  link in the README.md file
 
 Changed
 
