@@ -238,11 +238,11 @@ Requests the removal of unused capacity.
 
 <table border="0">
   <tr>
-    <td><a href="json%20push_back">push_back</a></td>
+    <td><a href="json%20push_back.md">push_back</a></td>
     <td>Adds a value to the end of a json array</td> 
   </tr>
   <tr>
-    <td><a href="json%20insert">insert</a></td>
+    <td><a href="json%20insert.md">insert</a></td>
     <td>Inserts a value at the specified location in a json array</td> 
   </tr>
   <tr>
