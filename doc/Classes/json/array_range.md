@@ -1,11 +1,15 @@
-    range<array_iterator> array_range();
-    range<const_array_iterator> array_range() const;
+### jsoncons::json::array_range
+
+```c++
+range<array_iterator> array_range();
+range<const_array_iterator> array_range() const;
+```
 Returns a "range" that supports a range-based for loop over the elements of a `json` array      
 Throws `std::runtime_error` if not an array.
 
-## Examples
+### Examples
 
-### Range-based for loop
+#### Range-based for loop
 
 ```c++
 json j = json::array{"Toronto", "Vancouver", "Montreal"};
@@ -22,7 +26,7 @@ Vancouver
 Montreal
 ```
 
-### Array iterator
+#### Array iterator
 ```c++
 json j = json::array{"Toronto", "Vancouver", "Montreal"};
 

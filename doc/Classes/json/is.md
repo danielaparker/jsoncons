@@ -1,6 +1,6 @@
-```c++
-jsoncons::json::is
+### jsoncons::json::is
 
+```c++
 template <class T, class... Args>
 bool is(Args&&... args) const noexcept
 ```
@@ -32,7 +32,7 @@ If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceCont
 If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `is<X<T>>()` returns `true` if the json value is an object and each mapped value is the "same as" `T` according to [json_type_traits](json_type_traits.md), `false` otherwise.
 
 
-## Examples
+### Examples
 
 ```c++
 json j = json::parse(R"(

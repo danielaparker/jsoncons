@@ -1,3 +1,5 @@
+### jsoncons::json::make_array
+
 ```c++
 template <class T>
 static json make_array(size_ n, const T& val)
@@ -18,9 +20,9 @@ static json make_array(size_t size1 ... size_t sizeN, const T& val,
 ```
 Makes a multidimensional array with the number of dimensions specified as a template parameter. The size of each dimension is passed as a parameter, and optionally an inital value. If no initial value, the default is an empty json object. The elements may be accessed using familiar C++ native array syntax.
 
-## Examples
+### Examples
 
-### Make an array of size 10 initialized with zeros
+#### Make an array of size 10 initialized with zeros
 ```c++
 json a = json::make_array<1>(10,0);
 a[1] = 1;
@@ -31,7 +33,7 @@ Output:
 ```json
 [0,1,2,0,0,0,0,0,0,0]
 ```
-### Make a two dimensional array of size 3x4 initialized with zeros
+#### Make a two dimensional array of size 3x4 initialized with zeros
 ```c++
 json a = json::make_array<2>(3,4,0);
 a[0][0] = "Tenor";
@@ -57,7 +59,7 @@ Output:
     ["2Y",0.18,0.009,-0.005]
 ]
 ```
-### Make a three dimensional array of size 4x3x2 initialized with zeros
+#### Make a three dimensional array of size 4x3x2 initialized with zeros
 ```c++
 json a = json::make_array<3>(4,3,2,0);
 a[0][2][0] = 2;

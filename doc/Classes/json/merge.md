@@ -1,6 +1,4 @@
-```c++
-jsoncons::json::merge
-```
+### jsoncons::json::merge
 
 <table>
   <tr>
@@ -24,7 +22,7 @@ jsoncons::json::merge
 Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object, 
 then that member is not copied. 
 
-### Parameters
+#### Parameters
 
 <table>
   <tr>
@@ -33,17 +31,17 @@ then that member is not copied.
   </tr>
 </table>
 
-### Return value
+#### Return value
 
 None
 
-### Exceptions
+#### Exceptions
 
 Throws `std::runtime_error` if source or *this are not json objects.
 
-## Examples
+### Examples
 
-### Merge `json`
+#### Merge `json`
 
 ```c++
 json j = json::parse(R"(

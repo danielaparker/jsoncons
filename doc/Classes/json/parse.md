@@ -1,18 +1,24 @@
-    static json parse(string_view_type s)
-    static json parse(string_view_type s, 
-                      parse_error_handler& err_handler)
+### jsoncons::json::parse
+
+```c++
+static json parse(string_view_type s)
+static json parse(string_view_type s, 
+                  parse_error_handler& err_handler)
+```
 Parses a string of JSON text and returns a json object or array value. 
 Throws [parse_error](parse_error.md) if parsing fails.
 
-    static json parse(std::istream& is)
-    static json parse(std::istream& is, 
-                      parse_error_handler& err_handler)
+```c++
+static json parse(std::istream& is)
+static json parse(std::istream& is, 
+                  parse_error_handler& err_handler)
+```
 Parses an input stream of JSON text and returns a json object or array value. 
 Throws [parse_error](parse_error.md) if parsing fails.
 
-## Examples
+### Examples
 
-### Parse from stream
+#### Parse from stream
 
 Input example.json:
 
@@ -37,7 +43,7 @@ Output:
 }
 ```
 
-### Parse from string
+#### Parse from string
 
 ```c++
 try 

@@ -1,6 +1,4 @@
-```c++
-jsoncons::json::merge_or_update
-```
+### jsoncons::json::merge_or_update
 
 <table>
   <tr>
@@ -23,7 +21,7 @@ jsoncons::json::merge_or_update
 
 Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.
 
-### Parameters
+#### Parameters
 
 <table>
   <tr>
@@ -32,17 +30,17 @@ Inserts another json object's key-value pairs into a json object, or assigns the
   </tr>
 </table>
 
-### Return value
+#### Return value
 
 None
 
-### Exceptions
+#### Exceptions
 
 Throws `std::runtime_error` if source or *this are not json objects.
 
-## Examples
+### Examples
 
-### Merge or update `json`
+#### Merge or update `json`
 
 ```c++
 json j = json::parse(R"(

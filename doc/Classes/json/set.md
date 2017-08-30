@@ -1,6 +1,6 @@
-```c++
-jsoncons::json::set
+### jsoncons::json::set
 
+```c++
 template <class T>
 pair<object_iterator, bool> set(string_view_type key, T&& value); (1)
 
@@ -9,7 +9,7 @@ object_iterator set(const_object_iterator hint, string_view_type key,
                     T&& value); (2)
 ```
 
-### Parameters
+#### Parameters
 
     key
 The member name used to look up and, if not found, to insert
@@ -20,7 +20,7 @@ An object iterator that provides a hint where to insert the new json value
     value
 Value to insert or assign
 
-### Return value
+#### Return value
 
 (1) returns a pair consisting of first, an iterator to the inserted value 
 or the already existing value, 
@@ -30,7 +30,7 @@ and second, a bool indicating whether the insertion took place
 (2) returns an iterator to the inserted value 
 or the already existing value. 
 
-### Exceptions
+#### Exceptions
 
 Throws `std::runtime_error` if not a json object.
 

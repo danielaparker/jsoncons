@@ -1,6 +1,6 @@
-```c++
-jsoncons::json::as
+### jsoncons::json::as
 
+```c++
 template <class T, class... Args>
 T as(Args&&... args) const
 ```
@@ -25,9 +25,9 @@ If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceCont
     as<X<std::string,T>>()
 If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<std::string,T>>()` returns the `json` value as an `X<std::string,T>` if the `json` value is an object and if each member value is convertible to type `T`, otherwise throws.
 
-## Examples
+### Examples
 
-### Accessing integral, floating point, and boolean values
+#### Accessing integral, floating point, and boolean values
 
 ```c++
 json j = json::parse(R"(
@@ -68,7 +68,7 @@ Output:
 (10) 10.5
 ```
 
-### Accessing a `json` value as a `std::vector`
+#### Accessing a `json` value as a `std::vector`
 ```c++
 std::string s = "{\"my-array\" : [1,2,3,4]}";
 json val = json::parse(s);

@@ -1,11 +1,15 @@
-    template <class T>
-    void push_back(T&& val)
+### jsoncons::json::push_back
+
+```c++
+template <class T>
+void push_back(T&& val)
+```
 Adds a new json element at the end of a json array. The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
 Throws `std::runtime_error` if not an array.
 
-## Examples
+### Examples
 
-### Creating an array of elements 
+#### Creating an array of elements 
 ```c++
 json cities = json::array();       // an empty array
 std::cout << cities << std::endl;  // output is "[]"
@@ -22,7 +26,7 @@ Output:
 []
 ["Montreal","Toronto","Vancouver"]
 ```
-### Creating an array of elements with reserved storage 
+#### Creating an array of elements with reserved storage 
 ```c++
 json cities = json::array();  
 cities.reserve(10);  // storage is reserved
