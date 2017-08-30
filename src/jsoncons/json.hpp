@@ -923,7 +923,21 @@ public:
             return !(*this == rhs);
         }
 
-        void swap(variant& rhs) JSONCONS_NOEXCEPT
+        template <class Alloc = allocator_type>
+        typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
+        swap(variant& rhs) JSONCONS_NOEXCEPT
+        {
+            if (this == &rhs)
+            {
+                return;
+            }
+
+            std::swap(data_,rhs.data_);
+        }
+
+        template <class Alloc = allocator_type>
+        typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
+        swap(variant& rhs) JSONCONS_NOEXCEPT
         {
             if (this == &rhs)
             {
