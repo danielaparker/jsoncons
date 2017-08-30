@@ -111,7 +111,7 @@ namespace my_ns
     }
     )");
 
-    deal["ObservationDates"].add(date(2014,2,28));    
+    deal["ObservationDates"].push_back(date(2014,2,28));    
 
     date maturity = deal["Maturity"].as<date>();
     std::cout << "Maturity: " << maturity << std::endl << std::endl;

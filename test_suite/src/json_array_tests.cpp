@@ -138,9 +138,9 @@ BOOST_AUTO_TEST_CASE(test_add_element_to_array)
     json arr = json::array();
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.is<json::array>());
-    arr.add("Toronto");
-    arr.add("Vancouver");
-    arr.add(arr.array_range().begin(),"Montreal");
+    arr.push_back("Toronto");
+    arr.push_back("Vancouver");
+    arr.insert(arr.array_range().begin(),"Montreal");
 
     BOOST_CHECK(arr.size() == 3);
 
@@ -170,9 +170,9 @@ BOOST_AUTO_TEST_CASE(test_array_add_pos)
     json arr = json::array();
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.is<json::array>());
-    arr.add("Toronto");
-    arr.add("Vancouver");
-    arr.add(arr.array_range().begin(),"Montreal");
+    arr.push_back("Toronto");
+    arr.push_back("Vancouver");
+    arr.insert(arr.array_range().begin(),"Montreal");
 
     BOOST_CHECK(arr.size() == 3);
 
@@ -186,9 +186,9 @@ BOOST_AUTO_TEST_CASE(test_array_erase_range)
     json arr = json::array();
     BOOST_CHECK(arr.is_array());
     BOOST_CHECK(arr.is<json::array>());
-    arr.add("Toronto");
-    arr.add("Vancouver");
-    arr.add(arr.array_range().begin(),"Montreal");
+    arr.push_back("Toronto");
+    arr.push_back("Vancouver");
+    arr.insert(arr.array_range().begin(),"Montreal");
 
     BOOST_CHECK(arr.size() == 3);
 
@@ -207,13 +207,13 @@ BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 0);
 
-    cities.add("Toronto");
+    cities.push_back("Toronto");
     BOOST_CHECK(cities.is_array());
     BOOST_CHECK(cities.is<json::array>());
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 1);
-    cities.add("Vancouver");
-    cities.add(cities.array_range().begin(),"Montreal");
+    cities.push_back("Vancouver");
+    cities.insert(cities.array_range().begin(),"Montreal");
     BOOST_CHECK(cities.capacity() == 10);
     BOOST_CHECK(cities.size() == 3);
 }
@@ -312,8 +312,8 @@ BOOST_AUTO_TEST_CASE(test_assign_vector_of_bool)
 BOOST_AUTO_TEST_CASE(test_add_null)
 {
     json a = json::array();
-    a.add(jsoncons::null_type());
-    a.add(json::null());
+    a.push_back(jsoncons::null_type());
+    a.push_back(json::null());
     BOOST_CHECK(a[0].is_null());
     BOOST_CHECK(a[1].is_null());
 }

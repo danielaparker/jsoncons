@@ -416,7 +416,7 @@ public:
             result.reserve(stack_.back().size());
             for (const auto& p : stack_.back())
             {
-                result.add(*(p.second));
+                result.push_back(*(p.second));
             }
         }
         return result;
@@ -430,7 +430,7 @@ public:
             result.reserve(stack_.back().size());
             for (const auto& p : stack_.back())
             {
-                result.add(p.first);
+                result.push_back(p.first);
             }
         }
         return result;

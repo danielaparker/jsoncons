@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
       // Create json value with all dynamic allocations in shared memory
 
       shm_json* j = segment.construct<shm_json>("my json")(shm_json::array(allocator));
-      j->add(10);
+      j->push_back(10);
 
       shm_json o(allocator);
       //o.try_emplace("category", "reference",allocator);
@@ -64,12 +64,12 @@ int main(int argc, char *argv[])
       o.set("title", "Sayings of the Century");
       o.set("price", 8.95);
 
-      j->add(o);
+      j->push_back(o);
 
       shm_json a = shm_json::array(2,shm_json::object(allocator),allocator);
       a[0]["first"] = 1;
 
-      j->add(a);
+      j->push_back(a);
 
       std::pair<shm_json*, boost::interprocess::managed_shared_memory::size_type> res;
       res = segment.find<shm_json>("my json");

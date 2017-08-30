@@ -238,8 +238,16 @@ Requests the removal of unused capacity.
 
 <table border="0">
   <tr>
-    <td><a href="json%20add">add</a></td>
-    <td>Adds a value to a json array</td> 
+    <td><a href="json%20push_back">push_back</a></td>
+    <td>Adds a value to the end of a json array</td> 
+  </tr>
+  <tr>
+    <td><a href="json%20insert">insert</a></td>
+    <td>Inserts a value at the specified location in a json array</td> 
+  </tr>
+  <tr>
+    <td><a>add</a></td>
+    <td>Same as push_back and insert</td> 
   </tr>
   <tr>
     <td><a href="json%20emplace_back">emplace_back</a></td>
@@ -401,7 +409,7 @@ address["country"] = "Canada";
 
 person["address"] = std::move(address);
 
-root["persons"].add(std::move(person));
+root["persons"].push_back(std::move(person));
 
 std::cout << pretty_print(root) << std::endl;
 ```

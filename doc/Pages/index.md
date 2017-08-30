@@ -199,9 +199,9 @@ json color_spaces = json::array();
 ```
 and add some elements
 ```c++
-color_spaces.add("sRGB");
-color_spaces.add("AdobeRGB");
-color_spaces.add("ProPhoto RGB");
+color_spaces.push_back("sRGB");
+color_spaces.push_back("AdobeRGB");
+color_spaces.push_back("ProPhoto RGB");
 ```
 
 Or, use an array initializer-list:
@@ -739,14 +739,14 @@ template <class T>
 basic_json& operator=(const T& val)
 
 template <class T>
-void add(T&& val)
+void push_back(T&& val)
 
 template <class T>
 void set(string_view_type name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
-If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `add`, and `set` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
+If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, `insert`, and `set` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
 
 Note that the json::is<T>() and json::as<T>() functions accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
 This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object

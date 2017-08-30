@@ -623,7 +623,7 @@ public:
                 Json result = typename Json::array();
                 while (*pos != 0xff)
                 {
-                    result.add(decode());
+                    result.push_back(decode());
                     pos = it_;
                 }
                 return result;
@@ -836,7 +836,7 @@ public:
         result.reserve(len);
         for (T i = 0; i < len; ++i)
         {
-            result.add(decode());
+            result.push_back(decode());
         }
         return result;
     }

@@ -57,9 +57,9 @@ using jsoncons::json;
 int main()
 {
     json color_spaces = json::array();
-    color_spaces.add("sRGB");
-    color_spaces.add("AdobeRGB");
-    color_spaces.add("ProPhoto RGB");
+    color_spaces.push_back("sRGB");
+    color_spaces.push_back("AdobeRGB");
+    color_spaces.push_back("ProPhoto RGB");
 
     json image_sizing; // empty object
     image_sizing["Resize To Fit"] = true; // a boolean 

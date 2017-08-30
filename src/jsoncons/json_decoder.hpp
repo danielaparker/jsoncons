@@ -196,7 +196,7 @@ private:
 
             while (it != end)
             {
-                j.add(std::move(it->value_));
+                j.push_back(std::move(it->value_));
                 ++it;
             }
             top_ -= count;

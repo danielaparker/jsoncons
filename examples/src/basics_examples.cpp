@@ -65,14 +65,14 @@ void basics_json_example1()
 
     // For efficency, tell jsoncons to move the contents 
     // of the four book objects into the array
-    booklist.add(std::move(book1));    
-    booklist.add(std::move(book2));    
+    booklist.push_back(std::move(book1));    
+    booklist.push_back(std::move(book2));    
 
     // Add the third one to the front
-    auto where = booklist.add(booklist.array_range().begin(),std::move(book3));
+    auto where = booklist.insert(booklist.array_range().begin(),std::move(book3));
     
     // Add the last one immediately after
-    booklist.add(where+1,std::move(book4));    
+    booklist.insert(where+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
@@ -218,14 +218,14 @@ void basics_wjson_example1()
 
     // For efficency, tell jsoncons to move the contents 
     // of the four book objects into the array
-    booklist.add(std::move(book1));
-    booklist.add(std::move(book2));
+    booklist.push_back(std::move(book1));
+    booklist.push_back(std::move(book2));
 
     // Add the third one to the front
-    auto where = booklist.add(booklist.array_range().begin(),std::move(book3));
+    auto where = booklist.insert(booklist.array_range().begin(),std::move(book3));
 
     // Add the last one immediately after
-    booklist.add(where+1,std::move(book4));    
+    booklist.insert(where+1,std::move(book4));    
 
     // See what's left of book1, 2, 3 and 4 (expect nulls)
     std::wcout << book1 << L"," << book2 << L"," << book3 << L"," << book4 << std::endl;

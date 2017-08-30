@@ -131,13 +131,13 @@ BOOST_AUTO_TEST_SUITE(json_extensibility_tests)
 BOOST_AUTO_TEST_CASE(test_add_extensibility)
 {
     json a = json::array();
-    a.add(boost::gregorian::date(2013,10,14));
+    a.push_back(boost::gregorian::date(2013,10,14));
     auto d = a[0].as<boost::gregorian::date>();
     BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,14),d);
 
     json o;
     o["ObservationDates"] = std::move(a);
-    o["ObservationDates"].add(boost::gregorian::date(2013,10,21));
+    o["ObservationDates"].push_back(boost::gregorian::date(2013,10,21));
     d = o["ObservationDates"][0].as<boost::gregorian::date>();
     auto d2 = o["ObservationDates"][1].as<boost::gregorian::date>();
 
@@ -147,8 +147,8 @@ BOOST_AUTO_TEST_CASE(test_add_extensibility)
     json deal;
     deal["maturity"] = boost::gregorian::date(2015,1,1);
     json observation_dates = json::array();
-    observation_dates.add(boost::gregorian::date(2013,10,21));
-    observation_dates.add(boost::gregorian::date(2013,10,28));
+    observation_dates.push_back(boost::gregorian::date(2013,10,21));
+    observation_dates.push_back(boost::gregorian::date(2013,10,28));
     deal["observation_dates"] = std::move(observation_dates);
 
 
@@ -182,8 +182,8 @@ BOOST_AUTO_TEST_CASE(test_example)
         deal["Maturity"] = date(2014,10,14);
 
         json observation_dates = json::array();
-        observation_dates.add(date(2014,2,14));
-        observation_dates.add(date(2014,2,21));
+        observation_dates.push_back(date(2014,2,14));
+        observation_dates.push_back(date(2014,2,21));
 
         deal["ObservationDates"] = std::move(observation_dates);
 

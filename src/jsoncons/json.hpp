@@ -1949,9 +1949,21 @@ public:
         }
 
         template <class T>
+        void push_back(T&& val)
+        {
+            evaluate_with_default().push_back(std::forward<T>(val));
+        }
+
+        template <class T>
         array_iterator add(const_array_iterator pos, T&& val)
         {
             return evaluate_with_default().add(pos, std::forward<T>(val));
+        }
+
+        template <class T>
+        array_iterator insert(const_array_iterator pos, T&& val)
+        {
+            return evaluate_with_default().insert(pos, std::forward<T>(val));
         }
 
         template <class SAllocator>
@@ -3719,7 +3731,37 @@ public:
     }
 
     template <class T>
+    void push_back(T&& val)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::array_t:
+            array_value().add(std::forward<T>(val));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    template <class T>
     array_iterator add(const_array_iterator pos, T&& val)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::array_t:
+            return array_value().add(pos, std::forward<T>(val));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    template <class T>
+    array_iterator insert(const_array_iterator pos, T&& val)
     {
         switch (var_.type_id())
         {

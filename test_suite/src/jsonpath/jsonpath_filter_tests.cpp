@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_div)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(3);
+    context.push_back(3);
 
     std::string s1 = "(3/1)";
     auto expr1 = parser.parse(context,s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -88,8 +88,8 @@ BOOST_AUTO_TEST_CASE(test_mult)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
-    context.add(2);
+    context.push_back(1);
+    context.push_back(2);
 
     std::string s1 = "(3*1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_minus)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(10.0);
+    context.push_back(10.0);
 
     std::string s1 = "(3-1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -157,8 +157,8 @@ BOOST_AUTO_TEST_CASE(test_lt)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(100);
-    context.add(1);
+    context.push_back(100);
+    context.push_back(1);
 
     std::string s1 = "(3 < 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(test_lte)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
+    context.push_back(1);
 
     std::string s1 = "(3 <= 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(test_gt)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
+    context.push_back(1);
 
     std::string s1 = "(3 > 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE(test_gte)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
+    context.push_back(1);
 
     std::string s1 = "(3 >= 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(test_eq)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
+    context.push_back(1);
 
     std::string s1 = "(3 == 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -283,8 +283,8 @@ BOOST_AUTO_TEST_CASE(test_precedence)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
-    context.add(2);
+    context.push_back(1);
+    context.push_back(2);
 
     std::string s1 = "(@.0 == 1 && @.1 == 2)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(test_ne)
     jsonpath_filter_parser<json> parser;
 
     json context = json::array();
-    context.add(1);
+    context.push_back(1);
 
     std::string s1 = "(3 != 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
@@ -341,8 +341,8 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter)
     const char* pend;
     jsonpath_filter_parser<json> parser;
     json parent = json::array();
-    parent.add(1);
-    parent.add(2);
+    parent.push_back(1);
+    parent.push_back(2);
 
     std::string expr1 = "(1 + 1)";
     auto res1 = parser.parse(parent, expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
@@ -366,8 +366,8 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_exclaim)
     const char* pend;
     jsonpath_filter_parser<json> parser;
     json parent = json::array();
-    parent.add(1);
-    parent.add(2);
+    parent.push_back(1);
+    parent.push_back(2);
 
     std::string expr1 = "(!(1 + 1))";
     auto res1 = parser.parse(parent, expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
@@ -400,8 +400,8 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_negative_numbers)
     const char* pend;
     jsonpath_filter_parser<json> parser;
     json parent = json::array();
-    parent.add(1);
-    parent.add(2);
+    parent.push_back(1);
+    parent.push_back(2);
 
     std::string expr1 = "(-1 + 1)";
     auto res1 = parser.parse(parent, expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
@@ -449,8 +449,8 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_uni)
     const char* pend;
     jsonpath_filter_parser<json> parser;
     json parent = json::array();
-    parent.add(1);
-    parent.add(2);
+    parent.push_back(1);
+    parent.push_back(2);
 
     std::string expr1 = "(0)";
     auto res = parser.parse(parent, expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
@@ -474,8 +474,8 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter_regex)
     const char* pend;
     jsonpath_filter_parser<json> parser;
     json parent = json::array();
-    parent.add(1);
-    parent.add(2);
+    parent.push_back(1);
+    parent.push_back(2);
 
     std::string expr1 = "('today I go' =~ /today.*?/)";
     auto res1 = parser.parse(parent, expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);

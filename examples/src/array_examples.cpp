@@ -93,9 +93,9 @@ void add_element_to_array()
 {
     json cities = json::array();  // an empty array
     std::cout << cities << std::endl;  // output is "[]"
-    cities.add("Toronto");
-    cities.add("Vancouver");
-    cities.add(cities.array_range().begin(),"Montreal");  // inserts "Montreal" at beginning of array
+    cities.push_back("Toronto");
+    cities.push_back("Vancouver");
+    cities.insert(cities.array_range().begin(),"Montreal");  // inserts "Montreal" at beginning of array
 
     std::cout << cities << std::endl;
 }
@@ -106,9 +106,9 @@ void reserve_array_capacity()
     cities.reserve(10);  // storage is allocated
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
-    cities.add("Toronto");
-    cities.add("Vancouver");
-    cities.add(cities.array_range().begin(),"Montreal");
+    cities.push_back("Toronto");
+    cities.push_back("Vancouver");
+    cities.insert(cities.array_range().begin(),"Montreal");
     std::cout << "capacity=" << cities.capacity() << ", size=" << cities.size() << std::endl;
 
     std::cout << cities << std::endl;
