@@ -37,11 +37,11 @@ Member type                         |Definition
 
 <table border="0">
   <tr>
-    <td><a href="json%20parse">parse</a></td>
+    <td><a href="json/parse.md">parse</a></td>
     <td>Parses JSON.</td> 
   </tr>
   <tr>
-    <td><a href="json%20make_array">make_array</a></td>
+    <td><a href="json/make_array.md">make_array</a></td>
     <td>Makes a multidimensional json array.</td> 
   </tr>
 </table>
@@ -107,11 +107,11 @@ Assigns the templated value to a `json` variable using [json_type_traits](json_t
 
 <table border="0">
   <tr>
-    <td><a href="json%20array_range">array_range</a></td>
+    <td><a href="json/array_range.md">array_range</a></td>
     <td>Returns a "range" that supports a range-based for loop over the elements of a `json` array.</td> 
   </tr>
   <tr>
-    <td><a href="json%20object_range">obect_range</a></td>
+    <td><a href="json/object_range.md">obect_range</a></td>
     <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `json` object.</td> 
   </tr>
 </table>
@@ -146,11 +146,11 @@ Returns the number of object members that match `name`.
 
 <table border="0">
   <tr>
-    <td><a href="json%20is">is</a></td>
+    <td><a href="json/is.md">is</a></td>
     <td>Checks if a json value matches a type.</td> 
   </tr>
   <tr>
-    <td><a href="json%20as">as</a></td>
+    <td><a href="json/as.md">as</a></td>
     <td>Attempts to convert a json value to a value of a type.</td> 
   </tr>
 </table>
@@ -238,11 +238,11 @@ Requests the removal of unused capacity.
 
 <table border="0">
   <tr>
-    <td><a href="json%20push_back.md">push_back</a></td>
+    <td><a href="json/push_back.md">push_back</a></td>
     <td>Adds a value to the end of a json array</td> 
   </tr>
   <tr>
-    <td><a href="json%20insert.md">insert</a></td>
+    <td><a href="json/insert.md">insert</a></td>
     <td>Inserts a value at the specified location in a json array</td> 
   </tr>
   <tr>
@@ -250,27 +250,27 @@ Requests the removal of unused capacity.
     <td>Same as push_back and insert</td> 
   </tr>
   <tr>
-    <td><a href="json%20emplace_back">emplace_back</a></td>
+    <td><a href="json/emplace_back.md">emplace_back</a></td>
     <td>Constructs a value in place at the end of a json array</td> 
   </tr>
   <tr>
-    <td><a href="json%20emplace">emplace</a></td>
+    <td><a href="json/emplace.md">emplace</a></td>
     <td>Constructs a value in place before a specified position in a json array</td> 
   </tr>
   <tr>
-    <td><a href="json%20try_emplace">try_emplace</a></td>
+    <td><a href="json/try_emplace.md">try_emplace</a></td>
     <td>Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists</td> 
   </tr>
   <tr>
-    <td><a href="json%20set">set</a></td>
+    <td><a href="json/set.md">set</a></td>
     <td>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</td> 
   </tr>
   <tr>
-    <td><a href="json%20merge">merge</a></td>
+    <td><a href="json/merge.md">merge</a></td>
     <td>Inserts another json object's key-value pairs into a json object, if they don't already exist.
   </tr>
   <tr>
-    <td><a href="json%20merge_or_update">merge_or_update</a></td>
+    <td><a href="json/merge_or_update.md">merge_or_update</a></td>
     <td>Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.
   </tr>
 </table>

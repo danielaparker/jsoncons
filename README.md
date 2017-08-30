@@ -300,8 +300,8 @@ Output:
     "c": [4,5,6]
 }
 ```
-See [json::merge](doc/Classes/json%20merge.md) 
-and [json::merge_or_update](doc/Classes/json%20merge_or_update.md) for details.
+See [json::merge](doc/Classes/json/merge.md) 
+and [json::merge_or_update](doc/Classes/json/merge_or_update.md) for details.
 
 ### Convert from and to standard library sequence containers
 
