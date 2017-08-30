@@ -271,7 +271,7 @@ Output:
     ]
 ]
 ```
-See [json::make_array](doc/Classes/json-make_array.md) for details
+See [json::make_array](doc/Classes/json/make_array.md) for details
 
 ### Merge key-value pairs from another json object
 ```c++
