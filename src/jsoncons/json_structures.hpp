@@ -302,7 +302,7 @@ public:
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
     template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<is_stateless<A>::value,iterator>::type 
     add(const_iterator pos, T&& value)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
@@ -310,7 +310,7 @@ public:
     }
 #else
     template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<is_stateless<A>::value,iterator>::type 
     add(const_iterator pos, T&& value)
     {
         return elements_.emplace(pos, std::forward<T>(value));
@@ -320,7 +320,7 @@ public:
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
     template <class A=allocator_type, class... Args>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<is_stateless<A>::value,iterator>::type 
     emplace(const_iterator pos, Args&&... args)
     {
         iterator it = elements_.begin() + (pos - elements_.begin());
@@ -328,7 +328,7 @@ public:
     }
 #else
     template <class A=allocator_type, class... Args>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<is_stateless<A>::value,iterator>::type 
     emplace(const_iterator pos, Args&&... args)
     {
         return elements_.emplace(pos, std::forward<Args>(args)...);
@@ -973,7 +973,7 @@ public:
     }
 
     template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
+    typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
     insert_or_assign(string_view_type name, T&& value)
     {
         bool inserted;
@@ -1248,7 +1248,7 @@ public:
     }
 
     template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<is_stateless<A>::value,iterator>::type 
     set_(iterator hint, key_storage_type&& name, T&& value)
     {
         string_view_type s(name.data(), name.size());
@@ -1284,7 +1284,7 @@ public:
     }
 
     template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<!is_stateless<A>::value,iterator>::type 
     set_(iterator hint, key_storage_type&& name, T&& value)
     {
         string_view_type s(name.data(), name.size());
@@ -1572,7 +1572,7 @@ public:
     }
 
     template <class A=allocator_type, class T>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<is_stateless<A>::value,iterator>::type 
     insert_or_assign(iterator hint, string_view_type key, T&& value)
     {
         iterator it;
@@ -1601,7 +1601,7 @@ public:
     }
 
     template <class A=allocator_type, class T>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<!is_stateless<A>::value,iterator>::type 
     insert_or_assign(iterator hint, string_view_type key, T&& value)
     {
         iterator it;
@@ -1872,7 +1872,7 @@ public:
     }
 
     template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<is_stateless<A>::value,iterator>::type 
     set_(iterator hint, key_storage_type&& key, T&& value)
     {
         iterator it = hint;
@@ -1897,7 +1897,7 @@ public:
     }
 
     template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<!is_stateless<A>::value,iterator>::type 
     set_(iterator hint, key_storage_type&& key, T&& value)
     {
         iterator it = hint;

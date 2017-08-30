@@ -1693,8 +1693,8 @@ public:
         }
 
         template<class T>
-        typename std::enable_if<std::is_same<string_type,T>::value>::type 
-            as(const char_allocator_type& allocator) const
+        typename std::enable_if<std::is_same<string_type,T>::value,T>::type 
+        as(const char_allocator_type& allocator) const
         {
             return evaluate().template as<T>(allocator);
         }
@@ -2867,18 +2867,16 @@ public:
         }
     }
 
-    template<class U=Allocator,
-         typename std::enable_if<is_stateless<U>::value
-            >::type* = nullptr>
-    void create_object_implicitly()
+    template<class U=Allocator>
+    typename std::enable_if<is_stateless<U>::value,void>::type
+    create_object_implicitly()
     {
         var_ = variant(Allocator());
     }
 
-    template<class U=Allocator,
-         typename std::enable_if<!is_stateless<U>::value
-            >::type* = nullptr>
-    void create_object_implicitly() const
+    template<class U=Allocator>
+    typename std::enable_if<!is_stateless<U>::value,void>::type
+    create_object_implicitly() const
     {
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Cannot create object implicitly - allocator is not default constructible.");
     }
@@ -2938,7 +2936,8 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<std::is_same<string_type,T>::value>::type as(const char_allocator_type& allocator) const
+    typename std::enable_if<std::is_same<string_type,T>::value,T>::type 
+    as(const char_allocator_type& allocator) const
     {
         return json_type_traits<json_type,T>::as(*this,allocator);
     }
