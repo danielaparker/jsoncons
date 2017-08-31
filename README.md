@@ -780,6 +780,8 @@ See [encode_cbor](doc/ref/encode_cbor.md) and [decode_cbor](doc/ref/decode_cbor.
 
 #### jsonpointer example
 
+Select author from second book
+
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -813,7 +815,7 @@ Output:
 "Evelyn Waugh"
 ```
 
-See [encode_cbor](doc/ref/encode_cbor.md) and [decode_cbor](doc/ref/decode_cbor.md) for details.
+See [jsoncons::jsonpointer::select](doc/ref/jsonpointer/select.md)
 
 ## Building the test suite and examples with CMake
 
