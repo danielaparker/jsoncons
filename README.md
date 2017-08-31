@@ -23,7 +23,7 @@ Extensions:
 - [jsonpath](#user-content-ext_jsonpath) supports search using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
 - [csv](#user-content-ext_csv) supports reading (writing) JSON values from (to) CSV files
 - [msgpack](#user-content-ext_msgpack) supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
-- [cbor](#user-content-ext_cbor) implements the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/) binary serialization format.
+- [cbor](#user-content-ext_cbor) implements the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
