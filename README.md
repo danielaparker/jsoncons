@@ -776,7 +776,7 @@ Output:
 
 See [encode_cbor](doc/ref/encode_cbor.md) and [decode_cbor](doc/ref/decode_cbor.md) for details.
 
-<div id="ext_cbor"/>
+<div id="ext_jsonpointer"/>
 
 #### jsonpointer example
 
