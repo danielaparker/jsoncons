@@ -19,10 +19,11 @@ Features:
 
 Extensions:
 
-- The [jsonpath](#user-content-ext_jsonpath) extension supports search using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
-- The [csv](#user-content-ext_csv) extension supports reading (writing) JSON values from (to) CSV files
-- The [msgpack](#user-content-ext_msgpack) extension supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
-- The [cbor](#user-content-ext_cbor) extension supports encoding to and decoding from the [cbor](http://cbor.io/) binary serialization format.
+- [jsonpath](#user-content-ext_jsonpath) supports search using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
+- [csv](#user-content-ext_csv) supports reading (writing) JSON values from (to) CSV files
+- [msgpack](#user-content-ext_msgpack) supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+- [cbor](#user-content-ext_cbor) supports encoding to and decoding from the [cbor](http://cbor.io/) binary serialization format.
+- [jsonpointer](#user-content-ext_jsonpointer) implements [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
@@ -47,7 +48,7 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - For a quick guide, see [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). 
 - Consult the [documentation](doc/Home.md) for the details. 
 
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/Classes/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
 ## Benchmarks
 
@@ -135,13 +136,13 @@ typedef basic_json<char,
 ```
 The library includes four instantiations of `basic_json`:
 
-- [json](doc/Classes/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
+- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
 
-- [ojson](doc/Classes/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
+- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
 
-- [wjson](doc/Classes/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
+- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
 
-- [wojson](doc/Classes/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
+- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ## Features
 
@@ -271,7 +272,7 @@ Output:
     ]
 ]
 ```
-See [json::make_array](doc/Classes/json/make_array.md) for details
+See [json::make_array](doc/ref/json/make_array.md) for details
 
 ### Merge key-value pairs from another json object
 ```c++
@@ -300,8 +301,8 @@ Output:
     "c": [4,5,6]
 }
 ```
-See [json::merge](doc/Classes/json/merge.md) 
-and [json::merge_or_update](doc/Classes/json/merge_or_update.md) for details.
+See [json::merge](doc/ref/json/merge.md) 
+and [json::merge_or_update](doc/ref/json/merge_or_update.md) for details.
 
 ### Convert from and to standard library sequence containers
 
@@ -371,7 +372,7 @@ json j = v;
 std::list<book> l = j.as<std::list<book>>();
 ```
 
-See [Type Extensibility](doc/Classes/Type%20Extensibility.md) for details.
+See [Type Extensibility](doc/ref/Type%20Extensibility.md) for details.
 
 ### Serialize C++ objects directly to JSON formatted streams, governed by `json_stream_traits` 
 
@@ -413,7 +414,7 @@ Output:
 
 ### Filter json names and values
 
-You can rename object member names with the built in filter [rename_name_filter](doc/Classes/rename_name_filter.md)
+You can rename object member names with the built in filter [rename_name_filter](doc/ref/rename_name_filter.md)
 
 ```c++
 #include <sstream>
@@ -452,7 +453,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [json_filter](doc/Classes/json_filter.md) for details.
+Or define and use your own filters. See [json_filter](doc/ref/json_filter.md) for details.
 
 ## Extensions
 
@@ -555,7 +556,7 @@ Output:
 }
 ```
 
-See [json_query](doc/Classes/json_query.md), [json_replace](doc/Classes/json_replace.md), and [Basics](doc/Tutorials/Basics.md) for details.
+See [json_query](doc/ref/json_query.md), [json_replace](doc/ref/json_replace.md), and [Basics](doc/Tutorials/Basics.md) for details.
 
 <div id="ext_csv"/>
 
@@ -644,7 +645,7 @@ project_id,task_name,task_start,task_finish
 4002,task2,05/01/2003,
 ```
 
-See [csv_reader](doc/Classes/csv_reader.md) and [csv_serializer](doc/Classes/csv_serializer.md) for details.
+See [csv_reader](doc/ref/csv_reader.md) and [csv_serializer](doc/ref/csv_serializer.md) for details.
 
 <div id="ext_msgpack"/>
 
@@ -717,7 +718,7 @@ Output:
 ]
 ```
 
-See [encode_msgpack](doc/Classes/encode_msgpack.md) and [decode_msgpack](doc/Classes/decode_msgpack.md) for details.
+See [encode_msgpack](doc/ref/encode_msgpack.md) and [decode_msgpack](doc/ref/decode_msgpack.md) for details.
 
 <div id="ext_cbor"/>
 
@@ -773,7 +774,46 @@ Output:
 }
 ```
 
-See [encode_cbor](doc/Classes/encode_cbor.md) and [decode_cbor](doc/Classes/decode_cbor.md) for details.
+See [encode_cbor](doc/ref/encode_cbor.md) and [decode_cbor](doc/ref/decode_cbor.md) for details.
+
+<div id="ext_cbor"/>
+
+#### jsonpointer example
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+json root = json::parse(R"(
+[
+  { "category": "reference",
+    "author": "Nigel Rees",
+    "title": "Sayings of the Century",
+    "price": 8.95
+  },
+  { "category": "fiction",
+    "author": "Evelyn Waugh",
+    "title": "Sword of Honour",
+    "price": 12.99
+  }
+]
+)");
+
+    json result = jsonpointer::select(root, "/1/author");
+
+    std::cout << result << std::endl;
+}
+```
+Output:
+```json
+"Evelyn Waugh"
+```
+
+See [encode_cbor](doc/ref/encode_cbor.md) and [decode_cbor](doc/ref/decode_cbor.md) for details.
 
 ## Building the test suite and examples with CMake
 

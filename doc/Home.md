@@ -4,58 +4,62 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### json Container
 
-[json](Classes/json.md)  
-[json_reader](Classes/json_reader.md)  
-[json_decoder](Classes/json_decoder.md)  
+[json](ref/json.md)  
+[json_reader](ref/json_reader.md)  
+[json_decoder](ref/json_decoder.md)  
 
-[ojson](Classes/ojson.md)  
+[ojson](ref/ojson.md)  
 
-[wjson](Classes/wjson.md)  
-[wjson_reader](Classes/wjson_reader.md)  
+[wjson](ref/wjson.md)  
+[wjson_reader](ref/wjson_reader.md)  
 
-[wojson](Classes/wojson.md)  
+[wojson](ref/wojson.md)  
 
 #### Streaming
 
-[dump](Classes/dump.md)
+[dump](ref/dump.md)
 
-[json_input_handler](Classes/json_input_handler.md)  
+[json_input_handler](ref/json_input_handler.md)  
 
-[json_output_handler](Classes/json_output_handler.md)  
-[json_serializer](Classes/json_serializer.md)  
-[serialization_options](Classes/serialization_options.md)  
+[json_output_handler](ref/json_output_handler.md)  
+[json_serializer](ref/json_serializer.md)  
+[serialization_options](ref/serialization_options.md)  
 
-[json_filter](Classes/json_filter.md)  
-[rename_name_filter](Classes/rename_name_filter.md)  
+[json_filter](ref/json_filter.md)  
+[rename_name_filter](ref/rename_name_filter.md)  
 
-[wjson_serializer](Classes/wjson_serializer.md)  
-[wserialization_options](Classes/wserialization_options.md)  
+[wjson_serializer](ref/wjson_serializer.md)  
+[wserialization_options](ref/wserialization_options.md)  
 
 ### Extensions
 
 #### csv
 
-[csv_reader](Classes/csv_reader.md)
+[csv_reader](ref/csv_reader.md)
 
-[csv_serializer](Classes/csv_serializer.md)
+[csv_serializer](ref/csv_serializer.md)
 
 #### jsonpath
 
-[json_query](Classes/json_query.md)
+[json_query](ref/json_query.md)
 
-[json_replace](Classes/json_replace.md)
+[json_replace](ref/json_replace.md)
 
 #### msgpack
 
-[encode_msgpack](Classes/encode_msgpack.md)
+[encode_msgpack](ref/encode_msgpack.md)
 
-[decode_msgpack](Classes/decode_msgpack.md)
+[decode_msgpack](ref/decode_msgpack.md)
 
 #### cbor
 
-[encode_cbor](Classes/encode_cbor.md)
+[encode_cbor](ref/encode_cbor.md)
 
-[decode_cbor](Classes/decode_cbor.md)
+[decode_cbor](ref/decode_cbor.md)
+
+#### jsonpointer
+
+[jsonpointer](ref/jsonpointer/select.md)
 
 ### Tutorials
 
