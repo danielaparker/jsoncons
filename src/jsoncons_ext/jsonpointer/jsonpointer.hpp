@@ -27,8 +27,7 @@ enum class pointer_state
     zero_array_reference_token,
     nonzero_array_reference_token,
     object_reference_token,
-    escaped,
-    unescaped
+    escaped
 };
 
 template<class Json>
