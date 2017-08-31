@@ -19,11 +19,11 @@ Features:
 
 Extensions:
 
+- [jsonpointer](#user-content-ext_jsonpointer) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 - [jsonpath](#user-content-ext_jsonpath) supports search using [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
 - [csv](#user-content-ext_csv) supports reading (writing) JSON values from (to) CSV files
 - [msgpack](#user-content-ext_msgpack) supports encoding to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
-- [cbor](#user-content-ext_cbor) supports encoding to and decoding from the [cbor](http://cbor.io/) binary serialization format.
-- [jsonpointer](#user-content-ext_jsonpointer) implements [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
+- [cbor](#user-content-ext_cbor) implements the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/) binary serialization format.
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
@@ -457,6 +457,47 @@ Or define and use your own filters. See [json_filter](doc/ref/json_filter.md) fo
 
 ## Extensions
 
+<div id="ext_jsonpointer"/>
+
+#### jsonpointer example
+
+Select author from second book
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+json root = json::parse(R"(
+[
+  { "category": "reference",
+    "author": "Nigel Rees",
+    "title": "Sayings of the Century",
+    "price": 8.95
+  },
+  { "category": "fiction",
+    "author": "Evelyn Waugh",
+    "title": "Sword of Honour",
+    "price": 12.99
+  }
+]
+)");
+
+    json result = jsonpointer::select(root, "/1/author");
+
+    std::cout << result << std::endl;
+}
+```
+Output:
+```json
+"Evelyn Waugh"
+```
+
+See [jsoncons::jsonpointer::select](doc/ref/jsonpointer/select.md)
+
 <div id="ext_jsonpath"/>
 
 ### jsonpath
@@ -775,47 +816,6 @@ Output:
 ```
 
 See [encode_cbor](doc/ref/encode_cbor.md) and [decode_cbor](doc/ref/decode_cbor.md) for details.
-
-<div id="ext_jsonpointer"/>
-
-#### jsonpointer example
-
-Select author from second book
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-json root = json::parse(R"(
-[
-  { "category": "reference",
-    "author": "Nigel Rees",
-    "title": "Sayings of the Century",
-    "price": 8.95
-  },
-  { "category": "fiction",
-    "author": "Evelyn Waugh",
-    "title": "Sword of Honour",
-    "price": 12.99
-  }
-]
-)");
-
-    json result = jsonpointer::select(root, "/1/author");
-
-    std::cout << result << std::endl;
-}
-```
-Output:
-```json
-"Evelyn Waugh"
-```
-
-See [jsoncons::jsonpointer::select](doc/ref/jsonpointer/select.md)
 
 ## Building the test suite and examples with CMake
 
