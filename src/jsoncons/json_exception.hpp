@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONCONS_HPP
-#define JSONCONS_JSONCONS_HPP
+#ifndef JSON_EXCEPTION_HPP
+#define JSON_EXCEPTION_HPP
 
 #include <locale>
 #include <string>
@@ -15,9 +15,8 @@
 #include <cstdint> 
 #include <iostream>
 #include <vector>
-#include <jsoncons/unicode_traits.hpp>
-#include <jsoncons/jsoncons_config.hpp>
-#include <jsoncons/jsoncons.hpp>
+#include <jsoncons/detail/unicode_traits.hpp>
+#include <jsoncons/detail/jsoncons_config.hpp>
 
 namespace jsoncons {
 
@@ -93,69 +92,6 @@ private:
 #define JSONCONS_ASSERT(x) if (!(x)) { \
     throw jsoncons::json_exception_0<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
             JSONCONS_STR(__LINE__)); }
-
-template <size_t arg1, size_t ... argn>
-struct static_max;
-
-template <size_t arg>
-struct static_max<arg>
-{
-    static const size_t value = arg;
-};
-
-template <size_t arg1, size_t arg2, size_t ... argn>
-struct static_max<arg1,arg2,argn ...>
-{
-    static const size_t value = arg1 >= arg2 ? 
-        static_max<arg1,argn...>::value :
-        static_max<arg2,argn...>::value; 
-};
-
-// null_type
-
-struct null_type
-{
-};
-
-template <class T>
-struct type_wrapper
-{
-    typedef T* pointer_type;
-    typedef const T* const_pointer_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <class T>
-struct type_wrapper<const T>
-{
-    typedef T* pointer_type;
-    typedef const T* const_pointer_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <class T>
-struct type_wrapper<T&>
-{
-    typedef T* pointer_type;
-    typedef const T* const_pointer_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
-
-template <class T>
-struct type_wrapper<const T&>
-{
-    typedef T* pointer_type;
-    typedef const T* const_pointer_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef const T& const_reference;
-};
 
 }
 #endif

@@ -19,7 +19,7 @@
 #include <fstream>
 #include <limits>
 #include <type_traits>
-#include <jsoncons/jsoncons_util.hpp>
+#include <jsoncons/detail/jsoncons_utilities.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -27,6 +27,14 @@
 #endif
 
 namespace jsoncons {
+
+// null_type
+
+struct null_type
+{
+};
+
+// json_type_traits
 
 template <class Json, class T, class Enable=void>
 struct json_type_traits

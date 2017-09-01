@@ -15,8 +15,8 @@
 #include <cstdlib>
 #include <limits>
 #include <cwchar>
-#include <jsoncons/jsoncons.hpp>
-#include <jsoncons/jsoncons_util.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/detail/jsoncons_utilities.hpp>
 
 namespace jsoncons {
 

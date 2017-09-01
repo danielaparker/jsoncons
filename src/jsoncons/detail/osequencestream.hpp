@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_OSEQUENCESTREAM_HPP
-#define JSONCONS_OSEQUENCESTREAM_HPP
+#ifndef JSONCONS_DETAIL_OSEQUENCESTREAM_HPP
+#define JSONCONS_DETAIL_OSEQUENCESTREAM_HPP
 
 #include <ios>
 #include <ostream>
@@ -13,7 +13,7 @@
 #include <cstddef>
 #include <vector>
 #include <locale>
-#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/detail/jsoncons_config.hpp>
 
 namespace jsoncons {
 

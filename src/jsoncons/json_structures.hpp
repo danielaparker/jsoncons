@@ -19,9 +19,9 @@
 #include <iomanip>
 #include <utility>
 #include <initializer_list>
-#include <jsoncons/jsoncons.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_traits.hpp>
-#include <jsoncons/jsoncons_util.hpp>
+#include <jsoncons/detail/jsoncons_utilities.hpp>
 
 namespace jsoncons {
 

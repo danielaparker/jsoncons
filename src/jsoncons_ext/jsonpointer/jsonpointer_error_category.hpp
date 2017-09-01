@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSONPOINTER_JSONPOINTER_ERROR_CATEGORY_HPP
 #define JSONCONS_JSONPOINTER_JSONPOINTER_ERROR_CATEGORY_HPP
 
-#include <jsoncons/jsoncons.hpp>
+#include <jsoncons/json_exception.hpp>
 #include <system_error>
 
 namespace jsoncons { namespace jsonpointer {

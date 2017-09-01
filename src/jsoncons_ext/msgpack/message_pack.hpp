@@ -7,7 +7,7 @@
 #ifndef JSONCONS_BINARY_MESSAGE_PACK_HPP
 #define JSONCONS_BINARY_MESSAGE_PACK_HPP
 
-#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/detail/jsoncons_config.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 namespace jsoncons { namespace msgpack {

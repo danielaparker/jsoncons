@@ -15,8 +15,8 @@
 #include <cstdlib>
 #include <limits> // std::numeric_limits
 #include <fstream>
-#include <jsoncons/jsoncons.hpp>
-#include <jsoncons/jsoncons_util.hpp>
+#include <jsoncons/json_exception.hpp>
+#include <jsoncons/detail/jsoncons_utilities.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONCONS_UTIL_HPP
-#define JSONCONS_JSONCONS_UTIL_HPP
+#ifndef JSONCONS_DETAIL_JSONCONS_UTILITIES_HPP
+#define JSONCONS_DETAIL_JSONCONS_UTILITIES_HPP
 
 #include <stdexcept>
 #include <string>
@@ -20,13 +20,13 @@
 #include <locale>
 #include <limits> 
 #include <type_traits>
-#include <jsoncons/jsoncons_config.hpp>
-#include <jsoncons/osequencestream.hpp>
 #include <algorithm>
 #include <memory>
 #include <iterator>
 #include <exception>
 #include <initializer_list>
+#include <jsoncons/detail/jsoncons_config.hpp>
+#include <jsoncons/detail/osequencestream.hpp>
 
 #if defined(JSONCONS_HAS_STRING_VIEW)
 #include <string_view>
@@ -34,6 +34,69 @@
 
 namespace jsoncons
 {
+
+// static_max
+
+template <size_t arg1, size_t ... argn>
+struct static_max;
+
+template <size_t arg>
+struct static_max<arg>
+{
+    static const size_t value = arg;
+};
+
+template <size_t arg1, size_t arg2, size_t ... argn>
+struct static_max<arg1,arg2,argn ...>
+{
+    static const size_t value = arg1 >= arg2 ? 
+        static_max<arg1,argn...>::value :
+        static_max<arg2,argn...>::value; 
+};
+
+// type_wrapper
+
+template <class T>
+struct type_wrapper
+{
+    typedef T* pointer_type;
+    typedef const T* const_pointer_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <class T>
+struct type_wrapper<const T>
+{
+    typedef T* pointer_type;
+    typedef const T* const_pointer_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <class T>
+struct type_wrapper<T&>
+{
+    typedef T* pointer_type;
+    typedef const T* const_pointer_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+template <class T>
+struct type_wrapper<const T&>
+{
+    typedef T* pointer_type;
+    typedef const T* const_pointer_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef const T& const_reference;
+};
+
+// json_literals
 
 template <class CharT>
 struct json_literals
