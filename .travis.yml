@@ -13,6 +13,7 @@ addons:
 before_install:
   - curl -L http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
   - echo 'deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.8 main' | sudo tee /etc/apt/sources.list
+  - chmod +x tests/build/cmake/run_tests.sh
 env:
   - CC=gcc-6 CXX=g++-6
   - CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES
@@ -24,5 +25,4 @@ script:
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
   - make -j2
-  - chmod ./run_tests.sh 777
   - ./run_tests.sh
