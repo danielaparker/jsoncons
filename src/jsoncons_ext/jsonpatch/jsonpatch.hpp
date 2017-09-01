@@ -72,7 +72,7 @@ public:
              const Json& value,
              std::error_code& ec)
     {
-        evaluate(root,path.data(),path.length(),operation::add,ec);
+        evaluate(root,operation::add,path,ec);
 
         switch (state_)
         {
@@ -103,7 +103,7 @@ public:
                 typename Json::string_view_type path,
                 std::error_code& ec)
     {
-        evaluate(root,path.data(),path.length(),operation::remove,ec);
+        evaluate(root,operation::remove,path,ec);
 
         switch (state_)
         {
@@ -142,7 +142,7 @@ public:
                  const Json& value,
                  std::error_code& ec)
     {
-        evaluate(root,path.data(),path.length(),operation::replace,ec);
+        evaluate(root,operation::replace,path,ec);
 
         switch (state_)
         {
@@ -184,16 +184,15 @@ public:
     }
 
     void evaluate(json_reference root,
-                  const char_type* path,
-                  size_t length,
                   operation op,
+                  typename Json::string_view_type path,
                   std::error_code& ec)
     {
         line_ = 1;
         column_ = 1;
         state_ = jsonpointer::detail::pointer_state::start;
-        begin_input_ = path;
-        end_input_ = path + length;
+        begin_input_ = path.data();
+        end_input_ = path.data() + path.length();
         p_ = begin_input_;
 
         index_ = 0;
