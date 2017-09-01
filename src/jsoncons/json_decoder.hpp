@@ -255,7 +255,7 @@ private:
 
     void do_null_value(const basic_parsing_context<char_type>&) override
     {
-        stack_[top_].value_ = null_type();
+        stack_[top_].value_ = Json::null();
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
