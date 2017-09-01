@@ -826,7 +826,7 @@ sudo apt-get install cmake
 
 Instructions for building the test suite with CMake may be found in
 
-    jsoncons/test_suite/build/cmake/README.txt
+    jsoncons/tests/build/cmake/README.txt
 
 Instructions for building the examples with CMake may be found in
 

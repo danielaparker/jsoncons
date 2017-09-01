@@ -24,4 +24,5 @@ script:
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
   - make -j2
+  - chmod ./run_tests.sh 777
   - ./run_tests.sh
