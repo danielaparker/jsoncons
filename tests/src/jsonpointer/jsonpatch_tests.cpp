@@ -17,7 +17,7 @@
 #include <new>
 #include <codecvt>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpatch.hpp>
 
 using namespace jsoncons;
 

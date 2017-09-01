@@ -1818,21 +1818,34 @@ public:
         }
         // Remove all elements from an array or object
 
+        void erase(object_iterator pos)
+        {
+            evaluate().erase(pos);
+        }
+        // Remove a range of elements from an object 
+
         void erase(object_iterator first, object_iterator last)
         {
             evaluate().erase(first, last);
         }
         // Remove a range of elements from an object 
 
-        void erase(array_iterator first, array_iterator last)
-        {
-            evaluate().erase(first, last);
-        }
-
         void erase(string_view_type name)
         {
             evaluate().erase(name);
         }
+
+        void erase(const_array_iterator pos)
+        {
+            evaluate().erase(pos);
+        }
+        // Removes the element at pos 
+
+        void erase(array_iterator first, array_iterator last)
+        {
+            evaluate().erase(first, last);
+        }
+        // Remove a range of elements from an array 
 
         // merge
 
@@ -3398,6 +3411,21 @@ public:
         }
     }
 
+    void erase(object_iterator pos)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::empty_object_t:
+            break;
+        case value_type::object_t:
+            object_value().erase(pos);
+            break;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
+            break;
+        }
+    }
+
     void erase(object_iterator first, object_iterator last)
     {
         switch (var_.type_id())
@@ -3409,6 +3437,19 @@ public:
             break;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
+            break;
+        }
+    }
+
+    void erase(const_array_iterator pos)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::array_t:
+            array_value().erase(pos);
+            break;
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
             break;
         }
     }

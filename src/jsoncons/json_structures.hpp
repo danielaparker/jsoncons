@@ -274,6 +274,11 @@ public:
         elements_.erase(elements_.begin()+from_index,elements_.begin()+to_index);
     }
 
+    void erase(const_iterator pos) 
+    {
+        elements_.erase(pos);
+    }
+
     void erase(iterator first, iterator last) 
     {
         elements_.erase(first,last);
@@ -775,6 +780,11 @@ public:
                                    [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});
         auto result = (it != this->members_.end() && it->key() == name) ? it : this->members_.end();
         return result;
+    }
+
+    void erase(iterator pos) 
+    {
+        this->members_.erase(pos);
     }
 
     void erase(iterator first, iterator last) 
