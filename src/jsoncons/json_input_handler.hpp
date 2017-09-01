@@ -10,9 +10,7 @@
 #include <string>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/detail/jsoncons_utilities.hpp>
-#if !defined(JSONCONS_NO_DEPRECATED)
 #include <jsoncons/json_type_traits.hpp> // for null_type
-#endif
 
 namespace jsoncons {
 
