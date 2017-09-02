@@ -33,17 +33,27 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 ### Extensions
 
-#### csv
+#### jsonpointer
 
-[csv_reader](ref/csv_reader.md)
+[select](ref/jsonpointer/select.md)
 
-[csv_serializer](ref/csv_serializer.md)
+[add](ref/jsonpointer/add.md)
+
+[remove](ref/jsonpointer/remove.md)
+
+[replace](ref/jsonpointer/replace.md)
 
 #### jsonpath
 
 [json_query](ref/json_query.md)
 
 [json_replace](ref/json_replace.md)
+
+#### csv
+
+[csv_reader](ref/csv_reader.md)
+
+[csv_serializer](ref/csv_serializer.md)
 
 #### msgpack
 
@@ -56,13 +66,6 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [encode_cbor](ref/encode_cbor.md)
 
 [decode_cbor](ref/decode_cbor.md)
-
-#### jsonpointer
-
-[select](ref/jsonpointer/select.md)
-[add](ref/jsonpointer/add.md)
-[remove](ref/jsonpointer/remove.md)
-[replace](ref/jsonpointer/replace.md)
 
 ### Tutorials
 
