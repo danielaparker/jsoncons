@@ -459,9 +459,9 @@ Or define and use your own filters. See [json_filter](doc/ref/json_filter.md) fo
 
 <div id="ext_jsonpointer"/>
 
-#### jsonpointer example
+#### jsonpointer
 
-Select author from second book
+Example. Select author from second book
 
 ```c++
 #include <jsoncons/json.hpp>
