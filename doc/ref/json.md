@@ -221,11 +221,19 @@ Make `get_with_default` do the right thing for string literals.
     void clear()
 Remove all elements from an array or object value, otherwise do nothing
 
-    void erase(array_iterator first, array_iterator last)
+    void erase(const_array_iterator pos)
+Remove an element from an array at the specified position.
+Throws `std::runtime_error` if not an object.
+
+    void erase(const_array_iterator first, const_array_iterator last)
 Remove the elements from an array in the range '[first,last)'.
 Throws `std::runtime_error` if not an object.
 
-    void erase(object_iterator first, object_iterator last)
+    void erase(const_object_iterator pos)
+Remove a member from an object at the specified position.
+Throws `std::runtime_error` if not an object.
+
+    void erase(const_object_iterator first, const_object_iterator last)
 Remove the members from an object in the range '[first,last)'.
 Throws `std::runtime_error` if not an object.
 

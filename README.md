@@ -496,7 +496,7 @@ Output:
 "Evelyn Waugh"
 ```
 
-See [jsoncons::jsonpointer::select](doc/ref/jsonpointer/select.md)
+See [select](doc/ref/jsonpointer/select.md), [add](doc/ref/jsonpointer/add.md), [remove](doc/ref/jsonpointer/remove.md), and [replace](doc/ref/jsonpointer/replace.md). 
 
 <div id="ext_jsonpath"/>
 
