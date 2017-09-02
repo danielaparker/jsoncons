@@ -279,7 +279,7 @@ public:
         elements_.erase(pos);
     }
 
-    void erase(iterator first, iterator last) 
+    void erase(const_iterator first, const_iterator last) 
     {
         elements_.erase(first,last);
     }
@@ -782,12 +782,12 @@ public:
         return result;
     }
 
-    void erase(iterator pos) 
+    void erase(const_iterator pos) 
     {
         this->members_.erase(pos);
     }
 
-    void erase(iterator first, iterator last) 
+    void erase(const_iterator first, const_iterator last) 
     {
         this->members_.erase(first,last);
     }
@@ -1504,7 +1504,7 @@ public:
                             [name](const value_type& kv){return kv.key() == name;});
     }
 
-    void erase(iterator first, iterator last) 
+    void erase(const_iterator first, const_iterator last) 
     {
         this->members_.erase(first,last);
     }

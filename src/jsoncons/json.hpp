@@ -1819,13 +1819,13 @@ public:
         }
         // Remove all elements from an array or object
 
-        void erase(object_iterator pos)
+        void erase(const_object_iterator pos)
         {
             evaluate().erase(pos);
         }
         // Remove a range of elements from an object 
 
-        void erase(object_iterator first, object_iterator last)
+        void erase(const_object_iterator first, const_object_iterator last)
         {
             evaluate().erase(first, last);
         }
@@ -1842,7 +1842,7 @@ public:
         }
         // Removes the element at pos 
 
-        void erase(array_iterator first, array_iterator last)
+        void erase(const_array_iterator first, const_array_iterator last)
         {
             evaluate().erase(first, last);
         }
@@ -3412,7 +3412,7 @@ public:
         }
     }
 
-    void erase(object_iterator pos)
+    void erase(const_object_iterator pos)
     {
         switch (var_.type_id())
         {
@@ -3427,7 +3427,7 @@ public:
         }
     }
 
-    void erase(object_iterator first, object_iterator last)
+    void erase(const_object_iterator first, const_object_iterator last)
     {
         switch (var_.type_id())
         {
@@ -3455,7 +3455,7 @@ public:
         }
     }
 
-    void erase(array_iterator first, array_iterator last)
+    void erase(const_array_iterator first, const_array_iterator last)
     {
         switch (var_.type_id())
         {
