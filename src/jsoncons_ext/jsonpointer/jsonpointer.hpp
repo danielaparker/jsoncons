@@ -40,32 +40,26 @@ struct PathResolver
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
 
-    void operator()(std::vector<json_pointer>& current,
-                    size_t index,
-                    std::error_code& ec) const
+    jsonpointer_errc operator()(std::vector<json_pointer>& current,
+                                size_t index) const
     {
         if (index >= current.back()->size())
         {
-            ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
+            return jsonpointer_errc::index_exceeds_array_size;
         }
-        else
-        {
-            current.push_back(std::addressof(current.back()->at(index)));
-        }
+        current.push_back(std::addressof(current.back()->at(index)));
+        return jsonpointer_errc();
     }
 
-    void operator()(std::vector<json_pointer>& current,
-                    const string_type& name,
-                    std::error_code& ec) const
+    jsonpointer_errc operator()(std::vector<json_pointer>& current,
+                                const string_type& name) const
     {
         if (!current.back()->has_key(name))
         {
-            ec = jsonpointer::jsonpointer_errc::name_not_found;
+            return jsonpointer_errc::name_not_found;
         }
-        else
-        {
-            current.push_back(std::addressof(current.back()->at(name)));
-        }
+        current.push_back(std::addressof(current.back()->at(name)));
+        return jsonpointer_errc();
     }
 };
 
@@ -78,29 +72,27 @@ struct PathSetter
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
 
-    void operator()(std::vector<json_pointer>& current,
-                    size_t index,
-                    std::error_code& ec) const
+    jsonpointer_errc operator()(std::vector<json_pointer>& current,
+                                size_t index) const
     {
         if (index >= current.back()->size())
         {
-            ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
+            return jsonpointer_errc::index_exceeds_array_size;
         }
-        else
-        {
-            current.push_back(std::addressof(current.back()->at(index)));
-        }
+        current.push_back(std::addressof(current.back()->at(index)));
+        return jsonpointer_errc();
     }
 
-    void operator()(std::vector<json_pointer>& current,
-                    const string_type& name,
-                    std::error_code& ec) const
+    jsonpointer_errc operator()(std::vector<json_pointer>& current,
+                                const string_type& name) const
     {
+        jsonpointer_errc ec = jsonpointer_errc();
         if (!current.back()->has_key(name))
         {
             current.back()->set(name,Json());
         }
         current.push_back(std::addressof(current.back()->at(name)));
+        return ec;
     }
 };
 
@@ -140,12 +132,15 @@ public:
         return column_;
     }
 
-    void select(json_reference root,
-                typename Json::string_view_type path,
-                std::error_code& ec)
+    jsonpointer_errc select(json_reference root,
+                            typename Json::string_view_type path)
     {
         PathResolver<Json,JsonReference,JsonPointer> op;
-        evaluate(root,op,path,ec);
+        jsonpointer_errc ec = evaluate(root,op,path);
+        if (ec != jsonpointer_errc())
+        {
+            return ec;
+        }
 
         switch (state_)
         {
@@ -153,23 +148,26 @@ public:
             break;
         case pointer_state::zero_array_reference_token: 
         case pointer_state::nonzero_array_reference_token: 
-            op(current_,index_,ec);
+            ec = op(current_,index_);
             break;
         case pointer_state::object_reference_token: 
-            op(current_,buffer_,ec);
+            ec = op(current_,buffer_);
             break;
         default:
-            ec = jsonpointer_errc::eof;
-            break;
+            return jsonpointer_errc::eof;
         }
+        return ec;
     }
 
-    void add(json_reference root,
-             typename Json::string_view_type path,
-             const Json& value,
-             std::error_code& ec)
+    jsonpointer_errc add(json_reference root,
+                         typename Json::string_view_type path,
+                         const Json& value)
     {
-        evaluate(root,PathSetter<Json,JsonReference,JsonPointer>(),path,ec);
+        jsonpointer_errc ec = evaluate(root,PathSetter<Json,JsonReference,JsonPointer>(),path);
+        if (ec != jsonpointer_errc())
+        {
+            return ec;
+        }
 
         switch (state_)
         {
@@ -179,8 +177,7 @@ public:
         case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
             if (index_ >= current_.back()->size())
             {
-                ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
-                return;
+                return jsonpointer_errc::index_exceeds_array_size;
             }
             current_.back()->insert(current_.back()->array_range().begin()+index_,value);
             break;
@@ -191,16 +188,19 @@ public:
             current_.back()->set(buffer_,value);
             break;
         default:
-            ec = jsonpointer::jsonpointer_errc::eof;
-            break;
+            return jsonpointer_errc::eof;
         }
+        return ec;
     }
 
-    void remove(json_reference root,
-                typename Json::string_view_type path,
-                std::error_code& ec)
+    jsonpointer_errc remove(json_reference root,
+                            typename Json::string_view_type path)
     {
-        evaluate(root,PathResolver<Json,JsonReference,JsonPointer>(),path,ec);
+        jsonpointer_errc ec = evaluate(root,PathResolver<Json,JsonReference,JsonPointer>(),path);
+        if (ec != jsonpointer_errc())
+        {
+            return ec;
+        }
 
         switch (state_)
         {
@@ -210,36 +210,34 @@ public:
         case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
             if (index_ >= current_.back()->size())
             {
-                ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
-                return;
+                return jsonpointer_errc::index_exceeds_array_size;
             }
             current_.back()->erase(current_.back()->array_range().begin()+index_);
             break;
         case jsonpointer::detail::pointer_state::after_last_array_reference_token:
-            ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
-            break;
+            return jsonpointer_errc::index_exceeds_array_size;
         case jsonpointer::detail::pointer_state::object_reference_token: 
             if (!current_.back()->has_key(buffer_))
             {
-                ec = jsonpointer::jsonpointer_errc::name_not_found;
+                return jsonpointer_errc::name_not_found;
             }
-            else
-            {
-                current_.back()->erase(buffer_);
-            }
+            current_.back()->erase(buffer_);
             break;
         default:
-            ec = jsonpointer::jsonpointer_errc::eof;
-            break;
+            return jsonpointer_errc::eof;
         }
+        return ec;
     }
 
-    void replace(json_reference root,
-                 typename Json::string_view_type path,
-                 const Json& value,
-                 std::error_code& ec)
+    jsonpointer_errc replace(json_reference root,
+                             typename Json::string_view_type path,
+                             const Json& value)
     {
-        evaluate(root,PathResolver<Json,JsonReference,JsonPointer>(),path,ec);
+        jsonpointer_errc ec = evaluate(root,PathResolver<Json,JsonReference,JsonPointer>(),path);
+        if (ec != jsonpointer_errc())
+        {
+            return ec;
+        }
 
         switch (state_)
         {
@@ -249,43 +247,32 @@ public:
         case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
             if (index_ >= current_.back()->size())
             {
-                ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
-                return;
+                return jsonpointer_errc::index_exceeds_array_size;
             }
             (*(current_.back()))[index_] = value;
             break;
         case jsonpointer::detail::pointer_state::after_last_array_reference_token:
-            ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
-            break;
+            return jsonpointer_errc::index_exceeds_array_size;
         case jsonpointer::detail::pointer_state::object_reference_token: 
             if (!current_.back()->has_key(buffer_))
             {
-                ec = jsonpointer::jsonpointer_errc::name_not_found;
+                return jsonpointer_errc::name_not_found;
             }
-            else
-            {
-                current_.back()->set(buffer_,value);
-            }
+            current_.back()->set(buffer_,value);
             break;
         default:
-            ec = jsonpointer::jsonpointer_errc::eof;
-            break;
+            return jsonpointer_errc::eof;
         }
-    }
-
-    void move(json_reference root,
-              typename Json::string_view_type from,
-              typename Json::string_view_type path,
-              std::error_code& ec)
-    {
+        return jsonpointer_errc();
     }
 
     template <class Op>
-    void evaluate(json_reference root,
-                  Op op,
-                  typename Json::string_view_type path,
-                  std::error_code& ec)
+    jsonpointer_errc evaluate(json_reference root,
+                              Op op,
+                              typename Json::string_view_type path)
     {
+        jsonpointer_errc ec = jsonpointer_errc();
+
         line_ = 1;
         column_ = 1;
         state_ = jsonpointer::detail::pointer_state::start;
@@ -308,8 +295,7 @@ public:
                     state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     break;
                 default:
-                    ec = jsonpointer::jsonpointer_errc::expected_slash;
-                    return;
+                    return jsonpointer_errc::expected_slash;
                 };
                 ++p_;
                 ++column_;
@@ -337,8 +323,7 @@ public:
                     state_ = jsonpointer::detail::pointer_state::after_last_array_reference_token;
                     break;
                 default:
-                    ec = jsonpointer::jsonpointer_errc::expected_digit_or_minus;
-                    return;
+                    return jsonpointer_errc::expected_digit_or_minus;
                 };
                 ++p_;
                 ++column_;
@@ -347,7 +332,12 @@ public:
                 switch (*p_)
                 {
                 case '/':
-                    op(current_,index_,ec);
+                    ec = op(current_,index_);
+                    //if (ec != jsonpointer_errc())
+                    //{
+                    //    return ec;
+                    //}
+
                     state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     index_ = 0;
                     break;
@@ -361,14 +351,11 @@ public:
                 case '7':
                 case '8':
                 case '9':
-                    ec = jsonpointer::jsonpointer_errc::unexpected_leading_zero;
-                    return;
+                    return jsonpointer_errc::unexpected_leading_zero;
                 case '-':
-                    ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
-                    return;
+                    return jsonpointer_errc::index_exceeds_array_size;
                 default:
-                    ec = jsonpointer::jsonpointer_errc::expected_digit_or_minus;
-                    return;
+                    return jsonpointer_errc::expected_digit_or_minus;
                 };
                 ++p_;
                 ++column_;
@@ -377,11 +364,9 @@ public:
                 switch (*p_)
                 {
                 case '/':
-                    ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
-                    return;
+                    return jsonpointer_errc::index_exceeds_array_size;
                 default:
-                    ec = jsonpointer::jsonpointer_errc::expected_slash;
-                    return;
+                    return jsonpointer_errc::expected_slash;
                 };
                 ++p_;
                 ++column_;
@@ -390,7 +375,7 @@ public:
                 switch (*p_)
                 {
                 case '/':
-                    op(current_,index_,ec);
+                    ec = op(current_,index_);
                     state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     index_ = 0;
                     break;
@@ -407,11 +392,9 @@ public:
                     index_ = index_ * 10 + (*p_ - '0');
                     break;
                 case '-':
-                    ec = jsonpointer::jsonpointer_errc::index_exceeds_array_size;
-                    return;
+                    return jsonpointer_errc::index_exceeds_array_size;
                 default:
-                    ec = jsonpointer::jsonpointer_errc::expected_digit_or_minus;
-                    return;
+                    return jsonpointer_errc::expected_digit_or_minus;
                 };
                 ++p_;
                 ++column_;
@@ -420,7 +403,7 @@ public:
                 switch (*p_)
                 {
                 case '/':
-                    op(current_,buffer_,ec);
+                    ec = op(current_,buffer_);
                     state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     index_ = 0;
                     buffer_.clear();
@@ -447,14 +430,14 @@ public:
                     state_ = jsonpointer::detail::pointer_state::object_reference_token;
                     break;
                 default:
-                    ec = jsonpointer::jsonpointer_errc::expected_0_or_1;
-                    return;
+                    return jsonpointer_errc::expected_0_or_1;
                 };
                 ++p_;
                 ++column_;
                 break;
             }
         }
+        return ec;
     }
 
 private:
@@ -484,9 +467,8 @@ Json select(const Json& root, typename Json::string_view_type path)
 {
     detail::jsonpointer_evaluator<Json,const Json&,const Json*> evaluator;
 
-    std::error_code ec;
-    evaluator.select(root,path,ec);
-    if (ec)
+    jsonpointer_errc ec = evaluator.select(root,path);
+    if (ec != jsonpointer_errc())
     {
         throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
     }
@@ -498,9 +480,8 @@ void add(Json& root, typename Json::string_view_type path, const Json& value)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
-    std::error_code ec;
-    evaluator.add(root,path,value,ec);
-    if (ec)
+    jsonpointer_errc ec = evaluator.add(root,path,value);
+    if (ec != jsonpointer_errc())
     {
         throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
     }
@@ -511,9 +492,8 @@ void remove(Json& root, typename Json::string_view_type path)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
-    std::error_code ec;
-    evaluator.remove(root,path,ec);
-    if (ec)
+    jsonpointer_errc ec = evaluator.remove(root,path);
+    if (ec != jsonpointer_errc())
     {
         throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
     }
@@ -524,22 +504,8 @@ void replace(Json& root, typename Json::string_view_type path, const Json& value
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
-    std::error_code ec;
-    evaluator.replace(root,path,value,ec);
-    if (ec)
-    {
-        throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
-    }
-}
-
-template<class Json>
-void move(Json& root, typename Json::string_view_type from, typename Json::string_view_type path)
-{
-    detail::jsonpointer_evaluator<Json> evaluator;
-
-    std::error_code ec;
-    //evaluator.evaluate(root,path.data(),path.length(),value,operation::replace,ec);
-    if (ec)
+    jsonpointer_errc ec = evaluator.replace(root,path,value);
+    if (ec != jsonpointer_errc())
     {
         throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
     }

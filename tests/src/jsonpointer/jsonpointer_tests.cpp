@@ -91,19 +91,6 @@ void check_remove(json& example, const std::string& path, const json& expected)
     }
 }
 
-void check_move(json& example, const std::string& from, const std::string& path, const json& expected)
-{
-    try
-    {
-        jsonpointer::move(example, from, path);
-        BOOST_CHECK_EQUAL(expected, example);
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << ". " << path << std::endl;
-    }
-}
-
 BOOST_AUTO_TEST_CASE(test_jsonpointer)
 {
     check_select("",example);
