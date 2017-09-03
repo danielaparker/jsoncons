@@ -7,24 +7,24 @@ Serialize C++ object to a JSON formatted stream, governed by `json_stream_traits
 #include <jsoncons/json_stream_traits.hpp>
 
 template <class CharT, class T>
-void dump(const T& val, basic_json_output_handler<CharT>& handler) (1)
+void dump(const T& val, basic_json_output_handler<CharT>& handler); // (1)
 
 template <class CharT, class T>
-void dump_body(const T& val, basic_json_output_handler<CharT>& handler) (2)
+void dump_body(const T& val, basic_json_output_handler<CharT>& handler); // (2)
 
 template <class CharT, class T>
-void dump(const T& val, std::basic_ostream<CharT>& os) (3)
-
-template <class CharT, class T>
-void dump(const T& val, const basic_serialization_options<CharT>& options,
-          std::basic_ostream<CharT>& os) (4)
-
-template <class CharT, class T>
-void dump(const T& val, std::basic_ostream<CharT>& os, bool pprint) (5)
+void dump(const T& val, std::basic_ostream<CharT>& os); // (3)
 
 template <class CharT, class T>
 void dump(const T& val, const basic_serialization_options<CharT>& options,
-          std::basic_ostream<CharT>& os, bool pprint) (6)
+          std::basic_ostream<CharT>& os); // (4)
+
+template <class CharT, class T>
+void dump(const T& val, std::basic_ostream<CharT>& os, bool pprint); // (5)
+
+template <class CharT, class T>
+void dump(const T& val, const basic_serialization_options<CharT>& options,
+          std::basic_ostream<CharT>& os, bool pprint); // (6)
 ```
 
 (1) Calls `begin_json()` on `handler`, applies `json_stream_traits` to serialize `val` to JSON output stream, and calls `end_json()` on `handler`.

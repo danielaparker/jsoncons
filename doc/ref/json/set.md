@@ -2,11 +2,11 @@
 
 ```c++
 template <class T>
-pair<object_iterator, bool> set(string_view_type key, T&& value); (1)
+pair<object_iterator, bool> set(string_view_type key, T&& value); // (1)
 
 template <class T>
 object_iterator set(const_object_iterator hint, string_view_type key, 
-                    T&& value); (2)
+                    T&& value); // (2)
 ```
 
 #### Parameters

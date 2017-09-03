@@ -1,23 +1,11 @@
 ### jsoncons::json::merge
 
-<table>
-  <tr>
-    <td><code>void merge(const json& source)</code></td>
-    <td>(1)</td> 
-  </tr>
-  <tr>
-    <td><code>void merge(json&& source)</code></td>
-    <td>(2)</td> 
-  </tr>
-  <tr>
-    <td><code>void merge(object_iterator hint, const json& source)</code></td>
-    <td>(3)</td> 
-  </tr>
-  <tr>
-    <td><code>void merge(object_iterator hint, json&& source)</code></td>
-    <td>(4)</td> 
-  </tr>
-</table>
+```c++
+void merge(const json& source); // (1)
+void merge(json&& source); // (2)
+void merge(object_iterator hint, const json& source); // (3)
+void merge(object_iterator hint, json&& source); // (4)
+```
 
 Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object, 
 then that member is not copied. 
