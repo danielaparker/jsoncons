@@ -471,20 +471,20 @@ using namespace jsoncons;
 
 int main()
 {
-json root = json::parse(R"(
-[
-  { "category": "reference",
-    "author": "Nigel Rees",
-    "title": "Sayings of the Century",
-    "price": 8.95
-  },
-  { "category": "fiction",
-    "author": "Evelyn Waugh",
-    "title": "Sword of Honour",
-    "price": 12.99
-  }
-]
-)");
+    json root = json::parse(R"(
+        [
+          { "category": "reference",
+            "author": "Nigel Rees",
+            "title": "Sayings of the Century",
+            "price": 8.95
+          },
+          { "category": "fiction",
+            "author": "Evelyn Waugh",
+            "title": "Sword of Honour",
+            "price": 12.99
+          }
+        ]
+    )");
 
     json result = jsonpointer::select(root, "/1/author");
 
