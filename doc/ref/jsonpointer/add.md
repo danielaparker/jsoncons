@@ -37,7 +37,7 @@ using namespace jsoncons;
 int main()
 {
     json target = json::parse(R"(
-    { "foo": "bar"}
+        { "foo": "bar"}
     )");
 
     try
@@ -67,7 +67,7 @@ using namespace jsoncons;
 int main()
 {
     json target = json::parse(R"(
-    { "foo": [ "bar", "baz" ] }
+        { "foo": [ "bar", "baz" ] }
     )");
 
     auto ec = jsonpointer::try_add(target, "/foo/1", json("qux"));
@@ -97,7 +97,7 @@ using namespace jsoncons;
 int main()
 {
     json target = json::parse(R"(
-    { "foo": [ "bar", "baz" ] }
+        { "foo": [ "bar", "baz" ] }
     )");
 
     try
@@ -113,7 +113,7 @@ int main()
 ```
 Output:
 ```json
-{"foo":["bar","baz","qux"]}
+    {"foo":["bar","baz","qux"]}
 ```
 
 #### Add an object member to a location that already exists
@@ -157,7 +157,7 @@ using namespace jsoncons;
 int main()
 {
     json target = json::parse(R"(
-    { "foo": [ "bar", "baz" ] }
+        { "foo": [ "bar", "baz" ] }
     )");
 
     auto ec = jsonpointer::try_add(target, "/foo/3", json("qux"));

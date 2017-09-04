@@ -39,20 +39,20 @@ using namespace jsoncons;
 
 int main()
 {
-json root = json::parse(R"(
-   {
-      "foo": ["bar", "baz"],
-      "": 0,
-      "a/b": 1,
-      "c%d": 2,
-      "e^f": 3,
-      "g|h": 4,
-      "i\\j": 5,
-      "k\"l": 6,
-      " ": 7,
-      "m~n": 8
-   }
-)");
+    json root = json::parse(R"(
+        {
+          "foo": ["bar", "baz"],
+          "": 0,
+          "a/b": 1,
+          "c%d": 2,
+          "e^f": 3,
+          "g|h": 4,
+          "i\\j": 5,
+          "k\"l": 6,
+          " ": 7,
+          "m~n": 8
+       }
+    )");
    
     try
     {
@@ -113,20 +113,20 @@ using namespace jsoncons;
 
 int main()
 {
-json root = json::parse(R"(
-[
-  { "category": "reference",
-    "author": "Nigel Rees",
-    "title": "Sayings of the Century",
-    "price": 8.95
-  },
-  { "category": "fiction",
-    "author": "Evelyn Waugh",
-    "title": "Sword of Honour",
-    "price": 12.99
-  }
-]
-)");
+    json root = json::parse(R"(
+        [
+          { "category": "reference",
+            "author": "Nigel Rees",
+            "title": "Sayings of the Century",
+            "price": 8.95
+          },
+          { "category": "fiction",
+            "author": "Evelyn Waugh",
+            "title": "Sword of Honour",
+            "price": 12.99
+          }
+        ]
+    )");
 
     json result = jsonpointer::select(root, "/1/author");
 
