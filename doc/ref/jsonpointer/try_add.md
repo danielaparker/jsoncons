@@ -26,14 +26,14 @@ int main()
     { "foo": "bar"}
     )");
 
-    try
+    auto ec = jsonpointer::try_add(target, "/baz", json("qux"));
+    if (ec == jsonpointer::jsonpointer_errc())
     {
-        jsonpointer::add(target, "/baz", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    else
     {
-        std::cout << e.what() << std::endl;
+        std::cout << make_error_code(ec).message() << std::endl;
     }
 }
 ```
@@ -56,14 +56,14 @@ int main()
     { "foo": [ "bar", "baz" ] }
     )");
 
-    try
+    auto ec = jsonpointer::try_add(target, "/foo/1", json("qux"));
+    if (ec == jsonpointer::jsonpointer_errc())
     {
-        jsonpointer::add(target, "/foo/1", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    else
     {
-        std::cout << e.what() << std::endl;
+        std::cout << make_error_code(ec).message() << std::endl;
     }
 }
 ```

@@ -26,14 +26,14 @@ int main()
         { "foo": [ "bar", "qux", "baz" ] }
     )");
 
-    try
+    auto ec = jsonpointer::try_remove(target, "/foo/1");
+    if (ec == jsonpointer::jsonpointer_errc())
     {
-        jsonpointer::remove(target, "/foo/1");
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    else
     {
-        std::cout << e.what() << std::endl;
+        std::cout << make_error_code(ec).message() << std::endl;
     }
 }
 ```

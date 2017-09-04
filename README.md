@@ -496,7 +496,7 @@ Output:
 "Evelyn Waugh"
 ```
 
-See [select](doc/ref/jsonpointer/select.md), [add](doc/ref/jsonpointer/add.md), [remove](doc/ref/jsonpointer/remove.md), and [replace](doc/ref/jsonpointer/replace.md). 
+See [select](doc/ref/jsonpointer/select.md), [try_select](doc/ref/jsonpointer/try_select.md), [add](doc/ref/jsonpointer/add.md), [try_add](doc/ref/jsonpointer/try_add.md), [remove](doc/ref/jsonpointer/remove.md), [try_remove](doc/ref/jsonpointer/try_remove.md), [replace](doc/ref/jsonpointer/replace.md) and [try_replace](doc/ref/jsonpointer/try_replace.md). 
 
 <div id="ext_jsonpath"/>
 

@@ -29,14 +29,14 @@ int main()
         }
     )");
 
-    try
+    auto ec = jsonpointer::try_replace(target, "/baz", json("boo"));
+    if (ec == jsonpointer::jsonpointer_errc())
     {
-        jsonpointer::replace(target, "/baz", json("boo"));
         std::cout << pretty_print(target) << std::endl;
     }
-    catch (const parse_exception& e)
+    else
     {
-        std::cout << e.what() << std::endl;
+        std::cout << make_error_code(ec).message() << std::endl;
     }
 }
 ```

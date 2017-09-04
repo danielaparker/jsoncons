@@ -20,8 +20,24 @@
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 using namespace jsoncons;
+using namespace jsoncons::literals;
 
 BOOST_AUTO_TEST_SUITE(jsonpatch_tests)
+
+BOOST_AUTO_TEST_CASE(test_patch)
+{
+    json target = R"(
+    { "foo": "bar"}
+    )"_json;
+
+    json patch = R"(
+    [
+      { "op": "add", "path": "/baz", "value": "qux" }
+    ]
+    )"_json;
+
+    jsonpatch::patch(target,patch);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

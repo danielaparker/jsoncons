@@ -36,12 +36,16 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 #### jsonpointer
 
 [select](ref/jsonpointer/select.md)
+[try_select](ref/jsonpointer/try_select.md)
 
 [add](ref/jsonpointer/add.md)
+[try_add](ref/jsonpointer/try_add.md)
 
 [remove](ref/jsonpointer/remove.md)
+[try_remove](ref/jsonpointer/try_remove.md)
 
 [replace](ref/jsonpointer/replace.md)
+[try_replace](ref/jsonpointer/try_replace.md)
 
 #### jsonpath
 

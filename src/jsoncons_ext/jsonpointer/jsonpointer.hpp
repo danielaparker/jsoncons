@@ -154,7 +154,7 @@ public:
             ec = op(current_,buffer_);
             break;
         default:
-            return jsonpointer_errc::eof;
+            return jsonpointer_errc::end_of_input;
         }
         return ec;
     }
@@ -188,7 +188,7 @@ public:
             current_.back()->set(buffer_,value);
             break;
         default:
-            return jsonpointer_errc::eof;
+            return jsonpointer_errc::end_of_input;
         }
         return ec;
     }
@@ -224,7 +224,7 @@ public:
             current_.back()->erase(buffer_);
             break;
         default:
-            return jsonpointer_errc::eof;
+            return jsonpointer_errc::end_of_input;
         }
         return ec;
     }
@@ -261,7 +261,7 @@ public:
             current_.back()->set(buffer_,value);
             break;
         default:
-            return jsonpointer_errc::eof;
+            return jsonpointer_errc::end_of_input;
         }
         return jsonpointer_errc();
     }
@@ -323,7 +323,7 @@ public:
                     state_ = jsonpointer::detail::pointer_state::after_last_array_reference_token;
                     break;
                 default:
-                    return jsonpointer_errc::expected_digit_or_minus;
+                    return jsonpointer_errc::expected_digit_or_dash;
                 };
                 ++p_;
                 ++column_;
@@ -355,7 +355,7 @@ public:
                 case '-':
                     return jsonpointer_errc::index_exceeds_array_size;
                 default:
-                    return jsonpointer_errc::expected_digit_or_minus;
+                    return jsonpointer_errc::expected_digit_or_dash;
                 };
                 ++p_;
                 ++column_;
@@ -394,7 +394,7 @@ public:
                 case '-':
                     return jsonpointer_errc::index_exceeds_array_size;
                 default:
-                    return jsonpointer_errc::expected_digit_or_minus;
+                    return jsonpointer_errc::expected_digit_or_dash;
                 };
                 ++p_;
                 ++column_;

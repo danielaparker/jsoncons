@@ -340,7 +340,7 @@ struct is_compatible_output_iterator<OutputIt,CharT,
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<conv_errc,InputIt>>::type 
+                        && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<conv_errc,InputIt>>::type 
 convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flags::strict) 
 {
     (void)flags;

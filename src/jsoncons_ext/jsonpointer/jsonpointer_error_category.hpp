@@ -15,12 +15,12 @@ namespace jsoncons { namespace jsonpointer {
 enum class jsonpointer_errc 
 {
     expected_slash = 1,
-    expected_digit_or_minus,
+    expected_digit_or_dash,
     unexpected_leading_zero,
     index_exceeds_array_size,
     expected_0_or_1,
     name_not_found,
-    eof
+    end_of_input
 };
 
 class jsonpointer_error_category_impl
@@ -37,8 +37,8 @@ public:
         {
         case jsonpointer_errc::expected_slash:
             return "Expected /";
-        case jsonpointer_errc::expected_digit_or_minus:
-            return "Expected digit or -";
+        case jsonpointer_errc::expected_digit_or_dash:
+            return "Expected digit or '-'";
         case jsonpointer_errc::unexpected_leading_zero:
             return "Unexpected leading zero";
         case jsonpointer_errc::index_exceeds_array_size:
@@ -47,7 +47,7 @@ public:
             return "Expected '0' or '1' after escape character '~'";
         case jsonpointer_errc::name_not_found:
             return "Name not found";
-        case jsonpointer_errc::eof:
+        case jsonpointer_errc::end_of_input:
             return "Unexpected end of input";
         default:
             return "Unknown jsonpointer error";
