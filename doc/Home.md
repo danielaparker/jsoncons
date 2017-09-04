@@ -2,7 +2,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 ### Core
 
-#### json Container
+#### json container
 
 [json](ref/json.md)  
 [json_reader](ref/json_reader.md)  
