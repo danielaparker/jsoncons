@@ -27,7 +27,7 @@ Extensions:
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
-## What's new on master
+### What's new on master
 
 New `json` functions `push_back` and `insert` have been added for appending values 
 to the end of a `json` array and inserting values at a specifed position.
@@ -37,25 +37,25 @@ While these functions provide the same functionality as the existing
 of the C++ library, and have been given prominence in the examples and documentation 
 (`add` is still supported.)
 
-## Get jsoncons
+### Get jsoncons
 
 Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Find the directory `jsoncons` under `src`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
 Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
 
-## How to use it
+### How to use it
 
 - For a quick guide, see [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). 
 - Consult the [documentation](doc/Home.md) for the details. 
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
-## Benchmarks
+### Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
 Results for [JSONTestSuite](https://github.com/nst/JSONTestSuite) and [JSON_checker](http://www.json.org/JSON_checker/) tests may be found [here](https://danielaparker.github.io/json_benchmarks/).
 
-## A simple program using jsoncons
+### A simple program using jsoncons
 
 ```c++
 #include <iostream>
@@ -126,7 +126,7 @@ Output:
 (3) Dimension 2 = 0.0
 ```
 
-## About jsoncons::basic_json
+### About jsoncons::basic_json
 
 The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different character types, different policies for ordering name-value pairs, etc.
 ```c++
@@ -144,9 +144,9 @@ The library includes four instantiations of `basic_json`:
 
 - [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
-## Features
+### Features
 
-### Meaningful error messages
+#### Meaningful error messages
 
 ```c++
 try 
@@ -163,7 +163,7 @@ Output:
 Extra comma at line 1 and column 10
 ```
 
-### Validation without parse exceptions
+#### Validation without parse exceptions
 
 ```c++
 std::string s = R"(
@@ -190,7 +190,7 @@ Output:
 ```
 Expected name separator ':' on line 4 and column 20
 ```
-### Range-based for loops with arrays
+#### Range-based for loops with arrays
 
 ```c++
 json j = json::array{1,2,3,4};
@@ -201,7 +201,7 @@ for (auto val : book.array_range())
 }
 ```
 
-### Range-based for loops with objects
+#### Range-based for loops with objects
 
 ```c++
 json book = json::object{
@@ -216,7 +216,7 @@ for (const auto& kv : book.object_range())
               << kv.value() << std::endl;
 }
 ```
-### _json and _ojson literal operators
+#### _json and _ojson literal operators
 
 ```c++
 using namespace jsoncons::literals;
@@ -230,7 +230,7 @@ ojson j2 = R"(
 )"_ojson;
 ```
 
-### Multi-dimensional json arrays
+#### Multi-dimensional json arrays
 ```c++
 json a = json::make_array<3>(4, 3, 2, 0.0);
 double val = 1.0;
@@ -274,7 +274,7 @@ Output:
 ```
 See [json::make_array](doc/ref/json/make_array.md) for details
 
-### Merge key-value pairs from another json object
+#### Merge key-value pairs from another json object
 ```c++
 json j = json::parse(R"(
 {
@@ -304,7 +304,7 @@ Output:
 See [json::merge](doc/ref/json/merge.md) 
 and [json::merge_or_update](doc/ref/json/merge_or_update.md) for details.
 
-### Convert from and to standard library sequence containers
+#### Convert from and to standard library sequence containers
 
 ```c++
 std::vector<int> v{1, 2, 3, 4};
@@ -317,7 +317,7 @@ Output:
 (1) [1,2,3,4]
 ```
 
-### Convert from and to standard library associative containers
+#### Convert from and to standard library associative containers
 
 ```c++
 std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
@@ -330,7 +330,7 @@ Output:
 (1) {"one":1,"three":3,"two":2}
 ```
 
-### Convert from and to std::tuple
+#### Convert from and to std::tuple
 
 ```c++
 auto t = std::make_tuple(false,1,"foo");
@@ -343,7 +343,7 @@ Output:
 (1) [false,1,"foo"]
 ```
 
-### Convert from and to user defined types (and standard library containers of user defined types)
+#### Convert from and to user defined types (and standard library containers of user defined types)
 
 ```c++
 struct book
@@ -374,7 +374,7 @@ std::list<book> l = j.as<std::list<book>>();
 
 See [Type Extensibility](doc/ref/Type%20Extensibility.md) for details.
 
-### Serialize C++ objects directly to JSON formatted streams, governed by `json_stream_traits` 
+#### Serialize C++ objects directly to JSON formatted streams, governed by `json_stream_traits` 
 
 ```c++
 #include <iostream>
@@ -412,7 +412,7 @@ Output:
 }
 ```
 
-### Filter json names and values
+#### Filter json names and values
 
 You can rename object member names with the built in filter [rename_name_filter](doc/ref/rename_name_filter.md)
 
@@ -455,7 +455,7 @@ Output:
 ```
 Or define and use your own filters. See [json_filter](doc/ref/json_filter.md) for details.
 
-## Extensions
+### Extensions
 
 <div id="ext_jsonpointer"/>
 
@@ -500,7 +500,7 @@ See [select,try_select](doc/ref/jsonpointer/select.md), [add,try_add](doc/ref/js
 
 <div id="ext_jsonpath"/>
 
-### jsonpath
+#### jsonpath
 
 Example file (store.json):
 ```json
@@ -601,7 +601,7 @@ See [json_query](doc/ref/json_query.md), [json_replace](doc/ref/json_replace.md)
 
 <div id="ext_csv"/>
 
-### csv
+#### csv
 Example file (tasks.csv)
 ```csv
 project_id, task_name, task_start, task_finish
@@ -690,11 +690,9 @@ See [csv_reader](doc/ref/csv_reader.md) and [csv_serializer](doc/ref/csv_seriali
 
 <div id="ext_msgpack"/>
 
-### msgpack
+#### msgpack
 
 The `msgpack` extension supports encoding json to and decoding from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
-
-#### MessagePack example
 
 Example file (book.json):
 ```json
@@ -763,11 +761,9 @@ See [encode_msgpack](doc/ref/encode_msgpack.md) and [decode_msgpack](doc/ref/dec
 
 <div id="ext_cbor"/>
 
-### cbor
+#### cbor
 
 The `cbor` extension supports encoding json to and decoding from the [cbor](http://cbor.io/) binary serialization format.
-
-#### cbor reputon example
 
 This example illustrates encoding a [Reputation Interchange](https://tools.ietf.org/rfc/rfc7071.txt) data object to and from cbor.
 
@@ -817,7 +813,7 @@ Output:
 
 See [encode_cbor](doc/ref/encode_cbor.md) and [decode_cbor](doc/ref/decode_cbor.md) for details.
 
-## Building the test suite and examples with CMake
+### Building the test suite and examples with CMake
 
 [CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
 ```
@@ -832,7 +828,7 @@ Instructions for building the examples with CMake may be found in
 
     jsoncons/examples/build/cmake/README.txt
 
-## Acknowledgements
+### Acknowledgements
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
 
