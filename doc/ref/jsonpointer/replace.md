@@ -10,6 +10,10 @@ template<class Json>
 void replace(const Json& root, typename Json::string_view_type path, const Json& value)
 ```
 
+#### Exceptions
+
+On error, a [parse_error](../parse_error.md) exception that has an associated [jsonpointer_errc](jsonpointer_errc.md) error code.
+
 ### Examples
 
 #### Replace a value

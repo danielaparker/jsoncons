@@ -10,6 +10,10 @@ template<class Json>
 Json select(const Json& root, typename Json::string_view_type path)
 ```
 
+#### Exceptions
+
+On error, a [parse_error](../parse_error.md) exception that has an associated [jsonpointer_errc](jsonpointer_errc.md) error code.
+
 ### Examples
 
 #### Select author from second book
