@@ -128,21 +128,6 @@ int main()
         ]
     )");
 
-    json root = json::parse(R"(
-    [
-      { "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      { "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      }
-    ]
-    )");
-
     json result;
     jsonpointer::jsonpointer_errc ec;
     std::tie(result,ec) = jsonpointer::try_select(root, "/1/author");
