@@ -20,6 +20,10 @@ std::tuple<Json,jsonpointer_errc> try_select(const Json& root,
 
 (1) On error, a [parse_error](../parse_error.md) exception that has an associated [jsonpointer_errc](jsonpointer_errc.md) error code.
 
+#### Return value
+
+(1) None
+
 (2) On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md)
 On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
 

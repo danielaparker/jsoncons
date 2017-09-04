@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::add
+### jsoncons::jsonpointer::add, jsoncons::jsonpointer::try_add
 
 Adds a `json` value.
 
@@ -7,12 +7,22 @@ Adds a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-void add(const Json& root, typename Json::string_view_type path, const Json& value)
+void add(const Json& root, typename Json::string_view_type path, const Json& value); // (1) 
+
+template<class Json>
+jsonpointer_errc add(const Json& root, typename Json::string_view_type path, const Json& value); // (2)
 ```
 
 #### Exceptions
 
-On error, a [parse_error](../parse_error.md) exception that has an associated [jsonpointer_errc](jsonpointer_errc.md) error code.
+(1) On error, a [parse_error](../parse_error.md) exception that has an associated [jsonpointer_errc](jsonpointer_errc.md) error code.
+
+#### Return value
+
+(1) None
+
+(2) On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md)
+On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
 
 ### Examples
 
@@ -48,6 +58,7 @@ Output:
 
 #### Add an element to the second position in an array
 
+
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -60,14 +71,14 @@ int main()
     { "foo": [ "bar", "baz" ] }
     )");
 
-    try
+    auto ec = jsonpointer::try_add(target, "/foo/1", json("qux"));
+    if (ec == jsonpointer::jsonpointer_errc())
     {
-        jsonpointer::add(target, "/foo/1", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_error& e)
+    else
     {
-        std::cout << e.what() << std::endl;
+        std::cout << make_error_code(ec).message() << std::endl;
     }
 }
 ```
@@ -136,4 +147,33 @@ Output:
 Index exceeds array size at line 1 and column 7
 ```
 
+#### The specified index must not exceed the size of the array
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    json target = json::parse(R"(
+    { "foo": [ "bar", "baz" ] }
+    )");
+
+    auto ec = jsonpointer::try_add(target, "/foo/3", json("qux"));
+    if (ec == jsonpointer::jsonpointer_errc())
+    {
+        std::cout << target << std::endl;
+    }
+    else
+    {
+        std::cout << make_error_code(ec).message() << std::endl;
+    }
+}
+```
+Output:
+```
+Index exceeds array size
+```
 
