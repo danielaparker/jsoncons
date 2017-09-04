@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::add
+### jsoncons::jsonpointer::try_add
 
 Adds a `json` value.
 

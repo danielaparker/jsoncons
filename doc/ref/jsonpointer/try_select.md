@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::select
+### jsoncons::jsonpointer::try_select
 
 Selects a `json` value.
 

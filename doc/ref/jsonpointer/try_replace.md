@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::replace
+### jsoncons::jsonpointer::try_replace
 
 Replace a `json` element or member.
 

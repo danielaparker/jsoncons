@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::remove
+### jsoncons::jsonpointer::try_remove
 
 Removes a `json` element.
 
