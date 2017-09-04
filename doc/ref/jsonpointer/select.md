@@ -7,8 +7,7 @@ Selects a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-Json select(const Json& root, 
-            typename Json::string_view_type path); // (1)
+Json select(const Json& root, typename Json::string_view_type path); // (1)
 
 template<class Json>
 std::tuple<Json,jsonpointer_errc> try_select(const Json& root, 
