@@ -10,6 +10,12 @@ template<class Json>
 std::tuple<Json,jsonpointer_errc> try_select(const Json& root, typename Json::string_view_type path)
 ```
 
+#### Return value
+
+On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md)
+
+On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
+
 ### Examples
 
 #### Select author from second book

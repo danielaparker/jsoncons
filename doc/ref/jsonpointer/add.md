@@ -7,7 +7,7 @@ Adds a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-Json add(const Json& root, typename Json::string_view_type path, const Json& value)
+void add(const Json& root, typename Json::string_view_type path, const Json& value)
 ```
 
 ### Examples

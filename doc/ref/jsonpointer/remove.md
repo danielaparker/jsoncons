@@ -7,7 +7,7 @@ Removes a `json` element.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-Json remove(const Json& root, typename Json::string_view_type path)
+void remove(const Json& root, typename Json::string_view_type path)
 ```
 
 ### Examples

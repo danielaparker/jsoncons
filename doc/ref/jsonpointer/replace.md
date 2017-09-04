@@ -7,7 +7,7 @@ Replace a `json` element or member.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-Json replace(const Json& root, typename Json::string_view_type path, const Json& value)
+void replace(const Json& root, typename Json::string_view_type path, const Json& value)
 ```
 
 ### Examples
