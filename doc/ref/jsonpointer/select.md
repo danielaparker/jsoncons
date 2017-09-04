@@ -128,9 +128,33 @@ int main()
         ]
     )");
 
-    json result = jsonpointer::select(root, "/1/author");
+    json root = json::parse(R"(
+    [
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      }
+    ]
+    )");
 
-    std::cout << result << std::endl;
+    json result;
+    jsonpointer::jsonpointer_errc ec;
+    std::tie(result,ec) = jsonpointer::try_select(root, "/1/author");
+
+    if (ec == jsonpointer::jsonpointer_errc())
+    {
+        std::cout << result << std::endl;
+    }
+    else
+    {
+        std::cout << make_error_code(ec).message() << std::endl;
+    }
 }
 ```
 Output:
