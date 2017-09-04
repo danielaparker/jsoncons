@@ -26,7 +26,7 @@ On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md
 
 ### Examples
 
-#### Remove an array element
+#### Remove an object member
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -37,12 +37,12 @@ using namespace jsoncons;
 int main()
 {
     json target = json::parse(R"(
-        { "foo": [ "bar", "qux", "baz" ] }
+        { "foo": "bar", "baz" : "qux"}
     )");
 
     try
     {
-        jsonpointer::remove(target, "/foo/1");
+        jsonpointer::remove(target, "/baz");
         std::cout << target << std::endl;
     }
     catch (const parse_error& e)
@@ -53,7 +53,7 @@ int main()
 ```
 Output:
 ```json
-{"foo":["bar","baz"]}
+{"foo":"bar"}
 ```
 
 #### Remove an array element

@@ -82,41 +82,7 @@ void jsonpointer_add_member_to_object()
     }
 }
 
-void jsonpointer_try_add_member_to_object()
-{
-    json target = json::parse(R"(
-    { "foo": "bar"}
-    )");
-
-    auto ec = jsonpointer::try_add(target, "/baz", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
-    {
-        std::cout << target << std::endl;
-    }
-    else
-    {
-        std::cout << make_error_code(ec).message() << std::endl;
-    }
-}
-
 void jsonpointer_add_element_to_array()
-{
-    json target = json::parse(R"(
-    { "foo": [ "bar", "baz" ] }
-    )");
-
-    try
-    {
-        jsonpointer::add(target, "/foo/1", json("qux"));
-        std::cout << target << std::endl;
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-}
-
-void jsonpointer_try_add_element_to_array()
 {
     json target = json::parse(R"(
     { "foo": [ "bar", "baz" ] }
@@ -150,32 +116,15 @@ void jsonpointer_add_element_to_end_array()
     }
 }
 
-void jsonpointer_try_add_element_to_end_array()
+void jsonpointer_add_value_name_exists()
 {
     json target = json::parse(R"(
-    { "foo": [ "bar", "baz" ] }
-    )");
-
-    auto ec = jsonpointer::try_add(target, "/foo/-", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
-    {
-        std::cout << target << std::endl;
-    }
-    else
-    {
-        std::cout << make_error_code(ec).message() << std::endl;
-    }
-}
-
-void jsonpointer_add_element_outside_range()
-{
-    json target = json::parse(R"(
-    { "foo": [ "bar", "baz" ] }
+        { "foo": "bar", "baz" : "abc"}
     )");
 
     try
     {
-        jsonpointer::add(target, "/foo/3", json("qux"));
+        jsonpointer::add(target, "/baz", json("qux"));
         std::cout << target << std::endl;
     }
     catch (const parse_error& e)
@@ -184,7 +133,7 @@ void jsonpointer_add_element_outside_range()
     }
 }
 
-void jsonpointer_try_add_element_outside_range()
+void jsonpointer_add_element_outside_range()
 {
     json target = json::parse(R"(
     { "foo": [ "bar", "baz" ] }
@@ -201,15 +150,15 @@ void jsonpointer_try_add_element_outside_range()
     }
 }
 
-void jsonpointer_remove()
+void jsonpointer_remove_object_member()
 {
     json target = json::parse(R"(
-        { "foo": [ "bar", "qux", "baz" ] }
+        { "foo": "bar", "baz" : "qux"}
     )");
 
     try
     {
-        jsonpointer::remove(target, "/foo/1");
+        jsonpointer::remove(target, "/baz");
         std::cout << target << std::endl;
     }
     catch (const parse_error& e)
@@ -218,7 +167,7 @@ void jsonpointer_remove()
     }
 }
 
-void jsonpointer_try_remove()
+void jsonpointer_remove_array_element()
 {
     json target = json::parse(R"(
         { "foo": [ "bar", "qux", "baz" ] }
@@ -235,7 +184,7 @@ void jsonpointer_try_remove()
     }
 }
 
-void jsonpointer_replace()
+void jsonpointer_replace_object_value()
 {
     json target = json::parse(R"(
         {
@@ -255,16 +204,13 @@ void jsonpointer_replace()
     }
 }
 
-void jsonpointer_try_replace()
+void jsonpointer_replace_array_value()
 {
     json target = json::parse(R"(
-        {
-          "baz": "qux",
-          "foo": "bar"
-        }
+        { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::try_replace(target, "/baz", json("boo"));
+    auto ec = jsonpointer::try_replace(target, "/foo/1", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << pretty_print(target) << std::endl;
@@ -281,17 +227,14 @@ void jsonpointer_examples()
     jsonpointer_select();
     jsonpointer_try_select();
     jsonpointer_add_member_to_object();
-    jsonpointer_try_add_member_to_object();
     jsonpointer_add_element_to_array();
-    jsonpointer_try_add_element_to_array();
     jsonpointer_add_element_to_end_array();
-    jsonpointer_try_add_element_to_end_array();
+    jsonpointer_add_value_name_exists();
     jsonpointer_add_element_outside_range();
-    jsonpointer_try_add_element_outside_range();
-    jsonpointer_remove();
-    jsonpointer_try_remove();
-    jsonpointer_replace();
-    jsonpointer_try_replace();
+    jsonpointer_remove_object_member();
+    jsonpointer_remove_array_element();
+    jsonpointer_replace_object_value();
+    jsonpointer_replace_array_value();
     std::cout << std::endl;
 }
 

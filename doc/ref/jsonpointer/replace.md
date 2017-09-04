@@ -26,7 +26,7 @@ On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md
 
 ### Examples
 
-#### Replace a value
+#### Replace an object value
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -62,7 +62,7 @@ Output:
 }
 ```
 
-#### Replace a value
+#### Replace an array value
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -73,13 +73,10 @@ using namespace jsoncons;
 int main()
 {
     json target = json::parse(R"(
-        {
-          "baz": "qux",
-          "foo": "bar"
-        }
+        { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::try_replace(target, "/baz", json("boo"));
+    auto ec = jsonpointer::try_replace(target, "/foo/1", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << pretty_print(target) << std::endl;
@@ -93,8 +90,7 @@ int main()
 Output:
 ```json
 {
-    "baz": "boo",
-    "foo": "bar"
+    "foo": ["bar","qux"]
 }
 ```
 

@@ -26,7 +26,7 @@ On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md
 
 ### Examples
 
-#### Add a member to an object
+#### Add a member to a target location that does not already exist
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -58,7 +58,6 @@ Output:
 
 #### Add an element to the second position in an array
 
-
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
@@ -87,7 +86,7 @@ Output:
 {"foo":["bar","qux","baz"]}
 ```
 
-#### Add an element to the end of an array
+#### Add a value to the end of an array
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -117,7 +116,7 @@ Output:
 {"foo":["bar","baz","qux"]}
 ```
 
-#### The specified index must not exceed the size of the array
+#### Add an object member to a location that already exists
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -128,12 +127,12 @@ using namespace jsoncons;
 int main()
 {
     json target = json::parse(R"(
-    { "foo": [ "bar", "baz" ] }
+        { "foo": "bar", "baz" : "abc"}
     )");
 
     try
     {
-        jsonpointer::add(target, "/foo/3", json("qux"));
+        jsonpointer::add(target, "/baz", json("qux"));
         std::cout << target << std::endl;
     }
     catch (const parse_error& e)
@@ -143,11 +142,11 @@ int main()
 }
 ```
 Output:
-```
-Index exceeds array size at line 1 and column 7
+```json
+{"baz":"qux","foo":"bar"}
 ```
 
-#### The specified index must not exceed the size of the array
+#### Add a value to a location in an array that exceeds the size of the array
 
 ```c++
 #include <jsoncons/json.hpp>

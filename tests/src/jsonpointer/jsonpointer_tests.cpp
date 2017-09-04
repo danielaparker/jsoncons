@@ -150,6 +150,19 @@ BOOST_AUTO_TEST_CASE(test_add_array_value)
 
 // remove
 
+BOOST_AUTO_TEST_CASE(test_remove_object_member)
+{
+    json example = json::parse(R"(
+    { "foo": "bar", "baz" : "qux"}
+    )");
+
+    const json expected = json::parse(R"(
+        { "foo": "bar"}
+    )");
+
+    check_remove(example,"/baz", expected);
+}
+
 BOOST_AUTO_TEST_CASE(test_remove_array_element)
 {
     json example = json::parse(R"(
@@ -165,7 +178,7 @@ BOOST_AUTO_TEST_CASE(test_remove_array_element)
 
 // replace
 
-BOOST_AUTO_TEST_CASE(test_replace_value)
+BOOST_AUTO_TEST_CASE(test_replace_object_value)
 {
     json example = json::parse(R"(
         {
@@ -182,6 +195,19 @@ BOOST_AUTO_TEST_CASE(test_replace_value)
     )");
 
     check_replace(example,"/baz", json("boo"), expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_replace_array_value)
+{
+    json example = json::parse(R"(
+        { "foo": [ "bar", "baz" ] }
+    )");
+
+    const json expected = json::parse(R"(
+        { "foo": [ "bar", "qux" ] }
+    )");
+
+    check_replace(example,"/foo/1", json("qux"), expected);
 }
 
 // move
