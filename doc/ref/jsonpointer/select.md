@@ -29,7 +29,7 @@ On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md
 
 ### Examples
 
-#### Select author from second book
+#### Examples from [RFC6901](https://tools.ietf.org/html/rfc6901)
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -40,28 +40,67 @@ using namespace jsoncons;
 int main()
 {
 json root = json::parse(R"(
-[
-  { "category": "reference",
-    "author": "Nigel Rees",
-    "title": "Sayings of the Century",
-    "price": 8.95
-  },
-  { "category": "fiction",
-    "author": "Evelyn Waugh",
-    "title": "Sword of Honour",
-    "price": 12.99
-  }
-]
+   {
+      "foo": ["bar", "baz"],
+      "": 0,
+      "a/b": 1,
+      "c%d": 2,
+      "e^f": 3,
+      "g|h": 4,
+      "i\\j": 5,
+      "k\"l": 6,
+      " ": 7,
+      "m~n": 8
+   }
 )");
-
-    json result = jsonpointer::select(root, "/1/author");
-
-    std::cout << result << std::endl;
+   
+    try
+    {
+        json result1 = jsonpointer::select(example, "");
+        std::cout << "(1) " << result1 << std::endl;
+        json result2 = jsonpointer::select(example, "/foo");
+        std::cout << "(2) " << result2 << std::endl;
+        json result3 = jsonpointer::select(example, "/foo/0");
+        std::cout << "(3) " << result3 << std::endl;
+        json result4 = jsonpointer::select(example, "/");
+        std::cout << "(4) " << result4 << std::endl;
+        json result5 = jsonpointer::select(example, "/a~1b");
+        std::cout << "(5) " << result5 << std::endl;
+        json result6 = jsonpointer::select(example, "/c%d");
+        std::cout << "(6) " << result6 << std::endl;
+        json result7 = jsonpointer::select(example, "/e^f");
+        std::cout << "(7) " << result7 << std::endl;
+        json result8 = jsonpointer::select(example, "/g|h");
+        std::cout << "(8) " << result8 << std::endl;
+        json result9 = jsonpointer::select(example, "/i\\j");
+        std::cout << "(9) " << result9 << std::endl;
+        json result10 = jsonpointer::select(example, "/k\"l");
+        std::cout << "(10) " << result10 << std::endl;
+        json result11 = jsonpointer::select(example, "/ ");
+        std::cout << "(11) " << result11 << std::endl;
+        json result12 = jsonpointer::select(example, "/m~0n");
+        std::cout << "(12) " << result12 << std::endl;
+    }
+    catch (const parse_error& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 }
 ```
 Output:
 ```json
-"Evelyn Waugh"
+(1) {"":0," ":7,"a/b":1,"c%d":2,"e^f":3,"foo":["bar","baz"],"g|h":4,"i\\j":5,"k\"l":6,"m~n":8}
+(2) ["bar","baz"]
+(3) "bar"
+(4) 0
+(5) 1
+(6) 2
+(7) 3
+(8) 4
+(9) 5
+(10) 6
+(11) 7
+(12) 8
 ```
 
 #### Select author from second book
