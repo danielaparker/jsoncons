@@ -10,6 +10,10 @@ template<class Json>
 void add(const Json& root, typename Json::string_view_type path, const Json& value)
 ```
 
+#### Exceptions
+
+[parse_error](../parse_error.md)
+
 ### Examples
 
 #### Add a member to an object
@@ -31,7 +35,7 @@ int main()
         jsonpointer::add(target, "/baz", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -61,7 +65,7 @@ int main()
         jsonpointer::add(target, "/foo/1", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -91,7 +95,7 @@ int main()
         jsonpointer::add(target, "/foo/-", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -121,7 +125,7 @@ int main()
         jsonpointer::add(target, "/foo/3", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }

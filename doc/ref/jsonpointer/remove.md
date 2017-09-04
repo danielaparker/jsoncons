@@ -31,7 +31,7 @@ int main()
         jsonpointer::remove(target, "/foo/1");
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }

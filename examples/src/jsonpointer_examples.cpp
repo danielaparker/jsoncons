@@ -28,7 +28,7 @@ void jsonpointer_select()
         json result = jsonpointer::select(root, "/1/author");
         std::cout << result << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -76,7 +76,7 @@ void jsonpointer_add_member_to_object()
         jsonpointer::add(target, "/baz", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -110,7 +110,7 @@ void jsonpointer_add_element_to_array()
         jsonpointer::add(target, "/foo/1", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -144,7 +144,7 @@ void jsonpointer_add_element_to_end_array()
         jsonpointer::add(target, "/foo/-", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -178,7 +178,7 @@ void jsonpointer_add_element_outside_range()
         jsonpointer::add(target, "/foo/3", json("qux"));
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -212,7 +212,7 @@ void jsonpointer_remove()
         jsonpointer::remove(target, "/foo/1");
         std::cout << target << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -249,7 +249,7 @@ void jsonpointer_replace()
         jsonpointer::replace(target, "/baz", json("boo"));
         std::cout << pretty_print(target) << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }

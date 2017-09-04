@@ -289,7 +289,7 @@ void more_examples()
 
 }
 
-void parse_exception_example()
+void parse_error_example()
 {
     std::string s = "[1,2,3,4,]";
     try 
@@ -361,7 +361,7 @@ int main()
 
         serialization_examples();
 
-        parse_exception_example();
+        parse_error_example();
 
         type_extensibility_examples();
 

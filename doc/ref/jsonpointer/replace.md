@@ -34,7 +34,7 @@ int main()
         jsonpointer::replace(target, "/baz", json("boo"));
         std::cout << pretty_print(target) << std::endl;
     }
-    catch (const parse_exception& e)
+    catch (const parse_error& e)
     {
         std::cout << e.what() << std::endl;
     }
