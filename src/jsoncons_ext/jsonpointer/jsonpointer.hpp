@@ -175,11 +175,18 @@ public:
             break;
         case jsonpointer::detail::pointer_state::zero_array_reference_token: 
         case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
-            if (index_ >= current_.back()->size())
+            if (index_ > current_.back()->size())
             {
                 return jsonpointer_errc::index_exceeds_array_size;
             }
-            current_.back()->insert(current_.back()->array_range().begin()+index_,value);
+            if (index_ == current_.back()->size())
+            {
+                current_.back()->push_back(value);
+            }
+            else
+            {
+                current_.back()->insert(current_.back()->array_range().begin()+index_,value);
+            }
             break;
         case jsonpointer::detail::pointer_state::after_last_array_reference_token:
             current_.back()->push_back(value);

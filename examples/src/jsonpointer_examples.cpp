@@ -133,6 +133,74 @@ void jsonpointer_try_add_element_to_array()
     }
 }
 
+void jsonpointer_add_element_to_end_array()
+{
+    json target = json::parse(R"(
+    { "foo": [ "bar", "baz" ] }
+    )");
+
+    try
+    {
+        jsonpointer::add(target, "/foo/-", json("qux"));
+        std::cout << target << std::endl;
+    }
+    catch (const parse_exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
+void jsonpointer_try_add_element_to_end_array()
+{
+    json target = json::parse(R"(
+    { "foo": [ "bar", "baz" ] }
+    )");
+
+    auto ec = jsonpointer::try_add(target, "/foo/-", json("qux"));
+    if (ec == jsonpointer::jsonpointer_errc())
+    {
+        std::cout << target << std::endl;
+    }
+    else
+    {
+        std::cout << make_error_code(ec).message() << std::endl;
+    }
+}
+
+void jsonpointer_add_element_outside_range()
+{
+    json target = json::parse(R"(
+    { "foo": [ "bar", "baz" ] }
+    )");
+
+    try
+    {
+        jsonpointer::add(target, "/foo/3", json("qux"));
+        std::cout << target << std::endl;
+    }
+    catch (const parse_exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
+void jsonpointer_try_add_element_outside_range()
+{
+    json target = json::parse(R"(
+    { "foo": [ "bar", "baz" ] }
+    )");
+
+    auto ec = jsonpointer::try_add(target, "/foo/3", json("qux"));
+    if (ec == jsonpointer::jsonpointer_errc())
+    {
+        std::cout << target << std::endl;
+    }
+    else
+    {
+        std::cout << make_error_code(ec).message() << std::endl;
+    }
+}
+
 void jsonpointer_remove()
 {
     json target = json::parse(R"(
@@ -211,15 +279,19 @@ void jsonpointer_examples()
 {
     std::cout << "\njsonpointer examples\n\n";
     jsonpointer_select();
-    //jsonpointer_try_select();
+    jsonpointer_try_select();
     jsonpointer_add_member_to_object();
-    //jsonpointer_try_add_member_to_object();
+    jsonpointer_try_add_member_to_object();
     jsonpointer_add_element_to_array();
-    //jsonpointer_try_add_element_to_array();
+    jsonpointer_try_add_element_to_array();
+    jsonpointer_add_element_to_end_array();
+    jsonpointer_try_add_element_to_end_array();
+    jsonpointer_add_element_outside_range();
+    jsonpointer_try_add_element_outside_range();
     jsonpointer_remove();
-    //jsonpointer_try_remove();
+    jsonpointer_try_remove();
     jsonpointer_replace();
-    //jsonpointer_try_replace();
+    jsonpointer_try_replace();
     std::cout << std::endl;
 }
 
