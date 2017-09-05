@@ -78,7 +78,7 @@ void construct_json_from_vector()
     address2["country"] = "USA";
     addresses.push_back(address2);
 
-    root["addresses"] = json(addresses.begin(),addresses.end());
+    root["addresses"] = addresses;
 
     std::cout << pretty_print(root) << std::endl;
 

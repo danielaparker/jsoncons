@@ -565,12 +565,30 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        return Json(std::begin(val), std::end(val));
+        Json j = Json::array();
+        auto first = std::begin(val);
+        auto last = std::end(val);
+        size_t size = std::distance(first,last);
+        j.reserve(size);
+        for (auto it = first; it != last; ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
     }
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json(std::begin(val), std::end(val), allocator);
+        Json j = Json::array(allocator);
+        auto first = std::begin(val);
+        auto last = std::end(val);
+        size_t size = std::distance(first, last);
+        j.reserve(size);
+        for (auto it = first; it != last; ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
     }
 };
 
@@ -700,13 +718,25 @@ struct json_type_traits<Json, std::array<E, N>>
 
     static Json to_json(const std::array<E, N>& val)
     {
-        return Json(val.begin(), val.end());
+        Json j = Json::array();
+        j.reserve(N);
+        for (auto it = val.begin(); it != val.end(); ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
     }
 
     static Json to_json(const std::array<E, N>& val, 
                         const allocator_type& allocator)
     {
-        return Json(val.begin(), val.end(), allocator);
+        Json j = Json::array(allocator);
+        j.reserve(N);
+        for (auto it = val.begin(); it != val.end(); ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
     }
 };
 
@@ -786,7 +816,7 @@ public:
     {
         std::array<Json, sizeof...(E)> buf;
         helper::to_json(val, buf);
-        return Json(buf.begin(), buf.end());
+        return Json(Json::array(buf.begin(), buf.end()));
     }
 };
 
@@ -815,6 +845,8 @@ public:
 template<class Json, class T>
 struct json_type_traits<Json, std::valarray<T>>
 {
+    typedef typename Json::allocator_type allocator_type;
+
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
         bool result = j.is_array();
@@ -851,7 +883,30 @@ struct json_type_traits<Json, std::valarray<T>>
     
     static Json to_json(const std::valarray<T>& val)
     {
-        return Json(std::begin(val), std::end(val));
+        Json j = Json::array();
+        auto first = std::begin(val);
+        auto last = std::end(val);
+        size_t size = std::distance(first,last);
+        j.reserve(size);
+        for (auto it = first; it != last; ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
+    }
+
+    static Json to_json(const std::valarray<T>& val, const allocator_type& allocator)
+    {
+        Json j = Json::array(allocator);
+        auto first = std::begin(val);
+        auto last = std::end(val);
+        size_t size = std::distance(first,last);
+        j.reserve(size);
+        for (auto it = first; it != last; ++it)
+        {
+            j.push_back(*it);
+        }
+        return j;
     }
 };
 

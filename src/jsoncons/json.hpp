@@ -2491,15 +2491,22 @@ public:
     {
     }
 
-    basic_json(const char_type *s, size_t length, const Allocator& allocator = Allocator())
+    basic_json(const char_type *s, size_t length)
         : var_(s, length, allocator)
     {
     }
+
+    basic_json(const char_type *s, size_t length, const Allocator& allocator)
+        : var_(s, length, allocator)
+    {
+    }
+#if !defined(JSONCONS_NO_DEPRECATED)
     template<class InputIterator>
     basic_json(InputIterator first, InputIterator last, const Allocator& allocator = Allocator())
         : var_(first,last,allocator)
     {
     }
+#endif
 
     ~basic_json()
     {

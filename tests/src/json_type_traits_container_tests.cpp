@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(test_assign_vector_of_bool)
 BOOST_AUTO_TEST_CASE(test_construct_vector_of_bool)
 {
     std::vector<bool> v = {true,false,true};
-    json a(v.begin(),v.end());
+    json a = v;
 
     BOOST_CHECK_EQUAL(a[0],true);
     BOOST_CHECK_EQUAL(a[1],false);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(test_construct_vector_of_bool)
 BOOST_AUTO_TEST_CASE(test_construct_const_vector_of_bool)
 {
     const std::vector<bool> v = {true,false,true};
-    json a(v.begin(),v.end());
+    json a = v;
 
     BOOST_CHECK_EQUAL(a[0],true);
     BOOST_CHECK_EQUAL(a[1],false);

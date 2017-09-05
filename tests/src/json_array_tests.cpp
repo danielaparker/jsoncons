@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_CASE(test_from_container)
     vec.push_back(20);
     vec.push_back(30);
 
-    json val1(vec.begin(), vec.end());
+    json val1 = vec;
     BOOST_REQUIRE(vec.size() == 3);
     BOOST_CHECK(vec[0] == 10);
     BOOST_CHECK(vec[1] == 20);
@@ -336,7 +336,7 @@ BOOST_AUTO_TEST_CASE(test_from_container)
     list.push_back(20.5);
     list.push_back(30.5);
 
-    json val2(list.begin(), list.end());
+    json val2 = list;
     BOOST_REQUIRE(val2.size() == 3);
     BOOST_CHECK_CLOSE(val2[0].as<double>(),10.5,0.000001);
     BOOST_CHECK_CLOSE(val2[1].as<double>(),20.5,0.000001);

@@ -49,47 +49,17 @@ Member type                         |Definition
     static const json& null()
 Returns a null value        
 
-#### Constructors
-
-    json()
-Constructs an empty json object. 
-
-    json(const allocator_type& allocator)
-Constructs a json object. 
-
-    json(std::initializer_list<json> list, const allocator_type& allocator)
-Constructs a json array with the elements of the initializer-list `init`. 
-
-    json(const json& val)
-Constructs a copy of val
-
-    json(const json& val, const allocator_type& allocator)
-Copy with allocator
-
-    json(json&& val) noexcept
-Acquires the contents of val, leaving val a `null` value
-
-    json(json&& val, const allocator_type& allocator) 
-Move with allocator
-
-    template <class T>
-    json(const T& val, const allocator_type& allocator=allocator_type())
-Constructs a `json` value for types supported in [json_type_traits](json_type_traits.md).
-
-    template <class T>
-    json(const CharT* val, const allocator_type& allocator=allocator_type())
-Constructs a `json` value for string literals.
-
-    template <class InputIterator>
-    json(InputIterator first, InputIterator last, 
-         const allocator_type& allocator=allocator_type())
-
-Constructs a json array with the elements in the range [first,last).
-
-#### Destructor
-
-    ~json()
-Destroys all values and deletes all memory allocated for strings, arrays, and objects.
+#### Member functions
+<table border="0">
+  <tr>
+    <td><a href="json/constructor.md">(constructor)</a></td>
+    <td>constructs the json value</td> 
+  </tr>
+  <tr>
+    <td><a href="json/destructor.md">(destructor)</a></td>
+    <td>destructs the json value</td> 
+  </tr>
+</table>
 
 #### Assignment operator
 

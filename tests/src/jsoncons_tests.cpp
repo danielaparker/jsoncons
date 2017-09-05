@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(test_array)
     address2["country"] = "USA";
     addresses.push_back(address2);
 
-    root["addresses"] = json(addresses.begin(), addresses.end());
+    root["addresses"] = addresses;
 
     BOOST_CHECK(root["addresses"].size() == 2);
 
