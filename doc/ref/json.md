@@ -44,10 +44,11 @@ Member type                         |Definition
     <td><a href="json/make_array.md">make_array</a></td>
     <td>Makes a multidimensional json array.</td> 
   </tr>
+  <tr>
+    <td><a href="">const json& null()</a></td>
+    <td>Returns a null value</td> 
+  </tr>
 </table>
-
-    static const json& null()
-Returns a null value        
 
 #### Member functions
 <table border="0">
@@ -59,19 +60,11 @@ Returns a null value
     <td><a href="json/destructor.md">(destructor)</a></td>
     <td>destructs the json value</td> 
   </tr>
+  <tr>
+    <td><a href="json/operator=.md">operator=</a></td>
+    <td>assigns values</td> 
+  </tr>
 </table>
-
-#### Assignment operator
-
-    json& operator=(const json& rhs)
-    json& operator=(json&& rhs) noexcept
-Assigns a new `json` value to a `json` variable, replacing it's current contents.
-
-    template <class T>
-    json& operator=(const T& rhs)
-Assigns the templated value to a `json` variable using [json_type_traits](json_type_traits.md).
-
-    json& operator=(const char_type* rhs)
 
 #### Ranges and Iterators
 
