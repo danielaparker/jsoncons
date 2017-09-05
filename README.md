@@ -501,9 +501,9 @@ See [select,try_select](doc/ref/jsonpointer/select.md), [add,try_add](doc/ref/js
 
 <div id="ext_jsonpatch"/>
 
-See [patch](doc/ref/jsonpatch/patch.md)
+#### jsonpatch
 
-#### jsonpointer
+See [patch](doc/ref/jsonpatch/patch.md)
 
 <div id="ext_jsonpath"/>
 
