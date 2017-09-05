@@ -26,31 +26,31 @@ BOOST_AUTO_TEST_SUITE(jsonpatch_tests)
 
 void check_good_patch(json& target, const json& patch, const json& expected)
 {
-    bool success;
+    jsonpatch::jsonpatch_errc ec;
     std::string op;
     std::string path;
-    std::tie(success,op,path) = jsonpatch::patch(target,patch);
-    if (!success)
+    std::tie(ec,op,path) = jsonpatch::patch(target,patch);
+    if (ec != jsonpatch::jsonpatch_errc())
     {
         std::cout << "op: " << op << std::endl;
         std::cout << "path: " << path << std::endl;
     }
-    BOOST_CHECK(success == true);
+    BOOST_CHECK(ec == jsonpatch::jsonpatch_errc());
     BOOST_CHECK_EQUAL(expected, target);
 }
 
-void check_bad_patch(json& target, const json& patch, const json& expected)
+void check_bad_patch(json& target, const json& patch, jsonpatch::jsonpatch_errc expected_ec, const json& expected)
 {
-    bool success;
+    jsonpatch::jsonpatch_errc ec;
     std::string op;
     std::string path;
-    std::tie(success,op,path) = jsonpatch::patch(target,patch);
-    if (!success)
+    std::tie(ec,op,path) = jsonpatch::patch(target,patch);
+    if (ec == jsonpatch::jsonpatch_errc())
     {
         std::cout << "op: " << op << std::endl;
         std::cout << "path: " << path << std::endl;
     }
-    BOOST_CHECK(success == false);
+    BOOST_CHECK(ec == expected_ec);
     BOOST_CHECK_EQUAL(expected, target);
 }
 
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(add_to_nonexistent_target)
 
     json expected = target;
 
-    check_bad_patch(target,patch,expected);
+    check_bad_patch(target,patch,jsonpatch::jsonpatch_errc::add_failed,expected);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

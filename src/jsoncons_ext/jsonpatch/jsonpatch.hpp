@@ -15,9 +15,9 @@
 #include <memory>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch_error_category.hpp>
 
 namespace jsoncons { namespace jsonpatch {
-
 
 namespace detail {
 
@@ -80,7 +80,7 @@ namespace detail {
 }
 
 template <class Json>
-std::tuple<bool,typename Json::string_type,typename Json::string_type> patch(Json& target, const Json& patch)
+std::tuple<jsonpatch_errc,typename Json::string_type,typename Json::string_type> patch(Json& target, const Json& patch)
 {
     typedef typename Json::string_type string_type;
     typedef typename Json::string_view_type string_view_type;
@@ -96,76 +96,103 @@ std::tuple<bool,typename Json::string_type,typename Json::string_type> patch(Jso
 
     // Validate
     
+    jsonpatch_errc patch_ec = jsonpatch_errc();
     string_type bad_op;
     string_type bad_path;
     for (const auto& operation : patch.array_range())
     {
         unwinder.state = detail::state_type::begin;
 
-        const string_view_type op = operation.at("op").as_string_view();
-        const string_view_type path = operation.at("path").as_string_view();
+        if (operation.count("op") != 1 || operation.count("path") != 1)
+        {
+            patch_ec = jsonpatch_errc::invalid_patch;
+            unwinder.state = detail::state_type::abort;
+        }
+        else
+        {
+            const string_view_type op = operation.at("op").as_string_view();
+            const string_view_type path = operation.at("path").as_string_view();
 
-        if (op == test_op)
-        {
-            Json val;
-            jsonpointer::jsonpointer_errc ec;
-            std::tie(val,ec) = jsonpointer::try_select(target,path);
-            if (ec != jsonpointer::jsonpointer_errc())
+            if (op == test_op)
             {
-                unwinder.state = detail::state_type::abort;
-            }
-            else if (val != operation.at("value"))
-            {
-                unwinder.state = detail::state_type::abort;
-            }
-        }
-        else if (op == add_op)
-        {
-            if (jsonpointer::try_add(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
-            {
-                unwinder.state = detail::state_type::abort;
-            }
-            else
-            {
-                unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
-            }
-        }
-        else if (op == remove_op)
-        {
-            Json val;
-            jsonpointer::jsonpointer_errc ec;
-            std::tie(val,ec) = jsonpointer::try_select(target,path);
-            if (ec != jsonpointer::jsonpointer_errc())
-            {
-                unwinder.state = detail::state_type::abort;
-            }
-            else
-            {
-                ec = jsonpointer::try_remove(target,path);
+                Json val;
+                jsonpointer::jsonpointer_errc ec;
+                std::tie(val,ec) = jsonpointer::try_select(target,path);
                 if (ec != jsonpointer::jsonpointer_errc())
                 {
+                    patch_ec = jsonpatch_errc::test_failed;
+                    unwinder.state = detail::state_type::abort;
+                }
+                else if (operation.count("value") != 1)
+                {
+                    patch_ec = jsonpatch_errc::invalid_patch;
+                    unwinder.state = detail::state_type::abort;
+                }
+                else if (val != operation.at("value"))
+                {
+                    patch_ec = jsonpatch_errc::test_failed;
+                    unwinder.state = detail::state_type::abort;
+                }
+            }
+            else if (op == add_op)
+            {
+                if (operation.count("value") != 1)
+                {
+                    patch_ec = jsonpatch_errc::invalid_patch;
+                    unwinder.state = detail::state_type::abort;
+                }
+                else if (jsonpointer::try_add(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
+                {
+                    patch_ec = jsonpatch_errc::add_failed;
                     unwinder.state = detail::state_type::abort;
                 }
                 else
                 {
-                    unwinder.stack.push_back({detail::op_type::add,path,val});
+                    unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
                 }
             }
-        }
-        else if (op == replace_op)
-        {
-            Json val;
-            jsonpointer::jsonpointer_errc ec;
-            std::tie(val,ec) = jsonpointer::try_select(target,path);
-            if (ec != jsonpointer::jsonpointer_errc())
+            else if (op == remove_op)
             {
-                unwinder.state = detail::state_type::abort;
-            }
-            else
-            {
-                ec = jsonpointer::try_replace(target,path,operation.at("value"));
+                Json val;
+                jsonpointer::jsonpointer_errc ec;
+                std::tie(val,ec) = jsonpointer::try_select(target,path);
                 if (ec != jsonpointer::jsonpointer_errc())
                 {
+                    patch_ec = jsonpatch_errc::remove_failed;
+                    unwinder.state = detail::state_type::abort;
+                }
+                else
+                {
+                    ec = jsonpointer::try_remove(target,path);
+                    if (ec != jsonpointer::jsonpointer_errc())
+                    {
+                        patch_ec = jsonpatch_errc::remove_failed;
+                        unwinder.state = detail::state_type::abort;
+                    }
+                    else
+                    {
+                        unwinder.stack.push_back({detail::op_type::add,path,val});
+                    }
+                }
+            }
+            else if (op == replace_op)
+            {
+                Json val;
+                jsonpointer::jsonpointer_errc ec;
+                std::tie(val,ec) = jsonpointer::try_select(target,path);
+                if (ec != jsonpointer::jsonpointer_errc())
+                {
+                    patch_ec = jsonpatch_errc::replace_failed;
+                    unwinder.state = detail::state_type::abort;
+                }
+                else if (operation.count("value") != 1)
+                {
+                    patch_ec = jsonpatch_errc::invalid_patch;
+                    unwinder.state = detail::state_type::abort;
+                }
+                else if (jsonpointer::try_replace(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
+                {
+                    patch_ec = jsonpatch_errc::replace_failed;
                     unwinder.state = detail::state_type::abort;
                 }
                 else
@@ -173,61 +200,85 @@ std::tuple<bool,typename Json::string_type,typename Json::string_type> patch(Jso
                     unwinder.stack.push_back({detail::op_type::replace,path,val});
                 }
             }
-        }
-        else if (op == move_op)
-        {
-            Json val;
-            jsonpointer::jsonpointer_errc ec;
-            string_view_type from = operation.at("from").as_string_view();
-            std::tie(val,ec) = jsonpointer::try_select(target,from);
-            if (ec != jsonpointer::jsonpointer_errc())
+            else if (op == move_op)
             {
-                unwinder.state = detail::state_type::abort;
-            }
-            else if (jsonpointer::try_remove(target,from) != jsonpointer::jsonpointer_errc())
-            {
-                unwinder.state = detail::state_type::abort;
-            }
-            else
-            {
-                unwinder.stack.push_back({detail::op_type::add,from,val});
-                if (jsonpointer::try_add(target,path,val) != jsonpointer::jsonpointer_errc())
+                if (operation.count("from") != 1)
                 {
+                    patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
                 else
                 {
-                    unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                    Json val;
+                    jsonpointer::jsonpointer_errc ec;
+                    string_view_type from = operation.at("from").as_string_view();
+                    std::tie(val,ec) = jsonpointer::try_select(target,from);
+                    if (ec != jsonpointer::jsonpointer_errc())
+                    {
+                        patch_ec = jsonpatch_errc::move_failed;
+                        unwinder.state = detail::state_type::abort;
+                    }
+                    else if (jsonpointer::try_remove(target,from) != jsonpointer::jsonpointer_errc())
+                    {
+                        patch_ec = jsonpatch_errc::move_failed;
+                        unwinder.state = detail::state_type::abort;
+                    }
+                    else
+                    {
+                        unwinder.stack.push_back({detail::op_type::add,from,val});
+                        if (jsonpointer::try_add(target,path,val) != jsonpointer::jsonpointer_errc())
+                        {
+                            patch_ec = jsonpatch_errc::move_failed;
+                            unwinder.state = detail::state_type::abort;
+                        }
+                        else
+                        {
+                            unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                        }
+                    }           
                 }
-            }           
-        }
-        else if (op == copy_op)
-        {
-            Json val;
-            jsonpointer::jsonpointer_errc ec;
-            string_view_type from = operation.at("from").as_string_view();
-            std::tie(val,ec) = jsonpointer::try_select(target,from);
-            if (ec != jsonpointer::jsonpointer_errc())
-            {
-                unwinder.state = detail::state_type::abort;
             }
-            else
+            else if (op == copy_op)
             {
-                unwinder.stack.push_back({detail::op_type::add,from,val});
-                if (jsonpointer::try_add(target,path,val) != jsonpointer::jsonpointer_errc())
+                if (operation.count("from") != 1)
                 {
+                    patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
                 else
                 {
-                    unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                    Json val;
+                    jsonpointer::jsonpointer_errc ec;
+                    string_view_type from = operation.at("from").as_string_view();
+                    std::tie(val,ec) = jsonpointer::try_select(target,from);
+                    if (ec != jsonpointer::jsonpointer_errc())
+                    {
+                        patch_ec = jsonpatch_errc::copy_failed;
+                        unwinder.state = detail::state_type::abort;
+                    }
+                    else
+                    {
+                        unwinder.stack.push_back({detail::op_type::add,from,val});
+                        if (jsonpointer::try_add(target,path,val) != jsonpointer::jsonpointer_errc())
+                        {
+                            patch_ec = jsonpatch_errc::copy_failed;
+                            unwinder.state = detail::state_type::abort;
+                        }
+                        else
+                        {
+                            unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                        }
+                    }
                 }
+            }
+            if (unwinder.state != detail::state_type::begin)
+            {
+                bad_op = op;
+                bad_path = path;
             }
         }
         if (unwinder.state != detail::state_type::begin)
         {
-            bad_op = op;
-            bad_path = path;
             break;
         }
     }
@@ -235,7 +286,7 @@ std::tuple<bool,typename Json::string_type,typename Json::string_type> patch(Jso
     {
         unwinder.state = detail::state_type::commit;
     }
-    return std::make_tuple(unwinder.state == detail::state_type::commit,bad_op,bad_path);
+    return std::make_tuple(patch_ec,bad_op,bad_path);
 }
 
 }}
