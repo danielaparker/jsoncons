@@ -23,8 +23,7 @@ std::tuple<Json,jsonpointer_errc> try_select(const Json& root,
 
 (1) None
 
-(2) On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md).  
-On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
+(2) On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md). On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
 
 ### Examples
 
