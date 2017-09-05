@@ -508,6 +508,41 @@ See [select](doc/ref/jsonpointer/select.md), [add](doc/ref/jsonpointer/add.md), 
 
 #### jsonpatch
 
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::literals;
+
+int main()
+{
+    json target = R"(
+        { "foo": "bar"}
+    )"_json;
+
+    json patch = R"(
+        [
+            { "op": "add", "path": "/baz", "value": "qux" },
+            { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] }
+        ]
+    )"_json;
+
+    jsonpatch::jsonpatch_errc ec;
+    std::string path;
+    std::tie(ec,path) = jsonpatch::patch(target,patch);
+
+    std::cout << pretty_print(target) << std::endl;
+}
+```
+Output:
+```
+{
+    "baz": "qux",
+    "foo": ["bar","baz"]
+}
+```
+
 See [patch](doc/ref/jsonpatch/patch.md)
 
 <div id="ext_jsonpath"/>
