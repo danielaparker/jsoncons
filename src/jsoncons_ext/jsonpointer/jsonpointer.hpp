@@ -89,7 +89,8 @@ struct PathSetter
         jsonpointer_errc ec = jsonpointer_errc();
         if (!current.back()->has_key(name))
         {
-            current.back()->set(name,Json());
+            return jsonpointer_errc::name_not_found;
+            //current.back()->set(name,Json());
         }
         current.push_back(std::addressof(current.back()->at(name)));
         return ec;

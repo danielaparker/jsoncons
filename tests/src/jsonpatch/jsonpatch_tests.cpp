@@ -24,19 +24,209 @@ using namespace jsoncons::literals;
 
 BOOST_AUTO_TEST_SUITE(jsonpatch_tests)
 
-BOOST_AUTO_TEST_CASE(test_patch)
+void check_good_patch(json& target, const json& patch, const json& expected)
+{
+    bool success;
+    std::string op;
+    std::string path;
+    std::tie(success,op,path) = jsonpatch::patch(target,patch);
+    if (!success)
+    {
+        std::cout << "op: " << op << std::endl;
+        std::cout << "path: " << path << std::endl;
+    }
+    BOOST_CHECK(success == true);
+    BOOST_CHECK_EQUAL(expected, target);
+}
+
+void check_bad_patch(json& target, const json& patch, const json& expected)
+{
+    bool success;
+    std::string op;
+    std::string path;
+    std::tie(success,op,path) = jsonpatch::patch(target,patch);
+    if (!success)
+    {
+        std::cout << "op: " << op << std::endl;
+        std::cout << "path: " << path << std::endl;
+    }
+    BOOST_CHECK(success == false);
+    BOOST_CHECK_EQUAL(expected, target);
+}
+
+BOOST_AUTO_TEST_CASE(add_an_object_member)
 {
     json target = R"(
-    { "foo": "bar"}
+        { "foo": "bar"}
     )"_json;
 
     json patch = R"(
     [
-      { "op": "add", "path": "/baz", "value": "qux" }
+        { "op": "add", "path": "/baz", "value": "qux" }
     ]
     )"_json;
 
-    jsonpatch::patch(target,patch);
+    json expected = R"(
+        {"baz":"qux","foo":"bar"}
+    )"_json;
+
+    check_good_patch(target,patch,expected);
+}
+
+BOOST_AUTO_TEST_CASE(add_an_array_element)
+{
+    json target = R"(
+        { "foo": [ "bar", "baz" ] }
+    )"_json;
+
+    json patch = R"(
+    [
+        { "op": "add", "path": "/foo/1", "value": "qux" }
+    ]
+    )"_json;
+
+    json expected = R"(
+        { "foo": [ "bar", "qux", "baz" ] }
+    )"_json;
+
+    check_good_patch(target,patch,expected);
+}
+
+BOOST_AUTO_TEST_CASE(remove_an_object_member)
+{
+    json target = R"(
+        {
+            "baz": "qux",
+            "foo": "bar"
+        }
+    )"_json;
+
+    json patch = R"(
+    [
+        { "op": "remove", "path": "/baz" }
+    ]
+    )"_json;
+
+    json expected = R"(
+        { "foo": "bar" }
+    )"_json;
+
+    check_good_patch(target,patch,expected);
+}
+
+BOOST_AUTO_TEST_CASE(remove_an_array_element)
+{
+    json target = R"(
+        { "foo": [ "bar", "qux", "baz" ] }
+    )"_json;
+
+    json patch = R"(
+    [
+        { "op": "remove", "path": "/foo/1" }
+    ]
+    )"_json;
+
+    json expected = R"(
+        { "foo": [ "bar", "baz" ] }
+    )"_json;
+
+    check_good_patch(target,patch,expected);
+}
+
+BOOST_AUTO_TEST_CASE(replace_a_value)
+{
+    json target = R"(
+        {
+            "baz": "qux",
+            "foo": "bar"
+        }
+    )"_json;
+
+    json patch = R"(
+        [
+            { "op": "replace", "path": "/baz", "value": "boo" }
+        ]
+    )"_json;
+
+    json expected = R"(
+        {
+            "baz": "boo",
+            "foo": "bar"
+        }
+    )"_json;
+
+    check_good_patch(target,patch,expected);
+}
+
+BOOST_AUTO_TEST_CASE(move_a_value)
+{
+    json target = R"(
+        {
+            "foo": {
+                "bar": "baz",
+                "waldo": "fred"
+            },
+            "qux": {
+                "corge": "grault"
+            }
+        }
+    )"_json;
+
+    json patch = R"(
+    [
+        { "op": "move", "from": "/foo/waldo", "path": "/qux/thud" }
+    ]
+    )"_json;
+
+    json expected = R"(
+       {
+           "foo": {
+                   "bar": "baz"
+                  },
+           "qux": {
+                     "corge": "grault",
+                     "thud": "fred"
+                  }
+       }
+    )"_json;
+
+    check_good_patch(target,patch,expected);
+}
+
+BOOST_AUTO_TEST_CASE(move_an_array_element)
+{
+    json target = R"(
+        { "foo": [ "all", "grass", "cows", "eat" ] }
+    )"_json;
+
+    json patch = R"(
+        [
+           { "op": "move", "from": "/foo/1", "path": "/foo/3" }
+        ]
+    )"_json;
+
+    json expected = R"(
+        { "foo": [ "all", "cows", "eat", "grass" ] }    
+    )"_json;
+
+    check_good_patch(target,patch,expected);
+}
+
+BOOST_AUTO_TEST_CASE(add_to_nonexistent_target)
+{
+    json target = R"(
+        { "foo": "bar" }
+    )"_json;
+
+    json patch = R"(
+        [
+           { "op": "add", "path": "/baz/bat", "value": "qux" }
+        ]
+    )"_json;
+
+    json expected = target;
+
+    check_bad_patch(target,patch,expected);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
