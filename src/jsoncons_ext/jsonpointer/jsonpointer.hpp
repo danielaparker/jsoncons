@@ -90,7 +90,6 @@ struct PathSetter
         if (!current.back()->has_key(name))
         {
             return jsonpointer_errc::name_not_found;
-            //current.back()->set(name,Json());
         }
         current.push_back(std::addressof(current.back()->at(name)));
         return ec;
@@ -300,6 +299,10 @@ public:
                 switch (*p_)
                 {
                 case '/':
+                    if (!(current_.back()->is_array() || current_.back()->is_object()))
+                    {
+                        return jsonpointer_errc::expected_object_or_array;
+                    }
                     state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     break;
                 default:
@@ -341,11 +344,14 @@ public:
                 {
                 case '/':
                     ec = op(current_,index_);
-                    //if (ec != jsonpointer_errc())
-                    //{
-                    //    return ec;
-                    //}
-
+                    if (ec != jsonpointer_errc())
+                    {
+                        return ec;
+                    }
+                    if (!(current_.back()->is_array() || current_.back()->is_object()))
+                    {
+                        return jsonpointer_errc::expected_object_or_array;
+                    }
                     state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     index_ = 0;
                     break;
@@ -384,6 +390,14 @@ public:
                 {
                 case '/':
                     ec = op(current_,index_);
+                    if (ec != jsonpointer_errc())
+                    {
+                        return ec;
+                    }
+                    if (!(current_.back()->is_array() || current_.back()->is_object()))
+                    {
+                        return jsonpointer_errc::expected_object_or_array;
+                    }
                     state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     index_ = 0;
                     break;
@@ -412,6 +426,14 @@ public:
                 {
                 case '/':
                     ec = op(current_,buffer_);
+                    if (ec != jsonpointer_errc())
+                    {
+                        return ec;
+                    }
+                    if (!(current_.back()->is_array() || current_.back()->is_object()))
+                    {
+                        return jsonpointer_errc::expected_object_or_array;
+                    }
                     state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     index_ = 0;
                     buffer_.clear();

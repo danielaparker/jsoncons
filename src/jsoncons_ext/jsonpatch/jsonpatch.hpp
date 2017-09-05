@@ -48,28 +48,32 @@ namespace detail {
 
         ~operation_unwinder()
         {
+            //std::cout << "state: " << std::boolalpha << (state == state_type::commit) << ", stack size: " << stack.size() << std::endl;
             if (state != state_type::commit)
             {
-                for (const auto& entry : stack)
+                for (auto it = stack.rbegin(); it != stack.rend(); ++it)
                 {
-                    if (entry.op == op_type::add)
+                    if (it->op == op_type::add)
                     {
-                        if (jsonpointer::try_add(target,entry.path,entry.value) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::try_add(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
                         {
+                            //std::cout << "add: " << it->path << std::endl;
                             break;
                         }
                     }
-                    else if (entry.op == op_type::remove)
+                    else if (it->op == op_type::remove)
                     {
-                        if (jsonpointer::try_remove(target,entry.path) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::try_remove(target,it->path) != jsonpointer::jsonpointer_errc())
                         {
+                            //std::cout << "remove: " << it->path << std::endl;
                             break;
                         }
                     }
-                    else if (entry.op == op_type::replace)
+                    else if (it->op == op_type::replace)
                     {
-                        if (jsonpointer::try_replace(target,entry.path,entry.value) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::try_replace(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
                         {
+                            //std::cout << "replace: " << it->path << std::endl;
                             break;
                         }
                     }
@@ -141,14 +145,24 @@ std::tuple<jsonpatch_errc,typename Json::string_type,typename Json::string_type>
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
-                else if (jsonpointer::try_add(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
-                {
-                    patch_ec = jsonpatch_errc::add_failed;
-                    unwinder.state = detail::state_type::abort;
-                }
                 else
                 {
-                    unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                    Json val;
+                    jsonpointer::jsonpointer_errc ec;
+                    std::tie(val,ec) = jsonpointer::try_select(target,path);
+                    if (jsonpointer::try_add(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
+                    {
+                        patch_ec = jsonpatch_errc::add_failed;
+                        unwinder.state = detail::state_type::abort;
+                    }
+                    else
+                    {
+                        if (ec == jsonpointer::jsonpointer_errc())
+                        {
+                            unwinder.stack.push_back({detail::op_type::add,path,val});
+                        }
+                        unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                    }
                 }
             }
             else if (op == remove_op)
