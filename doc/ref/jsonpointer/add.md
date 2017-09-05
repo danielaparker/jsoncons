@@ -105,7 +105,7 @@ int main()
 ```
 Output:
 ```json
-    {"foo":["bar","baz","qux"]}
+{"foo":["bar","baz","qux"]}
 ```
 
 #### Add an object member to a location that already exists
