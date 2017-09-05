@@ -1,16 +1,13 @@
-### jsoncons::jsonpointer::add, jsoncons::jsonpointer::try_add
+### jsoncons::jsonpatch::patch
 
-Adds a `json` value.
+Patched a `json` document.
 
 #### Header
 ```c++
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-template<class Json>
-void add(const Json& root, typename Json::string_view_type path, const Json& value); // (1) 
-
-template<class Json>
-jsonpointer_errc add(const Json& root, typename Json::string_view_type path, const Json& value); // (2)
+template <class Json>
+std::tuple<bool,typename Json::string_type,typename Json::string_type> patch(Json& target, const Json& patch)
 ```
 
 #### Exceptions
@@ -21,8 +18,8 @@ jsonpointer_errc add(const Json& root, typename Json::string_view_type path, con
 
 (1) None
 
-(2) On success, a value-initialized [jsonpointer_errc](jsonpointer_errc.md).  
-On error, a [jsonpointer_errc](jsonpointer_errc.md) error code 
+(2) On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md).  
+On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
 
 ### Examples
 
