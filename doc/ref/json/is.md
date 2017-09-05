@@ -16,7 +16,7 @@ Returns `true` if the json value is of string type, `false` otherwise.
     bool is<bool> const noexcept 
 Returns `true` if the json value is of boolean type, `false` otherwise.  
 
-    bool is<json::null_type> const noexcept
+    bool is<jsoncons::null_type> const noexcept
 Returns `true` if the json value is null, `false` otherwise.  
 
     bool is<json::object> const noexcept 

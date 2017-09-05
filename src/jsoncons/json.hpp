@@ -133,6 +133,7 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
     typedef key_value_pair_type kvp_type;
     typedef key_value_pair_type member_type;
+    typedef jsoncons::null_type null_type;
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
@@ -145,11 +146,8 @@ public:
     using object_storage_type = typename json_traits_type::template object_storage<key_value_pair_type , kvp_allocator_type>;
     typedef json_object<key_storage_type,json_type,json_traits_type::preserve_order> object;
 
-
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
-
-    typedef jsoncons::null_type null_type;
 
     typedef typename object::iterator object_iterator;
     typedef typename object::const_iterator const_object_iterator;

@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_null)
 {
     json nullval = json::null();
     BOOST_CHECK(nullval.is_null());
-    BOOST_CHECK(nullval.is<json::null_type>());
+    BOOST_CHECK(nullval.is<jsoncons::null_type>());
 
     json obj;
     obj["field"] = json::null();
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     json root = json::parse(os.str());
 
     BOOST_CHECK(root["null"].is_null());
-    BOOST_CHECK(root["null"].is<json::null_type>());
+    BOOST_CHECK(root["null"].is<jsoncons::null_type>());
     BOOST_CHECK(!root["bool1"].as<bool>());
     BOOST_CHECK(root["bool2"].as<bool>());
     BOOST_CHECK(root["integer"].as<int>() == 12345678);
