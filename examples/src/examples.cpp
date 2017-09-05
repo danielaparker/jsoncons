@@ -24,6 +24,7 @@ void json_is_as_examples();
 void msgpack_examples();
 void streaming_examples();
 void jsonpointer_examples();
+void jsonpatch_examples();
 
 void first_example_a()
 {
@@ -378,6 +379,8 @@ int main()
         validation_example();
 
         jsonpointer_examples();
+
+        jsonpatch_examples();
     }
     catch (const std::exception& e)
     {

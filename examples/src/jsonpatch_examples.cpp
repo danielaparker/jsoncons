@@ -1,32 +1,13 @@
-### jsoncons::jsonpatch::patch
+// Copyright 2017 Daniel Parker
+// Distributed under Boost license
 
-Patch a `json` document.
-
-#### Header
-```c++
+#include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-template <class Json>
-std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const Json& patch)
-```
-
-#### Return value
-
-On success, returns a value-initialized [jsonpatch_errc](jsonpatch_errc.md) and an empty string value.  
-
-On error, returns a [jsonpatch_errc](jsonpatch_errc.md) error code and the path that failed. 
-
-### Examples
-
-#### Apply a JSON Patch with two add operations
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
 using namespace jsoncons;
+using namespace jsoncons::literals;
 
-int main()
+void jsonpatch_add_add()
 {
     json target = R"(
         { "foo": "bar"}
@@ -45,24 +26,8 @@ int main()
 
     std::cout << pretty_print(target) << std::endl;
 }
-```
-Output:
-```
-{
-    "baz": "qux",
-    "foo": ["bar","baz"]
-}
-```
 
-#### Apply a JSON Patch with three add operations, the last one fails
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
-using namespace jsoncons;
-
-int main()
+void jsonpatch_add_add_add_failed()
 {
     json target = R"(
         { "foo": "bar"}
@@ -84,12 +49,12 @@ int main()
     std::cout << "(2) " << path << std::endl;
     std::cout << "(3) " << target << std::endl;
 }
-```
-Output:
-```
-(1) JSON Patch add operation failed
-(2) /baz/bat
-(3) {"foo":"bar"}
-```
-Note that all JSON Patch operations have been rolled back, and target is in its original state.
+
+void jsonpatch_examples()
+{
+    std::cout << "\njsonpatch examples\n\n";
+    jsonpatch_add_add();
+    jsonpatch_add_add_add_failed();
+    std::cout << std::endl;
+}
 
