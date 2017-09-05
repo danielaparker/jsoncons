@@ -45,12 +45,12 @@ Member type                         |Definition
     <td>Makes a multidimensional json array.</td> 
   </tr>
   <tr>
-    <td><a href="">const json& null()</a></td>
+    <td><a>const json& null()</a></td>
     <td>Returns a null value</td> 
   </tr>
 </table>
 
-#### Member functions
+### Member functions
 <table border="0">
   <tr>
     <td><a href="json/constructor.md">(constructor)</a></td>
