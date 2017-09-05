@@ -55,7 +55,7 @@ namespace detail {
                 {
                     if (it->op == op_type::add)
                     {
-                        if (jsonpointer::try_add(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::add(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
                         {
                             //std::cout << "add: " << it->path << std::endl;
                             break;
@@ -63,7 +63,7 @@ namespace detail {
                     }
                     else if (it->op == op_type::remove)
                     {
-                        if (jsonpointer::try_remove(target,it->path) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::remove(target,it->path) != jsonpointer::jsonpointer_errc())
                         {
                             //std::cout << "remove: " << it->path << std::endl;
                             break;
@@ -71,7 +71,7 @@ namespace detail {
                     }
                     else if (it->op == op_type::replace)
                     {
-                        if (jsonpointer::try_replace(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::replace(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
                         {
                             //std::cout << "replace: " << it->path << std::endl;
                             break;
@@ -123,7 +123,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
-                std::tie(val,ec) = jsonpointer::try_select(target,path);
+                std::tie(val,ec) = jsonpointer::select(target,path);
                 if (ec != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::test_failed;
@@ -151,8 +151,8 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                 {
                     Json val;
                     jsonpointer::jsonpointer_errc ec;
-                    std::tie(val,ec) = jsonpointer::try_select(target,path);
-                    if (jsonpointer::try_add(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
+                    std::tie(val,ec) = jsonpointer::select(target,path);
+                    if (jsonpointer::add(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::add_failed;
                         unwinder.state = detail::state_type::abort;
@@ -171,7 +171,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
-                std::tie(val,ec) = jsonpointer::try_select(target,path);
+                std::tie(val,ec) = jsonpointer::select(target,path);
                 if (ec != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::remove_failed;
@@ -179,7 +179,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                 }
                 else
                 {
-                    ec = jsonpointer::try_remove(target,path);
+                    ec = jsonpointer::remove(target,path);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::remove_failed;
@@ -195,7 +195,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
-                std::tie(val,ec) = jsonpointer::try_select(target,path);
+                std::tie(val,ec) = jsonpointer::select(target,path);
                 if (ec != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::replace_failed;
@@ -206,7 +206,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
-                else if (jsonpointer::try_replace(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
+                else if (jsonpointer::replace(target,path,operation.at("value")) != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::replace_failed;
                     unwinder.state = detail::state_type::abort;
@@ -228,13 +228,13 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     Json val;
                     jsonpointer::jsonpointer_errc ec;
                     string_view_type from = operation.at("from").as_string_view();
-                    std::tie(val,ec) = jsonpointer::try_select(target,from);
+                    std::tie(val,ec) = jsonpointer::select(target,from);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::move_failed;
                         unwinder.state = detail::state_type::abort;
                     }
-                    else if (jsonpointer::try_remove(target,from) != jsonpointer::jsonpointer_errc())
+                    else if (jsonpointer::remove(target,from) != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::move_failed;
                         unwinder.state = detail::state_type::abort;
@@ -242,7 +242,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     else
                     {
                         unwinder.stack.push_back({detail::op_type::add,from,val});
-                        if (jsonpointer::try_add(target,path,val) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::add(target,path,val) != jsonpointer::jsonpointer_errc())
                         {
                             patch_ec = jsonpatch_errc::move_failed;
                             unwinder.state = detail::state_type::abort;
@@ -266,7 +266,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     Json val;
                     jsonpointer::jsonpointer_errc ec;
                     string_view_type from = operation.at("from").as_string_view();
-                    std::tie(val,ec) = jsonpointer::try_select(target,from);
+                    std::tie(val,ec) = jsonpointer::select(target,from);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::copy_failed;
@@ -275,7 +275,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     else
                     {
                         unwinder.stack.push_back({detail::op_type::add,from,val});
-                        if (jsonpointer::try_add(target,path,val) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::add(target,path,val) != jsonpointer::jsonpointer_errc())
                         {
                             patch_ec = jsonpatch_errc::copy_failed;
                             unwinder.state = detail::state_type::abort;

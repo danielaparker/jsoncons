@@ -525,20 +525,7 @@ private:
 }
 
 template<class Json>
-Json select(const Json& root, typename Json::string_view_type path)
-{
-    detail::jsonpointer_evaluator<Json,const Json&,const Json*> evaluator;
-
-    jsonpointer_errc ec = evaluator.select(root,path);
-    if (ec != jsonpointer_errc())
-    {
-        throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
-    }
-    return evaluator.get_result();
-}
-
-template<class Json>
-std::tuple<Json,jsonpointer_errc> try_select(const Json& root, typename Json::string_view_type path)
+std::tuple<Json,jsonpointer_errc> select(const Json& root, typename Json::string_view_type path)
 {
     detail::jsonpointer_evaluator<Json,const Json&,const Json*> evaluator;
     jsonpointer_errc ec = evaluator.select(root,path);
@@ -546,19 +533,7 @@ std::tuple<Json,jsonpointer_errc> try_select(const Json& root, typename Json::st
 }
 
 template<class Json>
-void add(Json& root, typename Json::string_view_type path, const Json& value)
-{
-    detail::jsonpointer_evaluator<Json> evaluator;
-
-    jsonpointer_errc ec = evaluator.add(root,path,value);
-    if (ec != jsonpointer_errc())
-    {
-        throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
-    }
-}
-
-template<class Json>
-jsonpointer_errc try_add(Json& root, typename Json::string_view_type path, const Json& value)
+jsonpointer_errc add(Json& root, typename Json::string_view_type path, const Json& value)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
@@ -566,19 +541,7 @@ jsonpointer_errc try_add(Json& root, typename Json::string_view_type path, const
 }
 
 template<class Json>
-void remove(Json& root, typename Json::string_view_type path)
-{
-    detail::jsonpointer_evaluator<Json> evaluator;
-
-    jsonpointer_errc ec = evaluator.remove(root,path);
-    if (ec != jsonpointer_errc())
-    {
-        throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
-    }
-}
-
-template<class Json>
-jsonpointer_errc try_remove(Json& root, typename Json::string_view_type path)
+jsonpointer_errc remove(Json& root, typename Json::string_view_type path)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
@@ -586,19 +549,7 @@ jsonpointer_errc try_remove(Json& root, typename Json::string_view_type path)
 }
 
 template<class Json>
-void replace(Json& root, typename Json::string_view_type path, const Json& value)
-{
-    detail::jsonpointer_evaluator<Json> evaluator;
-
-    jsonpointer_errc ec = evaluator.replace(root,path,value);
-    if (ec != jsonpointer_errc())
-    {
-        throw parse_error(ec,evaluator.line_number(),evaluator.column_number());
-    }
-}
-
-template<class Json>
-jsonpointer_errc try_replace(Json& root, typename Json::string_view_type path, const Json& value)
+jsonpointer_errc replace(Json& root, typename Json::string_view_type path, const Json& value)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 

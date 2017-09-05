@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::select, jsoncons::jsonpointer::try_select
+### jsoncons::jsonpointer::select
 
 Selects a `json` value.
 
@@ -7,23 +7,15 @@ Selects a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-Json select(const Json& root, typename Json::string_view_type path); // (1)
-
-template<class Json>
-std::tuple<Json,jsonpointer_errc> try_select(const Json& root, 
-                                             typename Json::string_view_type path);  // (2)
+std::tuple<Json,jsonpointer_errc> select(const Json& root, typename Json::string_view_type path);
 
 ```
 
-#### Exceptions
-
-(1) On error, a [parse_error](../parse_error.md) exception that has an associated [jsonpointer_errc](jsonpointer_errc.md) error code.
-
 #### Return value
 
-(1) None
+On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md). 
 
-(2) On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md). On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
+On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
 
 ### Examples
 
@@ -37,7 +29,7 @@ using namespace jsoncons;
 
 int main()
 {
-    json root = json::parse(R"(
+    json example = json::parse(R"(
         {
           "foo": ["bar", "baz"],
           "": 0,
@@ -52,37 +44,33 @@ int main()
        }
     )");
    
-    try
-    {
-        json result1 = jsonpointer::select(example, "");
-        std::cout << "(1) " << result1 << std::endl;
-        json result2 = jsonpointer::select(example, "/foo");
-        std::cout << "(2) " << result2 << std::endl;
-        json result3 = jsonpointer::select(example, "/foo/0");
-        std::cout << "(3) " << result3 << std::endl;
-        json result4 = jsonpointer::select(example, "/");
-        std::cout << "(4) " << result4 << std::endl;
-        json result5 = jsonpointer::select(example, "/a~1b");
-        std::cout << "(5) " << result5 << std::endl;
-        json result6 = jsonpointer::select(example, "/c%d");
-        std::cout << "(6) " << result6 << std::endl;
-        json result7 = jsonpointer::select(example, "/e^f");
-        std::cout << "(7) " << result7 << std::endl;
-        json result8 = jsonpointer::select(example, "/g|h");
-        std::cout << "(8) " << result8 << std::endl;
-        json result9 = jsonpointer::select(example, "/i\\j");
-        std::cout << "(9) " << result9 << std::endl;
-        json result10 = jsonpointer::select(example, "/k\"l");
-        std::cout << "(10) " << result10 << std::endl;
-        json result11 = jsonpointer::select(example, "/ ");
-        std::cout << "(11) " << result11 << std::endl;
-        json result12 = jsonpointer::select(example, "/m~0n");
-        std::cout << "(12) " << result12 << std::endl;
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+    json result;
+    jsonpointer::jsonpointer_errc ec;
+
+    std::tie(result,ec) = jsonpointer::select(example, "");
+    std::cout << "(1) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/foo");
+    std::cout << "(2) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/foo/0");
+    std::cout << "(3) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/");
+    std::cout << "(4) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/a~1b");
+    std::cout << "(5) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/c%d");
+    std::cout << "(6) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/e^f");
+    std::cout << "(7) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/g|h");
+    std::cout << "(8) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/i\\j");
+    std::cout << "(9) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/k\"l");
+    std::cout << "(10) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/ ");
+    std::cout << "(11) " << result << std::endl;
+    std::tie(result,ec) = jsonpointer::select(example, "/m~0n");
+    std::cout << "(12) " << result << std::endl;
 }
 ```
 Output:
@@ -128,7 +116,7 @@ int main()
 
     json result;
     jsonpointer::jsonpointer_errc ec;
-    std::tie(result,ec) = jsonpointer::try_select(root, "/1/author");
+    std::tie(result,ec) = jsonpointer::select(root, "/1/author");
 
     if (ec == jsonpointer::jsonpointer_errc())
     {

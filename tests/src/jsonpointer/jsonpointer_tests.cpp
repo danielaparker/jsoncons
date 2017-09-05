@@ -41,54 +41,34 @@ const json example = json::parse(R"(
 
 void check_select(const std::string pointer, const json& expected)
 {
-    try
-    {
-        json result = jsonpointer::select(example,pointer);
-        BOOST_CHECK_EQUAL(expected,result);
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << ". " << pointer << std::endl;
-    }
+
+    json result;
+    jsonpointer::jsonpointer_errc ec;
+
+    std::tie(result,ec) = jsonpointer::select(example,pointer);
+    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    BOOST_CHECK_EQUAL(expected,result);
 }
 
 void check_add(json& example, const std::string& path, const json& value, const json& expected)
 {
-    try
-    {
-        jsonpointer::add(example, path, value);
-        BOOST_CHECK_EQUAL(expected, example);
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << ". " << path << std::endl;
-    }
+    jsonpointer::jsonpointer_errc ec = jsonpointer::add(example, path, value);
+    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    BOOST_CHECK_EQUAL(expected, example);
 }
 
 void check_replace(json& example, const std::string& path, const json& value, const json& expected)
 {
-    try
-    {
-        jsonpointer::replace(example, path, value);
-        BOOST_CHECK_EQUAL(expected, example);
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << ". " << path << std::endl;
-    }
+    jsonpointer::jsonpointer_errc ec = jsonpointer::replace(example, path, value);
+    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    BOOST_CHECK_EQUAL(expected, example);
 }
 
 void check_remove(json& example, const std::string& path, const json& expected)
 {
-    try
-    {
-        jsonpointer::remove(example, path);
-        BOOST_CHECK_EQUAL(expected, example);
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << ". " << path << std::endl;
-    }
+    jsonpointer::jsonpointer_errc ec = jsonpointer::remove(example, path);
+    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    BOOST_CHECK_EQUAL(expected, example);
 }
 
 BOOST_AUTO_TEST_CASE(test_jsonpointer)

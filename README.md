@@ -487,9 +487,14 @@ int main()
         ]
     )");
 
-    json result = jsonpointer::select(root, "/1/author");
+    json result;
+    jsonpointer::jsonpointer_errc ec;
+    std::tie(result,ec) = jsonpointer::select(root, "/1/author");
 
-    std::cout << result << std::endl;
+    if (ec == jsonpointer::jsonpointer_errc())
+    {
+        std::cout << result << std::endl;
+    }
 }
 ```
 Output:
@@ -497,7 +502,7 @@ Output:
 "Evelyn Waugh"
 ```
 
-See [select,try_select](doc/ref/jsonpointer/select.md), [add,try_add](doc/ref/jsonpointer/add.md), [remove,try_remove](doc/ref/jsonpointer/remove.md) and [replace,try_replace](doc/ref/jsonpointer/replace.md). 
+See [select](doc/ref/jsonpointer/select.md), [add](doc/ref/jsonpointer/add.md), [remove](doc/ref/jsonpointer/remove.md) and [replace](doc/ref/jsonpointer/replace.md). 
 
 <div id="ext_jsonpatch"/>
 
