@@ -565,7 +565,7 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        Json j = Json::array();
+        Json j = typename Json::array();
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first,last);
@@ -579,7 +579,7 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        Json j = Json::array(allocator);
+        Json j = typename Json::array(allocator);
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first, last);
@@ -718,7 +718,7 @@ struct json_type_traits<Json, std::array<E, N>>
 
     static Json to_json(const std::array<E, N>& val)
     {
-        Json j = Json::array();
+        Json j = typename Json::array();
         j.reserve(N);
         for (auto it = val.begin(); it != val.end(); ++it)
         {
@@ -730,7 +730,7 @@ struct json_type_traits<Json, std::array<E, N>>
     static Json to_json(const std::array<E, N>& val, 
                         const allocator_type& allocator)
     {
-        Json j = Json::array(allocator);
+        Json j = typename Json::array(allocator);
         j.reserve(N);
         for (auto it = val.begin(); it != val.end(); ++it)
         {
@@ -883,7 +883,7 @@ struct json_type_traits<Json, std::valarray<T>>
     
     static Json to_json(const std::valarray<T>& val)
     {
-        Json j = Json::array();
+        Json j = typename Json::array();
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first,last);
@@ -897,7 +897,7 @@ struct json_type_traits<Json, std::valarray<T>>
 
     static Json to_json(const std::valarray<T>& val, const allocator_type& allocator)
     {
-        Json j = Json::array(allocator);
+        Json j = typename Json::array(allocator);
         auto first = std::begin(val);
         auto last = std::end(val);
         size_t size = std::distance(first,last);
