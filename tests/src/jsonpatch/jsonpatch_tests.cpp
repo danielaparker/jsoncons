@@ -27,12 +27,10 @@ BOOST_AUTO_TEST_SUITE(jsonpatch_tests)
 void check_patch(json& target, const json& patch, jsonpatch::jsonpatch_errc expected_ec, const json& expected)
 {
     jsonpatch::jsonpatch_errc ec;
-    std::string op;
     std::string path;
-    std::tie(ec,op,path) = jsonpatch::patch(target,patch);
+    std::tie(ec,path) = jsonpatch::patch(target,patch);
     if (ec != expected_ec)
     {
-        std::cout << "op: " << op << std::endl;
         std::cout << "path: " << path << std::endl;
     }
     BOOST_CHECK(ec == expected_ec);

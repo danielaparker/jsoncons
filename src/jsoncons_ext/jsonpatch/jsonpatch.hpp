@@ -84,7 +84,7 @@ namespace detail {
 }
 
 template <class Json>
-std::tuple<jsonpatch_errc,typename Json::string_type,typename Json::string_type> patch(Json& target, const Json& patch)
+std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const Json& patch)
 {
     typedef typename Json::string_type string_type;
     typedef typename Json::string_view_type string_view_type;
@@ -96,26 +96,28 @@ std::tuple<jsonpatch_errc,typename Json::string_type,typename Json::string_type>
     const string_type move_op = string_type({ 'm','o','v','e' });
     const string_type copy_op = string_type({ 'c','o','p','y' });
 
+    const string_type op_key = string_type({ 'o','p' });
+    const string_type path_key = string_type({ 'p','a','t','h' });
+
     detail::operation_unwinder<Json> unwinder(target);
 
     // Validate
     
     jsonpatch_errc patch_ec = jsonpatch_errc();
-    string_type bad_op;
     string_type bad_path;
     for (const auto& operation : patch.array_range())
     {
         unwinder.state = detail::state_type::begin;
 
-        if (operation.count("op") != 1 || operation.count("path") != 1)
+        if (operation.count(op_key) != 1 || operation.count(path_key) != 1)
         {
             patch_ec = jsonpatch_errc::invalid_patch;
             unwinder.state = detail::state_type::abort;
         }
         else
         {
-            const string_view_type op = operation.at("op").as_string_view();
-            const string_view_type path = operation.at("path").as_string_view();
+            const string_view_type op = operation.at(op_key).as_string_view();
+            const string_view_type path = operation.at(path_key).as_string_view();
 
             if (op == test_op)
             {
@@ -287,7 +289,6 @@ std::tuple<jsonpatch_errc,typename Json::string_type,typename Json::string_type>
             }
             if (unwinder.state != detail::state_type::begin)
             {
-                bad_op = op;
                 bad_path = path;
             }
         }
@@ -300,7 +301,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type,typename Json::string_type>
     {
         unwinder.state = detail::state_type::commit;
     }
-    return std::make_tuple(patch_ec,bad_op,bad_path);
+    return std::make_tuple(patch_ec,bad_path);
 }
 
 }}

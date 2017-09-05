@@ -299,11 +299,20 @@ public:
                 switch (*p_)
                 {
                 case '/':
-                    if (!(current_.back()->is_array() || current_.back()->is_object()))
+                    if (current_.back()->is_array())
+                    {
+                        state_ = jsonpointer::detail::pointer_state::array_reference_token;
+                        index_ = 0;
+                    }
+                    else if (current_.back()->is_object())
+                    {
+                        state_ = jsonpointer::detail::pointer_state::object_reference_token;
+                        buffer_.clear();
+                    }
+                    else
                     {
                         return jsonpointer_errc::expected_object_or_array;
                     }
-                    state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
                     break;
                 default:
                     return jsonpointer_errc::expected_slash;
@@ -348,12 +357,20 @@ public:
                     {
                         return ec;
                     }
-                    if (!(current_.back()->is_array() || current_.back()->is_object()))
+                    if (current_.back()->is_array())
+                    {
+                        state_ = jsonpointer::detail::pointer_state::array_reference_token;
+                        index_ = 0;
+                    }
+                    else if (current_.back()->is_object())
+                    {
+                        state_ = jsonpointer::detail::pointer_state::object_reference_token;
+                        buffer_.clear();
+                    }
+                    else
                     {
                         return jsonpointer_errc::expected_object_or_array;
                     }
-                    state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
-                    index_ = 0;
                     break;
                 case '0':
                 case '1':
@@ -394,12 +411,20 @@ public:
                     {
                         return ec;
                     }
-                    if (!(current_.back()->is_array() || current_.back()->is_object()))
+                    if (current_.back()->is_array())
+                    {
+                        state_ = jsonpointer::detail::pointer_state::array_reference_token;
+                        index_ = 0;
+                    }
+                    else if (current_.back()->is_object())
+                    {
+                        state_ = jsonpointer::detail::pointer_state::object_reference_token;
+                        buffer_.clear();
+                    }
+                    else
                     {
                         return jsonpointer_errc::expected_object_or_array;
                     }
-                    state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
-                    index_ = 0;
                     break;
                 case '0':
                 case '1':
@@ -430,13 +455,20 @@ public:
                     {
                         return ec;
                     }
-                    if (!(current_.back()->is_array() || current_.back()->is_object()))
+                    if (current_.back()->is_array())
+                    {
+                        state_ = jsonpointer::detail::pointer_state::array_reference_token;
+                        index_ = 0;
+                    }
+                    else if (current_.back()->is_object())
+                    {
+                        state_ = jsonpointer::detail::pointer_state::object_reference_token;
+                        buffer_.clear();
+                    }
+                    else
                     {
                         return jsonpointer_errc::expected_object_or_array;
                     }
-                    state_ = current_.back()->is_array() ? jsonpointer::detail::pointer_state::array_reference_token : jsonpointer::detail::pointer_state::object_reference_token;
-                    index_ = 0;
-                    buffer_.clear();
                     break;
                 case '~':
                     state_ = jsonpointer::detail::pointer_state::escaped;

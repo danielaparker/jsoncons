@@ -1,175 +1,21 @@
 ### jsoncons::jsonpatch::patch
 
-Patched a `json` document.
+Patch a `json` document.
 
 #### Header
 ```c++
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 template <class Json>
-std::tuple<bool,typename Json::string_type,typename Json::string_type> patch(Json& target, const Json& patch)
+std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const Json& patch)
 ```
-
-#### Exceptions
-
-(1) On error, a [parse_error](../parse_error.md) exception that has an associated [jsonpointer_errc](jsonpointer_errc.md) error code.
 
 #### Return value
 
-(1) None
+On success, returns a value-initialized [jsonpatch_errc](jsonpatch_errc.md) and an empty string value.  
 
-(2) On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md).  
-On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
+On error, returns a [jsonpatch_errc](jsonpatch_errc.md) error code and the path that failed. 
 
 ### Examples
 
-#### Add a member to a target location that does not already exist
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    json target = json::parse(R"(
-        { "foo": "bar"}
-    )");
-
-    try
-    {
-        jsonpointer::add(target, "/baz", json("qux"));
-        std::cout << target << std::endl;
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-}
-```
-Output:
-```json
-{"baz":"qux","foo":"bar"}
-```
-
-#### Add an element to the second position in an array
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    json target = json::parse(R"(
-        { "foo": [ "bar", "baz" ] }
-    )");
-
-    auto ec = jsonpointer::try_add(target, "/foo/1", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
-    {
-        std::cout << target << std::endl;
-    }
-    else
-    {
-        std::cout << make_error_code(ec).message() << std::endl;
-    }
-}
-```
-Output:
-```json
-{"foo":["bar","qux","baz"]}
-```
-
-#### Add a value to the end of an array
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    json target = json::parse(R"(
-        { "foo": [ "bar", "baz" ] }
-    )");
-
-    try
-    {
-        jsonpointer::add(target, "/foo/-", json("qux"));
-        std::cout << target << std::endl;
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-}
-```
-Output:
-```json
-    {"foo":["bar","baz","qux"]}
-```
-
-#### Add an object member to a location that already exists
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    json target = json::parse(R"(
-        { "foo": "bar", "baz" : "abc"}
-    )");
-
-    try
-    {
-        jsonpointer::add(target, "/baz", json("qux"));
-        std::cout << target << std::endl;
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-}
-```
-Output:
-```json
-{"baz":"qux","foo":"bar"}
-```
-
-#### Add a value to a location in an array that exceeds the size of the array
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    json target = json::parse(R"(
-        { "foo": [ "bar", "baz" ] }
-    )");
-
-    auto ec = jsonpointer::try_add(target, "/foo/3", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
-    {
-        std::cout << target << std::endl;
-    }
-    else
-    {
-        std::cout << make_error_code(ec).message() << std::endl;
-    }
-}
-```
-Output:
-```
-Index exceeds array size
-```
 
