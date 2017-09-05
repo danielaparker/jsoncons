@@ -81,23 +81,32 @@ Member type                         |Definition
 
 #### Capacity
 
-    size_t size() const noexcept
-Returns the number of elements in a json array, or the number of members in a json object, or `zero`
-
-    bool empty() const noexcept
-Returns `true` if a json string, object or array has no elements, otherwise `false`.
-
-    size_t capacity() const
-Returns the size of the storage space currently allocated for a json object or array.
-
-    void reserve(size_t n)
-Increases the capacity of a json object or array to allow at least `n` members or elements. 
-
-    void resize(size_t n)
-Resizes a json array so that it contains `n` elements. 
-
-    void resize(size_t n, const json& val)
-Resizes a json array so that it contains `n` elements that are initialized to `val`. 
+<table border="0">
+  <tr>
+    <td><a>size_t size() const noexcept</a></td>
+    <td>Returns the number of elements in a json array, or the number of members in a json object, or `zero`</td> 
+  </tr>
+  <tr>
+    <td><a>bool empty() const noexcept</a></td>
+    <td>Returns `true` if a json string, object or array has no elements, otherwise `false`</td> 
+  </tr>
+  <tr>
+    <td><a>size_t capacity() const</a></td>
+    <td>Returns the size of the storage space currently allocated for a json object or array</td> 
+  </tr>
+  <tr>
+    <td><a>void reserve(size_t n)</a></td>
+    <td>Increases the capacity of a json object or array to allow at least `n` members or elements</td> 
+  </tr>
+  <tr>
+    <td><a>void resize(size_t n)</a></td>
+    <td>Resizes a json array so that it contains `n` elements</td> 
+  </tr>
+  <tr>
+    <td><a>void resize(size_t n, const json& val)</a></td>
+    <td>Resizes a json array so that it contains `n` elements that are initialized to `val`</td> 
+  </tr>
+</table>
 
 #### Accessors
 
