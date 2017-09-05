@@ -2492,7 +2492,7 @@ public:
     }
 
     basic_json(const char_type *s, size_t length)
-        : var_(s, length, allocator)
+        : var_(s, length)
     {
     }
 
