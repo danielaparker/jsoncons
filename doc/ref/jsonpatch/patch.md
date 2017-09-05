@@ -22,9 +22,10 @@ On error, returns a [jsonpatch_errc](jsonpatch_errc.md) error code and the path 
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 using namespace jsoncons;
+using namespace jsoncons::literals;
 
 int main()
 {
@@ -58,9 +59,10 @@ Output:
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 using namespace jsoncons;
+using namespace jsoncons::literals;
 
 int main()
 {
