@@ -43,6 +43,10 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [replace,try_replace](ref/jsonpointer/replace.md)  
 
+#### jsonpatch
+
+[patch](ref/jsonpatch/patch.md)  
+
 #### jsonpath
 
 [json_query](ref/json_query.md)

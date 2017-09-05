@@ -20,6 +20,7 @@ Features:
 Extensions:
 
 - [jsonpointer](#user-content-ext_jsonpointer) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
+- [jsonpatch](#user-content-ext_jsonpatch) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
 - [jsonpath](#user-content-ext_jsonpath) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
 - [csv](#user-content-ext_csv) implements reading (writing) JSON values from (to) CSV files
 - [msgpack](#user-content-ext_msgpack) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
@@ -497,6 +498,12 @@ Output:
 ```
 
 See [select,try_select](doc/ref/jsonpointer/select.md), [add,try_add](doc/ref/jsonpointer/add.md), [remove,try_remove](doc/ref/jsonpointer/remove.md) and [replace,try_replace](doc/ref/jsonpointer/replace.md). 
+
+<div id="ext_jsonpatch"/>
+
+See [patch](doc/ref/jsonpatch/patch.md)
+
+#### jsonpointer
 
 <div id="ext_jsonpath"/>
 
