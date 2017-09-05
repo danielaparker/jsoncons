@@ -362,7 +362,7 @@ v.push_back(10);
 v.push_back(20);
 v.push_back(30);
 
-json arr(v.begin(),v.end());
+json arr = v;
 
 std::cout << arr << std::endl;
 ```
