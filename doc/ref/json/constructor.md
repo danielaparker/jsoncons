@@ -13,7 +13,7 @@ json(const json& val, const allocator_type& allocator); // (5)
 
 json(json&& val) noexcept; // (6)
 
-json(json&& val, const allocator_type& allocator); // (7)
+json(json&& val, const allocator_type& allocator) noexcept; // (7)
 
 template <class T>
 json(const T& val); // (8)
