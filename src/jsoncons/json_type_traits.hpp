@@ -816,7 +816,7 @@ public:
     {
         std::array<Json, sizeof...(E)> buf;
         helper::to_json(val, buf);
-        return Json(Json::array(buf.begin(), buf.end()));
+        return Json(typename Json::array(buf.begin(), buf.end()));
     }
 };
 
