@@ -141,7 +141,7 @@ int main()
 ```
 Output:
 ```
-Insertion failed because an equivalent key already exists
+Key already exists
 ```
 
 #### Add a value to a location in an array that exceeds the size of the array

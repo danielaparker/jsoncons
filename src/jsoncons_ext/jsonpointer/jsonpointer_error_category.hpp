@@ -50,7 +50,7 @@ public:
         case jsonpointer_errc::name_not_found:
             return "Name not found";
         case jsonpointer_errc::key_already_exists:
-            return "Insertion failed because an equivalent key already exists";
+            return "Key already exists";
         case jsonpointer_errc::expected_object_or_array:
             return "Expected object or array";
         case jsonpointer_errc::end_of_input:
