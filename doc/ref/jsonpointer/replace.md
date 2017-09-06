@@ -7,8 +7,10 @@ Replace a `json` element or member.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-jsonpointer_errc replace(const Json& root, typename Json::string_view_type path, const Json& value); 
+jsonpointer_errc replace(Json& target, typename Json::string_view_type path, const Json& value); 
 ```
+
+Replaces the value at the location specified by `path` with a new value. 
 
 #### Return value
 

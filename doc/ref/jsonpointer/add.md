@@ -7,8 +7,16 @@ Adds a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-jsonpointer_errc add(const Json& root, typename Json::string_view_type path, const Json& value); 
+jsonpointer_errc add(Json& target, typename Json::string_view_type path, const Json& value); 
 ```
+
+Performs one of the following functions, depending upon what the `path` references:
+
+- If `path` specifies an array index, a new value is inserted into the array at the specified index.
+
+- If `path` specifies an object member that does not already exist, a new member is added to the object.
+
+- If `path` specifies an object member that does exist, that member's value is replaced.
 
 #### Return value
 
