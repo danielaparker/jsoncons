@@ -37,7 +37,7 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 ### How to use it
 
 - For a quick guide, see [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). 
-- Consult the [documentation](doc/Home.md) for the details. 
+- For the details, see the [documentation](doc/Home.md). 
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
