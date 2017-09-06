@@ -154,7 +154,8 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     Json val;
                     jsonpointer::jsonpointer_errc ec;
                     std::tie(val,ec) = jsonpointer::select(target,path);
-                    if (jsonpointer::add(target,path,operation.at(value_key)) != jsonpointer::jsonpointer_errc())
+                    auto npath = jsonpointer::normalized_path(target,path);
+                    if (jsonpointer::add(target,npath,operation.at(value_key)) != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::add_failed;
                         unwinder.state = detail::state_type::abort;
@@ -165,7 +166,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                         {
                             unwinder.stack.push_back({detail::op_type::add,path,val});
                         }
-                        unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                        unwinder.stack.push_back({detail::op_type::remove,npath,Json::null()});
                     }
                 }
             }
@@ -244,14 +245,26 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     else
                     {
                         unwinder.stack.push_back({detail::op_type::add,from,val});
-                        if (jsonpointer::add(target,path,val) != jsonpointer::jsonpointer_errc())
+                        // add
+                        auto npath = jsonpointer::normalized_path(target,path);
+                        // anything already there?
+                        Json oldval;
+                        jsonpointer::jsonpointer_errc oldec;
+                        std::tie(oldval,oldec) = jsonpointer::select(target,npath);
+
+                        if (jsonpointer::add(target,npath,val) != jsonpointer::jsonpointer_errc())
                         {
                             patch_ec = jsonpatch_errc::move_failed;
                             unwinder.state = detail::state_type::abort;
                         }
                         else
                         {
-                            unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                            if (oldec == jsonpointer::jsonpointer_errc())
+                            {
+                                // need to restore this
+                                unwinder.stack.push_back({detail::op_type::add,npath,oldval});
+                            }
+                            unwinder.stack.push_back({detail::op_type::remove,npath,Json::null()});
                         }
                     }           
                 }
@@ -276,15 +289,26 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     }
                     else
                     {
-                        unwinder.stack.push_back({detail::op_type::add,from,val});
-                        if (jsonpointer::add(target,path,val) != jsonpointer::jsonpointer_errc())
+                        // add
+                        auto npath = jsonpointer::normalized_path(target,path);
+                        // anything already there?
+                        Json oldval;
+                        jsonpointer::jsonpointer_errc oldec;
+                        std::tie(oldval,oldec) = jsonpointer::select(target,npath);
+
+                        if (jsonpointer::add(target,npath,val) != jsonpointer::jsonpointer_errc())
                         {
                             patch_ec = jsonpatch_errc::copy_failed;
                             unwinder.state = detail::state_type::abort;
                         }
                         else
                         {
-                            unwinder.stack.push_back({detail::op_type::remove,path,Json::null()});
+                            if (oldec == jsonpointer::jsonpointer_errc())
+                            {
+                                // need to restore this
+                                unwinder.stack.push_back({detail::op_type::add,npath,oldval});
+                            }
+                            unwinder.stack.push_back({detail::op_type::remove,npath,Json::null()});
                         }
                     }
                 }

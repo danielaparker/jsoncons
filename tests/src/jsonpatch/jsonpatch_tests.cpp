@@ -367,7 +367,7 @@ BOOST_AUTO_TEST_CASE(test_add_add)
     check_patch(target,patch,jsonpatch::jsonpatch_errc(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_add_add_add_failed)
+BOOST_AUTO_TEST_CASE(test_add_add_add_fail)
 {
     json target = R"(
         { "foo": "bar"}
@@ -384,6 +384,53 @@ BOOST_AUTO_TEST_CASE(test_add_add_add_failed)
     json expected = target;
 
     check_patch(target,patch,jsonpatch::jsonpatch_errc::add_failed,expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_add_remove_remove_fail)
+{
+    json target = R"(
+        {
+            "baz": "boo",
+            "foo": [ "bar", "qux", "baz" ]
+        }
+    )"_json;
+
+    json patch = R"(
+        [
+            { "op": "add", "path": "/baz", "value": "qux" },
+            { "op": "remove", "path": "/foo/2" },
+            { "op": "remove", "path": "/foo/2" } // nonexistent target
+        ]
+    )"_json;
+
+    json expected = target;
+
+    check_patch(target,patch,jsonpatch::jsonpatch_errc::remove_failed,expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_move_copy_replace_remove_fail)
+{
+    json target = R"(
+        {
+            "baz": ["boo"],
+            "foo": [ "bar", "qux", "baz" ]
+        }
+    )"_json;
+
+    json patch = R"(
+        [
+            { "op": "add", "path": "/baz/-", "value": "xyz" },
+            { "op": "move", "from": "/foo/1", "path" : "/baz/-" },
+            { "op": "copy", "from": "/baz/0", "path" : "/foo/-" },
+            { "op": "replace", "path": "/foo/2", "value" : "qux" },
+            { "op": "remove", "path": "/foo/3" } // nonexistent target
+        ]
+    )"_json;
+
+    json expected = target;
+
+    check_patch(target,patch,jsonpatch::jsonpatch_errc::remove_failed,expected);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

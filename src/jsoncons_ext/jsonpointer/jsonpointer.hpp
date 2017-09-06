@@ -159,6 +159,29 @@ public:
         return ec;
     }
 
+    string_type normalized_path(json_reference root, typename Json::string_view_type path)
+    {
+        jsonpointer_errc ec = evaluate(root,PathSetter<Json,JsonReference,JsonPointer>(),path);
+        if (ec != jsonpointer_errc())
+        {
+            return path;
+        }
+        if (state_ == jsonpointer::detail::pointer_state::after_last_array_reference_token)
+        {
+            string_type p = path.substr(0,path.length()-1);
+            std::string s = std::to_string(current_.back()->size());
+            for (auto c : s)
+            {
+                p.push_back(c);
+            }
+            return p;
+        }
+        else
+        {
+            return path;
+        }
+    }
+
     jsonpointer_errc add(json_reference root,
                          typename Json::string_view_type path,
                          const Json& value)
@@ -522,6 +545,13 @@ private:
     }
 };
 
+}
+
+template<class Json>
+typename Json::string_type normalized_path(const Json& root, typename Json::string_view_type path)
+{
+    detail::jsonpointer_evaluator<Json, const Json&, const Json*> evaluator;
+    return evaluator.normalized_path(root,path);
 }
 
 template<class Json>
