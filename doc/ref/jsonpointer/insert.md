@@ -38,7 +38,7 @@ int main()
         { "foo": "bar"}
     )");
 
-    auto ec = jsonpointer::insert_or_assign(target, "/baz", json("qux"));
+    auto ec = jsonpointer::insert(target, "/baz", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -68,7 +68,7 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::insert_or_assign(target, "/foo/1", json("qux"));
+    auto ec = jsonpointer::insert(target, "/foo/1", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -98,7 +98,7 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::insert_or_assign(target, "/foo/-", json("qux"));
+    auto ec = jsonpointer::insert(target, "/foo/-", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -128,7 +128,7 @@ int main()
         { "foo": "bar", "baz" : "abc"}
     )");
 
-    auto ec = jsonpointer::insert_or_assign(target, "/baz", json("qux"));
+    auto ec = jsonpointer::insert(target, "/baz", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -140,8 +140,8 @@ int main()
 }
 ```
 Output:
-```json
-{"baz":"qux","foo":"bar"}
+```
+Insertion failed because an equivalent key already exists
 ```
 
 #### Add a value to a location in an array that exceeds the size of the array
@@ -158,7 +158,7 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::insert_or_assign(target, "/foo/3", json("qux"));
+    auto ec = jsonpointer::insert(target, "/foo/3", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
