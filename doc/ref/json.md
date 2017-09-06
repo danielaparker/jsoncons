@@ -193,30 +193,15 @@ Make `get_with_default` do the right thing for string literals.
 
 #### Modifiers
 
-    void clear()
-Remove all elements from an array or object value, otherwise do nothing
-
-    void erase(const_array_iterator pos)
-Remove an element from an array at the specified position.
-Throws `std::runtime_error` if not an object.
-
-    void erase(const_array_iterator first, const_array_iterator last)
-Remove the elements from an array in the range '[first,last)'.
-Throws `std::runtime_error` if not an object.
-
-    void erase(const_object_iterator pos)
-Remove a member from an object at the specified position.
-Throws `std::runtime_error` if not an object.
-
-    void erase(const_object_iterator first, const_object_iterator last)
-Remove the members from an object in the range '[first,last)'.
-Throws `std::runtime_error` if not an object.
-
-    void erase(string_view_type name)
-Remove a member with the specified name from an object
-Throws `std::runtime_error` if not an object.
-
 <table border="0">
+  <tr>
+    <td><a>void clear()</a></td>
+    <td>Remove all elements from an array or members from an object, otherwise do nothing</td> 
+  </tr>
+  <tr>
+    <td><a href="json/erase.md">erase</a></td>
+    <td>Erases array elements and object members</td> 
+  </tr>
   <tr>
     <td><a href="json/push_back.md">push_back</a></td>
     <td>Adds a value to the end of a json array</td> 
@@ -247,16 +232,17 @@ Throws `std::runtime_error` if not an object.
   </tr>
   <tr>
     <td><a href="json/merge.md">merge</a></td>
-    <td>Inserts another json object's key-value pairs into a json object, if they don't already exist.
+    <td>Inserts another json object's key-value pairs into a json object, if they don't already exist.</td>
   </tr>
   <tr>
     <td><a href="json/merge_or_update.md">merge_or_update</a></td>
-    <td>Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.
+    <td>Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.</td>
+  </tr>
+  <tr>
+    <td><a>void swap(json& val)</a></td>
+    <td>Exchanges the content of the `json` value with the content of `val`, which is another `json` value</td>
   </tr>
 </table>
-
-    void swap(json& val)
-Exchanges the content of the `json` value with the content of `val`, which is another `json` value.
 
 #### Relational operators
 
