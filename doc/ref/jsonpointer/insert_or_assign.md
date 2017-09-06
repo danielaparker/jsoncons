@@ -10,7 +10,7 @@ template<class Json>
 jsonpointer_errc insert_or_assign(Json& target, typename Json::string_view_type path, const Json& value); 
 ```
 
-Performs one of the following functions, depending upon what the `path` references:
+Inserts a value into the target at the specified path, or if the path specifies an object member that already has the same key, assigns to that member's value
 
 - If `path` specifies an array index, a new value is inserted into the array at the specified index.
 
