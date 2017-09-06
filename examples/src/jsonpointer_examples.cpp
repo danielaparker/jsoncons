@@ -90,7 +90,7 @@ void jsonpointer_add_member_to_object()
         { "foo": "bar"}
     )");
 
-    auto ec = jsonpointer::add(target, "/baz", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/baz", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -107,7 +107,7 @@ void jsonpointer_add_element_to_array()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::add(target, "/foo/1", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/foo/1", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -124,7 +124,7 @@ void jsonpointer_add_element_to_end_array()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::add(target, "/foo/-", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/foo/-", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -141,7 +141,7 @@ void jsonpointer_add_value_name_exists()
         { "foo": "bar", "baz" : "abc"}
     )");
 
-    auto ec = jsonpointer::add(target, "/baz", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/baz", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -158,7 +158,7 @@ void jsonpointer_add_element_outside_range()
     { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::add(target, "/foo/3", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/foo/3", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -175,7 +175,7 @@ void jsonpointer_remove_object_member()
         { "foo": "bar", "baz" : "qux"}
     )");
 
-    auto ec = jsonpointer::remove(target, "/baz");
+    auto ec = jsonpointer::erase(target, "/baz");
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -192,7 +192,7 @@ void jsonpointer_remove_array_element()
         { "foo": [ "bar", "qux", "baz" ] }
     )");
 
-    auto ec = jsonpointer::remove(target, "/foo/1");
+    auto ec = jsonpointer::erase(target, "/foo/1");
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -212,7 +212,7 @@ void jsonpointer_replace_object_value()
         }
     )");
 
-    auto ec = jsonpointer::replace(target, "/baz", json("boo"));
+    auto ec = jsonpointer::assign(target, "/baz", json("boo"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -229,7 +229,7 @@ void jsonpointer_replace_array_value()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::replace(target, "/foo/1", json("qux"));
+    auto ec = jsonpointer::assign(target, "/foo/1", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << pretty_print(target) << std::endl;

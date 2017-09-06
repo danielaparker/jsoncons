@@ -492,7 +492,7 @@ Output:
 "Evelyn Waugh"
 ```
 
-See [select](doc/ref/jsonpointer/select.md), [add](doc/ref/jsonpointer/add.md), [remove](doc/ref/jsonpointer/remove.md) and [replace](doc/ref/jsonpointer/replace.md). 
+See [select](doc/ref/jsonpointer/select.md), [insert](doc/ref/jsonpointer/insert.md), [insert_or_assign](doc/ref/jsonpointer/insert_or_assign.md), [erase](doc/ref/jsonpointer/erase.md) and [assign](doc/ref/jsonpointer/assign.md). 
 
 <div id="ext_jsonpatch"/>
 

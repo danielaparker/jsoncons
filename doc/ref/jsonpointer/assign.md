@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::replace
+### jsoncons::jsonpointer::assign
 
 Replace a `json` element or member.
 
@@ -7,7 +7,7 @@ Replace a `json` element or member.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-jsonpointer_errc replace(Json& target, typename Json::string_view_type path, const Json& value); 
+jsonpointer_errc assign(Json& target, typename Json::string_view_type path, const Json& value); 
 ```
 
 Replaces the value at the location specified by `path` with a new value. 
@@ -37,7 +37,7 @@ int main()
         }
     )");
 
-    auto ec = jsonpointer::replace(target, "/baz", json("boo"));
+    auto ec = jsonpointer::assign(target, "/baz", json("boo"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -70,7 +70,7 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::replace(target, "/foo/1", json("qux"));
+    auto ec = jsonpointer::assign(target, "/foo/1", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << pretty_print(target) << std::endl;

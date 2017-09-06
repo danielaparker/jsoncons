@@ -52,21 +52,21 @@ void check_select(const std::string pointer, const json& expected)
 
 void check_add(json& example, const std::string& path, const json& value, const json& expected)
 {
-    jsonpointer::jsonpointer_errc ec = jsonpointer::add(example, path, value);
+    jsonpointer::jsonpointer_errc ec = jsonpointer::insert_or_assign(example, path, value);
     BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
     BOOST_CHECK_EQUAL(expected, example);
 }
 
 void check_replace(json& example, const std::string& path, const json& value, const json& expected)
 {
-    jsonpointer::jsonpointer_errc ec = jsonpointer::replace(example, path, value);
+    jsonpointer::jsonpointer_errc ec = jsonpointer::assign(example, path, value);
     BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
     BOOST_CHECK_EQUAL(expected, example);
 }
 
 void check_remove(json& example, const std::string& path, const json& expected)
 {
-    jsonpointer::jsonpointer_errc ec = jsonpointer::remove(example, path);
+    jsonpointer::jsonpointer_errc ec = jsonpointer::erase(example, path);
     BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
     BOOST_CHECK_EQUAL(expected, example);
 }

@@ -182,9 +182,9 @@ public:
         }
     }
 
-    jsonpointer_errc add(json_reference root,
-                         typename Json::string_view_type path,
-                         const Json& value)
+    jsonpointer_errc insert_or_assign(json_reference root,
+                                      typename Json::string_view_type path,
+                                      const Json& value)
     {
         jsonpointer_errc ec = evaluate(root,PathSetter<Json,JsonReference,JsonPointer>(),path);
         if (ec != jsonpointer_errc())
@@ -258,7 +258,7 @@ public:
         case jsonpointer::detail::pointer_state::object_reference_token: 
             if (current_.back()->has_key(buffer_))
             {
-                ec = jsonpointer_errc::member_already_exists;
+                ec = jsonpointer_errc::key_already_exists;
             }
             else
             {
@@ -271,7 +271,7 @@ public:
         return ec;
     }
 
-    jsonpointer_errc remove(json_reference root,
+    jsonpointer_errc erase(json_reference root,
                             typename Json::string_view_type path)
     {
         jsonpointer_errc ec = evaluate(root,PathResolver<Json,JsonReference,JsonPointer>(),path);
@@ -307,7 +307,7 @@ public:
         return ec;
     }
 
-    jsonpointer_errc replace(json_reference root,
+    jsonpointer_errc assign(json_reference root,
                              typename Json::string_view_type path,
                              const Json& value)
     {
@@ -611,11 +611,11 @@ std::tuple<Json,jsonpointer_errc> select(const Json& root, typename Json::string
 }
 
 template<class Json>
-jsonpointer_errc add(Json& root, typename Json::string_view_type path, const Json& value)
+jsonpointer_errc insert_or_assign(Json& root, typename Json::string_view_type path, const Json& value)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
-    return evaluator.add(root,path,value);
+    return evaluator.insert_or_assign(root,path,value);
 }
 
 template<class Json>
@@ -627,19 +627,19 @@ jsonpointer_errc insert(Json& root, typename Json::string_view_type path, const 
 }
 
 template<class Json>
-jsonpointer_errc remove(Json& root, typename Json::string_view_type path)
+jsonpointer_errc erase(Json& root, typename Json::string_view_type path)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
-    return evaluator.remove(root,path);
+    return evaluator.erase(root,path);
 }
 
 template<class Json>
-jsonpointer_errc replace(Json& root, typename Json::string_view_type path, const Json& value)
+jsonpointer_errc assign(Json& root, typename Json::string_view_type path, const Json& value)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
-    return evaluator.replace(root,path,value);
+    return evaluator.assign(root,path,value);
 }
 
 }}

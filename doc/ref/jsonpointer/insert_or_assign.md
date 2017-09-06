@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::add
+### jsoncons::jsonpointer::insert_or_assign
 
 Adds a `json` value.
 
@@ -7,7 +7,7 @@ Adds a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-jsonpointer_errc add(Json& target, typename Json::string_view_type path, const Json& value); 
+jsonpointer_errc insert_or_assign(Json& target, typename Json::string_view_type path, const Json& value); 
 ```
 
 Performs one of the following functions, depending upon what the `path` references:
@@ -40,7 +40,7 @@ int main()
         { "foo": "bar"}
     )");
 
-    auto ec = jsonpointer::add(target, "/baz", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/baz", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -70,7 +70,7 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::add(target, "/foo/1", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/foo/1", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -100,7 +100,7 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::add(target, "/foo/-", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/foo/-", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -130,7 +130,7 @@ int main()
         { "foo": "bar", "baz" : "abc"}
     )");
 
-    auto ec = jsonpointer::add(target, "/baz", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/baz", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -160,7 +160,7 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::add(target, "/foo/3", json("qux"));
+    auto ec = jsonpointer::insert_or_assign(target, "/foo/3", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;

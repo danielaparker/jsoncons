@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::remove
+### jsoncons::jsonpointer::erase
 
 Removes a `json` element.
 
@@ -7,7 +7,7 @@ Removes a `json` element.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-jsonpointer_errc remove(Json& target, typename Json::string_view_type path); 
+jsonpointer_errc erase(Json& target, typename Json::string_view_type path); 
 ```
 
 Removes the value at the location specifed by `path`.
@@ -34,7 +34,7 @@ int main()
         { "foo": "bar", "baz" : "qux"}
     )");
 
-    auto ec = jsonpointer::remove(target, "/baz");
+    auto ec = jsonpointer::erase(target, "/baz");
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -64,7 +64,7 @@ int main()
         { "foo": [ "bar", "qux", "baz" ] }
     )");
 
-    auto ec = jsonpointer::remove(target, "/foo/1");
+    auto ec = jsonpointer::erase(target, "/foo/1");
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;

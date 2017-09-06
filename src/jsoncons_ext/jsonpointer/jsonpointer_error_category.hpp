@@ -20,7 +20,7 @@ enum class jsonpointer_errc
     index_exceeds_array_size,
     expected_0_or_1,
     name_not_found,
-    member_already_exists,
+    key_already_exists,
     expected_object_or_array,
     end_of_input
 };
@@ -49,8 +49,8 @@ public:
             return "Expected '0' or '1' after escape character '~'";
         case jsonpointer_errc::name_not_found:
             return "Name not found";
-        case jsonpointer_errc::member_already_exists:
-            return "Attempt to insert a member that already exists";
+        case jsonpointer_errc::key_already_exists:
+            return "Insertion failed because an equivalent key already exists";
         case jsonpointer_errc::expected_object_or_array:
             return "Expected object or array";
         case jsonpointer_errc::end_of_input:

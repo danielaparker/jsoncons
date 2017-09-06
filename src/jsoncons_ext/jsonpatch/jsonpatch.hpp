@@ -55,7 +55,7 @@ namespace detail {
                 {
                     if (it->op == op_type::add)
                     {
-                        if (jsonpointer::add(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::insert_or_assign(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
                         {
                             //std::cout << "add: " << it->path << std::endl;
                             break;
@@ -63,7 +63,7 @@ namespace detail {
                     }
                     else if (it->op == op_type::remove)
                     {
-                        if (jsonpointer::remove(target,it->path) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::erase(target,it->path) != jsonpointer::jsonpointer_errc())
                         {
                             //std::cout << "remove: " << it->path << std::endl;
                             break;
@@ -71,7 +71,7 @@ namespace detail {
                     }
                     else if (it->op == op_type::replace)
                     {
-                        if (jsonpointer::replace(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::assign(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
                         {
                             //std::cout << "replace: " << it->path << std::endl;
                             break;
@@ -154,7 +154,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     Json val = operation.at(value_key);
                     auto npath = jsonpointer::normalized_path(target,path);
                     auto insert_ec = jsonpointer::insert(target,npath,val); // try insert without replace
-                    if (insert_ec == jsonpointer::jsonpointer_errc::member_already_exists) // try a replace
+                    if (insert_ec == jsonpointer::jsonpointer_errc::key_already_exists) // try a replace
                     {
                         Json orig_val;
                         jsonpointer::jsonpointer_errc select_ec;
@@ -164,7 +164,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                             patch_ec = jsonpatch_errc::add_failed;
                             unwinder.state = detail::state_type::abort;
                         }
-                        else if (jsonpointer::replace(target,npath,val) != jsonpointer::jsonpointer_errc())
+                        else if (jsonpointer::assign(target,npath,val) != jsonpointer::jsonpointer_errc())
                         {
                             patch_ec = jsonpatch_errc::add_failed;
                             unwinder.state = detail::state_type::abort;
@@ -197,7 +197,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                 }
                 else
                 {
-                    ec = jsonpointer::remove(target,path);
+                    ec = jsonpointer::erase(target,path);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::remove_failed;
@@ -224,7 +224,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
-                else if (jsonpointer::replace(target,path,operation.at(value_key)) != jsonpointer::jsonpointer_errc())
+                else if (jsonpointer::assign(target,path,operation.at(value_key)) != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::replace_failed;
                     unwinder.state = detail::state_type::abort;
@@ -252,7 +252,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                         patch_ec = jsonpatch_errc::move_failed;
                         unwinder.state = detail::state_type::abort;
                     }
-                    else if (jsonpointer::remove(target,from) != jsonpointer::jsonpointer_errc())
+                    else if (jsonpointer::erase(target,from) != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::move_failed;
                         unwinder.state = detail::state_type::abort;
@@ -263,7 +263,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                         // add
                         auto npath = jsonpointer::normalized_path(target,path);
                         auto insert_ec = jsonpointer::insert(target,npath,val); // try insert without replace
-                        if (insert_ec == jsonpointer::jsonpointer_errc::member_already_exists) // try a replace
+                        if (insert_ec == jsonpointer::jsonpointer_errc::key_already_exists) // try a replace
                         {
                             Json orig_val;
                             jsonpointer::jsonpointer_errc select_ec;
@@ -273,7 +273,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                                 patch_ec = jsonpatch_errc::copy_failed;
                                 unwinder.state = detail::state_type::abort;
                             }
-                            else if (jsonpointer::replace(target,npath,val) != jsonpointer::jsonpointer_errc())
+                            else if (jsonpointer::assign(target,npath,val) != jsonpointer::jsonpointer_errc())
                             {
                                 patch_ec = jsonpatch_errc::copy_failed;
                                 unwinder.state = detail::state_type::abort;
@@ -318,7 +318,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                         // add
                         auto npath = jsonpointer::normalized_path(target,path);
                         auto insert_ec = jsonpointer::insert(target,npath,val); // try insert without replace
-                        if (insert_ec == jsonpointer::jsonpointer_errc::member_already_exists) // try a replace
+                        if (insert_ec == jsonpointer::jsonpointer_errc::key_already_exists) // try a replace
                         {
                             Json orig_val;
                             jsonpointer::jsonpointer_errc select_ec;
@@ -328,7 +328,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                                 patch_ec = jsonpatch_errc::copy_failed;
                                 unwinder.state = detail::state_type::abort;
                             }
-                            else if (jsonpointer::replace(target,npath,val) != jsonpointer::jsonpointer_errc())
+                            else if (jsonpointer::assign(target,npath,val) != jsonpointer::jsonpointer_errc())
                             {
                                 patch_ec = jsonpatch_errc::copy_failed;
                                 unwinder.state = detail::state_type::abort;
