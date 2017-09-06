@@ -223,6 +223,54 @@ public:
         return ec;
     }
 
+    jsonpointer_errc insert(json_reference root,
+                            typename Json::string_view_type path,
+                            const Json& value)
+    {
+        jsonpointer_errc ec = evaluate(root,PathSetter<Json,JsonReference,JsonPointer>(),path);
+        if (ec != jsonpointer_errc())
+        {
+            return ec;
+        }
+
+        switch (state_)
+        {
+        case jsonpointer::detail::pointer_state::start: 
+            break;
+        case jsonpointer::detail::pointer_state::zero_array_reference_token: 
+        case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
+            if (index_ > current_.back()->size())
+            {
+                return jsonpointer_errc::index_exceeds_array_size;
+            }
+            if (index_ == current_.back()->size())
+            {
+                current_.back()->push_back(value);
+            }
+            else
+            {
+                current_.back()->insert(current_.back()->array_range().begin()+index_,value);
+            }
+            break;
+        case jsonpointer::detail::pointer_state::after_last_array_reference_token:
+            current_.back()->push_back(value);
+            break;
+        case jsonpointer::detail::pointer_state::object_reference_token: 
+            if (current_.back()->has_key(buffer_))
+            {
+                ec = jsonpointer_errc::member_already_exists;
+            }
+            else
+            {
+                current_.back()->set(buffer_,value);
+            }
+            break;
+        default:
+            return jsonpointer_errc::end_of_input;
+        }
+        return ec;
+    }
+
     jsonpointer_errc remove(json_reference root,
                             typename Json::string_view_type path)
     {
@@ -568,6 +616,14 @@ jsonpointer_errc add(Json& root, typename Json::string_view_type path, const Jso
     detail::jsonpointer_evaluator<Json> evaluator;
 
     return evaluator.add(root,path,value);
+}
+
+template<class Json>
+jsonpointer_errc insert(Json& root, typename Json::string_view_type path, const Json& value)
+{
+    detail::jsonpointer_evaluator<Json> evaluator;
+
+    return evaluator.insert(root,path,value);
 }
 
 template<class Json>
