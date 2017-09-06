@@ -105,6 +105,10 @@ Member type                         |Definition
     <td><a>void resize(size_t n, const json& val)</a></td>
     <td>Resizes a json array so that it contains `n` elements that are initialized to `val`</td> 
   </tr>
+  <tr>
+    <td><a>void shrink_to_fit()</a></td>
+    <td>Requests the removal of unused capacity</td> 
+  </tr>
 </table>
 
 #### Accessors
@@ -211,9 +215,6 @@ Throws `std::runtime_error` if not an object.
     void erase(string_view_type name)
 Remove a member with the specified name from an object
 Throws `std::runtime_error` if not an object.
-
-    void shrink_to_fit()
-Requests the removal of unused capacity.
 
 <table border="0">
   <tr>

@@ -1,3 +1,12 @@
+master
+------
+
+New features
+
+- JSON Pointer implementation
+
+- JSON Patch implementation
+
 0.99.8.2
 --------
 
