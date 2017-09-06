@@ -479,7 +479,7 @@ int main()
 
     json result;
     jsonpointer::jsonpointer_errc ec;
-    std::tie(result,ec) = jsonpointer::select(root, "/1/author");
+    std::tie(result,ec) = jsonpointer::get(root, "/1/author");
 
     if (ec == jsonpointer::jsonpointer_errc())
     {
@@ -492,7 +492,7 @@ Output:
 "Evelyn Waugh"
 ```
 
-See [select](doc/ref/jsonpointer/select.md), [insert](doc/ref/jsonpointer/insert.md), [insert_or_assign](doc/ref/jsonpointer/insert_or_assign.md), [erase](doc/ref/jsonpointer/erase.md) and [assign](doc/ref/jsonpointer/assign.md). 
+See [get](doc/ref/jsonpointer/get.md), [insert](doc/ref/jsonpointer/insert.md), [insert_or_assign](doc/ref/jsonpointer/insert_or_assign.md), [erase](doc/ref/jsonpointer/erase.md) and [assign](doc/ref/jsonpointer/assign.md). 
 
 <div id="ext_jsonpatch"/>
 

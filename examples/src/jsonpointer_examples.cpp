@@ -27,29 +27,29 @@ void jsonpointer_select_RFC6901()
     json result;
     jsonpointer::jsonpointer_errc ec;
 
-    std::tie(result,ec) = jsonpointer::select(example, "");
+    std::tie(result,ec) = jsonpointer::get(example, "");
     std::cout << "(1) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/foo");
+    std::tie(result,ec) = jsonpointer::get(example, "/foo");
     std::cout << "(2) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/foo/0");
+    std::tie(result,ec) = jsonpointer::get(example, "/foo/0");
     std::cout << "(3) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/");
+    std::tie(result,ec) = jsonpointer::get(example, "/");
     std::cout << "(4) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/a~1b");
+    std::tie(result,ec) = jsonpointer::get(example, "/a~1b");
     std::cout << "(5) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/c%d");
+    std::tie(result,ec) = jsonpointer::get(example, "/c%d");
     std::cout << "(6) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/e^f");
+    std::tie(result,ec) = jsonpointer::get(example, "/e^f");
     std::cout << "(7) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/g|h");
+    std::tie(result,ec) = jsonpointer::get(example, "/g|h");
     std::cout << "(8) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/i\\j");
+    std::tie(result,ec) = jsonpointer::get(example, "/i\\j");
     std::cout << "(9) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/k\"l");
+    std::tie(result,ec) = jsonpointer::get(example, "/k\"l");
     std::cout << "(10) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/ ");
+    std::tie(result,ec) = jsonpointer::get(example, "/ ");
     std::cout << "(11) " << result << std::endl;
-    std::tie(result,ec) = jsonpointer::select(example, "/m~0n");
+    std::tie(result,ec) = jsonpointer::get(example, "/m~0n");
     std::cout << "(12) " << result << std::endl;
 }
 
@@ -72,7 +72,7 @@ void jsonpointer_select_author()
 
     json result;
     jsonpointer::jsonpointer_errc ec;
-    std::tie(result,ec) = jsonpointer::select(root, "/1/author");
+    std::tie(result,ec) = jsonpointer::get(root, "/1/author");
 
     if (ec == jsonpointer::jsonpointer_errc())
     {

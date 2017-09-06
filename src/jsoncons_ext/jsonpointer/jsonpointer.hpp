@@ -132,7 +132,7 @@ public:
         return column_;
     }
 
-    jsonpointer_errc select(json_reference root,
+    jsonpointer_errc get(json_reference root,
                             typename Json::string_view_type path)
     {
         PathResolver<Json,JsonReference,JsonPointer> op;
@@ -603,10 +603,10 @@ typename Json::string_type normalized_path(const Json& root, typename Json::stri
 }
 
 template<class Json>
-std::tuple<Json,jsonpointer_errc> select(const Json& root, typename Json::string_view_type path)
+std::tuple<Json,jsonpointer_errc> get(const Json& root, typename Json::string_view_type path)
 {
     detail::jsonpointer_evaluator<Json,const Json&,const Json*> evaluator;
-    jsonpointer_errc ec = evaluator.select(root,path);
+    jsonpointer_errc ec = evaluator.get(root,path);
     return std::make_tuple(evaluator.get_result(),ec);
 }
 

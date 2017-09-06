@@ -45,7 +45,7 @@ void check_select(const std::string pointer, const json& expected)
     json result;
     jsonpointer::jsonpointer_errc ec;
 
-    std::tie(result,ec) = jsonpointer::select(example,pointer);
+    std::tie(result,ec) = jsonpointer::get(example,pointer);
     BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
     BOOST_CHECK_EQUAL(expected,result);
 }

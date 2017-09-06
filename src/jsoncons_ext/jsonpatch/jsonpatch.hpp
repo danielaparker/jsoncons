@@ -125,7 +125,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
-                std::tie(val,ec) = jsonpointer::select(target,path);
+                std::tie(val,ec) = jsonpointer::get(target,path);
                 if (ec != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::test_failed;
@@ -158,7 +158,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     {
                         Json orig_val;
                         jsonpointer::jsonpointer_errc select_ec;
-                        std::tie(orig_val,select_ec) = jsonpointer::select(target,npath);
+                        std::tie(orig_val,select_ec) = jsonpointer::get(target,npath);
                         if (select_ec != jsonpointer::jsonpointer_errc()) // shouldn't happen
                         {
                             patch_ec = jsonpatch_errc::add_failed;
@@ -189,7 +189,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
-                std::tie(val,ec) = jsonpointer::select(target,path);
+                std::tie(val,ec) = jsonpointer::get(target,path);
                 if (ec != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::remove_failed;
@@ -213,7 +213,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
-                std::tie(val,ec) = jsonpointer::select(target,path);
+                std::tie(val,ec) = jsonpointer::get(target,path);
                 if (ec != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::replace_failed;
@@ -246,7 +246,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     Json val;
                     jsonpointer::jsonpointer_errc ec;
                     string_view_type from = operation.at(from_key).as_string_view();
-                    std::tie(val,ec) = jsonpointer::select(target,from);
+                    std::tie(val,ec) = jsonpointer::get(target,from);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::move_failed;
@@ -267,7 +267,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                         {
                             Json orig_val;
                             jsonpointer::jsonpointer_errc select_ec;
-                            std::tie(orig_val,select_ec) = jsonpointer::select(target,npath);
+                            std::tie(orig_val,select_ec) = jsonpointer::get(target,npath);
                             if (select_ec != jsonpointer::jsonpointer_errc()) // shouldn't happen
                             {
                                 patch_ec = jsonpatch_errc::copy_failed;
@@ -307,7 +307,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     Json val;
                     jsonpointer::jsonpointer_errc ec;
                     string_view_type from = operation.at(from_key).as_string_view();
-                    std::tie(val,ec) = jsonpointer::select(target,from);
+                    std::tie(val,ec) = jsonpointer::get(target,from);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::copy_failed;
@@ -322,7 +322,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                         {
                             Json orig_val;
                             jsonpointer::jsonpointer_errc select_ec;
-                            std::tie(orig_val,select_ec) = jsonpointer::select(target,npath);
+                            std::tie(orig_val,select_ec) = jsonpointer::get(target,npath);
                             if (select_ec != jsonpointer::jsonpointer_errc()) // shouldn't happen
                             {
                                 patch_ec = jsonpatch_errc::copy_failed;
