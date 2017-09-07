@@ -45,14 +45,6 @@ BOOST_AUTO_TEST_CASE( test_surrogate_pair )
     BOOST_CHECK_EQUAL(input,output);
 }
 
-BOOST_AUTO_TEST_CASE(test_skip_bom)
-{
-    std::string input = "\xEF\xBB\xBF[1,2,3]";
-    json value = json::parse(input);
-    BOOST_CHECK_EQUAL(true,value.is_array());
-    BOOST_CHECK_EQUAL(3,value.size());
-}
-
 BOOST_AUTO_TEST_CASE(test_wide_surrogate_pair)
 {
     std::wstring input = L"[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";

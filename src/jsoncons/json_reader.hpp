@@ -137,17 +137,40 @@ public:
                     }        
                     is_.read(buffer_.data(), buffer_capacity_);
                     buffer_length_ = static_cast<size_t>(is_.gcount());
-                    parser_.set_source(buffer_.data(),buffer_length_);
                     if (buffer_length_ == 0)
                     {
                         eof_ = true;
                     }
                     else if (begin_)
                     {
-                        parser_.skip_bom(ec);
-                        if (ec) return;
+                        auto result = unicons::skip_bom(buffer_.data(), buffer_.data()+buffer_length_);
+                        switch (result.first)
+                        {
+                        case unicons::encoding_errc::expected_u8_found_u16:
+                            ec = json_parser_errc::expected_u8_found_u16;
+                            return;
+                        case unicons::encoding_errc::expected_u8_found_u32:
+                            ec = json_parser_errc::expected_u8_found_u32;
+                            return;
+                        case unicons::encoding_errc::expected_u16_found_fffe:
+                            ec = json_parser_errc::expected_u16_found_fffe;
+                            return;
+                        case unicons::encoding_errc::expected_u32_found_fffe:
+                            ec = json_parser_errc::expected_u32_found_fffe;
+                            return;
+                        default: // ok
+                            break;
+                        }
+                        size_t offset = result.second - buffer_.data();
+                        parser_.set_source(buffer_.data()+offset,buffer_length_-offset);
+                        parser_.set_column_number(offset+1);
                         begin_ = false;
                     }
+                    else
+                    {
+                        parser_.set_source(buffer_.data(),buffer_length_);
+                    }
+
                 }
                 else
                 {
@@ -260,6 +283,8 @@ public:
         parser_.max_nesting_depth(depth);
     }
 #endif
+
+private:
 };
 
 typedef basic_json_reader<char> json_reader;

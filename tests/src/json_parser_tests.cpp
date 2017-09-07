@@ -15,6 +15,19 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_parser_tests)
 
+BOOST_AUTO_TEST_CASE(test_skip_bom)
+{
+    std::string s = "\xEF\xBB\xBF[1,2,3]";
+    json j1 = json::parse(s);
+    BOOST_CHECK_EQUAL(true,j1.is_array());
+    BOOST_CHECK_EQUAL(3,j1.size());
+
+    std::istringstream is(s);
+    json j2 = json::parse(is);
+    BOOST_CHECK_EQUAL(true,j2.is_array());
+    BOOST_CHECK_EQUAL(3,j2.size());
+}
+
 BOOST_AUTO_TEST_CASE(test_object)
 {
     jsoncons::json_decoder<json> decoder;

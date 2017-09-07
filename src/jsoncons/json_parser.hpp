@@ -289,6 +289,11 @@ public:
         return column_;
     }
 
+    void set_column_number(size_t column)
+    {
+        column_ = column;
+    }
+
     bool source_exhausted() const
     {
         return p_ == end_input_;
@@ -643,45 +648,6 @@ public:
             }
             break;
         }
-    }
-
-    void skip_bom()
-    {
-        std::error_code ec;
-        skip_bom(ec);
-        if (ec)
-        {
-            throw parse_error(ec,line_,column_);
-        }
-    }
-
-    void skip_bom(std::error_code& ec)
-    {
-        auto result = unicons::skip_bom(p_, end_input_);
-        switch (result.first)
-        {
-        case unicons::encoding_errc::expected_u8_found_u16:
-            err_handler_.fatal_error(json_parser_errc::expected_u8_found_u16, *this);
-            ec = json_parser_errc::expected_u8_found_u16;
-            return;
-        case unicons::encoding_errc::expected_u8_found_u32:
-            err_handler_.fatal_error(json_parser_errc::expected_u8_found_u32, *this);
-            ec = json_parser_errc::expected_u8_found_u32;
-            return;
-        case unicons::encoding_errc::expected_u16_found_fffe:
-            err_handler_.fatal_error(json_parser_errc::expected_u16_found_fffe, *this);
-            ec = json_parser_errc::expected_u16_found_fffe;
-            return;
-        case unicons::encoding_errc::expected_u32_found_fffe:
-            err_handler_.fatal_error(json_parser_errc::expected_u32_found_fffe, *this);
-            ec = json_parser_errc::expected_u32_found_fffe;
-            return;
-        default: // ok
-            break;
-        }
-        begin_input_ = result.second;
-        column_ = begin_input_ - p_ + 1;
-        p_ = begin_input_;
     }
 
     void parse()

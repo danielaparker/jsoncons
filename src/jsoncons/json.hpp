@@ -2247,8 +2247,17 @@ public:
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
-        parser.set_source(s.data(),s.length());
-        parser.skip_bom();
+
+        // skip bom
+        auto result = unicons::skip_bom(s.begin(), s.end());
+        if (result.first != unicons::encoding_errc())
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid unicode encoding");
+        }
+        size_t offset = result.second - s.begin();
+
+        parser.set_source(s.data()+offset,s.length()-offset);
+        //parser.skip_bom();
         parser.parse();
         parser.end_parse();
         parser.check_done();
@@ -2268,61 +2277,8 @@ public:
     static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
                                  basic_parse_error_handler<char_type>& err_handler)
     {
-        FILE* fp;
-
-    #if !defined(JSONCONS_HAS_FOPEN_S)
-        fp = std::fopen(filename.c_str(), "rb");
-        if (fp == nullptr)
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-        }
-    #else
-        errno_t err = fopen_s(&fp, filename.c_str(), "rb");
-        if (err != 0) 
-        {
-            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Cannot open file %s", filename);
-        }
-    #endif
-
-        json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;
-        try
-        {
-            // obtain file size:
-            std::fseek (fp , 0 , SEEK_END);
-            long size = std::ftell (fp);
-            std::rewind(fp);
-
-            if (size > 0)
-            {
-                std::vector<char_type> buffer(size);
-
-                // copy the file into the buffer:
-                size_t result = std::fread (buffer.data(),1,size,fp);
-                if (result != static_cast<unsigned long long>(size))
-                {
-                    JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Error reading file %s", filename);
-                }
-
-                basic_json_parser<char_type> parser(handler,err_handler);
-                parser.set_source(buffer.data(),buffer.size());
-                parser.skip_bom();
-                parser.parse();
-                parser.end_parse();
-                parser.check_done();
-            }
-
-            std::fclose (fp);
-        }
-        catch (...)
-        {
-            std::fclose (fp);
-            throw;
-        }
-        if (!handler.is_valid())
-        {
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json file");
-        }
-        return handler.get_result();
+        std::basic_ifstream<CharT> is(filename);
+        return parse(is,err_handler);
     }
 
     static basic_json make_array()
