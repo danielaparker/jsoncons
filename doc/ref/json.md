@@ -343,21 +343,6 @@ Output:
 ```json
 {"field1":null}
 ```
-#### Array from std::vector
-```c++
-std::vector<int> v;
-v.push_back(10);
-v.push_back(20);
-v.push_back(30);
-
-json arr = v;
-
-std::cout << arr << std::endl;
-```
-Output: 
-```json
-[10,20,30]
-```
 #### Constructing json structures
 ```c++
 json root;

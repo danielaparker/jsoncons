@@ -3,7 +3,8 @@
 
 #include <stdexcept>
 #include <string>
-
+#include <vector>
+#include <map>
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
@@ -164,16 +165,38 @@ void second_example_a()
     }
 }
 
-void construction_in_code()
-{
-    // A null value
-    json null_val = json::null();
+void json_constructor_examples()
+{   
+    json j1; // An empty object
+    std::cout << "(1) " << j1 << std::endl;
 
-    // A boolean value
-    json flag(true);
+    json j2 = json::object({{"baz", "qux"}, {"foo", "bar"}}); // An object 
+    std::cout << "(2) " << j2 << std::endl;
 
-    // A numeric value
-    json number(10.5);
+    json j3 = json::array({"bar", "baz"}); // An array 
+    std::cout << "(3) " << j3 << std::endl;
+  
+    json j4(json::null()); // A null value
+    std::cout << "(4) " << j4 << std::endl;
+    
+    json j5(true); // A boolean value
+    std::cout << "(5) " << j5 << std::endl;
+
+    double x = 1.0/7.0;
+
+    json j6(x); // A double value
+    std::cout << "(6) " << j6 << std::endl;
+
+    json j7(x,4); // A double value with specified precision
+    std::cout << "(7) " << j7 << std::endl;
+
+    std::vector<int> v = {10,20,30};
+    json j8 = v; // From a sequence container
+    std::cout << "(8) " << j8 << std::endl;
+
+    std::map<std::string, int> m{ {"one", 1}, {"two", 2}, {"three", 3} };
+    json j9 = m; // From an associative container
+    std::cout << "(9) " << j9 << std::endl;
 
     // An object value with four members
     json obj;
@@ -189,10 +212,10 @@ void construction_in_code()
 
     // An array value with four elements
     json arr = json::array();
-    arr.push_back(null_val);
-    arr.push_back(flag);
-    arr.push_back(number);
-    arr.push_back(obj);
+    arr.push_back(j1);
+    arr.push_back(j2);
+    arr.push_back(j3);
+    arr.push_back(j4);
 
     serialization_options format;
     std::cout << pretty_print(arr) << std::endl;
@@ -332,6 +355,8 @@ int main()
 {
     try
     {
+        json_constructor_examples();
+
         object_range_based_for_loop();
 
         json_is_as_examples();
@@ -345,8 +370,6 @@ int main()
         first_example_d();
 
         second_example_a();
-
-        construction_in_code();
 
         array_examples();
         container_examples();
