@@ -287,7 +287,7 @@ public:
         auto result = unicons::convert(
             sv.begin(), sv.end(), std::back_inserter(target), 
             unicons::conv_flags::strict);
-        if (result.first != unicons::conv_errc::ok)
+        if (result.ec != unicons::conv_errc())
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
         }
@@ -388,7 +388,7 @@ public:
                 std::basic_string<char_type> target;
                 auto result = unicons::convert(
                     first, last,std::back_inserter(target),unicons::conv_flags::strict);
-                if (result.first != unicons::conv_errc::ok)
+                if (result.ec != unicons::conv_errc())
                 {
                     JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                 }
@@ -496,7 +496,7 @@ public:
                     std::basic_string<char_type> target;
                     auto result = unicons::convert(
                         first, last,std::back_inserter(target),unicons::conv_flags::strict);
-                    if (result.first != unicons::conv_errc::ok)
+                    if (result.ec != unicons::conv_errc())
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }
@@ -513,7 +513,7 @@ public:
                     std::basic_string<char_type> target;
                     auto result = unicons::convert(
                         first, last,std::back_inserter(target),unicons::conv_flags::strict);
-                    if (result.first != unicons::conv_errc::ok)
+                    if (result.ec != unicons::conv_errc())
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }
@@ -530,7 +530,7 @@ public:
                     std::basic_string<char_type> target;
                     auto result = unicons::convert(
                         first, last,std::back_inserter(target),unicons::conv_flags::strict);
-                    if (result.first != unicons::conv_errc::ok)
+                    if (result.ec != unicons::conv_errc())
                     {
                         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Illegal unicode");
                     }

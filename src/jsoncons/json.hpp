@@ -2250,11 +2250,11 @@ public:
 
         // skip bom
         auto result = unicons::skip_bom(s.begin(), s.end());
-        if (result.first != unicons::encoding_errc())
+        if (result.ec != unicons::encoding_errc())
         {
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Invalid unicode encoding");
         }
-        size_t offset = result.second - s.begin();
+        size_t offset = result.it - s.begin();
 
         parser.set_source(s.data()+offset,s.length()-offset);
         //parser.skip_bom();

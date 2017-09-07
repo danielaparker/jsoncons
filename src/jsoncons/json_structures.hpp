@@ -1589,7 +1589,7 @@ public:
         if (hint == this->members_.end())
         {
             auto result = insert_or_assign(key, std::forward<T>(value));
-            it = result.first;
+            it = result.ec;
         }
         else
         {
@@ -1618,7 +1618,7 @@ public:
         if (hint == this->members_.end())
         {
             auto result = insert_or_assign(key, std::forward<T>(value));
-            it = result.first;
+            it = result.ec;
         }
         else
         {

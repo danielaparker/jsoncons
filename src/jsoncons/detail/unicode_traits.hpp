@@ -120,8 +120,7 @@ enum class conv_flags
 
 enum class conv_errc 
 {
-    ok = 0,                     // conversion successful
-    over_long_utf8_sequence,    // over long utf8 sequence
+    over_long_utf8_sequence = 1,    // over long utf8 sequence
     expected_continuation_byte, // expected continuation byte    
     unpaired_high_surrogate,    // unpaired high surrogate UTF-16
     illegal_surrogate_value,    // UTF-16 surrogate values are illegal in UTF-32
@@ -177,8 +176,7 @@ std::error_code make_error_code(conv_errc result)
 
 enum class encoding_errc
 {
-    ok = 0,
-    expected_u8_found_u16,
+    expected_u8_found_u16 = 1,
     expected_u8_found_u32,
     expected_u16_found_fffe,
     expected_u32_found_fffe
@@ -282,7 +280,7 @@ is_legal_utf8(Iterator first, size_t length)
     if (static_cast<uint8_t>(*first) > 0xF4) 
         return conv_errc::source_illegal;
 
-    return conv_errc::ok;
+    return conv_errc();
 }
 
 template <class...> using void_t = void;
@@ -338,24 +336,31 @@ struct is_compatible_output_iterator<OutputIt,CharT,
 
 // convert
 
+template <class Iterator>
+struct convert_result
+{
+    Iterator it;
+    conv_errc ec;
+};
+
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                        && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<conv_errc,InputIt>>::type 
+                        && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flags::strict) 
 {
     (void)flags;
 
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
     while (first != last) 
     {
         size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)] + 1;
         if (length > (size_t)(last - first))
         {
-            return std::make_pair(conv_errc::source_exhausted,first);
+            return convert_result<InputIt>{first, conv_errc::source_exhausted};
         }
-        if ((result=is_legal_utf8(first, length)) != conv_errc::ok)
+        if ((result=is_legal_utf8(first, length)) != conv_errc())
         {
-            return std::make_pair(result,first);
+            return convert_result<InputIt>{first,result};
         }
 
         switch (length) {
@@ -365,17 +370,17 @@ convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flag
             case 1: *target++ = (static_cast<uint8_t>(*first++));
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<conv_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, 
         OutputIt target, 
         conv_flags flags = conv_flags::strict) 
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
 
     while (first != last) 
     {
@@ -387,7 +392,7 @@ convert(InputIt first, InputIt last,
             break;
         }
         /* Do this check whether lenient or strict */
-        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc::ok)
+        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc())
         {
             break;
         }
@@ -432,17 +437,17 @@ convert(InputIt first, InputIt last,
             *target++ = ((uint16_t)((ch & half_mask) + sur_low_start));
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<conv_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) 
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
 
     while (first < last) 
     {
@@ -454,7 +459,7 @@ convert(InputIt first, InputIt last,
             break;
         }
         /* Do this check whether lenient or strict */
-        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc::ok) {
+        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc()) {
             break;
         }
         /*
@@ -491,18 +496,18 @@ convert(InputIt first, InputIt last,
             *target++ = (replacement_char);
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 // utf16
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<conv_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
     while (first < last) {
         unsigned short bytes_to_write = 0;
         const uint32_t byteMask = 0xBF;
@@ -583,17 +588,17 @@ convert(InputIt first, InputIt last,
             break;
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<conv_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, 
         OutputIt target, 
         conv_flags flags = conv_flags::strict) 
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
 
     while (first != last) 
     {
@@ -637,17 +642,17 @@ convert(InputIt first, InputIt last,
             *target++ = ((uint16_t)ch);
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<conv_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) 
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
 
     while (first != last) 
     {
@@ -682,19 +687,19 @@ convert(InputIt first, InputIt last,
         }
         *target++ = (ch);
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 // utf32
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,std::pair<conv_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, 
         OutputIt target, 
         conv_flags flags = conv_flags::strict) 
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
     while (first < last) {
         unsigned short bytes_to_write = 0;
         const uint32_t byteMask = 0xBF;
@@ -763,17 +768,17 @@ convert(InputIt first, InputIt last,
             break;
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,std::pair<conv_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) 
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
 
     while (first != last) 
     {
@@ -804,17 +809,17 @@ convert(InputIt first, InputIt last,
             *target++ = ((uint16_t)((ch & half_mask) + sur_low_start));
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 template <class InputIt,class OutputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,std::pair<conv_errc,InputIt>>::type 
+                               && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<InputIt>>::type 
 convert(InputIt first, InputIt last, 
                  OutputIt target, 
                  conv_flags flags = conv_flags::strict) 
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
 
     while (first != last) 
     {
@@ -837,41 +842,41 @@ convert(InputIt first, InputIt last,
             result = conv_errc::source_illegal;
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 // validate
 
 template <class InputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                               ,std::pair<conv_errc,InputIt>>::type 
+                               ,convert_result<InputIt>>::type 
 validate(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
     while (first != last) 
     {
         size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)] + 1;
         if (length > (size_t)(last - first))
         {
-            return std::make_pair(conv_errc::source_exhausted,first);
+            return convert_result<InputIt>{first, conv_errc::source_exhausted};
         }
-        if ((result=is_legal_utf8(first, length)) != conv_errc::ok)
+        if ((result=is_legal_utf8(first, length)) != conv_errc())
         {
-            return std::make_pair(result,first);
+            return convert_result<InputIt>{first,result} ;
         }
         first += length;
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 // utf16
 
 template <class InputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                               ,std::pair<conv_errc,InputIt>>::type 
+                               ,convert_result<InputIt>>::type 
 validate(InputIt first, InputIt last)  UNICONS_NOEXCEPT
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
 
     while (first != last) 
     {
@@ -903,7 +908,7 @@ validate(InputIt first, InputIt last)  UNICONS_NOEXCEPT
             break;
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 
@@ -912,10 +917,10 @@ validate(InputIt first, InputIt last)  UNICONS_NOEXCEPT
 
 template <class InputIt>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                               ,std::pair<conv_errc,InputIt>>::type 
+                               ,convert_result<InputIt>>::type 
 validate(InputIt first, InputIt last) UNICONS_NOEXCEPT
 {
-    conv_errc  result = conv_errc::ok;
+    conv_errc  result = conv_errc();
 
     while (first != last) 
     {
@@ -931,7 +936,7 @@ validate(InputIt first, InputIt last) UNICONS_NOEXCEPT
             result = conv_errc::source_illegal;
         }
     }
-    return std::make_pair(result,first);
+    return convert_result<InputIt>{first,result} ;
 }
 
 // sequence 
@@ -1046,14 +1051,14 @@ public:
     sequence_generator(Iterator first, Iterator last, 
                        conv_flags flags = conv_flags::strict) UNICONS_NOEXCEPT
         : begin_(first), last_(last), flags_(flags), 
-          length_(0), err_cd_(conv_errc::ok)
+          length_(0), err_cd_(conv_errc())
     {
         next();
     }
 
     bool done() const UNICONS_NOEXCEPT
     {
-        return err_cd_ != conv_errc::ok || begin_ == last_;
+        return err_cd_ != conv_errc() || begin_ == last_;
     }
 
     conv_errc status() const UNICONS_NOEXCEPT
@@ -1078,7 +1083,7 @@ public:
             {
                 err_cd_ = conv_errc::source_exhausted;
             }
-            else if ((err_cd_ = is_legal_utf8(begin_, length)) != conv_errc::ok)
+            else if ((err_cd_ = is_legal_utf8(begin_, length)) != conv_errc())
             {
             }
             else
@@ -1291,8 +1296,15 @@ u32_length(InputIt first, InputIt last) UNICONS_NOEXCEPT
 enum class encoding {u8,u16le,u16be,u32le,u32be,undetected};
 
 template <class Iterator>
+struct detect_encoding_result
+{
+    Iterator it;
+    encoding ec;
+};
+
+template <class Iterator>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
-                               std::pair<encoding,Iterator>>::type 
+                        detect_encoding_result<Iterator>>::type 
 detect_encoding(Iterator first, Iterator last) UNICONS_NOEXCEPT
 {
     Iterator it1 = first;
@@ -1304,10 +1316,10 @@ detect_encoding(Iterator first, Iterator last) UNICONS_NOEXCEPT
             Iterator it3 = ++first;
             if (static_cast<uint8_t>(*it1) == 0xEF && static_cast<uint8_t>(*it2) == 0xBB && static_cast<uint8_t>(*it3) == 0xBF)
             {
-                return std::make_pair(encoding::u8,last);
+                return detect_encoding_result<Iterator>{last,encoding::u8};
             }
         }
-        return std::make_pair(encoding::undetected,it1);
+        return detect_encoding_result<Iterator>{it1,encoding::undetected};
     }
     else
     {
@@ -1318,115 +1330,122 @@ detect_encoding(Iterator first, Iterator last) UNICONS_NOEXCEPT
         uint32_t bom = static_cast<uint8_t>(*it1) | (static_cast<uint8_t>(*it2) << 8) | (static_cast<uint8_t>(*it3) << 16) | (static_cast<uint8_t>(*it4) << 24);
         if (bom == 0xFFFE0000)                  
         { 
-            return std::make_pair(encoding::u32be,it4++);
+            return detect_encoding_result<Iterator>{it4++,encoding::u32be};
         }
         else if (bom == 0x0000FEFF) 
         {
-            return std::make_pair(encoding::u32le,first);
+            return detect_encoding_result<Iterator>{first,encoding::u32le};
         }
         else if ((bom & 0xFFFF) == 0xFFFE)     
         {
-            return std::make_pair(encoding::u16be,it3);
+            return detect_encoding_result<Iterator>{it3,encoding::u16be};
         }
         else if ((bom & 0xFFFF) == 0xFEFF)      
         {
-            return std::make_pair(encoding::u16le,it3);
+            return detect_encoding_result<Iterator>{it3,encoding::u16le};
         }
         else if ((bom & 0xFFFFFF) == 0xBFBBEF)  
         {
-            return std::make_pair(encoding::u8,it4);
+            return detect_encoding_result<Iterator>{it4,encoding::u8};
         }
         else
         {
             uint32_t pattern = (static_cast<uint8_t>(*it1) ? 1 : 0) | (static_cast<uint8_t>(*it2) ? 2 : 0) | (static_cast<uint8_t>(*it3) ? 4 : 0) | (static_cast<uint8_t>(*it4) ? 8 : 0);
             switch (pattern) {
             case 0x08: 
-                return std::make_pair(encoding::u32be,it1);
+                return detect_encoding_result<Iterator>{it1,encoding::u32be};
             case 0x0A: 
-                return std::make_pair(encoding::u16be,it1);
+                return detect_encoding_result<Iterator>{it1,encoding::u16be};
             case 0x01: 
-                return std::make_pair(encoding::u32le,it1);
+                return detect_encoding_result<Iterator>{it1,encoding::u32le};
             case 0x05: 
-                return std::make_pair(encoding::u16le,it1);
+                return detect_encoding_result<Iterator>{it1,encoding::u16le};
             case 0x0F: 
-                return std::make_pair(encoding::u8,it1);
+                return detect_encoding_result<Iterator>{it1,encoding::u8};
             default:
-                return std::make_pair(encoding::undetected,it1);
+                return detect_encoding_result<Iterator>{it1,encoding::undetected};
             }
         }
     }
 }
 
 template <class Iterator>
+struct skip_bom_result
+{
+    Iterator it;
+    encoding_errc ec;
+};
+
+template <class Iterator>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
-                               std::pair<encoding_errc,Iterator>>::type 
+                               skip_bom_result<Iterator>>::type 
 skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
 {
     auto result = unicons::detect_encoding(first,last);
-    switch (result.first)
+    switch (result.ec)
     {
     case unicons::encoding::u8:
-        return std::make_pair(encoding_errc::ok,result.second);
+        return skip_bom_result<Iterator>{result.it,encoding_errc()};
         break;
     case unicons::encoding::u16le:
     case unicons::encoding::u16be:
-        return std::make_pair(encoding_errc::expected_u8_found_u16,result.second);
+        return skip_bom_result<Iterator>{result.it,encoding_errc::expected_u8_found_u16};
         break;
     case unicons::encoding::u32le:
     case unicons::encoding::u32be:
-        return std::make_pair(encoding_errc::expected_u8_found_u32,result.second);
+        return skip_bom_result<Iterator>{result.it,encoding_errc::expected_u8_found_u32};
         break;
     default:
-        return std::make_pair(encoding_errc::ok,result.second);
+        return skip_bom_result<Iterator>{result.it,encoding_errc()};
         break;
     }
 }
 
 template <class Iterator>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint16_t),
-                               std::pair<encoding_errc,Iterator>>::type 
+                               skip_bom_result<Iterator>>::type 
 skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
 {
     if (first == last)
     {
-        return std::make_pair(encoding_errc::ok,first);
+        return skip_bom_result<Iterator>{first,encoding_errc()};
     }
     uint16_t bom = static_cast<uint16_t>(*first);
     if (bom == 0xFEFF)                  
     {
-        return std::make_pair(encoding_errc::ok,++first);
+        return skip_bom_result<Iterator>{++first,encoding_errc()};
     }
     else if (bom == 0xFFFE) 
     {
-        return std::make_pair(encoding_errc::expected_u16_found_fffe,last);
+        return skip_bom_result<Iterator>{last,encoding_errc::expected_u16_found_fffe};
     }
     else
     {
-        return std::make_pair(encoding_errc::ok,first);
+        return skip_bom_result<Iterator>{first,encoding_errc()};
     }
 }
 
 template <class Iterator>
 typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint32_t),
-                               std::pair<encoding_errc,Iterator>>::type 
+                        skip_bom_result<Iterator>>::type 
 skip_bom(Iterator first, Iterator last) UNICONS_NOEXCEPT
 {
     if (first == last)
     {
-        return std::make_pair(encoding_errc::ok,first);
+        return skip_bom_result<Iterator>{first,encoding_errc()};
     }
     uint32_t bom = static_cast<uint32_t>(*first);
     if (bom == 0xFEFF0000)                  
     {
-        return std::make_pair(encoding_errc::ok,++first);
+        return skip_bom_result<Iterator>{++first,encoding_errc()};
     }
     else if (bom == 0xFFFE0000) 
     {
-        return std::make_pair(encoding_errc::expected_u32_found_fffe,last);
+        return skip_bom_result<Iterator>{last,encoding_errc::expected_u32_found_fffe};
     }
     else
     {
-        return std::make_pair(encoding_errc::ok,first);
+        return skip_bom_result<Iterator>{first,encoding_errc()};
     }
 }
 

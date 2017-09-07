@@ -144,7 +144,7 @@ public:
                     else if (begin_)
                     {
                         auto result = unicons::skip_bom(buffer_.data(), buffer_.data()+buffer_length_);
-                        switch (result.first)
+                        switch (result.ec)
                         {
                         case unicons::encoding_errc::expected_u8_found_u16:
                             ec = json_parser_errc::expected_u8_found_u16;
@@ -161,7 +161,7 @@ public:
                         default: // ok
                             break;
                         }
-                        size_t offset = result.second - buffer_.data();
+                        size_t offset = result.it - buffer_.data();
                         parser_.set_source(buffer_.data()+offset,buffer_length_-offset);
                         parser_.set_column_number(offset+1);
                         begin_ = false;

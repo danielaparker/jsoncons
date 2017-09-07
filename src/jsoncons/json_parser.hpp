@@ -563,14 +563,14 @@ public:
                 if (string_buffer_.length() == 0)
                 {
                     auto result = unicons::validate(sb,p_);
-                    if (result.first == unicons::conv_errc::ok)
+                    if (result.ec == unicons::conv_errc())
                     {
                         end_string_value(sb,p_-sb, ec);
                         if (ec) return;
                     }
                     else
                     {
-                        error(result.first,ec);
+                        error(result.ec,ec);
                         if (ec) return;
                     }
                 }
@@ -578,7 +578,7 @@ public:
                 {
                     string_buffer_.append(sb,p_-sb);
                     auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end());
-                    if (result.first == unicons::conv_errc::ok)
+                    if (result.ec == unicons::conv_errc())
                     {
                         end_string_value(string_buffer_.data(),string_buffer_.length(), ec);
                         if (ec) return;
@@ -586,7 +586,7 @@ public:
                     }
                     else
                     {
-                        error(result.first,ec);
+                        error(result.ec,ec);
                         if (ec) return;
                     }
                 }
@@ -610,7 +610,7 @@ public:
     {
         switch (result)
         {
-        case unicons::conv_errc::ok:
+        case unicons::conv_errc():
             break;
         case unicons::conv_errc::over_long_utf8_sequence:
             if (err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this))
