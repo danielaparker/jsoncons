@@ -32,7 +32,6 @@ class basic_json_reader
     std::basic_istream<CharT>& is_;
     bool eof_;
     std::vector<CharT> buffer_;
-    size_t buffer_length_;
     size_t buffer_capacity_;
     bool begin_;
 
@@ -46,11 +45,10 @@ public:
         : parser_(),
           is_(is),
           eof_(false),
-          buffer_length_(0),
           buffer_capacity_(default_max_buffer_length),
           begin_(true)
     {
-        buffer_.resize(buffer_capacity_);
+        buffer_.reserve(buffer_capacity_);
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
@@ -58,11 +56,10 @@ public:
        : parser_(err_handler),
          is_(is),
          eof_(false),
-         buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
          begin_(true)
     {
-        buffer_.resize(buffer_capacity_);
+        buffer_.reserve(buffer_capacity_);
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
@@ -70,11 +67,10 @@ public:
         : parser_(handler),
           is_(is),
           eof_(false),
-          buffer_length_(0),
           buffer_capacity_(default_max_buffer_length),
           begin_(true)
     {
-        buffer_.resize(buffer_capacity_);
+        buffer_.reserve(buffer_capacity_);
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
@@ -83,11 +79,10 @@ public:
        : parser_(handler,err_handler),
          is_(is),
          eof_(false),
-         buffer_length_(0),
          buffer_capacity_(default_max_buffer_length),
          begin_(true)
     {
-        buffer_.resize(buffer_capacity_);
+        buffer_.reserve(buffer_capacity_);
     }
 
     size_t buffer_capacity() const
@@ -98,7 +93,7 @@ public:
     void buffer_capacity(size_t capacity)
     {
         buffer_capacity_ = capacity;
-        buffer_.resize(buffer_capacity_);
+        buffer_.reserve(buffer_capacity_);
     }
 
     size_t max_nesting_depth() const
@@ -121,6 +116,45 @@ public:
         }
     }
 
+    void read_buffer(std::error_code& ec)
+    {
+        buffer_.resize(buffer_capacity_);
+        is_.read(buffer_.data(), buffer_capacity_);
+        buffer_.resize(static_cast<size_t>(is_.gcount()));
+        if (buffer_.size() == 0)
+        {
+            eof_ = true;
+        }
+        else if (begin_)
+        {
+            auto result = unicons::skip_bom(buffer_.begin(), buffer_.end());
+            switch (result.ec)
+            {
+            case unicons::encoding_errc::expected_u8_found_u16:
+                ec = json_parser_errc::expected_u8_found_u16;
+                return;
+            case unicons::encoding_errc::expected_u8_found_u32:
+                ec = json_parser_errc::expected_u8_found_u32;
+                return;
+            case unicons::encoding_errc::expected_u16_found_fffe:
+                ec = json_parser_errc::expected_u16_found_fffe;
+                return;
+            case unicons::encoding_errc::expected_u32_found_fffe:
+                ec = json_parser_errc::expected_u32_found_fffe;
+                return;
+            default: // ok
+                break;
+            }
+            size_t offset = result.it - buffer_.begin();
+            parser_.set_source(buffer_.data()+offset,buffer_.size()-offset);
+            begin_ = false;
+        }
+        else
+        {
+            parser_.set_source(buffer_.data(),buffer_.size());
+        }
+    }
+
     void read_next(std::error_code& ec)
     {
         parser_.reset();
@@ -135,42 +169,7 @@ public:
                         ec = json_parser_errc::source_error;
                         return;
                     }        
-                    is_.read(buffer_.data(), buffer_capacity_);
-                    buffer_length_ = static_cast<size_t>(is_.gcount());
-                    if (buffer_length_ == 0)
-                    {
-                        eof_ = true;
-                    }
-                    else if (begin_)
-                    {
-                        auto result = unicons::skip_bom(buffer_.data(), buffer_.data()+buffer_length_);
-                        switch (result.ec)
-                        {
-                        case unicons::encoding_errc::expected_u8_found_u16:
-                            ec = json_parser_errc::expected_u8_found_u16;
-                            return;
-                        case unicons::encoding_errc::expected_u8_found_u32:
-                            ec = json_parser_errc::expected_u8_found_u32;
-                            return;
-                        case unicons::encoding_errc::expected_u16_found_fffe:
-                            ec = json_parser_errc::expected_u16_found_fffe;
-                            return;
-                        case unicons::encoding_errc::expected_u32_found_fffe:
-                            ec = json_parser_errc::expected_u32_found_fffe;
-                            return;
-                        default: // ok
-                            break;
-                        }
-                        size_t offset = result.it - buffer_.data();
-                        parser_.set_source(buffer_.data()+offset,buffer_length_-offset);
-                        parser_.set_column_number(offset+1);
-                        begin_ = false;
-                    }
-                    else
-                    {
-                        parser_.set_source(buffer_.data(),buffer_length_);
-                    }
-
+                    read_buffer(ec);
                 }
                 else
                 {
@@ -229,14 +228,8 @@ public:
                         {
                             ec = json_parser_errc::source_error;
                             return;
-                        }        
-                        is_.read(buffer_.data(), buffer_capacity_);
-                        buffer_length_ = static_cast<size_t>(is_.gcount());
-                        parser_.set_source(buffer_.data(),buffer_length_);
-                        if (buffer_length_ == 0)
-                        {
-                            eof_ = true;
-                        }
+                        }   
+                        read_buffer(ec);     
                     }
                     else
                     {
