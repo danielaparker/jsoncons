@@ -190,51 +190,6 @@ BOOST_AUTO_TEST_CASE(test_replace_array_value)
     check_replace(example,"/foo/1", json("qux"), expected);
 }
 
-// move
-/*
-BOOST_AUTO_TEST_CASE(test_move_value)
-{
-    json example = json::parse(R"(
-        {
-          "foo": {
-            "bar": "baz",
-            "waldo": "fred"
-          },
-          "qux": {
-            "corge": "grault"
-          }
-        }
-    )");
-
-    const json expected = json::parse(R"(
-        {
-          "foo": {
-            "bar": "baz"
-          },
-          "qux": {
-            "corge": "grault",
-            "thud": "fred"
-          }
-        }
-    )");
-
-    check_move(example, "/foo/waldo", "/qux/thud", expected);
-}
-
-BOOST_AUTO_TEST_CASE(test_move_array_element)
-{
-    json example = json::parse(R"(
-        { "foo": [ "all", "grass", "cows", "eat" ] }
-    )");
-
-    const json expected = json::parse(R"(
-        { "foo": [ "all", "cows", "eat", "grass" ] }
-    )");
-
-    check_move(example, "/foo/1", "/foo/3", expected);
-}
-*/
-
 BOOST_AUTO_TEST_SUITE_END()
 
 
