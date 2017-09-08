@@ -128,26 +128,16 @@ public:
         else if (begin_)
         {
             auto result = unicons::skip_bom(buffer_.begin(), buffer_.end());
-            switch (result.ec)
+            if (result.ec != unicons::encoding_errc())
             {
-            case unicons::encoding_errc::expected_u8_found_u16:
-                ec = json_parser_errc::expected_u8_found_u16;
-                return;
-            case unicons::encoding_errc::expected_u8_found_u32:
-                ec = json_parser_errc::expected_u8_found_u32;
-                return;
-            case unicons::encoding_errc::expected_u16_found_fffe:
-                ec = json_parser_errc::expected_u16_found_fffe;
-                return;
-            case unicons::encoding_errc::expected_u32_found_fffe:
-                ec = json_parser_errc::expected_u32_found_fffe;
-                return;
-            default: // ok
-                break;
+                ec = result.ec;
             }
-            size_t offset = result.it - buffer_.begin();
-            parser_.set_source(buffer_.data()+offset,buffer_.size()-offset);
-            begin_ = false;
+            else
+            {
+                size_t offset = result.it - buffer_.begin();
+                parser_.set_source(buffer_.data()+offset,buffer_.size()-offset);
+                begin_ = false;
+            }
         }
         else
         {
@@ -170,6 +160,7 @@ public:
                         return;
                     }        
                     read_buffer(ec);
+                    if (ec) return;
                 }
                 else
                 {
@@ -230,6 +221,7 @@ public:
                             return;
                         }   
                         read_buffer(ec);     
+                        if (ec) return;
                     }
                     else
                     {

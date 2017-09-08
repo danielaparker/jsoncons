@@ -42,11 +42,7 @@ namespace jsoncons {
         over_long_utf8_sequence,
         illegal_codepoint,
         illegal_surrogate_value,
-        unpaired_high_surrogate,
-        expected_u8_found_u16,
-        expected_u8_found_u32,
-        expected_u16_found_fffe,
-        expected_u32_found_fffe
+        unpaired_high_surrogate
     };
 
 class json_error_category_impl
@@ -119,15 +115,7 @@ public:
             return "UTF-16 surrogate values are illegal in UTF-32";
         case json_parser_errc::unpaired_high_surrogate:
             return "Expected low surrogate following the high surrogate";
-        case json_parser_errc::expected_u8_found_u16:
-            return "Expected UTF-8, found UTF-16";
-        case json_parser_errc::expected_u8_found_u32:
-            return "Expected UTF-8, found UTF-32";
-        case json_parser_errc::expected_u16_found_fffe:
-            return "Expected UTF-16, found non character";
-        case json_parser_errc::expected_u32_found_fffe:
-            return "Expected UTF-32, found non character";
-        default:
+       default:
             return "Unknown JSON parser error";
         }
     }
