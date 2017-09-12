@@ -17,7 +17,6 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
-#include <jsoncons/detail/osequencestream.hpp>
 #include <jsoncons_ext/csv/csv_parameters.hpp>
 
 namespace jsoncons { namespace csv {
@@ -54,7 +53,7 @@ private:
     struct stack_item
     {
         stack_item(bool is_object)
-           : is_object_(is_object), count_(0)
+           : is_object_(is_object), count_(0), skip_(false)
         {
         }
         bool is_object() const
@@ -64,15 +63,19 @@ private:
 
         bool is_object_;
         size_t count_;
+        bool skip_;
         std::basic_string<CharT> name_;
     };
     buffered_output<CharT> os_;
     basic_csv_parameters<CharT> parameters_;
-    basic_serialization_options<CharT> options_;
+    basic_serialization_options<CharT> format_;
     std::vector<stack_item> stack_;
+    std::basic_ostringstream<CharT> header_oss_;
+    buffered_output<CharT> header_os_;
+    std::map<std::basic_string<CharT>,size_t> column_name_pos_map_;
     print_double<CharT> fp_;
     std::vector<std::basic_string<CharT>> column_names_;
-    std::map<std::basic_string<CharT>,std::basic_string<CharT>> buffered_line_;
+    std::map<std::basic_string<CharT>,std::basic_string<CharT>> buffered_values_;
 
     // Noncopyable and nonmoveable
     basic_csv_serializer(const basic_csv_serializer&) = delete;
@@ -81,23 +84,35 @@ public:
     basic_csv_serializer(std::basic_ostream<CharT>& os)
        :
        os_(os),
-       options_(),
+       format_(),
        stack_(),
-       fp_(options_.precision()),
+       header_os_(header_oss_),
+       column_name_pos_map_(),
+       fp_(format_.precision()),
        column_names_(parameters_.column_names())
     {
     }
 
     basic_csv_serializer(std::basic_ostream<CharT>& os,
-                         basic_csv_parameters<CharT> params)
+                         const basic_csv_parameters<CharT>& params)
        :
        os_(os),
        parameters_(params),
-       options_(),
+       format_(),
        stack_(),
-       fp_(options_.precision()),
+       header_os_(header_oss_),
+       column_name_pos_map_(),
+       fp_(format_.precision()),
        column_names_(parameters_.column_names())
     {
+        if (params.column_names().size() > 0)
+        {
+            size_t count = 0;
+            for (const auto& name : params.column_names())
+            {
+                column_name_pos_map_[name] = count++;
+            }
+        }
     }
 
 private:
@@ -132,20 +147,19 @@ private:
                 }
                 os_.write(parameters_.line_delimiter());
             }
-            for (size_t i = 0; i < column_names_.size(); ++i)
+
+            while (stack_.back().count_ < column_name_pos_map_.size())
             {
-                if (i > 0)
-                {
-                    os_.put(parameters_.field_delimiter());
-                }
-                auto it = buffered_line_.find(column_names_[i]);
-                if (it != buffered_line_.end())
-                {
-                    os_.write(it->second);
-                    it->second.clear();
-                }
+                os_.put(parameters_.field_delimiter());
+                ++stack_.back().count_;
             }
             os_.write(parameters_.line_delimiter());
+            if (stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
+            {
+                header_os_.flush();
+                os_.write(header_oss_.str());
+                os_.write(parameters_.line_delimiter());
+            }
         }
         stack_.pop_back();
 
@@ -155,24 +169,6 @@ private:
     void do_begin_array() override
     {
         stack_.push_back(stack_item(false));
-        if (stack_.size() == 2)
-        {
-            if (stack_[0].count_ == 0)
-            {
-                for (size_t i = 0; i < column_names_.size(); ++i)
-                {
-                    if (i > 0)
-                    {
-                        os_.put(parameters_.field_delimiter());
-                    }
-                    os_.write(column_names_[i]);
-                }
-                if (column_names_.size() > 0)
-                {
-                    os_.write(parameters_.line_delimiter());
-                }
-            }
-        }
     }
 
     void do_end_array() override
@@ -190,12 +186,20 @@ private:
     {
         if (stack_.size() == 2)
         {
-            stack_.back().name_ = name;
-            buffered_line_[name] = std::basic_string<CharT>();
             if (stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
                 column_names_.push_back(name);
+                if (stack_.back().count_ > 0)
+                {
+                    os_.put(parameters_.field_delimiter());
+                }
             }
+            stack_.back().name_ = name;
+            //while (stack_.back().count_ < it->second)
+            //{
+            //    os_.put(parameters_.field_delimiter());
+            //    ++stack_.back().count_;
+            //}
         }
     }
 
@@ -223,13 +227,7 @@ private:
         {
             if (stack_.back().is_object())
             {
-                auto it = buffered_line_.find(stack_.back().name_);
-                if (it != buffered_line_.end())
-                {
-                    basic_osequencestream<CharT> ss;
-                    do_null_value(buffered_output<CharT>(ss));
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
-                }
+                buffered_values_[stack_.back().name_] = json_literals<CharT>::null_literal();
             }
             else
             {
@@ -240,17 +238,11 @@ private:
 
     void do_string_value(string_view_type val) override
     {
-        if (stack_.size() == 2)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
             if (stack_.back().is_object())
             {
-                auto it = buffered_line_.find(stack_.back().name_);
-                if (it != buffered_line_.end())
-                {
-                    basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
-                }
+                buffered_values_[stack_.back().name_] = json_literals<CharT>::null_literal();
             }
             else
             {
@@ -263,17 +255,11 @@ private:
     {
         (void)precision;
 
-        if (stack_.size() == 2)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            if (stack_.back().is_object())
+            if (stack_.back().is_object() && stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
-                auto it = buffered_line_.find(stack_.back().name_);
-                if (it != buffered_line_.end())
-                {
-                    basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
-                }
+                value(val,header_os_);
             }
             else
             {
@@ -284,17 +270,11 @@ private:
 
     void do_integer_value(int64_t val) override
     {
-        if (stack_.size() == 2)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            if (stack_.back().is_object())
+            if (stack_.back().is_object() && stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
-                auto it = buffered_line_.find(stack_.back().name_);
-                if (it != buffered_line_.end())
-                {
-                    basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
-                }
+                value(val,header_os_);
             }
             else
             {
@@ -305,17 +285,11 @@ private:
 
     void do_uinteger_value(uint64_t val) override
     {
-        if (stack_.size() == 2)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            if (stack_.back().is_object())
+            if (stack_.back().is_object() && stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
-                auto it = buffered_line_.find(stack_.back().name_);
-                if (it != buffered_line_.end())
-                {
-                    basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
-                }
+                value(val,header_os_);
             }
             else
             {
@@ -326,17 +300,11 @@ private:
 
     void do_bool_value(bool val) override
     {
-        if (stack_.size() == 2)
+        if (stack_.size() == 2 && !stack_.back().skip_)
         {
-            if (stack_.back().is_object())
+            if (stack_.back().is_object() && stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
-                auto it = buffered_line_.find(stack_.back().name_);
-                if (it != buffered_line_.end())
-                {
-                    basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
-                }
+                value(val,header_os_);
             }
             else
             {
@@ -358,19 +326,19 @@ private:
 
         if ((std::isnan)(val))
         {
-            os.write(options_.nan_replacement());
+            os.write(format_.nan_replacement());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            os.write(options_.pos_inf_replacement());
+            os.write(format_.pos_inf_replacement());
         }
         else if (!(std::isfinite)(val))
         {
-            os.write(options_.neg_inf_replacement());
+            os.write(format_.neg_inf_replacement());
         }
         else
         {
-            fp_(val,options_.precision(),os);
+            fp_(val,format_.precision(),os);
         }
 
         end_value();
@@ -430,7 +398,7 @@ private:
     {
         if (!stack_.empty())
         {
-            if (!stack_.back().is_object_ && stack_.back().count_ > 0)
+            if (stack_.back().count_ > 0)
             {
                 os.put(parameters_.field_delimiter());
             }

@@ -748,15 +748,15 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 
     std::stringstream ss;
     csv_serializer serializer(ss,params);
+    //std::cout << pretty_print(employees1) << std::endl;
     employees1.dump(serializer);
-    std::cout << pretty_print(employees1) << std::endl;
-    std::cout << ss.str() << std::endl;
+    //std::cout << ss.str() << std::endl;
 
     json_decoder<ojson> encoder2;
     csv_reader reader2(ss,encoder2,params);
     reader2.read();
     ojson employees2 = encoder2.get_result();
-    std::cout << pretty_print(employees2) << std::endl;
+    //std::cout << pretty_print(employees2) << std::endl;
 
     BOOST_CHECK_EQUAL(employees1.size(), employees2.size());
 
@@ -785,7 +785,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped1)
     reader.read();
     json val = decoder.get_result();
 
-    std::cout << val << std::endl;
+    //std::cout << val << std::endl;
 
     /*BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -818,7 +818,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped2)
     reader.read();
     json val = decoder.get_result();
 
-    std::cout << val << std::endl;
+    //std::cout << val << std::endl;
 
     BOOST_REQUIRE(params.column_types().size() == 4);
     BOOST_CHECK(params.column_types()[0].first == csv_column_type::integer_t);

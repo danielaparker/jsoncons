@@ -188,7 +188,7 @@ void csv_examples()
     serialize_to_tab_delimited_file();
     serialize_array_of_arrays_to_comma_delimited();
     serialize_books_to_csv_file();
-    //serialize_books_to_csv_file_with_reorder();
+    serialize_books_to_csv_file_with_reorder();
     std::cout << std::endl;
 }
 

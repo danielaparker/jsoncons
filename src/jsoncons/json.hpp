@@ -4356,14 +4356,14 @@ public:
     json_printable(const Json& o,
                    bool is_pretty_print,
                    const basic_serialization_options<char_type>& options)
-       : o_(&o), is_pretty_print_(is_pretty_print), format_(options)
+       : o_(&o), is_pretty_print_(is_pretty_print), options_(options)
     {
         ;
     }
 
     void dump(std::basic_ostream<char_type>& os) const
     {
-        o_->dump(os, format_, is_pretty_print_);
+        o_->dump(os, options_, is_pretty_print_);
     }
 
     friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json>& o)
@@ -4374,7 +4374,7 @@ public:
 
     const Json *o_;
     bool is_pretty_print_;
-    basic_serialization_options<char_type> format_;
+    basic_serialization_options<char_type> options_;
 private:
     json_printable();
 };

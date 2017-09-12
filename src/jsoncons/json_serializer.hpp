@@ -78,7 +78,7 @@ private:
         bool indent_once_;
         bool unindent_at_end_;
     };
-    basic_serialization_options<CharT> format_;
+    basic_serialization_options<CharT> options_;
     std::vector<stack_item> stack_;
     int indent_;
     bool indenting_;
@@ -92,7 +92,7 @@ public:
     basic_json_serializer(std::basic_ostream<CharT>& os)
        : indent_(0), 
          indenting_(false),
-         fp_(format_.precision()),
+         fp_(options_.precision()),
          bos_(os)
     {
     }
@@ -100,24 +100,24 @@ public:
     basic_json_serializer(std::basic_ostream<CharT>& os, bool pprint)
        : indent_(0), 
          indenting_(pprint),
-         fp_(format_.precision()),
+         fp_(options_.precision()),
          bos_(os)
     {
     }
 
     basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options)
-       : format_(options), 
+       : options_(options), 
          indent_(0), 
          indenting_(false),  
-         fp_(format_.precision()),
+         fp_(options_.precision()),
          bos_(os)
     {
     }
     basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options, bool pprint)
-       : format_(options), 
+       : options_(options), 
          indent_(0), 
          indenting_(pprint),  
-         fp_(format_.precision()),
+         fp_(options_.precision()),
          bos_(os)
     {
     }
@@ -154,19 +154,19 @@ private:
         {
             if (!stack_.empty() && stack_.back().is_object())
             {
-                stack_.push_back(stack_item(true,format_.object_object_split_lines(), false));
+                stack_.push_back(stack_item(true,options_.object_object_split_lines(), false));
             }
             else if (!stack_.empty())
             {
-                if (format_.array_object_split_lines() != line_split_kind::same_line)
+                if (options_.array_object_split_lines() != line_split_kind::same_line)
                 {
                     stack_.back().unindent_at_end_ = true;
-                    stack_.push_back(stack_item(true,format_.array_object_split_lines(), false));
+                    stack_.push_back(stack_item(true,options_.array_object_split_lines(), false));
                     write_indent1();
                 }
                 else
                 {
-                    stack_.push_back(stack_item(true,format_.array_object_split_lines(), false));
+                    stack_.push_back(stack_item(true,options_.array_object_split_lines(), false));
                 }
             }
             else 
@@ -218,22 +218,22 @@ private:
             {
                 bos_.put('[');
                 indent();
-                if (format_.object_array_split_lines() != line_split_kind::same_line)
+                if (options_.object_array_split_lines() != line_split_kind::same_line)
                 {
-                    stack_.push_back(stack_item(false,format_.object_array_split_lines(),true));
+                    stack_.push_back(stack_item(false,options_.object_array_split_lines(),true));
                 }
                 else
                 {
-                    stack_.push_back(stack_item(false,format_.object_array_split_lines(),false));
+                    stack_.push_back(stack_item(false,options_.object_array_split_lines(),false));
                 }
             }
             else if (!stack_.empty())
             {
-                if (format_.array_array_split_lines() != line_split_kind::same_line)
+                if (options_.array_array_split_lines() != line_split_kind::same_line)
                 {
                     write_indent();
                 }
-                stack_.push_back(stack_item(false,format_.array_array_split_lines(), false));
+                stack_.push_back(stack_item(false,options_.array_array_split_lines(), false));
                 indent();
                 bos_.put('[');
             }
@@ -285,7 +285,7 @@ private:
         }
 
         bos_.put('\"');
-        escape_string<CharT>(name.data(), name.length(), format_, bos_);
+        escape_string<CharT>(name.data(), name.length(), options_, bos_);
         bos_.put('\"');
         bos_.put(':');
         if (indenting_)
@@ -315,7 +315,7 @@ private:
         }
 
         bos_. put('\"');
-        escape_string<CharT>(value.data(), value.length(), format_, bos_);
+        escape_string<CharT>(value.data(), value.length(), options_, bos_);
         bos_. put('\"');
 
         end_value();
@@ -330,15 +330,15 @@ private:
 
         if ((std::isnan)(value))
         {
-            bos_.write(format_.nan_replacement());
+            bos_.write(options_.nan_replacement());
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            bos_.write(format_.pos_inf_replacement());
+            bos_.write(options_.pos_inf_replacement());
         }
         else if (!(std::isfinite)(value))
         {
-            bos_.write(format_.neg_inf_replacement());
+            bos_.write(options_.neg_inf_replacement());
         }
         else
         {
@@ -435,12 +435,12 @@ private:
 
     void indent()
     {
-        indent_ += static_cast<int>(format_.indent());
+        indent_ += static_cast<int>(options_.indent());
     }
 
     void unindent()
     {
-        indent_ -= static_cast<int>(format_.indent());
+        indent_ -= static_cast<int>(options_.indent());
     }
 
     void write_indent()

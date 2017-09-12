@@ -416,10 +416,10 @@ int main()
         jsonpointer_examples();
 
         jsonpatch_examples();
-        
-        csv_examples();
 
         serialization_examples();
+
+        csv_examples();
     }
     catch (const std::exception& e)
     {
