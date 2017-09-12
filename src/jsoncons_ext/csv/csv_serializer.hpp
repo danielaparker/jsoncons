@@ -153,7 +153,7 @@ private:
                 ++stack_.back().count_;
             }
             os_.write(parameters_.line_delimiter());
-            if (stack_[0].count_ == 0)
+            if (stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
                 header_os_.flush();
                 os_.write(header_oss_.str());

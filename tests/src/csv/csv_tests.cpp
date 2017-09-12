@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(n_columns_test)
     json_decoder<ojson> decoder;
     csv_parameters params;
     params.assume_header(true)
-           .column_types("string,float,float,float,float");
+          .column_types("string,float,float,float,float");
 
     params.mapping(mapping_type::n_rows);
     std::istringstream is1(bond_yields);
@@ -749,11 +749,14 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
     std::stringstream ss;
     csv_serializer serializer(ss,params);
     employees1.dump(serializer);
+    std::cout << pretty_print(employees1) << std::endl;
+    std::cout << ss.str() << std::endl;
 
     json_decoder<ojson> encoder2;
     csv_reader reader2(ss,encoder2,params);
     reader2.read();
     ojson employees2 = encoder2.get_result();
+    std::cout << pretty_print(employees2) << std::endl;
 
     BOOST_CHECK_EQUAL(employees1.size(), employees2.size());
 
