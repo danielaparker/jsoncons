@@ -176,11 +176,11 @@ produces
 ```
 To construct a json object with members, take an empty json object and set some name-value pairs
 ```c++
-image_sizing.set("Resize To Fit",true);  // a boolean 
-image_sizing.set("Resize Unit", "pixels");  // a string
-image_sizing.set("Resize What", "long_edge");  // a string
-image_sizing.set("Dimension 1",9.84);  // a double
-image_sizing.set("Dimension 2",json::null());  // a null value
+image_sizing.insert_or_assign("Resize To Fit",true);  // a boolean 
+image_sizing.insert_or_assign("Resize Unit", "pixels");  // a string
+image_sizing.insert_or_assign("Resize What", "long_edge");  // a string
+image_sizing.insert_or_assign("Dimension 1",9.84);  // a double
+image_sizing.insert_or_assign("Dimension 2",json::null());  // a null value
 ```
 
 Or, use an object initializer-list:
@@ -413,7 +413,7 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [serialization_options](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/serialization_options.md), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [serialization_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/serialization_options.md), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
 ```c++
 serialization_options options;
@@ -464,7 +464,7 @@ produces
 <div id="A7"/>
 ### Filters
 
-You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/rename_name_filter.md)
+You can rename object member names with the built in filter [rename_name_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/rename_name_filter.md)
 
 ```c++
 #include <sstream>
@@ -503,7 +503,7 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
-Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/json_filter.md) for details.
+Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_filter.md) for details.
 <div id="A8"/>
 ### JsonPath
 
@@ -610,22 +610,22 @@ Output:
 <div id="A9"/>
 ### About jsoncons::json
 
-The [json](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/json.md) class is an instantiation of the `basic_json` class template that uses `char` as the character type
+The [json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md) class is an instantiation of the `basic_json` class template that uses `char` as the character type
 and sorts object members in alphabetically order.
 ```c++
 typedef basic_json<char,
                    JsonTraits = json_traits<char>,
                    Allocator = std::allocator<char>> json;
 ```
-If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/ojson.md) instead.
+If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/ojson.md) instead.
 
-The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/blob/master/Classes/doc/wjson.md)
+The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/blob/master/ref/doc/wjson.md)
 ```c++
 typedef basic_json<wchar_t,
                    JsonTraits = json_traits<wchar_t>,
                    Allocator = std::allocator<wchar_t>> wjson;
 ```
-If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/wojson.md) instead.
+If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/wojson.md) instead.
 
 Note that the allocator type allows you to supply a custom allocator. For example, you can use the boost [fast_pool_allocator](http://www.boost.org/doc/libs/1_60_0/libs/pool/doc/html/boost/fast_pool_allocator.html):
 ```c++
@@ -636,8 +636,8 @@ typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> myjson;
 
 myjson o;
 
-o.set("FirstName","Joe");
-o.set("LastName","Smith");
+o.insert_or_assign("FirstName","Joe");
+o.insert_or_assign("LastName","Smith");
 ```
 This results in a json value being constucted with all memory being allocated from the boost memory pool. (In this particular case there is no improvement in performance over `std::allocator`.)
 
@@ -664,7 +664,7 @@ which prints
 <div id="A11"/>
 ### ojson and wojson
 
-The [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/ojson.md) ([wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/Classes/wojson.md)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
+The [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/ojson.md) ([wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/wojson.md)) class is an instantiation of the `basic_json` class template that uses `char` (`wchar_t`) as the character type and keeps object members in their original order. 
 ```c++
 ojson o = ojson::parse(R"(
 {
@@ -688,7 +688,7 @@ Output:
 ```
 Insert "postal_code" at end
 ```c++
-o.set("postal_code", "M5H 2N2");
+o.insert_or_assign("postal_code", "M5H 2N2");
 
 std::cout << pretty_print(o) << std::endl;
 ```
@@ -705,7 +705,7 @@ Output:
 Insert "province" before "country"
 ```c++
 auto it = o.find("country");
-o.set(it,"province","Ontario");
+o.insert_or_assign(it,"province","Ontario");
 
 std::cout << pretty_print(o) << std::endl;
 ```
@@ -742,11 +742,11 @@ template <class T>
 void push_back(T&& val)
 
 template <class T>
-void set(string_view_type name, T&& val)
+void insert_or_assign(string_view_type name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
-If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, `insert`, and `set` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
+If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, `insert`, and `insert_or_assign` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
 
 Note that the json::is<T>() and json::as<T>() functions accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
 This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object
