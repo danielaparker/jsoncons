@@ -71,28 +71,43 @@ void first_example_b()
 
 void first_example_c()
 {
-    json books = json::parse_file("input/books.json");
+    const json books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer"
+        }
+    ]
+    )");
 
     serialization_options format;
     format.precision(2);
 
-    for (size_t i = 0; i < books.size(); ++i)
+    for (const auto& book : books.array_range())
     {
         try
         {
-            json& book = books[i];
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             std::string price;
-            book.get("price", "N/A").dump(price,format);
+            book.get_with_default<json>("price", "N/A").dump(price,format);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
-        catch (const std::exception& e)
+        catch (const parse_error& e)
         {
             std::cerr << e.what() << std::endl;
         }
     }
-
 }
 
 void first_example_d()
@@ -366,7 +381,7 @@ int main()
 
         first_example_a();
         first_example_b();
-        first_example_c();
+        //first_example_c();
         first_example_d();
 
         second_example_a();
@@ -404,6 +419,8 @@ int main()
         jsonpointer_examples();
 
         jsonpatch_examples();
+
+        first_example_c();
     }
     catch (const std::exception& e)
     {

@@ -244,40 +244,31 @@ Make `get_with_default` do the right thing for string literals.
   </tr>
   <tr>
     <td><a>void swap(json& val)</a></td>
-    <td>Exchanges the content of the `json` value with the content of `val`, which is another `json` value</td>
+    <td>Exchanges the content of the <code>json</code> value with the content of <code>val</code>, which is another <code>json</code> value</td>
   </tr>
 </table>
 
 #### Relational operators
 
-    bool operator==(const json& rhs) const
-Returns `true` if two json objects compare equal, `false` otherwise.
-
-    bool operator!=(const json& rhs) const
-Returns `true` if two json objects do not compare equal, `false` otherwise.
+<table border="0">
+  <tr>
+    <td><code>bool operator==(const json& rhs) const</code></td>
+    <td>Returns <code>true</true> if two json objects compare equal, <code>false</true> otherwise.</td> 
+  </tr>
+  <tr>
+    <td><code>bool operator!=(const json& rhs) const</code></td>
+    <td>Returns <code>true</true> if two json objects do not compare equal, <code>false</true> otherwise.</td> 
+  </tr>
+</table>
 
 #### Serialization
 
-    template <class SAllocator>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
-Inserts json value into string using default serialization_options.
-
-    template <class SAllocator>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-              const serialization_options& options) const
-Inserts json value into string using specified [serialization_options](serialization_options.md).
-
-    void dump(basic_json_output_handler<char_type>& output_handler) const
-Calls `begin_json()` on `output_handler`, emits json value to `output_handler`, and calls `end_json()` on `output_handler`.
-
-    void dump(std::ostream& os) const
-Inserts json value into stream with default serialization options.
-
-    void dump(std::ostream<CharT> os, const serialization_options& options) const
-Inserts json value into stream using specified [serialization_options](serialization_options.md).
-
-    void dump_fragment(json_output_handler& handler) const
-Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler.md), such as a [json_serializer](json_serializer.md).
+<table border="0">
+  <tr>
+    <td><<a href="json/dump.md"</a>dump, dump_fragment</td>
+    <td>Serializes json value to a string, stream, or output handler.</td> 
+  </tr>
+</table>
 
 #### Non member functions
 
