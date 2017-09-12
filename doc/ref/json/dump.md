@@ -35,5 +35,45 @@ void dump_fragment(json_output_handler& handler) const; // (7)
 
 ### Examples
 
+#### Dump json value to csv file
 
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv_serializer.hpp>
 
+using namespace jsoncons;
+
+int main()
+{
+    const json books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer"
+        }
+    ]
+    )");
+
+    csv::csv_serializer serializer(std::cout);
+
+    books.dump(serializer);
+}
+
+Output:
+
+```csv
+author,price,title
+Haruki Murakami,25.17,Kafka on the Shore
+Charles Bukowski,12.0,Women: A Novel
+Ivan Passer,,Cutter's Way
+```

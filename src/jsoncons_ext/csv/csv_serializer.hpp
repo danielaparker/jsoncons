@@ -157,6 +157,7 @@ private:
             {
                 header_os_.flush();
                 os_.write(header_oss_.str());
+                os_.write(parameters_.line_delimiter());
             }
         }
         stack_.pop_back();

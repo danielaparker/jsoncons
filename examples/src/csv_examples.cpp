@@ -9,7 +9,6 @@
 using namespace jsoncons;
 using namespace jsoncons::csv;
 
-
 void mapping_types()
 {
     const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
@@ -21,7 +20,7 @@ void mapping_types()
     json_decoder<ojson> decoder;
     csv_parameters params;
     params.assume_header(true)
-           .column_types("string,float,float,float,float");
+          .column_types("string,float,float,float,float");
 
     // Default
     std::istringstream is1(bond_yields);
@@ -151,6 +150,35 @@ void serialize_books_to_csv_file()
     books.dump(serializer);
 }
 
+void serialize_books_to_csv_file_with_reorder()
+{
+    const json books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer"
+        }
+    ]
+    )");
+
+    csv_parameters params;
+    params.column_names("author,title,price");
+
+    csv_serializer serializer(std::cout, params);
+
+    books.dump(serializer);
+}
+
 void csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
@@ -160,6 +188,7 @@ void csv_examples()
     serialize_to_tab_delimited_file();
     serialize_array_of_arrays_to_comma_delimited();
     serialize_books_to_csv_file();
+    //serialize_books_to_csv_file_with_reorder();
     std::cout << std::endl;
 }
 
