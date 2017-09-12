@@ -130,14 +130,14 @@ Output:
     std::cout << pretty_print(val) << std::endl;
 
     std::cout << "New line" << std::endl;
-    serialization_options format1;
+    serialization_options options1;
     format1.object_array_split_lines(line_split_kind::new_line);
-    std::cout << pretty_print(val,format1) << std::endl;
+    std::cout << pretty_print(val,options1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
-    serialization_options format2;
+    serialization_options options2;
     format2.object_array_split_lines(line_split_kind::multi_line);
-    std::cout << pretty_print(val,format2) << std::endl;
+    std::cout << pretty_print(val,options2) << std::endl;
 ```
 
 Output:
@@ -207,14 +207,14 @@ Multi line
     std::cout << pretty_print(val) << std::endl;
 
     std::cout << "Same line" << std::endl;
-    serialization_options format1;
+    serialization_options options1;
     format1.array_array_split_lines(line_split_kind::same_line);
-    std::cout << pretty_print(val, format1) << std::endl;
+    std::cout << pretty_print(val, options1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
-    serialization_options format2;
+    serialization_options options2;
     format2.array_array_split_lines(line_split_kind::multi_line);
-    std::cout << pretty_print(val, format2) << std::endl;
+    std::cout << pretty_print(val, options2) << std::endl;
 ```
 
 Output:

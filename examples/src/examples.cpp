@@ -90,7 +90,7 @@ void first_example_c()
     ]
     )");
 
-    serialization_options format;
+    serialization_options options;
 
     for (const auto& book : books.array_range())
     {
@@ -99,7 +99,7 @@ void first_example_c()
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             std::string price;
-            book.get_with_default<json>("price", "N/A").dump(price,format);
+            book.get_with_default<json>("price", "N/A").dump(price,options);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
         catch (const parse_error& e)
@@ -113,9 +113,9 @@ void first_example_d()
 {
     json books = json::parse_file("input/books.json");
 
-    serialization_options format;
-    //format.floatfield(std::ios::fixed);
-    format.precision(2);
+    serialization_options options;
+    //options.floatfield(std::ios::fixed);
+    options.precision(2);
 
     for (size_t i = 0; i < books.size(); ++i)
     {
@@ -231,7 +231,7 @@ void json_constructor_examples()
     arr.push_back(j3);
     arr.push_back(j4);
 
-    serialization_options format;
+    serialization_options options;
     std::cout << pretty_print(arr) << std::endl;
 }
 
@@ -397,8 +397,6 @@ int main()
 
         unicode_examples();
 
-        serialization_examples();
-
         parse_error_example();
 
         type_extensibility_examples();
@@ -420,6 +418,8 @@ int main()
         jsonpatch_examples();
         
         csv_examples();
+
+        serialization_examples();
     }
     catch (const std::exception& e)
     {

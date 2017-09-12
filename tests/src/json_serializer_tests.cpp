@@ -23,11 +23,11 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    serialization_options format;
+    serialization_options options;
 
     std::ostringstream os1;
 
-    json_serializer os(os1, format, true); // pretty printing
+    json_serializer os(os1, options, true); // pretty printing
     os.begin_json();
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os1 << pretty_print(val);
     BOOST_CHECK_EQUAL(expected1,os1.str());
 
-    serialization_options format2;
-    format2.array_array_split_lines(line_split_kind::same_line);
+    serialization_options options2 ;
+    options2 .array_array_split_lines(line_split_kind::same_line);
     std::string expected2 = R"({
     "data": {
         "id": [1,2,3],
@@ -92,11 +92,11 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     }
 })";
     std::ostringstream os2;
-    os2 << pretty_print(val,format2);
+    os2 << pretty_print(val,options2 );
     BOOST_CHECK_EQUAL(expected2,os2.str());
 
-    serialization_options format3;
-    format3.array_array_split_lines(line_split_kind::new_line);
+    serialization_options options3;
+    options3.array_array_split_lines(line_split_kind::new_line);
     std::string expected3 = R"({
     "data": {
         "id": [1,2,3],
@@ -110,11 +110,11 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     }
 })";
     std::ostringstream os3;
-    os3 << pretty_print(val,format3);
+    os3 << pretty_print(val,options3);
     BOOST_CHECK_EQUAL(expected3,os3.str());
 
-    serialization_options format4;
-    format4.array_array_split_lines(line_split_kind::multi_line);
+    serialization_options options4;
+    options4.array_array_split_lines(line_split_kind::multi_line);
     std::string expected4 = R"({
     "data": {
         "id": [1,2,3],
@@ -132,11 +132,11 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     }
 })";
     std::ostringstream os4;
-    os4 << pretty_print(val,format4);
+    os4 << pretty_print(val,options4);
     BOOST_CHECK_EQUAL(expected4,os4.str());
 
-    serialization_options format5;
-    format5.object_array_split_lines(line_split_kind::same_line);
+    serialization_options options5;
+    options5.object_array_split_lines(line_split_kind::same_line);
     std::string expected5 = R"({
     "data": {
         "id": [1,2,3],
@@ -150,11 +150,11 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     }
 })";
     std::ostringstream os5;
-    os5 << pretty_print(val,format5);
+    os5 << pretty_print(val,options5);
     BOOST_CHECK_EQUAL(expected5,os5.str());
 
-    serialization_options format6;
-    format6.object_array_split_lines(line_split_kind::new_line);
+    serialization_options options6;
+    options6.object_array_split_lines(line_split_kind::new_line);
     std::string expected6 = R"({
     "data": {
         "id": [
@@ -170,11 +170,11 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     }
 })";
     std::ostringstream os6;
-    os6 << pretty_print(val,format6);
+    os6 << pretty_print(val,options6);
     BOOST_CHECK_EQUAL(expected6,os6.str());
 
-    serialization_options format7;
-    format7.object_array_split_lines(line_split_kind::multi_line);
+    serialization_options options7;
+    options7.object_array_split_lines(line_split_kind::multi_line);
     std::string expected7 = R"({
     "data": {
         "id": [
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     }
 })";
     std::ostringstream os7;
-    os7 << pretty_print(val,format7);
+    os7 << pretty_print(val,options7);
     BOOST_CHECK_EQUAL(expected7,os7.str());
 }
 

@@ -77,3 +77,85 @@ Haruki Murakami,25.17,Kafka on the Shore
 Charles Bukowski,12.0,Women: A Novel
 Ivan Passer,,Cutter's Way
 ```
+
+#### Dump json fragments one by one
+
+```c++
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    const json some_books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        }
+    ]
+    )");
+
+    const json more_books = json::parse(R"(
+    [
+        {
+            "title" : "A Wild Sheep Chase: A Novel",
+            "author" : "Haruki Murakami",
+            "price" : 9.01
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer",
+            "price" : 8.00
+        }
+    ]
+    )");
+
+    json_serializer serializer(std::cout, true); // pretty print
+    serializer.begin_json();
+    serializer.begin_array();
+    for (const auto& book : some_books.array_range())
+    {
+        book.dump_fragment(serializer);
+    }
+    for (const auto& book : more_books.array_range())
+    {
+        book.dump_fragment(serializer);
+    }
+    serializer.end_array();
+    serializer.end_json();
+}
+```
+
+Output:
+
+```json
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 12.0,
+        "title": "Women: A Novel"
+    },
+    {
+        "author": "Haruki Murakami",
+        "price": 9.01,
+        "title": "A Wild Sheep Chase: A Novel"
+    },
+    {
+        "author": "Ivan Passer",
+        "price": 8.0,
+        "title": "Cutter's Way"
+    }
+]
+```
