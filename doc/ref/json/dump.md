@@ -27,6 +27,6 @@ void dump_fragment(json_output_handler& handler) const; // (6)
 
 (5) Inserts json value into stream using specified [serialization_options](../serialization_options.md). 
 
-(6) Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler.md), such as a [json_serializer](../json_serializer.md). 
+(6) Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](../json_output_handler.md), such as a [json_serializer](../json_serializer.md). 
 
 
