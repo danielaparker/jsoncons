@@ -369,7 +369,7 @@ int main()
 {
     try
     {
-/*        json_constructor_examples();
+        json_constructor_examples();
 
         object_range_based_for_loop();
 
@@ -418,7 +418,7 @@ int main()
         jsonpointer_examples();
 
         jsonpatch_examples();
-        */
+        
         csv_examples();
     }
     catch (const std::exception& e)
