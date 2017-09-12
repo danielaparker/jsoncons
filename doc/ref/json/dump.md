@@ -1,4 +1,4 @@
-### `jsoncons::json::dump`
+### `jsoncons::json::dump`, `jsoncons::json::dump_fragment`
 
 ```c++
 template <class SAllocator>
@@ -68,6 +68,7 @@ int main()
 
     books.dump(serializer);
 }
+```
 
 Output:
 
