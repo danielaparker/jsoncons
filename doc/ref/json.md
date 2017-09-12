@@ -130,25 +130,6 @@ Returns the number of object members that match `name`.
   </tr>
 </table>
 
-    bool is_null() const noexcept
-    bool is_string() const noexcept
-    bool is_number() const noexcept
-    bool is_integer() const noexcept
-    bool is_uinteger() const noexcept
-    bool is_double() const noexcept
-    bool is_bool() const noexcept
-    bool is_object() const noexcept
-    bool is_array() const noexcept
-Non-generic versions of `is_` methods
-
-    bool as_bool() const
-    int64_t as_integer() const
-    uint64_t as_uinteger() const
-    double as_double() const
-    string_view_type as_string_view() const
-    unsigned int as<unsigned int> const 
-Non-generic versions of `as` methods
-
     json& operator[](size_t i)
     const json& operator[](size_t i) const
 Returns a reference to the value at position i in a json object or array.
