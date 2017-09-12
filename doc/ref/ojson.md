@@ -17,9 +17,9 @@ The `jsoncons` library will always rebind the supplied allocator from the templa
 
 The interface is the same as [json](json), with these provisos:
 
-- `ojson`, like `json`, supports object member `set` methods that take an `object_iterator` as the first parameter. But while with `json` that parameter is just a hint that allows optimization, with `ojson` it is the actual location where to insert the member.
+- `ojson`, like `json`, supports object member `insert_or_assign` methods that take an `object_iterator` as the first parameter. But while with `json` that parameter is just a hint that allows optimization, with `ojson` it is the actual location where to insert the member.
 
-- In `ojson`, the `set` members that just take a name and a value always insert the member at the end.
+- In `ojson`, the `insert_or_assign` members that just take a name and a value always insert the member at the end.
 
 #### See also
 
@@ -53,7 +53,7 @@ Output:
 ```
 Insert "postal_code" at end
 ```c++
-o.set("postal_code", "M5H 2N2");
+o.insert_or_assign("postal_code", "M5H 2N2");
 
 std::cout << pretty_print(o) << std::endl;
 ```
@@ -70,7 +70,7 @@ Output:
 Insert "province" before "country"
 ```c++
 auto it = o.find("country");
-o.set(it,"province","Ontario");
+o.insert_or_assign(it,"province","Ontario");
 
 std::cout << pretty_print(o) << std::endl;
 ```

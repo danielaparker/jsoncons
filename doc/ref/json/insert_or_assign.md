@@ -1,12 +1,12 @@
-### jsoncons::json::set
+### jsoncons::json::insert_or_assign
 
 ```c++
 template <class T>
-pair<object_iterator, bool> set(string_view_type key, T&& value); // (1)
+pair<object_iterator, bool> insert_or_assign(string_view_type key, T&& value); // (1)
 
 template <class T>
-object_iterator set(const_object_iterator hint, string_view_type key, 
-                    T&& value); // (2)
+object_iterator insert_or_assign(const_object_iterator hint, string_view_type key, 
+                                 T&& value); // (2)
 ```
 
 #### Parameters

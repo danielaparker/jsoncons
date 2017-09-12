@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(test_object_set)
 {
     json b = json::array();
     b.resize(3);
-    BOOST_REQUIRE_THROW(b.set("key1","value1"), std::runtime_error);
+    BOOST_REQUIRE_THROW(b.insert_or_assign("key1","value1"), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_array_add)

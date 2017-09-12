@@ -8,6 +8,7 @@ Category|Old name, now deprecated|<em>&#x2713;</em>|Recommendation
 --------|-----------|--------------|------------------------
 json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator pos, const json& val)
 &#160;|add(size_t index, json&& val)|<em>&#x2713;</em>|Use add(array_iterator pos, json&& val)
+&#160;|dump_body|<em>&#x2713;</em>|dump_fragment
 &#160;|remove_range(size_t from_index, size_t to_index)|<em>&#x2713;</em>|erase(array_iterator first, array_iterator last)
 &#160;|remove(const std::string& name)|<em>&#x2713;</em>|Use erase(const std::string& name)
 &#160;|parse_stream(std::istream& is)|<em>&#x2713;</em>|Use parse(std::istream& is)

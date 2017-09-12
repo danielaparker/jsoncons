@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
       //o.try_emplace("author", "Nigel Rees",allocator);
       //o.try_emplace("title", "Sayings of the Century",allocator);
       //o.try_emplace("price", 8.95, allocator);
-      o.set("category", "reference");
-      o.set("author", "Nigel Rees");
-      o.set("title", "Sayings of the Century");
-      o.set("price", 8.95);
+      o.insert_or_assign("category", "reference");
+      o.insert_or_assign("author", "Nigel Rees");
+      o.insert_or_assign("title", "Sayings of the Century");
+      o.insert_or_assign("price", 8.95);
 
       j->push_back(o);
 

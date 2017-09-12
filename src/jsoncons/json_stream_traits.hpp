@@ -46,8 +46,16 @@ void dump(const T& val, basic_json_output_handler<CharT>& handler)
     handler.end_json();
 }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
 template <class CharT, class T>
 void dump_body(const T& val, basic_json_output_handler<CharT>& handler)
+{
+    dump_fragment(val,handler);
+}
+#endif
+
+template <class CharT, class T>
+void dump_fragment(const T& val, basic_json_output_handler<CharT>& handler)
 {
     json_stream_traits<T>::encode(val,handler);
 }

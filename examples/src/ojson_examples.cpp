@@ -21,7 +21,7 @@ void ojson_examples()
 
     std::cout << pretty_print(o) << std::endl;
 
-    o.set("postal_code", "M5H 2N2");
+    o.insert_or_assign("postal_code", "M5H 2N2");
     std::cout << pretty_print(o) << std::endl;
 
     ojson o2 = o;
@@ -30,9 +30,9 @@ void ojson_examples()
     o3["street_name"] = "Queen St W";
 
     auto it = o.find("country");
-    o.set(it,"province","Ontario");
+    o.insert_or_assign(it,"province","Ontario");
 
-    o.set("unit_type","O");
+    o.insert_or_assign("unit_type","O");
 
     std::cout << pretty_print(o) << std::endl;
 

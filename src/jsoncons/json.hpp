@@ -2575,7 +2575,13 @@ public:
         s = os.str();
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     void dump_body(basic_json_output_handler<char_type>& handler) const
+    {
+        dump_fragment(handler);
+    }
+#endif
+    void dump_fragment(basic_json_output_handler<char_type>& handler) const
     {
         switch (var_.type_id())
         {
@@ -2609,7 +2615,7 @@ public:
                 for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
                     handler.name(string_view_type((it->key()).data(),it->key().length()));
-                    it->value().dump_body(handler);
+                    it->value().dump_fragment(handler);
                 }
                 handler.end_object();
             }
@@ -2620,7 +2626,7 @@ public:
                 const array& o = array_value();
                 for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                 {
-                    it->dump_body(handler);
+                    it->dump_fragment(handler);
                 }
                 handler.end_array();
             }
@@ -2632,7 +2638,7 @@ public:
     void dump(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        dump_body(handler);
+        dump_fragment(handler);
         handler.end_json();
     }
 
@@ -2661,7 +2667,7 @@ public:
         os.imbue(std::locale::classic());
         {
             basic_json_serializer<char_type> serializer(os);
-            dump_body(serializer);
+            dump_fragment(serializer);
         }
         return os.str();
     }
@@ -2674,7 +2680,7 @@ public:
         os.imbue(std::locale::classic());
         {
             basic_json_serializer<char_type> serializer(os, options);
-            dump_body(serializer);
+            dump_fragment(serializer);
         }
         return os.str();
     }
@@ -2708,7 +2714,7 @@ public:
     void to_stream(basic_json_output_handler<char_type>& handler) const
     {
         handler.begin_json();
-        dump_body(handler);
+        dump_fragment(handler);
         handler.end_json();
     }
 

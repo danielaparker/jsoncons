@@ -105,7 +105,7 @@ void streaming_example2()
     serializer.begin_json();       
     serializer.begin_object();       
     serializer.name("Employees");       
-    dump_body(employees, serializer);
+    dump_fragment(employees, serializer);
     serializer.end_object();       
     serializer.end_json();       
 

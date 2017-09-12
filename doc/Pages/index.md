@@ -176,11 +176,11 @@ produces
 ```
 To construct a json object with members, take an empty json object and set some name-value pairs
 ```c++
-image_sizing.set("Resize To Fit",true);  // a boolean 
-image_sizing.set("Resize Unit", "pixels");  // a string
-image_sizing.set("Resize What", "long_edge");  // a string
-image_sizing.set("Dimension 1",9.84);  // a double
-image_sizing.set("Dimension 2",json::null());  // a null value
+image_sizing.insert_or_assign("Resize To Fit",true);  // a boolean 
+image_sizing.insert_or_assign("Resize Unit", "pixels");  // a string
+image_sizing.insert_or_assign("Resize What", "long_edge");  // a string
+image_sizing.insert_or_assign("Dimension 1",9.84);  // a double
+image_sizing.insert_or_assign("Dimension 2",json::null());  // a null value
 ```
 
 Or, use an object initializer-list:
@@ -636,8 +636,8 @@ typedef jsoncons::basic_json<char, boost::fast_pool_allocator<char>> myjson;
 
 myjson o;
 
-o.set("FirstName","Joe");
-o.set("LastName","Smith");
+o.insert_or_assign("FirstName","Joe");
+o.insert_or_assign("LastName","Smith");
 ```
 This results in a json value being constucted with all memory being allocated from the boost memory pool. (In this particular case there is no improvement in performance over `std::allocator`.)
 
@@ -688,7 +688,7 @@ Output:
 ```
 Insert "postal_code" at end
 ```c++
-o.set("postal_code", "M5H 2N2");
+o.insert_or_assign("postal_code", "M5H 2N2");
 
 std::cout << pretty_print(o) << std::endl;
 ```
@@ -705,7 +705,7 @@ Output:
 Insert "province" before "country"
 ```c++
 auto it = o.find("country");
-o.set(it,"province","Ontario");
+o.insert_or_assign(it,"province","Ontario");
 
 std::cout << pretty_print(o) << std::endl;
 ```
@@ -742,11 +742,11 @@ template <class T>
 void push_back(T&& val)
 
 template <class T>
-void set(string_view_type name, T&& val)
+void insert_or_assign(string_view_type name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
-If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, `insert`, and `set` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
+If you want to use the json constructor, `is<T>`, `as<T>`, `operator=`, `push_back`, `insert`, and `insert_or_assign` to access or modify with a new type, you need to show `json` how to interact with that type, by extending `json_type_traits` in the `jsoncons` namespace.
 
 Note that the json::is<T>() and json::as<T>() functions accept template packs, which they forward to the `json_type_traits` `is` and `as` functions.
 This allows user defined `json_type_traits` implementations to resolve, for instance, a name into a C++ object

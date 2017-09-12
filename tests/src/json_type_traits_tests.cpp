@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(test_trait_type_erasure)
 
     val = o;
 
-    val.set("A",o);
+    val.insert_or_assign("A",o);
 }
 
 BOOST_AUTO_TEST_CASE(test_assign_non_const_cstring)

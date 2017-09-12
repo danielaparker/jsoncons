@@ -283,9 +283,9 @@ BOOST_AUTO_TEST_CASE(test_set_and_proxy_set)
 {
     json a;
 
-    a.set("object1",json());
-    a.set("field1","value1");
-    a["object1"].set("field2","value2");
+    a.insert_or_assign("object1",json());
+    a.insert_or_assign("field1","value1");
+    a["object1"].insert_or_assign("field2","value2");
 
     BOOST_CHECK_EQUAL(std::string("value1"),a["field1"].as<std::string>());
     BOOST_CHECK_EQUAL(std::string("value2"),a["object1"]["field2"].as<std::string>());

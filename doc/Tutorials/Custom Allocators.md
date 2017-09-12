@@ -9,8 +9,8 @@ typedef jsoncons::basic_json<char, boost::fast_pool_allocator<void>> bfp_json;
 
 bfp_json j;
 
-j.set("FirstName","Joe");
-j.set("LastName","Smith");
+j.insert_or_assign("FirstName","Joe");
+j.insert_or_assign("LastName","Smith");
 ```
 
 ### Using `json` with stateful Boost.Interprocess allocators
@@ -73,10 +73,10 @@ int main(int argc, char *argv[])
       j->add(10);
 
       shm_json o(allocator);
-      o.set("category", "reference");
-      o.set("author", "Nigel Rees");
-      o.set("title", "Sayings of the Century");
-      o.set("price", 8.95);
+      o.insert_or_assign("category", "reference");
+      o.insert_or_assign("author", "Nigel Rees");
+      o.insert_or_assign("title", "Sayings of the Century");
+      o.insert_or_assign("price", 8.95);
 
       j->add(o);
 

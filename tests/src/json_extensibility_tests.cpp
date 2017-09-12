@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(test_set_extensibility)
 {
     json o;
     boost::gregorian::date d(boost::gregorian::day_clock::local_day());
-    o.set("today",d);
+    o.insert_or_assign("today",d);
     boost::gregorian::date val = o["today"].as<boost::gregorian::date>();
     BOOST_CHECK_EQUAL(d,val);
 }

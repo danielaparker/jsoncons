@@ -1,7 +1,18 @@
 master
 ------
 
+Changes (non breaking)
+----------------------
+
+- The name `json::dump_body` has been deprecated and replaced with `json::dump_fragment`. 
+- The name `dump_body` has been deprecated and replaced with `dump_fragment`. 
+
+- In the documentation and examples, the existing function `json::insert_or_assign` 
+  is now used instead of the still-supported `json::set`. The reason is that 
+  `insert_or_assign` follows the naming convention of the C++ standard library.   
+
 New features
+------------
 
 - JSON Pointer implementation
 

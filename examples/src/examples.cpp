@@ -272,10 +272,10 @@ void more_examples()
     };
 
     json image_sizing;
-    image_sizing.set("Resize To Fit",true);  // a boolean 
-    image_sizing.set("Resize Unit", "pixels");  // a string
-    image_sizing.set("Resize What", "long_edge");  // a string
-    image_sizing.set("Dimension 1",9.84);  // a double
+    image_sizing.insert_or_assign("Resize To Fit",true);  // a boolean 
+    image_sizing.insert_or_assign("Resize Unit", "pixels");  // a string
+    image_sizing.insert_or_assign("Resize What", "long_edge");  // a string
+    image_sizing.insert_or_assign("Dimension 1",9.84);  // a double
     std::cout << pretty_print(image_sizing) << std::endl;
 
     json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};

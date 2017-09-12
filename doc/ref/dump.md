@@ -10,7 +10,7 @@ template <class CharT, class T>
 void dump(const T& val, basic_json_output_handler<CharT>& handler); // (1)
 
 template <class CharT, class T>
-void dump_body(const T& val, basic_json_output_handler<CharT>& handler); // (2)
+void dump_fragment(const T& val, basic_json_output_handler<CharT>& handler); // (2)
 
 template <class CharT, class T>
 void dump(const T& val, std::basic_ostream<CharT>& os); // (3)
@@ -129,7 +129,7 @@ int main()
     serializer.begin_json();       
     serializer.begin_object();       
     serializer.name("Employees");       
-    dump_body(employees, serializer);
+    dump_fragment(employees, serializer);
     serializer.end_object();       
     serializer.end_json();       
 }

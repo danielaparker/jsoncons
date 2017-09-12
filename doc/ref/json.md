@@ -212,7 +212,7 @@ Make `get_with_default` do the right thing for string literals.
   </tr>
   <tr>
     <td><a>add</a></td>
-    <td>Same as push_back and insert</td> 
+    <td>Combines push_back and insert</td> 
   </tr>
   <tr>
     <td><a href="json/emplace_back.md">emplace_back</a></td>
@@ -227,8 +227,12 @@ Make `get_with_default` do the right thing for string literals.
     <td>Constructs a key-value pair in place in a json object if the key does not exist, does nothing if the key exists</td> 
   </tr>
   <tr>
-    <td><a href="json/set.md">set</a></td>
+    <td><a href="json/insert_or_assign.md">insert_or_assign</a></td>
     <td>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</td> 
+  </tr>
+  <tr>
+    <td><a>set</a></td>
+    <td>Same as <code>insert_or_assign</code></td> 
   </tr>
   <tr>
     <td><a href="json/merge.md">merge</a></td>
@@ -272,7 +276,7 @@ Inserts json value into stream with default serialization options.
     void dump(std::ostream<CharT> os, const serialization_options& options) const
 Inserts json value into stream using specified [serialization_options](serialization_options.md).
 
-    void dump_body(json_output_handler& handler) const
+    void dump_fragment(json_output_handler& handler) const
 Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](json_output_handler.md), such as a [json_serializer](json_serializer.md).
 
 #### Non member functions

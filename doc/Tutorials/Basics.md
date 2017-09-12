@@ -20,30 +20,30 @@ book1["date"] = "2002-04-09";
 book1["price"] = 9.01;
 book1["isbn"] = "037571894X";  
 
-// Construct another using the set function
+// Construct another using the insert_or_assign function
 json book2;
 
-book2.set("category", "History");
-book2.set("title", "Charlie Wilson's War");
-book2.set("author", "George Crile");
-book2.set("date", "2007-11-06");
-book2.set("price", 10.50);
-book2.set("isbn", "0802143415");  
+book2.insert_or_assign("category", "History");
+book2.insert_or_assign("title", "Charlie Wilson's War");
+book2.insert_or_assign("author", "George Crile");
+book2.insert_or_assign("date", "2007-11-06");
+book2.insert_or_assign("price", 10.50);
+book2.insert_or_assign("isbn", "0802143415");  
 
-// Use set again, but more efficiently
+// Use insert_or_assign again, but more efficiently
 json book3;
 
 // Reserve memory, to avoid reallocations
 book3.reserve(6);
 
 // Insert in name alphabetical order
-// Give set a hint where to insert the next member
-auto hint = book3.set(book3.object_range().begin(),"author", "Haruki Murakami");
-hint = book3.set(hint, "category", "Fiction");
-hint = book3.set(hint, "date", "2006-01-03");
-hint = book3.set(hint, "isbn", "1400079276");  
-hint = book3.set(hint, "price", 13.45);
-hint = book3.set(hint, "title", "Kafka on the Shore");
+// Give insert_or_assign a hint where to insert the next member
+auto hint = book3.insert_or_assign(book3.object_range().begin(),"author", "Haruki Murakami");
+hint = book3.insert_or_assign(hint, "category", "Fiction");
+hint = book3.insert_or_assign(hint, "date", "2006-01-03");
+hint = book3.insert_or_assign(hint, "isbn", "1400079276");  
+hint = book3.insert_or_assign(hint, "price", 13.45);
+hint = book3.insert_or_assign(hint, "title", "Kafka on the Shore");
 
 // Construct a fourth from a string
 json book4 = json::parse(R"(
@@ -268,30 +268,30 @@ book1[L"date"] = L"2002-04-09";
 book1[L"price"] = 9.01;
 book1[L"isbn"] = L"037571894X";
 
-// Construct another using the set function
+// Construct another using the insert_or_assign function
 wjson book2;
 
-book2.set(L"category", L"History");
-book2.set(L"title", L"Charlie Wilson's War");
-book2.set(L"author", L"George Crile");
-book2.set(L"date", L"2007-11-06");
-book2.set(L"price", 10.50);
-book2.set(L"isbn", L"0802143415");
+book2.insert_or_assign(L"category", L"History");
+book2.insert_or_assign(L"title", L"Charlie Wilson's War");
+book2.insert_or_assign(L"author", L"George Crile");
+book2.insert_or_assign(L"date", L"2007-11-06");
+book2.insert_or_assign(L"price", 10.50);
+book2.insert_or_assign(L"isbn", L"0802143415");
 
-// Use set again, but more efficiently
+// Use insert_or_assign again, but more efficiently
 wjson book3;
 
 // Reserve memory, to avoid reallocations
 book3.reserve(6);
 
 // Insert in name alphabetical order
-// Give set a hint where to insert the next member
-auto hint = book3.set(book3.object_range().begin(), L"author", L"Haruki Murakami");
-hint = book3.set(hint, L"category", L"Fiction");
-hint = book3.set(hint, L"date", L"2006-01-03");
-hint = book3.set(hint, L"isbn", L"1400079276");
-hint = book3.set(hint, L"price", 13.45);
-hint = book3.set(hint, L"title", L"Kafka on the Shore");
+// Give insert_or_assign a hint where to insert the next member
+auto hint = book3.insert_or_assign(book3.object_range().begin(), L"author", L"Haruki Murakami");
+hint = book3.insert_or_assign(hint, L"category", L"Fiction");
+hint = book3.insert_or_assign(hint, L"date", L"2006-01-03");
+hint = book3.insert_or_assign(hint, L"isbn", L"1400079276");
+hint = book3.insert_or_assign(hint, L"price", 13.45);
+hint = book3.insert_or_assign(hint, L"title", L"Kafka on the Shore");
 
 // Construct a fourth from a string
 wjson book4 = wjson::parse(LR"(
