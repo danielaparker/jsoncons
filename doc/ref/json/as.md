@@ -15,20 +15,8 @@ double as_double() const; // (5)
 string_view_type as_string_view() const; // (6)
 ```
 
-(1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits.md).
-
-(2) Same as `as<bool>()`. Returns `true` if value is `bool` and `true`, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as `true`. 
-Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
-Otherwise throws `std::runtime_exception`
-
-(3) Same as `as<int64_t>()`. Returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
-
-(4) Same as `as<uint64_t>()`. Returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
-
-(5) Same as `as<double>()`. Returns value cast to double if value is integral, returns `NaN` if value is `null`, attempts conversion if value is string, otherwise throws.
-
-(6) 
-
+(1) Generic get `as` type `T`.  
+Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits.md).
     std::string as<std::string>() const noexcept
     std::string as<std::string>(const char_allocator& allocator) const noexcept
 If value is string, returns value, otherwise returns result of `dump`.
@@ -38,6 +26,22 @@ If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceCont
 
     as<X<std::string,T>>()
 If the type 'X' satisfies [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) or [UnorderedAssociativeContainer](http://en.cppreference.com/w/cpp/concept/UnorderedAssociativeContainer), `as<X<std::string,T>>()` returns the `json` value as an `X<std::string,T>` if the `json` value is an object and if each member value is convertible to type `T`, otherwise throws.
+
+(2) Same as `as<bool>()`.  
+Returns `true` if value is `bool` and `true`, or if value is integral and non-zero, or if value is floating point and non-zero, or if value is string and parsed value evaluates as `true`. 
+Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
+Otherwise throws `std::runtime_exception`
+
+(3) Same as `as<int64_t>()`.  
+Returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
+
+(4) Same as `as<uint64_t>()`.  
+Returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
+
+(5) Same as `as<double>()`.  
+Returns value cast to double if value is integral, returns `NaN` if value is `null`, attempts conversion if value is string, otherwise throws.
+
+(6) 
 
 ### Examples
 
