@@ -15,11 +15,11 @@ double as_double() const; // (5)
 string_view_type as_string_view() const; // (6)
 ```
 
-(1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](json_type_traits.md).
+(1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../json_type_traits.md).
 
     std::string as<std::string>() const noexcept
     std::string as<std::string>(const char_allocator& allocator) const noexcept
-If value is string, returns value, otherwise returns result of `dump`.
+If value is string, returns value, otherwise returns result of [dump](dump.md).
 
     as<X<T>>()
 If the type `X` is not `std::basic_string` but otherwise satisfies [SequenceContainer](http://en.cppreference.com/w/cpp/concept/SequenceContainer), `as<X<T>>()` returns the `json` value as an `X<T>` if the `json` value is an array and each element is convertible to type `T`, otherwise throws.
