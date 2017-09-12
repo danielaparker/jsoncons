@@ -125,14 +125,41 @@ void serialize_to_tab_delimited_file()
     employees.dump(serializer);
 }
 
+void serialize_books_to_csv_file()
+{
+    const json books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer"
+        }
+    ]
+    )");
+
+    csv_serializer serializer(std::cout);
+
+    books.dump(serializer);
+}
+
 void csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
     mapping_types();
     read_csv_file1();
     read_write_csv_tasks();
-    serialize_array_of_arrays_to_comma_delimited();
     serialize_to_tab_delimited_file();
+    serialize_array_of_arrays_to_comma_delimited();
+    serialize_books_to_csv_file();
     std::cout << std::endl;
 }
 

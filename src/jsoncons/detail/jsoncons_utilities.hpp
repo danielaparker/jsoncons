@@ -889,6 +889,7 @@ public:
         {
             throw std::runtime_error("Failed attempting double to string conversion");
         }
+        //std::cout << "prec:" << prec << ", buf:" << buf << std::endl;
         char* s = buf;
         char* se = s + prec;
 
@@ -991,6 +992,8 @@ public:
         oss_.clear_sequence();
         oss_.precision((precision == 0) ? precision_ : precision);
         oss_ << val;
+
+        //std::cout << "precision_:" << (int)precision_ << ", precision:" << (int)precision << ", buf:" << oss_.data() << std::endl;
 
         const CharT* sbeg = oss_.data();
         const CharT* send = sbeg + oss_.length();

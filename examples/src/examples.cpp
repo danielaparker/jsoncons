@@ -91,7 +91,6 @@ void first_example_c()
     )");
 
     serialization_options format;
-    format.precision(2);
 
     for (const auto& book : books.array_range())
     {
@@ -370,7 +369,7 @@ int main()
 {
     try
     {
-        json_constructor_examples();
+/*        json_constructor_examples();
 
         object_range_based_for_loop();
 
@@ -381,7 +380,7 @@ int main()
 
         first_example_a();
         first_example_b();
-        //first_example_c();
+        first_example_c();
         first_example_d();
 
         second_example_a();
@@ -419,8 +418,8 @@ int main()
         jsonpointer_examples();
 
         jsonpatch_examples();
-
-        first_example_c();
+        */
+        csv_examples();
     }
     catch (const std::exception& e)
     {

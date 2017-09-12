@@ -29,4 +29,58 @@ void dump_fragment(json_output_handler& handler) const; // (6)
 
 (6) Emits JSON events for JSON objects, arrays, object members and array elements to a [json_output_handler](../json_output_handler.md), such as a [json_serializer](../json_serializer.md). 
 
+### Examples
+
+#### Dump json "price" value to a string
+
+```c++
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    const json books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer"
+        }
+    ]
+    )");
+
+    for (const auto& book : books.array_range())
+    {
+        try
+        {
+            std::string author = book["author"].as<std::string>();
+            std::string title = book["title"].as<std::string>();
+            std::string price;
+            book.get_with_default<json>("price", "N/A").dump(price);
+            std::cout << author << ", " << title << ", " << price << std::endl;
+        }
+        catch (const parse_error& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+    }
+}
+```
+Output:
+```
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Women: A Novel, 12.0
+Ivan Passer, Cutter's Way, "N/A"
+```
+
 
