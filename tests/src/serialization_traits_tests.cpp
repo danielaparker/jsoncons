@@ -3,7 +3,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <jsoncons/json_serialization_traits.hpp>
+#include <jsoncons/serialization_traits.hpp>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -16,7 +16,7 @@ using boost::numeric::ublas::matrix;
 namespace jsoncons
 {
     template <>
-    struct json_serialization_traits<matrix<double>>
+    struct serialization_traits<matrix<double>>
     {
         static void encode(const matrix<double>& val, json_output_handler& handler)
         {
@@ -37,7 +37,7 @@ namespace jsoncons
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_serialization_traits_tests)
+BOOST_AUTO_TEST_SUITE(serialization_traits_tests)
 
 BOOST_AUTO_TEST_CASE(test_matrix)
 {

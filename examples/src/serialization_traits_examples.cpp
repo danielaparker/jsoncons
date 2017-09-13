@@ -4,7 +4,7 @@
 #include <iostream>
 #include <map>
 #include <tuple>
-#include <jsoncons/json_serialization_traits.hpp>
+#include <jsoncons/serialization_traits.hpp>
 
 using namespace jsoncons;
 
@@ -58,7 +58,7 @@ using namespace examples::serialization_traits;
 namespace jsoncons
 {
     template <>
-    struct json_serialization_traits<std::shared_ptr<Employee>>
+    struct serialization_traits<std::shared_ptr<Employee>>
     {
         static void encode(const std::shared_ptr<Employee>& val, json_output_handler& handler)
         {

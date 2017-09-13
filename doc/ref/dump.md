@@ -1,10 +1,10 @@
 ### jsoncons::dump
 
-Serialize C++ object to a JSON formatted stream, governed by `json_serialization_traits`
+Serialize C++ object to a JSON formatted stream, governed by `serialization_traits`
 
 #### Header
 ```c++
-#include <jsoncons/json_serialization_traits.hpp>
+#include <jsoncons/serialization_traits.hpp>
 
 template <class CharT, class T>
 void dump(const T& val, basic_json_output_handler<CharT>& handler); // (1)
@@ -27,9 +27,9 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
           std::basic_ostream<CharT>& os, bool pprint); // (6)
 ```
 
-(1) Calls `begin_json()` on `handler`, applies `json_serialization_traits` to serialize `val` to JSON output stream, and calls `end_json()` on `handler`.
+(1) Calls `begin_json()` on `handler`, applies `serialization_traits` to serialize `val` to JSON output stream, and calls `end_json()` on `handler`.
 
-(2) Applies `json_serialization_traits` to serialize `val` to JSON output stream, but does not call begin_json() and `end_json()`.
+(2) Applies `serialization_traits` to serialize `val` to JSON output stream, but does not call begin_json() and `end_json()`.
 
 #### Parameters
 
@@ -73,7 +73,7 @@ None
 #include <iostream>
 #include <map>
 #include <tuple>
-#include <jsoncons/json_serialization_traits.hpp>
+#include <jsoncons/serialization_traits.hpp>
 
 using namespace jsoncons;
 
@@ -111,7 +111,7 @@ Output:
 #include <iostream>
 #include <map>
 #include <tuple>
-#include <jsoncons/json_serialization_traits.hpp>
+#include <jsoncons/serialization_traits.hpp>
 
 using namespace jsoncons;
 
@@ -144,7 +144,7 @@ Output:
 }
 ```
     
-#### Extending `json_serialization_traits`
+#### Extending `serialization_traits`
 
 ```c++
 class Employee
@@ -192,7 +192,7 @@ public:
 namespace jsoncons
 {
     template <>
-    struct json_serialization_traits<std::shared_ptr<Employee>>
+    struct serialization_traits<std::shared_ptr<Employee>>
     {
         static void encode(const std::shared_ptr<Employee>& val, json_output_handler& handler)
         {
@@ -234,7 +234,7 @@ Output:
 
 ```c++
 #include <boost/numeric/ublas/matrix.hpp>
-#include <jsoncons/json_serialization_traits.hpp>
+#include <jsoncons/serialization_traits.hpp>
 #include <sstream>
 
 using boost::numeric::ublas::matrix;
@@ -242,7 +242,7 @@ using boost::numeric::ublas::matrix;
 namespace jsoncons
 {
     template <>
-    struct json_serialization_traits<matrix<double>>
+    struct serialization_traits<matrix<double>>
     {
         static void encode(const matrix<double>& val, json_output_handler& handler)
         {

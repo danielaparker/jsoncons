@@ -20,7 +20,7 @@ Changes (non breaking)
 Changes
 -------
 
-- The recently introduced class `json_stream_traits` has been renamed to `json_serialization_traits`
+- The recently introduced class `json_stream_traits` has been renamed to `serialization_traits`
 
 New features
 ------------

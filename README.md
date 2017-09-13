@@ -350,13 +350,13 @@ std::list<book> l = j.as<std::list<book>>();
 
 See [Type Extensibility](doc/ref/Type%20Extensibility.md) for details.
 
-#### Serialize C++ objects directly to JSON formatted streams, governed by `json_serialization_traits` 
+#### Serialize C++ objects directly to JSON formatted streams, governed by `serialization_traits` 
 
 ```c++
 #include <iostream>
 #include <map>
 #include <tuple>
-#include <jsoncons/json_serialization_traits.hpp>
+#include <jsoncons/serialization_traits.hpp>
 
 using namespace jsoncons;
 
