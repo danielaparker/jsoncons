@@ -10,13 +10,15 @@ void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
 
 void dump(std::ostream& os) const; // (3)
 
-void dump(std::ostream<CharT> os, const serialization_options& options) const; // (4)
+void dump(std::ostream<CharT> os, bool pprint) const; // (4)
 
-void dump(std::ostream<CharT> os, const serialization_options& options, bool pprint) const; // (5)
+void dump(std::ostream<CharT> os, const serialization_options& options) const; // (5)
 
-void dump(basic_json_output_handler<char_type>& output_handler) const; // (6)
+void dump(std::ostream<CharT> os, const serialization_options& options, bool pprint) const; // (6)
 
-void dump_fragment(json_output_handler& handler) const; // (7)
+void dump(basic_json_output_handler<char_type>& output_handler) const; // (7)
+
+void dump_fragment(json_output_handler& handler) const; // (8)
 ```
 
 (1) Inserts json value into string using default serialization_options.
@@ -25,13 +27,15 @@ void dump_fragment(json_output_handler& handler) const; // (7)
 
 (3) Inserts json value into stream with default serialization options. 
 
-(4) Inserts json value into stream using specified [serialization_options](../serialization_options.md). 
+(4) Inserts json value into stream using default serialization options and pretty print flag. 
 
-(5) Inserts json value into stream using specified [serialization_options](../serialization_options.md) and pretty print flag. 
+(5) Inserts json value into stream using specified [serialization_options](../serialization_options.md). 
 
-(6) Calls `begin_json()` on [output_handler](../json_output_handler.md), emits json value to the [output_handler](../json_output_handler.md), and calls `end_json()` on [output_handler](../json_output_handler.md). 
+(6) Inserts json value into stream using specified [serialization_options](../serialization_options.md) and pretty print flag. 
 
-(7) Emits json value to the [output_handler](../json_output_handler.md) (does not call `begin_json()` or `end_json()`.)
+(7) Calls `begin_json()` on [output_handler](../json_output_handler.md), emits json value to the [output_handler](../json_output_handler.md), and calls `end_json()` on [output_handler](../json_output_handler.md). 
+
+(8) Emits json value to the [output_handler](../json_output_handler.md) (does not call `begin_json()` or `end_json()`.)
 
 ### Examples
 
@@ -64,7 +68,10 @@ int main()
     ]
     )");
 
-    csv::csv_serializer serializer(std::cout);
+    csv_parameters params;
+    params.column_names("author,title,price");
+
+    csv_serializer serializer(std::cout, params);
 
     books.dump(serializer);
 }
@@ -73,10 +80,10 @@ int main()
 Output:
 
 ```csv
-author,price,title
-Haruki Murakami,25.17,Kafka on the Shore
-Charles Bukowski,12.0,Women: A Novel
-Ivan Passer,,Cutter's Way
+author,title,price
+Haruki Murakami,Kafka on the Shore,25.17
+Charles Bukowski,Women: A Novel,12.0
+Ivan Passer,Cutter's Way,
 ```
 
 #### Dump json fragments one by one

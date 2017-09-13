@@ -2000,6 +2000,11 @@ public:
             evaluate().dump(os);
         }
 
+        void dump(std::basic_ostream<char_type>& os, bool pprint) const
+        {
+            evaluate().dump(os, pprint);
+        }
+
         void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options) const
         {
             evaluate().dump(os,options);
@@ -2645,6 +2650,12 @@ public:
     void dump(std::basic_ostream<char_type>& os) const
     {
         basic_json_serializer<char_type> serializer(os);
+        dump(serializer);
+    }
+
+    void dump(std::basic_ostream<char_type>& os, bool pprint) const
+    {
+        basic_json_serializer<char_type> serializer(os, pprint);
         dump(serializer);
     }
 
