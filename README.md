@@ -2,32 +2,6 @@ jsoncons is a modern C++, header-only library for constructing [JSON](http://www
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
 
-Features:
-
-- Uses the standard C++ input/output streams library
-- Supports conversion from and to the standard library sequence containers, associative containers, std::pair, and std::tuple
-- Supports conversion from and to user defined types
-- Supports object members sorted alphabetically by name or in original order
-- Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
-- Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
-- Supports event based JSON parsing and serializing with user defined input and output handlers
-- Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */
-- Parses files with duplicate object member names but uses only the last entry
-- Supports optional escaping of the solidus (/) character
-- Supports reading a sequence of JSON texts from a stream
-- Supports optional escaping of non-ascii UTF-8 octets
-
-Extensions:
-
-- [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
-- [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
-- [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
-- [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
-- [msgpack](doc/ref/msgpack/msgpack.md) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
-- [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
-
-Planned new features are listed on the [roadmap](doc/Roadmap.md)
-
 ### Get jsoncons
 
 Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Find the directory `jsoncons` under `src`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
@@ -40,6 +14,17 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - For the details, see the [documentation](doc/Home.md). 
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
+
+Extensions:
+
+- [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
+- [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
+- [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
+- [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
+- [msgpack](doc/ref/msgpack/msgpack.md) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+- [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
+
+Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
 ### Benchmarks
 
@@ -136,6 +121,19 @@ The library includes four instantiations of `basic_json`:
 - [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ### Features
+
+- Uses the standard C++ input/output streams library
+- Supports conversion from and to the standard library sequence containers, associative containers, std::pair, and std::tuple
+- Supports conversion from and to user defined types
+- Supports object members sorted alphabetically by name or in original order
+- Implements parsing and serializing JSON text in UTF-8 for narrow character strings and streams
+- Supports UTF16 (UTF32) encodings with size 2 (size 4) wide characters
+- Supports event based JSON parsing and serializing with user defined input and output handlers
+- Accepts and ignores single line comments that start with //, and multi line comments that start with /* and end with */
+- Parses files with duplicate object member names but uses only the last entry
+- Supports optional escaping of the solidus (/) character
+- Supports reading a sequence of JSON texts from a stream
+- Supports optional escaping of non-ascii UTF-8 octets
 
 #### Meaningful error messages
 
