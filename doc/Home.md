@@ -35,29 +35,15 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### [jsonpointer](ref/jsonpointer/jsonpointer.md)
 
-#### jsonpatch
+#### [jsonpatch](ref/jsonpatch/jsonpatch.md)
 
-[patch](ref/jsonpatch/patch.md)  
-
-#### jsonpath
-
-[json_query](ref/json_query.md)
-
-[json_replace](ref/json_replace.md)
+#### [jsonpath](ref/jsonpath/jsonpath.md)
 
 #### [csv](ref/csv/csv.md)
 
-#### msgpack
+#### [msgpack](ref/msgpack/msgpack.md)
 
-[encode_msgpack](ref/encode_msgpack.md)
-
-[decode_msgpack](ref/decode_msgpack.md)
-
-#### cbor
-
-[encode_cbor](ref/encode_cbor.md)
-
-[decode_cbor](ref/decode_cbor.md)
+#### [cbor](ref/cbor/cbor.md)
 
 ### Tutorials
 

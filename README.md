@@ -20,11 +20,11 @@ Features:
 Extensions:
 
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
-- [jsonpatch](#user-content-ext_jsonpatch) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
-- [jsonpath](#user-content-ext_jsonpath) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
+- [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
+- [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
 - [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
-- [msgpack](#user-content-ext_msgpack) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
-- [cbor](#user-content-ext_cbor) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
+- [msgpack](doc/ref/msgpack/msgpack.md) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+- [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
@@ -492,7 +492,7 @@ Output:
 "Evelyn Waugh"
 ```
 
-See [get](doc/ref/jsonpointer/get.md), [insert](doc/ref/jsonpointer/insert.md), [insert_or_assign](doc/ref/jsonpointer/insert_or_assign.md), [erase](doc/ref/jsonpointer/erase.md) and [assign](doc/ref/jsonpointer/assign.md). 
+See [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) for details. 
 
 <div id="ext_jsonpatch"/>
 
@@ -533,7 +533,7 @@ Output:
 }
 ```
 
-See [patch](doc/ref/jsonpatch/patch.md)
+See [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) for details.
 
 <div id="ext_jsonpath"/>
 
@@ -634,7 +634,7 @@ Output:
 }
 ```
 
-See [json_query](doc/ref/json_query.md), [json_replace](doc/ref/json_replace.md), and [Basics](doc/Tutorials/Basics.md) for details.
+See [jsonpath](doc/ref/jsonpath/jsonpath.md) for details.
 
 <div id="ext_csv"/>
 
@@ -723,7 +723,7 @@ project_id,task_name,task_start,task_finish
 4002,task2,05/01/2003,
 ```
 
-See [csv_reader](doc/ref/csv/csv_reader.md) and [csv_serializer](doc/ref/csv/csv_serializer.md) for details.
+See [csv](doc/ref/csv/csv.md) for details.
 
 <div id="ext_msgpack"/>
 
@@ -794,7 +794,7 @@ Output:
 ]
 ```
 
-See [encode_msgpack](doc/ref/encode_msgpack.md) and [decode_msgpack](doc/ref/decode_msgpack.md) for details.
+See [msgpack](doc/ref/msgpack/msgpack.md) for details.
 
 <div id="ext_cbor"/>
 
@@ -848,7 +848,7 @@ Output:
 }
 ```
 
-See [encode_cbor](doc/ref/encode_cbor.md) and [decode_cbor](doc/ref/decode_cbor.md) for details.
+See [cbor](doc/ref/cbor/cbor.md) for details.
 
 ### Building the test suite and examples with CMake
 
