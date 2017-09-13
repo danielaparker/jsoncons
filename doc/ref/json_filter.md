@@ -42,7 +42,7 @@ Returns a reference to the JSON handler that sends json events to downstream han
 
 ### Examples
 
-#### Rename object member names with the built in filter [rename_name_filter](rename_name_filter.md)
+#### Rename object member names with the built in filter [rename_object_member_filter](rename_object_member_filter.md)
 
 ```c++
 #include <sstream>
@@ -58,8 +58,8 @@ int main()
     json_serializer serializer(std::cout);
 
     // Filters can be chained
-    rename_name_filter filter2("fifth", "fourth", serializer);
-    rename_name_filter filter1("fourth", "third", filter2);
+    rename_object_member_filter filter2("fifth", "fourth", serializer);
+    rename_object_member_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
     // a json_input_handler ...
@@ -163,7 +163,7 @@ private:
     std::string member_name_;
 };
 ```
-Configure a [rename_name_filter](rename_name_filter.md) to emit json events to a [json_serializer](json_serializer.md). 
+Configure a [rename_object_member_filter](rename_object_member_filter.md) to emit json events to a [json_serializer](json_serializer.md). 
 ```c++
 std::ofstream os("output/new-address-book.json");
 json_serializer serializer(os, true);

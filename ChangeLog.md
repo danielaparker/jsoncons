@@ -8,8 +8,10 @@ Bug fixes
 Changes (non breaking)
 ----------------------
 
-- The name `json::dump_body` has been deprecated and replaced with `json::dump_fragment`. 
-- The name `dump_body` has been deprecated and replaced with `dump_fragment`. 
+- The member function name `json::dump_body` has been deprecated and replaced with `json::dump_fragment`. 
+- The non member function name `dump_body` has been deprecated and replaced with `dump_fragment`. 
+
+- The class name `rename_name_filter` has been deprecated and replaced with `rename_object_member_filter`.
 
 - In the documentation and examples, the existing function `json::insert_or_assign` 
   is now used instead of the still-supported `json::set`. The reason is that 

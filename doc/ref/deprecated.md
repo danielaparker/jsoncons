@@ -45,6 +45,7 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
 &#160;|wojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wojson>`
 &#160;|owjson|<em>&#x2713;</em>|Use wojson`
 &#160;|member_type name()|<em>&#x2713;</em>|Use key()
+&#160;|rename_name_filter|<em>&#x2713;</em>|Use rename_object_member_filter`
 json member types|any||
 &#160;|member_type|<em>&#x2713;</em>|Use key_value_pair_type
 &#160;|kvp_type|<em>&#x2713;</em>|Use key_value_pair_type

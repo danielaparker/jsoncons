@@ -405,7 +405,7 @@ Output:
 
 #### Filter json names and values
 
-You can rename object member names with the built in filter [rename_name_filter](doc/ref/rename_name_filter.md)
+You can rename object members with the built in filter [rename_object_member_filter](doc/ref/rename_object_member_filter.md)
 
 ```c++
 #include <sstream>
@@ -421,8 +421,8 @@ int main()
     json_serializer serializer(std::cout);
 
     // Filters can be chained
-    rename_name_filter filter2("fifth", "fourth", serializer);
-    rename_name_filter filter1("fourth", "third", filter2);
+    rename_object_member_filter filter2("fifth", "fourth", serializer);
+    rename_object_member_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
     // a json_input_handler ...

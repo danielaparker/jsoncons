@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(test_filter2)
 
     name_fix_up_filter filter2(serializer);
 
-    rename_name_filter filter1("email","email2",filter2);
+    rename_object_member_filter filter1("email","email2",filter2);
 
     json_reader reader(is, filter1);
     reader.read_next();
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
 
     std::stringstream ss;
     json_serializer serializer(ss, false);
-    rename_name_filter filter("price","price2",serializer);
+    rename_object_member_filter filter("price","price2",serializer);
     j.dump(filter);
 
     json j2 = json::parse(ss);
@@ -159,8 +159,8 @@ BOOST_AUTO_TEST_CASE(test_chained_filters)
 
     json_decoder<ojson> decoder;
 
-    rename_name_filter filter2("fifth", "fourth", decoder);
-    rename_name_filter filter1("fourth", "third", filter2);
+    rename_object_member_filter filter2("fifth", "fourth", decoder);
+    rename_object_member_filter filter1("fourth", "third", filter2);
 
     j.dump(filter1);
     ojson j2 = decoder.get_result();
