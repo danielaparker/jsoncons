@@ -33,17 +33,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 ### Extensions
 
-#### jsonpointer
-
-[get](ref/jsonpointer/get.md)  
-
-[insert](ref/jsonpointer/insert.md)  
-
-[insert_or_assign](ref/jsonpointer/insert_or_assign.md)  
-
-[erase](ref/jsonpointer/erase.md)  
-
-[assign](ref/jsonpointer/assign.md)  
+#### [jsonpointer](ref/jsonpointer/jsonpointer.md)
 
 #### jsonpatch
 
