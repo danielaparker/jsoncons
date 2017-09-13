@@ -35,7 +35,7 @@ Json json_query(const Json& root,
 Returns a `json` array containing either values or normalized path expressions matching the input path expression. 
 Returns an empty array if there is no match.
     
-## Stefan Goessner's JsonPath
+### Stefan Goessner's JsonPath
 
 [JsonPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 
