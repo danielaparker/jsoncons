@@ -22,7 +22,7 @@ Extensions:
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 - [jsonpatch](#user-content-ext_jsonpatch) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
 - [jsonpath](#user-content-ext_jsonpath) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
-- [csv](#user-content-ext_csv) implements reading (writing) JSON values from (to) CSV files
+- [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
 - [msgpack](#user-content-ext_msgpack) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 - [cbor](#user-content-ext_cbor) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
 
