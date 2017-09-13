@@ -812,6 +812,10 @@ public:
         : os_(os), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
     {
     }
+    buffered_output(std::basic_ostream<CharT>& os, size_t buflen)
+        : os_(os), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+buflen), p_(buffer_.data())
+    {
+    }
     ~buffered_output()
     {
         os_.write(begin_buffer_, (p_ - begin_buffer_));

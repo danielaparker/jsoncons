@@ -227,7 +227,9 @@ private:
                 if (it != buffered_line_.end())
                 {
                     basic_osequencestream<CharT> ss;
-                    do_null_value(buffered_output<CharT>(ss));
+                    buffered_output<CharT> bo(ss,10);
+                    do_null_value(bo);
+                    bo.flush();
                     it->second = std::basic_string<CharT>(ss.data(),ss.length());
                 }
             }
@@ -248,7 +250,9 @@ private:
                 if (it != buffered_line_.end())
                 {
                     basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
+                    buffered_output<CharT> bo(ss,1000);
+                    value(val,bo);
+                    bo.flush();
                     it->second = std::basic_string<CharT>(ss.data(),ss.length());
                 }
             }
@@ -271,7 +275,9 @@ private:
                 if (it != buffered_line_.end())
                 {
                     basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
+                    buffered_output<CharT> bo(ss,30);
+                    value(val,bo);
+                    bo.flush();
                     it->second = std::basic_string<CharT>(ss.data(),ss.length());
                 }
             }
@@ -292,7 +298,9 @@ private:
                 if (it != buffered_line_.end())
                 {
                     basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
+                    buffered_output<CharT> bo(ss,30);
+                    value(val,bo);
+                    bo.flush();
                     it->second = std::basic_string<CharT>(ss.data(),ss.length());
                 }
             }
@@ -313,7 +321,9 @@ private:
                 if (it != buffered_line_.end())
                 {
                     basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
+                    buffered_output<CharT> bo(ss,30);
+                    value(val,bo);
+                    bo.flush();
                     it->second = std::basic_string<CharT>(ss.data(),ss.length());
                 }
             }
@@ -334,7 +344,9 @@ private:
                 if (it != buffered_line_.end())
                 {
                     basic_osequencestream<CharT> ss;
-                    value(val,buffered_output<CharT>(ss));
+                    buffered_output<CharT> bo(ss,30);
+                    value(val,bo);
+                    bo.flush();
                     it->second = std::basic_string<CharT>(ss.data(),ss.length());
                 }
             }
