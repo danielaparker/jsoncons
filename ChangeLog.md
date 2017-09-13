@@ -1,6 +1,10 @@
 master
 ------
 
+Bug fixes
+
+- Fixed issue with serialization of json array of objects to csv file
+
 Changes (non breaking)
 ----------------------
 
