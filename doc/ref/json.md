@@ -113,13 +113,15 @@ Member type                         |Definition
 
 #### Accessors
 
-    bool has_key(string_view_type name) const
-Returns `true` if an object has a member with the given `name`, otherwise `false`.    
-
-    size_t count(string_view_type name) const
-Returns the number of object members that match `name`.    
-
 <table border="0">
+  <tr>
+    <td><code>bool has_key(string_view_type key) const</code></td>
+    <td>Returns `true` if an object has a member with the given `key`, otherwise `false`</td> 
+  </tr>
+  <tr>
+    <td><code>bool count(string_view_type key) const</code></td>
+    <td>Returns the number of object members that match `key`</td> 
+  </tr>
   <tr>
     <td><a href="json/is.md">is</a></td>
     <td>Checks if a json value matches a type.</td> 
