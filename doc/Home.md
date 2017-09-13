@@ -47,9 +47,11 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### csv
 
-[csv_reader](ref/csv_reader.md)
+[csv_parameters](ref/csv/csv_parameters.md)
 
-[csv_serializer](ref/csv_serializer.md)
+[csv_reader](ref/csv/csv_reader.md)
+
+[csv_serializer](ref/csv/csv_serializer.md)
 
 #### msgpack
 

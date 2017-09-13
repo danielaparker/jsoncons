@@ -108,7 +108,7 @@ Note
 - The names in the first object in the array will be used for the header row of the CSV file
 - The fourth object has a `note` member whose value contains escaped quotes and an escaped new line character, in the CSV file, this value will be quoted, and it will contain a new line character and escaped quotes.
 
-#### Reading the tab delimited file with csv_serializer
+#### Dump json value to a tab delimited file
 ```c++
 std::string in_file = "input/employees.json";
 std::ifstream is(in_file);
@@ -134,3 +134,51 @@ finance Oberc, Scott    00000003                110,000.00
 sales   Scott, Colette  00000004        ""Exemplary"" employee
 Dependable, trustworthy 75,000.00
 ```
+
+#### Dump json value to csv file
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv_serializer.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    const json books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer"
+        }
+    ]
+    )");
+
+    csv_parameters params;
+    params.column_names("author,title,price");
+
+    csv_serializer serializer(std::cout, params);
+
+    books.dump(serializer);
+}
+```
+
+Output:
+
+```csv
+author,title,price
+Haruki Murakami,Kafka on the Shore,25.17
+Charles Bukowski,Women: A Novel,12.0
+Ivan Passer,Cutter's Way,
+```
+

@@ -17,6 +17,11 @@ Changes (non breaking)
   is now used instead of the still-supported `json::set`. The reason is that 
   `insert_or_assign` follows the naming convention of the C++ standard library.   
 
+Changes
+-------
+
+- The recently introduced class `json_stream_traits` has been renamed to `json_serialization_traits`
+
 New features
 ------------
 

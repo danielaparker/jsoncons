@@ -365,13 +365,13 @@ std::list<book> l = j.as<std::list<book>>();
 
 See [Type Extensibility](doc/ref/Type%20Extensibility.md) for details.
 
-#### Serialize C++ objects directly to JSON formatted streams, governed by `json_stream_traits` 
+#### Serialize C++ objects directly to JSON formatted streams, governed by `json_serialization_traits` 
 
 ```c++
 #include <iostream>
 #include <map>
 #include <tuple>
-#include <jsoncons/json_stream_traits.hpp>
+#include <jsoncons/json_serialization_traits.hpp>
 
 using namespace jsoncons;
 
@@ -723,7 +723,7 @@ project_id,task_name,task_start,task_finish
 4002,task2,05/01/2003,
 ```
 
-See [csv_reader](doc/ref/csv_reader.md) and [csv_serializer](doc/ref/csv_serializer.md) for details.
+See [csv_reader](doc/ref/csv/csv_reader.md) and [csv_serializer](doc/ref/csv/csv_serializer.md) for details.
 
 <div id="ext_msgpack"/>
 

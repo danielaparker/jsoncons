@@ -25,10 +25,10 @@
 
 namespace jsoncons {
 
-//json_stream_traits
+// json_serialization_traits
 
 template <class T, class Enable = void>
-struct json_stream_traits
+struct json_serialization_traits
 {
     template <class CharT>
     static void encode(const T&, basic_json_output_handler<CharT>&)
@@ -42,7 +42,7 @@ template <class CharT, class T>
 void dump(const T& val, basic_json_output_handler<CharT>& handler)
 {
     handler.begin_json();
-    json_stream_traits<T>::encode(val,handler);
+    json_serialization_traits<T>::encode(val,handler);
     handler.end_json();
 }
 
@@ -57,7 +57,7 @@ void dump_body(const T& val, basic_json_output_handler<CharT>& handler)
 template <class CharT, class T>
 void dump_fragment(const T& val, basic_json_output_handler<CharT>& handler)
 {
-    json_stream_traits<T>::encode(val,handler);
+    json_serialization_traits<T>::encode(val,handler);
 }
 
 template <class CharT, class T>
@@ -93,7 +93,7 @@ void dump(const T& val, const basic_serialization_options<CharT>& options,
 // integer
 
 template<class T>
-struct json_stream_traits<T,
+struct json_serialization_traits<T,
                           typename std::enable_if<detail::is_integer_like<T>::value
 >::type>
 {
@@ -107,7 +107,7 @@ struct json_stream_traits<T,
 // uinteger
 
 template<class T>
-struct json_stream_traits<T,
+struct json_serialization_traits<T,
                           typename std::enable_if<detail::is_uinteger_like<T>::value
 >::type>
 {
@@ -121,7 +121,7 @@ struct json_stream_traits<T,
 // double
 
 template<class T>
-struct json_stream_traits<T,
+struct json_serialization_traits<T,
                           typename std::enable_if<detail::is_floating_point_like<T>::value
 >::type>
 {
@@ -135,7 +135,7 @@ struct json_stream_traits<T,
 // bool
 
 template<>
-struct json_stream_traits<bool>
+struct json_serialization_traits<bool>
 {
     template <class CharT>
     static void encode(bool val, basic_json_output_handler<CharT>& handler)
@@ -147,7 +147,7 @@ struct json_stream_traits<bool>
 // string
 
 template<class T>
-struct json_stream_traits<T,
+struct json_serialization_traits<T,
     typename std::enable_if<detail::is_string_like<T>::value
 >::type>
 {
@@ -159,7 +159,7 @@ struct json_stream_traits<T,
 };
 
 /*template<>
-struct json_stream_traits<typename type_wrapper<CharT>::const_pointer_type>
+struct json_serialization_traits<typename type_wrapper<CharT>::const_pointer_type>
 {
     template <class CharT>
     static void encode(typename type_wrapper<CharT>::const_pointer_type val, basic_json_output_handler<CharT>& handler)
@@ -171,7 +171,7 @@ struct json_stream_traits<typename type_wrapper<CharT>::const_pointer_type>
 // sequence container (except string and array)
 
 template<class T>
-struct json_stream_traits<T,
+struct json_serialization_traits<T,
     typename std::enable_if<detail::is_vector_like<T>::value
 >::type>
 {
@@ -183,7 +183,7 @@ struct json_stream_traits<T,
         handler.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            json_stream_traits<value_type>::encode(*it,handler);
+            json_serialization_traits<value_type>::encode(*it,handler);
         }
         handler.end_array();
     }
@@ -192,7 +192,7 @@ struct json_stream_traits<T,
 // std::array
 
 template<class T, size_t N>
-struct json_stream_traits<std::array<T,N>>
+struct json_serialization_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;
 public:
@@ -203,7 +203,7 @@ public:
         handler.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            json_stream_traits<value_type>::encode(*it,handler);
+            json_serialization_traits<value_type>::encode(*it,handler);
         }
         handler.end_array();
     }
@@ -212,7 +212,7 @@ public:
 // associative container
 
 template<class T>
-struct json_stream_traits<T,
+struct json_serialization_traits<T,
     typename std::enable_if<detail::is_map_like<T>::value
 >::type>
 {
@@ -226,7 +226,7 @@ struct json_stream_traits<T,
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             handler.name(it->first);
-            json_stream_traits<mapped_type>::encode(it->second,handler);
+            json_serialization_traits<mapped_type>::encode(it->second,handler);
         }
         handler.end_object();
     }
@@ -243,7 +243,7 @@ struct tuple_helper
     template <class CharT>
     static void encode(const Tuple& tuple, basic_json_output_handler<CharT>& handler)
     {
-        json_stream_traits<element_type>::encode(std::get<std::tuple_size<Tuple>::value - Pos>(tuple),handler);
+        json_serialization_traits<element_type>::encode(std::get<std::tuple_size<Tuple>::value - Pos>(tuple),handler);
         next::encode(tuple, handler);
     }
 };
@@ -260,7 +260,7 @@ struct tuple_helper<0, Tuple>
 }}
 
 template<typename... E>
-struct json_stream_traits<std::tuple<E...>>
+struct json_serialization_traits<std::tuple<E...>>
 {
 private:
     using helper = detail::streaming::tuple_helper<sizeof...(E), std::tuple<E...>>;
@@ -276,7 +276,7 @@ public:
 };
 
 template<class T1, class T2>
-struct json_stream_traits<std::pair<T1,T2>>
+struct json_serialization_traits<std::pair<T1,T2>>
 {
 public:
    
@@ -284,22 +284,22 @@ public:
     static void encode(const std::pair<T1,T2>& value, basic_json_output_handler<CharT>& handler)
     {
         handler.begin_array();
-        json_stream_traits<T1>::encode(value.first, handler);
-        json_stream_traits<T2>::encode(value.second, handler);
+        json_serialization_traits<T1>::encode(value.first, handler);
+        json_serialization_traits<T2>::encode(value.second, handler);
         handler.end_array();
     }
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class T>
-struct json_stream_traits<std::shared_ptr<T>>
+struct json_serialization_traits<std::shared_ptr<T>>
 {
 public:
    
     template <class CharT>
     static void encode(std::shared_ptr<T> p, basic_json_output_handler<CharT>& handler)
     {
-        json_stream_traits<T>::encode(*p, handler);
+        json_serialization_traits<T>::encode(*p, handler);
     }
 };
 #endif
