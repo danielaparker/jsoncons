@@ -129,7 +129,7 @@ template<class Json,
          class JsonReference=const Json&,
          class JsonPointer=const Json*,
          class PathCons=PathConstructor<Json>>
-class jsonpath_evaluator : private basic_parsing_context<typename Json::char_type>
+class jsonpath_evaluator : private parsing_context
 {
 private:
     typedef typename Json::char_type char_type;
@@ -1089,11 +1089,6 @@ public:
     size_t do_column_number() const override
     {
         return column_;
-    }
-
-    char_type do_current_char() const override
-    {
-        return 0; //p_ < end_input_? *p_ : 0;
     }
 
 };

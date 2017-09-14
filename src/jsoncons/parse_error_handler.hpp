@@ -85,11 +85,10 @@ typedef parse_error json_parse_exception;
 typedef parse_error parse_exception;
 #endif
 
-template<class CharT>
-class basic_parsing_context
+class parsing_context
 {
 public:
-    virtual ~basic_parsing_context() {}
+    virtual ~parsing_context() = default;
 
     size_t line_number() const
     {
@@ -99,26 +98,11 @@ public:
     {
         return do_column_number();
     }
-    CharT current_char() const
-    {
-        return do_current_char();
-    }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    CharT last_char() const
-    {
-        return do_current_char();
-    }
-#endif
 
 private:
     virtual size_t do_line_number() const = 0;
     virtual size_t do_column_number() const = 0;
-    virtual CharT do_current_char() const = 0;
 };
-
-typedef basic_parsing_context<char> parsing_context;
-typedef basic_parsing_context<wchar_t> wparsing_context;
 
 template <class CharT>
 class basic_parse_error_handler
@@ -129,23 +113,23 @@ public:
     }
 
     bool error(std::error_code ec,
-               const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT 
+               const parsing_context& context) JSONCONS_NOEXCEPT 
     {
         return do_error(ec,context);
     }
 
     void fatal_error(std::error_code ec,
-                     const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT 
+                     const parsing_context& context) JSONCONS_NOEXCEPT 
     {
         do_fatal_error(ec,context);
     }
 
 private:
     virtual bool do_error(std::error_code,
-                          const basic_parsing_context<CharT>& context) JSONCONS_NOEXCEPT = 0;
+                          const parsing_context& context) JSONCONS_NOEXCEPT = 0;
 
     virtual void do_fatal_error(std::error_code,
-                                const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
+                                const parsing_context&) JSONCONS_NOEXCEPT
     {
     }
 };
@@ -154,8 +138,8 @@ template <class CharT>
 class basic_default_parse_error_handler : public basic_parse_error_handler<CharT>
 {
 private:
-    virtual bool do_error(std::error_code code,
-                          const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
+    bool do_error(std::error_code code,
+                  const parsing_context&) JSONCONS_NOEXCEPT override
     {
         static const std::error_code illegal_comment = make_error_code(json_parser_errc::illegal_comment);
 
@@ -174,8 +158,8 @@ template <class CharT>
 class basic_strict_parse_error_handler : public basic_parse_error_handler<CharT>
 {
 private:
-    virtual bool do_error(std::error_code,
-                          const basic_parsing_context<CharT>&) JSONCONS_NOEXCEPT
+    bool do_error(std::error_code,
+                  const parsing_context&) JSONCONS_NOEXCEPT override
     {
         return true;
     }
@@ -188,9 +172,6 @@ typedef basic_default_parse_error_handler<char> default_parse_error_handler;
 typedef basic_default_parse_error_handler<wchar_t> wdefault_parse_error_handler;
 typedef basic_strict_parse_error_handler<char> strict_parse_error_handler;
 typedef basic_strict_parse_error_handler<wchar_t> wstrict_parse_error_handler;
-
-typedef basic_parsing_context<char> parsing_context;
-typedef basic_parsing_context<wchar_t> wparsing_context;
 
 }
 #endif

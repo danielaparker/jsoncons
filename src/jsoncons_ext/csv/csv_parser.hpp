@@ -53,7 +53,7 @@ enum class csv_state_type
 };
 
 template<class CharT>
-class basic_csv_parser : private basic_parsing_context<CharT>
+class basic_csv_parser : private parsing_context
 {
 #if !defined(JSONCONS_HAS_STRING_VIEW)
     typedef Basic_string_view_<CharT> string_view_type;
@@ -168,7 +168,7 @@ public:
     {
     }
 
-    const basic_parsing_context<CharT>& parsing_context() const
+    const parsing_context& parsing_context() const
     {
         return *this;
     }
@@ -834,11 +834,6 @@ private:
     size_t do_column_number() const override
     {
         return column_;
-    }
-
-    CharT do_current_char() const override
-    {
-        return (CharT)prev_char_;
     }
 
     void push_mode(csv_mode_type mode)

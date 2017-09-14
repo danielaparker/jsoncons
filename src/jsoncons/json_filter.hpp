@@ -52,60 +52,60 @@ private:
         output_handler_.end_json();
     }
 
-    void do_begin_object(const basic_parsing_context<CharT>&) override
+    void do_begin_object(const parsing_context&) override
     {
         output_handler_.begin_object();
     }
 
-    void do_end_object(const basic_parsing_context<CharT>&) override
+    void do_end_object(const parsing_context&) override
     {
         output_handler_.end_object();
     }
 
-    void do_begin_array(const basic_parsing_context<CharT>&) override
+    void do_begin_array(const parsing_context&) override
     {
         output_handler_.begin_array();
     }
 
-    void do_end_array(const basic_parsing_context<CharT>&) override
+    void do_end_array(const parsing_context&) override
     {
         output_handler_.end_array();
     }
 
     void do_name(string_view_type name, 
-                 const basic_parsing_context<CharT>&) override
+                 const parsing_context&) override
     {
         output_handler_.name(name);
     }
 
     void do_string_value(string_view_type value, 
-                         const basic_parsing_context<CharT>&) override
+                         const parsing_context&) override
     {
         output_handler_.string_value(value);
     }
 
-    void do_integer_value(int64_t value, const basic_parsing_context<CharT>&) override
+    void do_integer_value(int64_t value, const parsing_context&) override
     {
         output_handler_.integer_value(value);
     }
 
     void do_uinteger_value(uint64_t value, 
-                           const basic_parsing_context<CharT>&) override
+                           const parsing_context&) override
     {
         output_handler_.uinteger_value(value);
     }
 
-    void do_double_value(double value, uint8_t precision, const basic_parsing_context<CharT>&) override
+    void do_double_value(double value, uint8_t precision, const parsing_context&) override
     {
         output_handler_.double_value(value, precision);
     }
 
-    void do_bool_value(bool value, const basic_parsing_context<CharT>&) override
+    void do_bool_value(bool value, const parsing_context&) override
     {
         output_handler_.bool_value(value);
     }
 
-    void do_null_value(const basic_parsing_context<CharT>&) override
+    void do_null_value(const parsing_context&) override
     {
         output_handler_.null_value();
     }
@@ -122,8 +122,6 @@ private:
         size_t do_line_number() const override { return 0; }
 
         size_t do_column_number() const override { return 0; }
-
-        char do_current_char() const override { return '\0'; }
     };
     const null_parsing_context default_context_ = null_parsing_context();
 
@@ -280,63 +278,63 @@ private:
         downstream_handler_.end_json();
     }
 
-    void do_begin_object(const basic_parsing_context<CharT>& context) override
+    void do_begin_object(const parsing_context& context) override
     {
         downstream_handler_.begin_object(context);
     }
 
-    void do_end_object(const basic_parsing_context<CharT>& context) override
+    void do_end_object(const parsing_context& context) override
     {
         downstream_handler_.end_object(context);
     }
 
-    void do_begin_array(const basic_parsing_context<CharT>& context) override
+    void do_begin_array(const parsing_context& context) override
     {
         downstream_handler_.begin_array(context);
     }
 
-    void do_end_array(const basic_parsing_context<CharT>& context) override
+    void do_end_array(const parsing_context& context) override
     {
         downstream_handler_.end_array(context);
     }
 
     void do_name(string_view_type name,
-                 const basic_parsing_context<CharT>& context) override
+                 const parsing_context& context) override
     {
         downstream_handler_.name(name,context);
     }
 
     void do_string_value(string_view_type value,
-                         const basic_parsing_context<CharT>& context) override
+                         const parsing_context& context) override
     {
         downstream_handler_.string_value(value,context);
     }
 
     void do_double_value(double value, uint8_t precision,
-                 const basic_parsing_context<CharT>& context) override
+                 const parsing_context& context) override
     {
         downstream_handler_.double_value(value,precision,context);
     }
 
     void do_integer_value(int64_t value,
-                 const basic_parsing_context<CharT>& context) override
+                 const parsing_context& context) override
     {
         downstream_handler_.integer_value(value,context);
     }
 
     void do_uinteger_value(uint64_t value,
-                 const basic_parsing_context<CharT>& context) override
+                 const parsing_context& context) override
     {
         downstream_handler_.uinteger_value(value,context);
     }
 
     void do_bool_value(bool value,
-                 const basic_parsing_context<CharT>& context) override
+                 const parsing_context& context) override
     {
         downstream_handler_.bool_value(value,context);
     }
 
-    void do_null_value(const basic_parsing_context<CharT>& context) override
+    void do_null_value(const parsing_context& context) override
     {
         downstream_handler_.null_value(context);
     }
@@ -392,7 +390,7 @@ public:
 
 private:
     void do_name(string_view_type name,
-                 const basic_parsing_context<CharT>& context) override
+                 const parsing_context& context) override
     {
         if (name == name_)
         {

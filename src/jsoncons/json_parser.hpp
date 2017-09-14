@@ -148,7 +148,7 @@ enum class parse_state
 };
 
 template<class CharT>
-class basic_json_parser : private basic_parsing_context<CharT>
+class basic_json_parser : private parsing_context
 {
     static const int default_initial_stack_capacity_ = 100;
     typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
@@ -299,7 +299,7 @@ public:
         return p_ == end_input_;
     }
 
-    const basic_parsing_context<CharT>& parsing_context() const
+    const parsing_context& parsing_context() const
     {
         return *this;
     }
@@ -2184,11 +2184,6 @@ private:
     size_t do_column_number() const override
     {
         return column_;
-    }
-
-    CharT do_current_char() const override
-    {
-        return p_ < end_input_? *p_ : 0;
     }
 };
 

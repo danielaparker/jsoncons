@@ -149,23 +149,23 @@ private:
         pop_initial();
     }
 
-    void do_begin_object(const basic_parsing_context<char_type>&) override
+    void do_begin_object(const parsing_context&) override
     {
         push_object();
     }
 
-    void do_end_object(const basic_parsing_context<char_type>&) override
+    void do_end_object(const parsing_context&) override
     {
         end_structure();
         pop_object();
     }
 
-    void do_begin_array(const basic_parsing_context<char_type>&) override
+    void do_begin_array(const parsing_context&) override
     {
         push_array();
     }
 
-    void do_end_array(const basic_parsing_context<char_type>&) override
+    void do_end_array(const parsing_context&) override
     {
         end_structure();
         pop_array();
@@ -203,12 +203,12 @@ private:
         }
     }
 
-    void do_name(string_view_type name, const basic_parsing_context<char_type>&) override
+    void do_name(string_view_type name, const parsing_context&) override
     {
         stack_[top_].name_ = key_storage_type(name.begin(),name.end(),sa_);
     }
 
-    void do_string_value(string_view_type val, const basic_parsing_context<char_type>&) override
+    void do_string_value(string_view_type val, const parsing_context&) override
     {
         stack_[top_].value_ = Json(val.data(),val.length(),sa_);
         if (++top_ >= stack_.size())
@@ -217,7 +217,7 @@ private:
         }
     }
 
-    void do_integer_value(int64_t value, const basic_parsing_context<char_type>&) override
+    void do_integer_value(int64_t value, const parsing_context&) override
     {
         stack_[top_].value_ = value;
         if (++top_ >= stack_.size())
@@ -226,7 +226,7 @@ private:
         }
     }
 
-    void do_uinteger_value(uint64_t value, const basic_parsing_context<char_type>&) override
+    void do_uinteger_value(uint64_t value, const parsing_context&) override
     {
         stack_[top_].value_ = value;
         if (++top_ >= stack_.size())
@@ -235,7 +235,7 @@ private:
         }
     }
 
-    void do_double_value(double value, uint8_t precision, const basic_parsing_context<char_type>&) override
+    void do_double_value(double value, uint8_t precision, const parsing_context&) override
     {
         stack_[top_].value_ = Json(value,precision);
         if (++top_ >= stack_.size())
@@ -244,7 +244,7 @@ private:
         }
     }
 
-    void do_bool_value(bool value, const basic_parsing_context<char_type>&) override
+    void do_bool_value(bool value, const parsing_context&) override
     {
         stack_[top_].value_ = value;
         if (++top_ >= stack_.size())
@@ -253,7 +253,7 @@ private:
         }
     }
 
-    void do_null_value(const basic_parsing_context<char_type>&) override
+    void do_null_value(const parsing_context&) override
     {
         stack_[top_].value_ = Json::null();
         if (++top_ >= stack_.size())

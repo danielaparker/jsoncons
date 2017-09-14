@@ -99,7 +99,7 @@ struct PathSetter
 template<class Json,
          class JsonReference=Json&,
          class JsonPointer=Json*>
-class jsonpointer_evaluator : private basic_parsing_context<typename Json::char_type>
+class jsonpointer_evaluator : private parsing_context
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::char_traits_type char_traits_type;
@@ -575,7 +575,7 @@ public:
 
 private:
 
-    // basic_parsing_context
+    // parsing_context
 
     size_t do_line_number() const override
     {
@@ -585,11 +585,6 @@ private:
     size_t do_column_number() const override
     {
         return column_;
-    }
-
-    char_type do_current_char() const override
-    {
-        return p_ < end_input_? *p_ : 0;
     }
 };
 
