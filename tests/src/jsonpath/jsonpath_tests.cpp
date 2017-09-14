@@ -272,8 +272,6 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_bicycle_unquoted)
 
 BOOST_AUTO_TEST_CASE(test_jsonpath_store_book_union)
 {
-    jsonpath_fixture fixture;
-
     json root = json::parse(jsonpath_fixture::store_text());
 
     json result = json_query(root,"$['store']..['author','title']");

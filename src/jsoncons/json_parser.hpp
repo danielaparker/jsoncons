@@ -22,6 +22,8 @@
 
 namespace jsoncons {
 
+// try_string_to_uinteger
+
 template<class CharT> inline
 bool try_string_to_uinteger(const CharT *s, size_t length, uint64_t& result)
 {

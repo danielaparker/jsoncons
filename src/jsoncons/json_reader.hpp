@@ -22,6 +22,114 @@
 #include <jsoncons/json_parser.hpp>
 
 namespace jsoncons {
+template <class CharT>
+
+// utf8_other_json_input_adapter
+
+class utf8_other_json_input_adapter : public json_input_handler
+{
+public:
+    using json_input_handler::string_view_type;
+private:
+    const basic_json_input_handler<CharT>& other_handler_;
+    parse_error_handler& err_handler_;
+
+    utf8_other_json_input_adapter() = delete;
+    // noncopyable and nonmoveable
+    utf8_other_json_input_adapter<CharT>(const utf8_other_json_input_adapter<CharT>&) = delete;
+    utf8_other_json_input_adapter<CharT>& operator=(const utf8_other_json_input_adapter<CharT>&) = delete;
+
+public:
+    utf8_other_json_input_adapter(basic_json_input_handler<CharT>& other_handler,
+                                  parse_error_handler& err_handler)
+        : other_handler_(other_handler),
+          err_handler_(err_handler)
+    {
+    }
+
+private:
+
+    void do_begin_json() override
+    {
+        other_handler_.begin_json();
+    }
+
+    void do_end_json() override
+    {
+        other_handler_.end_json();
+    }
+
+    void do_begin_object(const parsing_context& context) override
+    {
+        other_handler_.begin_object(context);
+    }
+
+    void do_end_object(const parsing_context& context) override
+    {
+        other_handler_.end_object(context);
+    }
+
+    void do_begin_array(const parsing_context& context) override
+    {
+        other_handler_.begin_array(context);
+    }
+
+    void do_end_array(const parsing_context& context) override
+    {
+        other_handler_.end_array(context);
+    }
+
+    void do_name(string_view_type name, const parsing_context& context) override
+    {
+        std::basic_string<CharT> target;
+        auto result = unicons::convert(
+            name.begin(), name.end(), std::back_inserter(target), 
+            unicons::conv_flags::strict);
+        if (result.ec != unicons::conv_errc())
+        {
+            err_handler_.error(result.ec,context);
+        }
+        other_handler_.name(target, context);
+    }
+
+    void do_string_value(string_view_type value, const parsing_context& context) override
+    {
+        std::basic_string<CharT> target;
+        auto result = unicons::convert(
+            value.begin(), value.end(), std::back_inserter(target), 
+            unicons::conv_flags::strict);
+        if (result.ec != unicons::conv_errc())
+        {
+            err_handler_.error(result.ec,context);
+        }
+        other_handler_.string_value(target, context);
+    }
+
+    void do_integer_value(int64_t value, const parsing_context& context) override
+    {
+        other_handler_.integer_value(value, context);
+    }
+
+    void do_uinteger_value(uint64_t value, const parsing_context& context) override
+    {
+        other_handler_.uinteger_value(value, context);
+    }
+
+    void do_double_value(double value, uint8_t precision, const parsing_context& context) override
+    {
+        other_handler_.double_value(value, precision, context);
+    }
+
+    void do_bool_value(bool value, const parsing_context& context) override
+    {
+        other_handler_.bool_value(value, context);
+    }
+
+    void do_null_value(const parsing_context& context) override
+    {
+        other_handler_.null_value(context);
+    }
+};
 
 template<class CharT>
 class basic_json_reader 
@@ -116,7 +224,9 @@ public:
         }
     }
 
-    void read_buffer(std::error_code& ec)
+    template <class Ch = CharT>
+    typename std::enable_if<sizeof(Ch) == sizeof(char),void>::type
+    read_buffer(std::error_code& ec)
     {
         buffer_.resize(buffer_capacity_);
         is_.read(buffer_.data(), buffer_capacity_);
@@ -131,16 +241,63 @@ public:
             if (result.ec != unicons::encoding_errc())
             {
                 ec = result.ec;
+                return;
             }
-            else
-            {
-                size_t offset = result.it - buffer_.begin();
-                parser_.set_source(buffer_.data()+offset,buffer_.size()-offset);
-                begin_ = false;
-            }
+            size_t offset = result.it - buffer_.begin();
+            parser_.set_source(buffer_.data()+offset,buffer_.size()-offset);
+            begin_ = false;
         }
         else
         {
+            parser_.set_source(buffer_.data(),buffer_.size());
+        }
+    }
+
+    template <class Ch = CharT>
+    typename std::enable_if<sizeof(Ch) != sizeof(char),void>::type
+    read_buffer(std::error_code& ec)
+    {
+        std::vector<CharT> buf(buffer_capacity_);
+        is_.read(buf.data(), buffer_capacity_);
+        buf.resize(static_cast<size_t>(is_.gcount()));
+        if (buf.size() == 0)
+        {
+            eof_ = true;
+        }
+        else if (begin_)
+        {
+            auto result = unicons::skip_bom(buf.begin(), buf.end());
+            if (result.ec != unicons::encoding_errc())
+            {
+                ec = result.ec;
+                return;
+            }
+            size_t offset = result.it - buf.begin();
+
+            buffer_.clear();
+            auto result2 = unicons::convert(buf.begin()+offset, buf.end(), 
+                                            std::back_inserter(buffer_), 
+                                            unicons::conv_flags::strict);
+            if (result2.ec != unicons::conv_errc())
+            {
+                ec = result2.ec;
+                return;
+            }
+
+            parser_.set_source(buffer_.data(),buffer_.size());
+            begin_ = false;
+        }
+        else
+        {
+            buffer_.clear();
+            auto result2 = unicons::convert(buf.begin(), buf.end(), 
+                                            std::back_inserter(buffer_), 
+                                            unicons::conv_flags::strict);
+            if (result2.ec != unicons::conv_errc())
+            {
+                ec = result2.ec;
+                return;
+            }
             parser_.set_source(buffer_.data(),buffer_.size());
         }
     }
