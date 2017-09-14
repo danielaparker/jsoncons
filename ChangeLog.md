@@ -22,6 +22,10 @@ Changes
 
 - The recently introduced class `json_stream_traits` has been renamed to `serialization_traits`
 
+- Removed template parameter `CharT` from class `basic_parsing_context` and renamed it to `parsing_context`
+
+- Removed template parameter `CharT` from class `basic_parse_error_handler` and renamed it to `parse_error_handler`
+
 New features
 ------------
 
