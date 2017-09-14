@@ -1,7 +1,7 @@
 ### jsoncons::default_parse_error_handler
 
 ```c++
-typedef basic_default_parse_error_handler<char> default_parse_error_handler
+class default_parse_error_handler;
 ```
 
 #### Header
@@ -12,15 +12,10 @@ typedef basic_default_parse_error_handler<char> default_parse_error_handler
 
 [parse_error_handler](parse_error_handler.md)  
   
-#### Static memebr functions
-  
-    static parse_error_handler& instance()   
-Returns a singleton instance of a `default_parse_error_handler`       
-
 ##### Private virtual implementation methods
 
-     bool do_error(std::error_code ec,
-                   const parsing_context& context) override
-Returns `true`
+     bool do_error(std::error_code ec, const parsing_context& context) override;
+
+Returns `false` if `ec` indicates a comment, otherwise `true`
     
 

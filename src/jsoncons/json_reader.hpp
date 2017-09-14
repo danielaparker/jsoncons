@@ -52,7 +52,7 @@ public:
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
-                      basic_parse_error_handler<CharT>& err_handler)
+                      parse_error_handler& err_handler)
        : parser_(err_handler),
          is_(is),
          eof_(false),
@@ -75,7 +75,7 @@ public:
 
     basic_json_reader(std::basic_istream<CharT>& is,
                       basic_json_input_handler<CharT>& handler,
-                      basic_parse_error_handler<CharT>& err_handler)
+                      parse_error_handler& err_handler)
        : parser_(handler,err_handler),
          is_(is),
          eof_(false),

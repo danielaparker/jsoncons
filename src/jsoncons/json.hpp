@@ -2229,7 +2229,7 @@ public:
     };
 
     static basic_json parse(std::basic_istream<char_type>& is);
-    static basic_json parse(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler);
+    static basic_json parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler);
 
     static basic_json parse(string_view_type s)
     {
@@ -2243,12 +2243,12 @@ public:
         return parse(s,length,err_handler);
     }
 
-    static basic_json parse(const char_type* s, size_t length, basic_parse_error_handler<char_type>& err_handler)
+    static basic_json parse(const char_type* s, size_t length, parse_error_handler& err_handler)
     {
         return parse(string_view_type(s,length),err_handler);
     }
 
-    static basic_json parse(string_view_type s, basic_parse_error_handler<char_type>& err_handler)
+    static basic_json parse(string_view_type s, parse_error_handler& err_handler)
     {
         json_decoder<json_type> handler;
         basic_json_parser<char_type> parser(handler,err_handler);
@@ -2280,7 +2280,7 @@ public:
     }
 
     static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
-                                 basic_parse_error_handler<char_type>& err_handler)
+                                 parse_error_handler& err_handler)
     {
         std::basic_ifstream<CharT> is(filename);
         return parse(is,err_handler);
@@ -3905,7 +3905,7 @@ public:
     {
         return parse(is);
     }
-    static basic_json parse_stream(std::basic_istream<char_type>& is, basic_parse_error_handler<char_type>& err_handler)
+    static basic_json parse_stream(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
     {
         return parse(is,err_handler);
     }
@@ -3915,7 +3915,7 @@ public:
         return parse(s);
     }
 
-    static basic_json parse_string(const string_type& s, basic_parse_error_handler<char_type>& err_handler)
+    static basic_json parse_string(const string_type& s, parse_error_handler& err_handler)
     {
         return parse(s,err_handler);
     }
@@ -4324,7 +4324,7 @@ basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::p
 
 template<class CharT,class JsonTraits,class Allocator>
 basic_json<CharT,JsonTraits,Allocator> basic_json<CharT,JsonTraits,Allocator>::parse(std::basic_istream<char_type>& is, 
-                                                                                            basic_parse_error_handler<char_type>& err_handler)
+                                                                                            parse_error_handler& err_handler)
 {
     json_decoder<basic_json<CharT,JsonTraits,Allocator>> handler;
     basic_json_reader<char_type> reader(is, handler, err_handler);

@@ -154,10 +154,10 @@ class basic_json_parser : private parsing_context
     typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
 
     basic_null_json_input_handler<CharT> default_input_handler_;
-    basic_default_parse_error_handler<CharT> default_err_handler_;
+    default_parse_error_handler default_err_handler_;
 
     basic_json_input_handler<CharT>& handler_;
-    basic_parse_error_handler<CharT>& err_handler_;
+    parse_error_handler& err_handler_;
     uint32_t cp_;
     uint32_t cp2_;
     std::basic_string<CharT> string_buffer_;
@@ -209,7 +209,7 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(basic_parse_error_handler<CharT>& err_handler)
+    basic_json_parser(parse_error_handler& err_handler)
        : handler_(default_input_handler_),
          err_handler_(err_handler),
          cp_(0),
@@ -256,7 +256,7 @@ public:
     }
 
     basic_json_parser(basic_json_input_handler<CharT>& handler,
-                      basic_parse_error_handler<CharT>& err_handler)
+                      parse_error_handler& err_handler)
        : handler_(handler),
          err_handler_(err_handler),
          cp_(0),

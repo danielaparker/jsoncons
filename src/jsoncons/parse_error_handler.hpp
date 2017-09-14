@@ -104,11 +104,10 @@ private:
     virtual size_t do_column_number() const = 0;
 };
 
-template <class CharT>
-class basic_parse_error_handler
+class parse_error_handler
 {
 public:
-    virtual ~basic_parse_error_handler()
+    virtual ~parse_error_handler()
     {
     }
 
@@ -134,8 +133,7 @@ private:
     }
 };
 
-template <class CharT>
-class basic_default_parse_error_handler : public basic_parse_error_handler<CharT>
+class default_parse_error_handler : public parse_error_handler
 {
 private:
     bool do_error(std::error_code code,
@@ -154,24 +152,14 @@ private:
     }
 };
 
-template <class CharT>
-class basic_strict_parse_error_handler : public basic_parse_error_handler<CharT>
+class strict_parse_error_handler : public parse_error_handler
 {
 private:
-    bool do_error(std::error_code,
-                  const parsing_context&) JSONCONS_NOEXCEPT override
+    bool do_error(std::error_code, const parsing_context&) JSONCONS_NOEXCEPT override
     {
         return true;
     }
 };
-
-typedef basic_parse_error_handler<char> parse_error_handler;
-typedef basic_parse_error_handler<wchar_t> wparse_error_handler;
-
-typedef basic_default_parse_error_handler<char> default_parse_error_handler;
-typedef basic_default_parse_error_handler<wchar_t> wdefault_parse_error_handler;
-typedef basic_strict_parse_error_handler<char> strict_parse_error_handler;
-typedef basic_strict_parse_error_handler<wchar_t> wstrict_parse_error_handler;
 
 }
 #endif

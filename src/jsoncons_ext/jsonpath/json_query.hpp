@@ -371,8 +371,8 @@ private:
         }
     };
 
-    basic_default_parse_error_handler<char_type> default_err_handler_;
-    basic_parse_error_handler<char_type> *err_handler_;
+    default_parse_error_handler default_err_handler_;
+    parse_error_handler *err_handler_;
     path_state state_;
     string_type buffer_;
     size_t start_;

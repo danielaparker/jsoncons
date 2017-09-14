@@ -1,7 +1,7 @@
 ### jsoncons::parse_error_handler
 
 ```c++
-typedef basic_parse_error_handler<char> parse_error_handler
+class parse_error_handler;
 ```
 
 When parsing JSON text with [json_reader](json_reader.md), if you need to implement

@@ -62,12 +62,12 @@ class basic_csv_parser : private parsing_context
 #endif
     static const int default_depth = 3;
 
-    basic_default_parse_error_handler<CharT> default_err_handler_;
+    default_parse_error_handler default_err_handler_;
     csv_state_type state_;
     int top_;
     std::vector<csv_mode_type> stack_;
     basic_json_input_handler<CharT>& handler_;
-    basic_parse_error_handler<CharT>& err_handler_;
+    parse_error_handler& err_handler_;
     size_t index_;
     unsigned long column_;
     unsigned long line_;
@@ -125,7 +125,7 @@ public:
     }
 
     basic_csv_parser(basic_json_input_handler<CharT>& handler,
-                     basic_parse_error_handler<CharT>& err_handler)
+                     parse_error_handler& err_handler)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
@@ -144,7 +144,7 @@ public:
     }
 
     basic_csv_parser(basic_json_input_handler<CharT>& handler,
-                     basic_parse_error_handler<CharT>& err_handler,
+                     parse_error_handler& err_handler,
                      basic_csv_parameters<CharT> params)
        : top_(-1),
          stack_(default_depth),
