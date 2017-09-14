@@ -81,7 +81,7 @@ class basic_csv_parser : private parsing_context
     std::vector<std::pair<csv_column_type,size_t>> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
     size_t column_index_;
-    basic_json_body_filter<CharT> filter_;
+    basic_json_fragment_filter<CharT> filter_;
     size_t level_;
     size_t offset_;
 
@@ -727,10 +727,9 @@ private:
                     {
                         if (column_index - offset_ < column_defaults_.size() && column_defaults_[column_index - offset_].length() > 0)
                         {
-                            basic_json_parser<CharT> parser(filter_);
-                            parser.set_source(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
-                            parser.parse();
-                            parser.end_parse();
+                            std::basic_stringstream<CharT> ss(column_defaults_[column_index - offset_]);
+                            basic_json_reader<CharT> reader(ss,filter_);
+                            reader.read();
                         }
                         else
                         {
@@ -752,10 +751,9 @@ private:
                     {
                         if (column_index - offset_ < column_defaults_.size() && column_defaults_[column_index - offset_].length() > 0)
                         {
-                            basic_json_parser<CharT> parser(filter_);
-                            parser.set_source(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
-                            parser.parse();
-                            parser.end_parse();
+                            std::basic_stringstream<CharT> ss(column_defaults_[column_index - offset_]);
+                            basic_json_reader<CharT> reader(ss,filter_);
+                            reader.read();
                         }
                         else
                         {
@@ -786,10 +784,9 @@ private:
                     {
                         if (column_index - offset_ < column_defaults_.size() && column_defaults_[column_index - offset_].length() > 0)
                         {
-                            basic_json_parser<CharT> parser(filter_);
-                            parser.set_source(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
-                            parser.parse();
-                            parser.end_parse();
+                            std::basic_stringstream<CharT> ss(column_defaults_[column_index - offset_]);
+                            basic_json_reader<CharT> reader(ss,filter_);
+                            reader.read();
                         }
                         else
                         {
@@ -807,10 +804,9 @@ private:
                 {
                     if (column_index - offset_ < column_defaults_.size() && column_defaults_[column_index - offset_].length() > 0)
                     {
-                        basic_json_parser<CharT> parser(filter_);
-                        parser.set_source(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
-                        parser.parse();
-                        parser.end_parse();
+                        std::basic_stringstream<CharT> ss(column_defaults_[column_index - offset_]);
+                        basic_json_reader<CharT> reader(ss,filter_);
+                        reader.read();
                     }
                     else
                     {

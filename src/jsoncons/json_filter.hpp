@@ -343,12 +343,12 @@ private:
 
 // Filters out begin_json and end_json events
 template <class CharT>
-class basic_json_body_filter : public basic_json_filter<CharT>
+class basic_json_fragment_filter : public basic_json_filter<CharT>
 {
 public:
     using typename basic_json_filter<CharT>::string_view_type;
 
-    basic_json_body_filter(basic_json_input_handler<CharT>& handler)
+    basic_json_fragment_filter(basic_json_input_handler<CharT>& handler)
         : basic_json_filter<CharT>(handler)
     {
     }

@@ -149,20 +149,19 @@ enum class parse_state
     done
 };
 
-template<class CharT>
-class basic_json_parser : private parsing_context
+class json_parser : private parsing_context
 {
     static const int default_initial_stack_capacity_ = 100;
-    typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
+    typedef json_input_handler::string_view_type string_view_type;
 
-    basic_null_json_input_handler<CharT> default_input_handler_;
+    basic_null_json_input_handler<char> default_input_handler_;
     default_parse_error_handler default_err_handler_;
 
-    basic_json_input_handler<CharT>& handler_;
+    basic_json_input_handler<char>& handler_;
     parse_error_handler& err_handler_;
     uint32_t cp_;
     uint32_t cp2_;
-    std::basic_string<CharT> string_buffer_;
+    std::basic_string<char> string_buffer_;
     bool is_negative_;
 
     size_t line_;
@@ -171,24 +170,24 @@ class basic_json_parser : private parsing_context
     int initial_stack_capacity_;
 
     int max_depth_;
-    string_to_double<CharT> str_to_double_;
+    string_to_double<char> str_to_double_;
     uint8_t precision_;
     size_t literal_index_;
-    const CharT* begin_input_;
-    const CharT* end_input_;
-    const CharT* p_;
-    std::pair<const CharT*,size_t> literal_;
+    const char* begin_input_;
+    const char* end_input_;
+    const char* p_;
+    std::pair<const char*,size_t> literal_;
 
     parse_state state_;
     std::vector<parse_state> state_stack_;
 
     // Noncopyable and nonmoveable
-    basic_json_parser(const basic_json_parser&) = delete;
-    basic_json_parser& operator=(const basic_json_parser&) = delete;
+    json_parser(const json_parser&) = delete;
+    json_parser& operator=(const json_parser&) = delete;
 
 public:
 
-    basic_json_parser()
+    json_parser()
        : handler_(default_input_handler_),
          err_handler_(default_err_handler_),
          cp_(0),
@@ -211,7 +210,7 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(parse_error_handler& err_handler)
+    json_parser(parse_error_handler& err_handler)
        : handler_(default_input_handler_),
          err_handler_(err_handler),
          cp_(0),
@@ -234,7 +233,7 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(basic_json_input_handler<CharT>& handler)
+    json_parser(basic_json_input_handler<char>& handler)
        : handler_(handler),
          err_handler_(default_err_handler_),
          cp_(0),
@@ -257,7 +256,7 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(basic_json_input_handler<CharT>& handler,
+    json_parser(basic_json_input_handler<char>& handler,
                       parse_error_handler& err_handler)
        : handler_(handler),
          err_handler_(err_handler),
@@ -306,7 +305,7 @@ public:
         return *this;
     }
 
-    ~basic_json_parser()
+    ~json_parser()
     {
     }
 
@@ -467,7 +466,7 @@ public:
         }
         for (; p_ != end_input_; ++p_)
         {
-            CharT curr_char_ = *p_;
+            char curr_char_ = *p_;
             switch (curr_char_)
             {
             case '\n':
@@ -487,7 +486,7 @@ public:
     }
     void parse_string(std::error_code& ec)
     {
-        const CharT* sb = p_;
+        const char* sb = p_;
         bool done = false;
         while (!done && p_ < end_input_)
         {
@@ -753,19 +752,19 @@ public:
                     case 'f':
                         handler_.begin_json();
                         state_ = parse_state::f;
-                        literal_ = json_literals<CharT>::false_literal();
+                        literal_ = json_literals<char>::false_literal();
                         literal_index_ = 1;
                         break;
                     case 'n':
                         handler_.begin_json();
                         state_ = parse_state::n;
-                        literal_ = json_literals<CharT>::null_literal();
+                        literal_ = json_literals<char>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         handler_.begin_json();
                         state_ = parse_state::t;
-                        literal_ = json_literals<CharT>::true_literal();
+                        literal_ = json_literals<char>::true_literal();
                         literal_index_ = 1;
                         break;
                     case '}':
@@ -1015,17 +1014,17 @@ public:
                         break;
                     case 'f':
                         state_ = parse_state::f;
-                        literal_ = json_literals<CharT>::false_literal();
+                        literal_ = json_literals<char>::false_literal();
                         literal_index_ = 1;
                         break;
                     case 'n':
                         state_ = parse_state::n;
-                        literal_ = json_literals<CharT>::null_literal();
+                        literal_ = json_literals<char>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         state_ = parse_state::t;
-                        literal_ = json_literals<CharT>::true_literal();
+                        literal_ = json_literals<char>::true_literal();
                         literal_index_ = 1;
                         break;
                     case ']':
@@ -1115,17 +1114,17 @@ public:
                         break;
                     case 'f':
                         state_ = parse_state::f;
-                        literal_ = json_literals<CharT>::false_literal();
+                        literal_ = json_literals<char>::false_literal();
                         literal_index_ = 1;
                         break;
                     case 'n':
                         state_ = parse_state::n;
-                        literal_ = json_literals<CharT>::null_literal();
+                        literal_ = json_literals<char>::null_literal();
                         literal_index_ = 1;
                         break;
                     case 't':
                         state_ = parse_state::t;
-                        literal_ = json_literals<CharT>::true_literal();
+                        literal_ = json_literals<char>::true_literal();
                         literal_index_ = 1;
                         break;
                     case '\'':
@@ -1874,7 +1873,7 @@ public:
         return state_;
     }
 
-    void set_source(const CharT* input, size_t length)
+    void set_source(const char* input, size_t length)
     {
         begin_input_ = input;
         end_input_ = input + length;
@@ -2088,7 +2087,7 @@ private:
         }
     }
 
-    void end_string_value(const CharT* s, size_t length, std::error_code& ec) 
+    void end_string_value(const char* s, size_t length, std::error_code& ec) 
     {
         switch (parent())
         {
@@ -2188,9 +2187,6 @@ private:
         return column_;
     }
 };
-
-typedef basic_json_parser<char> json_parser;
-typedef basic_json_parser<wchar_t> wjson_parser;
 
 }
 
