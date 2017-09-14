@@ -16,7 +16,7 @@
 namespace jsoncons {
 
 template <class CharT>
-class basic_json_input_output_adapter : public basic_json_input_handler<CharT>
+class basic_json_input_output_handler_adapter : public basic_json_input_handler<CharT>
 {
 public:
     using typename basic_json_input_handler<CharT>::string_view_type;
@@ -26,16 +26,16 @@ private:
     basic_json_output_handler<CharT>& output_handler_;
 
     // noncopyable and nonmoveable
-    basic_json_input_output_adapter<CharT>(const basic_json_input_output_adapter<CharT>&) = delete;
-    basic_json_input_output_adapter<CharT>& operator=(const basic_json_input_output_adapter<CharT>&) = delete;
+    basic_json_input_output_handler_adapter<CharT>(const basic_json_input_output_handler_adapter<CharT>&) = delete;
+    basic_json_input_output_handler_adapter<CharT>& operator=(const basic_json_input_output_handler_adapter<CharT>&) = delete;
 
 public:
-    basic_json_input_output_adapter()
+    basic_json_input_output_handler_adapter()
         : output_handler_(null_output_handler_)
     {
     }
 
-    basic_json_input_output_adapter(basic_json_output_handler<CharT>& handler)
+    basic_json_input_output_handler_adapter(basic_json_output_handler<CharT>& handler)
         : output_handler_(handler)
     {
     }
@@ -112,7 +112,7 @@ private:
 };
 
 template <class CharT>
-class basic_json_output_input_adapter : public basic_json_output_handler<CharT>
+class basic_json_output_input_handler_adapter : public basic_json_output_handler<CharT>
 {
 public:
     using typename basic_json_output_handler<CharT>::string_view_type                                 ;
@@ -126,27 +126,27 @@ private:
     const null_parsing_context default_context_ = null_parsing_context();
 
     basic_null_json_input_handler<CharT> null_input_handler_;
-    basic_json_input_output_adapter<CharT> default_input_output_adapter_;
+    basic_json_input_output_handler_adapter<CharT> default_input_output_adapter_;
     basic_json_input_handler<CharT>& input_handler_;
-    const basic_json_input_output_adapter<CharT>& input_output_adapter_;
+    const basic_json_input_output_handler_adapter<CharT>& input_output_adapter_;
 
     // noncopyable and nonmoveable
-    basic_json_output_input_adapter<CharT>(const basic_json_output_input_adapter<CharT>&) = delete;
-    basic_json_output_input_adapter<CharT>& operator=(const basic_json_output_input_adapter<CharT>&) = delete;
+    basic_json_output_input_handler_adapter<CharT>(const basic_json_output_input_handler_adapter<CharT>&) = delete;
+    basic_json_output_input_handler_adapter<CharT>& operator=(const basic_json_output_input_handler_adapter<CharT>&) = delete;
 
 public:
-    basic_json_output_input_adapter()
+    basic_json_output_input_handler_adapter()
         : input_handler_(null_input_handler_),
           input_output_adapter_(default_input_output_adapter_)
     {
     }
-    basic_json_output_input_adapter(basic_json_input_handler<CharT>& input_handler)
+    basic_json_output_input_handler_adapter(basic_json_input_handler<CharT>& input_handler)
         : input_handler_(input_handler),
           input_output_adapter_(default_input_output_adapter_)
     {
     }
-    basic_json_output_input_adapter(basic_json_input_handler<CharT>& input_handler,
-                                    const basic_json_input_output_adapter<CharT>& input_output_adapter)
+    basic_json_output_input_handler_adapter(basic_json_input_handler<CharT>& input_handler,
+                                    const basic_json_input_output_handler_adapter<CharT>& input_output_adapter)
         : input_handler_(input_handler),
           input_output_adapter_(input_output_adapter)
     {
@@ -226,8 +226,8 @@ class basic_json_filter : public basic_json_input_handler<CharT>
 public:
     using typename basic_json_input_handler<CharT>::string_view_type                                 ;
 private:
-    basic_json_input_output_adapter<CharT> input_output_adapter_;
-    basic_json_output_input_adapter<CharT> output_input_adapter_;
+    basic_json_input_output_handler_adapter<CharT> input_output_adapter_;
+    basic_json_output_input_handler_adapter<CharT> output_input_adapter_;
     basic_json_output_handler<CharT>& output_handler_;
     basic_json_input_handler<CharT>& downstream_handler_;
 

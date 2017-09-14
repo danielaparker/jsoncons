@@ -22,28 +22,33 @@
 #include <jsoncons/json_parser.hpp>
 
 namespace jsoncons {
-template <class CharT>
 
 // utf8_other_json_input_adapter
 
-class utf8_other_json_input_adapter : public json_input_handler
+template <class CharT>
+class json_utf8_other_input_handler_adapter : public json_input_handler
 {
 public:
     using json_input_handler::string_view_type;
 private:
-    const basic_json_input_handler<CharT>& other_handler_;
-    parse_error_handler& err_handler_;
+    basic_null_json_input_handler<CharT> default_input_handler_;
+    basic_json_input_handler<CharT>& other_handler_;
+    //parse_error_handler& err_handler_;
 
-    utf8_other_json_input_adapter() = delete;
     // noncopyable and nonmoveable
-    utf8_other_json_input_adapter<CharT>(const utf8_other_json_input_adapter<CharT>&) = delete;
-    utf8_other_json_input_adapter<CharT>& operator=(const utf8_other_json_input_adapter<CharT>&) = delete;
+    json_utf8_other_input_handler_adapter<CharT>(const json_utf8_other_input_handler_adapter<CharT>&) = delete;
+    json_utf8_other_input_handler_adapter<CharT>& operator=(const json_utf8_other_input_handler_adapter<CharT>&) = delete;
 
 public:
-    utf8_other_json_input_adapter(basic_json_input_handler<CharT>& other_handler,
-                                  parse_error_handler& err_handler)
-        : other_handler_(other_handler),
-          err_handler_(err_handler)
+    json_utf8_other_input_handler_adapter()
+        : other_handler_(default_input_handler_)
+    {
+    }
+
+    json_utf8_other_input_handler_adapter(basic_json_input_handler<CharT>& other_handler/*,
+                                          parse_error_handler& err_handler*/)
+        : other_handler_(other_handler)/*,
+          err_handler_(err_handler)*/
     {
     }
 
@@ -87,7 +92,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            err_handler_.error(result.ec,context);
+            //err_handler_.error(result.ec,context);
         }
         other_handler_.name(target, context);
     }
@@ -100,7 +105,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            err_handler_.error(result.ec,context);
+            //err_handler_.error(result.ec,context);
         }
         other_handler_.string_value(target, context);
     }
@@ -136,10 +141,11 @@ class basic_json_reader
 {
     static const size_t default_max_buffer_length = 16384;
 
-    basic_json_parser<CharT> parser_;
+    json_utf8_other_input_handler_adapter<CharT> other_adapter_;
+    json_parser parser_;
     std::basic_istream<CharT>& is_;
     bool eof_;
-    std::vector<CharT> buffer_;
+    std::vector<char> buffer_;
     size_t buffer_capacity_;
     bool begin_;
 
@@ -170,8 +176,10 @@ public:
         buffer_.reserve(buffer_capacity_);
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is,
-                      basic_json_input_handler<CharT>& handler)
+    template <class Ch = CharT>
+    basic_json_reader(std::basic_istream<CharT>& is, 
+                      json_input_handler& handler, 
+                      typename std::enable_if<sizeof(Ch) == sizeof(char)>::type* = 0)
         : parser_(handler),
           is_(is),
           eof_(false),
@@ -181,10 +189,41 @@ public:
         buffer_.reserve(buffer_capacity_);
     }
 
+    template <class Ch = CharT>
+    basic_json_reader(std::basic_istream<CharT>& is,
+                      basic_json_input_handler<CharT>& handler, 
+                      typename std::enable_if<sizeof(Ch) != sizeof(char)>::type* = 0)
+        : other_adapter_(handler),
+          parser_(other_adapter_),
+          is_(is),
+          eof_(false),
+          buffer_capacity_(default_max_buffer_length),
+          begin_(true)
+    {
+        buffer_.reserve(buffer_capacity_);
+    }
+
+    template <class Ch = CharT>
+    basic_json_reader(std::basic_istream<CharT>& is,
+                      json_input_handler& handler,
+                      parse_error_handler& err_handler, 
+                      typename std::enable_if<sizeof(Ch) == sizeof(char)>::type* = 0)
+       : parser_(handler,err_handler),
+         is_(is),
+         eof_(false),
+         buffer_capacity_(default_max_buffer_length),
+         begin_(true)
+    {
+        buffer_.reserve(buffer_capacity_);
+    }
+
+    template <class Ch = CharT>
     basic_json_reader(std::basic_istream<CharT>& is,
                       basic_json_input_handler<CharT>& handler,
-                      parse_error_handler& err_handler)
-       : parser_(handler,err_handler),
+                      parse_error_handler& err_handler, 
+                      typename std::enable_if<sizeof(Ch) != sizeof(char)>::type* = 0)
+       : other_adapter_(handler),
+         parser_(other_adapter_,err_handler),
          is_(is),
          eof_(false),
          buffer_capacity_(default_max_buffer_length),
