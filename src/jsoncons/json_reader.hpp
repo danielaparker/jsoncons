@@ -92,7 +92,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            //err_handler_.error(result.ec,context);
+            throw parse_error(result.ec,context.line_number(),context.column_number());
         }
         other_handler_.name(target, context);
     }
@@ -105,7 +105,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            //err_handler_.error(result.ec,context);
+            throw parse_error(result.ec,context.line_number(),context.column_number());
         }
         other_handler_.string_value(target, context);
     }
