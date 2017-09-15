@@ -22,6 +22,25 @@
 // Uncomment the following line to suppress deprecated names (recommended for new code)
 //#define JSONCONS_NO_DEPRECATED
 
+#if defined(__GNUC__) || defined(__clang__)
+#define JSONCONS_LIKELY(x) __builtin_expect(!!(x), 1)
+#define JSONCONS_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#define JSONCONS_UNREACHABLE() __builtin_unreachable()
+#elif defined(_MSC_VER)
+#define JSONCONS_LIKELY(x) x
+#define JSONCONS_UNLIKELY(x) x
+#define JSONCONS_UNREACHABLE() __assume(0)
+#else
+#define JSONCONS_LIKELY(x) x
+#define JSONCONS_UNLIKELY(x) x
+#define JSONCONS_UNREACHABLE() do {} while (0)
+#endif
+
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__) && \
+    (__GNUC__ * 100 + __GNUC_MINOR__ >= 404)
+#  pragma GCC optimize("-ffunction-sections")
+#endif
+
 namespace jsoncons
 {
 

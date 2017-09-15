@@ -509,9 +509,18 @@ public:
     }
     void parse_string(std::error_code& ec)
     {
+        const char* local_end_input = end_input_;
         const char* sb = p_;
-        while (p_ < end_input_)
+
+        for (;;)
         {
+            if (JSONCONS_UNLIKELY(p_ >= local_end_input)) 
+            {
+                // Buffer exhausted               
+                string_buffer_.append(sb,p_-sb);
+                column_ += (p_ - sb + 1);
+                return;
+            }
             switch (string_state_)
             {
             case string_state::u1:
@@ -701,10 +710,7 @@ public:
                 break;
             }
         }
-               
-        // Buffer exhausted               
-        string_buffer_.append(sb,p_-sb);
-        column_ += (p_ - sb + 1);
+        JSONCONS_UNREACHABLE();               
     }
 
     void error(unicons::conv_errc result, std::error_code& ec)
