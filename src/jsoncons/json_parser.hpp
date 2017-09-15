@@ -20,6 +20,11 @@
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error_category.hpp>
 
+#define JSONCONS_ILLEGAL_CONTROL_CHARACTER \
+        case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b: \
+        case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16: \
+        case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f 
+
 namespace jsoncons {
 
 // try_string_to_uinteger
@@ -505,8 +510,7 @@ public:
     void parse_string(std::error_code& ec)
     {
         const char* sb = p_;
-        bool done = false;
-        while (!done && p_ < end_input_)
+        while (p_ < end_input_)
         {
             switch (string_state_)
             {
@@ -514,9 +518,7 @@ public:
                 {
                 switch (*p_)
                 {
-                case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
-                case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
-                case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
+                JSONCONS_ILLEGAL_CONTROL_CHARACTER:
                     string_buffer_.append(sb,p_-sb);
                     column_ += (p_ - sb + 1);
                     if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
@@ -525,9 +527,8 @@ public:
                         return;
                     }
                     // recovery - skip
-                    done = true;
                     ++p_;
-                    break;
+                    return;
                 case '\r':
                     {
                         column_ += (p_ - sb + 1);
@@ -541,8 +542,8 @@ public:
 
                         push_state(state_);
                         state_ = parse_state::cr;
-                        done = true;
                         ++p_;
+                        return;
                     }
                     break;
                 case '\n':
@@ -557,8 +558,8 @@ public:
                         string_buffer_.append(sb, p_ - sb + 1);
                         push_state(state_);
                         state_ = parse_state::lf;
-                        done = true;
                         ++p_;
+                        return;
                     }
                     break;
                 case '\t':
@@ -571,17 +572,16 @@ public:
                         }
                         // recovery - keep
                         string_buffer_.append(sb, p_ - sb + 1);
-                        done = true;
                         ++p_;
+                        return;
                     }
                     break;
                 case '\\': 
                     string_buffer_.append(sb,p_-sb);
                     column_ += (p_ - sb + 1);
                     state_ = parse_state::escape;
-                    done = true;
                     ++p_;
-                    break;
+                    return;
                 case '\"':
                     if (string_buffer_.length() == 0)
                     {
@@ -594,9 +594,8 @@ public:
                         string_buffer_.clear();
                     }
                     column_ += (p_ - sb + 1);
-                    done = true;
                     ++p_;
-                    break;
+                    return;
                 default:
                     if (static_cast<unsigned char>(*p_) < 0x80)
                     {
@@ -706,11 +705,9 @@ public:
             }
         }
                
-        if (!done)
-        {
-            string_buffer_.append(sb,p_-sb);
-            column_ += (p_ - sb + 1);
-        }
+        // Buffer exhausted               
+        string_buffer_.append(sb,p_-sb);
+        column_ += (p_ - sb + 1);
     }
 
     void error(unicons::conv_errc result, std::error_code& ec)
@@ -773,9 +770,7 @@ public:
         {
             switch (*p_)
             {
-            case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b:
-            case 0x0c:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:
-            case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f:
+            JSONCONS_ILLEGAL_CONTROL_CHARACTER:
                 if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
                 {
                     ec = json_parser_errc::illegal_control_character;
