@@ -125,7 +125,10 @@ enum class parse_state : uint8_t
     expect_value_or_end,
     expect_value,
     array, 
-    string,
+    string_u1,
+    string_u2,
+    string_u3,
+    string_u4,
     member_name,
     escape, 
     escape_u1, 
@@ -152,14 +155,6 @@ enum class parse_state : uint8_t
     cr,
     lf,
     done
-};
-
-enum class string_state : uint8_t
-{
-    u1,
-    u2,
-    u3,
-    u4
 };
 
 class json_parser : private parsing_context
@@ -192,7 +187,6 @@ class json_parser : private parsing_context
     std::pair<const char*,size_t> literal_;
 
     parse_state state_;
-    string_state string_state_;
     size_t continuation_count_;   
     std::vector<parse_state> state_stack_;
 
@@ -218,7 +212,6 @@ public:
          end_input_(nullptr),
          p_(nullptr),
          state_(parse_state::start),
-         string_state_(string_state::u1),
          continuation_count_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
@@ -243,7 +236,6 @@ public:
          end_input_(nullptr),
          p_(nullptr),
          state_(parse_state::start),
-         string_state_(string_state::u1),
          continuation_count_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
@@ -268,7 +260,6 @@ public:
          end_input_(nullptr),
          p_(nullptr),
          state_(parse_state::start),
-         string_state_(string_state::u1),
          continuation_count_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
@@ -294,7 +285,6 @@ public:
          end_input_(nullptr),
          p_(nullptr),
          state_(parse_state::start),
-         string_state_(string_state::u1),
          continuation_count_(0)
     {
         max_depth_ = (std::numeric_limits<int>::max)();
@@ -521,9 +511,9 @@ public:
                 column_ += (p_ - sb + 1);
                 return;
             }
-            switch (string_state_)
+            switch (state_)
             {
-            case string_state::u1:
+            case parse_state::string_u1:
                 {
                 switch (*p_)
                 {
@@ -614,19 +604,19 @@ public:
                     {
                         cp_  = (static_cast<unsigned char>(*p_) & 0x1f) << 6;
                         continuation_count_ = 1;
-                        string_state_ = string_state::u2;
+                        state_ = parse_state::string_u2;
                     }
                     else if (static_cast<unsigned char>(*p_) < 0xf0)
                     {
                         continuation_count_ = 2;
                         cp_  = (static_cast<unsigned char>(*p_) & 0x0f) << 12;
-                        string_state_ = string_state::u3;
+                        state_ = parse_state::string_u3;
                     }
                     else if (static_cast<unsigned char>(*p_) < 0xf8)
                     {
                         continuation_count_ = 3;
                         cp_  = (static_cast<unsigned char>(*p_) & 0x07) << 18;
-                        string_state_ = string_state::u4;
+                        state_ = parse_state::string_u4;
                     }
                     else
                     {
@@ -638,13 +628,13 @@ public:
                 break;
             }
 
-            case string_state::u2:
+            case parse_state::string_u2:
                 if (!unicons::is_continuation_byte(*p_))
                 {
                     err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
                 }
                 continuation_count_ = 0;
-                string_state_ = string_state::u1;
+                state_ = parse_state::string_u1;
                 cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
                 if (cp_ < 0x80) 
                 {
@@ -652,7 +642,7 @@ public:
                 }
                 ++p_;
                 break;
-            case string_state::u3:
+            case parse_state::string_u3:
                 if (!unicons::is_continuation_byte(*p_))
                 {
                     err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
@@ -674,12 +664,12 @@ public:
                         err_handler_.error(json_parser_errc::illegal_codepoint, *this);
                     }
                     continuation_count_ = 0;
-                    string_state_ = string_state::u1;
+                    state_ = parse_state::string_u1;
                     break;
                 }
                 ++p_;
                 break;
-            case string_state::u4:
+            case parse_state::string_u4:
                 if (!unicons::is_continuation_byte(*p_))
                 {
                     err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
@@ -701,7 +691,7 @@ public:
                         err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
                     }
                     continuation_count_ = 0;
-                    string_state_ = string_state::u1;
+                    state_ = parse_state::string_u1;
                     break;
                 }
                 ++p_;
@@ -836,7 +826,7 @@ public:
                         break;
                     case '\"':
                         handler_.begin_json();
-                        state_ = parse_state::string;
+                        state_ = parse_state::string_u1;
                         break;
                     case '-':
                         handler_.begin_json();
@@ -968,7 +958,7 @@ public:
                         break;
                     case '\"':
                         push_state(parse_state::member_name);
-                        state_ = parse_state::string;
+                        state_ = parse_state::string_u1;
                         break;
                     case '\'':
                         if (err_handler_.error(json_parser_errc::single_quote, *this))
@@ -1010,7 +1000,7 @@ public:
                         break;
                     case '\"':
                         push_state(parse_state::member_name);
-                        state_ = parse_state::string;
+                        state_ = parse_state::string_u1;
                         break;
                     case '}':
                         if (err_handler_.error(json_parser_errc::extra_comma, *this))
@@ -1102,7 +1092,7 @@ public:
                         if (ec) return;
                         break;
                     case '\"':
-                        state_ = parse_state::string;
+                        state_ = parse_state::string_u1;
                         break;
                     case '-':
                         is_negative_ = true;
@@ -1202,7 +1192,7 @@ public:
                         if (ec) return;
                         break;
                     case '\"':
-                        state_ = parse_state::string;
+                        state_ = parse_state::string_u1;
                         break;
                     case '-':
                         is_negative_ = true;
@@ -1250,7 +1240,10 @@ public:
                 ++p_;
                 ++column_;
                 break;
-            case parse_state::string: 
+            case parse_state::string_u1: 
+            case parse_state::string_u2: 
+            case parse_state::string_u3: 
+            case parse_state::string_u4: 
                 parse_string(ec);
                 if (ec) return;
                 break;
@@ -1298,7 +1291,7 @@ public:
                     else
                     {
                         unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
-                        state_ = parse_state::string;
+                        state_ = parse_state::string_u1;
                     }
                 }
                 ++p_;
@@ -1376,7 +1369,7 @@ public:
                     if (ec) return;
                     uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
                     unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
-                    state_ = parse_state::string;
+                    state_ = parse_state::string_u1;
                 }
                 ++p_;
                 ++column_;
@@ -2147,35 +2140,35 @@ private:
         {
         case '\"':
             string_buffer_.push_back('\"');
-            state_ = parse_state::string;
+            state_ = parse_state::string_u1;
             break;
         case '\\': 
             string_buffer_.push_back('\\');
-            state_ = parse_state::string;
+            state_ = parse_state::string_u1;
             break;
         case '/':
             string_buffer_.push_back('/');
-            state_ = parse_state::string;
+            state_ = parse_state::string_u1;
             break;
         case 'b':
             string_buffer_.push_back('\b');
-            state_ = parse_state::string;
+            state_ = parse_state::string_u1;
             break;
         case 'f':  
             string_buffer_.push_back('\f');
-            state_ = parse_state::string;
+            state_ = parse_state::string_u1;
             break;
         case 'n':
             string_buffer_.push_back('\n');
-            state_ = parse_state::string;
+            state_ = parse_state::string_u1;
             break;
         case 'r':
             string_buffer_.push_back('\r');
-            state_ = parse_state::string;
+            state_ = parse_state::string_u1;
             break;
         case 't':
             string_buffer_.push_back('\t');
-            state_ = parse_state::string;
+            state_ = parse_state::string_u1;
             break;
         case 'u':
             cp_ = 0;
