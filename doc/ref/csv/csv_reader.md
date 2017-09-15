@@ -55,7 +55,7 @@ Throws [parse_error](parse_error.md) if parsing fails.
 
     size_t buffer_length() const
 
-    void buffer_length(size_t buffer_length)
+    void buffer_length(size_t length)
 
 ### Examples
 

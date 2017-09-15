@@ -162,7 +162,7 @@ public:
           buffer_length_(default_max_buffer_length),
           begin_(true)
     {
-        buffer_.reserve(buffer_length_+1);
+        buffer_.reserve(buffer_length_);
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
@@ -173,7 +173,7 @@ public:
          buffer_length_(default_max_buffer_length),
          begin_(true)
     {
-        buffer_.reserve(buffer_length_+1);
+        buffer_.reserve(buffer_length_);
     }
 
     template <class Ch = CharT>
@@ -186,7 +186,7 @@ public:
           buffer_length_(default_max_buffer_length),
           begin_(true)
     {
-        buffer_.reserve(buffer_length_+1);
+        buffer_.reserve(buffer_length_);
     }
 
     template <class Ch = CharT>
@@ -200,7 +200,7 @@ public:
           buffer_length_(default_max_buffer_length),
           begin_(true)
     {
-        buffer_.reserve(buffer_length_+1);
+        buffer_.reserve(buffer_length_);
     }
 
     template <class Ch = CharT>
@@ -214,7 +214,7 @@ public:
          buffer_length_(default_max_buffer_length),
          begin_(true)
     {
-        buffer_.reserve(buffer_length_+1);
+        buffer_.reserve(buffer_length_);
     }
 
     template <class Ch = CharT>
@@ -229,7 +229,7 @@ public:
          buffer_length_(default_max_buffer_length),
          begin_(true)
     {
-        buffer_.reserve(buffer_length_+1);
+        buffer_.reserve(buffer_length_);
     }
 
     size_t buffer_length() const
@@ -240,7 +240,7 @@ public:
     void buffer_length(size_t length)
     {
         buffer_length_ = length;
-        buffer_.reserve(buffer_length_+1);
+        buffer_.reserve(buffer_length_);
     }
 
     size_t max_nesting_depth() const
@@ -464,7 +464,7 @@ public:
     void buffer_capacity(size_t length)
     {
         buffer_length_ = length;
-        buffer_.reserve(buffer_length_+1);
+        buffer_.reserve(buffer_length_);
     }
     size_t max_depth() const
     {

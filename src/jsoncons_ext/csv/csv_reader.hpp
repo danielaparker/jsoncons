@@ -36,6 +36,16 @@ class basic_csv_reader
 
         bool array_begun_;
     };
+    basic_csv_reader(const basic_csv_reader&) = delete; 
+    basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
+
+    basic_csv_parser<CharT> parser_;
+    std::basic_istream<CharT>& is_;
+    std::vector<CharT> buffer_;
+    size_t buffer_length_;
+    size_t buffer_position_;
+    bool eof_;
+    size_t index_;
 public:
     // Structural characters
     static const size_t default_max_buffer_length = 16384;
@@ -49,13 +59,12 @@ public:
 
        : parser_(handler),
          is_(is),
-         buffer_(default_max_buffer_length),
-         buffer_capacity_(default_max_buffer_length),
+         buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         buffer_length_(0),
          eof_(false),
          index_(0)
     {
+        buffer_.reserve(buffer_length_);
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
@@ -64,13 +73,12 @@ public:
 
        : parser_(handler,params),
          is_(is),
-         buffer_(default_max_buffer_length),
-         buffer_capacity_(default_max_buffer_length),
+         buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         buffer_length_(0),
          eof_(false),
          index_(0)
     {
+        buffer_.reserve(buffer_length_);
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
@@ -79,15 +87,12 @@ public:
        :
          parser_(handler,err_handler),
          is_(is),
-         buffer_(),
-         buffer_capacity_(default_max_buffer_length),
+         buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         buffer_length_(0),
          eof_(false),
          index_(0)
-
-
     {
+        buffer_.reserve(buffer_length_);
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
@@ -97,13 +102,12 @@ public:
        :
          parser_(handler,err_handler,params),
          is_(is),
-         buffer_(),
-         buffer_capacity_(default_max_buffer_length),
+         buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         buffer_length_(0),
          eof_(false),
          index_(0)
     {
+        buffer_.reserve(buffer_length_);
     }
 
     ~basic_csv_reader()
@@ -115,13 +119,15 @@ public:
         parser_.reset();
         while (!eof_ && !parser_.done())
         {
-            if (!(index_ < buffer_length_))
+            if (!(index_ < buffer_.size()))
             {
                 if (!is_.eof())
                 {
-                    is_.read(buffer_.data(), buffer_capacity_);
-                    buffer_length_ = static_cast<size_t>(is_.gcount());
-                    if (buffer_length_ == 0)
+                    buffer_.clear();
+                    buffer_.resize(buffer_length_);
+                    is_.read(buffer_.data(), buffer_length_);
+                    buffer_.resize(static_cast<size_t>(is_.gcount()));
+                    if (buffer_.size() == 0)
                     {
                         eof_ = true;
                     }
@@ -134,7 +140,7 @@ public:
             }
             if (!eof_)
             {
-                parser_.parse(buffer_.data(),index_,buffer_length_);
+                parser_.parse(buffer_.data(),index_,buffer_.size());
                 index_ = parser_.index();
             }
         }
@@ -146,29 +152,30 @@ public:
         return eof_;
     }
 
+    size_t buffer_length() const
+    {
+        return buffer_length_;
+    }
+
+    void buffer_length(size_t length)
+    {
+        buffer_length_ = length;
+        buffer_.reserve(buffer_length_);
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
     size_t buffer_capacity() const
     {
-        return buffer_capacity_;
+        return buffer_length_;
     }
 
-    void buffer_capacity(size_t buffer_capacity)
+    void buffer_capacity(size_t length)
     {
-        buffer_capacity_ = buffer_capacity;
+        buffer_length_ = length;
+        buffer_.reserve(buffer_length_);
     }
-
-private:
-    // noncopyable and nonmoveable
-    basic_csv_reader(const basic_csv_reader&) = delete; 
-    basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
-
-    basic_csv_parser<CharT> parser_;
-    std::basic_istream<CharT>& is_;
-    std::vector<CharT> buffer_;
-    size_t buffer_capacity_;
-    size_t buffer_position_;
-    size_t buffer_length_;
-    bool eof_;
-    size_t index_;
+#endif
 };
 
 typedef basic_csv_reader<char> csv_reader;
