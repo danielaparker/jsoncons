@@ -497,254 +497,277 @@ public:
             }
         }
     }
+
     void parse_string(std::error_code& ec)
     {
+        //std::cout << "enter parse_string " << (int)state_ << std::endl;
+
         const char* local_end_input = end_input_;
         const char* sb = p_;
 
-        for (;;)
+        switch (state_)
         {
-            if (JSONCONS_UNLIKELY(p_ >= local_end_input)) 
-            {
-                // Buffer exhausted               
+        case parse_state::string_u1:
+            goto string_u1;
+        case parse_state::string_u2:
+            goto string_u2;
+        case parse_state::string_u3:
+            goto string_u3;
+        case parse_state::string_u4:
+            goto string_u4;
+        default:
+            JSONCONS_UNREACHABLE();               
+        }
+        
+string_u1:
+        //std::cout << "parse_string string_u1" << std::endl;
+
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            string_buffer_.append(sb,p_-sb);
+            column_ += (p_ - sb + 1);
+
+            state_ = parse_state::string_u1;
+            return;
+        }
+        switch (*p_)
+        {
+            JSONCONS_ILLEGAL_CONTROL_CHARACTER:
                 string_buffer_.append(sb,p_-sb);
                 column_ += (p_ - sb + 1);
+                if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                {
+                    ec = json_parser_errc::illegal_control_character;
+
+                    state_ = parse_state::string_u1;
+                    return;
+                }
+                // recovery - skip
+                ++p_;
+                goto string_u1;
+            case '\r':
+                {
+                    column_ += (p_ - sb + 1);
+                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    {
+                        ec = json_parser_errc::illegal_character_in_string;
+
+                        state_ = parse_state::string_u1;
+                        return;
+                    }
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+
+                    ++p_;
+                    push_state(state_);
+                    state_ = parse_state::cr;
+                    return;
+                }
+            case '\n':
+                {
+                    column_ += (p_ - sb + 1);
+                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    {
+                        ec = json_parser_errc::illegal_character_in_string;
+                        return;
+                    }
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+                    ++p_;
+                    push_state(state_);
+                    state_ = parse_state::lf;
+                    return;
+                }
+            case '\t':
+                {
+                    column_ += (p_ - sb + 1);
+                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    {
+                        ec = json_parser_errc::illegal_character_in_string;
+                        return;
+                    }
+                    // recovery - keep
+                    string_buffer_.append(sb, p_ - sb + 1);
+                    ++p_;
+                    state_ = parse_state::string_u1;
+                    return;
+                }
+            case '\\': 
+                string_buffer_.append(sb,p_-sb);
+                column_ += (p_ - sb + 1);
+                ++p_;
+                state_ = parse_state::escape;
                 return;
-            }
-            switch (state_)
-            {
-            case parse_state::string_u1:
+            case '\"':
+                if (string_buffer_.length() == 0)
                 {
-                switch (*p_)
+                     end_string_value(sb,p_-sb, ec);
+                }
+                else
                 {
-                JSONCONS_ILLEGAL_CONTROL_CHARACTER:
                     string_buffer_.append(sb,p_-sb);
-                    column_ += (p_ - sb + 1);
-                    if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
-                    {
-                        ec = json_parser_errc::illegal_control_character;
-                        return;
-                    }
-                    // recovery - skip
-                    ++p_;
-                    break;
-                case '\r':
-                    {
-                        column_ += (p_ - sb + 1);
-                        if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
-                        {
-                            ec = json_parser_errc::illegal_character_in_string;
-                            return;
-                        }
-                        // recovery - keep
-                        string_buffer_.append(sb, p_ - sb + 1);
-
-                        push_state(state_);
-                        state_ = parse_state::cr;
-                        ++p_;
-                        return;
-                    }
-                case '\n':
-                    {
-                        column_ += (p_ - sb + 1);
-                        if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
-                        {
-                            ec = json_parser_errc::illegal_character_in_string;
-                            return;
-                        }
-                        // recovery - keep
-                        string_buffer_.append(sb, p_ - sb + 1);
-                        push_state(state_);
-                        state_ = parse_state::lf;
-                        ++p_;
-                        return;
-                    }
-                case '\t':
-                    {
-                        column_ += (p_ - sb + 1);
-                        if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
-                        {
-                            ec = json_parser_errc::illegal_character_in_string;
-                            return;
-                        }
-                        // recovery - keep
-                        string_buffer_.append(sb, p_ - sb + 1);
-                        ++p_;
-                        return;
-                    }
-                case '\\': 
-                    string_buffer_.append(sb,p_-sb);
-                    column_ += (p_ - sb + 1);
-                    state_ = parse_state::escape;
-                    ++p_;
-                    return;
-                case '\"':
-                    if (string_buffer_.length() == 0)
-                    {
-                         end_string_value(sb,p_-sb, ec);
-                    }
-                    else
-                    {
-                        string_buffer_.append(sb,p_-sb);
-                        end_string_value(string_buffer_.data(),string_buffer_.length(), ec);
-                        string_buffer_.clear();
-                    }
-                    column_ += (p_ - sb + 1);
-                    ++p_;
-                    return;
-                default:
-                    if (static_cast<unsigned char>(*p_) < 0x80)
-                    {
-                    }
-                    else if (unicons::is_continuation_byte(*p_))
-                    {
-                        err_handler_.error(json_parser_errc::unexpected_continuation_byte, *this);
-                    }
-                    else if (static_cast<unsigned char>(*p_) < 0xe0)
-                    {
-                        cp_  = (static_cast<unsigned char>(*p_) & 0x1f) << 6;
-                        continuation_count_ = 1;
-                        state_ = parse_state::string_u2;
-                    }
-                    else if (static_cast<unsigned char>(*p_) < 0xf0)
-                    {
-                        continuation_count_ = 2;
-                        cp_  = (static_cast<unsigned char>(*p_) & 0x0f) << 12;
-                        state_ = parse_state::string_u3;
-                    }
-                    else if (static_cast<unsigned char>(*p_) < 0xf8)
-                    {
-                        continuation_count_ = 3;
-                        cp_  = (static_cast<unsigned char>(*p_) & 0x07) << 18;
-                        state_ = parse_state::string_u4;
-                    }
-                    else
-                    {
-                        err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
-                    }
-                    ++p_;
-                    break;
+                    end_string_value(string_buffer_.data(),string_buffer_.length(), ec);
+                    string_buffer_.clear();
                 }
-                break;
-            }
-
-            case parse_state::string_u2:
-                if (!unicons::is_continuation_byte(*p_))
-                {
-                    err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                }
-                continuation_count_ = 0;
-                state_ = parse_state::string_u1;
-                cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
-                if (cp_ < 0x80) 
-                {
-                    err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                }
+                column_ += (p_ - sb + 1);
                 ++p_;
-                break;
-            case parse_state::string_u3:
-                if (!unicons::is_continuation_byte(*p_))
-                {
-                    err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                }
-                switch (continuation_count_)
-                {
-                case 2:
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
-                    --continuation_count_;
-                    break;
-                default:
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
-                    if (cp_ < 0x0800) 
-                    {
-                        err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                    }
-                    if (cp_ >= 0xD800 && cp_ <= 0xDFFF) 
-                    {
-                        err_handler_.error(json_parser_errc::illegal_codepoint, *this);
-                    }
-                    continuation_count_ = 0;
-                    state_ = parse_state::string_u1;
-                    break;
-                }
-                ++p_;
-                break;
-            case parse_state::string_u4:
-                if (!unicons::is_continuation_byte(*p_))
-                {
-                    err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
-                }
-                switch (continuation_count_)
-                {
-                case 3:
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 12;
-                    --continuation_count_;
-                    break;
-                case 2:
-                    --continuation_count_;
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
-                    break;
-                default:
-                    cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
-                    if (cp_ <= 0x010000) 
-                    {
-                        err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
-                    }
-                    continuation_count_ = 0;
-                    state_ = parse_state::string_u1;
-                    break;
-                }
-                ++p_;
-                break;
+                return;
             default:
-                break;
+                if (static_cast<unsigned char>(*p_) < 0x80)
+                {
+                    ++p_;
+                    goto string_u1;
+                }
+                else if (unicons::is_continuation_byte(*p_))
+                {
+                    err_handler_.error(json_parser_errc::unexpected_continuation_byte, *this);
+                    ec = json_parser_errc::unexpected_continuation_byte;
+                    ++p_;
+                    return;
+                }
+                else if (static_cast<unsigned char>(*p_) < 0xe0)
+                {
+                    cp_  = (static_cast<unsigned char>(*p_) & 0x1f) << 6;
+                    ++p_;
+                    continuation_count_ = 1;
+                    goto string_u2;
+                }
+                else if (static_cast<unsigned char>(*p_) < 0xf0)
+                {
+                    cp_  = (static_cast<unsigned char>(*p_) & 0x0f) << 12;
+                    ++p_;
+                    continuation_count_ = 2;
+                    goto string_u3;
+                }
+                else if (static_cast<unsigned char>(*p_) < 0xf8)
+                {
+                    cp_  = (static_cast<unsigned char>(*p_) & 0x07) << 18;
+                    ++p_;
+                    continuation_count_ = 3;
+                    goto string_u4;
+                }
+                else
+                {
+                    err_handler_.error(json_parser_errc::illegal_character_in_string, *this);
+                    ec = json_parser_errc::illegal_character_in_string;
+                    ++p_;
+                    state_ = parse_state::string_u1;
+                    return;
+                }
             }
-        }
-        JSONCONS_UNREACHABLE();               
-    }
+        
+string_u2:
+        //std::cout << "parse_string string_u2" << std::endl;
 
-    void error(unicons::conv_errc result, std::error_code& ec)
-    {
-        switch (result)
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
         {
-        case unicons::conv_errc():
-            break;
-        case unicons::conv_errc::over_long_utf8_sequence:
-            if (err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this))
+            string_buffer_.append(sb,p_-sb);
+            column_ += (p_ - sb + 1);
+            state_ = parse_state::string_u2;
+            return;
+        }
+        if (!unicons::is_continuation_byte(*p_))
+        {
+            err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
+            ec = json_parser_errc::expected_continuation_byte;
+            return;
+        }
+        continuation_count_ = 0;
+        state_ = parse_state::string_u1;
+        cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
+        if (cp_ < 0x80) 
+        {
+            err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
+            ec = json_parser_errc::over_long_utf8_sequence;
+            return;
+        }
+        ++p_;
+        goto string_u1;
+
+string_u3:
+        //std::cout << "parse_string string_u3" << std::endl;
+
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            string_buffer_.append(sb,p_-sb);
+            column_ += (p_ - sb + 1);
+            state_ = parse_state::string_u3;
+            return;
+        }
+        if (!unicons::is_continuation_byte(*p_))
+        {
+            err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
+            ec = json_parser_errc::expected_continuation_byte;
+            return;
+        }
+        switch (continuation_count_)
+        {
+        case 2:
+            cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
+            ++p_;
+            --continuation_count_;
+            goto string_u3;
+        default:
+            cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
+            if (cp_ < 0x0800) 
             {
+                err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
                 ec = json_parser_errc::over_long_utf8_sequence;
                 return;
             }
-            break;
-        case unicons::conv_errc::unpaired_high_surrogate:
-            if (err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this))
+            if (cp_ >= 0xD800 && cp_ <= 0xDFFF) 
             {
-                ec = json_parser_errc::unpaired_high_surrogate;
-                return;
-            }
-            break;
-        case unicons::conv_errc::expected_continuation_byte:
-            if (err_handler_.error(json_parser_errc::expected_continuation_byte, *this))
-            {
-                ec = json_parser_errc::expected_continuation_byte;
-                return;
-            }
-            break;
-        case unicons::conv_errc::illegal_surrogate_value:
-            if (err_handler_.error(json_parser_errc::illegal_surrogate_value, *this))
-            {
-                ec = json_parser_errc::illegal_surrogate_value;
-                return;
-            }
-            break;
-        default:
-            if (err_handler_.error(json_parser_errc::illegal_codepoint, *this))
-            {
+                err_handler_.error(json_parser_errc::illegal_codepoint, *this);
                 ec = json_parser_errc::illegal_codepoint;
                 return;
             }
-            break;
+            continuation_count_ = 0;
+            ++p_;
+            goto string_u1;
         }
+
+string_u4:
+        //std::cout << "parse_string string_u4" << std::endl;
+
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            string_buffer_.append(sb,p_-sb);
+            column_ += (p_ - sb + 1);
+            state_ = parse_state::string_u4;
+            return;
+        }
+        if (!unicons::is_continuation_byte(*p_))
+        {
+            err_handler_.error(json_parser_errc::expected_continuation_byte, *this);
+            ec = json_parser_errc::expected_continuation_byte;
+            return;
+        }
+        switch (continuation_count_)
+        {
+        case 3:
+            cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 12;
+            --continuation_count_;
+            ++p_;
+            goto string_u4;
+        case 2:
+            --continuation_count_;
+            cp_ |= (static_cast<unsigned char>(*p_) & 0x3f) << 6;
+            ++p_;
+            goto string_u4;
+        default:
+            cp_ |= (static_cast<unsigned char>(*p_) & 0x3f);
+            if (cp_ <= 0x010000) 
+            {
+                err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this);
+                ec = json_parser_errc::over_long_utf8_sequence;
+                return;
+            }
+            ++p_;
+            continuation_count_ = 0;
+            state_ = parse_state::string_u1;
+            goto string_u1;
+        }
+        JSONCONS_UNREACHABLE();               
     }
 
     void parse()

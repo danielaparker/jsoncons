@@ -93,6 +93,29 @@
 #  endif
 #endif
 
+#ifdef __GNUC__
+#ifndef likely
+#  define likely(x)     __builtin_expect(!!(x), 1)
+#endif
+#ifndef unlikely
+#  define unlikely(x)   __builtin_expect(!!(x), 0)
+#endif
+#  define unreachable() __builtin_unreachable()
+#elif defined(_MSC_VER)
+#  define likely(x)     (x)
+#  define unlikely(x)   (x)
+#  define unreachable() __assume(0)
+#else
+#  define likely(x)     (x)
+#  define unlikely(x)   (x)
+#  define unreachable() do {} while (0)
+#endif
+
+#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__) && \
+    (__GNUC__ * 100 + __GNUC_MINOR__ >= 404)
+#  pragma GCC optimize("-ffunction-sections")
+#endif
+
 namespace jsoncons { namespace detail { namespace binary {
 
 static inline bool add_check_overflow(size_t v1, size_t v2, size_t *r)
