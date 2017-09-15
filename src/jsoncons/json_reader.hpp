@@ -291,7 +291,6 @@ public:
         {
             parser_.set_source(buffer_.data(),buffer_.size());
         }
-        buffer_.push_back(0);
     }
 
     template <class Ch = CharT>
@@ -341,7 +340,6 @@ public:
             }
             parser_.set_source(buffer_.data(),buffer_.size());
         }
-        buffer_.push_back(0);
     }
 
     void read_next(std::error_code& ec)

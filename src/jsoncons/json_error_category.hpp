@@ -38,6 +38,7 @@ namespace jsoncons {
         unexpected_right_bracket,
         unexpected_right_brace,
         illegal_comment,
+        unexpected_continuation_byte,
         expected_continuation_byte,
         over_long_utf8_sequence,
         illegal_codepoint,
@@ -105,6 +106,8 @@ public:
             return "Unexpected right bracket ']'";
         case json_parser_errc::illegal_comment:
             return "Illegal comment";
+        case json_parser_errc::unexpected_continuation_byte:
+            return "Lead utf8 continuation byte";
         case json_parser_errc::expected_continuation_byte:
             return "Expected continuation byte";
         case json_parser_errc::over_long_utf8_sequence:

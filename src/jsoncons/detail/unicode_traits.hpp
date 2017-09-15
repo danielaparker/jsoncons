@@ -93,6 +93,12 @@ const uint16_t sur_low_start = 0xDC00;
 const uint16_t sur_low_end = 0xDFFF;
 
 inline
+static bool is_continuation_byte(unsigned char ch)
+{
+    return (ch & 0xC0) == 0x80;
+}
+
+inline
 bool is_high_surrogate(uint32_t ch) UNICONS_NOEXCEPT
 {
     return (ch >= sur_high_start && ch <= sur_high_end);
