@@ -146,7 +146,7 @@ class basic_json_reader
     std::basic_istream<CharT>& is_;
     bool eof_;
     std::vector<char> buffer_;
-    size_t buffer_capacity_;
+    size_t buffer_length_;
     bool begin_;
 
     // Noncopyable and nonmoveable
@@ -159,10 +159,10 @@ public:
         : parser_(),
           is_(is),
           eof_(false),
-          buffer_capacity_(default_max_buffer_length),
+          buffer_length_(default_max_buffer_length),
           begin_(true)
     {
-        buffer_.reserve(buffer_capacity_);
+        buffer_.reserve(buffer_length_+1);
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
@@ -170,10 +170,10 @@ public:
        : parser_(err_handler),
          is_(is),
          eof_(false),
-         buffer_capacity_(default_max_buffer_length),
+         buffer_length_(default_max_buffer_length),
          begin_(true)
     {
-        buffer_.reserve(buffer_capacity_);
+        buffer_.reserve(buffer_length_+1);
     }
 
     template <class Ch = CharT>
@@ -183,10 +183,10 @@ public:
         : parser_(handler),
           is_(is),
           eof_(false),
-          buffer_capacity_(default_max_buffer_length),
+          buffer_length_(default_max_buffer_length),
           begin_(true)
     {
-        buffer_.reserve(buffer_capacity_);
+        buffer_.reserve(buffer_length_+1);
     }
 
     template <class Ch = CharT>
@@ -197,10 +197,10 @@ public:
           parser_(other_adapter_),
           is_(is),
           eof_(false),
-          buffer_capacity_(default_max_buffer_length),
+          buffer_length_(default_max_buffer_length),
           begin_(true)
     {
-        buffer_.reserve(buffer_capacity_);
+        buffer_.reserve(buffer_length_+1);
     }
 
     template <class Ch = CharT>
@@ -211,10 +211,10 @@ public:
        : parser_(handler,err_handler),
          is_(is),
          eof_(false),
-         buffer_capacity_(default_max_buffer_length),
+         buffer_length_(default_max_buffer_length),
          begin_(true)
     {
-        buffer_.reserve(buffer_capacity_);
+        buffer_.reserve(buffer_length_+1);
     }
 
     template <class Ch = CharT>
@@ -226,21 +226,21 @@ public:
          parser_(other_adapter_,err_handler),
          is_(is),
          eof_(false),
-         buffer_capacity_(default_max_buffer_length),
+         buffer_length_(default_max_buffer_length),
          begin_(true)
     {
-        buffer_.reserve(buffer_capacity_);
+        buffer_.reserve(buffer_length_+1);
     }
 
-    size_t buffer_capacity() const
+    size_t buffer_length() const
     {
-        return buffer_capacity_;
+        return buffer_length_;
     }
 
-    void buffer_capacity(size_t capacity)
+    void buffer_length(size_t length)
     {
-        buffer_capacity_ = capacity;
-        buffer_.reserve(buffer_capacity_);
+        buffer_length_ = length;
+        buffer_.reserve(buffer_length_+1);
     }
 
     size_t max_nesting_depth() const
@@ -267,8 +267,9 @@ public:
     typename std::enable_if<sizeof(Ch) == sizeof(char),void>::type
     read_buffer(std::error_code& ec)
     {
-        buffer_.resize(buffer_capacity_);
-        is_.read(buffer_.data(), buffer_capacity_);
+        buffer_.clear();
+        buffer_.resize(buffer_length_);
+        is_.read(buffer_.data(), buffer_length_);
         buffer_.resize(static_cast<size_t>(is_.gcount()));
         if (buffer_.size() == 0)
         {
@@ -290,14 +291,15 @@ public:
         {
             parser_.set_source(buffer_.data(),buffer_.size());
         }
+        buffer_.push_back(0);
     }
 
     template <class Ch = CharT>
     typename std::enable_if<sizeof(Ch) != sizeof(char),void>::type
     read_buffer(std::error_code& ec)
     {
-        std::vector<CharT> buf(buffer_capacity_);
-        is_.read(buf.data(), buffer_capacity_);
+        std::vector<CharT> buf(buffer_length_);
+        is_.read(buf.data(), buffer_length_);
         buf.resize(static_cast<size_t>(is_.gcount()));
         if (buf.size() == 0)
         {
@@ -339,6 +341,7 @@ public:
             }
             parser_.set_source(buffer_.data(),buffer_.size());
         }
+        buffer_.push_back(0);
     }
 
     void read_next(std::error_code& ec)
@@ -454,6 +457,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    size_t buffer_capacity() const
+    {
+        return buffer_length_;
+    }
+
+    void buffer_capacity(size_t length)
+    {
+        buffer_length_ = length;
+        buffer_.reserve(buffer_length_+1);
+    }
     size_t max_depth() const
     {
         return parser_.max_nesting_depth();

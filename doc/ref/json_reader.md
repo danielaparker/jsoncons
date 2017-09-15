@@ -54,9 +54,9 @@ Throws [parse_error](parse_error.md) if there are any unconsumed non-whitespace 
 Throws if there are any unconsumed non-whitespace characters in the input.
 The error code `ec` is set if there are any unconsumed non-whitespace characters left in the input.
 
-    size_t buffer_capacity() const
+    size_t buffer_length() const
 
-    void buffer_capacity(size_t capacity)
+    void buffer_length(size_t length)
 
     size_t max_nesting_depth() const
 By default `jsoncons` can read a `JSON` text of arbitrarily large depth.

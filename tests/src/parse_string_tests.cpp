@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string4)
         try
         {
             json_reader reader(is, decoder);
-            reader.buffer_capacity(i);
+            reader.buffer_length(i);
             reader.read_next();
         }
         catch (const std::exception&)
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string1)
         try
         {
             json_reader reader(is, decoder);
-            reader.buffer_capacity(i);
+            reader.buffer_length(i);
             reader.read_next();
         }
         catch (const std::exception&)
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string2)
         try
         {
             json_reader reader(is, decoder, err_handler);
-            //reader.buffer_capacity(i);
+            //reader.buffer_length(i);
             reader.read_next();
         }
         catch (const std::exception&)
