@@ -528,7 +528,7 @@ public:
                     }
                     // recovery - skip
                     ++p_;
-                    return;
+                    break;
                 case '\r':
                     {
                         column_ += (p_ - sb + 1);
@@ -545,7 +545,6 @@ public:
                         ++p_;
                         return;
                     }
-                    break;
                 case '\n':
                     {
                         column_ += (p_ - sb + 1);
@@ -561,7 +560,6 @@ public:
                         ++p_;
                         return;
                     }
-                    break;
                 case '\t':
                     {
                         column_ += (p_ - sb + 1);
@@ -575,7 +573,6 @@ public:
                         ++p_;
                         return;
                     }
-                    break;
                 case '\\': 
                     string_buffer_.append(sb,p_-sb);
                     column_ += (p_ - sb + 1);
