@@ -27,6 +27,37 @@ void streaming_examples();
 void jsonpointer_examples();
 void jsonpatch_examples();
 
+void comment_example()
+{
+    std::string s = R"(
+    {
+        // Single line comments
+        /*
+            Multi line comments 
+        */
+    }
+    )";
+
+    try
+    {
+        json j = json::parse(s);
+        std::cout << "(1) " << j << std::endl;
+    }
+    catch (parse_error& e)
+    {
+    }
+
+    try
+    {
+        strict_parse_error_handler err_handler;
+        json j = json::parse(s, err_handler);
+    }
+    catch (parse_error& e)
+    {
+        std::cout << "(2) " << e.what() << std::endl;
+    }
+}
+
 void first_example_a()
 {
     json books = json::parse_file("input/books.json");
@@ -420,6 +451,8 @@ int main()
         serialization_examples();
 
         csv_examples();
+
+        comment_example();
     }
     catch (const std::exception& e)
     {

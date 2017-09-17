@@ -122,6 +122,37 @@ The library includes four instantiations of `basic_json`:
 
 ### Features
 
+#### By default, accepts and ignores C-style comments
+
+```c++
+std::string s = R"(
+{
+    // Single line comments
+    /*
+        Multi line comments 
+    */
+}
+)";
+
+json j = json::parse(s);
+std::cout << "(1) " << j << std::endl;
+
+try
+{
+    strict_parse_error_handler err_handler;
+    json j = json::parse(s, err_handler);
+}
+catch (parse_error& e)
+{
+    std::cout << "(2) " << e.what() << std::endl;
+}
+```
+Output:
+```
+(1) {}
+(2) Illegal comment at line 3 and column 10
+```
+
 #### Meaningful error messages
 
 ```c++
