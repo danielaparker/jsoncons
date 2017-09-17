@@ -990,131 +990,18 @@ public:
                 if (ec) return;
                 break;
             case parse_state::escape: 
-                escape_next_char(*p_, ec);
-                if (ec) return;
-                ++p_;
-                ++column_;
-                break;
             case parse_state::escape_u1: 
-                {
-                    append_codepoint(*p_,ec);
-                    if (ec) return;
-                    state_ = parse_state::escape_u2;
-                }
-                ++p_;
-                ++column_;
-                break;
             case parse_state::escape_u2: 
-                {
-                    append_codepoint(*p_, ec);
-                    if (ec) return;
-                    state_ = parse_state::escape_u3;
-                }
-                ++p_;
-                ++column_;
-                break;
             case parse_state::escape_u3: 
-                {
-                    append_codepoint(*p_, ec);
-                    if (ec) return;
-                    state_ = parse_state::escape_u4;
-                }
-                ++p_;
-                ++column_;
-                break;
             case parse_state::escape_u4: 
-                {
-                    append_codepoint(*p_, ec);
-                    if (ec) return;
-                    if (unicons::is_high_surrogate(cp_))
-                    {
-                        state_ = parse_state::escape_expect_surrogate_pair1;
-                    }
-                    else
-                    {
-                        unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
-                        state_ = parse_state::string_u1;
-                    }
-                }
-                ++p_;
-                ++column_;
-                break;
             case parse_state::escape_expect_surrogate_pair1: 
-                {
-                    switch (*p_)
-                    {
-                    case '\\': 
-                        cp2_ = 0;
-                        state_ = parse_state::escape_expect_surrogate_pair2;
-                        break;
-                    default:
-                        if (err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this))
-                        {
-                            ec = json_parser_errc::expected_codepoint_surrogate_pair;
-                            return;
-                        }
-                        break;
-                    }
-                }
-                ++p_;
-                ++column_;
-                break;
             case parse_state::escape_expect_surrogate_pair2: 
-                {
-                    switch (*p_)
-                    {
-                    case 'u':
-                        state_ = parse_state::escape_u6;
-                        break;
-                    default:
-                        if (err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this))
-                        {
-                            ec = json_parser_errc::expected_codepoint_surrogate_pair;
-                            return;
-                        }
-                        break;
-                    }
-                }
-                ++p_;
-                ++column_;
-                break;
-            case parse_state::escape_u6:
-                {
-                    append_second_codepoint(*p_, ec);
-                    if (ec) return;
-                    state_ = parse_state::escape_u7;
-                }
-                ++p_;
-                ++column_;
-                break;
+            case parse_state::escape_u6: 
             case parse_state::escape_u7: 
-                {
-                    append_second_codepoint(*p_, ec);
-                    if (ec) return;
-                    state_ = parse_state::escape_u8;
-                }
-                ++p_;
-                ++column_;
-                break;
             case parse_state::escape_u8: 
-                {
-                    append_second_codepoint(*p_, ec);
-                    if (ec) return;
-                    state_ = parse_state::escape_u9;
-                }
-                ++p_;
-                ++column_;
-                break;
             case parse_state::escape_u9: 
-                {
-                    append_second_codepoint(*p_, ec);
-                    if (ec) return;
-                    uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
-                    unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
-                    state_ = parse_state::string_u1;
-                }
-                ++p_;
-                ++column_;
+                escape_char(ec);
+                if (ec) return;
                 break;
             case parse_state::minus:
             case parse_state::zero:  
@@ -1779,7 +1666,7 @@ exp3:
             goto string_u4_2;
         case parse_state::string_u4_3:
             goto string_u4_3;
-        default:
+                default:
             JSONCONS_UNREACHABLE();               
         }
 
@@ -1805,7 +1692,8 @@ string_u1:
                 }
                 // recovery - skip
                 ++p_;
-                goto string_u1;
+                state_ = parse_state::string_u1;
+                return;
             case '\r':
                 {
                     column_ += (p_ - sb + 1);
@@ -1817,7 +1705,6 @@ string_u1:
                     }
                     // recovery - keep
                     string_buffer_.append(sb, p_ - sb + 1);
-
                     ++p_;
                     push_state(state_);
                     state_ = parse_state::cr;
@@ -2059,6 +1946,311 @@ string_u4_3:
         JSONCONS_UNREACHABLE();               
     }
 
+    void escape_char(std::error_code& ec)
+    {
+        const char* local_end_input = end_input_;
+        const char* sb = p_;
+
+        switch (state_)
+        {
+        case parse_state::escape:
+            goto escape;
+        case parse_state::escape_u1:
+            goto escape_u1;
+        case parse_state::escape_u2:
+            goto escape_u2;
+        case parse_state::escape_u3:
+            goto escape_u3;
+        case parse_state::escape_u4:
+            goto escape_u4;
+        case parse_state::escape_expect_surrogate_pair1:
+            goto escape_expect_surrogate_pair1;
+        case parse_state::escape_expect_surrogate_pair2:
+            goto escape_expect_surrogate_pair2;
+        case parse_state::escape_u6:
+            goto escape_u6;
+        case parse_state::escape_u7:
+            goto escape_u7;
+        case parse_state::escape_u8:
+            goto escape_u8;
+        case parse_state::escape_u9:
+            goto escape_u9;
+        default:
+            JSONCONS_UNREACHABLE();               
+        }
+
+escape:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape;
+            return;
+        }
+        switch (*p_)
+        {
+        case '\"':
+            string_buffer_.push_back('\"');
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        case '\\': 
+            string_buffer_.push_back('\\');
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        case '/':
+            string_buffer_.push_back('/');
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        case 'b':
+            string_buffer_.push_back('\b');
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        case 'f':
+            string_buffer_.push_back('\f');
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        case 'n':
+            string_buffer_.push_back('\n');
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        case 'r':
+            string_buffer_.push_back('\r');
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        case 't':
+            string_buffer_.push_back('\t');
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        case 'u':
+            cp_ = 0;
+            ++p_;
+            ++column_;
+            goto escape_u1;
+        default:    
+            err_handler_.error(json_parser_errc::illegal_escaped_character, *this);
+            ec = json_parser_errc::illegal_escaped_character;
+            state_ = parse_state::escape;
+            return;
+        }
+
+escape_u1:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_u1;
+            return;
+        }
+        {
+            append_codepoint(*p_,ec);
+            if (ec)
+            {
+                state_ = parse_state::escape_u1;
+                return;
+            }
+            ++p_;
+            ++column_;
+            goto escape_u2;
+        }
+
+escape_u2:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_u2;
+            return;
+        }
+        {
+            append_codepoint(*p_, ec);
+            if (ec)
+            {
+                state_ = parse_state::escape_u2;
+                return;
+            }
+            ++p_;
+            ++column_;
+            goto escape_u3;
+        }
+
+escape_u3:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_u3;
+            return;
+        }
+        {
+            append_codepoint(*p_, ec);
+            if (ec)
+            {
+                state_ = parse_state::escape_u3;
+                return;
+            }
+            ++p_;
+            ++column_;
+            goto escape_u4;
+        }
+
+escape_u4:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_u4;
+            return;
+        }
+        {
+            append_codepoint(*p_, ec);
+            if (ec)
+            {
+                state_ = parse_state::escape_u4;
+                return;
+            }
+            if (unicons::is_high_surrogate(cp_))
+            {
+                ++p_;
+                ++column_;
+                goto escape_expect_surrogate_pair1;
+            }
+            else
+            {
+                unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
+                ++p_;
+                ++column_;
+                state_ = parse_state::string_u1;
+                return;
+            }
+        }
+
+escape_expect_surrogate_pair1:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_expect_surrogate_pair1;
+            return;
+        }
+        {
+            switch (*p_)
+            {
+            case '\\': 
+                cp2_ = 0;
+                ++p_;
+                ++column_;
+                goto escape_expect_surrogate_pair2;
+            default:
+                err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
+                ec = json_parser_errc::expected_codepoint_surrogate_pair;
+                state_ = parse_state::escape_expect_surrogate_pair1;
+                return;
+            }
+        }
+
+escape_expect_surrogate_pair2:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_expect_surrogate_pair2;
+            return;
+        }
+        {
+            switch (*p_)
+            {
+            case 'u':
+                ++p_;
+                ++column_;
+                goto escape_u6;
+            default:
+                err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
+                ec = json_parser_errc::expected_codepoint_surrogate_pair;
+                state_ = parse_state::escape_expect_surrogate_pair2;
+                return;
+            }
+        }
+
+escape_u6:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_u6;
+            return;
+        }
+        {
+            append_second_codepoint(*p_, ec);
+            if (ec)
+            {
+                state_ = parse_state::escape_u6;
+                return;
+            }
+        }
+        ++p_;
+        ++column_;
+        goto escape_u7;
+
+escape_u7:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_u7;
+            return;
+        }
+        {
+            append_second_codepoint(*p_, ec);
+            if (ec)
+            {
+                state_ = parse_state::escape_u7;
+                return;
+            }
+            ++p_;
+            ++column_;
+            goto escape_u8;
+        }
+
+escape_u8:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_u8;
+            return;
+        }
+        {
+            append_second_codepoint(*p_, ec);
+            if (ec)
+            {
+                state_ = parse_state::escape_u8;
+                return;
+            }
+            ++p_;
+            ++column_;
+            goto escape_u9;
+        }
+
+escape_u9:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::escape_u9;
+            return;
+        }
+        {
+            append_second_codepoint(*p_, ec);
+            if (ec)
+            {
+                state_ = parse_state::escape_u9;
+                return;
+            }
+            uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
+            unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
+            ++p_;
+            ++column_;
+            state_ = parse_state::string_u1;
+            return;
+        }
+
+        JSONCONS_UNREACHABLE();               
+    }
+
     void parse()
     {
         std::error_code ec;
@@ -2276,56 +2468,6 @@ private:
             if (err_handler_.error(json_parser_errc::expected_value, *this))
             {
                 ec = json_parser_errc::expected_value;
-                return;
-            }
-            break;
-        }
-    }
-
-    void escape_next_char(int next_input, std::error_code& ec)
-    {
-        switch (next_input)
-        {
-        case '\"':
-            string_buffer_.push_back('\"');
-            state_ = parse_state::string_u1;
-            break;
-        case '\\': 
-            string_buffer_.push_back('\\');
-            state_ = parse_state::string_u1;
-            break;
-        case '/':
-            string_buffer_.push_back('/');
-            state_ = parse_state::string_u1;
-            break;
-        case 'b':
-            string_buffer_.push_back('\b');
-            state_ = parse_state::string_u1;
-            break;
-        case 'f':  
-            string_buffer_.push_back('\f');
-            state_ = parse_state::string_u1;
-            break;
-        case 'n':
-            string_buffer_.push_back('\n');
-            state_ = parse_state::string_u1;
-            break;
-        case 'r':
-            string_buffer_.push_back('\r');
-            state_ = parse_state::string_u1;
-            break;
-        case 't':
-            string_buffer_.push_back('\t');
-            state_ = parse_state::string_u1;
-            break;
-        case 'u':
-            cp_ = 0;
-            state_ = parse_state::escape_u1;
-            break;
-        default:    
-            if (err_handler_.error(json_parser_errc::illegal_escaped_character, *this))
-            {
-                ec = json_parser_errc::illegal_escaped_character;
                 return;
             }
             break;
