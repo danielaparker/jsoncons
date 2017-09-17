@@ -597,16 +597,16 @@ public:
                         ++p_;
                         ++column_;
                         break;
-                    case 'f':
-                        parse_false(ec);
-                        if (ec) {return;}
-                        break;
                     case 'n':
                         parse_null(ec);
                         if (ec) {return;}
                         break;
                     case 't':
                         parse_true(ec);
+                        if (ec) {return;}
+                        break;
+                    case 'f':
+                        parse_false(ec);
                         if (ec) {return;}
                         break;
                     case '}':
@@ -909,16 +909,16 @@ public:
                         ++column_;
                         state_ = parse_state::integer;
                         break;
-                    case 'f':
-                        parse_false(ec);
-                        if (ec) {return;}
-                        break;
                     case 'n':
                         parse_null(ec);
                         if (ec) {return;}
                         break;
                     case 't':
                         parse_true(ec);
+                        if (ec) {return;}
+                        break;
+                    case 'f':
+                        parse_false(ec);
                         if (ec) {return;}
                         break;
                     case ']':
@@ -1041,16 +1041,16 @@ public:
                         ++column_;
                         state_ = parse_state::integer;
                         break;
-                    case 'f':
-                        parse_false(ec);
-                        if (ec) {return;}
-                        break;
                     case 'n':
                         parse_null(ec);
                         if (ec) {return;}
                         break;
                     case 't':
                         parse_true(ec);
+                        if (ec) {return;}
+                        break;
+                    case 'f':
+                        parse_false(ec);
                         if (ec) {return;}
                         break;
                     case '\'':
