@@ -125,27 +125,27 @@ The library includes four instantiations of `basic_json`:
 #### By default, accepts and ignores C-style comments
 
 ```c++
-std::string s = R"(
-{
-    // Single line comments
-    /*
-        Multi line comments 
-    */
-}
-)";
+    std::string s = R"(
+    {
+        // Single line comments
+        /*
+            Multi line comments 
+        */
+    }
+    )";
 
-json j = json::parse(s);
-std::cout << "(1) " << j << std::endl;
+    json j = json::parse(s);
+    std::cout << "(1) " << j << std::endl;
 
-try
-{
-    strict_parse_error_handler err_handler;
-    json j = json::parse(s, err_handler);
-}
-catch (parse_error& e)
-{
-    std::cout << "(2) " << e.what() << std::endl;
-}
+    try
+    {
+        strict_parse_error_handler err_handler;
+        json j = json::parse(s, err_handler);
+    }
+    catch (parse_error& e)
+    {
+        std::cout << "(2) " << e.what() << std::endl;
+    }
 ```
 Output:
 ```
@@ -156,25 +156,25 @@ Output:
 #### Validation without parse exceptions
 
 ```c++
-std::string s = R"(
-{
-    "StartDate" : "2017-03-01",
-    "MaturityDate" "2020-12-30"          
-}
-)";
-std::stringstream is(s);
+    std::string s = R"(
+    {
+        "StartDate" : "2017-03-01",
+        "MaturityDate" "2020-12-30"          
+    }
+    )";
+    std::stringstream is(s);
 
-json_reader reader(is);
+    json_reader reader(is);
 
-std::error_code ec;
-reader.read(ec);
-if (ec)
-{
-    std::cout << ec.message() 
-              << " on line " << reader.line_number()
-              << " and column " << reader.column_number()
-              << std::endl;
-}
+    std::error_code ec;
+    reader.read(ec);
+    if (ec)
+    {
+        std::cout << ec.message() 
+                  << " on line " << reader.line_number()
+                  << " and column " << reader.column_number()
+                  << std::endl;
+    }
 ```
 Output:
 ```
@@ -183,59 +183,59 @@ Expected name separator ':' on line 4 and column 20
 #### Range-based for loops with arrays
 
 ```c++
-json j = json::array{1,2,3,4};
+    json j = json::array{1,2,3,4};
 
-for (auto val : book.array_range())
-{
-    std::cout << val << std::endl;
-}
+    for (auto val : book.array_range())
+    {
+        std::cout << val << std::endl;
+    }
 ```
 
 #### Range-based for loops with objects
 
 ```c++
-json book = json::object{
-    {"author", "Haruki Murakami"},
-    {"title", "Kafka on the Shore"},
-    {"price", 25.17}
-};
+    json book = json::object{
+        {"author", "Haruki Murakami"},
+        {"title", "Kafka on the Shore"},
+        {"price", 25.17}
+    };
 
-for (const auto& kv : book.object_range())
-{
-    std::cout << kv.key() << "=" 
-              << kv.value() << std::endl;
-}
+    for (const auto& kv : book.object_range())
+    {
+        std::cout << kv.key() << "=" 
+                  << kv.value() << std::endl;
+    }
 ```
 #### _json and _ojson literal operators
 
 ```c++
-using namespace jsoncons::literals;
+    using namespace jsoncons::literals;
 
 
-ojson j2 = R"(
-{
-    "StartDate" : "2017-03-01",
-    "MaturityDate" : "2020-12-30"          
-}
-)"_ojson;
+    ojson j2 = R"(
+    {
+        "StartDate" : "2017-03-01",
+        "MaturityDate" : "2020-12-30"          
+    }
+    )"_ojson;
 ```
 
 #### Multi-dimensional json arrays
 ```c++
-json a = json::make_array<3>(4, 3, 2, 0.0);
-double val = 1.0;
-for (size_t i = 0; i < a.size(); ++i)
-{
-    for (size_t j = 0; j < a[i].size(); ++j)
+    json a = json::make_array<3>(4, 3, 2, 0.0);
+    double val = 1.0;
+    for (size_t i = 0; i < a.size(); ++i)
     {
-        for (size_t k = 0; k < a[i][j].size(); ++k)
+        for (size_t j = 0; j < a[i].size(); ++j)
         {
-            a[i][j][k] = val;
-            val += 1.0;
+            for (size_t k = 0; k < a[i][j].size(); ++k)
+            {
+                a[i][j][k] = val;
+                val += 1.0;
+            }
         }
     }
-}
-std::cout << pretty_print(a) << std::endl;
+    std::cout << pretty_print(a) << std::endl;
 ```
 Output:
 ```json
@@ -266,22 +266,22 @@ See [json::make_array](doc/ref/json/make_array.md) for details
 
 #### Merge key-value pairs from another json object
 ```c++
-json j = json::parse(R"(
-{
-    "a" : "1",
-    "b" : [1,2,3]
-}
-)");
+    json j = json::parse(R"(
+    {
+        "a" : "1",
+        "b" : [1,2,3]
+    }
+    )");
 
-json source = json::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
+    json source = json::parse(R"(
+    {
+        "a" : "2",
+        "c" : [4,5,6]
+    }
+    )");
 
-j.merge(std::move(source));
-std::cout << pretty_print(j) << std::endl;
+    j.merge(std::move(source));
+    std::cout << pretty_print(j) << std::endl;
 ```
 Output:
 ```json
@@ -297,10 +297,10 @@ and [json::merge_or_update](doc/ref/json/merge_or_update.md) for details.
 #### Convert from and to standard library sequence containers
 
 ```c++
-std::vector<int> v{1, 2, 3, 4};
-json j(v);
-std::cout << "(1) "<< j << std::endl;
-std::deque<int> d = j.as<std::deque<int>>();
+    std::vector<int> v{1, 2, 3, 4};
+    json j(v);
+    std::cout << "(1) "<< j << std::endl;
+    std::deque<int> d = j.as<std::deque<int>>();
 ```
 Output:
 ```
@@ -310,10 +310,10 @@ Output:
 #### Convert from and to standard library associative containers
 
 ```c++
-std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
-json j(m);
-std::cout << "(1) " << j << std::endl;
-std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
+    std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
+    json j(m);
+    std::cout << "(1) " << j << std::endl;
+    std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
 ```
 Output:
 ```
@@ -323,10 +323,10 @@ Output:
 #### Convert from and to std::tuple
 
 ```c++
-auto t = std::make_tuple(false,1,"foo");
-json j(t);
-std::cout << "(1) "<< j << std::endl;
-auto t2 = j.as<std::tuple<bool,int,std::string>>();
+    auto t = std::make_tuple(false,1,"foo");
+    json j(t);
+    std::cout << "(1) "<< j << std::endl;
+    auto t2 = j.as<std::tuple<bool,int,std::string>>();
 ```
 Output:
 ```
@@ -336,30 +336,30 @@ Output:
 #### Convert from and to user defined types (and standard library containers of user defined types)
 
 ```c++
-struct book
-{
-    std::string author;
-    std::string title;
-    double price;
-};
-
-namespace jsoncons
-{
-    template<class Json>
-    struct json_type_traits<Json, book>
+    struct book
     {
-        // Implement static functions is, as and to_json 
+        std::string author;
+        std::string title;
+        double price;
     };
-}        
 
-book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
-book book2{"Charles Bukowski", "Women: A Novel", 12.0};
+    namespace jsoncons
+    {
+        template<class Json>
+        struct json_type_traits<Json, book>
+        {
+            // Implement static functions is, as and to_json 
+        };
+    }        
 
-std::vector<book> v{book1, book2};
+    book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
+    book book2{"Charles Bukowski", "Women: A Novel", 12.0};
 
-json j = v;
+    std::vector<book> v{book1, book2};
 
-std::list<book> l = j.as<std::list<book>>();
+    json j = v;
+
+    std::list<book> l = j.as<std::list<book>>();
 ```
 
 See [Type Extensibility](doc/ref/Type%20Extensibility.md) for details.
