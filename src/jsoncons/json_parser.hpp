@@ -153,8 +153,15 @@ enum class parse_state : uint8_t
     exp2,
     exp3,
     n,
+    nu,
+    nul,
     t,  
+    tr,  
+    tru,  
     f,  
+    fa,  
+    fal,  
+    fals,  
     cr,
     lf,
     done
@@ -183,11 +190,9 @@ class json_parser : private parsing_context
     int max_depth_;
     string_to_double<char> str_to_double_;
     uint8_t precision_;
-    size_t literal_index_;
     const char* begin_input_;
     const char* end_input_;
     const char* p_;
-    std::pair<const char*,size_t> literal_;
 
     parse_state state_;
     std::vector<parse_state> state_stack_;
@@ -209,7 +214,6 @@ public:
          nesting_depth_(0), 
          initial_stack_capacity_(default_initial_stack_capacity_),
          precision_(0), 
-         literal_index_(0),
          begin_input_(nullptr),
          end_input_(nullptr),
          p_(nullptr),
@@ -232,7 +236,6 @@ public:
          nesting_depth_(0), 
          initial_stack_capacity_(default_initial_stack_capacity_),
          precision_(0), 
-         literal_index_(0),
          begin_input_(nullptr),
          end_input_(nullptr),
          p_(nullptr),
@@ -255,7 +258,6 @@ public:
          nesting_depth_(0), 
          initial_stack_capacity_(default_initial_stack_capacity_),
          precision_(0), 
-         literal_index_(0),
          begin_input_(nullptr),
          end_input_(nullptr),
          p_(nullptr),
@@ -279,7 +281,6 @@ public:
          nesting_depth_(0), 
          initial_stack_capacity_(default_initial_stack_capacity_),
          precision_(0), 
-         literal_index_(0),
          begin_input_(nullptr),
          end_input_(nullptr),
          p_(nullptr),
@@ -341,7 +342,7 @@ public:
         return state_ == parse_state::done;
     }
 
-    void do_space()
+    void skip_whitespace()
     {
         while ((p_ + 1) < end_input_ && (*(p_ + 1) == ' ' || *(p_ + 1) == '\t')) 
         {                                      
@@ -500,19 +501,6 @@ public:
     {
         while ((p_ < end_input_) && (state_ != parse_state::done))
         {
-            switch (*p_)
-            {
-            JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
-                {
-                    ec = json_parser_errc::illegal_control_character;
-                    return;
-                }
-                break;
-            default:
-                break;
-            }
-
             switch (state_)
             {
             case parse_state::cr:
@@ -538,18 +526,33 @@ public:
                 {
                     switch (*p_)
                     {
+                    JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                        if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                        {
+                            ec = json_parser_errc::illegal_control_character;
+                            return;
+                        }
+                        break;
                     case '\r': 
                         push_state(state_);
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::cr;
                         break; 
                     case '\n': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::lf;
                         break;   
                     case ' ':case '\t':
-                        do_space();
+                        skip_whitespace();
+                        ++p_;
+                        ++column_;
                         break;
                     case '/': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::slash;
                         break;
@@ -557,48 +560,54 @@ public:
                         handler_.begin_json();
                         do_begin_object(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case '[':
                         handler_.begin_json();
                         do_begin_array(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case '\"':
                         handler_.begin_json();
                         state_ = parse_state::string_u1;
+                        ++p_;
+                        ++column_;
                         break;
                     case '-':
                         handler_.begin_json();
                         is_negative_ = true;
                         state_ = parse_state::minus;
+                        ++p_;
+                        ++column_;
                         break;
                     case '0': 
                         handler_.begin_json();
                         string_buffer_.push_back(static_cast<char>(*p_));
                         state_ = parse_state::zero;
+                        ++p_;
+                        ++column_;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         handler_.begin_json();
                         string_buffer_.push_back(static_cast<char>(*p_));
                         state_ = parse_state::integer;
+                        ++p_;
+                        ++column_;
                         break;
                     case 'f':
-                        handler_.begin_json();
-                        state_ = parse_state::f;
-                        literal_ = json_literals<char>::false_literal();
-                        literal_index_ = 1;
+                        parse_false(ec);
+                        if (ec) {return;}
                         break;
                     case 'n':
-                        handler_.begin_json();
-                        state_ = parse_state::n;
-                        literal_ = json_literals<char>::null_literal();
-                        literal_index_ = 1;
+                        parse_null(ec);
+                        if (ec) {return;}
                         break;
                     case 't':
-                        handler_.begin_json();
-                        state_ = parse_state::t;
-                        literal_ = json_literals<char>::true_literal();
-                        literal_index_ = 1;
+                        parse_true(ec);
+                        if (ec) {return;}
                         break;
                     case '}':
                         err_handler_.fatal_error(json_parser_errc::unexpected_right_brace, *this);
@@ -614,14 +623,19 @@ public:
                         return;
                     }
                 }
-                ++p_;
-                ++column_;
                 break;
 
             case parse_state::expect_comma_or_end: 
                 {
                     switch (*p_)
                     {
+                    JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                        if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                        {
+                            ec = json_parser_errc::illegal_control_character;
+                            return;
+                        }
+                        break;
                     case '\r': 
                         push_state(state_);
                         state_ = parse_state::cr;
@@ -631,7 +645,7 @@ public:
                         state_ = parse_state::lf;
                         break;   
                     case ' ':case '\t':
-                        do_space();
+                        skip_whitespace();
                         break;
                     case '/':
                         push_state(state_); 
@@ -676,6 +690,13 @@ public:
                 {
                     switch (*p_)
                     {
+                    JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                        if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                        {
+                            ec = json_parser_errc::illegal_control_character;
+                            return;
+                        }
+                        break;
                     case '\r': 
                         push_state(state_);
                         state_ = parse_state::cr;
@@ -685,7 +706,7 @@ public:
                         state_ = parse_state::lf;
                         break;   
                     case ' ':case '\t':
-                        do_space();
+                        skip_whitespace();
                         break;
                     case '/':
                         push_state(state_); 
@@ -722,6 +743,13 @@ public:
                 {
                     switch (*p_)
                     {
+                    JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                        if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                        {
+                            ec = json_parser_errc::illegal_control_character;
+                            return;
+                        }
+                        break;
                     case '\r': 
                         push_state(state_);
                         state_ = parse_state::cr;
@@ -731,7 +759,7 @@ public:
                         state_ = parse_state::lf;
                         break;   
                     case ' ':case '\t':
-                        do_space();
+                        skip_whitespace();
                         break;
                     case '/': 
                         push_state(state_);
@@ -773,6 +801,13 @@ public:
                 {
                     switch (*p_)
                     {
+                    JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                        if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                        {
+                            ec = json_parser_errc::illegal_control_character;
+                            return;
+                        }
+                        break;
                     case '\r': 
                         push_state(state_);
                         state_ = parse_state::cr;
@@ -782,7 +817,7 @@ public:
                         state_ = parse_state::lf;
                         break;   
                     case ' ':case '\t':
-                        do_space();
+                        skip_whitespace();
                         break;
                     case '/': 
                         push_state(state_);
@@ -807,58 +842,84 @@ public:
                 {
                     switch (*p_)
                     {
+                    JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                        if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                        {
+                            ec = json_parser_errc::illegal_control_character;
+                            return;
+                        }
+                        ++p_;
+                        ++column_;
+                        break;
                     case '\r': 
                         push_state(state_);
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::cr;
                         break; 
                     case '\n': 
                         push_state(state_);
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::lf;
                         break;   
                     case ' ':case '\t':
-                        do_space();
+                        skip_whitespace();
+                        ++p_;
+                        ++column_;
                         break;
                     case '/': 
                         push_state(state_);
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::slash;
                         break;
                     case '{':
                         do_begin_object(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case '[':
                         do_begin_array(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case '\"':
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::string_u1;
                         break;
                     case '-':
                         is_negative_ = true;
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::minus;
                         break;
                     case '0': 
                         string_buffer_.push_back(static_cast<char>(*p_));
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         string_buffer_.push_back(static_cast<char>(*p_));
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::integer;
                         break;
                     case 'f':
-                        state_ = parse_state::f;
-                        literal_ = json_literals<char>::false_literal();
-                        literal_index_ = 1;
+                        parse_false(ec);
+                        if (ec) {return;}
                         break;
                     case 'n':
-                        state_ = parse_state::n;
-                        literal_ = json_literals<char>::null_literal();
-                        literal_index_ = 1;
+                        parse_null(ec);
+                        if (ec) {return;}
                         break;
                     case 't':
-                        state_ = parse_state::t;
-                        literal_ = json_literals<char>::true_literal();
-                        literal_index_ = 1;
+                        parse_true(ec);
+                        if (ec) {return;}
                         break;
                     case ']':
                         if (parent() == parse_state::array)
@@ -879,6 +940,8 @@ public:
                                 return;
                             }
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     case '\'':
                         if (err_handler_.error(json_parser_errc::single_quote, *this))
@@ -886,6 +949,8 @@ public:
                             ec = json_parser_errc::single_quote;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     default:
                         if (err_handler_.error(json_parser_errc::expected_value, *this))
@@ -893,72 +958,100 @@ public:
                             ec = json_parser_errc::expected_value;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     }
                 }
-                ++p_;
-                ++column_;
                 break;
             case parse_state::expect_value_or_end: 
                 {
                     switch (*p_)
                     {
+                    JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                        if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                        {
+                            ec = json_parser_errc::illegal_control_character;
+                            return;
+                        }
+                        ++p_;
+                        ++column_;
+                        break;
                     case '\r': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::cr;
                         break; 
                     case '\n': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::lf;
                         break;   
                     case ' ':case '\t':
-                        do_space();
+                        skip_whitespace();
+                        ++p_;
+                        ++column_;
                         break;
                     case '/': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::slash;
                         break;
                     case '{':
                         do_begin_object(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case '[':
                         do_begin_array(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case ']':
                         do_end_array(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case '\"':
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::string_u1;
                         break;
                     case '-':
                         is_negative_ = true;
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::minus;
                         break;
                     case '0': 
                         string_buffer_.push_back(static_cast<char>(*p_));
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         string_buffer_.push_back(static_cast<char>(*p_));
+                        ++p_;
+                        ++column_;
                         state_ = parse_state::integer;
                         break;
                     case 'f':
-                        state_ = parse_state::f;
-                        literal_ = json_literals<char>::false_literal();
-                        literal_index_ = 1;
+                        parse_false(ec);
+                        if (ec) {return;}
                         break;
                     case 'n':
-                        state_ = parse_state::n;
-                        literal_ = json_literals<char>::null_literal();
-                        literal_index_ = 1;
+                        parse_null(ec);
+                        if (ec) {return;}
                         break;
                     case 't':
-                        state_ = parse_state::t;
-                        literal_ = json_literals<char>::true_literal();
-                        literal_index_ = 1;
+                        parse_true(ec);
+                        if (ec) {return;}
                         break;
                     case '\'':
                         if (err_handler_.error(json_parser_errc::single_quote, *this))
@@ -966,6 +1059,8 @@ public:
                             ec = json_parser_errc::single_quote;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     default:
                         if (err_handler_.error(json_parser_errc::expected_value, *this))
@@ -973,11 +1068,11 @@ public:
                             ec = json_parser_errc::expected_value;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     }
                 }
-                ++p_;
-                ++column_;
                 break;
             case parse_state::string_u1: 
             case parse_state::string_u2: 
@@ -1012,52 +1107,38 @@ public:
                 if (ec) return;
                 break;
             case parse_state::t: 
-                while (p_ < end_input_ && literal_index_ < literal_.second)
+                switch (*p_)
                 {
-                    if (*p_ != literal_.first[literal_index_])
-                    {
-                        if (err_handler_.error(json_parser_errc::invalid_value, *this))
-                        {
-                            ec = json_parser_errc::invalid_value;
-                            return;
-                        }
-                    }
+                case 'r':
                     ++p_;
-                    ++literal_index_;
                     ++column_;
-                }
-                if (literal_index_ == literal_.second)
-                {
-                    handler_.bool_value(true, *this);
-                    if (parent() == parse_state::root)
-                    {
-                        state_ = parse_state::done;
-                        handler_.end_json();
-                    }
-                    else
-                    {
-                        state_ = parse_state::expect_comma_or_end;
-                    }
+                    state_ = parse_state::tr;
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
                 }
                 break;
-            case parse_state::f:  
-                while (p_ < end_input_ && literal_index_ < literal_.second)
+            case parse_state::tr: 
+                switch (*p_)
                 {
-                    if (*p_ != literal_.first[literal_index_])
-                    {
-                        if (err_handler_.error(json_parser_errc::invalid_value, *this))
-                        {
-                            ec = json_parser_errc::invalid_value;
-                            return;
-                        }
-                    }
-                    ++p_;
-                    ++literal_index_;
-                    ++column_;
+                case 'u':
+                    state_ = parse_state::tru;
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
                 }
-                if (literal_index_ == literal_.second)
+                ++p_;
+                ++column_;
+                break;
+            case parse_state::tru: 
+                switch (*p_)
                 {
-                    handler_.bool_value(false, *this);
+                case 'e':
+                    handler_.bool_value(true,*this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
@@ -1067,25 +1148,112 @@ public:
                     {
                         state_ = parse_state::expect_comma_or_end;
                     }
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
                 }
+                ++p_;
+                ++column_;
+                break;
+            case parse_state::f: 
+                switch (*p_)
+                {
+                case 'a':
+                    ++p_;
+                    ++column_;
+                    state_ = parse_state::fa;
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
+                }
+                break;
+            case parse_state::fa: 
+                switch (*p_)
+                {
+                case 'l':
+                    state_ = parse_state::fal;
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
+                }
+                ++p_;
+                ++column_;
+                break;
+            case parse_state::fal: 
+                switch (*p_)
+                {
+                case 's':
+                    state_ = parse_state::fals;
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
+                }
+                ++p_;
+                ++column_;
+                break;
+            case parse_state::fals: 
+                switch (*p_)
+                {
+                case 'e':
+                    handler_.bool_value(false,*this);
+                    if (parent() == parse_state::root)
+                    {
+                        state_ = parse_state::done;
+                        handler_.end_json();
+                    }
+                    else
+                    {
+                        state_ = parse_state::expect_comma_or_end;
+                    }
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
+                }
+                ++p_;
+                ++column_;
                 break;
             case parse_state::n: 
-                while (p_ < end_input_ && literal_index_ < literal_.second)
+                switch (*p_)
                 {
-                    if (*p_ != literal_.first[literal_index_])
-                    {
-                        if (err_handler_.error(json_parser_errc::invalid_value, *this))
-                        {
-                            ec = json_parser_errc::invalid_value;
-                            return;
-                        }
-                    }
+                case 'u':
                     ++p_;
-                    ++literal_index_;
                     ++column_;
+                    state_ = parse_state::nu;
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
                 }
-                if (literal_index_ == literal_.second)
+                break;
+            case parse_state::nu: 
+                switch (*p_)
                 {
+                case 'l':
+                    state_ = parse_state::nul;
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
+                }
+                ++p_;
+                ++column_;
+                break;
+            case parse_state::nul: 
+                switch (*p_)
+                {
+                case 'l':
                     handler_.null_value(*this);
                     if (parent() == parse_state::root)
                     {
@@ -1096,7 +1264,14 @@ public:
                     {
                         state_ = parse_state::expect_comma_or_end;
                     }
+                    break;
+                default:
+                    err_handler_.error(json_parser_errc::invalid_value, *this);
+                    ec = json_parser_errc::invalid_value;
+                    return;
                 }
+                ++p_;
+                ++column_;
                 break;
             case parse_state::slash: 
                 {
@@ -1188,6 +1363,108 @@ public:
         }
     }
 
+    void parse_true(std::error_code& ec)
+    {
+        if (JSONCONS_LIKELY(end_input_ - p_ >= 4))
+        {
+            if (*(p_+1) == 'r' && *(p_+2) == 'u' && *(p_+3) == 'e')
+            {
+                handler_.bool_value(true,*this);
+                p_ += 4;
+                column_ += 4;
+                if (parent() == parse_state::root)
+                {
+                    handler_.end_json();
+                    state_ = parse_state::done;
+                }
+                else
+                {
+                    state_ = parse_state::expect_comma_or_end;
+                }
+            }
+            else
+            {
+                err_handler_.error(json_parser_errc::invalid_value, *this);
+                ec = json_parser_errc::invalid_value;
+                return;
+            }
+        }
+        else
+        {
+            ++p_;
+            ++column_;
+            state_ = parse_state::t;
+        }
+    }
+
+    void parse_null(std::error_code& ec)
+    {
+        if (JSONCONS_LIKELY(end_input_ - p_ >= 4))
+        {
+            if (*(p_+1) == 'u' && *(p_+2) == 'l' && *(p_+3) == 'l')
+            {
+                handler_.null_value(*this);
+                p_ += 4;
+                column_ += 4;
+                if (parent() == parse_state::root)
+                {
+                    handler_.end_json();
+                    state_ = parse_state::done;
+                }
+                else
+                {
+                    state_ = parse_state::expect_comma_or_end;
+                }
+            }
+            else
+            {
+                err_handler_.error(json_parser_errc::invalid_value, *this);
+                ec = json_parser_errc::invalid_value;
+                return;
+            }
+        }
+        else
+        {
+            ++p_;
+            ++column_;
+            state_ = parse_state::n;
+        }
+    }
+
+    void parse_false(std::error_code& ec)
+    {
+        if (JSONCONS_LIKELY(end_input_ - p_ >= 5))
+        {
+            if (*(p_+1) == 'a' && *(p_+2) == 'l' && *(p_+3) == 's' && *(p_+4) == 'e')
+            {
+                handler_.bool_value(false,*this);
+                p_ += 5;
+                column_ += 5;
+                if (parent() == parse_state::root)
+                {
+                    handler_.end_json();
+                    state_ = parse_state::done;
+                }
+                else
+                {
+                    state_ = parse_state::expect_comma_or_end;
+                }
+            }
+            else
+            {
+                err_handler_.error(json_parser_errc::invalid_value, *this);
+                ec = json_parser_errc::invalid_value;
+                return;
+            }
+        }
+        else
+        {
+            ++p_;
+            ++column_;
+            state_ = parse_state::f;
+        }
+    }
+
     void parse_number(std::error_code& ec)
     {
         const char* local_end_input = end_input_;
@@ -1266,7 +1543,7 @@ zero:
             case ' ':case '\t':
                 end_integer_value(ec);
                 if (ec) return;
-                do_space();
+                skip_whitespace();
                 ++p_;
                 ++column_;
                 return;
@@ -1352,7 +1629,7 @@ integer:
         case ' ':case '\t':
             end_integer_value(ec);
             if (ec) return;
-            do_space();
+            skip_whitespace();
             ++p_;
             ++column_;
             return;
@@ -1460,7 +1737,7 @@ fraction2:
         case ' ':case '\t':
             end_fraction_value(ec);
             if (ec) return;
-            do_space();
+            skip_whitespace();
             ++p_;
             ++column_;
             return;
@@ -1591,7 +1868,7 @@ exp3:
         case ' ':case '\t':
             end_fraction_value(ec);
             if (ec) return;
-            do_space();
+            skip_whitespace();
             ++p_;
             ++column_;
             return;
