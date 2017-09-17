@@ -153,23 +153,6 @@ Output:
 (2) Illegal comment at line 3 and column 10
 ```
 
-#### Meaningful error messages
-
-```c++
-try 
-{
-    json val = json::parse("[1,2,3,4,]");
-} 
-catch(const parse_error& e) 
-{
-    std::cout << e.what() << std::endl;
-}
-```
-Output:
-```
-Extra comma at line 1 and column 10
-```
-
 #### Validation without parse exceptions
 
 ```c++
