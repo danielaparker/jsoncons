@@ -986,9 +986,6 @@ public:
             case parse_state::string_u4_1: 
             case parse_state::string_u4_2: 
             case parse_state::string_u4_3: 
-                parse_string(ec);
-                if (ec) return;
-                break;
             case parse_state::escape: 
             case parse_state::escape_u1: 
             case parse_state::escape_u2: 
@@ -1000,7 +997,7 @@ public:
             case parse_state::escape_u7: 
             case parse_state::escape_u8: 
             case parse_state::escape_u9: 
-                escape_char(ec);
+                parse_string(ec);
                 if (ec) return;
                 break;
             case parse_state::minus:
@@ -1666,7 +1663,29 @@ exp3:
             goto string_u4_2;
         case parse_state::string_u4_3:
             goto string_u4_3;
-                default:
+        case parse_state::escape:
+            goto escape;
+        case parse_state::escape_u1:
+            goto escape_u1;
+        case parse_state::escape_u2:
+            goto escape_u2;
+        case parse_state::escape_u3:
+            goto escape_u3;
+        case parse_state::escape_u4:
+            goto escape_u4;
+        case parse_state::escape_expect_surrogate_pair1:
+            goto escape_expect_surrogate_pair1;
+        case parse_state::escape_expect_surrogate_pair2:
+            goto escape_expect_surrogate_pair2;
+        case parse_state::escape_u6:
+            goto escape_u6;
+        case parse_state::escape_u7:
+            goto escape_u7;
+        case parse_state::escape_u8:
+            goto escape_u8;
+        case parse_state::escape_u9:
+            goto escape_u9;
+        default:
             JSONCONS_UNREACHABLE();               
         }
 
@@ -1745,8 +1764,7 @@ string_u1:
                 string_buffer_.append(sb,p_-sb);
                 column_ += (p_ - sb + 1);
                 ++p_;
-                state_ = parse_state::escape;
-                return;
+                goto escape;
             case '\"':
                 if (string_buffer_.length() == 0)
                 {
@@ -1942,43 +1960,6 @@ string_u4_3:
         }
         ++p_;
         goto string_u1;
-
-        JSONCONS_UNREACHABLE();               
-    }
-
-    void escape_char(std::error_code& ec)
-    {
-        const char* local_end_input = end_input_;
-        const char* sb = p_;
-
-        switch (state_)
-        {
-        case parse_state::escape:
-            goto escape;
-        case parse_state::escape_u1:
-            goto escape_u1;
-        case parse_state::escape_u2:
-            goto escape_u2;
-        case parse_state::escape_u3:
-            goto escape_u3;
-        case parse_state::escape_u4:
-            goto escape_u4;
-        case parse_state::escape_expect_surrogate_pair1:
-            goto escape_expect_surrogate_pair1;
-        case parse_state::escape_expect_surrogate_pair2:
-            goto escape_expect_surrogate_pair2;
-        case parse_state::escape_u6:
-            goto escape_u6;
-        case parse_state::escape_u7:
-            goto escape_u7;
-        case parse_state::escape_u8:
-            goto escape_u8;
-        case parse_state::escape_u9:
-            goto escape_u9;
-        default:
-            JSONCONS_UNREACHABLE();               
-        }
-
 escape:
         if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
         {
@@ -1989,52 +1970,44 @@ escape:
         {
         case '\"':
             string_buffer_.push_back('\"');
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         case '\\': 
             string_buffer_.push_back('\\');
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         case '/':
             string_buffer_.push_back('/');
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         case 'b':
             string_buffer_.push_back('\b');
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         case 'f':
             string_buffer_.push_back('\f');
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         case 'n':
             string_buffer_.push_back('\n');
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         case 'r':
             string_buffer_.push_back('\r');
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         case 't':
             string_buffer_.push_back('\t');
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         case 'u':
             cp_ = 0;
             ++p_;
@@ -2123,7 +2096,7 @@ escape_u4:
             else
             {
                 unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
-                ++p_;
+                sb = ++p_;
                 ++column_;
                 state_ = parse_state::string_u1;
                 return;
@@ -2242,10 +2215,9 @@ escape_u9:
             }
             uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
             unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
-            ++p_;
+            sb = ++p_;
             ++column_;
-            state_ = parse_state::string_u1;
-            return;
+            goto string_u1;
         }
 
         JSONCONS_UNREACHABLE();               
