@@ -144,7 +144,7 @@ The library includes four instantiations of `basic_json`:
         strict_parse_error_handler err_handler;
         json j = json::parse(s, err_handler);
     }
-    catch (parse_error& e)
+    catch (const parse_error& e)
     {
         std::cout << "(2) " << e.what() << std::endl;
     }
