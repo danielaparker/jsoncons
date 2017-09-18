@@ -54,7 +54,7 @@ linkflags = [
     '-rdynamic'
 ]
 cpppath = [
-    Dir('../../../src')
+    Dir('../../../include')
 ]
 libs = []
 libpath = []
@@ -148,7 +148,7 @@ if not SCutils.has_option('verbose'):
 ############################################################################
 
 
-env.VariantDir('.', '../../src', duplicate=0)
+env.VariantDir('.', '../../include', duplicate=0)
 
 sources = Glob('*.cpp')
 

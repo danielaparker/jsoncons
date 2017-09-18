@@ -14,8 +14,8 @@ project (Examples CXX)
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
-include_directories (../../src
-                     ../../../src)
+include_directories (../../include
+                     ../../../include)
 
 file(GLOB_RECURSE Example_sources ../../src/*.cpp)
 
