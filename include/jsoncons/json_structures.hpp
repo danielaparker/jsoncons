@@ -151,6 +151,8 @@ public:
     allocator_type self_allocator_;
 };
 
+// json_array
+
 template <class Json>
 class json_array: public Json_array_base_<Json>
 {
@@ -304,23 +306,42 @@ public:
         elements_.emplace_back(std::forward<T>(value),get_allocator());
     }
 
+    template <class T, class A=allocator_type>
+    typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    insert(const_iterator pos, T&& value)
+    {
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
-    template <class T, class A=allocator_type>
-    typename std::enable_if<is_stateless<A>::value,iterator>::type 
-    insert(const_iterator pos, T&& value)
-    {
         iterator it = elements_.begin() + (pos - elements_.begin());
         return elements_.emplace(it, std::forward<T>(value));
-    }
 #else
+        return elements_.emplace(pos, std::forward<T>(value));
+#endif
+    }
     template <class T, class A=allocator_type>
-    typename std::enable_if<is_stateless<A>::value,iterator>::type 
+    typename std::enable_if<!is_stateless<A>::value,iterator>::type 
     insert(const_iterator pos, T&& value)
     {
-        return elements_.emplace(pos, std::forward<T>(value));
-    }
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+        iterator it = elements_.begin() + (pos - elements_.begin());
+        return elements_.emplace(it, std::forward<T>(value), get_allocator());
+#else
+        return elements_.emplace(pos, std::forward<T>(value), get_allocator());
 #endif
+    }
+
+    template <class InputIt>
+    iterator insert(const_iterator pos, InputIt first, InputIt last)
+    {
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+    // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
+        iterator it = elements_.begin() + (pos - elements_.begin());
+        return elements_.insert(it, first, last);
+#else
+        return elements_.insert(pos, first, last);
+#endif
+    }
 
 #if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577

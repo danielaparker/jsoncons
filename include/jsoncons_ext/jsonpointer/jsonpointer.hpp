@@ -272,7 +272,7 @@ public:
     }
 
     jsonpointer_errc erase(json_reference root,
-                            typename Json::string_view_type path)
+                           typename Json::string_view_type path)
     {
         jsonpointer_errc ec = evaluate(root,PathResolver<Json,JsonReference,JsonPointer>(),path);
         if (ec != jsonpointer_errc())
@@ -635,6 +635,28 @@ jsonpointer_errc assign(Json& root, typename Json::string_view_type path, const 
     detail::jsonpointer_evaluator<Json> evaluator;
 
     return evaluator.assign(root,path,value);
+}
+
+template <class String>
+void escape(const String& s, std::basic_ostringstream<typename String::value_type>& os)
+{
+    for (auto c : s)
+    {
+        if (c == '~')
+        {
+            os.put('~');
+            os.put('0');
+        }
+        else if (c == '/')
+        {
+            os.put('~');
+            os.put('1');
+        }
+        else
+        {
+            os.put(c);
+        }
+    }
 }
 
 }}

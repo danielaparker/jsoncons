@@ -81,6 +81,100 @@ namespace detail {
             }
         }
     };
+
+    template <class Json>
+    Json diff(const Json& source, const Json& target, const typename Json::string_type& path)
+    {
+        typedef typename Json::char_type char_type;
+        typedef typename Json::string_type string_type;
+        typedef typename Json::string_view_type string_view_type;
+
+        const string_type add_op = string_type({ 'a','d','d' });
+        const string_type remove_op = string_type({ 'r','e','m','o','v','e' });
+        const string_type replace_op = string_type({ 'r','e','p','l','a','c','e' });
+        const string_type move_op = string_type({ 'm','o','v','e' });
+        const string_type copy_op = string_type({ 'c','o','p','y' });
+
+        const string_type op_key = string_type({ 'o','p' });
+        const string_type path_key = string_type({ 'p','a','t','h' });
+        const string_type from_key = string_type({ 'f','r','o','m' });
+        const string_type value_key = string_type({ 'v','a','l','u','e' });
+
+        Json result = typename Json::array();
+
+        if (source == target)
+        {
+            return result;
+        }
+
+        if (source.is_array() && target.is_array())
+        {
+            size_t common = (std::min)(source.size(),target.size());
+            for (size_t i = 0; i < common; ++i)
+            {
+                std::basic_ostringstream<char_type> ss; 
+                ss << path << '/' << i;
+                auto temp_diff = diff(source[i],target[i],ss.str());
+                result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
+            }
+            for (size_t i = common; i < source.size(); ++i)
+            {
+                std::basic_ostringstream<char_type> ss; 
+                ss << path << '/' << i;
+                Json val = typename Json::object();
+                val.insert_or_assign(op_key, remove_op);
+                val.insert_or_assign(path_key, ss.str());
+                result.push_back(std::move(val));
+            }
+        }
+        else if (source.is_object() && target.is_object())
+        {
+            for (const auto& a : source.object_range())
+            {
+                std::basic_ostringstream<char_type> ss; 
+                ss << path << '/';
+                jsonpointer::escape(a.key(),ss);
+                auto it = target.find(a.key());
+                if (it != target.object_range().end())
+                {
+                    auto temp_diff = diff(a.value(),it->value(),ss.str());
+                    result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
+                }
+                else
+                {
+                    Json val = typename Json::object();
+                    val.insert_or_assign(op_key, remove_op);
+                    val.insert_or_assign(path_key, ss.str());
+                    result.push_back(std::move(val));
+                }
+            }
+            for (const auto& a : target.object_range())
+            {
+                auto it = source.find(a.key());
+                if (it == source.object_range().end())
+                {
+                    std::basic_ostringstream<char_type> ss; 
+                    ss << path << '/';
+                    jsonpointer::escape(a.key(),ss);
+                    Json val = typename Json::object();
+                    val.insert_or_assign(op_key, add_op);
+                    val.insert_or_assign(path_key, ss.str());
+                    val.insert_or_assign(value_key, a.value());
+                    result.push_back(std::move(val));
+                }
+            }
+        }
+        else
+        {
+            Json val = typename Json::object();
+            val.insert_or_assign(op_key, replace_op);
+            val.insert_or_assign(path_key, path);
+            val.insert_or_assign(value_key, target);
+            result.push_back(std::move(val));
+        }
+
+        return result;
+    }
 }
 
 template <class Json>
@@ -365,6 +459,14 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
         unwinder.state = detail::state_type::commit;
     }
     return std::make_tuple(patch_ec,bad_path);
+}
+
+
+template <class Json>
+Json diff(const Json& source, const Json& target)
+{
+    typename Json::string_type path;
+    return detail::diff(source, target, path);
 }
 
 }}

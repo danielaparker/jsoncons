@@ -7,6 +7,10 @@ The jsonpatch extension implements the IETF standard [JavaScript Object Notation
     <td><a href="patch.md">patch</a></td>
     <td>Apply JSON Patch operations to a JSON document.</td> 
   </tr>
+  <tr>
+    <td><a href="diff.md">diff</a></td>
+    <td>Create a diff as a JSON patch.</td> 
+  </tr>
 </table>
 
 The JSON Patch IETF standard requires that the JSON Patch method is atomic, so that if any JSON Patch operation results in an error, the target document is unchanged.

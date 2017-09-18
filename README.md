@@ -508,9 +508,13 @@ using namespace jsoncons::literals;
 
 int main()
 {
-    json target = R"(
+    // Apply a JSON Patch
+
+    json doc = R"(
         { "foo": "bar"}
     )"_json;
+
+    json doc2 = doc;
 
     json patch = R"(
         [
@@ -521,13 +525,42 @@ int main()
 
     jsonpatch::jsonpatch_errc ec;
     std::string path;
-    std::tie(ec,path) = jsonpatch::patch(target,patch);
+    std::tie(ec,path) = jsonpatch::patch(doc,patch);
 
-    std::cout << pretty_print(target) << std::endl;
+    std::cout << "(1)\n" << pretty_print(doc) << std::endl;
+
+    // Create a JSON Patch
+
+    auto patch2 = jsonpatch::diff(doc2,doc);
+
+    std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
+
+    std::tie(ec,path) = jsonpatch::patch(doc2,patch2);
+
+    std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
 }
 ```
 Output:
 ```
+(1)
+{
+    "baz": "qux",
+    "foo": ["bar","baz"]
+}
+(2)
+[
+    {
+        "op": "replace",
+        "path": "/foo",
+        "value": ["bar","baz"]
+    },
+    {
+        "op": "add",
+        "path": "/baz",
+        "value": "qux"
+    }
+]
+(3)
 {
     "baz": "qux",
     "foo": ["bar","baz"]

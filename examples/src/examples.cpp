@@ -442,13 +442,13 @@ int main()
 
         jsonpointer_examples();
 
-        jsonpatch_examples();
-
         serialization_examples();
 
         csv_examples();
 
         comment_example();
+
+        jsonpatch_examples();
     }
     catch (const std::exception& e)
     {

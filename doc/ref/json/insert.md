@@ -2,12 +2,17 @@
 
 ```c++
 template <class T>
-array_iterator insert(const_array_iterator pos, T&& val)
+array_iterator insert(const_array_iterator pos, T&& val); // (1)
+
+template <class InputIt>
+array_iterator insert(const_array_iterator pos, InputIt first, InputIt last); // (2)
 ```
-Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.
+(1) Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.
 The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
 Returns an `array_iterator` that points to the new value
-Throws `std::runtime_error` if not an array.
+Throws `std::runtime_error` if not an array.  
+
+(2) Inserts elements from range [first, last) before pos.
 
 #### See also
 

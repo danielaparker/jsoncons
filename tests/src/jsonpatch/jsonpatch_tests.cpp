@@ -433,6 +433,42 @@ BOOST_AUTO_TEST_CASE(test_move_copy_replace_remove_fail)
 
 }
 
+BOOST_AUTO_TEST_CASE(test_diff1)
+{
+    json source = R"(
+        {"/": 9, "~1": 10, "foo": "bar"}
+    )"_json;
+
+    json target = R"(
+        { "baz":"qux", "foo": [ "bar", "baz" ]}
+    )"_json;
+
+    auto patch = jsonpatch::diff(source, target);
+
+    check_patch(source,patch,jsonpatch::jsonpatch_errc(),target);
+}
+
+BOOST_AUTO_TEST_CASE(test_diff2)
+{
+    json source = R"(
+        { 
+            "/": 3,
+            "foo": "bar"
+        }
+    )"_json;
+
+    json target = R"(
+        {
+            "/": 9,
+            "~1": 10
+        }
+    )"_json;
+
+    auto patch = jsonpatch::diff(source, target);
+
+    check_patch(source,patch,jsonpatch::jsonpatch_errc(),target);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

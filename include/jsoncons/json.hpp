@@ -1978,6 +1978,12 @@ public:
             return evaluate_with_default().insert(pos, std::forward<T>(val));
         }
 
+        template <class InputIt>
+        array_iterator insert(const_array_iterator pos, InputIt first, InputIt last)
+        {
+            return evaluate_with_default().insert(pos, first, last);
+        }
+
         template <class SAllocator>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
         {
@@ -3784,6 +3790,21 @@ public:
         {
         case value_type::array_t:
             return array_value().insert(pos, std::forward<T>(val));
+            break;
+        default:
+            {
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
+            }
+        }
+    }
+
+    template <class InputIt>
+    array_iterator insert(const_array_iterator pos, InputIt first, InputIt last)
+    {
+        switch (var_.type_id())
+        {
+        case value_type::array_t:
+            return array_value().insert(pos, first, last);
             break;
         default:
             {

@@ -1,6 +1,15 @@
 master
 ------
 
+New features
+------------
+
+- JSON Pointer implementation
+
+- JSON Patch implementation, includes patch and diff
+
+- `json::insert` function for array that inserts values from range [first, last) before pos. 
+
 Bug fixes
 
 - Fixed issue with serialization of json array of objects to csv file
@@ -25,13 +34,6 @@ Changes
 - Removed template parameter `CharT` from class `basic_parsing_context` and renamed it to `parsing_context`
 
 - Removed template parameter `CharT` from class `basic_parse_error_handler` and renamed it to `parse_error_handler`
-
-New features
-------------
-
-- JSON Pointer implementation
-
-- JSON Patch implementation
 
 0.99.8.2
 --------
