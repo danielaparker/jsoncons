@@ -506,7 +506,9 @@ public:
 
     void parse(std::error_code& ec)
     {
-        while ((p_ < end_input_) && (state_ != parse_state::done))
+        const CharT* local_end_input = end_input_;
+
+        while ((p_ < local_end_input) && (state_ != parse_state::done))
         {
             switch (state_)
             {
