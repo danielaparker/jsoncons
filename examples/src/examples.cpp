@@ -38,21 +38,17 @@ void comment_example()
     }
     )";
 
-    try
-    {
-        json j = json::parse(s);
-        std::cout << "(1) " << j << std::endl;
-    }
-    catch (parse_error& e)
-    {
-    }
+    // Default
+    json j = json::parse(s);
+    std::cout << "(1) " << j << std::endl;
 
+    // Strict
     try
     {
         strict_parse_error_handler err_handler;
         json j = json::parse(s, err_handler);
     }
-    catch (parse_error& e)
+    catch (const parse_error& e)
     {
         std::cout << "(2) " << e.what() << std::endl;
     }
