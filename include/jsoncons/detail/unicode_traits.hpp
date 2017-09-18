@@ -126,12 +126,12 @@ enum class conv_flags
 
 enum class conv_errc 
 {
-    over_long_utf8_sequence = 1,    // over long utf8 sequence
-    expected_continuation_byte, // expected continuation byte    
-    unpaired_high_surrogate,    // unpaired high surrogate UTF-16
-    illegal_surrogate_value,    // UTF-16 surrogate values are illegal in UTF-32
-    source_exhausted,           // partial character in source, but hit end
-    source_illegal              // source sequence is illegal/malformed
+    over_long_utf8_sequence = 1, // over long utf8 sequence
+    expected_continuation_byte,  // expected continuation byte    
+    unpaired_high_surrogate,     // unpaired high surrogate UTF-16
+    illegal_surrogate_value,     // UTF-16 surrogate values are illegal in UTF-32
+    source_exhausted,            // partial character in source, but hit end
+    source_illegal               // source sequence is illegal/malformed
 };
 
 class Unicode_traits_error_category_impl_
