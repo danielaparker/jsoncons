@@ -134,9 +134,11 @@ The library includes four instantiations of `basic_json`:
     }
     )";
 
+    // Default
     json j = json::parse(s);
     std::cout << "(1) " << j << std::endl;
 
+    // Strict
     try
     {
         strict_parse_error_handler err_handler;
