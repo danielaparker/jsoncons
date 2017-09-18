@@ -339,11 +339,23 @@ public:
 
     void skip_whitespace()
     {
-        while ((p_ + 1) < end_input_ && (*(p_ + 1) == ' ' || *(p_ + 1) == '\t')) 
-        {                                      
-            ++p_;                          
-            ++column_;                     
-        }                                      
+        const CharT* local_end_input = end_input_;
+        for (;;) 
+        {
+            if (JSONCONS_UNLIKELY(p_ == local_end_input)) 
+            {
+                return;
+            } 
+            else if (*p_ == ' ' || *p_ == '\t') 
+            {
+                ++p_;
+                ++column_;                     
+            } 
+            else 
+            {
+                return;
+            }
+        }
     }
 
     void do_begin_object(std::error_code& ec)
@@ -542,8 +554,6 @@ public:
                         break;   
                     case ' ':case '\t':
                         skip_whitespace();
-                        ++p_;
-                        ++column_;
                         break;
                     case '/': 
                         ++p_;
@@ -630,12 +640,18 @@ public:
                             ec = json_parser_errc::illegal_control_character;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     case '\r': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::cr;
                         break; 
                     case '\n': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::lf;
                         break;   
@@ -643,20 +659,28 @@ public:
                         skip_whitespace();
                         break;
                     case '/':
+                        ++p_;
+                        ++column_;
                         push_state(state_); 
                         state_ = parse_state::slash;
                         break;
                     case '}':
                         do_end_object(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case ']':
                         do_end_array(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case ',':
                         begin_member_or_element(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     default:
                         if (parent() == parse_state::array)
@@ -675,11 +699,11 @@ public:
                                 return;
                             }
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     }
                 }
-                ++p_;
-                ++column_;
                 break;
             case parse_state::expect_member_name_or_end: 
                 {
@@ -691,12 +715,18 @@ public:
                             ec = json_parser_errc::illegal_control_character;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     case '\r': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::cr;
                         break; 
                     case '\n': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::lf;
                         break;   
@@ -704,14 +734,20 @@ public:
                         skip_whitespace();
                         break;
                     case '/':
+                        ++p_;
+                        ++column_;
                         push_state(state_); 
                         state_ = parse_state::slash;
                         break;
                     case '}':
                         do_end_object(ec);
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case '\"':
+                        ++p_;
+                        ++column_;
                         push_state(parse_state::member_name);
                         state_ = parse_state::string_u1;
                         break;
@@ -721,6 +757,8 @@ public:
                             ec = json_parser_errc::single_quote;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     default:
                         if (err_handler_.error(json_parser_errc::expected_name, *this))
@@ -728,11 +766,11 @@ public:
                             ec = json_parser_errc::expected_name;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     }
                 }
-                ++p_;
-                ++column_;
                 break;
             case parse_state::expect_member_name: 
                 {
@@ -744,12 +782,18 @@ public:
                             ec = json_parser_errc::illegal_control_character;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     case '\r': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::cr;
                         break; 
                     case '\n': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::lf;
                         break;   
@@ -757,10 +801,14 @@ public:
                         skip_whitespace();
                         break;
                     case '/': 
+                        ++p_;
+                        ++column_;
                         push_state(state_);
                         state_ = parse_state::slash;
                         break;
                     case '\"':
+                        ++p_;
+                        ++column_;
                         push_state(parse_state::member_name);
                         state_ = parse_state::string_u1;
                         break;
@@ -772,6 +820,8 @@ public:
                         }
                         do_end_object(ec);  // Recover
                         if (ec) return;
+                        ++p_;
+                        ++column_;
                         break;
                     case '\'':
                         if (err_handler_.error(json_parser_errc::single_quote, *this))
@@ -779,6 +829,8 @@ public:
                             ec = json_parser_errc::single_quote;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     default:
                         if (err_handler_.error(json_parser_errc::expected_name, *this))
@@ -786,11 +838,11 @@ public:
                             ec = json_parser_errc::expected_name;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     }
                 }
-                ++p_;
-                ++column_;
                 break;
             case parse_state::expect_colon: 
                 {
@@ -802,14 +854,20 @@ public:
                             ec = json_parser_errc::illegal_control_character;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     case '\r': 
                         push_state(state_);
                         state_ = parse_state::cr;
+                        ++p_;
+                        ++column_;
                         break; 
                     case '\n': 
                         push_state(state_);
                         state_ = parse_state::lf;
+                        ++p_;
+                        ++column_;
                         break;   
                     case ' ':case '\t':
                         skip_whitespace();
@@ -817,9 +875,13 @@ public:
                     case '/': 
                         push_state(state_);
                         state_ = parse_state::slash;
+                        ++p_;
+                        ++column_;
                         break;
                     case ':':
                         state_ = parse_state::expect_value;
+                        ++p_;
+                        ++column_;
                         break;
                     default:
                         if (err_handler_.error(json_parser_errc::expected_colon, *this))
@@ -827,11 +889,11 @@ public:
                             ec = json_parser_errc::expected_colon;
                             return;
                         }
+                        ++p_;
+                        ++column_;
                         break;
                     }
                 }
-                ++p_;
-                ++column_;
                 break;
             case parse_state::expect_value: 
                 {
@@ -860,8 +922,6 @@ public:
                         break;   
                     case ' ':case '\t':
                         skip_whitespace();
-                        ++p_;
-                        ++column_;
                         break;
                     case '/': 
                         push_state(state_);
@@ -986,8 +1046,6 @@ public:
                         break;   
                     case ' ':case '\t':
                         skip_whitespace();
-                        ++p_;
-                        ++column_;
                         break;
                     case '/': 
                         ++p_;
@@ -1533,8 +1591,6 @@ zero:
                 end_integer_value(ec);
                 if (ec) return;
                 skip_whitespace();
-                ++p_;
-                ++column_;
                 return;
             case '/': 
                 end_integer_value(ec);
@@ -1619,8 +1675,6 @@ integer:
             end_integer_value(ec);
             if (ec) return;
             skip_whitespace();
-            ++p_;
-            ++column_;
             return;
         case '/': 
             end_integer_value(ec);
@@ -1727,8 +1781,6 @@ fraction2:
             end_fraction_value(ec);
             if (ec) return;
             skip_whitespace();
-            ++p_;
-            ++column_;
             return;
         case '/': 
             end_fraction_value(ec);
@@ -1858,8 +1910,6 @@ exp3:
             end_fraction_value(ec);
             if (ec) return;
             skip_whitespace();
-            ++p_;
-            ++column_;
             return;
         case '/': 
             end_fraction_value(ec);
@@ -1946,16 +1996,22 @@ exp3:
 string_u1:
         if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
         {
+            auto result = unicons::validate(sb,p_);
+            if (result.ec != unicons::conv_errc())
+            {
+                translate_conv_errc(result.ec,ec);
+                column_ += (result.it - sb);
+                return;
+            }
             string_buffer_.append(sb,p_-sb);
             column_ += (p_ - sb + 1);
-
             state_ = parse_state::string_u1;
             return;
         }
         switch (*p_)
         {
             JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                string_buffer_.append(sb,p_-sb);
+            {
                 column_ += (p_ - sb + 1);
                 if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
                 {
@@ -1964,98 +2020,125 @@ string_u1:
                     return;
                 }
                 // recovery - skip
+                auto result = unicons::validate(sb,p_);
+                if (result.ec != unicons::conv_errc())
+                {
+                    translate_conv_errc(result.ec,ec);
+                    column_ += (result.it - sb);
+                    return;
+                }
+                string_buffer_.append(sb,p_-sb);
                 ++p_;
                 state_ = parse_state::string_u1;
                 return;
+            }
             case '\r':
+            {
+                column_ += (p_ - sb + 1);
+                if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
                 {
-                    column_ += (p_ - sb + 1);
-                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
-                    {
-                        ec = json_parser_errc::illegal_character_in_string;
-                        state_ = parse_state::string_u1;
-                        return;
-                    }
-                    // recovery - keep
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    ++p_;
-                    push_state(state_);
-                    state_ = parse_state::cr;
-                    return;
-                }
-            case '\n':
-                {
-                    column_ += (p_ - sb + 1);
-                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
-                    {
-                        ec = json_parser_errc::illegal_character_in_string;
-                        state_ = parse_state::string_u1;
-                        return;
-                    }
-                    // recovery - keep
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    ++p_;
-                    push_state(state_);
-                    state_ = parse_state::lf;
-                    return;
-                }
-            case '\t':
-                {
-                    column_ += (p_ - sb + 1);
-                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
-                    {
-                        ec = json_parser_errc::illegal_character_in_string;
-                        state_ = parse_state::string_u1;
-                        return;
-                    }
-                    // recovery - keep
-                    string_buffer_.append(sb, p_ - sb + 1);
-                    ++p_;
+                    ec = json_parser_errc::illegal_character_in_string;
                     state_ = parse_state::string_u1;
                     return;
                 }
+                // recovery - keep
+                auto result = unicons::validate(sb,p_);
+                if (result.ec != unicons::conv_errc())
+                {
+                    translate_conv_errc(result.ec,ec);
+                    column_ += (result.it - sb);
+                    return;
+                }
+                string_buffer_.append(sb, p_ - sb + 1);
+                ++p_;
+                push_state(state_);
+                state_ = parse_state::cr;
+                return;
+            }
+            case '\n':
+            {
+                column_ += (p_ - sb + 1);
+                if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                {
+                    ec = json_parser_errc::illegal_character_in_string;
+                    state_ = parse_state::string_u1;
+                    return;
+                }
+                // recovery - keep
+                auto result = unicons::validate(sb,p_);
+                if (result.ec != unicons::conv_errc())
+                {
+                    translate_conv_errc(result.ec,ec);
+                    column_ += (result.it - sb);
+                    return;
+                }
+                string_buffer_.append(sb, p_ - sb + 1);
+                ++p_;
+                push_state(state_);
+                state_ = parse_state::lf;
+                return;
+            }
+            case '\t':
+            {
+                column_ += (p_ - sb + 1);
+                if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                {
+                    ec = json_parser_errc::illegal_character_in_string;
+                    state_ = parse_state::string_u1;
+                    return;
+                }
+                // recovery - keep
+                auto result = unicons::validate(sb,p_);
+                if (result.ec != unicons::conv_errc())
+                {
+                    translate_conv_errc(result.ec,ec);
+                    column_ += (result.it - sb);
+                    return;
+                }
+                string_buffer_.append(sb, p_ - sb + 1);
+                ++p_;
+                state_ = parse_state::string_u1;
+                return;
+            }
             case '\\': 
+            {
+                auto result = unicons::validate(sb,p_);
+                if (result.ec != unicons::conv_errc())
+                {
+                    translate_conv_errc(result.ec,ec);
+                    column_ += (result.it - sb);
+                    return;
+                }
                 string_buffer_.append(sb,p_-sb);
                 column_ += (p_ - sb + 1);
                 ++p_;
                 goto escape;
+            }
             case '\"':
+            {
+                auto result = unicons::validate(sb,p_);
+                if (result.ec != unicons::conv_errc())
+                {
+                    translate_conv_errc(result.ec,ec);
+                    column_ += (result.it - sb);
+                    return;
+                }
                 if (string_buffer_.length() == 0)
                 {
-                    auto result = unicons::validate(sb,p_);
-                    if (result.ec == unicons::conv_errc())
-                    {
-                        end_string_value(sb,p_-sb, ec);
-                        if (ec) {return;}
-                    }
-                    else
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
+                    end_string_value(sb,p_-sb, ec);
+                    if (ec) {return;}
                 }
                 else
                 {
                     string_buffer_.append(sb,p_-sb);
-                    auto result = unicons::validate(string_buffer_.begin(),string_buffer_.end());
-                    if (result.ec == unicons::conv_errc())
-                    {
-                        end_string_value(string_buffer_.data(),string_buffer_.length(), ec);
-                        string_buffer_.clear();
-                        if (ec) {return;}
-                    }
-                    else
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - string_buffer_.begin());
-                        string_buffer_.clear();
-                        return;
-                    }
+                    end_string_value(string_buffer_.data(),string_buffer_.length(), ec);
+                    string_buffer_.clear();
+                    if (ec) {return;}
                 }
                 column_ += (p_ - sb + 1);
                 ++p_;
                 return;
+            }
             default:
                 ++p_;
                 goto string_u1;
