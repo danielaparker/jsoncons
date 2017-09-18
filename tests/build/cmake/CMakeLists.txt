@@ -42,8 +42,8 @@ add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
 
 target_include_directories (jsoncons_tests PUBLIC ${Boost_INCLUDE_DIRS}
-                                           PUBLIC ../../../src
-                                           PRIVATE ../../src)
+                                           PUBLIC ../../../include
+                                           PRIVATE ../../include)
 
 target_link_libraries (jsoncons_tests ${Boost_LIBRARIES})
 

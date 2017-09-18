@@ -4,7 +4,7 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 
 ### Get jsoncons
 
-Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Find the directory `jsoncons` under `src`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
+Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Find the directory `jsoncons` under `include`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
 Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
 

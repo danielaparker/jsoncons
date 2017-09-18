@@ -33,7 +33,7 @@ jsoncons uses some features that are new to C++ 11, particularly [move semantics
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
 
-To install the jsoncons library, download the zip file, extract the zipped files, look under `src` for the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
+To install the jsoncons library, download the zip file, extract the zipped files, look under `include` for the directory `jsoncons`, and copy it to your `include` directory. If you wish to use extensions, copy the `jsoncons_ext` directory as well. 
 
 The jsoncons classes and functions are in namespace `jsoncons`. You need to include the header file
 ```c++ 
