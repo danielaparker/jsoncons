@@ -2041,12 +2041,14 @@ string_u1:
                     if (result.ec == unicons::conv_errc())
                     {
                         end_string_value(string_buffer_.data(),string_buffer_.length(), ec);
+                        string_buffer_.clear();
                         if (ec) {return;}
                     }
                     else
                     {
                         translate_conv_errc(result.ec,ec);
                         column_ += (result.it - string_buffer_.begin());
+                        string_buffer_.clear();
                         return;
                     }
                 }
