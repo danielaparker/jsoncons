@@ -141,11 +141,10 @@ class basic_json_reader
 {
     static const size_t default_max_buffer_length = 16384;
 
-    json_utf8_other_input_handler_adapter<CharT> other_adapter_;
-    json_parser parser_;
+    basic_json_parser<CharT> parser_;
     std::basic_istream<CharT>& is_;
     bool eof_;
-    std::vector<char> buffer_;
+    std::vector<CharT> buffer_;
     size_t buffer_length_;
     bool begin_;
 
@@ -176,10 +175,8 @@ public:
         buffer_.reserve(buffer_length_);
     }
 
-    template <class Ch = CharT>
     basic_json_reader(std::basic_istream<CharT>& is, 
-                      json_input_handler& handler, 
-                      typename std::enable_if<sizeof(Ch) == sizeof(char)>::type* = 0)
+                      basic_json_input_handler<CharT>& handler)
         : parser_(handler),
           is_(is),
           eof_(false),
@@ -189,41 +186,10 @@ public:
         buffer_.reserve(buffer_length_);
     }
 
-    template <class Ch = CharT>
-    basic_json_reader(std::basic_istream<CharT>& is,
-                      basic_json_input_handler<CharT>& handler, 
-                      typename std::enable_if<sizeof(Ch) != sizeof(char)>::type* = 0)
-        : other_adapter_(handler),
-          parser_(other_adapter_),
-          is_(is),
-          eof_(false),
-          buffer_length_(default_max_buffer_length),
-          begin_(true)
-    {
-        buffer_.reserve(buffer_length_);
-    }
-
-    template <class Ch = CharT>
-    basic_json_reader(std::basic_istream<CharT>& is,
-                      json_input_handler& handler,
-                      parse_error_handler& err_handler, 
-                      typename std::enable_if<sizeof(Ch) == sizeof(char)>::type* = 0)
-       : parser_(handler,err_handler),
-         is_(is),
-         eof_(false),
-         buffer_length_(default_max_buffer_length),
-         begin_(true)
-    {
-        buffer_.reserve(buffer_length_);
-    }
-
-    template <class Ch = CharT>
     basic_json_reader(std::basic_istream<CharT>& is,
                       basic_json_input_handler<CharT>& handler,
-                      parse_error_handler& err_handler, 
-                      typename std::enable_if<sizeof(Ch) != sizeof(char)>::type* = 0)
-       : other_adapter_(handler),
-         parser_(other_adapter_,err_handler),
+                      parse_error_handler& err_handler)
+       : parser_(handler,err_handler),
          is_(is),
          eof_(false),
          buffer_length_(default_max_buffer_length),
@@ -263,9 +229,7 @@ public:
         }
     }
 
-    template <class Ch = CharT>
-    typename std::enable_if<sizeof(Ch) == sizeof(char),void>::type
-    read_buffer(std::error_code& ec)
+    void read_buffer(std::error_code& ec)
     {
         buffer_.clear();
         buffer_.resize(buffer_length_);
@@ -289,55 +253,6 @@ public:
         }
         else
         {
-            parser_.set_source(buffer_.data(),buffer_.size());
-        }
-    }
-
-    template <class Ch = CharT>
-    typename std::enable_if<sizeof(Ch) != sizeof(char),void>::type
-    read_buffer(std::error_code& ec)
-    {
-        std::vector<CharT> buf(buffer_length_);
-        is_.read(buf.data(), buffer_length_);
-        buf.resize(static_cast<size_t>(is_.gcount()));
-        if (buf.size() == 0)
-        {
-            eof_ = true;
-        }
-        else if (begin_)
-        {
-            auto result = unicons::skip_bom(buf.begin(), buf.end());
-            if (result.ec != unicons::encoding_errc())
-            {
-                ec = result.ec;
-                return;
-            }
-            size_t offset = result.it - buf.begin();
-
-            buffer_.clear();
-            auto result2 = unicons::convert(buf.begin()+offset, buf.end(), 
-                                            std::back_inserter(buffer_), 
-                                            unicons::conv_flags::strict);
-            if (result2.ec != unicons::conv_errc())
-            {
-                ec = result2.ec;
-                return;
-            }
-
-            parser_.set_source(buffer_.data(),buffer_.size());
-            begin_ = false;
-        }
-        else
-        {
-            buffer_.clear();
-            auto result2 = unicons::convert(buf.begin(), buf.end(), 
-                                            std::back_inserter(buffer_), 
-                                            unicons::conv_flags::strict);
-            if (result2.ec != unicons::conv_errc())
-            {
-                ec = result2.ec;
-                return;
-            }
             parser_.set_source(buffer_.data(),buffer_.size());
         }
     }

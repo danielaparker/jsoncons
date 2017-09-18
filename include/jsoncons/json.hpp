@@ -2250,8 +2250,24 @@ public:
 
     static basic_json parse(string_view_type s, parse_error_handler& err_handler)
     {
-        std::basic_istringstream<CharT> is(s);
-        return parse(is, err_handler);
+        json_decoder<json_type> handler;
+        basic_json_parser<char_type> parser(handler,err_handler);
+
+        auto result = unicons::skip_bom(s.begin(), s.end());
+        if (result.ec != unicons::encoding_errc())
+        {
+            throw parse_error(result.ec,1,1);
+        }
+        size_t offset = result.it - s.begin();
+        parser.set_source(s.data()+offset,s.size()-offset);
+        parser.parse();
+        parser.end_parse();
+        parser.check_done();
+        if (!handler.is_valid())
+        {
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Failed to parse json string");
+        }
+        return handler.get_result();
     }
 
     static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)

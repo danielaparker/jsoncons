@@ -161,19 +161,20 @@ enum class parse_state : uint8_t
     done
 };
 
-class json_parser : private parsing_context
+template <class CharT>
+class basic_json_parser : private parsing_context
 {
     static const int default_initial_stack_capacity_ = 100;
-    typedef json_input_handler::string_view_type string_view_type;
+    typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
 
-    basic_null_json_input_handler<char> default_input_handler_;
+    basic_null_json_input_handler<CharT> default_input_handler_;
     default_parse_error_handler default_err_handler_;
 
-    basic_json_input_handler<char>& handler_;
+    basic_json_input_handler<CharT>& handler_;
     parse_error_handler& err_handler_;
     uint32_t cp_;
     uint32_t cp2_;
-    std::basic_string<char> string_buffer_;
+    std::basic_string<CharT> string_buffer_;
     bool is_negative_;
 
     size_t line_;
@@ -182,22 +183,22 @@ class json_parser : private parsing_context
     int initial_stack_capacity_;
 
     int max_depth_;
-    string_to_double<char> str_to_double_;
+    string_to_double<CharT> str_to_double_;
     uint8_t precision_;
-    const char* begin_input_;
-    const char* end_input_;
-    const char* p_;
+    const CharT* begin_input_;
+    const CharT* end_input_;
+    const CharT* p_;
 
     parse_state state_;
     std::vector<parse_state> state_stack_;
 
     // Noncopyable and nonmoveable
-    json_parser(const json_parser&) = delete;
-    json_parser& operator=(const json_parser&) = delete;
+    basic_json_parser(const basic_json_parser&) = delete;
+    basic_json_parser& operator=(const basic_json_parser&) = delete;
 
 public:
 
-    json_parser()
+    basic_json_parser()
        : handler_(default_input_handler_),
          err_handler_(default_err_handler_),
          cp_(0),
@@ -219,7 +220,7 @@ public:
         push_state(parse_state::root);
     }
 
-    json_parser(parse_error_handler& err_handler)
+    basic_json_parser(parse_error_handler& err_handler)
        : handler_(default_input_handler_),
          err_handler_(err_handler),
          cp_(0),
@@ -241,7 +242,7 @@ public:
         push_state(parse_state::root);
     }
 
-    json_parser(basic_json_input_handler<char>& handler)
+    basic_json_parser(basic_json_input_handler<CharT>& handler)
        : handler_(handler),
          err_handler_(default_err_handler_),
          cp_(0),
@@ -263,7 +264,7 @@ public:
         push_state(parse_state::root);
     }
 
-    json_parser(basic_json_input_handler<char>& handler,
+    basic_json_parser(basic_json_input_handler<CharT>& handler,
                       parse_error_handler& err_handler)
        : handler_(handler),
          err_handler_(err_handler),
@@ -311,7 +312,7 @@ public:
         return *this;
     }
 
-    ~json_parser()
+    ~basic_json_parser()
     {
     }
 
@@ -472,7 +473,7 @@ public:
         }
         for (; p_ != end_input_; ++p_)
         {
-            char curr_char_ = *p_;
+            CharT curr_char_ = *p_;
             switch (curr_char_)
             {
             case '\n':
@@ -579,14 +580,14 @@ public:
                         break;
                     case '0': 
                         handler_.begin_json();
-                        string_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(*p_);
                         state_ = parse_state::zero;
                         ++p_;
                         ++column_;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                         handler_.begin_json();
-                        string_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(*p_);
                         state_ = parse_state::integer;
                         ++p_;
                         ++column_;
@@ -892,13 +893,13 @@ public:
                         state_ = parse_state::minus;
                         break;
                     case '0': 
-                        string_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(*p_);
                         ++p_;
                         ++column_;
                         state_ = parse_state::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(*p_);
                         ++p_;
                         ++column_;
                         state_ = parse_state::integer;
@@ -1024,13 +1025,13 @@ public:
                         state_ = parse_state::minus;
                         break;
                     case '0': 
-                        string_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(*p_);
                         ++p_;
                         ++column_;
                         state_ = parse_state::zero;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        string_buffer_.push_back(static_cast<char>(*p_));
+                        string_buffer_.push_back(*p_);
                         ++p_;
                         ++column_;
                         state_ = parse_state::integer;
@@ -1455,8 +1456,8 @@ public:
 
     void parse_number(std::error_code& ec)
     {
-        const char* local_end_input = end_input_;
-        const char* sb = p_;
+        const CharT* local_end_input = end_input_;
+        const CharT* sb = p_;
 
         switch (state_)
         {
@@ -1489,12 +1490,12 @@ minus:
         switch (*p_)
         {
         case '0': 
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto zero;
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto integer;
@@ -1561,13 +1562,13 @@ zero:
                 return;
             case '.':
                 precision_ = static_cast<uint8_t>(string_buffer_.length());
-                string_buffer_.push_back(static_cast<char>(*p_));
+                string_buffer_.push_back(*p_);
                 ++p_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
                 precision_ = static_cast<uint8_t>(string_buffer_.length());
-                string_buffer_.push_back(static_cast<char>(*p_));
+                string_buffer_.push_back(*p_);
                 ++p_;
                 ++column_;
                 goto exp1;
@@ -1647,13 +1648,13 @@ integer:
             return;
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto integer;
         case '.':
             precision_ = static_cast<uint8_t>(string_buffer_.length());
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto fraction1;
@@ -1667,7 +1668,7 @@ integer:
             return;
         case 'e':case 'E':
             precision_ = static_cast<uint8_t>(string_buffer_.length());
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto exp1;
@@ -1688,7 +1689,7 @@ fraction1:
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
             ++precision_;
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto fraction2;
@@ -1756,7 +1757,7 @@ fraction2:
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
             ++precision_;
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto fraction2;
@@ -1769,7 +1770,7 @@ fraction2:
             ++column_;
             return;
         case 'e':case 'E':
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto exp1;
@@ -1792,13 +1793,13 @@ exp1:
             ++column_;
             goto exp2;
         case '-':
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto exp2;
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto exp3;
@@ -1818,7 +1819,7 @@ exp2:
         {
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto exp3;
@@ -1894,7 +1895,7 @@ exp3:
             return;
         case '0': 
         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-            string_buffer_.push_back(static_cast<char>(*p_));
+            string_buffer_.push_back(*p_);
             ++p_;
             ++column_;
             goto exp3;
@@ -1909,8 +1910,8 @@ exp3:
 
     void parse_string(std::error_code& ec)
     {
-        const char* local_end_input = end_input_;
-        const char* sb = p_;
+        const CharT* local_end_input = end_input_;
+        const CharT* sb = p_;
 
         switch (state_)
         {
@@ -2426,7 +2427,7 @@ escape_u9:
         return state_;
     }
 
-    void set_source(const char* input, size_t length)
+    void set_source(const CharT* input, size_t length)
     {
         begin_input_ = input;
         end_input_ = input + length;
@@ -2590,7 +2591,7 @@ private:
         }
     }
 
-    void end_string_value(const char* s, size_t length, std::error_code& ec) 
+    void end_string_value(const CharT* s, size_t length, std::error_code& ec) 
     {
         switch (parent())
         {
@@ -2690,6 +2691,9 @@ private:
         return column_;
     }
 };
+
+typedef basic_json_parser<char> json_parser;
+typedef basic_json_parser<wchar_t> wjson_parser;
 
 }
 
