@@ -296,44 +296,28 @@ Output:
 See [json::merge](doc/ref/json/merge.md) 
 and [json::merge_or_update](doc/ref/json/merge_or_update.md) for details.
 
-#### Convert from and to standard library sequence containers
+#### Convert json values from and to standard library types
 
 ```c++
     std::vector<int> v{1, 2, 3, 4};
     json j(v);
     std::cout << "(1) "<< j << std::endl;
     std::deque<int> d = j.as<std::deque<int>>();
+
+    std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
+    json j(m);
+    std::cout << "(2) " << j << std::endl;
+    std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
+
 ```
 Output:
 ```
 (1) [1,2,3,4]
+
+(2) {"one":1,"three":3,"two":2}
 ```
 
-#### Convert from and to standard library associative containers
-
-```c++
-    std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
-    json j(m);
-    std::cout << "(1) " << j << std::endl;
-    std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
-```
-Output:
-```
-(1) {"one":1,"three":3,"two":2}
-```
-
-#### Convert from and to std::tuple
-
-```c++
-    auto t = std::make_tuple(false,1,"foo");
-    json j(t);
-    std::cout << "(1) "<< j << std::endl;
-    auto t2 = j.as<std::tuple<bool,int,std::string>>();
-```
-Output:
-```
-(1) [false,1,"foo"]
-```
+See [json_type_traits](doc/ref/json_type_traits.md)
 
 #### Convert from and to user defined types (and standard library containers of user defined types)
 
@@ -366,7 +350,7 @@ Output:
 
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
-#### Serialize C++ objects directly to JSON formatted streams, governed by `serialization_traits` 
+#### Serialize C++ objects directly to JSON formatted streams
 
 ```c++
 #include <iostream>
@@ -403,6 +387,8 @@ Output:
     "John Smith": ["Hourly","Software Engineer",10000.0]
 }
 ```
+
+See [dump](doc/ref/dump.md)
 
 #### Filter json names and values
 
