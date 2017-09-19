@@ -22,7 +22,7 @@ struct json_type_traits
 ```
 
 ### Specializations
-`T`|`j.is<T>`|`j.as<T>`|j is assignable from `T`
+`T`|`j.is<T>()`|`j.as<T>()`|j is assignable from `T`
 --------|-----------|--------------|---
 `Json`|`true`|self|<em>&#x2713;</em>
 `Json::object`|`true` if `j.is_object()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
