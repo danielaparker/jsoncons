@@ -39,7 +39,7 @@ const json example = json::parse(R"(
    }
 )");
 
-void check_select(const std::string pointer, const json& expected)
+void check_get(const std::string& pointer, const json& expected)
 {
 
     json result;
@@ -47,6 +47,13 @@ void check_select(const std::string pointer, const json& expected)
 
     std::tie(result,ec) = jsonpointer::get(example,pointer);
     BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+void check_contains(const std::string& pointer, bool expected)
+{
+
+    bool result = jsonpointer::contains(example,pointer);
     BOOST_CHECK_EQUAL(expected,result);
 }
 
@@ -59,7 +66,7 @@ void check_add(json& example, const std::string& path, const json& value, const 
 
 void check_replace(json& example, const std::string& path, const json& value, const json& expected)
 {
-    jsonpointer::jsonpointer_errc ec = jsonpointer::assign(example, path, value);
+    jsonpointer::jsonpointer_errc ec = jsonpointer::replace(example, path, value);
     BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
     BOOST_CHECK_EQUAL(expected, example);
 }
@@ -73,18 +80,31 @@ void check_remove(json& example, const std::string& path, const json& expected)
 
 BOOST_AUTO_TEST_CASE(test_jsonpointer)
 {
-    check_select("",example);
-    check_select("/foo",json::parse("[\"bar\", \"baz\"]"));
-    check_select("/foo/0",json("bar"));
-    check_select("/",json(0));
-    check_select("/a~1b",json(1));
-    check_select("/c%d",json(2));
-    check_select("/e^f",json(3));
-    check_select("/g|h",json(4));
-    check_select("/i\\j",json(5));
-    check_select("/k\"l",json(6));
-    check_select("/ ",json(7));
-    check_select("/m~0n",json(8));
+    check_contains("",true);
+    check_contains("/foo",true);
+    check_contains("/foo/0",true);
+    check_contains("/",true);
+    check_contains("/a~1b",true);
+    check_contains("/c%d",true);
+    check_contains("/e^f",true);
+    check_contains("/g|h",true);
+    check_contains("/i\\j",true);
+    check_contains("/k\"l",true);
+    check_contains("/ ",true);
+    check_contains("/m~0n",true);
+
+    check_get("",example);
+    check_get("/foo",json::parse("[\"bar\", \"baz\"]"));
+    check_get("/foo/0",json("bar"));
+    check_get("/",json(0));
+    check_get("/a~1b",json(1));
+    check_get("/c%d",json(2));
+    check_get("/e^f",json(3));
+    check_get("/g|h",json(4));
+    check_get("/i\\j",json(5));
+    check_get("/k\"l",json(6));
+    check_get("/ ",json(7));
+    check_get("/m~0n",json(8));
 }
 
 // add

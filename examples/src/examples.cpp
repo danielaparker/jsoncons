@@ -440,8 +440,6 @@ int main()
 
         validation_example();
 
-        jsonpointer_examples();
-
         serialization_examples();
 
         csv_examples();
@@ -449,6 +447,8 @@ int main()
         comment_example();
 
         jsonpatch_examples();
+
+        jsonpointer_examples();
     }
     catch (const std::exception& e)
     {

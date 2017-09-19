@@ -307,7 +307,7 @@ public:
         return ec;
     }
 
-    jsonpointer_errc assign(json_reference root,
+    jsonpointer_errc replace(json_reference root,
                              typename Json::string_view_type path,
                              const Json& value)
     {
@@ -606,6 +606,14 @@ std::tuple<Json,jsonpointer_errc> get(const Json& root, typename Json::string_vi
 }
 
 template<class Json>
+bool contains(const Json& root, typename Json::string_view_type path)
+{
+    detail::jsonpointer_evaluator<Json,const Json&,const Json*> evaluator;
+    jsonpointer_errc ec = evaluator.get(root,path);
+    return ec == jsonpointer_errc() ? true : false;
+}
+
+template<class Json>
 jsonpointer_errc insert_or_assign(Json& root, typename Json::string_view_type path, const Json& value)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
@@ -630,12 +638,23 @@ jsonpointer_errc erase(Json& root, typename Json::string_view_type path)
 }
 
 template<class Json>
+jsonpointer_errc replace(Json& root, typename Json::string_view_type path, const Json& value)
+{
+    detail::jsonpointer_evaluator<Json> evaluator;
+
+    return evaluator.replace(root,path,value);
+}
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+template<class Json>
 jsonpointer_errc assign(Json& root, typename Json::string_view_type path, const Json& value)
 {
     detail::jsonpointer_evaluator<Json> evaluator;
 
-    return evaluator.assign(root,path,value);
+    return evaluator.replace(root,path,value);
 }
+#endif
 
 template <class String>
 void escape(const String& s, std::basic_ostringstream<typename String::value_type>& os)

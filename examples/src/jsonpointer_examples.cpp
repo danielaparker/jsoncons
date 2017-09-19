@@ -53,9 +53,31 @@ void jsonpointer_select_RFC6901()
     std::cout << "(12) " << result << std::endl;
 }
 
+void jsonpointer_contains()
+{
+    // Example from RFC 6901
+    const json example = json::parse(R"(
+       {
+          "foo": ["bar", "baz"],
+          "": 0,
+          "a/b": 1,
+          "c%d": 2,
+          "e^f": 3,
+          "g|h": 4,
+          "i\\j": 5,
+          "k\"l": 6,
+          " ": 7,
+          "m~n": 8
+       }
+    )");
+
+    std::cout << "(1) " << jsonpointer::contains(example, "/foo/0") << std::endl;
+    std::cout << "(2) " << jsonpointer::contains(example, "e^g") << std::endl;
+}
+
 void jsonpointer_select_author()
 {
-    json root = json::parse(R"(
+    json doc = json::parse(R"(
     [
       { "category": "reference",
         "author": "Nigel Rees",
@@ -72,7 +94,7 @@ void jsonpointer_select_author()
 
     json result;
     jsonpointer::jsonpointer_errc ec;
-    std::tie(result,ec) = jsonpointer::get(root, "/1/author");
+    std::tie(result,ec) = jsonpointer::get(doc, "/1/author");
 
     if (ec == jsonpointer::jsonpointer_errc())
     {
@@ -212,7 +234,7 @@ void jsonpointer_replace_object_value()
         }
     )");
 
-    auto ec = jsonpointer::assign(target, "/baz", json("boo"));
+    auto ec = jsonpointer::replace(target, "/baz", json("boo"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -229,7 +251,7 @@ void jsonpointer_replace_array_value()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::assign(target, "/foo/1", json("qux"));
+    auto ec = jsonpointer::replace(target, "/foo/1", json("qux"));
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << pretty_print(target) << std::endl;
@@ -254,6 +276,7 @@ void jsonpointer_examples()
     jsonpointer_remove_array_element();
     jsonpointer_replace_object_value();
     jsonpointer_replace_array_value();
+    jsonpointer_contains();
     std::cout << std::endl;
 }
 

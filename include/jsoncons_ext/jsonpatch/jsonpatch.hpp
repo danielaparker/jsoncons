@@ -71,7 +71,7 @@ namespace detail {
                     }
                     else if (it->op == op_type::replace)
                     {
-                        if (jsonpointer::assign(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::replace(target,it->path,it->value) != jsonpointer::jsonpointer_errc())
                         {
                             //std::cout << "replace: " << it->path << std::endl;
                             break;
@@ -258,7 +258,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                             patch_ec = jsonpatch_errc::add_failed;
                             unwinder.state = detail::state_type::abort;
                         }
-                        else if (jsonpointer::assign(target,npath,val) != jsonpointer::jsonpointer_errc())
+                        else if (jsonpointer::replace(target,npath,val) != jsonpointer::jsonpointer_errc())
                         {
                             patch_ec = jsonpatch_errc::add_failed;
                             unwinder.state = detail::state_type::abort;
@@ -318,7 +318,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
-                else if (jsonpointer::assign(target,path,operation.at(value_key)) != jsonpointer::jsonpointer_errc())
+                else if (jsonpointer::replace(target,path,operation.at(value_key)) != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::replace_failed;
                     unwinder.state = detail::state_type::abort;
@@ -367,7 +367,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                                 patch_ec = jsonpatch_errc::copy_failed;
                                 unwinder.state = detail::state_type::abort;
                             }
-                            else if (jsonpointer::assign(target,npath,val) != jsonpointer::jsonpointer_errc())
+                            else if (jsonpointer::replace(target,npath,val) != jsonpointer::jsonpointer_errc())
                             {
                                 patch_ec = jsonpatch_errc::copy_failed;
                                 unwinder.state = detail::state_type::abort;
@@ -422,7 +422,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                                 patch_ec = jsonpatch_errc::copy_failed;
                                 unwinder.state = detail::state_type::abort;
                             }
-                            else if (jsonpointer::assign(target,npath,val) != jsonpointer::jsonpointer_errc())
+                            else if (jsonpointer::replace(target,npath,val) != jsonpointer::jsonpointer_errc())
                             {
                                 patch_ec = jsonpatch_errc::copy_failed;
                                 unwinder.state = detail::state_type::abort;

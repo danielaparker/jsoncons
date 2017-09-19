@@ -4,6 +4,10 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
 
 <table border="0">
   <tr>
+    <td><a href="contains.md">get</a></td>
+    <td>Returns `true` if the json document contains the given json pointer</td> 
+  </tr>
+  <tr>
     <td><a href="get.md">get</a></td>
     <td>Get a value from a JSON document using Json Pointer path notation.</td> 
   </tr>
@@ -20,7 +24,7 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
     <td>Removes a value from a JSON document using Json Pointer path notation.</td> 
   </tr>
   <tr>
-    <td><a href="assign.md">assign`</a></td>
+    <td><a href="replace.md">replace`</a></td>
     <td>Replaces a value in a JSON document using Json Pointer path notation.</td> 
   </tr>
 </table>
