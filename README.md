@@ -364,7 +364,7 @@ Output:
     std::list<book> l = j.as<std::list<book>>();
 ```
 
-See [Type Extensibility](doc/ref/Type%20Extensibility.md) for details.
+See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
 #### Serialize C++ objects directly to JSON formatted streams, governed by `serialization_traits` 
 
