@@ -4,7 +4,7 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
 
 <table border="0">
   <tr>
-    <td><a href="contains.md">get</a></td>
+    <td><a href="contains.md">contains</a></td>
     <td>Returns `true` if the json document contains the given json pointer</td> 
   </tr>
   <tr>
