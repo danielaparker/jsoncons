@@ -27,17 +27,17 @@ struct json_type_traits
 `Json`|`true`|self|<em>&#x2713;</em>
 `Json::object`|`true` if `j.is_object()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
 `Json::array`|`true` if `j.is_array()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`bool`|`true` if boolean, otherwise `false`|as `bool`|<em>&#x2713;</em>
-`null_type`|`true` if null, otherwise `false`|null value if null, otherwise throws|<em>&#x2713;</em>
+`bool`|`true` if `j.is_bool()`, otherwise `false`|as `bool`|<em>&#x2713;</em>
+`null_type`|`true` if `j.is_null()`, otherwise `false`|`null_type()` value if j.is_null(), otherwise throws|<em>&#x2713;</em>
 `const char_type*`|`true` if string, otherwise `false`|as `const char_type*`|<em>&#x2713;</em>
-`char_type*`|`true` if string, otherwise `false`|Compile-time error|<em>&#x2713;</em>
+`char_type*`|`true` if `j.is_string()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
 `integral types`|`true` if `j.is_integer()` or `j.is_uinteger()` and value is in range, otherwise `false`|integer cast to `char`|<em>&#x2713;</em>
 `floating point types`|`true` if j.is_double() and value is in range, otherwise `false`|integer cast to `float`|<em>&#x2713;</em>
 `string`|`true` if j.is_string(), otherwise `false`|as string|<em>&#x2713;</em>
 STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
 STL associative container e.g. std::map|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
 `std::tuple`|`true` if `j.is_array()` and each tuple element is assignable to a `Json` value, otherwise false|a tuple|<em>&#x2713;</em>
-`std::pair`|`true` if `j.is_array()` and first and second are assignable to a `Json` value, otherwise false|a tuple|<em>&#x2713;</em>
+`std::pair`|`true` if `j.is_array()` and `j.size()==2` and first and second are assignable to a `Json` value, otherwise false|a tuple|<em>&#x2713;</em>
 
 ### Examples
 
