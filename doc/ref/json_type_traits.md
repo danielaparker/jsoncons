@@ -36,8 +36,8 @@ struct json_type_traits
 `string`|`true` if j.is_string(), otherwise `false`|as string|<em>&#x2713;</em>
 STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
 STL associative container e.g. std::map|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
-`std::tuple`|`true` if `j.is_array()` and each tuple element is assignable to a `Json` value, otherwise false|a tuple|<em>&#x2713;</em>
-`std::pair`|`true` if `j.is_array()` and `j.size()==2` and first and second are assignable to a `Json` value, otherwise false|a tuple|<em>&#x2713;</em>
+`std::tuple`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
+`std::pair`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
 
 ### Examples
 
