@@ -22,32 +22,63 @@ struct json_type_traits
 ```
 
 ### Specializations
-`T`|`is<T>`|`as<T>`|Assignable from `T`
+`T`|`j.is<T>`|`j.as<T>`|j is assignable from `T`
 --------|-----------|--------------|---
 `Json`|`true`|self|<em>&#x2713;</em>
-`Json::object`|`true` if object, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`Json::array`|`true` if array, otherwise `false`|Compile-time error|<em>&#x2713;</em>
+`Json::object`|`true` if `j.is_object()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
+`Json::array`|`true` if `j.is_array()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
 `bool`|`true` if boolean, otherwise `false`|as `bool`|<em>&#x2713;</em>
 `null_type`|`true` if null, otherwise `false`|null value if null, otherwise throws|<em>&#x2713;</em>
 `const char_type*`|`true` if string, otherwise `false`|as `const char_type*`|<em>&#x2713;</em>
 `char_type*`|`true` if string, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`char`|`true` if integer and value in range, otherwise `false`|integer cast to `char`|<em>&#x2713;</em>
-`unsigned char`|`true` if integer and value in range, otherwise `false`|integer cast to `unsigned char`|<em>&#x2713;</em>
-`signed char`|`true` if integer and value in range, otherwise `false`|integer cast to `signed char`|<em>&#x2713;</em>
-`wchar_t`|`true` if integer and value in range, otherwise `false`|integer cast to `wchar_t`|<em>&#x2713;</em>
-`short`|`true` if integer and value in range, otherwise `false`|integer cast to `short`|<em>&#x2713;</em>
-`unsigned short`|`true` if integer and value in range, otherwise `false`|integer cast to `unsigned short`|<em>&#x2713;</em>
-`int`|`true` if integer and value in range, otherwise `false`|integer cast to `int`|<em>&#x2713;</em>
-`unsigned int`|`true` if integer and value in range, otherwise `false`|integer cast to `unsigned int`|<em>&#x2713;</em>
-`long`|`true` if integer and value in range, otherwise `false`|integer cast to `long`|<em>&#x2713;</em>
-`unsigned long`|`true` if integer and value in range, otherwise `false`|integer cast to `unsigned long`|<em>&#x2713;</em>
-`long  long`|`true` if integer and value in range, otherwise `false`|integer cast to `long  long`|<em>&#x2713;</em>
-`unsigned long  long`|`true` if integer and value in range, otherwise `false`|integer cast to `unsigned long  long`|<em>&#x2713;</em>
-`float`|`true` if integer and value in range, otherwise `false`|integer cast to `float`|<em>&#x2713;</em>
-`double`|`true` if integer and value in range, otherwise `false`|integer cast to `double`|<em>&#x2713;</em>
-`string`|`true` if string, otherwise `false`|as string|<em>&#x2713;</em>
+`integral types`|`true` if `j.is_integer()` or `j.is_uinteger()` and value is in range, otherwise `false`|integer cast to `char`|<em>&#x2713;</em>
+`floating point types`|`true` if j.is_double() and value is in range, otherwise `false`|integer cast to `float`|<em>&#x2713;</em>
+`string`|`true` if j.is_string(), otherwise `false`|as string|<em>&#x2713;</em>
 STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
 STL associative container e.g. std::map|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
+`std::tuple`|`true` if `j.is_array()` and each tuple element is assignable to a `Json` value, otherwise false|a tuple|<em>&#x2713;</em>
+`std::pair`|`true` if `j.is_array()` and first and second are assignable to a `Json` value, otherwise false|a tuple|<em>&#x2713;</em>
+
+### Examples
+
+#### Convert from and to standard library sequence containers
+
+```c++
+    std::vector<int> v{1, 2, 3, 4};
+    json j(v);
+    std::cout << "(1) "<< j << std::endl;
+    std::deque<int> d = j.as<std::deque<int>>();
+```
+Output:
+```
+(1) [1,2,3,4]
+```
+
+#### Convert from and to standard library associative containers
+
+```c++
+    std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
+    json j(m);
+    std::cout << "(1) " << j << std::endl;
+    std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
+```
+Output:
+```
+(1) {"one":1,"three":3,"two":2}
+```
+
+#### Convert from and to std::tuple
+
+```c++
+    auto t = std::make_tuple(false,1,"foo");
+    json j(t);
+    std::cout << "(1) "<< j << std::endl;
+    auto t2 = j.as<std::tuple<bool,int,std::string>>();
+```
+Output:
+```
+(1) [false,1,"foo"]
+```
 
 ### Extensibility
 
