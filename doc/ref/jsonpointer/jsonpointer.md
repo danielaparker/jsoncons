@@ -24,7 +24,7 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
     <td>Removes a value from a JSON document using Json Pointer path notation.</td> 
   </tr>
   <tr>
-    <td><a href="replace.md">replace`</a></td>
+    <td><a href="replace.md">replace</a></td>
     <td>Replaces a value in a JSON document using Json Pointer path notation.</td> 
   </tr>
 </table>
