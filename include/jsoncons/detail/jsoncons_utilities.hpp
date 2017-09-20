@@ -98,27 +98,11 @@ struct type_wrapper<const T&>
 
 // json_literals
 
-template <class CharT>
-struct json_literals
-{
-    static const std::pair<const CharT*,size_t> null_literal() 
-    {
-        static const CharT data[] = {'n','u','l','l',0};
-        return std::pair<const CharT*,size_t>{data,4};
-    }
-
-    static const std::pair<const CharT*,size_t> true_literal() 
-    {
-        static const CharT data[] = {'t','r','u','e',0};
-        return std::pair<const CharT*,size_t>{data,4};
-    }
-
-    static const std::pair<const CharT*,size_t> false_literal() 
-    {
-        static const CharT data[] = {'f','a','l','s','e',0};
-        return std::pair<const CharT*,size_t>{data,5};
-    }
-};
+namespace detail {
+JSONCONS_DEFINE_LITERAL(null_literal,"null");
+JSONCONS_DEFINE_LITERAL(true_literal,"true");
+JSONCONS_DEFINE_LITERAL(false_literal,"false");
+}
 
 inline
 unsigned char to_hex_character(unsigned char c)

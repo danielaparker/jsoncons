@@ -417,13 +417,13 @@ private:
 
         if (val)
         {
-            auto buf = json_literals<CharT>::true_literal();
-            os.write(buf.first,buf.second);
+            auto buf = jsoncons::detail::true_literal<CharT>();
+            os.write(buf,4);
         }
         else
         {
-            auto buf = json_literals<CharT>::false_literal();
-            os.write(buf.first,buf.second);
+            auto buf = jsoncons::detail::false_literal<CharT>();
+            os.write(buf,5);
         }
 
         end_value();
@@ -432,8 +432,8 @@ private:
     void do_null_value(buffered_output<CharT>& os) 
     {
         begin_value(os);
-        auto buf = json_literals<CharT>::null_literal();
-        os.write(buf.first,buf.second);
+        auto buf = jsoncons::detail::null_literal<CharT>();
+        os.write(buf,4);
         end_value();
 
     }

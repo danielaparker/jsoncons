@@ -301,8 +301,8 @@ private:
             begin_scalar_value();
         }
 
-        auto buf = json_literals<CharT>::null_literal();
-        bos_.write(buf.first,buf.second);
+        auto buf = detail::null_literal<CharT>();
+        bos_.write(buf, 4);
 
         end_value();
     }
@@ -377,13 +377,13 @@ private:
 
         if (value)
         {
-            auto buf = json_literals<CharT>::true_literal();
-            bos_.write(buf.first,buf.second);
+            auto buf = detail::true_literal<CharT>();
+            bos_.write(buf,4);
         }
         else
         {
-            auto buf = json_literals<CharT>::false_literal();
-            bos_.write(buf.first,buf.second);
+            auto buf = detail::false_literal<CharT>();
+            bos_.write(buf,5);
         }
 
         end_value();
