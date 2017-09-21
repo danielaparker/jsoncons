@@ -21,6 +21,17 @@ namespace jsoncons { namespace jsonpatch {
 
 namespace detail {
 
+    JSONCONS_DEFINE_LITERAL(test_literal,"test");
+    JSONCONS_DEFINE_LITERAL(add_literal,"add");
+    JSONCONS_DEFINE_LITERAL(remove_literal,"remove");
+    JSONCONS_DEFINE_LITERAL(replace_literal,"replace");
+    JSONCONS_DEFINE_LITERAL(move_literal,"move");
+    JSONCONS_DEFINE_LITERAL(copy_literal,"copy");
+    JSONCONS_DEFINE_LITERAL(op_literal,"op");
+    JSONCONS_DEFINE_LITERAL(path_literal,"path");
+    JSONCONS_DEFINE_LITERAL(from_literal,"from");
+    JSONCONS_DEFINE_LITERAL(value_literal,"value");
+
     enum class op_type {add,remove,replace};
     enum class state_type {begin,abort,commit};
 
@@ -89,17 +100,6 @@ namespace detail {
         typedef typename Json::string_type string_type;
         typedef typename Json::string_view_type string_view_type;
 
-        const string_type add_op = string_type({ 'a','d','d' });
-        const string_type remove_op = string_type({ 'r','e','m','o','v','e' });
-        const string_type replace_op = string_type({ 'r','e','p','l','a','c','e' });
-        const string_type move_op = string_type({ 'm','o','v','e' });
-        const string_type copy_op = string_type({ 'c','o','p','y' });
-
-        const string_type op_key = string_type({ 'o','p' });
-        const string_type path_key = string_type({ 'p','a','t','h' });
-        const string_type from_key = string_type({ 'f','r','o','m' });
-        const string_type value_key = string_type({ 'v','a','l','u','e' });
-
         Json result = typename Json::array();
 
         if (source == target)
@@ -122,8 +122,8 @@ namespace detail {
                 std::basic_ostringstream<char_type> ss; 
                 ss << path << '/' << i;
                 Json val = typename Json::object();
-                val.insert_or_assign(op_key, remove_op);
-                val.insert_or_assign(path_key, ss.str());
+                val.insert_or_assign(op_literal<char_type>(), remove_literal<char_type>());
+                val.insert_or_assign(path_literal<char_type>(), ss.str());
                 result.push_back(std::move(val));
             }
         }
@@ -143,8 +143,8 @@ namespace detail {
                 else
                 {
                     Json val = typename Json::object();
-                    val.insert_or_assign(op_key, remove_op);
-                    val.insert_or_assign(path_key, ss.str());
+                    val.insert_or_assign(op_literal<char_type>(), remove_literal<char_type>());
+                    val.insert_or_assign(path_literal<char_type>(), ss.str());
                     result.push_back(std::move(val));
                 }
             }
@@ -157,9 +157,9 @@ namespace detail {
                     ss << path << '/';
                     jsonpointer::escape(a.key(),ss);
                     Json val = typename Json::object();
-                    val.insert_or_assign(op_key, add_op);
-                    val.insert_or_assign(path_key, ss.str());
-                    val.insert_or_assign(value_key, a.value());
+                    val.insert_or_assign(op_literal<char_type>(), add_literal<char_type>());
+                    val.insert_or_assign(path_literal<char_type>(), ss.str());
+                    val.insert_or_assign(value_literal<char_type>(), a.value());
                     result.push_back(std::move(val));
                 }
             }
@@ -167,9 +167,9 @@ namespace detail {
         else
         {
             Json val = typename Json::object();
-            val.insert_or_assign(op_key, replace_op);
-            val.insert_or_assign(path_key, path);
-            val.insert_or_assign(value_key, target);
+            val.insert_or_assign(op_literal<char_type>(), replace_literal<char_type>());
+            val.insert_or_assign(path_literal<char_type>(), path);
+            val.insert_or_assign(value_literal<char_type>(), target);
             result.push_back(std::move(val));
         }
 
@@ -180,20 +180,9 @@ namespace detail {
 template <class Json>
 std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const Json& patch)
 {
+    typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
     typedef typename Json::string_view_type string_view_type;
-
-    const string_type test_op = string_type({ 't','e','s','t' });
-    const string_type add_op = string_type({ 'a','d','d' });
-    const string_type remove_op = string_type({ 'r','e','m','o','v','e' });
-    const string_type replace_op = string_type({ 'r','e','p','l','a','c','e' });
-    const string_type move_op = string_type({ 'm','o','v','e' });
-    const string_type copy_op = string_type({ 'c','o','p','y' });
-
-    const string_type op_key = string_type({ 'o','p' });
-    const string_type path_key = string_type({ 'p','a','t','h' });
-    const string_type from_key = string_type({ 'f','r','o','m' });
-    const string_type value_key = string_type({ 'v','a','l','u','e' });
 
     detail::operation_unwinder<Json> unwinder(target);
 
@@ -205,17 +194,17 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
     {
         unwinder.state = detail::state_type::begin;
 
-        if (operation.count(op_key) != 1 || operation.count(path_key) != 1)
+        if (operation.count(detail::op_literal<char_type>()) != 1 || operation.count(detail::path_literal<char_type>()) != 1)
         {
             patch_ec = jsonpatch_errc::invalid_patch;
             unwinder.state = detail::state_type::abort;
         }
         else
         {
-            const string_view_type op = operation.at(op_key).as_string_view();
-            const string_view_type path = operation.at(path_key).as_string_view();
+            const string_view_type op = operation.at(detail::op_literal<char_type>()).as_string_view();
+            const string_view_type path = operation.at(detail::path_literal<char_type>()).as_string_view();
 
-            if (op == test_op)
+            if (op == detail::test_literal<char_type>())
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
@@ -225,27 +214,27 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     patch_ec = jsonpatch_errc::test_failed;
                     unwinder.state = detail::state_type::abort;
                 }
-                else if (operation.count(value_key) != 1)
+                else if (operation.count(detail::value_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
-                else if (val != operation.at(value_key))
+                else if (val != operation.at(detail::value_literal<char_type>()))
                 {
                     patch_ec = jsonpatch_errc::test_failed;
                     unwinder.state = detail::state_type::abort;
                 }
             }
-            else if (op == add_op)
+            else if (op == detail::add_literal<char_type>())
             {
-                if (operation.count(value_key) != 1)
+                if (operation.count(detail::value_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
                 else
                 {
-                    Json val = operation.at(value_key);
+                    Json val = operation.at(detail::value_literal<char_type>());
                     auto npath = jsonpointer::normalized_path(target,path);
                     auto insert_ec = jsonpointer::insert(target,npath,val); // try insert without replace
                     if (insert_ec == jsonpointer::jsonpointer_errc::key_already_exists) // try a replace
@@ -279,7 +268,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     }
                 }
             }
-            else if (op == remove_op)
+            else if (op == detail::remove_literal<char_type>())
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
@@ -303,7 +292,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     }
                 }
             }
-            else if (op == replace_op)
+            else if (op == detail::replace_literal<char_type>())
             {
                 Json val;
                 jsonpointer::jsonpointer_errc ec;
@@ -313,12 +302,12 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     patch_ec = jsonpatch_errc::replace_failed;
                     unwinder.state = detail::state_type::abort;
                 }
-                else if (operation.count(value_key) != 1)
+                else if (operation.count(detail::value_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
                 }
-                else if (jsonpointer::replace(target,path,operation.at(value_key)) != jsonpointer::jsonpointer_errc())
+                else if (jsonpointer::replace(target,path,operation.at(detail::value_literal<char_type>())) != jsonpointer::jsonpointer_errc())
                 {
                     patch_ec = jsonpatch_errc::replace_failed;
                     unwinder.state = detail::state_type::abort;
@@ -328,9 +317,9 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     unwinder.stack.push_back({detail::op_type::replace,path,val});
                 }
             }
-            else if (op == move_op)
+            else if (op == detail::move_literal<char_type>())
             {
-                if (operation.count(from_key) != 1)
+                if (operation.count(detail::from_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
@@ -339,7 +328,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                 {
                     Json val;
                     jsonpointer::jsonpointer_errc ec;
-                    string_view_type from = operation.at(from_key).as_string_view();
+                    string_view_type from = operation.at(detail::from_literal<char_type>()).as_string_view();
                     std::tie(val,ec) = jsonpointer::get(target,from);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {
@@ -389,9 +378,9 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                     }           
                 }
             }
-            else if (op == copy_op)
+            else if (op == detail::copy_literal<char_type>())
             {
-                if (operation.count(from_key) != 1)
+                if (operation.count(detail::from_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
                     unwinder.state = detail::state_type::abort;
@@ -400,7 +389,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                 {
                     Json val;
                     jsonpointer::jsonpointer_errc ec;
-                    string_view_type from = operation.at(from_key).as_string_view();
+                    string_view_type from = operation.at(detail::from_literal<char_type>()).as_string_view();
                     std::tie(val,ec) = jsonpointer::get(target,from);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {

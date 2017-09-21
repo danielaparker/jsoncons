@@ -22,6 +22,22 @@
 
 namespace jsoncons { namespace jsonpath { namespace detail {
 
+JSONCONS_DEFINE_LITERAL(eqtilde_literal,"=~");
+JSONCONS_DEFINE_LITERAL(star_literal,"*");
+JSONCONS_DEFINE_LITERAL(forwardslash_literal,"/");
+JSONCONS_DEFINE_LITERAL(plus_literal,"+");
+JSONCONS_DEFINE_LITERAL(minus_literal,"-");
+JSONCONS_DEFINE_LITERAL(lt_literal,"<");
+JSONCONS_DEFINE_LITERAL(lte_literal,"<=");
+JSONCONS_DEFINE_LITERAL(gt_literal,">");
+JSONCONS_DEFINE_LITERAL(gte_literal,">=");
+JSONCONS_DEFINE_LITERAL(eq_literal,"==");
+JSONCONS_DEFINE_LITERAL(ne_literal,"!=");
+JSONCONS_DEFINE_LITERAL(ampamp_literal,"&&");
+JSONCONS_DEFINE_LITERAL(pipepipe_literal,"||");
+JSONCONS_DEFINE_LITERAL(max_literal,"max");
+JSONCONS_DEFINE_LITERAL(min_literal,"min");
+
 template<class Json>
 struct PathConstructor
 {
@@ -1032,20 +1048,6 @@ public:
     }
 };
 
-JSONCONS_DEFINE_LITERAL(eqtilde_literal,"=~");
-JSONCONS_DEFINE_LITERAL(star_literal,"*");
-JSONCONS_DEFINE_LITERAL(forwardslash_literal,"/");
-JSONCONS_DEFINE_LITERAL(plus_literal,"+");
-JSONCONS_DEFINE_LITERAL(minus_literal,"-");
-JSONCONS_DEFINE_LITERAL(lt_literal,"<");
-JSONCONS_DEFINE_LITERAL(lte_literal,"<=");
-JSONCONS_DEFINE_LITERAL(gt_literal,">");
-JSONCONS_DEFINE_LITERAL(gte_literal,">=");
-JSONCONS_DEFINE_LITERAL(eq_literal,"==");
-JSONCONS_DEFINE_LITERAL(ne_literal,"!=");
-JSONCONS_DEFINE_LITERAL(ampamp_literal,"&&");
-JSONCONS_DEFINE_LITERAL(pipepipe_literal,"||");
-
 template <class Json>
 class jsonpath_filter_parser
 {
@@ -1069,7 +1071,7 @@ class jsonpath_filter_parser
         const function_dictionary functions_ =
         {
             {
-                string_type({'m','a','x'}),{1,true,true,[](const term<Json>& term)
+                max_literal<char_type>(),{1,true,true,[](const term<Json>& term)
                       {
                           Json a = term.evaluate_single_node();
 
@@ -1087,7 +1089,7 @@ class jsonpath_filter_parser
                 }
             },
             {
-                string_type({'m','i','n'}),{1,true,true,[](const term<Json>& term) 
+                min_literal<char_type>(),{1,true,true,[](const term<Json>& term) 
                       {
                           Json a = term.evaluate_single_node();
 
