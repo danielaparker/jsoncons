@@ -1032,6 +1032,19 @@ public:
     }
 };
 
+JSONCONS_DEFINE_LITERAL(eqtilde_literal,"=~");
+JSONCONS_DEFINE_LITERAL(star_literal,"*");
+JSONCONS_DEFINE_LITERAL(forwardslash_literal,"/");
+JSONCONS_DEFINE_LITERAL(plus_literal,"+");
+JSONCONS_DEFINE_LITERAL(minus_literal,"-");
+JSONCONS_DEFINE_LITERAL(lt_literal,"<");
+JSONCONS_DEFINE_LITERAL(lte_literal,"<=");
+JSONCONS_DEFINE_LITERAL(gt_literal,">");
+JSONCONS_DEFINE_LITERAL(gte_literal,">=");
+JSONCONS_DEFINE_LITERAL(eq_literal,"==");
+JSONCONS_DEFINE_LITERAL(ne_literal,"!=");
+JSONCONS_DEFINE_LITERAL(ampamp_literal,"&&");
+JSONCONS_DEFINE_LITERAL(pipepipe_literal,"||");
 
 template <class Json>
 class jsonpath_filter_parser
@@ -1111,19 +1124,19 @@ class jsonpath_filter_parser
 
         const binary_operator_map operators =
         {
-            {string_type({'=','~'}),{2,false,[](const term<Json>& a, const term<Json>& b) {return a.regex_term(b); }}},
-            {string_type({'*'}),{3,false,[](const term<Json>& a, const term<Json>& b) {return a.mult_term(b); }}},
-            {string_type({'/'}),{3,false,[](const term<Json>& a, const term<Json>& b) {return a.div_term(b); }}},
-            {string_type({'+'}),{4,false,[](const term<Json>& a, const term<Json>& b) {return a.plus_term(b); }}},
-            {string_type({'-'}),{4,false,[](const term<Json>& a, const term<Json>& b) {return a.minus_term(b); }}},
-            {string_type({'<'}),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b); }}},
-            {string_type({'<','='}),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b) || a.eq_term(b); }}},
-            {string_type({'>'}),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b); }}},
-            {string_type({'>','='}),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b) || a.eq_term(b); }}},
-            {string_type({'=','='}),{6,false,[](const term<Json>& a, const term<Json>& b) {return a.eq_term(b); }}},
-            {string_type({'!','='}),{6,false,[](const term<Json>& a, const term<Json>& b) {return a.ne_term(b); }}},
-            {string_type({'&','&'}),{7,false,[](const term<Json>& a, const term<Json>& b) {return a.ampamp_term(b); }}},
-            {string_type({'|','|'}),{8,false,[](const term<Json>& a, const term<Json>& b) {return a.pipepipe_term(b); }}}
+            {eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) {return a.regex_term(b); }}},
+            {star_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) {return a.mult_term(b); }}},
+            {forwardslash_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) {return a.div_term(b); }}},
+            {plus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) {return a.plus_term(b); }}},
+            {minus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) {return a.minus_term(b); }}},
+            {lt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b); }}},
+            {lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b) || a.eq_term(b); }}},
+            {gt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b); }}},
+            {gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b) || a.eq_term(b); }}},
+            {eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) {return a.eq_term(b); }}},
+            {ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) {return a.ne_term(b); }}},
+            {ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) {return a.ampamp_term(b); }}},
+            {pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) {return a.pipepipe_term(b); }}}
         };
 
     public:
