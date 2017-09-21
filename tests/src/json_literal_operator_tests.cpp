@@ -10,6 +10,8 @@
 #include <ctime>
 #include <map>
 
+#if defined(JSONCONS_HAS_USER_DEFINED_LITERALS)
+
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
@@ -92,4 +94,6 @@ BOOST_AUTO_TEST_CASE(ojson_literal_operator_test2)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+#endif
 

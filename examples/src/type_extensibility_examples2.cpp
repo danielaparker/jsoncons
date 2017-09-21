@@ -6,6 +6,8 @@
 #include <memory>
 #include <jsoncons/json.hpp>
 
+#if defined(JSONCONS_HAS_USER_DEFINED_LITERALS)
+
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
@@ -132,3 +134,4 @@ void type_extensibility_examples2()
 
     std::cout << "(3)\n" << pretty_print(j2) << std::endl;
 }
+#endif

@@ -61,11 +61,11 @@ public:
 
     basic_osequencebuf(const basic_osequencebuf<CharT,Traits>&) = delete;
 
-    basic_osequencebuf(basic_osequencebuf<CharT,Traits>&&) = default;
+    //basic_osequencebuf(basic_osequencebuf<CharT,Traits>&&) = default;
 
     basic_osequencebuf<CharT,Traits>& operator=(const basic_osequencebuf<CharT,Traits>&) = delete;
 
-    basic_osequencebuf<CharT,Traits>& operator=(basic_osequencebuf<CharT,Traits>&&) = default;
+    //basic_osequencebuf<CharT,Traits>& operator=(basic_osequencebuf<CharT,Traits>&&) = default;
 
     const CharT* data() const
     {
@@ -226,7 +226,7 @@ public:
 
     basic_osequencestream(const basic_osequencestream<CharT,Traits>&) = delete;
 
-    basic_osequencestream(basic_osequencestream<CharT,Traits>&&) = default;
+    //basic_osequencestream(basic_osequencestream<CharT,Traits>&&) = default;
 
     virtual ~basic_osequencestream() JSONCONS_NOEXCEPT 
     { 
@@ -234,7 +234,7 @@ public:
 
     basic_osequencestream<CharT,Traits>& operator=(const basic_osequencestream<CharT,Traits>&) = delete;
 
-    basic_osequencestream<CharT,Traits>& operator=(basic_osequencestream<CharT,Traits>&&) = default;
+    //basic_osequencestream<CharT,Traits>& operator=(basic_osequencestream<CharT,Traits>&&) = default;
 
     const CharT* data() const
     {
