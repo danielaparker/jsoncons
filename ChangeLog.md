@@ -1,3 +1,8 @@
+master
+------
+
+- Restore support for vs2013
+
 0.99.9.1
 --------
 

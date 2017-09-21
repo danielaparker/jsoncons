@@ -342,10 +342,10 @@ public:
     {
     }
     token(const token& t) = default;
-    token(token&& t) = default;
+    //token(token&& t) = default;
 
     token<Json>& operator=(const token<Json>& val) = default;
-    token<Json>& operator=(token<Json>&& val) = default;
+    //token<Json>& operator=(token<Json>&& val) = default;
 
     bool is_operator() const
     {
