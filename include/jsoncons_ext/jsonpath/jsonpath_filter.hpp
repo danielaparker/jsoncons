@@ -277,6 +277,15 @@ struct function_properties
 {
     typedef std::function<Json(const term<Json>&)> function_type;
 
+    function_properties(size_t level,
+                        bool right_associative,
+                        bool aggregate,
+                        function_type operation)
+        : level(level), is_right_associative(right_associative), 
+          is_aggregate(aggregate), op(operation)
+    {
+    }
+
     size_t precedence_level;
     bool is_right_associative;
     bool is_aggregate;

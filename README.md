@@ -390,6 +390,86 @@ Output:
 
 See [dump](doc/ref/dump.md)
 
+#### Dump json fragments into a larger document
+
+```c++
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    const json some_books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        }
+    ]
+    )");
+
+    const json more_books = json::parse(R"(
+    [
+        {
+            "title" : "A Wild Sheep Chase: A Novel",
+            "author" : "Haruki Murakami",
+            "price" : 9.01
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer",
+            "price" : 8.00
+        }
+    ]
+    )");
+
+    json_serializer serializer(std::cout, true); // pretty print
+    serializer.begin_json();
+    serializer.begin_array();
+    for (const auto& book : some_books.array_range())
+    {
+        book.dump_fragment(serializer);
+    }
+    for (const auto& book : more_books.array_range())
+    {
+        book.dump_fragment(serializer);
+    }
+    serializer.end_array();
+    serializer.end_json();
+}
+```
+Output:
+```json
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 12.0,
+        "title": "Women: A Novel"
+    },
+    {
+        "author": "Haruki Murakami",
+        "price": 9.01,
+        "title": "A Wild Sheep Chase: A Novel"
+    },
+    {
+        "author": "Ivan Passer",
+        "price": 8.0,
+        "title": "Cutter's Way"
+    }
+]
+```
+
 #### Filter json names and values
 
 You can rename object members with the built in filter [rename_object_member_filter](doc/ref/rename_object_member_filter.md)
