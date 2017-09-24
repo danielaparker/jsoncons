@@ -1010,7 +1010,7 @@ public:
 };
 
 template<class Json>
-std::vector<uint8_t> encode_cbor(const Json& j)
+cbor_value encode_cbor(const Json& j)
 {
     size_t n = 0;
     cbor_Encoder_<Json>::encode(j,Calculate_size_(),n);
@@ -1019,13 +1019,13 @@ std::vector<uint8_t> encode_cbor(const Json& j)
     v.reserve(n);
 
     cbor_Encoder_<Json>::encode(j,Encode_cbor_(),v);
-    return v;
+    return cbor_value(std::move(v));
 }
 
 template<class Json>
-Json decode_cbor(const std::vector<uint8_t>& v)
+Json decode_cbor(const cbor_value& v)
 {
-    Decode_cbor_<Json> decoder(v.data(),v.data()+v.size());
+    Decode_cbor_<Json> decoder(v.bytes().begin(),v.bytes().end());
     return decoder.decode();
 }
 

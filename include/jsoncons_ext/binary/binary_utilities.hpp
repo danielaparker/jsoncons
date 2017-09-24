@@ -125,8 +125,11 @@ class bytes_view
     const uint8_t* data_;
     size_t length_; 
 public:
+    typedef uint8_t value_type;
+    typedef const uint8_t& const_reference;
     typedef const uint8_t* const_iterator;
     typedef const uint8_t* iterator;
+    typedef std::size_t size_type;
 
     bytes_view(const uint8_t* data, size_t length)
         : data_(data), length_(length)
@@ -148,6 +151,11 @@ public:
         return length_;
     }
 
+    size_t size() const
+    {
+        return length_;
+    }
+
     // iterator support 
     const_iterator begin() const JSONCONS_NOEXCEPT
     {
@@ -156,6 +164,28 @@ public:
     const_iterator end() const JSONCONS_NOEXCEPT
     {
         return data_ + length_;
+    }
+
+    const_reference operator[](size_type pos) const 
+    { 
+        return data_[pos]; 
+    }
+
+    friend bool operator==(const bytes_view& lhs, 
+                           const bytes_view& rhs)
+    {
+        if (lhs.length() != rhs.length())
+        {
+            return false;
+        }
+        for (size_t i = 0; i < lhs.length(); ++i)
+        {
+            if (lhs[i] != rhs[i])
+            {
+                return false;
+            }
+        }
+        return true;
     }
 };
 
