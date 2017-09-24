@@ -116,7 +116,50 @@
 #  pragma GCC optimize("-ffunction-sections")
 #endif
 
-namespace jsoncons { namespace detail { namespace binary {
+namespace jsoncons { namespace binary { 
+
+// bytes_view
+
+class bytes_view
+{
+    const uint8_t* data_;
+    size_t length_; 
+public:
+    typedef const uint8_t* const_iterator;
+    typedef const uint8_t* iterator;
+
+    bytes_view(const uint8_t* data, size_t length)
+        : data_(data), length_(length)
+    {
+    }
+
+    operator std::vector<uint8_t>() const
+    { 
+        return std::vector<uint8_t>(begin(),end()); 
+    }
+
+    const uint8_t* data() const
+    {
+        return data_;
+    }
+
+    size_t length() const
+    {
+        return length_;
+    }
+
+    // iterator support 
+    const_iterator begin() const JSONCONS_NOEXCEPT
+    {
+        return data_;
+    }
+    const_iterator end() const JSONCONS_NOEXCEPT
+    {
+        return data_ + length_;
+    }
+};
+
+namespace detail {
 
 static inline bool add_check_overflow(size_t v1, size_t v2, size_t *r)
 {
@@ -327,6 +370,8 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
     return *reinterpret_cast<T*>(&data);
 }
 
-}}}
+}
+
+}}
 
 #endif
