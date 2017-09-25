@@ -27,7 +27,6 @@ public:
 
     static const int default_stack_size = 1000;
 
-    typedef Json json_type;
     typedef typename Json::key_value_pair_type key_value_pair_type;
     typedef typename Json::string_type string_type;
     typedef typename Json::key_storage_type key_storage_type;

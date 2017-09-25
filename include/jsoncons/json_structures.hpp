@@ -162,7 +162,6 @@ public:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> val_allocator_type;
 
     typedef typename Json::array_storage_type array_storage_type;
-    typedef typename Json::json_type json_type;
 
     typedef typename array_storage_type::iterator iterator;
     typedef typename array_storage_type::const_iterator const_iterator;
@@ -361,7 +360,7 @@ public:
     }
 #endif
     template <class... Args>
-    json_type& emplace_back(Args&&... args)
+    Json& emplace_back(Args&&... args)
     {
         elements_.emplace_back(std::forward<Args>(args)...);
         return elements_.back();

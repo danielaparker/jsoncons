@@ -128,6 +128,7 @@ public:
     using string_storage_type = typename json_traits_type::template string_storage<char_allocator_type>;
 
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
+    typedef json_type value_type;
     typedef key_value_pair<key_storage_type,json_type> key_value_pair_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
