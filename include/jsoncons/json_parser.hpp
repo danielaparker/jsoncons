@@ -1672,51 +1672,45 @@ negative_zero:
         switch (*p_)
         {
             case '\r': 
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 ++p_;
                 ++column_;
                 push_state(state_);
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 push_state(state_);
                 ++p_;
                 ++column_;
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 ++p_;
                 ++column_;
                 push_state(state_);
                 state_ = parse_state::slash;
                 return;
             case '}':
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 do_end_object(ec);
                 ++p_;
                 ++column_;
                 if (ec) return;
                 return;
             case ']':
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 do_end_array(ec);
                 ++p_;
                 ++column_;
@@ -1735,9 +1729,8 @@ negative_zero:
                 ++column_;
                 goto exp1;
             case ',':
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
                 ++p_;
@@ -1763,51 +1756,45 @@ negative_integer:
         switch (*p_)
         {
             case '\r': 
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 push_state(state_);
                 ++p_;
                 ++column_;
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 push_state(state_);
                 ++p_;
                 ++column_;
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 push_state(state_);
                 ++p_;
                 ++column_;
                 state_ = parse_state::slash;
                 return;
             case '}':
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 do_end_object(ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
                 return;
             case ']':
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 do_end_array(ec);
                 if (ec) return;
                 ++p_;
@@ -1834,9 +1821,8 @@ negative_integer:
                 ++column_;
                 goto fraction1;
             case ',':
-                handler_.integer_value(negative_val_, *this);
-                //end_integer_value(ec);
-                //if (ec) return;
+                end_integer_value(ec);
+                if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
                 ++p_;
@@ -1863,7 +1849,7 @@ positive_zero:
         switch (*p_)
         {
             case '\r': 
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
@@ -1871,7 +1857,7 @@ positive_zero:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1879,12 +1865,12 @@ positive_zero:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
@@ -1892,7 +1878,7 @@ positive_zero:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 do_end_object(ec);
                 ++p_;
@@ -1900,7 +1886,7 @@ positive_zero:
                 if (ec) return;
                 return;
             case ']':
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 do_end_array(ec);
                 ++p_;
@@ -1920,7 +1906,7 @@ positive_zero:
                 ++column_;
                 goto exp1;
             case ',':
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -1947,7 +1933,7 @@ positive_integer:
         switch (*p_)
         {
             case '\r': 
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1955,7 +1941,7 @@ positive_integer:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1963,12 +1949,12 @@ positive_integer:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1976,7 +1962,7 @@ positive_integer:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 do_end_object(ec);
                 if (ec) return;
@@ -1984,7 +1970,7 @@ positive_integer:
                 ++column_;
                 return;
             case ']':
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 do_end_array(ec);
                 if (ec) return;
@@ -2012,7 +1998,7 @@ positive_integer:
                 ++column_;
                 goto fraction1;
             case ',':
-                end_integer_value(ec);
+                end_uinteger_value(ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -2810,6 +2796,9 @@ escape_u9:
             {
                 case parse_state::positive_zero:  
                 case parse_state::positive_integer:
+                    end_uinteger_value(ec);
+                    if (ec) return;
+                    break;
                 case parse_state::negative_zero:  
                 case parse_state::negative_integer:
                     end_integer_value(ec);
@@ -2960,56 +2949,33 @@ private:
 
     void end_integer_value(std::error_code& ec)
     {
-        if (is_negative_)
+        handler_.integer_value(negative_val_, *this);
+
+        switch (parent())
         {
-            int64_t d;
-            if (try_string_to_integer(is_negative_, string_buffer_.data(), string_buffer_.length(),d))
+        case parse_state::array:
+        case parse_state::object:
+            state_ = parse_state::expect_comma_or_end;
+            break;
+        case parse_state::root:
+            state_ = parse_state::done;
+            handler_.end_json();
+            break;
+        default:
+            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
             {
-                handler_.integer_value(d, *this);
+                ec = json_parser_errc::invalid_json_text;
+                return;
             }
-            else
-            {
-                try
-                {
-                    double d2 = str_to_double_(string_buffer_.data(), string_buffer_.length());
-                    handler_.double_value(-d2, static_cast<uint8_t>(string_buffer_.length()), *this);
-                }
-                catch (...)
-                {
-                    if (err_handler_.error(json_parser_errc::invalid_number, *this))
-                    {
-                        ec = json_parser_errc::invalid_number;
-                        return;
-                    }
-                    handler_.null_value(*this);
-                }
-            }
+            break;
         }
-        else
-        {
-            uint64_t d;
-            if (try_string_to_uinteger(string_buffer_.data(), string_buffer_.length(),d))
-            {
-                handler_.uinteger_value(d, *this);
-            }
-            else
-            {
-                try
-                {
-                    double d2 = str_to_double_(string_buffer_.data(),string_buffer_.length());
-                    handler_.double_value(d2, static_cast<uint8_t>(string_buffer_.length()), *this);
-                }
-                catch (...)
-                {
-                    if (err_handler_.error(json_parser_errc::invalid_number, *this))
-                    {
-                        ec = json_parser_errc::invalid_number;
-                        return;
-                    }
-                    handler_.null_value(*this);
-                }
-            }
-        }
+        string_buffer_.clear();
+        is_negative_ = false;
+    }
+
+    void end_uinteger_value(std::error_code& ec)
+    {
+        handler_.uinteger_value(positive_val_, *this);
 
         switch (parent())
         {
