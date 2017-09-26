@@ -58,7 +58,7 @@ public:
     }
 };
 
-enum class value_type : uint8_t 
+enum class json_value_type_tag : uint8_t 
 {
     null_t = 0,
     bool_t,
@@ -158,9 +158,9 @@ public:
     {
         struct base_data
         {
-            value_type type_id_;
+            json_value_type_tag type_id_;
 
-            base_data(value_type id)
+            base_data(json_value_type_tag id)
                 : type_id_(id)
             {}
         };
@@ -168,7 +168,7 @@ public:
         struct null_data : public base_data
         {
             null_data()
-                : base_data(value_type::null_t)
+                : base_data(json_value_type_tag::null_t)
             {
             }
         };
@@ -176,7 +176,7 @@ public:
         struct empty_object_data : public base_data
         {
             empty_object_data()
-                : base_data(value_type::empty_object_t)
+                : base_data(json_value_type_tag::empty_object_t)
             {
             }
         };
@@ -186,12 +186,12 @@ public:
             bool val_;
 
             bool_data(bool val)
-                : base_data(value_type::bool_t),val_(val)
+                : base_data(json_value_type_tag::bool_t),val_(val)
             {
             }
 
             bool_data(const bool_data& val)
-                : base_data(value_type::bool_t),val_(val.val_)
+                : base_data(json_value_type_tag::bool_t),val_(val.val_)
             {
             }
 
@@ -207,12 +207,12 @@ public:
             int64_t val_;
 
             integer_data(int64_t val)
-                : base_data(value_type::integer_t),val_(val)
+                : base_data(json_value_type_tag::integer_t),val_(val)
             {
             }
 
             integer_data(const integer_data& val)
-                : base_data(value_type::integer_t),val_(val.val_)
+                : base_data(json_value_type_tag::integer_t),val_(val.val_)
             {
             }
 
@@ -227,12 +227,12 @@ public:
             uint64_t val_;
 
             uinteger_data(uint64_t val)
-                : base_data(value_type::uinteger_t),val_(val)
+                : base_data(json_value_type_tag::uinteger_t),val_(val)
             {
             }
 
             uinteger_data(const uinteger_data& val)
-                : base_data(value_type::uinteger_t),val_(val.val_)
+                : base_data(json_value_type_tag::uinteger_t),val_(val.val_)
             {
             }
 
@@ -248,14 +248,14 @@ public:
             double val_;
 
             double_data(double val, uint8_t precision)
-                : base_data(value_type::double_t), 
+                : base_data(json_value_type_tag::double_t), 
                   precision_(precision), 
                   val_(val)
             {
             }
 
             double_data(const double_data& val)
-                : base_data(value_type::double_t),
+                : base_data(json_value_type_tag::double_t),
                   precision_(val.precision_), 
                   val_(val.val_)
             {
@@ -281,7 +281,7 @@ public:
             char_type data_[capacity];
 
             small_string_data(const char_type* p, uint8_t length)
-                : base_data(value_type::small_string_t), length_(length)
+                : base_data(json_value_type_tag::small_string_t), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
@@ -289,7 +289,7 @@ public:
             }
 
             small_string_data(const small_string_data& val)
-                : base_data(value_type::small_string_t), length_(val.length_)
+                : base_data(json_value_type_tag::small_string_t), length_(val.length_)
             {
                 std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
                 data_[length_] = 0;
@@ -334,44 +334,44 @@ public:
             }
 
             string_data(const Json_string_<json_type>& val)
-                : base_data(value_type::string_t)
+                : base_data(json_value_type_tag::string_t)
             {
                 create(val.get_allocator(), val);
             }
 
             string_data(pointer ptr)
-                : base_data(value_type::string_t)
+                : base_data(json_value_type_tag::string_t)
             {
                 ptr_ = ptr;
             }
 
             string_data(const Json_string_<json_type>& val, const Allocator& a)
-                : base_data(value_type::string_t)
+                : base_data(json_value_type_tag::string_t)
             {
                 create(string_holder_allocator_type(a), val, a);
             }
 
             string_data(const string_data & val)
-                : base_data(value_type::string_t)
+                : base_data(json_value_type_tag::string_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             string_data(const string_data & val, const Allocator& a)
-                : base_data(value_type::string_t)
+                : base_data(json_value_type_tag::string_t)
             {
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
 
             template<class InputIterator>
             string_data(InputIterator first, InputIterator last, const Allocator& a)
-                : base_data(value_type::string_t)
+                : base_data(json_value_type_tag::string_t)
             {
                 create(string_holder_allocator_type(a), first, last, a);
             }
 
             string_data(const char_type* data, size_t length, const Allocator& a)
-                : base_data(value_type::string_t)
+                : base_data(json_value_type_tag::string_t)
             {
                 create(string_holder_allocator_type(a), data, length, a);
             }
@@ -426,37 +426,37 @@ public:
             }
 
             explicit object_data(const Allocator& a)
-                : base_data(value_type::object_t)
+                : base_data(json_value_type_tag::object_t)
             {
                 create(a,a);
             }
 
             explicit object_data(pointer ptr)
-                : base_data(value_type::object_t)
+                : base_data(json_value_type_tag::object_t)
             {
                 ptr_ = ptr;
             }
 
             explicit object_data(const object & val)
-                : base_data(value_type::object_t)
+                : base_data(json_value_type_tag::object_t)
             {
                 create(val.get_allocator(), val);
             }
 
             explicit object_data(const object & val, const Allocator& a)
-                : base_data(value_type::object_t)
+                : base_data(json_value_type_tag::object_t)
             {
                 create(object_allocator(a), val, a);
             }
 
             explicit object_data(const object_data & val)
-                : base_data(value_type::object_t)
+                : base_data(json_value_type_tag::object_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             explicit object_data(const object_data & val, const Allocator& a)
-                : base_data(value_type::object_t)
+                : base_data(json_value_type_tag::object_t)
             {
                 create(object_allocator(a), *(val.ptr_), a);
             }
@@ -511,38 +511,38 @@ public:
             }
 
             array_data(const array& val)
-                : base_data(value_type::array_t)
+                : base_data(json_value_type_tag::array_t)
             {
                 create(val.get_allocator(), val);
             }
 
             array_data(pointer ptr)
-                : base_data(value_type::array_t)
+                : base_data(json_value_type_tag::array_t)
             {
                 ptr_ = ptr;
             }
 
             array_data(const array& val, const Allocator& a)
-                : base_data(value_type::array_t)
+                : base_data(json_value_type_tag::array_t)
             {
                 create(array_allocator(a), val, a);
             }
 
             array_data(const array_data & val)
-                : base_data(value_type::array_t)
+                : base_data(json_value_type_tag::array_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             array_data(const array_data & val, const Allocator& a)
-                : base_data(value_type::array_t)
+                : base_data(json_value_type_tag::array_t)
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
 
             template<class InputIterator>
             array_data(InputIterator first, InputIterator last, const Allocator& a)
-                : base_data(value_type::array_t)
+                : base_data(json_value_type_tag::array_t)
             {
                 create(array_allocator(a), first, last, a);
             }
@@ -711,13 +711,13 @@ public:
         {
             switch (type_id())
             {
-            case value_type::string_t:
+            case json_value_type_tag::string_t:
                 reinterpret_cast<string_data*>(&data_)->~string_data();
                 break;
-            case value_type::object_t:
+            case json_value_type_tag::object_t:
                 reinterpret_cast<object_data*>(&data_)->~object_data();
                 break;
-            case value_type::array_t:
+            case json_value_type_tag::array_t:
                 reinterpret_cast<array_data*>(&data_)->~array_data();
                 break;
             default:
@@ -732,34 +732,34 @@ public:
                 Destroy_();
                 switch (val.type_id())
                 {
-                case value_type::null_t:
+                case json_value_type_tag::null_t:
                     new(reinterpret_cast<void*>(&data_))null_data();
                     break;
-                case value_type::empty_object_t:
+                case json_value_type_tag::empty_object_t:
                     new(reinterpret_cast<void*>(&data_))empty_object_data();
                     break;
-                case value_type::double_t:
+                case json_value_type_tag::double_t:
                     new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                     break;
-                case value_type::integer_t:
+                case json_value_type_tag::integer_t:
                     new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
                     break;
-                case value_type::uinteger_t:
+                case json_value_type_tag::uinteger_t:
                     new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
                     break;
-                case value_type::bool_t:
+                case json_value_type_tag::bool_t:
                     new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
                     break;
-                case value_type::small_string_t:
+                case json_value_type_tag::small_string_t:
                     new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
                     break;
-                case value_type::string_t:
+                case json_value_type_tag::string_t:
                     new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
                     break;
-                case value_type::object_t:
+                case json_value_type_tag::object_t:
                     new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
                     break;
-                case value_type::array_t:
+                case json_value_type_tag::array_t:
                     new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
                     break;
                 default:
@@ -780,7 +780,7 @@ public:
             return *this;
         }
 
-        value_type type_id() const
+        json_value_type_tag type_id() const
         {
             return reinterpret_cast<const base_data*>(&data_)->type_id_;
         }
@@ -854,9 +854,9 @@ public:
         {
             switch (type_id())
             {
-            case value_type::small_string_t:
+            case json_value_type_tag::small_string_t:
                 return string_view_type(small_string_data_cast()->data(),small_string_data_cast()->length());
-            case value_type::string_t:
+            case json_value_type_tag::string_t:
                 return string_view_type(string_data_cast()->data(),string_data_cast()->length());
             default:
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a string");
@@ -1323,34 +1323,34 @@ public:
         {
             switch (val.type_id())
             {
-            case value_type::null_t:
+            case json_value_type_tag::null_t:
                 new(reinterpret_cast<void*>(&data_))null_data();
                 break;
-            case value_type::empty_object_t:
+            case json_value_type_tag::empty_object_t:
                 new(reinterpret_cast<void*>(&data_))empty_object_data();
                 break;
-            case value_type::double_t:
+            case json_value_type_tag::double_t:
                 new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                 break;
-            case value_type::integer_t:
+            case json_value_type_tag::integer_t:
                 new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
                 break;
-            case value_type::uinteger_t:
+            case json_value_type_tag::uinteger_t:
                 new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
                 break;
-            case value_type::bool_t:
+            case json_value_type_tag::bool_t:
                 new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
                 break;
-            case value_type::small_string_t:
+            case json_value_type_tag::small_string_t:
                 new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
                 break;
-            case value_type::string_t:
+            case json_value_type_tag::string_t:
                 new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
                 break;
-            case value_type::object_t:
+            case json_value_type_tag::object_t:
                 new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
                 break;
-            case value_type::array_t:
+            case json_value_type_tag::array_t:
                 new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
                 break;
             default:
@@ -1362,22 +1362,22 @@ public:
         {
             switch (val.type_id())
             {
-            case value_type::null_t:
-            case value_type::empty_object_t:
-            case value_type::double_t:
-            case value_type::integer_t:
-            case value_type::uinteger_t:
-            case value_type::bool_t:
-            case value_type::small_string_t:
+            case json_value_type_tag::null_t:
+            case json_value_type_tag::empty_object_t:
+            case json_value_type_tag::double_t:
+            case json_value_type_tag::integer_t:
+            case json_value_type_tag::uinteger_t:
+            case json_value_type_tag::bool_t:
+            case json_value_type_tag::small_string_t:
                 Init_(val);
                 break;
-            case value_type::string_t:
+            case json_value_type_tag::string_t:
                 new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
                 break;
-            case value_type::object_t:
+            case json_value_type_tag::object_t:
                 new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),a);
                 break;
-            case value_type::array_t:
+            case json_value_type_tag::array_t:
                 new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),a);
                 break;
             default:
@@ -1389,31 +1389,31 @@ public:
         {
             switch (val.type_id())
             {
-            case value_type::null_t:
-            case value_type::empty_object_t:
-            case value_type::double_t:
-            case value_type::integer_t:
-            case value_type::uinteger_t:
-            case value_type::bool_t:
-            case value_type::small_string_t:
+            case json_value_type_tag::null_t:
+            case json_value_type_tag::empty_object_t:
+            case json_value_type_tag::double_t:
+            case json_value_type_tag::integer_t:
+            case json_value_type_tag::uinteger_t:
+            case json_value_type_tag::bool_t:
+            case json_value_type_tag::small_string_t:
                 Init_(val);
                 break;
-            case value_type::string_t:
+            case json_value_type_tag::string_t:
                 {
                     new(reinterpret_cast<void*>(&data_))string_data(val.string_data_cast()->ptr_);
-                    val.string_data_cast()->type_id_ = value_type::null_t;
+                    val.string_data_cast()->type_id_ = json_value_type_tag::null_t;
                 }
                 break;
-            case value_type::object_t:
+            case json_value_type_tag::object_t:
                 {
                     new(reinterpret_cast<void*>(&data_))object_data(val.object_data_cast()->ptr_);
-                    val.object_data_cast()->type_id_ = value_type::null_t;
+                    val.object_data_cast()->type_id_ = json_value_type_tag::null_t;
                 }
                 break;
-            case value_type::array_t:
+            case json_value_type_tag::array_t:
                 {
                     new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
-                    val.array_data_cast()->type_id_ = value_type::null_t;
+                    val.array_data_cast()->type_id_ = json_value_type_tag::null_t;
                 }
                 break;
             default:
@@ -1430,16 +1430,16 @@ public:
         {
             switch (val.type_id())
             {
-            case value_type::null_t:
-            case value_type::empty_object_t:
-            case value_type::double_t:
-            case value_type::integer_t:
-            case value_type::uinteger_t:
-            case value_type::bool_t:
-            case value_type::small_string_t:
+            case json_value_type_tag::null_t:
+            case json_value_type_tag::empty_object_t:
+            case json_value_type_tag::double_t:
+            case json_value_type_tag::integer_t:
+            case json_value_type_tag::uinteger_t:
+            case json_value_type_tag::bool_t:
+            case json_value_type_tag::small_string_t:
                 Init_(std::forward<variant>(val));
                 break;
-            case value_type::string_t:
+            case json_value_type_tag::string_t:
                 {
                     if (a == val.string_data_cast()->get_allocator())
                     {
@@ -1451,7 +1451,7 @@ public:
                     }
                 }
                 break;
-            case value_type::object_t:
+            case json_value_type_tag::object_t:
                 {
                     if (a == val.object_data_cast()->get_allocator())
                     {
@@ -1463,7 +1463,7 @@ public:
                     }
                 }
                 break;
-            case value_type::array_t:
+            case json_value_type_tag::array_t:
                 {
                     if (a == val.array_data_cast()->get_allocator())
                     {
@@ -1567,7 +1567,7 @@ public:
             return evaluate().size();
         }
 
-        value_type type_id() const
+        json_value_type_tag type_id() const
         {
             return evaluate().type_id();
         }
@@ -2516,11 +2516,11 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             return 0;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().size();
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return array_value().size();
         default:
             return 0;
@@ -2541,10 +2541,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t: 
+        case json_value_type_tag::empty_object_t: 
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return json_proxy<json_type>(*this, key_storage_type(name.begin(),name.end(),char_allocator_type(object_value().get_allocator())));
             break;
         default:
@@ -2593,30 +2593,30 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             handler.string_value(as_string_view());
             break;
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             handler.double_value(var_.double_data_cast()->value(), var_.double_data_cast()->precision());
             break;
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             handler.integer_value(var_.integer_data_cast()->value());
             break;
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             handler.uinteger_value(var_.uinteger_data_cast()->value());
             break;
-        case value_type::bool_t:
+        case json_value_type_tag::bool_t:
             handler.bool_value(var_.bool_data_cast()->value());
             break;
-        case value_type::null_t:
+        case json_value_type_tag::null_t:
             handler.null_value();
             break;
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             handler.begin_object();
             handler.end_object();
             break;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 handler.begin_object();
                 const object& o = object_value();
@@ -2628,7 +2628,7 @@ public:
                 handler.end_object();
             }
             break;
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             {
                 handler.begin_array();
                 const array& o = array_value();
@@ -2752,14 +2752,14 @@ public:
 #endif
     bool is_null() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::null_t;
+        return var_.type_id() == json_value_type_tag::null_t;
     }
 
     bool has_key(string_view_type name) const
     {
         switch (var_.type_id())
         {
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 return it != object_range().end();
@@ -2774,7 +2774,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 auto it = object_value().find(name);
                 if (it == object_range().end())
@@ -2803,58 +2803,58 @@ public:
 
     bool is_string() const JSONCONS_NOEXCEPT
     {
-        return (var_.type_id() == value_type::string_t) || (var_.type_id() == value_type::small_string_t);
+        return (var_.type_id() == json_value_type_tag::string_t) || (var_.type_id() == json_value_type_tag::small_string_t);
     }
 
 
     bool is_bool() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::bool_t;
+        return var_.type_id() == json_value_type_tag::bool_t;
     }
 
     bool is_object() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::object_t || var_.type_id() == value_type::empty_object_t;
+        return var_.type_id() == json_value_type_tag::object_t || var_.type_id() == json_value_type_tag::empty_object_t;
     }
 
     bool is_array() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::array_t;
+        return var_.type_id() == json_value_type_tag::array_t;
     }
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::integer_t || (var_.type_id() == value_type::uinteger_t && (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<long long>::max)())));
+        return var_.type_id() == json_value_type_tag::integer_t || (var_.type_id() == json_value_type_tag::uinteger_t && (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<long long>::max)())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::uinteger_t || (var_.type_id() == value_type::integer_t && as_integer() >= 0);
+        return var_.type_id() == json_value_type_tag::uinteger_t || (var_.type_id() == json_value_type_tag::integer_t && as_integer() >= 0);
     }
 
     bool is_double() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::double_t;
+        return var_.type_id() == json_value_type_tag::double_t;
     }
 
     bool is_number() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::integer_t || var_.type_id() == value_type::uinteger_t || var_.type_id() == value_type::double_t;
+        return var_.type_id() == json_value_type_tag::integer_t || var_.type_id() == json_value_type_tag::uinteger_t || var_.type_id() == json_value_type_tag::double_t;
     }
 
     bool empty() const JSONCONS_NOEXCEPT
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
+        case json_value_type_tag::small_string_t:
             return var_.small_string_data_cast()->length() == 0;
-        case value_type::string_t:
+        case json_value_type_tag::string_t:
             return var_.string_data_cast()->length() == 0;
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return array_value().size() == 0;
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             return true;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().size() == 0;
         default:
             return false;
@@ -2865,9 +2865,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return array_value().capacity();
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().capacity();
         default:
             return 0;
@@ -2892,16 +2892,16 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().reserve(n);
             break;
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
         {
             create_object_implicitly();
             object_value().reserve(n);
         }
         break;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
         {
             object_value().reserve(n);
         }
@@ -2915,7 +2915,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().resize(n);
             break;
         default:
@@ -2928,7 +2928,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().resize(n, val);
             break;
         default:
@@ -2953,8 +2953,8 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             try
             {
                 json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
@@ -2965,13 +2965,13 @@ public:
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
             }
             break;
-        case value_type::bool_t:
+        case json_value_type_tag::bool_t:
             return var_.bool_data_cast()->value();
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return var_.double_data_cast()->value() != 0.0;
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             return var_.integer_data_cast()->value() != 0;
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             return var_.uinteger_data_cast()->value() != 0;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a bool");
@@ -2982,8 +2982,8 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             try
             {
                 json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
@@ -2994,13 +2994,13 @@ public:
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
             }
             break;
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return static_cast<int64_t>(var_.double_data_cast()->value());
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             return static_cast<int64_t>(var_.integer_data_cast()->value());
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             return static_cast<int64_t>(var_.uinteger_data_cast()->value());
-        case value_type::bool_t:
+        case json_value_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an integer");
@@ -3011,8 +3011,8 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             try
             {
                 json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
@@ -3023,13 +3023,13 @@ public:
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
             }
             break;
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return static_cast<uint64_t>(var_.double_data_cast()->value());
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             return static_cast<uint64_t>(var_.integer_data_cast()->value());
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             return static_cast<uint64_t>(var_.uinteger_data_cast()->value());
-        case value_type::bool_t:
+        case json_value_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned integer");
@@ -3040,7 +3040,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return var_.double_data_cast()->precision();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
@@ -3051,8 +3051,8 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             try
             {
                 json_type j = json_type::parse(as_string_view().data(),as_string_view().length());
@@ -3063,13 +3063,13 @@ public:
                 JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
             }
             break;
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return var_.double_data_cast()->value();
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             return static_cast<double>(var_.integer_data_cast()->value());
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             return static_cast<double>(var_.uinteger_data_cast()->value());
-        case value_type::null_t:
+        case json_value_type_tag::null_t:
             return std::numeric_limits<double>::quiet_NaN();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
@@ -3085,8 +3085,8 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length());
         default:
             return to_string();
@@ -3098,8 +3098,8 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length(),allocator);
         default:
             return to_string(allocator);
@@ -3110,8 +3110,8 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length());
         default:
             return to_string(options);
@@ -3124,8 +3124,8 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
-        case value_type::string_t:
+        case json_value_type_tag::small_string_t:
+        case json_value_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length(),allocator);
         default:
             return to_string(options,allocator);
@@ -3136,9 +3136,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::small_string_t:
+        case json_value_type_tag::small_string_t:
             return var_.small_string_data_cast()->c_str();
-        case value_type::string_t:
+        case json_value_type_tag::string_t:
             return var_.string_data_cast()->c_str();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
@@ -3148,9 +3148,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 auto it = object_value().find(name);
                 if (it == object_range().end())
@@ -3195,9 +3195,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 auto it = object_value().find(name);
                 if (it == object_range().end())
@@ -3218,13 +3218,13 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             if (i >= array_value().size())
             {
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
             return array_value().operator[](i);
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().at(i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
@@ -3235,13 +3235,13 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             if (i >= array_value().size())
             {
                 JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
             }
             return array_value().operator[](i);
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().at(i);
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Index on non-array value not supported");
@@ -3252,9 +3252,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             return object_range().end();
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().find(name);
         default:
             {
@@ -3267,9 +3267,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             return object_range().end();
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().find(name);
         default:
             {
@@ -3283,11 +3283,11 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             {
                 return json_type(std::forward<T>(default_val));
             }
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
@@ -3311,11 +3311,11 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             {
                 return default_val;
             }
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
@@ -3338,11 +3338,11 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             {
                 return default_val;
             }
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
@@ -3367,10 +3367,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().shrink_to_fit();
             break;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             object_value().shrink_to_fit();
             break;
         default:
@@ -3382,10 +3382,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().clear();
             break;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             object_value().clear();
             break;
         default:
@@ -3397,9 +3397,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             break;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             object_value().erase(pos);
             break;
         default:
@@ -3412,9 +3412,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             break;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             object_value().erase(first, last);
             break;
         default:
@@ -3427,7 +3427,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().erase(pos);
             break;
         default:
@@ -3440,7 +3440,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().erase(first, last);
             break;
         default:
@@ -3455,9 +3455,9 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             break;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             object_value().erase(name);
             break;
         default:
@@ -3471,10 +3471,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().insert_or_assign(name, std::forward<T>(val));
         default:
             {
@@ -3488,10 +3488,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().insert_or_assign(name, std::forward<T>(val));
         default:
             {
@@ -3505,10 +3505,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().try_emplace(name, std::forward<Args>(args)...);
         default:
             {
@@ -3522,10 +3522,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             object_value().set_(std::forward<key_storage_type>(name), std::forward<T>(val));
             break;
         default:
@@ -3541,10 +3541,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().merge(source.object_value());
         default:
             {
@@ -3557,10 +3557,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().merge(std::move(source.object_value()));
         default:
             {
@@ -3573,10 +3573,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().merge(hint, source.object_value());
         default:
             {
@@ -3589,10 +3589,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().merge(hint, std::move(source.object_value()));
         default:
             {
@@ -3607,10 +3607,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().merge_or_update(source.object_value());
         default:
             {
@@ -3623,10 +3623,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().merge_or_update(std::move(source.object_value()));
         default:
             {
@@ -3639,10 +3639,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().merge_or_update(hint, source.object_value());
         default:
             {
@@ -3655,10 +3655,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().merge_or_update(hint, std::move(source.object_value()));
         default:
             {
@@ -3674,10 +3674,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().insert_or_assign(hint, name, std::forward<T>(val));
         default:
             {
@@ -3691,10 +3691,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().insert_or_assign(hint, name, std::forward<T>(val));
         default:
             {
@@ -3708,10 +3708,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().try_emplace(hint, name, std::forward<Args>(args)...);
         default:
             {
@@ -3725,10 +3725,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return object_value().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(val));
             break;
         default:
@@ -3743,7 +3743,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().push_back(std::forward<T>(val));
             break;
         default:
@@ -3758,7 +3758,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().push_back(std::forward<T>(val));
             break;
         default:
@@ -3773,7 +3773,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return array_value().insert(pos, std::forward<T>(val));
             break;
         default:
@@ -3788,7 +3788,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return array_value().insert(pos, std::forward<T>(val));
             break;
         default:
@@ -3803,7 +3803,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return array_value().insert(pos, first, last);
             break;
         default:
@@ -3818,7 +3818,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return array_value().emplace(pos, std::forward<Args>(args)...);
             break;
         default:
@@ -3833,7 +3833,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return array_value().emplace_back(std::forward<Args>(args)...);
         default:
             {
@@ -3842,7 +3842,7 @@ public:
         }
     }
 
-    value_type type_id() const
+    json_value_type_tag type_id() const
     {
         return var_.type_id();
     }
@@ -3995,9 +3995,9 @@ public:
 
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             return a_null;
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 return it != object_range().end() ? it->value() : a_null;
@@ -4011,12 +4011,12 @@ public:
 
     bool is_longlong() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::integer_t;
+        return var_.type_id() == json_value_type_tag::integer_t;
     }
 
     bool is_ulonglong() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == value_type::uinteger_t;
+        return var_.type_id() == json_value_type_tag::uinteger_t;
     }
 
     long long as_longlong() const
@@ -4033,13 +4033,13 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return static_cast<int>(var_.double_data_cast()->value());
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             return static_cast<int>(var_.integer_data_cast()->value());
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             return static_cast<int>(var_.uinteger_data_cast()->value());
-        case value_type::bool_t:
+        case json_value_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an int");
@@ -4050,13 +4050,13 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return static_cast<unsigned int>(var_.double_data_cast()->value());
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             return static_cast<unsigned int>(var_.integer_data_cast()->value());
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             return static_cast<unsigned int>(var_.uinteger_data_cast()->value());
-        case value_type::bool_t:
+        case json_value_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned int");
@@ -4067,13 +4067,13 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return static_cast<long>(var_.double_data_cast()->value());
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             return static_cast<long>(var_.integer_data_cast()->value());
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             return static_cast<long>(var_.uinteger_data_cast()->value());
-        case value_type::bool_t:
+        case json_value_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a long");
@@ -4084,13 +4084,13 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::double_t:
+        case json_value_type_tag::double_t:
             return static_cast<unsigned long>(var_.double_data_cast()->value());
-        case value_type::integer_t:
+        case json_value_type_tag::integer_t:
             return static_cast<unsigned long>(var_.integer_data_cast()->value());
-        case value_type::uinteger_t:
+        case json_value_type_tag::uinteger_t:
             return static_cast<unsigned long>(var_.uinteger_data_cast()->value());
-        case value_type::bool_t:
+        case json_value_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an unsigned long");
@@ -4101,7 +4101,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 return it != object_range().end();
@@ -4116,7 +4116,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             array_value().remove_range(from_index, to_index);
             break;
         default:
@@ -4205,9 +4205,9 @@ public:
         static json_type empty_object = object();
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             return range<object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return range<object_iterator>(object_value().begin(),object_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -4219,9 +4219,9 @@ public:
         static const json_type empty_object = object();
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             return range<const_object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return range<const_object_iterator>(object_value().begin(),object_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an object");
@@ -4232,7 +4232,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return range<array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
@@ -4243,7 +4243,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return range<const_array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
@@ -4254,7 +4254,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return var_.array_data_cast()->value();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad array cast");
@@ -4266,7 +4266,7 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::array_t:
+        case json_value_type_tag::array_t:
             return var_.array_data_cast()->value();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad array cast");
@@ -4278,10 +4278,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return var_.object_data_cast()->value();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad object cast");
@@ -4293,10 +4293,10 @@ public:
     {
         switch (var_.type_id())
         {
-        case value_type::empty_object_t:
+        case json_value_type_tag::empty_object_t:
             const_cast<json_type*>(this)->create_object_implicitly(); // HERE
             // FALLTHRU
-        case value_type::object_t:
+        case json_value_type_tag::object_t:
             return var_.object_data_cast()->value();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Bad object cast");

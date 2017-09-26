@@ -143,6 +143,7 @@ enum class parse_state : uint8_t
     negative_zero,  
     negative_integer,
     positive_integer,
+    try_fraction,
     fraction1,
     fraction2,
     exp1,
@@ -1146,6 +1147,7 @@ public:
             case parse_state::negative_zero:  
             case parse_state::positive_integer: 
             case parse_state::negative_integer: 
+            case parse_state::try_fraction: 
             case parse_state::fraction1: 
             case parse_state::fraction2: 
             case parse_state::exp1: 
@@ -1530,6 +1532,8 @@ public:
                 goto positive_integer;
             case parse_state::negative_integer:
                 goto negative_integer;
+            case parse_state::try_fraction:
+                goto try_fraction;
             case parse_state::fraction1:
                 goto fraction1;
             case parse_state::fraction2:
@@ -1564,6 +1568,37 @@ minus:
         default:
             err_handler_.error(json_parser_errc::expected_value, *this);
             ec = json_parser_errc::expected_value;
+            return;
+        }
+try_fraction:
+        if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
+        {
+            state_ = parse_state::positive_integer;
+            return;
+        }
+        switch (*p_)
+        {
+        case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+            string_buffer_.push_back(*p_);
+            ++p_;
+            ++column_;
+            goto positive_integer;
+        case '.':
+            precision_ = static_cast<uint8_t>(string_buffer_.length());
+            string_buffer_.push_back(*p_);
+            ++p_;
+            ++column_;
+            goto fraction1;
+        case 'e':case 'E':
+            precision_ = static_cast<uint8_t>(string_buffer_.length());
+            string_buffer_.push_back(*p_);
+            ++p_;
+            ++column_;
+            goto exp1;
+        default:
+            err_handler_.error(json_parser_errc::invalid_number, *this);
+            ec = json_parser_errc::invalid_number;
+            state_ = parse_state::positive_integer;
             return;
         }
 positive_zero:
