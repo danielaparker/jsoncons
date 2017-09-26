@@ -533,6 +533,7 @@ public:
                 break;
             case parse_state::start: 
                 {
+                    handler_.begin_json();
                     switch (*p_)
                     {
                     JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -564,41 +565,35 @@ public:
                         state_ = parse_state::slash;
                         break;
                     case '{':
-                        handler_.begin_json();
                         do_begin_object(ec);
                         if (ec) return;
                         ++p_;
                         ++column_;
                         break;
                     case '[':
-                        handler_.begin_json();
                         do_begin_array(ec);
                         if (ec) return;
                         ++p_;
                         ++column_;
                         break;
                     case '\"':
-                        handler_.begin_json();
                         state_ = parse_state::string_u1;
                         ++p_;
                         ++column_;
                         break;
                     case '-':
-                        handler_.begin_json();
                         is_negative_ = true;
                         state_ = parse_state::minus;
                         ++p_;
                         ++column_;
                         break;
                     case '0': 
-                        handler_.begin_json();
                         string_buffer_.push_back(*p_);
                         state_ = parse_state::zero;
                         ++p_;
                         ++column_;
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        handler_.begin_json();
                         string_buffer_.push_back(*p_);
                         state_ = parse_state::integer;
                         ++p_;
