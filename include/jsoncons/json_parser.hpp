@@ -2684,18 +2684,20 @@ escape_u9:
         {
             switch (state_)
             {
-            case parse_state::positive_zero:  
-            case parse_state::positive_integer:
-                end_integer_value(ec);
-                if (ec) return;
-                break;
-            case parse_state::fraction2:
-            case parse_state::exp3:
-                end_fraction_value(ec);
-                if (ec) return;
-                break;
-            default:
-                break;
+                case parse_state::positive_zero:  
+                case parse_state::positive_integer:
+                case parse_state::negative_zero:  
+                case parse_state::negative_integer:
+                    end_integer_value(ec);
+                    if (ec) return;
+                    break;
+                case parse_state::fraction2:
+                case parse_state::exp3:
+                    end_fraction_value(ec);
+                    if (ec) return;
+                    break;
+                default:
+                    break;
             }
         }
         if (state_ == parse_state::lf || state_ == parse_state::cr)
