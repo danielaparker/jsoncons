@@ -191,6 +191,55 @@ BOOST_AUTO_TEST_CASE(test_multiple)
     }
 }
 
+BOOST_AUTO_TEST_CASE(test_uinteger_overflow)
+{
+    uint64_t m = (std::numeric_limits<uint64_t>::max)();
+    std::string s1 = std::to_string(m);
+    std::string s2 = s1;
+    s2.push_back('0');
+    
+    uint64_t result;
+    BOOST_CHECK(try_string_to_uinteger(s1.data(), s1.length(), result));
+    BOOST_CHECK(m == result);
+    BOOST_CHECK(!try_string_to_uinteger(s2.data(), s2.length(), result));
+
+    json j1 =  json::parse(s1);
+    BOOST_CHECK(m == j1.as_uinteger());
+}
+
+BOOST_AUTO_TEST_CASE(test_negative_integer_overflow)
+{
+    int64_t m = (std::numeric_limits<int64_t>::max)();
+    std::string s1 = std::to_string(m);
+    std::string s2 = s1;
+    s2.push_back('0');
+    
+    int64_t result;
+    BOOST_CHECK(try_string_to_integer(true, s1.data(), s1.length(), result));
+    BOOST_CHECK(-m == result);
+    BOOST_CHECK(!try_string_to_integer(true, s2.data(), s2.length(), result));
+
+    std::string s3 = "-" + s1;
+    json j1 =  json::parse(s3);
+    BOOST_CHECK(-m == j1.as_integer());
+}
+
+BOOST_AUTO_TEST_CASE(test_positive_integer_overflow)
+{
+    int64_t m = (std::numeric_limits<int64_t>::max)();
+    std::string s1 = std::to_string(m);
+    std::string s2 = s1;
+    s2.push_back('0');
+    
+    int64_t result;
+    BOOST_CHECK(try_string_to_integer(false,s1.data(), s1.length(), result));
+    BOOST_CHECK(m == result);
+    BOOST_CHECK(!try_string_to_integer(false,s2.data(), s2.length(), result));
+
+    json j1 =  json::parse(s1);
+    BOOST_CHECK(m == j1.as_integer());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
