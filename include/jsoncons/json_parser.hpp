@@ -38,17 +38,17 @@ bool try_string_to_uinteger(const CharT *s, size_t length, uint64_t& result)
     for (size_t i = 0; i < length; ++i)
     {
         uint64_t x = s[i] - '0';
-        if (n > max_value_div_10)
+        if (n > max_value_div_10 - x)
         {
             return false;
         }
-        n = n * 10;
-        if (n > max_value - x)
-        {
-            return false;
-        }
+        n = n * 10 + x;
+        //if (n > max_value - x)
+        //{
+        //    return false;
+        //}
 
-        n += x;
+        //n += x;
     }
     result = n;
     return true;
@@ -67,17 +67,17 @@ bool try_string_to_integer(bool has_neg, const CharT *s, size_t length, int64_t&
         for (const CharT* p = s; p < end; ++p)
         {
             int64_t x = *p - '0';
-            if (n < min_value_div_10)
+            if (n < min_value_div_10 + x)
             {
                 return false;
             }
-            n = n * 10;
-            if (n < min_value + x)
-            {
-                return false;
-            }
+            n = n * 10 - x;
+            //if (n < min_value + x)
+            //{
+            //    return false;
+            //}
 
-            n -= x;
+            //n -= x;
         }
         result = n;
         return true;
@@ -92,17 +92,17 @@ bool try_string_to_integer(bool has_neg, const CharT *s, size_t length, int64_t&
         for (const CharT* p = s; p < end; ++p)
         {
             int64_t x = *p - '0';
-            if (n > max_value_div_10)
+            if (n > max_value_div_10 - x)
             {
                 return false;
             }
-            n = n * 10;
-            if (n > max_value - x)
-            {
-                return false;
-            }
+            n = n * 10 + x;
+            //if (n > max_value - x)
+            //{
+            //    return false;
+            //}
 
-            n += x;
+            //n += x;
         }
         result = n;
         return true;
