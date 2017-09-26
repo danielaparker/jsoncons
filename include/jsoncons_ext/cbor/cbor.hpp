@@ -55,19 +55,19 @@ struct cbor_Encoder_
     {
         switch (jval.type_id())
         {
-            case value_type::null_t:
+            case json_type_tag::null_t:
             {
                 action(static_cast<uint8_t>(0xf6),v);
                 break;
             }
 
-            case value_type::bool_t:
+            case json_type_tag::bool_t:
             {
                 action(static_cast<uint8_t>(jval.as_bool() ? 0xf5 : 0xf4),v);
                 break;
             }
 
-            case value_type::integer_t:
+            case json_type_tag::integer_t:
             {
                 int64_t val = jval.as_integer();
                 if (val >= 0)
@@ -128,7 +128,7 @@ struct cbor_Encoder_
                 break;
             }
 
-        case value_type::uinteger_t:
+        case json_type_tag::uinteger_t:
             {
                 uint64_t val = jval.as_uinteger();
                 if (val <= 0x17)
@@ -158,21 +158,21 @@ struct cbor_Encoder_
                 break;
             }
 
-            case value_type::double_t:
+            case json_type_tag::double_t:
             {
                 action(static_cast<uint8_t>(0xfb), v);
                 action(jval.as_double(),v);
                 break;
             }
 
-            case value_type::small_string_t:
-            case value_type::string_t:
+            case json_type_tag::small_string_t:
+            case json_type_tag::string_t:
             {
                 encode_string(jval.as_string_view(), action, v);
                 break;
             }
 
-            case value_type::array_t:
+            case json_type_tag::array_t:
             {
                 const auto length = jval.array_value().size();
                 if (length <= 0x17)
@@ -208,7 +208,7 @@ struct cbor_Encoder_
                 break;
             }
 
-            case value_type::object_t:
+            case json_type_tag::object_t:
             {
                 const auto length = jval.object_value().size();
                 if (length <= 0x17)
