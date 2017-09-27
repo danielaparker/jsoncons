@@ -2014,7 +2014,7 @@ positive_integer:
 try_fraction:
         if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
         {
-            state_ = parse_state::positive_integer;
+            state_ = parse_state::try_fraction;
             return;
         }
         switch (*p_)
@@ -2847,6 +2847,7 @@ escape_u9:
                     end_integer_value(ec);
                     if (ec) return;
                     break;
+                case parse_state::try_fraction: // overflowed integer, no '.' or e
                 case parse_state::fraction2:
                 case parse_state::exp3:
                     end_fraction_value(ec);
