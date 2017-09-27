@@ -2838,54 +2838,114 @@ private:
 
     void end_integer_value(std::error_code& ec)
     {
-        handler_.integer_value(negative_val_, *this);
+        static const int64_t min_value = (std::numeric_limits<int64_t>::min)();
+        static const int64_t min_value_div_10 = min_value / 10;
 
-        switch (parent())
+        int64_t n = 0;
+        bool overflow = false;
+        const CharT* end = string_buffer_.data()+string_buffer_.length(); 
+        for (const CharT* p = string_buffer_.data(); p < end; ++p)
         {
-        case parse_state::array:
-        case parse_state::object:
-            state_ = parse_state::expect_comma_or_end;
-            break;
-        case parse_state::root:
-            state_ = parse_state::done;
-            handler_.end_json();
-            break;
-        default:
-            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            int64_t x = *p - '0';
+            if (n < min_value_div_10)
             {
-                ec = json_parser_errc::invalid_json_text;
-                return;
+                overflow = true;
+                break;
             }
-            break;
+            n = n * 10;
+            if (n < min_value + x)
+            {
+                overflow = true;
+                break;
+            }
+
+            n -= x;
+        }        
+
+        if (!overflow)
+        {
+            handler_.integer_value(n, *this);
+
+            switch (parent())
+            {
+            case parse_state::array:
+            case parse_state::object:
+                state_ = parse_state::expect_comma_or_end;
+                break;
+            case parse_state::root:
+                state_ = parse_state::done;
+                handler_.end_json();
+                break;
+            default:
+                if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+                {
+                    ec = json_parser_errc::invalid_json_text;
+                    return;
+                }
+                break;
+            }
+            string_buffer_.clear();
+            is_negative_ = false;
         }
-        string_buffer_.clear();
-        is_negative_ = false;
+        else
+        {
+            end_fraction_value(ec);
+        }
     }
 
     void end_uinteger_value(std::error_code& ec)
     {
-        handler_.uinteger_value(positive_val_, *this);
-
-        switch (parent())
+        static const uint64_t max_value = (std::numeric_limits<uint64_t>::max)();
+        static const uint64_t max_value_div_10 = max_value / 10;
+        uint64_t n = 0;
+        bool overflow = false;
+        for (size_t i = 0; i < string_buffer_.length(); ++i)
         {
-        case parse_state::array:
-        case parse_state::object:
-            state_ = parse_state::expect_comma_or_end;
-            break;
-        case parse_state::root:
-            state_ = parse_state::done;
-            handler_.end_json();
-            break;
-        default:
-            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            uint64_t x = string_buffer_[i] - '0';
+            if (n > max_value_div_10)
             {
-                ec = json_parser_errc::invalid_json_text;
-                return;
+                overflow = true;
+                break;
             }
-            break;
+            n = n * 10;
+            if (n > max_value - x)
+            {
+                overflow = true;
+                break;
+            }
+
+            n += x;
         }
-        string_buffer_.clear();
-        is_negative_ = false;
+
+        if (!overflow)
+        {
+            handler_.uinteger_value(n, *this);
+
+            switch (parent())
+            {
+            case parse_state::array:
+            case parse_state::object:
+                state_ = parse_state::expect_comma_or_end;
+                break;
+            case parse_state::root:
+                state_ = parse_state::done;
+                handler_.end_json();
+                break;
+            default:
+                if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+                {
+                    ec = json_parser_errc::invalid_json_text;
+                    return;
+                }
+                break;
+            }
+            string_buffer_.clear();
+            is_negative_ = false;
+        }
+        else
+        {
+            end_fraction_value(ec);
+        }
     }
 
     void append_codepoint(int c, std::error_code& ec)
