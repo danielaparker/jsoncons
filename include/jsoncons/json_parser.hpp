@@ -889,6 +889,7 @@ public:
                             break;
                         case '0': 
                             number_buffer_.clear();
+                            is_negative_ = false;
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*p_));
                             ++p_;
@@ -899,6 +900,7 @@ public:
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             number_buffer_.clear();
+                            is_negative_ = false;
                             precision_ = 0;
                             state_ = parse_state::positive_integer;
                             parse_number(ec);
@@ -1028,6 +1030,7 @@ public:
                             break;
                         case '0': 
                             number_buffer_.clear();
+                            is_negative_ = false;
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*p_));
                             ++p_;
@@ -1038,6 +1041,7 @@ public:
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             number_buffer_.clear();
+                            is_negative_ = false;
                             precision_ = 0;
                             state_ = parse_state::positive_integer;
                             parse_number(ec);
