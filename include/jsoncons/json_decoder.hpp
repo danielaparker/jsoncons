@@ -173,33 +173,28 @@ private:
     void end_structure() 
     {
         JSONCONS_ASSERT(stack_offsets_.size() > 0);
+        const size_t structure_index = stack_offsets_.back();
+        const size_t count = top_ - (structure_index + 1);
+        auto first = stack_.begin() + (structure_index+1);
+        auto last = first + count;
         if (stack_[stack_offsets_.back()].value_.is_object())
         {
-            size_t count = top_ - (stack_offsets_.back() + 1);
-            auto s = stack_.begin() + (stack_offsets_.back()+1);
-            auto send = s + count;
-            stack_[stack_offsets_.back()].value_.object_value().insert(
-                std::make_move_iterator(s),
-                std::make_move_iterator(send),
+            stack_[structure_index].value_.object_value().insert(
+                std::make_move_iterator(first),
+                std::make_move_iterator(last),
                 [](stack_item&& val){return key_value_pair_type(std::move(val.name_),std::move(val.value_));});
-            top_ -= count;
         }
         else
         {
-            auto& j = stack_[stack_offsets_.back()].value_;
-
-            auto it = stack_.begin() + (stack_offsets_.back()+1);
-            auto end = stack_.begin() + top_;
-            size_t count = end - it;
+            auto& j = stack_[structure_index].value_;
             j.reserve(count);
-
-            while (it != end)
+            while (first != last)
             {
-                j.push_back(std::move(it->value_));
-                ++it;
+                j.push_back(std::move(first->value_));
+                ++first;
             }
-            top_ -= count;
         }
+        top_ -= count;
     }
 
     void do_name(string_view_type name, const parsing_context&) override

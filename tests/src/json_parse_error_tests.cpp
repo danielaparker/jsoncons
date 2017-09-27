@@ -191,6 +191,52 @@ BOOST_AUTO_TEST_CASE(test_multiple)
     }
 }
 
+BOOST_AUTO_TEST_CASE(test_uinteger_overflow)
+{
+    uint64_t m = (std::numeric_limits<uint64_t>::max)();
+    std::string s1 = std::to_string(m);
+    std::string s2 = s1;
+    s2.push_back('0');
+    
+    json j1 =  json::parse(s1);
+    BOOST_CHECK(j1.is_uinteger());
+    BOOST_CHECK(m == j1.as_uinteger());
+
+    json j2 =  json::parse(s2);
+    BOOST_CHECK(!j2.is_uinteger());
+    BOOST_CHECK(j2.is_double());
+}
+
+BOOST_AUTO_TEST_CASE(test_negative_integer_overflow)
+{
+    int64_t m = (std::numeric_limits<int64_t>::min)();
+    std::string s1 = std::to_string(m);
+    std::string s2 = s1;
+    s2.push_back('0');
+    
+    json j1 =  json::parse(s1);
+    BOOST_CHECK(m == j1.as_integer());
+
+    json j2 =  json::parse(s2);
+    BOOST_CHECK(!j2.is_integer());
+    BOOST_CHECK(j2.is_double());
+}
+
+BOOST_AUTO_TEST_CASE(test_positive_integer_overflow)
+{
+    int64_t m = (std::numeric_limits<int64_t>::max)();
+    std::string s1 = std::to_string(m);
+    std::string s2 = s1;
+    s2.push_back('0');
+
+    json j1 =  json::parse(s1);
+    BOOST_CHECK(m == j1.as_integer());
+
+    json j2 =  json::parse(s2);
+    BOOST_CHECK(!j2.is_integer());
+    BOOST_CHECK(j2.is_double());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

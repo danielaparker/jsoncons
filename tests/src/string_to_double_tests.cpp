@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(test_string_to_double)
 
 BOOST_AUTO_TEST_CASE(test_exponent)
 {
-    string_to_double<char> reader;
+    string_to_double reader;
     const char* begin = "1.15507e-173";
     const char* endptr = begin + strlen(begin);
     const double value1 = 1.15507e-173;
