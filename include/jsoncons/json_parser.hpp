@@ -106,7 +106,7 @@ class basic_json_parser : private parsing_context
     int initial_stack_capacity_;
 
     int max_depth_;
-    string_to_double<char> str_to_double_;
+    string_to_double str_to_double_;
     const CharT* begin_input_;
     const CharT* end_input_;
     const CharT* p_;

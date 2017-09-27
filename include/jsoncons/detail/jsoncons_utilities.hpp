@@ -725,58 +725,6 @@ bool operator>(const std::basic_string<CharT,Traits,Allocator>& lhs,
 #endif
 
 template <class CharT>
-struct cstring_traits
-{
-};
-
-template <>
-struct cstring_traits<char>
-{
-    static double tod(const char* str, char** endptr)
-    {
-        return strtod(str, endptr);
-    }
-#if defined(_MSC_VER)
-    static double _tod_l(const char* str, char** endptr,
-                         _locale_t loc)
-    {
-        return _strtod_l(str, endptr, loc);
-    }
-#endif
-
-#if defined(JSONCONS_HAS_STRTOD_L)
-    static double tod_l(const char* str, char** endptr,
-                        locale_t loc)
-    {
-        return strtod_l(str, endptr, loc);
-    }
-#endif
-};
-
-template <>
-struct cstring_traits<wchar_t>
-{
-    static double tod(const wchar_t* str, wchar_t** endptr)
-    {
-        return wcstod(str, endptr);
-    }
-#if defined(_MSC_VER)
-    static double _tod_l(const wchar_t* str, wchar_t** endptr,
-                         _locale_t loc)
-    {
-        return _wcstod_l(str, endptr, loc);
-    }
-#endif
-#if defined(JSONCONS_HAS_STRTOD_L)
-    static double tod_l(const wchar_t* str, wchar_t** endptr,
-                        locale_t loc)
-    {
-        return wcstod_l(str, endptr, loc);
-    }
-#endif
-};
-
-template <class CharT>
 class buffered_output
 {
     static const size_t default_buffer_length = 16384;
@@ -1051,7 +999,6 @@ public:
 
 #if defined(_MSC_VER)
 
-template <class CharT>
 class string_to_double
 {
 private:
@@ -1066,11 +1013,11 @@ public:
         _free_locale(locale_);
     }
 
-    double operator()(const CharT* s, size_t)
+    double operator()(const char* s, size_t)
     {
-        const CharT *begin = s;
-        CharT *end = nullptr;
-        double val = cstring_traits<CharT>::_tod_l(begin, &end, locale_);
+        const char *begin = s;
+        char *end = nullptr;
+        double val = _strtod_l(begin, &end, locale_);
         if (begin == end)
         {
             throw std::invalid_argument("Invalid float value");
@@ -1085,7 +1032,6 @@ private:
 
 #elif defined(JSONCONS_HAS_STRTOD_L)
 
-template <class CharT>
 class string_to_double
 {
 private:
@@ -1100,11 +1046,11 @@ public:
         freelocale(locale_);
     }
 
-    double operator()(const CharT* s, size_t length)
+    double operator()(const char* s, size_t length)
     {
-        const CharT *begin = s;
-        CharT *end = nullptr;
-        double val = cstring_traits<CharT>::tod_l(begin, &end, locale_);
+        const char *begin = s;
+        char *end = nullptr;
+        double val = strtod_l(begin, &end, locale_);
         if (begin == end)
         {
             throw std::invalid_argument("Invalid float value");
@@ -1119,11 +1065,10 @@ private:
 };
 
 #else
-template <class CharT>
 class string_to_double
 {
 private:
-    std::vector<CharT> buffer_;
+    std::vector<char> buffer_;
     std::string decimal_point_;
     bool is_dot_;
 public:
@@ -1143,14 +1088,14 @@ public:
         is_dot_ = decimal_point_ == ".";
     }
 
-    double operator()(const CharT* s, size_t length)
+    double operator()(const char* s, size_t length)
     {
         double val;
         if (is_dot_)
         {
-            const CharT *begin = s;
-            CharT *end = nullptr;
-            val = cstring_traits<CharT>::tod(begin, &end);
+            const char *begin = s;
+            char *end = nullptr;
+            val = strtod(begin, &end);
             if (begin == end)
             {
                 throw std::invalid_argument("Invalid float value");
@@ -1160,8 +1105,8 @@ public:
         {
             buffer_.clear();
             size_t j = 0;
-            const CharT* pe = s + length;
-            for (const CharT* p = s; p < pe; ++p)
+            const char* pe = s + length;
+            for (const char* p = s; p < pe; ++p)
             {
                 if (*p == '.')
                 {
@@ -1174,9 +1119,9 @@ public:
                     ++j;
                 }
             }
-            const CharT *begin = buffer_.data();
-            CharT *end = nullptr;
-            val = cstring_traits<CharT>::tod(begin, &end);
+            const char *begin = buffer_.data();
+            char *end = nullptr;
+            val = strtod(begin, &end);
             if (begin == end)
             {
                 throw std::invalid_argument("Invalid float value");
