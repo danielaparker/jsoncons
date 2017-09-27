@@ -95,6 +95,7 @@ class basic_json_parser : private parsing_context
     uint32_t cp_;
     uint32_t cp2_;
     std::basic_string<CharT> string_buffer_;
+    std::string number_buffer_;
 
     bool is_negative_;
     uint8_t precision_;
@@ -105,7 +106,7 @@ class basic_json_parser : private parsing_context
     int initial_stack_capacity_;
 
     int max_depth_;
-    string_to_double<CharT> str_to_double_;
+    string_to_double<char> str_to_double_;
     const CharT* begin_input_;
     const CharT* end_input_;
     const CharT* p_;
@@ -513,7 +514,7 @@ public:
                         break;
                     case '0': 
                         precision_ = 1;
-                        string_buffer_.push_back(*p_);
+                        number_buffer_.push_back(static_cast<char>(*p_));
                         state_ = parse_state::positive_zero;
                         ++p_;
                         ++column_;
@@ -882,7 +883,7 @@ public:
                             break;
                         case '0': 
                             precision_ = 1;
-                            string_buffer_.push_back(*p_);
+                            number_buffer_.push_back(static_cast<char>(*p_));
                             ++p_;
                             ++column_;
                             state_ = parse_state::positive_zero;
@@ -1018,7 +1019,7 @@ public:
                             break;
                         case '0': 
                             precision_ = 1;
-                            string_buffer_.push_back(*p_);
+                            number_buffer_.push_back(static_cast<char>(*p_));
                             ++p_;
                             ++column_;
                             state_ = parse_state::positive_zero;
@@ -1490,13 +1491,13 @@ minus:
         switch (*p_)
         {
             case '0': 
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++precision_;
                 ++p_;
                 ++column_;
                 goto negative_zero;
             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++precision_;
                 ++p_;
                 ++column_;
@@ -1515,7 +1516,7 @@ negative_zero:
         switch (*p_)
         {
             case '\r': 
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
@@ -1523,7 +1524,7 @@ negative_zero:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1531,12 +1532,12 @@ negative_zero:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
@@ -1544,7 +1545,7 @@ negative_zero:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_object(ec);
                 ++p_;
@@ -1552,7 +1553,7 @@ negative_zero:
                 if (ec) return;
                 return;
             case ']':
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_array(ec);
                 ++p_;
@@ -1560,19 +1561,19 @@ negative_zero:
                 if (ec) return;
                 return;
             case '.':
-                JSONCONS_ASSERT(precision_ == string_buffer_.length());
-                string_buffer_.push_back(*p_);
+                JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
-                JSONCONS_ASSERT(precision_ == string_buffer_.length());
-                string_buffer_.push_back(*p_);
+                JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp1;
             case ',':
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -1599,7 +1600,7 @@ negative_integer:
         switch (*p_)
         {
             case '\r': 
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1607,7 +1608,7 @@ negative_integer:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1615,12 +1616,12 @@ negative_integer:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1628,7 +1629,7 @@ negative_integer:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_object(ec);
                 if (ec) return;
@@ -1636,7 +1637,7 @@ negative_integer:
                 ++column_;
                 return;
             case ']':
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_array(ec);
                 if (ec) return;
@@ -1644,13 +1645,13 @@ negative_integer:
                 ++column_;
                 return;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++precision_;
                 ++p_;
                 ++column_;
                 goto negative_integer;
             case ',':
-                end_integer_value(ec);
+                end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -1658,14 +1659,14 @@ negative_integer:
                 ++column_;
                 return;
             case '.':
-                JSONCONS_ASSERT(precision_ == string_buffer_.length());
-                string_buffer_.push_back(*p_);
+                JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
-                JSONCONS_ASSERT(precision_ == string_buffer_.length());
-                string_buffer_.push_back(*p_);
+                JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp1;
@@ -1684,7 +1685,7 @@ positive_zero:
         switch (*p_)
         {
             case '\r': 
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
@@ -1692,7 +1693,7 @@ positive_zero:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1700,12 +1701,12 @@ positive_zero:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
@@ -1713,7 +1714,7 @@ positive_zero:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_object(ec);
                 ++p_;
@@ -1721,7 +1722,7 @@ positive_zero:
                 if (ec) return;
                 return;
             case ']':
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_array(ec);
                 ++p_;
@@ -1729,19 +1730,19 @@ positive_zero:
                 if (ec) return;
                 return;
             case '.':
-                JSONCONS_ASSERT(precision_ == string_buffer_.length());
-                string_buffer_.push_back(*p_);
+                JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
-                JSONCONS_ASSERT(precision_ == string_buffer_.length());
-                string_buffer_.push_back(*p_);
+                JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp1;
             case ',':
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -1768,7 +1769,7 @@ positive_integer:
         switch (*p_)
         {
             case '\r': 
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1776,7 +1777,7 @@ positive_integer:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1784,12 +1785,12 @@ positive_integer:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1797,7 +1798,7 @@ positive_integer:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_object(ec);
                 if (ec) return;
@@ -1805,7 +1806,7 @@ positive_integer:
                 ++column_;
                 return;
             case ']':
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_array(ec);
                 if (ec) return;
@@ -1813,25 +1814,25 @@ positive_integer:
                 ++column_;
                 return;
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++precision_;
                 ++p_;
                 ++column_;
                 goto positive_integer;
             case '.':
-                JSONCONS_ASSERT(precision_ == string_buffer_.length());
-                string_buffer_.push_back(*p_);
+                JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
-                JSONCONS_ASSERT(precision_ == string_buffer_.length());
-                string_buffer_.push_back(*p_);
+                JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp1;
             case ',':
-                end_uinteger_value(ec);
+                end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -1854,7 +1855,7 @@ fraction1:
         {
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 ++precision_;
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto fraction2;
@@ -1873,7 +1874,7 @@ fraction2:
         switch (*p_)
         {
             case '\r': 
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1881,7 +1882,7 @@ fraction2:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1889,12 +1890,12 @@ fraction2:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -1902,7 +1903,7 @@ fraction2:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_object(ec);
                 if (ec) return;
@@ -1910,7 +1911,7 @@ fraction2:
                 ++column_;
                 return;
             case ']':
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_array(ec);
                 if (ec) return;
@@ -1918,7 +1919,7 @@ fraction2:
                 ++column_;
                 return;
             case ',':
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -1927,12 +1928,12 @@ fraction2:
                 return;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 ++precision_;
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto fraction2;
             case 'e':case 'E':
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp1;
@@ -1955,12 +1956,12 @@ exp1:
                 ++column_;
                 goto exp2;
             case '-':
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp2;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp3;
@@ -1979,7 +1980,7 @@ exp2:
         switch (*p_)
         {
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp3;
@@ -1999,7 +2000,7 @@ exp3:
         switch (*p_)
         {
             case '\r': 
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
@@ -2007,7 +2008,7 @@ exp3:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 ++p_;
                 ++column_;
@@ -2015,12 +2016,12 @@ exp3:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 push_state(state_);
                 ++p_;
@@ -2028,7 +2029,7 @@ exp3:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_object(ec);
                 if (ec) return;
@@ -2036,7 +2037,7 @@ exp3:
                 ++column_;
                 return;
             case ']':
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 do_end_array(ec);
                 if (ec) return;
@@ -2044,7 +2045,7 @@ exp3:
                 ++column_;
                 return;
             case ',':
-                end_fraction_value(ec);
+                end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -2052,7 +2053,7 @@ exp3:
                 ++column_;
                 return;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                string_buffer_.push_back(*p_);
+                number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
                 goto exp3;
@@ -2587,17 +2588,17 @@ escape_u9:
             {
                 case parse_state::positive_zero:  
                 case parse_state::positive_integer:
-                    end_uinteger_value(ec);
+                    end_positive_value(number_buffer_.data(), number_buffer_.length(), ec);
                     if (ec) return;
                     break;
                 case parse_state::negative_zero:  
                 case parse_state::negative_integer:
-                    end_integer_value(ec);
+                    end_negative_value(number_buffer_.data(), number_buffer_.length(), ec);
                     if (ec) return;
                     break;
                 case parse_state::fraction2:
                 case parse_state::exp3:
-                    end_fraction_value(ec);
+                    end_fraction_value(number_buffer_.data(), number_buffer_.length(), ec);
                     if (ec) return;
                     break;
                 default:
@@ -2630,61 +2631,18 @@ escape_u9:
         p_ = begin_input_;
     }
 private:
-    void end_fraction_value(std::error_code& ec)
-    {
-        try
-        {
-            double d = str_to_double_(string_buffer_.data(), precision_);
-            if (is_negative_)
-                d = -d;
 
-            handler_.double_value(d, static_cast<uint8_t>(precision_), *this);
-
-        }
-        catch (...)
-        {
-            if (err_handler_.error(json_parser_errc::invalid_number, *this))
-            {
-                ec = json_parser_errc::invalid_number;
-                return;
-            }
-            handler_.null_value(*this); // recovery
-        }
-
-        string_buffer_.clear();
-        is_negative_ = false;
-
-        switch (parent())
-        {
-        case parse_state::array:
-        case parse_state::object:
-            state_ = parse_state::expect_comma_or_end;
-            break;
-        case parse_state::root:
-            state_ = parse_state::done;
-            handler_.end_json();
-            break;
-        default:
-            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
-            {
-                ec = json_parser_errc::invalid_json_text;
-                return;
-            }
-            break;
-        }
-    }
-
-    void end_integer_value(std::error_code& ec)
+    void end_negative_value(const char* s, size_t length, std::error_code& ec)
     {
         static const int64_t min_value = (std::numeric_limits<int64_t>::min)();
         static const int64_t min_value_div_10 = min_value / 10;
 
         int64_t n = 0;
         bool overflow = false;
-        const CharT* end = string_buffer_.data()+string_buffer_.length(); 
-        for (const CharT* p = string_buffer_.data(); p < end; ++p)
+        const char* end = s + length; 
+        for (; s < end; ++s)
         {
-            int64_t x = *p - '0';
+            int64_t x = *s - '0';
             if (n < min_value_div_10)
             {
                 overflow = true;
@@ -2722,24 +2680,25 @@ private:
                 }
                 break;
             }
-            string_buffer_.clear();
+            number_buffer_.clear();
             is_negative_ = false;
         }
         else
         {
-            end_fraction_value(ec);
+            end_fraction_value(s, length, ec);
         }
     }
 
-    void end_uinteger_value(std::error_code& ec)
+    void end_positive_value(const char* s, size_t length, std::error_code& ec)
     {
         static const uint64_t max_value = (std::numeric_limits<uint64_t>::max)();
         static const uint64_t max_value_div_10 = max_value / 10;
         uint64_t n = 0;
         bool overflow = false;
-        for (size_t i = 0; i < string_buffer_.length(); ++i)
+        const char* end = s + length; 
+        for (; s < end; ++s)
         {
-            uint64_t x = string_buffer_[i] - '0';
+            uint64_t x = *s - '0';
             if (n > max_value_div_10)
             {
                 overflow = true;
@@ -2777,12 +2736,56 @@ private:
                 }
                 break;
             }
-            string_buffer_.clear();
+            number_buffer_.clear();
             is_negative_ = false;
         }
         else
         {
-            end_fraction_value(ec);
+            end_fraction_value(s, length, ec);
+        }
+    }
+
+    void end_fraction_value(const char* s, size_t length, std::error_code& ec)
+    {
+        try
+        {
+            double d = str_to_double_(s, length);
+            if (is_negative_)
+                d = -d;
+
+            handler_.double_value(d, static_cast<uint8_t>(precision_), *this);
+
+        }
+        catch (...)
+        {
+            if (err_handler_.error(json_parser_errc::invalid_number, *this))
+            {
+                ec = json_parser_errc::invalid_number;
+                return;
+            }
+            handler_.null_value(*this); // recovery
+        }
+
+        number_buffer_.clear();
+        is_negative_ = false;
+
+        switch (parent())
+        {
+        case parse_state::array:
+        case parse_state::object:
+            state_ = parse_state::expect_comma_or_end;
+            break;
+        case parse_state::root:
+            state_ = parse_state::done;
+            handler_.end_json();
+            break;
+        default:
+            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            {
+                ec = json_parser_errc::invalid_json_text;
+                return;
+            }
+            break;
         }
     }
 
