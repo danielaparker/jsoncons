@@ -534,12 +534,9 @@ public:
                         if (ec) {return;}
                         break;
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                        positive_val_ = (*p_ - '0');
-                        precision_ = 1;
-                        string_buffer_.push_back(*p_);
+                        positive_val_ = 0;
+                        precision_ = 0;
                         state_ = parse_state::positive_integer;
-                        ++p_;
-                        ++column_;
                         parse_number(ec);
                         if (ec) {return;}
                         break;
@@ -909,11 +906,8 @@ public:
                             if (ec) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            positive_val_ = (*p_ - '0');
-                            precision_ = 1;
-                            string_buffer_.push_back(*p_);
-                            ++p_;
-                            ++column_;
+                            positive_val_ = 0;
+                            precision_ = 0;
                             state_ = parse_state::positive_integer;
                             parse_number(ec);
                             if (ec) {return;}
@@ -1051,11 +1045,8 @@ public:
                             if (ec) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            positive_val_ = (*p_ - '0');
-                            precision_ = 1;
-                            string_buffer_.push_back(*p_);
-                            ++p_;
-                            ++column_;
+                            positive_val_ = 0;
+                            precision_ = 0;
                             state_ = parse_state::positive_integer;
                             parse_number(ec);
                             if (ec) {return;}
