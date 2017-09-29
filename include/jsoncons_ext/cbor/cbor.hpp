@@ -195,128 +195,19 @@ namespace detail {
     inline
     bool is_string(uint8_t b)
     {
-        switch (b)
-        {
-        case 0x60:
-        case 0x61:
-        case 0x62:
-        case 0x63:
-        case 0x64:
-        case 0x65:
-        case 0x66:
-        case 0x67:
-        case 0x68:
-        case 0x69:
-        case 0x6a:
-        case 0x6b:
-        case 0x6c:
-        case 0x6d:
-        case 0x6e:
-        case 0x6f:
-        case 0x70:
-        case 0x71:
-        case 0x72:
-        case 0x73:
-        case 0x74:
-        case 0x75:
-        case 0x76:
-        case 0x77:
-        case 0x78: 
-        case 0x79: 
-        case 0x7a: 
-        case 0x7b: 
-        case 0x7f: 
-            return true;
-        default:
-            return false;
-        }
+        return (b >= 0x60 && b <= 0x7b) || b == 0x7f;
     }
 
     inline 
     bool is_array(uint8_t b) 
     {
-        switch (b)
-        {
-        // array (0x00..0x17 data items follow)
-        case 0x80:
-        case 0x81:
-        case 0x82:
-        case 0x83:
-        case 0x84:
-        case 0x85:
-        case 0x86:
-        case 0x87:
-        case 0x88:
-        case 0x89:
-        case 0x8a:
-        case 0x8b:
-        case 0x8c:
-        case 0x8d:
-        case 0x8e:
-        case 0x8f:
-        case 0x90:
-        case 0x91:
-        case 0x92:
-        case 0x93:
-        case 0x94:
-        case 0x95:
-        case 0x96:
-        case 0x97:
-        // array (one-byte uint8_t for n follows)
-        case 0x98:
-        case 0x99:
-        case 0x9a:
-        case 0x9b:
-        // array (indefinite length)
-        case 0x9f:
-            return true;
-        default:
-            return false;
-        }
+        return (b >= 0x80 && b <= 0x9b) || b == 0x9f; 
     }
 
-    inline bool is_object(uint8_t b) 
+    inline 
+    bool is_object(uint8_t b) 
     {
-        switch (b)
-        {
-        // map (0x00..0x17 pairs of data items follow)
-        case 0xa0:
-        case 0xa1:
-        case 0xa2:
-        case 0xa3:
-        case 0xa4:
-        case 0xa5:
-        case 0xa6:
-        case 0xa7:
-        case 0xa8:
-        case 0xa9:
-        case 0xaa:
-        case 0xab:
-        case 0xac:
-        case 0xad:
-        case 0xae:
-        case 0xaf:
-        case 0xb0:
-        case 0xb1:
-        case 0xb2:
-        case 0xb3:
-        case 0xb4:
-        case 0xb5:
-        case 0xb6:
-        case 0xb7:
-        case 0xb8: 
-        // map (two-byte uint16_t for n follow)
-        case 0xb9: 
-        // map (four-byte uint32_t for n follow)
-        case 0xba: 
-        // map (eight-byte uint64_t for n follow)
-        case 0xbb: 
-        // map (indefinite length)
-        case 0xbf: 
-            return true;
-        default:
-            return false;
-        }
+        return (b >= 0xa0 && b <= 0xbb) || b == 0xb8;
     }
 
     inline const uint8_t* walk(const uint8_t* it, const uint8_t* end)
@@ -873,9 +764,9 @@ public:
 
     cbor_view& operator=(const cbor_view&) = default;
 
-    const binary::bytes_view bytes() const
+    const bytes_view bytes() const
     {
-        return binary::bytes_view(data_, length_);
+        return bytes_view(data_, length_);
     }
 
     bool is_array() const
@@ -901,15 +792,19 @@ public:
     cbor_view at(size_t index) const
     {
         JSONCONS_ASSERT(is_array());
-
+        size_t len;
         const uint8_t* it = data_;
         const uint8_t* end = data_ + length_;
+
+        std::tie(len, it) = detail::size(it, end);
 
         for (size_t i = 0; i < index; ++i)
         {
             it = detail::walk(it, end);
         }
+
         const uint8_t* last = detail::walk(it,end);
+
         return cbor_view(it,last-it);
     }
 
@@ -922,18 +817,13 @@ public:
 
         std::tie(len, it) = detail::size(it, end);
 
-        std::cout << "len: " << len << std::endl;
-        std::cout << "pos: " << (it - data_) << std::endl;
-
         for (size_t i = 0; i < len; ++i)
         {
             std::string a_key;
             std::tie(a_key,it) = detail::get_string(it, end);
-            std::cout << a_key << std::endl;
             if (a_key == key)
             {
                 const uint8_t* last = detail::walk(it, end);
-                std::cout << std::hex << (int)(*it) << std::endl;
                 return cbor_view(it,last-it);
             }
             it = detail::walk(it, end);
@@ -979,9 +869,9 @@ public:
     {
     }
 
-    const binary::bytes_view bytes() const
+    const bytes_view bytes() const
     {
-        return binary::bytes_view(v_.data(), v_.size());
+        return bytes_view(v_.data(), v_.size());
     }
 
     bool is_array() const
