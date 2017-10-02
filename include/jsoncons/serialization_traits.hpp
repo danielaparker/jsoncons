@@ -21,7 +21,7 @@
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_serializer.hpp>
-#include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/detail/jsoncons_utilities.hpp>
 
 namespace jsoncons {
 

@@ -19,7 +19,7 @@
 #include <fstream>
 #include <limits>
 #include <type_traits>
-#include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/detail/jsoncons_utilities.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push

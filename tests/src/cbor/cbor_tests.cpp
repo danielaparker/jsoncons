@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(cbor_test)
 
     size_t calculated_size = cbor_Encoder_<json>::calculate_size(j1);
     cbor_value v = encode_cbor(j1);
-    BOOST_CHECK(calculated_size == v.bytes().length());
+    BOOST_CHECK(calculated_size == v.buflen());
     //BOOST_CHECK(calculated_size == v.capacity());
 
     json j2 = decode_cbor<json>(v);
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(cbor_test2)
 
     size_t calculated_size = cbor_Encoder_<wjson>::calculate_size(j1);
     cbor_value v = encode_cbor(j1);
-    BOOST_CHECK(calculated_size == v.bytes().length());
+    BOOST_CHECK(calculated_size == v.buflen());
     //BOOST_CHECK(calculated_size == v.capacity());
 
     wjson j2 = decode_cbor<wjson>(v);

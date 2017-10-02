@@ -118,77 +118,6 @@
 
 namespace jsoncons { namespace binary { 
 
-// bytes_view
-
-class bytes_view
-{
-    const uint8_t* data_;
-    size_t length_; 
-public:
-    typedef uint8_t value_type;
-    typedef const uint8_t& const_reference;
-    typedef const uint8_t* const_iterator;
-    typedef const uint8_t* iterator;
-    typedef std::size_t size_type;
-
-    bytes_view(const uint8_t* data, size_t length)
-        : data_(data), length_(length)
-    {
-    }
-
-    operator std::vector<uint8_t>() const
-    { 
-        return std::vector<uint8_t>(begin(),end()); 
-    }
-
-    const uint8_t* data() const
-    {
-        return data_;
-    }
-
-    size_t length() const
-    {
-        return length_;
-    }
-
-    size_t size() const
-    {
-        return length_;
-    }
-
-    // iterator support 
-    const_iterator begin() const JSONCONS_NOEXCEPT
-    {
-        return data_;
-    }
-    const_iterator end() const JSONCONS_NOEXCEPT
-    {
-        return data_ + length_;
-    }
-
-    const_reference operator[](size_type pos) const 
-    { 
-        return data_[pos]; 
-    }
-
-    friend bool operator==(const bytes_view& lhs, 
-                           const bytes_view& rhs)
-    {
-        if (lhs.length() != rhs.length())
-        {
-            return false;
-        }
-        for (size_t i = 0; i < lhs.length(); ++i)
-        {
-            if (lhs[i] != rhs[i])
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-};
-
 namespace detail {
 
 static inline bool add_check_overflow(size_t v1, size_t v2, size_t *r)
@@ -398,6 +327,145 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     uint64_t data = from_big_endian<uint64_t>(it,end);
     return *reinterpret_cast<T*>(&data);
+}
+
+// base64
+/*
+template<typename unused=void>
+struct base64 {
+    static const unsigned char chars[256];
+};
+typedef base64<> globals;
+
+// bit 0 (1) - set if: plain ASCII string character
+// bit 1 (2) - set if: whitespace
+// bit 4 (0x10) - set if: 0-9 e E .
+template<typename unused>
+const uint8_t base64_chars<unused>::parse_flags[256] = {
+*/
+
+static const std::string base64_alphabet = 
+             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+             "abcdefghijklmnopqrstuvwxyz"
+             "0123456789+/";
+
+inline 
+static bool is_base64(uint8_t c) 
+{
+    return (isalnum(c) || (c == '+') || (c == '/'));
+}
+
+template <class InputIt>
+std::string encode_base64(InputIt first, InputIt last)
+{
+    std::string result;
+    int i = 0;
+    int j = 0;
+    unsigned char a3[3];
+    unsigned char a4[4];
+
+    while (first != last)
+    {
+        a3[i++] = *first++;
+        if (i == 3)
+        {
+            a4[0] = (a3[0] & 0xfc) >> 2;
+            a4[1] = ((a3[0] & 0x03) << 4) + ((a3[1] & 0xf0) >> 4);
+            a4[2] = ((a3[1] & 0x0f) << 2) + ((a3[2] & 0xc0) >> 6);
+            a4[3] = a3[2] & 0x3f;
+
+            for (i = 0; i < 4; i++) 
+            {
+                result.push_back(base64_alphabet[a4[i]]);
+            }
+            i = 0;
+        }
+    }
+
+    if (i > 0)
+    {
+        for (j = i; j < 3; ++j) 
+        {
+            a3[j] = '\0';
+        }
+
+        a4[0] = (a3[0] & 0xfc) >> 2;
+        a4[1] = ((a3[0] & 0x03) << 4) + ((a3[1] & 0xf0) >> 4);
+        a4[2] = ((a3[1] & 0x0f) << 2) + ((a3[2] & 0xc0) >> 6);
+
+        for (j = 0; j < i + 1; ++j) 
+        {
+            result.push_back(base64_alphabet[a4[j]]);
+        }
+
+        while (i++ < 3) 
+        {
+            result.push_back('=');
+        }
+    }
+
+    return result; 
+}
+
+inline
+std::string encode_base64(const std::string& s)
+{
+    return encode_base64(s.begin(), s.end());
+}
+
+inline
+std::string decode_base64(const std::string& base64_string)
+{
+    std::string result;
+    size_t buflen = base64_string.size();
+    uint8_t i = 0;
+    uint8_t j = 0;
+    uint8_t a4[4], a3[3];
+
+    auto first = base64_string.begin();
+    auto last = base64_string.end();
+
+    while (first != last && *first != '=')
+    {
+        JSONCONS_ASSERT(is_base64(*first));
+
+        a4[i++] = *first++; 
+        if (i == 4)
+        {
+            for (i = 0; i < 4; ++i) 
+            {
+                a4[i] = static_cast<uint8_t>(base64_alphabet.find(a4[i]));
+            }
+
+            a3[0] = (a4[0] << 2) + ((a4[1] & 0x30) >> 4);
+            a3[1] = ((a4[1] & 0xf) << 4) + ((a4[2] & 0x3c) >> 2);
+            a3[2] = ((a4[2] & 0x3) << 6) +   a4[3];
+
+            for (i = 0; i < 3; i++) 
+            {
+                result.push_back(a3[i]);
+            }
+            i = 0;
+        }
+    }
+
+    if (i > 0)
+    {
+        for (j = 0; j < i; ++j) 
+        {
+            a4[j] = static_cast<uint8_t>(base64_alphabet.find(a4[j]));
+        }
+
+        a3[0] = (a4[0] << 2) + ((a4[1] & 0x30) >> 4);
+        a3[1] = ((a4[1] & 0xf) << 4) + ((a4[2] & 0x3c) >> 2);
+
+        for (j = 0; j < i - 1; ++j) 
+        {
+            result.push_back(a3[j]);
+        }
+    }
+
+    return result;
 }
 
 }

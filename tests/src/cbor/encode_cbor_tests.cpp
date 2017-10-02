@@ -22,10 +22,10 @@ BOOST_AUTO_TEST_SUITE(cbor_tests)
 void check_encode(const std::vector<uint8_t>& expected, const json& j)
 {
     cbor_value result = encode_cbor(j);
-    BOOST_REQUIRE_MESSAGE(expected.size() == result.bytes().size(), j.to_string());
+    BOOST_REQUIRE_MESSAGE(expected.size() == result.buflen(), j.to_string());
     for (size_t i = 0; i < expected.size(); ++i)
     {
-        BOOST_REQUIRE_MESSAGE(expected[i] == result.bytes()[i], j.to_string());
+        BOOST_REQUIRE_MESSAGE(expected[i] == result.buffer()[i], j.to_string());
     }
 }
 
