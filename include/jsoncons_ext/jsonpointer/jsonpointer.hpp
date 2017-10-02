@@ -35,8 +35,7 @@ template<class Json,class JsonReference,class JsonPointer>
 struct PathResolver
 {
     typedef typename Json::char_type char_type;
-    typedef typename Json::char_traits_type char_traits_type;
-    typedef std::basic_string<char_type,char_traits_type> string_type;
+    typedef typename Json::string_type string_type;
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
 
@@ -67,8 +66,7 @@ template<class Json, class JsonReference, class JsonPointer>
 struct PathSetter
 {
     typedef typename Json::char_type char_type;
-    typedef typename Json::char_traits_type char_traits_type;
-    typedef std::basic_string<char_type,char_traits_type> string_type;
+    typedef typename Json::string_type string_type;
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
 
@@ -102,8 +100,7 @@ template<class Json,
 class jsonpointer_evaluator : private parsing_context
 {
     typedef typename Json::char_type char_type;
-    typedef typename Json::char_traits_type char_traits_type;
-    typedef std::basic_string<char_type,char_traits_type> string_type;
+    typedef typename Json::string_type string_type;
     typedef JsonReference json_reference;
     typedef JsonPointer json_pointer;
 

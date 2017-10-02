@@ -6,16 +6,43 @@ Selects a `json` value.
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json>
-std::tuple<Json,jsonpointer_errc> get(const Json& root, typename Json::string_view_type path);
+template<class J>
+std::tuple<J,jsonpointer_errc> get(const J& root, typename J::string_view_type path);
 
 ```
 
 #### Return value
 
-On success, returns the selected Json value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md). 
+On success, returns the selected J value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md). 
 
-On error, returns a null Json value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
+On error, returns a null J value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
+
+#### Requirements
+
+The type J satisfies the requirements for `jsonpointer::get` if it defines the following types
+
+name            |type               |notes
+----------------|-------------------|---------------
+char_type       |J::char_type       |
+string_type     |J::string_type     |
+string_view_type|J::string_view_type|
+
+and given 
+
+- a value `index` of type `size_t`
+- a value `key` of type `string_type` 
+- an rvalue expression `j` of type `J`
+
+the following expressions are valid
+
+expression     |return type|effects
+---------------|-----------|---------------
+is_array()     |bool       |
+is_object()    |bool       |
+size()         |size_t     |
+has_key(key)   |bool       |
+at(index)      |const J&   |
+at(key)        |const J&   |
 
 ### Examples
 

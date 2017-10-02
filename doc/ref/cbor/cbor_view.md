@@ -1,6 +1,6 @@
 ### jsoncons::cbor::cbor_view
 
-A `cbor_view` object refers to a constant contiguous sequence of bytes belonging to an underlyng `cbor_value` object.
+A `cbor_view` object refers to a constant contiguous sequence of bytes.
 
 #### Header
 ```c++
