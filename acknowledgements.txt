@@ -36,3 +36,5 @@ adding Travis CI configuration.
 
 jakalx contributed fix for operator== throws when comparing a string 
 against an empty object
+
+Alexander (rog13) for contributing fix to jsonpatch::diff

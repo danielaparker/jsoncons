@@ -29,9 +29,10 @@ void check_patch(json& target, const json& patch, jsonpatch::jsonpatch_errc expe
     jsonpatch::jsonpatch_errc ec;
     std::string path;
     std::tie(ec,path) = jsonpatch::patch(target,patch);
-    if (ec != expected_ec)
+    if (ec != expected_ec || expected != target)
     {
         std::cout << "path: " << path << std::endl;
+        std::cout << "target:\n" << target << std::endl;
     }
     BOOST_CHECK(ec == expected_ec);
     BOOST_CHECK_EQUAL(expected, target);
@@ -465,6 +466,36 @@ BOOST_AUTO_TEST_CASE(test_diff2)
     )"_json;
 
     auto patch = jsonpatch::diff(source, target);
+
+    check_patch(source,patch,jsonpatch::jsonpatch_errc(),target);
+}
+
+BOOST_AUTO_TEST_CASE(add_when_new_items_in_target_array1)
+{
+    jsoncons::json source = R"(
+        {"/": 9, "foo": [ "bar"]}
+    )"_json;
+
+    jsoncons::json target = R"(
+        { "baz":"qux", "foo": [ "bar", "baz" ]}
+    )"_json;
+
+    jsoncons::json patch = jsoncons::jsonpatch::diff(source, target); 
+
+    check_patch(source,patch,jsonpatch::jsonpatch_errc(),target);
+}
+
+BOOST_AUTO_TEST_CASE(add_when_new_items_in_target_array2)
+{
+    jsoncons::json source = R"(
+        {"/": 9, "foo": [ "bar", "bar"]}
+    )"_json;
+
+    jsoncons::json target = R"(
+        { "baz":"qux", "foo": [ "bar", "baz" ]}
+    )"_json;
+
+    jsoncons::json patch = jsoncons::jsonpatch::diff(source, target); 
 
     check_patch(source,patch,jsonpatch::jsonpatch_errc(),target);
 }

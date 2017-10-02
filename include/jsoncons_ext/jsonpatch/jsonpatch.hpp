@@ -117,13 +117,27 @@ namespace detail {
                 auto temp_diff = diff(source[i],target[i],ss.str());
                 result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
             }
-            for (size_t i = common; i < source.size(); ++i)
+            // Element in source, not in target - remove
+            for (size_t i = target.size(); i < source.size(); ++i)
             {
                 std::basic_ostringstream<char_type> ss; 
                 ss << path << '/' << i;
                 Json val = typename Json::object();
                 val.insert_or_assign(op_literal<char_type>(), remove_literal<char_type>());
                 val.insert_or_assign(path_literal<char_type>(), ss.str());
+                result.push_back(std::move(val));
+            }
+            // Element in target, not in source - add, 
+            // Fix contributed by Alexander rog13
+            for (size_t i = source.size(); i < target.size(); ++i)
+            {
+                const auto& a = target[i];
+                std::basic_ostringstream<char_type> ss; 
+                ss << path << '/' << i;
+                Json val = typename Json::object();
+                val.insert_or_assign(op_literal<char_type>(), add_literal<char_type>());
+                val.insert_or_assign(path_literal<char_type>(), ss.str());
+                val.insert_or_assign(value_literal<char_type>(), a);
                 result.push_back(std::move(val));
             }
         }
