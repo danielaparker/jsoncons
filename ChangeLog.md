@@ -1,7 +1,13 @@
 master
 ------
 
-- Restore support for vs2013
+Platform support:
+
+- Removed requirement for C++11 string initilizer list feature (unsupported by vs2013)
+ 
+Bug fixes:
+
+- Fixed issue with jsonpatch::diff (fix contributed by Alexander (rog13)) 
 
 0.99.9.1
 --------
