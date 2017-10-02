@@ -838,8 +838,6 @@ public:
 
 // cbor_view
 
-class cbor_value;
-
 class cbor_view : public base_cbor_view
 {
     const uint8_t* buffer_;
@@ -864,8 +862,6 @@ public:
     }
 
     cbor_view(const cbor_view&) = default;
-
-    cbor_view(const cbor_value& val);
 
     cbor_view& operator=(const cbor_view&) = default;
 
@@ -941,90 +937,6 @@ public:
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Key not found");
     }
 };
-
-class cbor_value
-{
-    std::vector<uint8_t> buffer_;
-public:
-    typedef cbor_view value_type;
-    typedef const cbor_view& const_reference;
-
-    cbor_value() = default;
-
-    cbor_value(const cbor_value&) = default;
-
-    cbor_value(cbor_value&& val)
-        : buffer_(std::move(val.buffer_))
-    {
-    }
-
-    cbor_value(const std::vector<uint8_t>& v)
-        : buffer_(v)
-    {
-    }
-
-    cbor_value(std::vector<uint8_t>&& v)
-        : buffer_(std::move(v))
-    {
-    }
-
-    template< class InputIt >
-    cbor_value(InputIt first, InputIt last)
-        : buffer_(first, last)
-    {
-    }
-
-    cbor_value(cbor_view v)
-        : buffer_(v.buffer(),v.buffer() + v.buflen())
-    {
-    }
-
-    const uint8_t* buffer() const
-    {
-        return buffer_.data();
-    }
-
-    const size_t buflen() const
-    {
-        return buffer_.size();
-    }
-
-    bool is_array() const
-    {
-        JSONCONS_ASSERT(buffer_.size() > 0);
-        return detail::is_array(buffer_[0]);
-    }
-
-    bool is_object() const
-    {
-        JSONCONS_ASSERT(buffer_.size() > 0);
-        return detail::is_object(buffer_[0]);
-    }
-
-    size_t size() const
-    {
-        size_t len;
-        const uint8_t* it;
-        std::tie(len, it) = detail::size(buffer_.data(),buffer_.data()+buffer_.size());
-        return len;
-    }
-
-    cbor_view at(size_t index) const
-    {
-        return cbor_view(buffer_.data(),buffer_.size()).at(index);
-    }
-
-    cbor_view at(const std::string& key) const
-    {
-        return cbor_view(buffer_.data(),buffer_.size()).at(key);
-    }
-};
-
-inline
-cbor_view::cbor_view(const cbor_value& val)
-    : buffer_(val.buffer()), buflen_(val.buflen())
-{
-}
 
 struct Encode_cbor_
 {
@@ -1862,7 +1774,7 @@ public:
 };
 
 template<class Json>
-cbor_value encode_cbor(const Json& j)
+std::vector<uint8_t> encode_cbor(const Json& j)
 {
     size_t n = 0;
     cbor_Encoder_<Json>::encode(j,Calculate_size_(),n);
@@ -1871,7 +1783,7 @@ cbor_value encode_cbor(const Json& j)
     v.reserve(n);
 
     cbor_Encoder_<Json>::encode(j,Encode_cbor_(),v);
-    return cbor_value(std::move(v));
+    return v;
 }
 
 template<class Json>

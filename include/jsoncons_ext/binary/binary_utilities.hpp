@@ -329,40 +329,24 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
     return *reinterpret_cast<T*>(&data);
 }
 
-// base64
-/*
-template<typename unused=void>
-struct base64 {
-    static const unsigned char chars[256];
-};
-typedef base64<> globals;
-
-// bit 0 (1) - set if: plain ASCII string character
-// bit 1 (2) - set if: whitespace
-// bit 4 (0x10) - set if: 0-9 e E .
-template<typename unused>
-const uint8_t base64_chars<unused>::parse_flags[256] = {
-*/
-
-static const std::string base64_alphabet = 
-             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-             "abcdefghijklmnopqrstuvwxyz"
-             "0123456789+/";
+static const std::string base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                           "abcdefghijklmnopqrstuvwxyz"
+                                           "0123456789+/";
 
 inline 
 static bool is_base64(uint8_t c) 
 {
-    return (isalnum(c) || (c == '+') || (c == '/'));
+    return isalnum(c) || c == '+' || c == '/';
 }
 
 template <class InputIt>
 std::string encode_base64(InputIt first, InputIt last)
 {
     std::string result;
-    int i = 0;
-    int j = 0;
     unsigned char a3[3];
     unsigned char a4[4];
+    int i = 0;
+    int j = 0;
 
     while (first != last)
     {
@@ -418,9 +402,9 @@ std::string decode_base64(const std::string& base64_string)
 {
     std::string result;
     size_t buflen = base64_string.size();
+    uint8_t a4[4], a3[3];
     uint8_t i = 0;
     uint8_t j = 0;
-    uint8_t a4[4], a3[3];
 
     auto first = base64_string.begin();
     auto last = base64_string.end();

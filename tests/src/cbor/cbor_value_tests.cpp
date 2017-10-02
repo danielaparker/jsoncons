@@ -35,7 +35,9 @@ BOOST_AUTO_TEST_CASE(cbor_value_test)
     }
     )");
 
-    cbor_value v = encode_cbor(j1);
+    auto c = encode_cbor(j1);
+
+    cbor_view v(c); 
     BOOST_CHECK(v.is_object());
     BOOST_CHECK(!v.is_array());
 
