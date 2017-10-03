@@ -559,6 +559,8 @@ Output:
 "Evelyn Waugh"
 ```
 
+[jsonpointer::get](jsonpointer/get.md) may also be used to query packed cbor values.
+
 See [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) for details. 
 
 <div id="ext_jsonpatch"/>
@@ -947,6 +949,8 @@ Output:
     ]
 }
 ```
+
+[jsonpointer::get](jsonpointer/get.md) may be used to query packed cbor values.
 
 See [cbor](doc/ref/cbor/cbor.md) for details.
 
