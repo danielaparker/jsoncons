@@ -210,7 +210,7 @@ public:
             current_.back()->push_back(value);
             break;
         case jsonpointer::detail::pointer_state::object_reference_token: 
-            current_.back()->set(buffer_,value);
+            current_.back()->insert_or_assign(buffer_,value);
             break;
         default:
             return jsonpointer_errc::end_of_input;
@@ -257,7 +257,7 @@ public:
             }
             else
             {
-                current_.back()->set(buffer_,value);
+                current_.back()->insert_or_assign(buffer_,value);
             }
             break;
         default:
@@ -331,7 +331,7 @@ public:
             {
                 return jsonpointer_errc::name_not_found;
             }
-            current_.back()->set(buffer_,value);
+            current_.back()->insert_or_assign(buffer_,value);
             break;
         default:
             return jsonpointer_errc::end_of_input;
@@ -588,7 +588,7 @@ private:
 template<class Json>
 typename Json::string_type normalized_path(const Json& root, typename Json::string_view_type path)
 {
-    detail::jsonpointer_evaluator<Json, const Json&, const Json*> evaluator;
+    detail::jsonpointer_evaluator<const Json> evaluator;
     return evaluator.normalized_path(root,path);
 }
 
