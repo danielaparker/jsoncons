@@ -26,13 +26,13 @@ Json json_query(const Json& root, typename Json::string_view_type path, result_t
 {
     if (result_t == result_type::value)
     {
-        detail::jsonpath_evaluator<Json,const Json&,const Json*,detail::VoidPathConstructor<Json>> evaluator;
+        detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
         evaluator.evaluate(root,path.data(),path.length());
         return evaluator.get_values();
     }
     else
     {
-        detail::jsonpath_evaluator<Json,const Json&,const Json*,detail::PathConstructor<Json>> evaluator;
+        detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
         evaluator.evaluate(root,path.data(),path.length());
         return evaluator.get_normalized_paths();
     }
@@ -41,7 +41,7 @@ Json json_query(const Json& root, typename Json::string_view_type path, result_t
 template<class Json, class T>
 void json_replace(Json& root, typename Json::string_view_type path, T&& new_value)
 {
-    detail::jsonpath_evaluator<Json,Json&,Json*,detail::VoidPathConstructor<Json>> evaluator;
+    detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
     evaluator.evaluate(root,path.data(),path.length());
     evaluator.replace(std::forward<T>(new_value));
 }
@@ -127,7 +127,6 @@ enum class path_state
 
 template<class Json,
          class JsonReference=const Json&,
-         class JsonPointer=const Json*,
          class PathCons=PathConstructor<Json>>
 class jsonpath_evaluator : private parsing_context
 {
@@ -138,7 +137,7 @@ private:
     typedef typename Json::key_storage_type key_storage_type;
     typedef typename Json::string_view_type string_view_type;
     typedef JsonReference json_reference;
-    typedef JsonPointer json_pointer;
+    using json_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
     typedef std::pair<string_type,json_pointer> node_type;
     typedef std::vector<node_type> node_set;
 

@@ -98,7 +98,6 @@ struct VoidPathConstructor
 
 template <class Json,
           class JsonReference,
-          class JsonPointer,
           class PathCons>
 class jsonpath_evaluator;
 
@@ -708,7 +707,7 @@ public:
 
     void initialize(const Json& context_node) override
     {
-        jsonpath_evaluator<Json,const Json&,const Json*,VoidPathConstructor<Json>> evaluator;
+        jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator;
         evaluator.evaluate(context_node,path_);
         nodes_ = evaluator.get_values();
     }
@@ -1333,7 +1332,7 @@ public:
                                 try
                                 {
                                     // path, parse against root, get value
-                                    jsonpath_evaluator<Json,const Json&,const Json*,detail::VoidPathConstructor<Json>> evaluator;
+                                    jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
                                     evaluator.evaluate(root,buffer.data(),buffer.length());
                                     auto result = evaluator.get_values();
                                     add_token(token<Json>(token_type::operand,std::make_shared<value_term<Json>>(result)));
