@@ -31,15 +31,15 @@ enum class pointer_state
     escaped
 };
 
-template<class Json,class JsonReference,class JsonPointer>
+template<class Json>
 struct PathResolver
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
-    typedef JsonReference json_reference;
-    typedef JsonPointer json_pointer;
+    using reference = typename std::conditional<std::is_const<Json>::value,typename Json::const_reference,typename Json::reference>::type;
+    using pointer = typename std::conditional<std::is_const<Json>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
-    jsonpointer_errc operator()(std::vector<json_pointer>& current,
+    jsonpointer_errc operator()(std::vector<pointer>& current,
                                 size_t index) const
     {
         if (index >= current.back()->size())
@@ -50,7 +50,7 @@ struct PathResolver
         return jsonpointer_errc();
     }
 
-    jsonpointer_errc operator()(std::vector<json_pointer>& current,
+    jsonpointer_errc operator()(std::vector<pointer>& current,
                                 const string_type& name) const
     {
         if (!current.back()->has_key(name))
@@ -62,15 +62,15 @@ struct PathResolver
     }
 };
 
-template<class Json, class JsonReference, class JsonPointer>
+template<class Json>
 struct PathSetter
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
-    typedef JsonReference json_reference;
-    typedef JsonPointer json_pointer;
+    using reference = typename std::conditional<std::is_const<Json>::value,typename Json::const_reference,typename Json::reference>::type;
+    using pointer = typename std::conditional<std::is_const<Json>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
-    jsonpointer_errc operator()(std::vector<json_pointer>& current,
+    jsonpointer_errc operator()(std::vector<pointer>& current,
                                 size_t index) const
     {
         if (index >= current.back()->size())
@@ -81,7 +81,7 @@ struct PathSetter
         return jsonpointer_errc();
     }
 
-    jsonpointer_errc operator()(std::vector<json_pointer>& current,
+    jsonpointer_errc operator()(std::vector<pointer>& current,
                                 const string_type& name) const
     {
         jsonpointer_errc ec = jsonpointer_errc();
@@ -94,15 +94,13 @@ struct PathSetter
     }
 };
 
-template<class Json,
-         class JsonReference=Json&,
-         class JsonPointer=Json*>
+template<class Json>
 class jsonpointer_evaluator : private parsing_context
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
-    typedef JsonReference json_reference;
-    typedef JsonPointer json_pointer;
+    using reference = typename std::conditional<std::is_const<Json>::value,typename Json::const_reference,typename Json::reference>::type;
+    using pointer = typename std::conditional<std::is_const<Json>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
     jsonpointer::detail::pointer_state state_;
     size_t line_;
@@ -112,7 +110,7 @@ class jsonpointer_evaluator : private parsing_context
     const char_type* p_;
     string_type buffer_;
     size_t index_;
-    std::vector<json_pointer> current_;
+    std::vector<pointer> current_;
 public:
     Json get_result() 
     {
@@ -129,10 +127,10 @@ public:
         return column_;
     }
 
-    jsonpointer_errc get(json_reference root,
-                            typename Json::string_view_type path)
+    jsonpointer_errc get(reference root,
+                         typename Json::string_view_type path)
     {
-        PathResolver<Json,JsonReference,JsonPointer> op;
+        PathResolver<Json> op;
         jsonpointer_errc ec = evaluate(root,op,path);
         if (ec != jsonpointer_errc())
         {
@@ -156,9 +154,9 @@ public:
         return ec;
     }
 
-    string_type normalized_path(json_reference root, typename Json::string_view_type path)
+    string_type normalized_path(reference root, typename Json::string_view_type path)
     {
-        jsonpointer_errc ec = evaluate(root,PathSetter<Json,JsonReference,JsonPointer>(),path);
+        jsonpointer_errc ec = evaluate(root,PathSetter<Json>(),path);
         if (ec != jsonpointer_errc())
         {
             return path;
@@ -179,11 +177,11 @@ public:
         }
     }
 
-    jsonpointer_errc insert_or_assign(json_reference root,
+    jsonpointer_errc insert_or_assign(reference root,
                                       typename Json::string_view_type path,
                                       const Json& value)
     {
-        jsonpointer_errc ec = evaluate(root,PathSetter<Json,JsonReference,JsonPointer>(),path);
+        jsonpointer_errc ec = evaluate(root,PathSetter<Json>(),path);
         if (ec != jsonpointer_errc())
         {
             return ec;
@@ -212,7 +210,7 @@ public:
             current_.back()->push_back(value);
             break;
         case jsonpointer::detail::pointer_state::object_reference_token: 
-            current_.back()->set(buffer_,value);
+            current_.back()->insert_or_assign(buffer_,value);
             break;
         default:
             return jsonpointer_errc::end_of_input;
@@ -220,11 +218,11 @@ public:
         return ec;
     }
 
-    jsonpointer_errc insert(json_reference root,
+    jsonpointer_errc insert(reference root,
                             typename Json::string_view_type path,
                             const Json& value)
     {
-        jsonpointer_errc ec = evaluate(root,PathSetter<Json,JsonReference,JsonPointer>(),path);
+        jsonpointer_errc ec = evaluate(root,PathSetter<Json>(),path);
         if (ec != jsonpointer_errc())
         {
             return ec;
@@ -259,7 +257,7 @@ public:
             }
             else
             {
-                current_.back()->set(buffer_,value);
+                current_.back()->insert_or_assign(buffer_,value);
             }
             break;
         default:
@@ -268,10 +266,10 @@ public:
         return ec;
     }
 
-    jsonpointer_errc erase(json_reference root,
+    jsonpointer_errc erase(reference root,
                            typename Json::string_view_type path)
     {
-        jsonpointer_errc ec = evaluate(root,PathResolver<Json,JsonReference,JsonPointer>(),path);
+        jsonpointer_errc ec = evaluate(root,PathResolver<Json>(),path);
         if (ec != jsonpointer_errc())
         {
             return ec;
@@ -304,11 +302,11 @@ public:
         return ec;
     }
 
-    jsonpointer_errc replace(json_reference root,
+    jsonpointer_errc replace(reference root,
                              typename Json::string_view_type path,
                              const Json& value)
     {
-        jsonpointer_errc ec = evaluate(root,PathResolver<Json,JsonReference,JsonPointer>(),path);
+        jsonpointer_errc ec = evaluate(root,PathResolver<Json>(),path);
         if (ec != jsonpointer_errc())
         {
             return ec;
@@ -333,7 +331,7 @@ public:
             {
                 return jsonpointer_errc::name_not_found;
             }
-            current_.back()->set(buffer_,value);
+            current_.back()->insert_or_assign(buffer_,value);
             break;
         default:
             return jsonpointer_errc::end_of_input;
@@ -342,7 +340,7 @@ public:
     }
 
     template <class Op>
-    jsonpointer_errc evaluate(json_reference root,
+    jsonpointer_errc evaluate(reference root,
                               Op op,
                               typename Json::string_view_type path)
     {
@@ -590,14 +588,14 @@ private:
 template<class Json>
 typename Json::string_type normalized_path(const Json& root, typename Json::string_view_type path)
 {
-    detail::jsonpointer_evaluator<Json, const Json&, const Json*> evaluator;
+    detail::jsonpointer_evaluator<const Json> evaluator;
     return evaluator.normalized_path(root,path);
 }
 
 template<class Json>
 std::tuple<Json,jsonpointer_errc> get(const Json& root, typename Json::string_view_type path)
 {
-    detail::jsonpointer_evaluator<Json,const Json&,const Json*> evaluator;
+    detail::jsonpointer_evaluator<const Json> evaluator;
     jsonpointer_errc ec = evaluator.get(root,path);
     return std::make_tuple(evaluator.get_result(),ec);
 }
@@ -605,7 +603,7 @@ std::tuple<Json,jsonpointer_errc> get(const Json& root, typename Json::string_vi
 template<class Json>
 bool contains(const Json& root, typename Json::string_view_type path)
 {
-    detail::jsonpointer_evaluator<Json,const Json&,const Json*> evaluator;
+    detail::jsonpointer_evaluator<const Json> evaluator;
     jsonpointer_errc ec = evaluator.get(root,path);
     return ec == jsonpointer_errc() ? true : false;
 }
