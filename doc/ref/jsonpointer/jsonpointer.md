@@ -20,7 +20,7 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
     <td>Inserts a value in a JSON document using Json Pointer path notation, or if the path specifies an object member that already has the same key, assigns the new value to that member.</td> 
   </tr>
   <tr>
-    <td><a href="erase.md">erase</a></td>
+    <td><a href="remove.md">remove</a></td>
     <td>Removes a value from a JSON document using Json Pointer path notation.</td> 
   </tr>
   <tr>
