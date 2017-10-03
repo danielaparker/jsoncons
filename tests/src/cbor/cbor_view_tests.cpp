@@ -72,22 +72,8 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     cbor_view application;
     jsonpointer::jsonpointer_errc ec;
 
-    std::cout << "buffer size: " << buffer.size() << std::endl;
-    for (auto b : buffer)
-    {
-        std::cout << std::hex << (int)b << " ";
-    }
-    std::cout << std::endl;
-
     std::tie(application,ec) = jsonpointer::get(v,"/application");
     BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
-
-    std::cout << "application.buflen: " << application.buflen() << std::endl;
-    for (size_t i = 0; i < application.buflen(); ++i)
-    {
-        std::cout << std::hex << (int)application.buffer()[i] << " ";
-    }
-    std::cout << std::endl;
 
     json j2 = decode_cbor<json>(application);
     std::cout << pretty_print(j2) << std::endl;

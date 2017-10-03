@@ -21,28 +21,33 @@ On error, returns a null J value and a [jsonpointer_errc](jsonpointer_errc.md) e
 
 The type J satisfies the requirements for `jsonpointer::get` if it defines the following types
 
-name            |type               |notes
-----------------|-------------------|---------------
-char_type       |J::char_type       |
-string_type     |J::string_type     |
-string_view_type|J::string_view_type|
+name              |type                  |notes
+------------------|----------------------|---------------
+`value_type`      |`J::value_type`       |
+`reference`       |`J::reference`        |
+`const_reference` |`J::const_reference`  |
+`pointer`         |`J::pointer`          |
+`const_pointer`   |`J::const_pointer`    |
+`char_type`       |`J::char_type`        |
+`string_type`     |`J::string_type`      |
+`string_view_type`|`J::string_view_type` |
 
 and given 
 
 - a value `index` of type `size_t`
-- a value `key` of type `string_type` 
+- a value `key` of type `string_view_type` 
 - an rvalue expression `j` of type `J`
 
 the following expressions are valid
 
-expression     |return type|effects
----------------|-----------|---------------
-is_array()     |bool       |
-is_object()    |bool       |
-size()         |size_t     |
-has_key(key)   |bool       |
-at(index)      |const J&   |
-at(key)        |const J&   |
+expression     |return type                |effects
+---------------|---------------------------|---------------
+is_array()     |`bool`                     |
+is_object()    |`bool`                     |
+size()         |`size_t`                   |
+has_key(key)   |`bool`                     |
+at(index)      |`reference` or `value_type`|
+at(key)        |`reference` or `value_type`|
 
 ### Examples
 
@@ -160,4 +165,5 @@ Output:
 "Evelyn Waugh"
 ```
 
+#### Select values from `cbor_view` object
 

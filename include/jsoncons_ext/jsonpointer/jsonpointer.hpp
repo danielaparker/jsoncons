@@ -92,6 +92,7 @@ struct path_resolver
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
+    typedef typename Json::string_view_type string_view_type;
     using reference = JsonReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
@@ -107,7 +108,7 @@ struct path_resolver
     }
 
     jsonpointer_errc operator()(std::vector<json_wrapper<Json,JsonReference>>& current,
-                                const string_type& name) const
+                                string_view_type name) const
     {
         if (!current.back().get().has_key(name))
         {
@@ -123,6 +124,7 @@ struct path_setter
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
+    typedef typename Json::string_view_type string_view_type;
     using reference = JsonReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
@@ -138,7 +140,7 @@ struct path_setter
     }
 
     jsonpointer_errc operator()(std::vector<json_wrapper<Json,JsonReference>>& current,
-                                const string_type& name) const
+                                string_view_type name) const
     {
         jsonpointer_errc ec = jsonpointer_errc();
         if (!current.back().get().has_key(name))
@@ -155,6 +157,7 @@ class jsonpointer_evaluator : private parsing_context
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
+    typedef typename Json::string_view_type string_view_type;
     using reference = JsonReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
@@ -183,8 +186,7 @@ public:
         return column_;
     }
 
-    jsonpointer_errc get(reference root,
-                         typename Json::string_view_type path)
+    jsonpointer_errc get(reference root, string_view_type path)
     {
         path_resolver<Json,reference> op;
         jsonpointer_errc ec = evaluate(root,op,path);
@@ -210,7 +212,7 @@ public:
         return ec;
     }
 
-    string_type normalized_path(reference root, typename Json::string_view_type path)
+    string_type normalized_path(reference root, string_view_type path)
     {
         jsonpointer_errc ec = evaluate(root,path_setter<Json,reference>(),path);
         if (ec != jsonpointer_errc())
@@ -233,9 +235,7 @@ public:
         }
     }
 
-    jsonpointer_errc insert_or_assign(reference root,
-                                      typename Json::string_view_type path,
-                                      const Json& value)
+    jsonpointer_errc insert_or_assign(reference root, string_view_type path, const Json& value)
     {
         jsonpointer_errc ec = evaluate(root,path_setter<Json,reference>(),path);
         if (ec != jsonpointer_errc())
@@ -274,9 +274,7 @@ public:
         return ec;
     }
 
-    jsonpointer_errc insert(reference root,
-                            typename Json::string_view_type path,
-                            const Json& value)
+    jsonpointer_errc insert(reference root, string_view_type path, const Json& value)
     {
         jsonpointer_errc ec = evaluate(root,path_setter<Json,reference>(),path);
         if (ec != jsonpointer_errc())
@@ -322,8 +320,7 @@ public:
         return ec;
     }
 
-    jsonpointer_errc erase(reference root,
-                           typename Json::string_view_type path)
+    jsonpointer_errc erase(reference root, string_view_type path)
     {
         jsonpointer_errc ec = evaluate(root,path_resolver<Json,reference>(),path);
         if (ec != jsonpointer_errc())
@@ -358,9 +355,7 @@ public:
         return ec;
     }
 
-    jsonpointer_errc replace(reference root,
-                             typename Json::string_view_type path,
-                             const Json& value)
+    jsonpointer_errc replace(reference root, string_view_type path, const Json& value)
     {
         jsonpointer_errc ec = evaluate(root,path_resolver<Json,reference>(),path);
         if (ec != jsonpointer_errc())
@@ -396,9 +391,7 @@ public:
     }
 
     template <class Op>
-    jsonpointer_errc evaluate(reference root,
-                              Op op,
-                              typename Json::string_view_type path)
+    jsonpointer_errc evaluate(reference root, Op op, string_view_type path)
     {
         jsonpointer_errc ec = jsonpointer_errc();
 

@@ -127,13 +127,13 @@ public:
 
     using string_storage_type = typename json_traits_type::template string_storage<char_allocator_type>;
 
-    typedef basic_json<CharT,JsonTraits,Allocator> json_type;
-    typedef json_type value_type;
+    typedef basic_json<CharT,JsonTraits,Allocator> value_type;
+    typedef value_type json_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
     typedef value_type* pointer;
     typedef const value_type* const_pointer;
-    typedef key_value_pair<key_storage_type,json_type> key_value_pair_type;
+    typedef key_value_pair<key_storage_type,value_type> key_value_pair_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     typedef key_value_pair_type kvp_type;
@@ -144,7 +144,7 @@ public:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_type> val_allocator_type;
     using array_storage_type = typename json_traits_type::template array_storage<json_type, val_allocator_type>;
 
-    typedef json_array<json_type> array;
+    typedef json_array<value_type> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_pair_type> kvp_allocator_type;
 
@@ -1503,19 +1503,19 @@ public:
         {
         }
 
-        json_type& evaluate() 
+        basic_json& evaluate() 
         {
             return parent_.evaluate(string_view_type(key_.data(),key_.size()));
         }
 
-        const json_type& evaluate() const
+        const basic_json& evaluate() const
         {
             return parent_.evaluate(string_view_type(key_.data(),key_.size()));
         }
 
-        json_type& evaluate_with_default()
+        basic_json& evaluate_with_default()
         {
-            json_type& val = parent_.evaluate_with_default();
+            basic_json& val = parent_.evaluate_with_default();
             auto it = val.find(string_view_type(key_.data(),key_.size()));
             if (it == val.object_range().end())
             {
@@ -1524,22 +1524,22 @@ public:
             return it->value();
         }
 
-        json_type& evaluate(size_t index)
+        basic_json& evaluate(size_t index)
         {
             return evaluate().at(index);
         }
 
-        const json_type& evaluate(size_t index) const
+        const basic_json& evaluate(size_t index) const
         {
             return evaluate().at(index);
         }
 
-        json_type& evaluate(string_view_type index)
+        basic_json& evaluate(string_view_type index)
         {
             return evaluate().at(index);
         }
 
-        const json_type& evaluate(string_view_type index) const
+        const basic_json& evaluate(string_view_type index) const
         {
             return evaluate().at(index);
         }
@@ -1744,12 +1744,12 @@ public:
             return evaluate() != val;
         }
 
-        json_type& operator[](size_t i)
+        basic_json& operator[](size_t i)
         {
             return evaluate_with_default().at(i);
         }
 
-        const json_type& operator[](size_t i) const
+        const basic_json& operator[](size_t i) const
         {
             return evaluate().at(i);
         }
@@ -1759,27 +1759,27 @@ public:
             return json_proxy<proxy_type>(*this,key_storage_type(name.begin(),name.end(),key_.get_allocator()));
         }
 
-        const json_type& operator[](string_view_type name) const
+        const value_type& operator[](string_view_type name) const
         {
             return at(name);
         }
 
-        json_type& at(string_view_type name)
+        value_type& at(string_view_type name)
         {
             return evaluate().at(name);
         }
 
-        const json_type& at(string_view_type name) const
+        const value_type& at(string_view_type name) const
         {
             return evaluate().at(name);
         }
 
-        const json_type& at(size_t index)
+        const value_type& at(size_t index)
         {
             return evaluate().at(index);
         }
 
-        const json_type& at(size_t index) const
+        const value_type& at(size_t index) const
         {
             return evaluate().at(index);
         }
@@ -1795,7 +1795,7 @@ public:
         }
 
         template <class T>
-        json_type get(string_view_type name, T&& default_val) const
+        value_type get(string_view_type name, T&& default_val) const
         {
             return evaluate().get(name,std::forward<T>(default_val));
         }
@@ -1853,12 +1853,12 @@ public:
 
         // merge
 
-        void merge(const json_type& source)
+        void merge(const basic_json& source)
         {
             return evaluate().merge(source);
         }
 
-        void merge(json_type&& source)
+        void merge(basic_json&& source)
         {
             return evaluate().merge(std::forward<json_type>(source));
         }
@@ -1875,22 +1875,22 @@ public:
 
         // merge_or_update
 
-        void merge_or_update(const json_type& source)
+        void merge_or_update(const basic_json& source)
         {
             return evaluate().merge_or_update(source);
         }
 
-        void merge_or_update(json_type&& source)
+        void merge_or_update(basic_json&& source)
         {
             return evaluate().merge_or_update(std::forward<json_type>(source));
         }
 
-        void merge_or_update(object_iterator hint, const json_type& source)
+        void merge_or_update(object_iterator hint, const basic_json& source)
         {
             return evaluate().merge_or_update(hint, source);
         }
 
-        void merge_or_update(object_iterator hint, json_type&& source)
+        void merge_or_update(object_iterator hint, basic_json&& source)
         {
             return evaluate().merge_or_update(hint, std::forward<json_type>(source));
         }
@@ -3172,17 +3172,17 @@ public:
         }
     }
 
-    json_type& evaluate() 
+    basic_json& evaluate() 
     {
         return *this;
     }
 
-    json_type& evaluate_with_default() 
+    basic_json& evaluate_with_default() 
     {
         return *this;
     }
 
-    const json_type& evaluate() const
+    const basic_json& evaluate() const
     {
         return *this;
     }
