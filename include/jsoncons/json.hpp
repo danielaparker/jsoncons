@@ -129,6 +129,10 @@ public:
 
     typedef basic_json<CharT,JsonTraits,Allocator> json_type;
     typedef json_type value_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
     typedef key_value_pair<key_storage_type,json_type> key_value_pair_type;
 
 #if !defined(JSONCONS_NO_DEPRECATED)

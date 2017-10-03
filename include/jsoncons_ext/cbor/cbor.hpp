@@ -212,6 +212,11 @@ namespace detail {
 
     inline const uint8_t* walk(const uint8_t* it, const uint8_t* end)
     {
+        if (it >= end)
+        {
+            return end;
+        }
+
         const uint8_t* pos = it++;
         switch (*pos)
         {
@@ -744,107 +749,26 @@ namespace detail {
     }
 }
 
-// base_cbor_view
-
-class base_cbor_view
-{
-    const uint8_t* buffer_;
-    size_t buflen_; 
-public:
-    typedef base_cbor_view value_type;
-    typedef const base_cbor_view& const_reference;
-
-    base_cbor_view()
-        : buffer_(nullptr), buflen_(0)
-    {
-    }
-
-    base_cbor_view(const uint8_t* buffer, size_t buflen)
-        : buffer_(buffer), buflen_(buflen)
-    {
-    }
-    const uint8_t* buffer() const
-    {
-        return buffer_;
-    }
-
-    const size_t buflen() const
-    {
-        return buflen_;
-    }
-
-    bool is_array() const
-    {
-        JSONCONS_ASSERT(buflen_ > 0);
-        return detail::is_array(buffer_[0]);
-    }
-
-    bool is_object() const
-    {
-        JSONCONS_ASSERT(buflen_ > 0);
-        return detail::is_object(buffer_[0]);
-    }
-
-    size_t size() const
-    {
-        size_t len;
-        const uint8_t* it;
-        std::tie(len, it) = detail::size(buffer_,buffer_+buflen_);
-        return len;
-    }
-
-    base_cbor_view at(size_t index) const
-    {
-        JSONCONS_ASSERT(is_array());
-        size_t len;
-        const uint8_t* it = buffer_;
-        const uint8_t* end = buffer_ + buflen_;
-
-        std::tie(len, it) = detail::size(it, end);
-
-        for (size_t i = 0; i < index; ++i)
-        {
-            it = detail::walk(it, end);
-        }
-
-        const uint8_t* last = detail::walk(it,end);
-
-        return base_cbor_view(it,last-it);
-    }
-
-    base_cbor_view at(const std::string& key) const
-    {
-        JSONCONS_ASSERT(is_object());
-        size_t len;
-        const uint8_t* it = buffer_;
-        const uint8_t* end = buffer_ + buflen_;
-
-        std::tie(len, it) = detail::size(it, end);
-
-        for (size_t i = 0; i < len; ++i)
-        {
-            std::string a_key;
-            std::tie(a_key,it) = detail::get_string(it, end);
-            if (a_key == key)
-            {
-                const uint8_t* last = detail::walk(it, end);
-                return base_cbor_view(it,last-it);
-            }
-            it = detail::walk(it, end);
-        }
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Key not found");
-    }
-};
-
 // cbor_view
 
-class cbor_view : public base_cbor_view
+class cbor_view 
 {
     const uint8_t* buffer_;
     size_t buflen_; 
 public:
     typedef cbor_view value_type;
+    typedef cbor_view& reference;
     typedef const cbor_view& const_reference;
+    typedef cbor_view* pointer;
+    typedef const cbor_view* const_pointer;
+    typedef std::string string_type;
+    typedef char char_type;
+    typedef std::char_traits<char_type> char_traits_type;
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+    typedef Basic_string_view_<char_type,char_traits_type> string_view_type;
+#else
+    typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
+#endif
 
     cbor_view()
         : buffer_(nullptr), buflen_(0)
@@ -854,6 +778,7 @@ public:
     cbor_view(const uint8_t* buffer, size_t buflen)
         : buffer_(buffer), buflen_(buflen)
     {
+        std::cout << "cbor_view buflen_: " << buflen_ << std::endl;
     }
 
     cbor_view(const std::vector<uint8_t>& v)
@@ -861,9 +786,30 @@ public:
     {
     }
 
-    cbor_view(const cbor_view&) = default;
+    cbor_view(const cbor_view& other)
+        : buffer_(other.buffer_), buflen_(other.buflen_)
+    {
+
+    }
+
+    cbor_view(cbor_view&& other)
+        : buffer_(nullptr), buflen_(0)
+    {
+        std::swap(buffer_,other.buffer_);
+        std::swap(buflen_,other.buflen_);
+    }
 
     cbor_view& operator=(const cbor_view&) = default;
+
+    cbor_view& operator=(cbor_view&& other)
+    {
+        if (this != &other)
+        {
+            std::swap(buffer_,other.buffer_);
+            std::swap(buflen_,other.buflen_);
+        }
+        return *this;
+    }
 
     const uint8_t* buffer() const
     {
@@ -914,9 +860,44 @@ public:
         return cbor_view(it,last-it);
     }
 
-    cbor_view at(const std::string& key) const
+    cbor_view at(string_view_type key) const
     {
+        std::cout << "at " << key << " buflen: " << buflen_ << std::endl;
         JSONCONS_ASSERT(is_object());
+        size_t len;
+        const uint8_t* it = buffer_;
+        const uint8_t* end = buffer_ + buflen_;
+
+        std::tie(len, it) = detail::size(buffer_, end);
+
+        std::cout << "length: " << len << std::endl;
+
+        for (size_t i = 0; i < len; ++i)
+        {
+            string_type a_key;
+            std::tie(a_key,it) = detail::get_string(it, end);
+            std::cout << "key: " << a_key << " after key: " << std::hex << (int)*it << std::endl;
+            if (a_key == key)
+            {
+                const uint8_t* last = detail::walk(it, end);
+                std::cout << "after data: " << std::hex << std::hex << (int)*last << std::endl;
+                std::cout << "data length: " << (last-it) << std::endl;
+                JSONCONS_ASSERT(last >= it);
+                return cbor_view(it,last-it);
+            }
+            const uint8_t* last = detail::walk(it, end);
+            std::cout << "skipped data length: " << (last-it) << std::endl;
+            it = last;
+        }
+        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Key not found");
+    }
+
+    bool has_key(string_view_type key) const
+    {
+        if (!is_object())
+        {
+            return false;
+        }
         size_t len;
         const uint8_t* it = buffer_;
         const uint8_t* end = buffer_ + buflen_;
@@ -925,16 +906,15 @@ public:
 
         for (size_t i = 0; i < len; ++i)
         {
-            std::string a_key;
+            string_type a_key;
             std::tie(a_key,it) = detail::get_string(it, end);
             if (a_key == key)
             {
-                const uint8_t* last = detail::walk(it, end);
-                return cbor_view(it,last-it);
+                return true;
             }
             it = detail::walk(it, end);
         }
-        JSONCONS_THROW_EXCEPTION(std::runtime_error,"Key not found");
+        return false;
     }
 };
 
