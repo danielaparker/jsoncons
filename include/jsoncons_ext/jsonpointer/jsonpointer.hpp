@@ -90,7 +90,6 @@ private:
 template<class Json,class JsonReference>
 struct path_resolver
 {
-    typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
     typedef typename Json::string_view_type string_view_type;
     using reference = JsonReference;
@@ -122,7 +121,6 @@ struct path_resolver
 template<class Json, class JsonReference>
 struct path_setter
 {
-    typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
     typedef typename Json::string_view_type string_view_type;
     using reference = JsonReference;
@@ -155,8 +153,8 @@ struct path_setter
 template<class Json,class JsonReference>
 class jsonpointer_evaluator : private parsing_context
 {
-    typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
+    typedef typename string_type::value_type char_type;
     typedef typename Json::string_view_type string_view_type;
     using reference = JsonReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;

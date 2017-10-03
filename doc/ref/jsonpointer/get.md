@@ -28,7 +28,6 @@ name              |type                  |notes
 `const_reference` |`J::const_reference`  |
 `pointer`         |`J::pointer`          |
 `const_pointer`   |`J::const_pointer`    |
-`char_type`       |`J::char_type`        |
 `string_type`     |`J::string_type`      |
 `string_view_type`|`J::string_view_type` |
 
@@ -167,3 +166,48 @@ Output:
 
 #### Select values from `cbor_view` object
 
+A [cbor_view](../cbor/cbor_view.md) satisfies the requirements for `jsonpointer::get`.
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    ojson j1 = ojson::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+       {
+           "rater": "HikingAsylum.example.com",
+           "assertion": "is-good",
+           "rated": "sk",
+           "rating": 0.90
+         }
+       ]
+    }
+    )");
+
+    auto buffer = cbor::encode_cbor(j1);
+
+    cbor::cbor_view b1(buffer); 
+
+    cbor::cbor_view b2;
+    jsonpointer::jsonpointer_errc ec;
+
+    std::tie(b2,ec) = jsonpointer::get(b1,"/reputons/0/rated");
+
+    ojson j2 = cbor::decode_cbor<ojson>(b2);
+
+    std::cout << j2 << std::endl;
+}
+```
+
+Output:
+
+```
+"sk"
+```

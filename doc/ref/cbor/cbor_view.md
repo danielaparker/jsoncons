@@ -9,10 +9,15 @@ A `cbor_view` object refers to a constant contiguous sequence of bytes.
 class cbor_view
 ```
 
-Member type                         |Definition
-------------------------------------|------------------------------
-`value_type`|`cbor_view`
-`const_reference`|`const cbor_view&`
+Member type          |Definition
+---------------------|------------------------------
+`value_type`         |`cbor_view`
+`reference`          |`cbor_view&`
+`const_reference`    |`const cbor_view&`
+`pointer`            |`cbor_view*`
+`const_pointer`      |`const cbor_view*`
+`string_type`        |`std::string`
+`string_view_type`   |A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied. 
 
 #### Constructors
 
@@ -62,8 +67,55 @@ cbor_view(const cbor_view& val); // (3)
   </tr>
 </table>
 
+#### Select values from `cbor_view` object
+
+A `cbor_view` satisfies the requirements for [jsonpointer::get](../jsonpointer/get.md).
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    ojson j1 = ojson::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+       {
+           "rater": "HikingAsylum.example.com",
+           "assertion": "is-good",
+           "rated": "sk",
+           "rating": 0.90
+         }
+       ]
+    }
+    )");
+
+    auto buffer = cbor::encode_cbor(j1);
+
+    cbor::cbor_view b1(buffer); 
+
+    cbor::cbor_view b2;
+    jsonpointer::jsonpointer_errc ec;
+
+    std::tie(b2,ec) = jsonpointer::get(b1,"/reputons/0/rated");
+
+    ojson j2 = cbor::decode_cbor<ojson>(b2);
+
+    std::cout << j2 << std::endl;
+}
+```
+
+Output:
+
+```
+"sk"
+```
+
 #### See also
 
-- [cbor_view](cbor_view.md)
-
+- [jsonpointer::get](../jsonpointer/get.md)
 

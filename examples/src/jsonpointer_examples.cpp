@@ -3,6 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
 
 using namespace jsoncons;
 
@@ -262,6 +263,36 @@ void jsonpointer_replace_array_value()
     }
 }
 
+void jsonpointer_cbor()
+{
+    ojson j1 = ojson::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+       {
+           "rater": "HikingAsylum.example.com",
+           "assertion": "is-good",
+           "rated": "sk",
+           "rating": 0.90
+         }
+       ]
+    }
+    )");
+
+    auto buffer = cbor::encode_cbor(j1);
+
+    cbor::cbor_view b1(buffer); 
+
+    cbor::cbor_view b2;
+    jsonpointer::jsonpointer_errc ec;
+
+    std::tie(b2,ec) = jsonpointer::get(b1,"/reputons/0/rated");
+
+    ojson j2 = cbor::decode_cbor<ojson>(b2);
+
+    std::cout << j2 << std::endl;
+}
+
 void jsonpointer_examples()
 {
     std::cout << "\njsonpointer examples\n\n";
@@ -277,6 +308,7 @@ void jsonpointer_examples()
     jsonpointer_replace_object_value();
     jsonpointer_replace_array_value();
     jsonpointer_contains();
+    jsonpointer_cbor();
     std::cout << std::endl;
 }
 
