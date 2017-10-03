@@ -136,9 +136,9 @@ private:
     typedef std::basic_string<char_type,char_traits_type> string_type;
     typedef typename Json::key_storage_type key_storage_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef JsonReference json_reference;
-    using json_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-    typedef std::pair<string_type,json_pointer> node_type;
+    typedef JsonReference reference;
+    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+    typedef std::pair<string_type,pointer> node_type;
     typedef std::vector<node_type> node_set;
 
     static string_view_type length_literal() 
@@ -153,7 +153,7 @@ private:
         virtual ~selector()
         {
         }
-        virtual void select(const string_type& path, json_reference val, 
+        virtual void select(const string_type& path, reference val, 
                             node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
@@ -167,7 +167,7 @@ private:
         {
         }
 
-        void select(const string_type& path, json_reference val, 
+        void select(const string_type& path, reference val, 
                     node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             auto index = result_.eval(val);
@@ -197,7 +197,7 @@ private:
         {
         }
 
-        void select(const string_type& path, json_reference val, node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
+        void select(const string_type& path, reference val, node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
         {
             if (val.is_array())
             {
@@ -230,7 +230,7 @@ private:
         {
         }
 
-        void select(const string_type& path, json_reference val,
+        void select(const string_type& path, reference val,
             node_set& nodes,
             std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
@@ -304,7 +304,7 @@ private:
         }
 
         void select(const string_type& path, 
-                    json_reference val,
+                    reference val,
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>&) override
         {
@@ -318,7 +318,7 @@ private:
             }
         }
 
-        void end_array_slice1(const string_type& path, json_reference val, node_set& nodes)
+        void end_array_slice1(const string_type& path, reference val, node_set& nodes)
         {
             if (val.is_array())
             {
@@ -342,7 +342,7 @@ private:
             }
         }
 
-        void end_array_slice2(const string_type& path, json_reference val, node_set& nodes)
+        void end_array_slice2(const string_type& path, reference val, node_set& nodes)
         {
             if (val.is_array())
             {
@@ -447,16 +447,16 @@ public:
         }
     }
 
-    void evaluate(json_reference root, string_view_type path)
+    void evaluate(reference root, string_view_type path)
     {
         evaluate(root,path.data(),path.length());
     }
-    void evaluate(json_reference root, const char_type* path)
+    void evaluate(reference root, const char_type* path)
     {
         evaluate(root,path,char_traits_type::length(path));
     }
 
-    void evaluate(json_reference root, 
+    void evaluate(reference root, 
                   const char_type* path, 
                   size_t length)
     {
@@ -468,7 +468,7 @@ public:
         }
     }
 
-    void evaluate(json_reference root, 
+    void evaluate(reference root, 
                   const char_type* path, 
                   size_t length,
                   std::error_code& ec)
@@ -926,7 +926,7 @@ public:
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
             const auto& path = stack_.back()[i].first;
-            json_pointer p = stack_.back()[i].second;
+            pointer p = stack_.back()[i].second;
 
             if (p->is_array())
             {
@@ -959,7 +959,7 @@ public:
         buffer_.clear();
     }
 
-    void apply_unquoted_string(const string_type& path, json_reference val, string_view_type name)
+    void apply_unquoted_string(const string_type& path, reference val, string_view_type name)
     {
         if (val.is_object())
         {
@@ -1042,7 +1042,7 @@ public:
         }
     }
 
-    void apply_selectors(const string_type& path, json_reference val)
+    void apply_selectors(const string_type& path, reference val)
     {
         for (const auto& selector : selectors_)
         {
