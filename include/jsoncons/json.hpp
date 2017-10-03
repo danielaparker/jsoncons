@@ -4132,11 +4132,11 @@ public:
 
     void remove(string_view_type name)
     {
-        erase(name.data(),name.length());
+        erase(name);
     }
     void remove_member(string_view_type name)
     {
-        erase(name.data(),name.length());
+        erase(name);
     }
     // Removes a member from an object value
 

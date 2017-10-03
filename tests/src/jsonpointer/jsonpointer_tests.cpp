@@ -73,7 +73,7 @@ void check_replace(json& example, const std::string& path, const json& value, co
 
 void check_remove(json& example, const std::string& path, const json& expected)
 {
-    jsonpointer::jsonpointer_errc ec = jsonpointer::erase(example, path);
+    jsonpointer::jsonpointer_errc ec = jsonpointer::remove(example, path);
     BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
     BOOST_CHECK_EQUAL(expected, example);
 }

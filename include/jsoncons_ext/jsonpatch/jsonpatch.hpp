@@ -74,7 +74,7 @@ namespace detail {
                     }
                     else if (it->op == op_type::remove)
                     {
-                        if (jsonpointer::erase(target,it->path) != jsonpointer::jsonpointer_errc())
+                        if (jsonpointer::remove(target,it->path) != jsonpointer::jsonpointer_errc())
                         {
                             //std::cout << "remove: " << it->path << std::endl;
                             break;
@@ -294,7 +294,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                 }
                 else
                 {
-                    ec = jsonpointer::erase(target,path);
+                    ec = jsonpointer::remove(target,path);
                     if (ec != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::remove_failed;
@@ -349,7 +349,7 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
                         patch_ec = jsonpatch_errc::move_failed;
                         unwinder.state = detail::state_type::abort;
                     }
-                    else if (jsonpointer::erase(target,from) != jsonpointer::jsonpointer_errc())
+                    else if (jsonpointer::remove(target,from) != jsonpointer::jsonpointer_errc())
                     {
                         patch_ec = jsonpatch_errc::move_failed;
                         unwinder.state = detail::state_type::abort;

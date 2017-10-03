@@ -198,7 +198,7 @@ void jsonpointer_remove_object_member()
         { "foo": "bar", "baz" : "qux"}
     )");
 
-    auto ec = jsonpointer::erase(target, "/baz");
+    auto ec = jsonpointer::remove(target, "/baz");
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;
@@ -215,7 +215,7 @@ void jsonpointer_remove_array_element()
         { "foo": [ "bar", "qux", "baz" ] }
     )");
 
-    auto ec = jsonpointer::erase(target, "/foo/1");
+    auto ec = jsonpointer::remove(target, "/foo/1");
     if (ec == jsonpointer::jsonpointer_errc())
     {
         std::cout << target << std::endl;

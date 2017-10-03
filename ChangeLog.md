@@ -13,6 +13,11 @@ Enhancements:
 
 - New class `cbor_view` for accessing packed `cbor` values. A `cbor_view` satisfies the requirements for `jsonpointer::get`.
 
+Changes (non breaking)
+----------------------
+
+- `jsonpointer::erase` renamed to `jsonpointer::remove`, old name deprecated
+
 0.99.9.1
 --------
 

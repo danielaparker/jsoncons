@@ -318,7 +318,7 @@ public:
         return ec;
     }
 
-    jsonpointer_errc erase(reference root, string_view_type path)
+    jsonpointer_errc remove(reference root, string_view_type path)
     {
         jsonpointer_errc ec = evaluate(root,path_resolver<Json,reference>(),path);
         if (ec != jsonpointer_errc())
@@ -672,11 +672,11 @@ jsonpointer_errc insert(Json& root, typename Json::string_view_type path, const 
 }
 
 template<class Json>
-jsonpointer_errc erase(Json& root, typename Json::string_view_type path)
+jsonpointer_errc remove(Json& root, typename Json::string_view_type path)
 {
     detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
-    return evaluator.erase(root,path);
+    return evaluator.remove(root,path);
 }
 
 template<class Json>
@@ -688,6 +688,14 @@ jsonpointer_errc replace(Json& root, typename Json::string_view_type path, const
 }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+template<class Json>
+jsonpointer_errc erase(Json& root, typename Json::string_view_type path)
+{
+    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+
+    return evaluator.erase(root,path);
+}
 
 template<class Json>
 jsonpointer_errc assign(Json& root, typename Json::string_view_type path, const Json& value)
