@@ -79,25 +79,25 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     }
     std::cout << std::endl;
 
-    //std::tie(application,ec) = jsonpointer::get(v,"/application");
-    //BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    std::tie(application,ec) = jsonpointer::get(v,"/application");
+    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
 
-    //std::cout << "application.buflen: " << application.buflen() << std::endl;
-    //for (size_t i = 0; i < application.buflen(); ++i)
-    //{
-    //    std::cout << std::hex << (int)application.buffer()[i] << " ";
-    //}
-    //std::cout << std::endl;
+    std::cout << "application.buflen: " << application.buflen() << std::endl;
+    for (size_t i = 0; i < application.buflen(); ++i)
+    {
+        std::cout << std::hex << (int)application.buffer()[i] << " ";
+    }
+    std::cout << std::endl;
 
-    //json j2 = decode_cbor<json>(application);
-    //std::cout << pretty_print(j2) << std::endl;
+    json j2 = decode_cbor<json>(application);
+    std::cout << pretty_print(j2) << std::endl;
 
-    //cbor_view reputons_0_rated;
-    //std::tie(reputons_0_rated,ec) = jsonpointer::get(v,"/reputons");
-    //BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    cbor_view reputons_0_rated;
+    std::tie(reputons_0_rated,ec) = jsonpointer::get(v,"/reputons");
+    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
 
-    //json j2 = decode_cbor<json>(reputons_0_rated);
-    //std::cout << pretty_print(j2) << std::endl;
+    json j3 = decode_cbor<json>(reputons_0_rated);
+    std::cout << pretty_print(j3) << std::endl;
 
 }
 

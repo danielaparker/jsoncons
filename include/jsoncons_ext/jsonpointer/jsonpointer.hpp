@@ -30,9 +30,13 @@ enum class pointer_state
     object_reference_token,
     escaped
 };
+template <class Json,class JsonReference, class Enable = void>
+class json_wrapper
+{
+};
 
 template <class Json,class JsonReference>
-class json_wrapper
+class json_wrapper<Json,JsonReference,typename std::enable_if<std::is_reference<decltype(std::declval<Json>().at(typename Json::string_view_type()))>::value>::type>
 {
 public:
     using reference = JsonReference;
@@ -53,6 +57,34 @@ public:
     }
 private:
     pointer ptr_;
+};
+
+template <class Json,class JsonReference>
+class json_wrapper<Json,JsonReference,typename std::enable_if<!std::is_reference<decltype(std::declval<Json>().at(typename Json::string_view_type()))>::value>::type>
+{
+public:
+    using value_type = typename Json::value_type;
+    using reference = JsonReference;
+    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+
+    json_wrapper(reference ref) JSONCONS_NOEXCEPT
+        : val_(ref)
+    {
+    }
+
+    json_wrapper(const json_wrapper& w) JSONCONS_NOEXCEPT
+        : val_(w.val_)
+    {
+    }
+
+    json_wrapper& operator=(const json_wrapper&) JSONCONS_NOEXCEPT = default;
+
+    value_type get() const JSONCONS_NOEXCEPT
+    {
+        return val_;
+    }
+private:
+    value_type val_;
 };
 
 template<class Json,class JsonReference>
