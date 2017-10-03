@@ -9,6 +9,10 @@ Bug fixes:
 
 - Fixed issue with jsonpatch::diff (fix contributed by Alexander (rog13)) 
 
+Enhancements:
+
+- New class `cbor_view` for accessing packed `cbor` values. A `cbor_view` satisfies the requirements for `jsonpointer::get`.
+
 0.99.9.1
 --------
 
