@@ -631,7 +631,7 @@ public:
         }
         variant(double val)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val,0);
+            new(reinterpret_cast<void*>(&data_))double_data(val,std::numeric_limits<double>::digits10);
         }
         variant(double val, uint8_t precision)
         {
@@ -3899,12 +3899,12 @@ public:
 
     static json_type from_floating_point(double val)
     {
-        return json_type(variant(val));
+        return json_type(variant(val, std::numeric_limits<double>::digits10));
     }
 
     static json_type from_floating_point(double val, allocator_type)
     {
-        return json_type(variant(val));
+        return json_type(variant(val,std::numeric_limits<double>::digits10));
     }
 
     static json_type from_bool(bool val)

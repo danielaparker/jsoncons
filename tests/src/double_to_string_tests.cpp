@@ -35,20 +35,20 @@ const serialization_options options;
 BOOST_AUTO_TEST_CASE(test_double_to_string)
 {
     double x = 1.0e100;
-    std::string s = float_to_string<char>(x, options.precision());
+    std::string s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     //std::cout << x << ": " << s << std::endl;
     BOOST_CHECK(s == std::string("1.0e+100") || s == std::string("1.0e100"));
 
     x = 1.0e-100;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("1.0e-100"));
 
     x = 0.123456789e-100;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("1.23456789e-101"));
 
     x = 0.123456789e100;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("1.23456789e+99") || s == std::string("1.23456789e+099"));
 
     x = 1234563;
@@ -60,27 +60,27 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
     BOOST_CHECK(s == std::string("1.23456e-7") || s == std::string("1.23456e-07") || s == std::string("1.23456e-007"));
 
     x = -1.0e+100;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("-1.0e+100") || s == std::string("-1.0e100"));
 
     x = -1.0e-100;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("-1.0e-100"));
 
     x = 0;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("0.0"));
 
     x = -0;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("0.0"));
 
     x = 1;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("1.0"));
 
     x = 0.1;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("0.1"));
 
     x = 1.1;
@@ -88,23 +88,23 @@ BOOST_AUTO_TEST_CASE(test_double_to_string)
     BOOST_CHECK(s == std::string("1.1000000000000001"));
 
     x = -1;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("-1.0"));
 
     x = 10;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("10.0"));
 
     x = -10;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("-10.0"));
 
     x = 11;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("11.0"));
 
     x = -11;
-    s = float_to_string<char>(x, options.precision());
+    s = float_to_string<char>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::string("-11.0"));
 }
 
@@ -125,52 +125,52 @@ BOOST_AUTO_TEST_CASE(test_locale)
 BOOST_AUTO_TEST_CASE(test_double_to_wstring)
 {
     double x = 1.0e100;
-    std::wstring s = float_to_string<wchar_t>(x, options.precision());
+    std::wstring s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     //std::wcout << x << L":" << s << std::endl;
     BOOST_CHECK(s == std::wstring(L"1.0e+100") || s == std::wstring(L"1.0e100"));
 
     x = 1.0e-100;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"1.0e-100"));
 
     x = -1.0e+100;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"-1.0e+100") || s == std::wstring(L"-1.0e100"));
 
     x = -1.0e-100;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"-1.0e-100"));
 
     x = 0;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"0.0"));
 
     x = -0;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"0.0"));
 
     x = 1;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"1.0"));
 
     x = -1;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"-1.0"));
 
     x = 10;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"10.0"));
 
     x = -10;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"-10.0"));
 
     x = 11;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"11.0"));
 
     x = -11;
-    s = float_to_string<wchar_t>(x, options.precision());
+    s = float_to_string<wchar_t>(x, std::numeric_limits<double>::digits10);
     BOOST_CHECK(s == std::wstring(L"-11.0"));
 }
 BOOST_AUTO_TEST_SUITE_END()

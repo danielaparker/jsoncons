@@ -889,7 +889,7 @@ public:
         int decimal_point = 0;
         int sign = 0;
 
-        int prec = (precision == 0) ? precision_ : precision;
+        int prec = (precision_ == 0) ? precision : precision_;
 
         int err = _ecvt_s(buf, _CVTBUFSIZE, val, prec, &decimal_point, &sign);
         if (err != 0)
@@ -997,7 +997,7 @@ public:
     void operator()(double val, uint8_t precision, buffered_output<CharT>& os)
     {
         oss_.clear_sequence();
-        oss_.precision((precision == 0) ? precision_ : precision);
+        oss_.precision((precision_ == 0) ? precision : precision_);
         oss_ << val;
 
         //std::cout << "precision_:" << (int)precision_ << ", precision:" << (int)precision << ", buf:" << oss_.data() << std::endl;
