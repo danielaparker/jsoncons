@@ -2764,8 +2764,14 @@ private:
             if (is_negative_)
                 d = -d;
 
-            handler_.double_value(d, static_cast<uint8_t>(precision_), *this);
-
+            if (precision_ > std::numeric_limits<double>::max_digits10)
+            {
+                handler_.double_value(d, static_cast<uint8_t>(std::numeric_limits<double>::max_digits10), *this);
+            }
+            else
+            {
+                handler_.double_value(d, static_cast<uint8_t>(precision_), *this);
+            }
         }
         catch (...)
         {

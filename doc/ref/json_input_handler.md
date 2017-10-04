@@ -55,8 +55,12 @@ line and column information is provided in the [parsing_context](parsing_context
 Send non-negative integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_uinteger_value`.
 
+    void double_value(double value, const parsing_context& context)
+Send floating point value event with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
+line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_double_value`.
+
     void double_value(double value, uint8_t precision, const parsing_context& context)
-Send floating point value event. Contextual information including
+Send floating point value event with specified precision. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_double_value`.
 
     void bool_value(bool value, const parsing_context& context) 

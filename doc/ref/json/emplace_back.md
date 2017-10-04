@@ -1,7 +1,7 @@
 ### jsoncons::json::emplace_back
 ```c++
 template<class... Args>
-json_type& emplace_back(Args&&... args);
+json& emplace_back(Args&&... args);
 ```
 
 #### Parameters

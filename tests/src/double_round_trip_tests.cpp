@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_precision)
     BOOST_CHECK_EQUAL(17,val.double_precision());
 
     val = json::parse("0.42229999999999997");
-    BOOST_CHECK_EQUAL(18,val.double_precision());
+    BOOST_CHECK_EQUAL(17,val.double_precision()); // max is std::numeric_limits<double>::max_digits10
 
     val = json::parse("1.2345e+30");
     BOOST_CHECK_EQUAL(5,val.double_precision());

@@ -85,9 +85,21 @@ public:
         do_uinteger_value(value,context);
     }
 
+    void double_value(double value, const parsing_context& context)
+    {
+        do_double_value(value, std::numeric_limits<double>::digits10, context);
+    }
+
     void double_value(double value, uint8_t precision, const parsing_context& context)
     {
-        do_double_value(value, precision, context);
+        if (precision == 0)
+        {
+            do_double_value(value, std::numeric_limits<double>::digits10, context);
+        }
+        else
+        {
+            do_double_value(value, precision, context);
+        }
     }
 
     void bool_value(bool value, const parsing_context& context) 

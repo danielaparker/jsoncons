@@ -252,7 +252,7 @@ namespace jsoncons
                 handler.begin_array();
                 for (size_t j = 0; j < val.size2(); ++j)
                 {
-                    handler.double_value(val(i, j),0);
+                    handler.double_value(val(i, j));
                 }
                 handler.end_array();
             }

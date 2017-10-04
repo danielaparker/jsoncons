@@ -48,8 +48,11 @@ Output signed integer event. Uses `do_integer_value`.
     void uinteger_value(uint64_t value) 
 Output non-negative integer event. Uses `do_uinteger_value`.
 
-    void double_value(double value, uint8_t precision = std::numeric_limits<double>::digits10) 
-Output floating point value event. Uses `do_double_value`.
+    void double_value(double value) 
+Output floating point value with default precision (`std::numeric_limits<double>::digits10`.) Uses `do_double_value`.
+
+    void double_value(double value, uint8_t precision) 
+Output floating point value with specified precision. Uses `do_double_value`.
 
     void bool_value(bool value) 
 Output boolean value event. Uses `do_bool_value`.

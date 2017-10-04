@@ -18,7 +18,11 @@ The `jsoncons` library will always rebind the supplied allocator from the templa
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`json_type`|json type
+`value_type`|json
+`reference`|json&
+`const_reference`|const json&
+`pointer`|json*
+`const_pointer`|const json*
 `allocator_type`|Allocator type
 `char_allocator`|String allocator type
 `array_allocator`|Array allocator type

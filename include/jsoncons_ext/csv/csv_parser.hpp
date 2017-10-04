@@ -745,7 +745,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler_.double_value(val, std::numeric_limits<double>::digits10, *this);
+                        handler_.double_value(val, *this);
                     }
                     else
                     {

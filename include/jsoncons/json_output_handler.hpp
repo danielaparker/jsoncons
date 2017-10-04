@@ -119,7 +119,12 @@ public:
         do_uinteger_value(value);
     }
 
-    void double_value(double value, uint8_t precision = std::numeric_limits<double>::digits10) 
+    void double_value(double value) 
+    {
+        do_double_value(value, std::numeric_limits<double>::digits10);
+    }
+
+    void double_value(double value, uint8_t precision) 
     {
         do_double_value(value, precision);
     }

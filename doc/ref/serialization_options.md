@@ -15,9 +15,6 @@ When parsing text, the precision of the fractional number is retained, and used 
 ```
 #### Member constants
 
-    default_precision
-The default precision is 15
-
     default_indent
 The default indent is 4
 
@@ -32,7 +29,7 @@ Constructs an `serialization_options` with default values.
 Returns the level of indentation, the default is 4
 
     uint8_t precision() const 
-Returns the maximum number of significant digits.
+If set, returns an override for the number of significant digits, otherwise zero.
 
     bool escape_all_non_ascii() const
 The default is false
@@ -65,6 +62,7 @@ The default is "null"
 Sets replacement text for negative infinity.
 
     serialization_options& precision(uint8_t prec)
+Overrides floating point precision
 
     serialization_options& object_object_split_lines(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
