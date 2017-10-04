@@ -67,6 +67,7 @@ enum class json_type_tag : uint8_t
     double_t,
     small_string_t,
     string_t,
+    bstring_t,
     array_t,
     empty_object_t,
     object_t
@@ -74,35 +75,38 @@ enum class json_type_tag : uint8_t
 
 enum class tt : uint8_t 
 {
-    null_null,null_bool,null_integer,null_uinteger,null_double,null_smallstr,null_string,null_array,null_emptyobj,null_object,
-    bool_null,bool_bool,bool_integer,bool_uinteger,bool_double,bool_smallstr,bool_string,bool_array,bool_emptyobj,bool_object,
-    integer_null,integer_bool,integer_integer,integer_uinteger,integer_double,integer_smallstr,integer_string,integer_array,integer_emptyobj,integer_object,
-    uinteger_null,uinteger_bool,uinteger_integer,uinteger_uinteger,uinteger_double,uinteger_smallstr,uinteger_string,uinteger_array,uinteger_emptyobj,uinteger_object,
-    double_null,double_bool,double_integer,double_uinteger,double_double,double_smallstr,double_string,double_array,double_emptyobj,double_object,
-    smallstr_null,smallstr_bool,smallstr_integer,smallstr_uinteger,smallstr_double,smallstr_smallstr,smallstr_string,smallstr_array,smallstr_emptyobj,smallstr_object,
-    string_null,string_bool,string_integer,string_uinteger,string_double,string_smallstr,string_string,string_array,string_emptyobj,string_object,
-    array_null,array_bool,array_integer,array_uinteger,array_double,array_smallstr,array_string,array_array,array_emptyobj,array_object,
-    emptyobj_null,emptyobj_bool,emptyobj_integer,emptyobj_uinteger,emptyobj_double,emptyobj_smallstr,emptyobj_string,emptyobj_array,emptyobj_emptyobj,emptyobj_object,
-    object_null,object_bool,object_integer,object_uinteger,object_double,object_smallstr,object_string,object_array,object_emptyobj,object_object
+    null_null,null_bool,null_integer,null_uinteger,null_double,null_smallstr,null_string,null_bstring,null_array,null_emptyobj,null_object,
+    bool_null,bool_bool,bool_integer,bool_uinteger,bool_double,bool_smallstr,bool_string,bool_bstring,bool_array,bool_emptyobj,bool_object,
+    integer_null,integer_bool,integer_integer,integer_uinteger,integer_double,integer_smallstr,integer_string,integer_bstring,integer_array,integer_emptyobj,integer_object,
+    uinteger_null,uinteger_bool,uinteger_integer,uinteger_uinteger,uinteger_double,uinteger_smallstr,uinteger_string,uinteger_bstring,uinteger_array,uinteger_emptyobj,uinteger_object,
+    double_null,double_bool,double_integer,double_uinteger,double_double,double_smallstr,double_string,double_bstring,double_array,double_emptyobj,double_object,
+    smallstr_null,smallstr_bool,smallstr_integer,smallstr_uinteger,smallstr_double,smallstr_smallstr,smallstr_string,smallstr_bstring,smallstr_array,smallstr_emptyobj,smallstr_object,
+    string_null,string_bool,string_integer,string_uinteger,string_double,string_smallstr,string_string,string_bstring,string_array,string_emptyobj,string_object,
+    bstring_null,bstring_bool,bstring_integer,bstring_uinteger,bstring_double,bstring_smallstr,bstring_string,bstring_bstring,bstring_array,bstring_emptyobj,bstring_object,
+    array_null,array_bool,array_integer,array_uinteger,array_double,array_smallstr,array_string,array_bstring,array_array,array_emptyobj,array_object,
+    emptyobj_null,emptyobj_bool,emptyobj_integer,emptyobj_uinteger,emptyobj_double,emptyobj_smallstr,emptyobj_string,emptyobj_bstring,emptyobj_array,emptyobj_emptyobj,emptyobj_object,
+    object_null,object_bool,object_integer,object_uinteger,object_double,object_smallstr,object_string,object_bstring,object_array,object_emptyobj,object_object
 };
+
 template<typename unused=void>
 struct json_globals {
-    static const tt t_by_t[10][10];
+    static const tt t_by_t[11][11];
 };
 typedef json_globals<> globals;
 
 template<typename unused>
-const tt json_globals<unused>::t_by_t[10][10] = {
-    {tt::null_null,tt::null_bool,tt::null_integer,tt::null_uinteger,tt::null_double,tt::null_smallstr,tt::null_string,tt::null_array,tt::null_emptyobj,tt::null_object},
-    {tt::bool_null,tt::bool_bool,tt::bool_integer,tt::bool_uinteger,tt::bool_double,tt::bool_smallstr,tt::bool_string,tt::bool_array,tt::bool_emptyobj,tt::bool_object},
-    {tt::integer_null,tt::integer_bool,tt::integer_integer,tt::integer_uinteger,tt::integer_double,tt::integer_smallstr,tt::integer_string,tt::integer_array,tt::integer_emptyobj,tt::integer_object},
-    {tt::uinteger_null,tt::uinteger_bool,tt::uinteger_integer,tt::uinteger_uinteger,tt::uinteger_double,tt::uinteger_smallstr,tt::uinteger_string,tt::uinteger_array,tt::uinteger_emptyobj,tt::uinteger_object},
-    {tt::double_null,tt::double_bool,tt::double_integer,tt::double_uinteger,tt::double_double,tt::double_smallstr,tt::double_string,tt::double_array,tt::double_emptyobj,tt::double_object},
-    {tt::smallstr_null,tt::smallstr_bool,tt::smallstr_integer,tt::smallstr_uinteger,tt::smallstr_double,tt::smallstr_smallstr,tt::smallstr_string,tt::smallstr_array,tt::smallstr_emptyobj,tt::smallstr_object},
-    {tt::string_null,tt::string_bool,tt::string_integer,tt::string_uinteger,tt::string_double,tt::string_smallstr,tt::string_string,tt::string_array,tt::string_emptyobj,tt::string_object},
-    {tt::array_null,tt::array_bool,tt::array_integer,tt::array_uinteger,tt::array_double,tt::array_smallstr,tt::array_string,tt::array_array,tt::array_emptyobj,tt::array_object},
-    {tt::emptyobj_null,tt::emptyobj_bool,tt::emptyobj_integer,tt::emptyobj_uinteger,tt::emptyobj_double,tt::emptyobj_smallstr,tt::emptyobj_string,tt::emptyobj_array,tt::emptyobj_emptyobj,tt::emptyobj_object},
-    {tt::object_null,tt::object_bool,tt::object_integer,tt::object_uinteger,tt::object_double,tt::object_smallstr,tt::object_string,tt::object_array,tt::object_emptyobj,tt::object_object}
+const tt json_globals<unused>::t_by_t[11][11] = {
+    {tt::null_null,tt::null_bool,tt::null_integer,tt::null_uinteger,tt::null_double,tt::null_smallstr,tt::null_string,tt::null_bstring,tt::null_array,tt::null_emptyobj,tt::null_object},
+    {tt::bool_null,tt::bool_bool,tt::bool_integer,tt::bool_uinteger,tt::bool_double,tt::bool_smallstr,tt::bool_string,tt::bool_bstring,tt::bool_array,tt::bool_emptyobj,tt::bool_object},
+    {tt::integer_null,tt::integer_bool,tt::integer_integer,tt::integer_uinteger,tt::integer_double,tt::integer_smallstr,tt::integer_string,tt::integer_bstring,tt::integer_array,tt::integer_emptyobj,tt::integer_object},
+    {tt::uinteger_null,tt::uinteger_bool,tt::uinteger_integer,tt::uinteger_uinteger,tt::uinteger_double,tt::uinteger_smallstr,tt::uinteger_string,tt::uinteger_bstring,tt::uinteger_array,tt::uinteger_emptyobj,tt::uinteger_object},
+    {tt::double_null,tt::double_bool,tt::double_integer,tt::double_uinteger,tt::double_double,tt::double_smallstr,tt::double_string,tt::double_bstring,tt::double_array,tt::double_emptyobj,tt::double_object},
+    {tt::smallstr_null,tt::smallstr_bool,tt::smallstr_integer,tt::smallstr_uinteger,tt::smallstr_double,tt::smallstr_smallstr,tt::smallstr_string,tt::smallstr_bstring,tt::smallstr_array,tt::smallstr_emptyobj,tt::smallstr_object},
+    {tt::string_null,tt::string_bool,tt::string_integer,tt::string_uinteger,tt::string_double,tt::string_smallstr,tt::string_string,tt::string_bstring,tt::string_array,tt::string_emptyobj,tt::string_object},
+    {tt::bstring_null,tt::bstring_bool,tt::bstring_integer,tt::bstring_uinteger,tt::bstring_double,tt::bstring_smallstr,tt::bstring_string,tt::bstring_bstring,tt::bstring_array,tt::bstring_emptyobj,tt::bstring_object},
+    {tt::array_null,tt::array_bool,tt::array_integer,tt::array_uinteger,tt::array_double,tt::array_smallstr,tt::array_string,tt::array_bstring,tt::array_array,tt::array_emptyobj,tt::array_object},
+    {tt::emptyobj_null,tt::emptyobj_bool,tt::emptyobj_integer,tt::emptyobj_uinteger,tt::emptyobj_double,tt::emptyobj_smallstr,tt::emptyobj_string,tt::emptyobj_bstring,tt::emptyobj_array,tt::emptyobj_emptyobj,tt::emptyobj_object},
+    {tt::object_null,tt::object_bool,tt::object_integer,tt::object_uinteger,tt::object_double,tt::object_smallstr,tt::object_string,tt::object_bstring,tt::object_array,tt::object_emptyobj,tt::object_object}
 };
                         
 template <class CharT, 
