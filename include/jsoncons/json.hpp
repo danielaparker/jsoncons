@@ -981,7 +981,7 @@ public:
         }
 
         template <class Alloc = allocator_type>
-        typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
+        typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
         swap(variant& other) JSONCONS_NOEXCEPT
         {
             if (this ==&other)
@@ -993,7 +993,7 @@ public:
         }
 
         template <class Alloc = allocator_type>
-        typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
+        typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
         swap(variant& other) JSONCONS_NOEXCEPT
         {
             if (this ==&other)
