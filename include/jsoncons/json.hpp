@@ -426,14 +426,6 @@ public:
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
-/*
-            template<class InputIterator>
-            array_data(InputIterator first, InputIterator last, const Allocator& a)
-                : base_data(json_type_tag::array_t)
-            {
-                create(array_allocator(a), first, last, a);
-            }
-*/
             ~array_data()
             {
                 if (ptr_ != nullptr)
