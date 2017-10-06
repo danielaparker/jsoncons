@@ -313,22 +313,10 @@ public:
                 }
             }
 
-            string_data(const Json_string_<basic_json>& val)
-                : base_data(json_type_tag::string_t)
-            {
-                create(val.get_allocator(), val);
-            }
-
             string_data(pointer ptr)
                 : base_data(json_type_tag::string_t)
             {
                 ptr_ = ptr;
-            }
-
-            string_data(const Json_string_<basic_json>& val, const Allocator& a)
-                : base_data(json_type_tag::string_t)
-            {
-                create(string_holder_allocator_type(a), val, a);
             }
 
             string_data(const string_data & val)
