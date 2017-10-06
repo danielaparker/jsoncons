@@ -145,26 +145,28 @@ public:
             {}
         };
 
-        struct null_data : public base_data
+        class null_data : public base_data
         {
+        public:
             null_data()
                 : base_data(json_type_tag::null_t)
             {
             }
         };
 
-        struct empty_object_data : public base_data
+        class empty_object_data : public base_data
         {
+        public:
             empty_object_data()
                 : base_data(json_type_tag::empty_object_t)
             {
             }
         };
 
-        struct bool_data : public base_data
+        class bool_data : public base_data
         {
             bool val_;
-
+        public:
             bool_data(bool val)
                 : base_data(json_type_tag::bool_t),val_(val)
             {
@@ -182,10 +184,10 @@ public:
 
         };
 
-        struct integer_data : public base_data
+        class integer_data : public base_data
         {
             int64_t val_;
-
+        public:
             integer_data(int64_t val)
                 : base_data(json_type_tag::integer_t),val_(val)
             {
@@ -202,10 +204,10 @@ public:
             }
         };
 
-        struct uinteger_data : public base_data
+        class uinteger_data : public base_data
         {
             uint64_t val_;
-
+        public:
             uinteger_data(uint64_t val)
                 : base_data(json_type_tag::uinteger_t),val_(val)
             {
@@ -222,11 +224,11 @@ public:
             }
         };
 
-        struct double_data : public base_data
+        class double_data : public base_data
         {
             uint8_t precision_;
             double val_;
-
+        public:
             double_data(double val, uint8_t precision)
                 : base_data(json_type_tag::double_t), 
                   precision_(precision), 
@@ -252,13 +254,13 @@ public:
             }
         };
 
-        struct small_string_data : public base_data
+        class small_string_data : public base_data
         {
             static const size_t capacity = 14/sizeof(char_type);
-            static const size_t max_length = (14 / sizeof(char_type)) - 1;
-
             uint8_t length_;
             char_type data_[capacity];
+        public:
+            static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
             small_string_data(const char_type* p, uint8_t length)
                 : base_data(json_type_tag::small_string_t), length_(length)
@@ -290,7 +292,7 @@ public:
                 return data_;
             }
         };
-        struct string_data : public base_data
+        class string_data : public base_data
         {
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<Json_string_<basic_json>> string_holder_allocator_type;
             typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
@@ -312,7 +314,7 @@ public:
                     throw;
                 }
             }
-
+        public:
             string_data(const string_data& val)
                 : base_data(json_type_tag::string_t)
             {
@@ -374,7 +376,7 @@ public:
         };
 
         // array_data
-        struct array_data : public base_data
+        class array_data : public base_data
         {
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
             pointer ptr_;
@@ -394,12 +396,7 @@ public:
                     throw;
                 }
             }
-
-            allocator_type get_allocator() const
-            {
-                return ptr_->get_allocator();
-            }
-
+        public:
             array_data(const array& val)
                 : base_data(json_type_tag::array_t)
             {
@@ -429,14 +426,14 @@ public:
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
-
+/*
             template<class InputIterator>
             array_data(InputIterator first, InputIterator last, const Allocator& a)
                 : base_data(json_type_tag::array_t)
             {
                 create(array_allocator(a), first, last, a);
             }
-
+*/
             ~array_data()
             {
                 if (ptr_ != nullptr)
@@ -445,6 +442,11 @@ public:
                     std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
+            }
+
+            allocator_type get_allocator() const
+            {
+                return ptr_->get_allocator();
             }
 
             void swap(array_data& val)
@@ -464,7 +466,7 @@ public:
         };
 
         // object_data
-        struct object_data : public base_data
+        class object_data : public base_data
         {
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
             pointer ptr_;
@@ -484,7 +486,7 @@ public:
                     throw;
                 }
             }
-
+        public:
             explicit object_data(const Allocator& a)
                 : base_data(json_type_tag::object_t)
             {
@@ -874,7 +876,7 @@ public:
                 case json_type_tag::empty_object_t:
                     return true;
                 case json_type_tag::object_t:
-                    return rhs.object_data_cast()->ptr_->size() == 0;
+                    return rhs.object_data_cast()->value().size() == 0;
                 default:
                     return false;
                 }
@@ -883,7 +885,7 @@ public:
                 switch (rhs.type_id())
                 {
                 case json_type_tag::bool_t:
-                    return bool_data_cast()->val_ == rhs.bool_data_cast()->val_;
+                    return bool_data_cast()->value() == rhs.bool_data_cast()->value();
                 default:
                     return false;
                 }
@@ -892,11 +894,11 @@ public:
                 switch (rhs.type_id())
                 {
                 case json_type_tag::integer_t:
-                    return integer_data_cast()->val_ == rhs.integer_data_cast()->val_;
+                    return integer_data_cast()->value() == rhs.integer_data_cast()->value();
                 case json_type_tag::uinteger_t:
-                    return integer_data_cast()->val_ >= 0 ? static_cast<uint64_t>(integer_data_cast()->val_) == rhs.uinteger_data_cast()->val_ : false;
+                    return integer_data_cast()->value() >= 0 ? static_cast<uint64_t>(integer_data_cast()->value()) == rhs.uinteger_data_cast()->value() : false;
                 case json_type_tag::double_t:
-                    return static_cast<double>(integer_data_cast()->val_) == rhs.double_data_cast()->val_;
+                    return static_cast<double>(integer_data_cast()->value()) == rhs.double_data_cast()->value();
                 default:
                     return false;
                 }
@@ -905,11 +907,11 @@ public:
                 switch (rhs.type_id())
                 {
                 case json_type_tag::integer_t:
-                    return rhs.integer_data_cast()->val_ >= 0 ? uinteger_data_cast()->val_ == static_cast<uint64_t>(rhs.integer_data_cast()->val_) : false;
+                    return rhs.integer_data_cast()->value() >= 0 ? uinteger_data_cast()->value() == static_cast<uint64_t>(rhs.integer_data_cast()->value()) : false;
                 case json_type_tag::uinteger_t:
-                    return uinteger_data_cast()->val_ == rhs.uinteger_data_cast()->val_;
+                    return uinteger_data_cast()->value() == rhs.uinteger_data_cast()->value();
                 case json_type_tag::double_t:
-                    return static_cast<double>(uinteger_data_cast()->val_) == rhs.double_data_cast()->val_;
+                    return static_cast<double>(uinteger_data_cast()->value()) == rhs.double_data_cast()->value();
                 default:
                     return false;
                 }
@@ -918,11 +920,11 @@ public:
                 switch (rhs.type_id())
                 {
                 case json_type_tag::integer_t:
-                    return double_data_cast()->val_ == static_cast<double>(rhs.integer_data_cast()->val_);
+                    return double_data_cast()->value() == static_cast<double>(rhs.integer_data_cast()->value());
                 case json_type_tag::uinteger_t:
-                    return double_data_cast()->val_ == static_cast<double>(rhs.uinteger_data_cast()->val_);
+                    return double_data_cast()->value() == static_cast<double>(rhs.uinteger_data_cast()->value());
                 case json_type_tag::double_t:
-                    return double_data_cast()->val_ == rhs.double_data_cast()->val_;
+                    return double_data_cast()->value() == rhs.double_data_cast()->value();
                 default:
                     return false;
                 }
@@ -962,7 +964,7 @@ public:
                 switch (rhs.type_id())
                 {
                 case json_type_tag::empty_object_t:
-                    return object_data_cast()->ptr_->size() == 0;
+                    return object_data_cast()->value().size() == 0;
                 case json_type_tag::object_t:
                     return object_data_cast()->value() == rhs.object_data_cast()->value();
                 default:

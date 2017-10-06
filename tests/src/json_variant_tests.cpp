@@ -44,21 +44,21 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
     json::variant var2(std::move(var1));
     //BOOST_CHECK(json_type_tag::null_t == var1.type_id());
     BOOST_CHECK(json_type_tag::integer_t == var2.type_id());
-    BOOST_CHECK(var2.integer_data_cast()->val_ == val1);
+    BOOST_CHECK(var2.integer_data_cast()->value() == val1);
 
     uint64_t val3 = 9999;
     json::variant var3(val3);
     json::variant var4(std::move(var3));
     //BOOST_CHECK(json_type_tag::null_t == var3.type_id());
     BOOST_CHECK(json_type_tag::uinteger_t == var4.type_id());
-    BOOST_CHECK(var4.uinteger_data_cast()->val_ == val3);
+    BOOST_CHECK(var4.uinteger_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
     json::variant var5(val5,0);
     json::variant var6(std::move(var5));
     //BOOST_CHECK(json_type_tag::null_t == var5.type_id());
     BOOST_CHECK(json_type_tag::double_t == var6.type_id());
-    BOOST_CHECK(var6.double_data_cast()->val_ == val5);
+    BOOST_CHECK(var6.double_data_cast()->value() == val5);
 
     std::string val7("Too long for small string");
     json::variant var7(val7.data(),val7.length());
@@ -73,15 +73,15 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
     json::variant var10(std::move(var9));
     //BOOST_CHECK(json_type_tag::null_t == var9.type_id());
     BOOST_CHECK(json_type_tag::small_string_t == var10.type_id());
-    BOOST_CHECK(val9 == var10.small_string_data_cast()->data_);
-    BOOST_CHECK(val9.length() == var10.small_string_data_cast()->length_);
+    BOOST_CHECK(val9 == var10.small_string_data_cast()->data());
+    BOOST_CHECK(val9.length() == var10.small_string_data_cast()->length());
 
     bool val11 = true;
     json::variant var11(val11);
     json::variant var12(std::move(var11));
     //BOOST_CHECK(json_type_tag::null_t == var11.type_id());
     BOOST_CHECK(json_type_tag::bool_t == var12.type_id());
-    BOOST_CHECK(var12.bool_data_cast()->val_ == val11);
+    BOOST_CHECK(var12.bool_data_cast()->value() == val11);
 
     std::string val13("Too long for small string");
     json::variant var13(val13.data(), val13.length());
@@ -95,14 +95,14 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
     json::variant var16(std::move(var15));
     BOOST_CHECK(json_type_tag::null_t == var15.type_id());
     BOOST_CHECK(json_type_tag::object_t == var16.type_id());
-    BOOST_CHECK(val15 == *(var16.object_data_cast()->ptr_));
+    BOOST_CHECK(val15 == var16.object_data_cast()->value());
 
     json::array val17 = {1,2,3,4};
     json::variant var17(val17);
     json::variant var18(std::move(var17));
     BOOST_CHECK(json_type_tag::null_t == var17.type_id());
     BOOST_CHECK(json_type_tag::array_t == var18.type_id());
-    BOOST_CHECK(val17 == *(var18.array_data_cast()->ptr_));
+    BOOST_CHECK(val17 == var18.array_data_cast()->value());
 }
 
 BOOST_AUTO_TEST_CASE(test_copy_constructor)
@@ -112,35 +112,35 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
     json::variant var2(var1);
     BOOST_CHECK(json_type_tag::integer_t == var1.type_id());
     BOOST_CHECK(json_type_tag::integer_t == var2.type_id());
-    BOOST_CHECK(var2.integer_data_cast()->val_ == val1);
+    BOOST_CHECK(var2.integer_data_cast()->value() == val1);
 
     uint64_t val3 = 123456789;
     json::variant var3(val3);
     json::variant var4(var3);
     BOOST_CHECK(json_type_tag::uinteger_t == var3.type_id());
     BOOST_CHECK(json_type_tag::uinteger_t == var4.type_id());
-    BOOST_CHECK(var4.uinteger_data_cast()->val_ == val3);
+    BOOST_CHECK(var4.uinteger_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
     json::variant var5(val5,0);
     json::variant var6(var5);
     BOOST_CHECK(json_type_tag::double_t == var5.type_id());
     BOOST_CHECK(json_type_tag::double_t == var6.type_id());
-    BOOST_CHECK(var6.double_data_cast()->val_ == val5);
+    BOOST_CHECK(var6.double_data_cast()->value() == val5);
 
     std::string val9 = "Small string";
     json::variant var9(val9.data(),val9.length());
     json::variant var10(var9);
     BOOST_CHECK(json_type_tag::small_string_t == var9.type_id());
     BOOST_CHECK(json_type_tag::small_string_t == var10.type_id());
-    BOOST_CHECK(var10.small_string_data_cast()->data_ == val9);
+    BOOST_CHECK(var10.small_string_data_cast()->data() == val9);
 
     bool val11 = true;
     json::variant var11(val11);
     json::variant var12(var11);
     BOOST_CHECK(json_type_tag::bool_t == var11.type_id());
     BOOST_CHECK(json_type_tag::bool_t == var12.type_id());
-    BOOST_CHECK(var12.bool_data_cast()->val_ == val11);
+    BOOST_CHECK(var12.bool_data_cast()->value() == val11);
 
     std::string val13 = "Too long for small string";
     json::variant var13(val13.data(),val13.length());
@@ -154,14 +154,14 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
     json::variant var16(var15);
     BOOST_CHECK(json_type_tag::object_t == var15.type_id());
     BOOST_CHECK(json_type_tag::object_t == var16.type_id());
-    BOOST_CHECK(val15 == *(var16.object_data_cast()->ptr_));
+    BOOST_CHECK(val15 == var16.object_data_cast()->value());
 
     json::array val17 = {1,2,3,4};
     json::variant var17(val17);
     json::variant var18(var17);
     BOOST_CHECK(json_type_tag::array_t == var17.type_id());
     BOOST_CHECK(json_type_tag::array_t == var18.type_id());
-    BOOST_CHECK(val17 == *(var18.array_data_cast()->ptr_));
+    BOOST_CHECK(val17 == var18.array_data_cast()->value());
 }
 
 BOOST_AUTO_TEST_CASE(test_equals)
