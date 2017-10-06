@@ -343,13 +343,6 @@ public:
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
 
-            template<class InputIterator>
-            string_data(InputIterator first, InputIterator last, const Allocator& a)
-                : base_data(json_type_tag::string_t)
-            {
-                create(string_holder_allocator_type(a), first, last, a);
-            }
-
             string_data(const char_type* data, size_t length, const Allocator& a)
                 : base_data(json_type_tag::string_t)
             {
