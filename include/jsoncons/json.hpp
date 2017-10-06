@@ -325,6 +325,12 @@ public:
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
+            string_data(string_data&& val)
+                : base_data(json_type_tag::string_t), ptr_(nullptr)
+            {
+                std::swap(val.ptr_,ptr_);
+            }
+
             string_data(const string_data & val, const Allocator& a)
                 : base_data(json_type_tag::string_t)
             {
@@ -339,9 +345,17 @@ public:
 
             ~string_data()
             {
-                typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<Json_string_<basic_json>> alloc(ptr_->get_allocator());
-                std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<Json_string_<basic_json>>::destroy(alloc, to_plain_pointer(ptr_));
-                alloc.deallocate(ptr_,1);
+                if (ptr_ != nullptr)
+                {
+                    typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<Json_string_<basic_json>> alloc(ptr_->get_allocator());
+                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<Json_string_<basic_json>>::destroy(alloc, to_plain_pointer(ptr_));
+                    alloc.deallocate(ptr_,1);
+                }
+            }
+
+            void swap(string_data& val)
+            {
+                std::swap(val.ptr_,ptr_);
             }
 
             const char_type* data() const
@@ -365,6 +379,103 @@ public:
             }
         };
 
+        // array_data
+        struct array_data : public base_data
+        {
+            typedef typename std::allocator_traits<array_allocator>::pointer pointer;
+            pointer ptr_;
+
+            template <typename... Args>
+            void create(array_allocator allocator, Args&& ... args)
+            {
+                typename std::allocator_traits<Allocator>:: template rebind_alloc<array> alloc(allocator);
+                ptr_ = alloc.allocate(1);
+                try
+                {
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                }
+                catch (...)
+                {
+                    alloc.deallocate(ptr_,1);
+                    throw;
+                }
+            }
+
+            allocator_type get_allocator() const
+            {
+                return ptr_->get_allocator();
+            }
+
+            array_data(const array& val)
+                : base_data(json_type_tag::array_t)
+            {
+                create(val.get_allocator(), val);
+            }
+
+            array_data(pointer ptr)
+                : base_data(json_type_tag::array_t)
+            {
+                ptr_ = ptr;
+            }
+
+            array_data(const array& val, const Allocator& a)
+                : base_data(json_type_tag::array_t)
+            {
+                create(array_allocator(a), val, a);
+            }
+
+            array_data(const array_data & val)
+                : base_data(json_type_tag::array_t)
+            {
+                create(val.ptr_->get_allocator(), *(val.ptr_));
+            }
+
+            array_data(array_data&& val)
+                : base_data(json_type_tag::array_t), ptr_(nullptr)
+            {
+                std::swap(val.ptr_, ptr_);
+            }
+
+            array_data(const array_data & val, const Allocator& a)
+                : base_data(json_type_tag::array_t)
+            {
+                create(array_allocator(a), *(val.ptr_), a);
+            }
+
+            template<class InputIterator>
+            array_data(InputIterator first, InputIterator last, const Allocator& a)
+                : base_data(json_type_tag::array_t)
+            {
+                create(array_allocator(a), first, last, a);
+            }
+
+            ~array_data()
+            {
+                if (ptr_ != nullptr)
+                {
+                    typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_allocator());
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(ptr_));
+                    alloc.deallocate(ptr_,1);
+                }
+            }
+
+            void swap(array_data& val)
+            {
+                std::swap(val.ptr_,ptr_);
+            }
+
+            array& value()
+            {
+                return *ptr_;
+            }
+
+            const array& value() const
+            {
+                return *ptr_;
+            }
+        };
+
+        // object_data
         struct object_data : public base_data
         {
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
@@ -416,6 +527,12 @@ public:
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
+            explicit object_data(object_data&& val)
+                : base_data(json_type_tag::object_t), ptr_(nullptr)
+            {
+                std::swap(val.ptr_,ptr_);
+            }
+
             explicit object_data(const object_data & val, const Allocator& a)
                 : base_data(json_type_tag::object_t)
             {
@@ -424,9 +541,17 @@ public:
 
             ~object_data()
             {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_allocator());
-                std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(ptr_));
-                alloc.deallocate(ptr_,1);
+                if (ptr_ != nullptr)
+                {
+                    typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_allocator());
+                    std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(ptr_));
+                    alloc.deallocate(ptr_,1);
+                }
+            }
+
+            void swap(object_data& val)
+            {
+                std::swap(val.ptr_,ptr_);
             }
 
             object& value()
@@ -442,87 +567,6 @@ public:
             allocator_type get_allocator() const
             {
                 return ptr_->get_allocator();
-            }
-        };
-    public:
-        struct array_data : public base_data
-        {
-            typedef typename std::allocator_traits<array_allocator>::pointer pointer;
-            pointer ptr_;
-
-            template <typename... Args>
-            void create(array_allocator allocator, Args&& ... args)
-            {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<array> alloc(allocator);
-                ptr_ = alloc.allocate(1);
-                try
-                {
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
-                }
-                catch (...)
-                {
-                    alloc.deallocate(ptr_,1);
-                    throw;
-                }
-            }
-
-            allocator_type get_allocator() const
-            {
-                return ptr_->get_allocator();
-            }
-
-            array_data(const array& val)
-                : base_data(json_type_tag::array_t)
-            {
-                create(val.get_allocator(), val);
-            }
-
-            array_data(pointer ptr)
-                : base_data(json_type_tag::array_t)
-            {
-                ptr_ = ptr;
-            }
-
-            array_data(const array& val, const Allocator& a)
-                : base_data(json_type_tag::array_t)
-            {
-                create(array_allocator(a), val, a);
-            }
-
-            array_data(const array_data & val)
-                : base_data(json_type_tag::array_t)
-            {
-                create(val.ptr_->get_allocator(), *(val.ptr_));
-            }
-
-            array_data(const array_data & val, const Allocator& a)
-                : base_data(json_type_tag::array_t)
-            {
-                create(array_allocator(a), *(val.ptr_), a);
-            }
-
-            template<class InputIterator>
-            array_data(InputIterator first, InputIterator last, const Allocator& a)
-                : base_data(json_type_tag::array_t)
-            {
-                create(array_allocator(a), first, last, a);
-            }
-
-            ~array_data()
-            {
-                typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_allocator());
-                std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(ptr_));
-                alloc.deallocate(ptr_,1);
-            }
-
-            array& value()
-            {
-                return *ptr_;
-            }
-
-            const array& value() const
-            {
-                return *ptr_;
             }
         };
 
@@ -955,7 +999,7 @@ public:
         }
 
         template <class Alloc = allocator_type>
-        typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
+        typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
         swap(variant& other) JSONCONS_NOEXCEPT
         {
             if (this == &other)
@@ -967,7 +1011,7 @@ public:
         }
 
         template <class Alloc = allocator_type>
-        typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
+        typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
         swap(variant& other) JSONCONS_NOEXCEPT
         {
             if (this == &other)
@@ -982,9 +1026,9 @@ public:
                     {
                     case json_type_tag::string_t:
                         {
-                            auto ptr = other.string_data_cast()->ptr_;
+                            string_data temp(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))null_data();
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
@@ -1013,9 +1057,9 @@ public:
                     {
                     case json_type_tag::string_t:
                         {
-                            auto ptr = other.string_data_cast()->ptr_;
+                            string_data temp(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))empty_object_data();
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
@@ -1044,9 +1088,9 @@ public:
                     {
                     case json_type_tag::string_t:
                         {
-                            auto ptr = other.string_data_cast()->ptr_;
+                            string_data temp(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
@@ -1075,9 +1119,9 @@ public:
                     {
                     case json_type_tag::string_t:
                         {
-                            auto ptr = other.string_data_cast()->ptr_;
+                            string_data temp(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))integer_data(*integer_data_cast());
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
@@ -1106,9 +1150,9 @@ public:
                     {
                     case json_type_tag::string_t:
                         {
-                            auto ptr = other.string_data_cast()->ptr_;
+                            string_data temp(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))uinteger_data(*uinteger_data_cast());
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
@@ -1137,9 +1181,9 @@ public:
                     {
                     case json_type_tag::string_t:
                         {
-                            auto ptr = other.string_data_cast()->ptr_;
+                            string_data temp(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
@@ -1168,9 +1212,9 @@ public:
                     {
                     case json_type_tag::string_t:
                         {
-                            auto ptr = other.string_data_cast()->ptr_;
+                            string_data temp(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
-                            new(reinterpret_cast<void*>(&data_))string_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
@@ -1195,67 +1239,74 @@ public:
                 break;
             case json_type_tag::string_t:
                 {
-                    auto ptr = string_data_cast()->ptr_;
                     switch (other.type_id())
                     {
                     case json_type_tag::null_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))null_data();
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::empty_object_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::bool_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))bool_data(*(other.bool_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::integer_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))integer_data(*(other.integer_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::uinteger_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))uinteger_data(*(other.uinteger_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::double_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))double_data(*(other.double_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::small_string_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))small_string_data(*(other.small_string_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::string_t:
                         {
-                            string_data_cast()->ptr_ = other.string_data_cast()->ptr_;
-                            other.string_data_cast()->ptr_ = ptr;
+                            string_data_cast()->swap(*other.string_data_cast());
                         }
                         break;
                     case json_type_tag::array_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))array_data(other.array_data_cast()->ptr_);
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
+                            string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))object_data(other.object_data_cast()->ptr_);
-                            new(reinterpret_cast<void*>(&(other.data_)))string_data(ptr);
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     default:
@@ -1266,67 +1317,74 @@ public:
                 break;
             case json_type_tag::array_t:
                 {
-                    auto ptr = array_data_cast()->ptr_;
                     switch (other.type_id())
                     {
                     case json_type_tag::null_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))null_data();
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::empty_object_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::bool_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))bool_data(*(other.bool_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::integer_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))integer_data(*(other.integer_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::uinteger_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))uinteger_data(*(other.uinteger_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::double_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))double_data(*(other.double_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::small_string_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))small_string_data(*(other.small_string_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::string_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))string_data(other.string_data_cast()->ptr_);
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
                         {
-                            array_data_cast()->ptr_ = other.array_data_cast()->ptr_;
-                            other.array_data_cast()->ptr_ = ptr;
+                            array_data_cast()->swap(*other.array_data_cast());
                         }
                         break;
                     case json_type_tag::object_t:
                         {
+                            array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))object_data(other.object_data_cast()->ptr_);
-                            new(reinterpret_cast<void*>(&(other.data_)))array_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
                     default:
@@ -1337,67 +1395,74 @@ public:
                 break;
             case json_type_tag::object_t:
                 {
-                    auto ptr = object_data_cast()->ptr_;
                     switch (other.type_id())
                     {
                     case json_type_tag::null_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))null_data();
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::empty_object_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))empty_object_data();
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::bool_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))bool_data(*(other.bool_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::integer_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))integer_data(*(other.integer_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::uinteger_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))uinteger_data(*(other.uinteger_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::double_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))double_data(*(other.double_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::small_string_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))small_string_data(*(other.small_string_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::string_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))string_data(other.string_data_cast()->ptr_);
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
                         {
+                            object_data temp(std::move(*object_data_cast()));
                             new(reinterpret_cast<void*>(&data_))array_data(other.array_data_cast()->ptr_);
-                            new(reinterpret_cast<void*>(&(other.data_)))object_data(ptr);
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
-                            object_data_cast()->ptr_ = other.object_data_cast()->ptr_;
-                            other.object_data_cast()->ptr_ = ptr;
+                            object_data_cast()->swap(*other.object_data_cast());
                         }
                         break;
                     default:
