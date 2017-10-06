@@ -1298,14 +1298,14 @@ public:
                     case json_type_tag::array_t:
                         {
                             string_data temp(std::move(*string_data_cast()));
-                            new(reinterpret_cast<void*>(&data_))array_data(other.array_data_cast()->ptr_);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
                             string_data temp(std::move(*string_data_cast()));
-                            new(reinterpret_cast<void*>(&data_))object_data(other.object_data_cast()->ptr_);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
                         }
                         break;
@@ -1371,7 +1371,7 @@ public:
                     case json_type_tag::string_t:
                         {
                             array_data temp(std::move(*array_data_cast()));
-                            new(reinterpret_cast<void*>(&data_))string_data(other.string_data_cast()->ptr_);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
@@ -1383,7 +1383,7 @@ public:
                     case json_type_tag::object_t:
                         {
                             array_data temp(std::move(*array_data_cast()));
-                            new(reinterpret_cast<void*>(&data_))object_data(other.object_data_cast()->ptr_);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
                         }
                         break;
@@ -1449,14 +1449,14 @@ public:
                     case json_type_tag::string_t:
                         {
                             object_data temp(std::move(*object_data_cast()));
-                            new(reinterpret_cast<void*>(&data_))string_data(other.string_data_cast()->ptr_);
+                            new(reinterpret_cast<void*>(&data_))string_data(std::move(*other.string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::array_t:
                         {
                             object_data temp(std::move(*object_data_cast()));
-                            new(reinterpret_cast<void*>(&data_))array_data(other.array_data_cast()->ptr_);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
