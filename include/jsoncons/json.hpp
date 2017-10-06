@@ -313,13 +313,7 @@ public:
                 }
             }
 
-            string_data(pointer ptr)
-                : base_data(json_type_tag::string_t)
-            {
-                ptr_ = ptr;
-            }
-
-            string_data(const string_data & val)
+            string_data(const string_data& val)
                 : base_data(json_type_tag::string_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
@@ -331,7 +325,7 @@ public:
                 std::swap(val.ptr_,ptr_);
             }
 
-            string_data(const string_data & val, const Allocator& a)
+            string_data(const string_data& val, const Allocator& a)
                 : base_data(json_type_tag::string_t)
             {
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
@@ -412,19 +406,13 @@ public:
                 create(val.get_allocator(), val);
             }
 
-            array_data(pointer ptr)
-                : base_data(json_type_tag::array_t)
-            {
-                ptr_ = ptr;
-            }
-
             array_data(const array& val, const Allocator& a)
                 : base_data(json_type_tag::array_t)
             {
                 create(array_allocator(a), val, a);
             }
 
-            array_data(const array_data & val)
+            array_data(const array_data& val)
                 : base_data(json_type_tag::array_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
@@ -436,7 +424,7 @@ public:
                 std::swap(val.ptr_, ptr_);
             }
 
-            array_data(const array_data & val, const Allocator& a)
+            array_data(const array_data& val, const Allocator& a)
                 : base_data(json_type_tag::array_t)
             {
                 create(array_allocator(a), *(val.ptr_), a);
@@ -503,25 +491,19 @@ public:
                 create(a,a);
             }
 
-            explicit object_data(pointer ptr)
-                : base_data(json_type_tag::object_t)
-            {
-                ptr_ = ptr;
-            }
-
-            explicit object_data(const object & val)
+            explicit object_data(const object& val)
                 : base_data(json_type_tag::object_t)
             {
                 create(val.get_allocator(), val);
             }
 
-            explicit object_data(const object & val, const Allocator& a)
+            explicit object_data(const object& val, const Allocator& a)
                 : base_data(json_type_tag::object_t)
             {
                 create(object_allocator(a), val, a);
             }
 
-            explicit object_data(const object_data & val)
+            explicit object_data(const object_data& val)
                 : base_data(json_type_tag::object_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
@@ -533,7 +515,7 @@ public:
                 std::swap(val.ptr_,ptr_);
             }
 
-            explicit object_data(const object_data & val, const Allocator& a)
+            explicit object_data(const object_data& val, const Allocator& a)
                 : base_data(json_type_tag::object_t)
             {
                 create(object_allocator(a), *(val.ptr_), a);
@@ -732,7 +714,7 @@ public:
 
         variant& operator=(const variant& val)
         {
-            if (this != &val)
+            if (this !=&val)
             {
                 Destroy_();
                 switch (val.type_id())
@@ -777,7 +759,7 @@ public:
 
         variant& operator=(variant&& val) JSONCONS_NOEXCEPT
         {
-            if (this != &val)
+            if (this !=&val)
             {
                 Destroy_();
                 new(reinterpret_cast<void*>(&data_))null_data();
@@ -871,7 +853,7 @@ public:
 
         bool operator==(const variant& rhs) const
         {
-            if (this == &rhs)
+            if (this ==&rhs)
             {
                 return true;
             }
@@ -1002,7 +984,7 @@ public:
         typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
         swap(variant& other) JSONCONS_NOEXCEPT
         {
-            if (this == &other)
+            if (this ==&other)
             {
                 return;
             }
@@ -1014,7 +996,7 @@ public:
         typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
         swap(variant& other) JSONCONS_NOEXCEPT
         {
-            if (this == &other)
+            if (this ==&other)
             {
                 return;
             }
@@ -1559,20 +1541,20 @@ public:
                 break;
             case json_type_tag::string_t:
                 {
-                    new(reinterpret_cast<void*>(&data_))string_data(val.string_data_cast()->ptr_);
-                    val.string_data_cast()->type_id_ = json_type_tag::null_t;
-                }
-                break;
-            case json_type_tag::object_t:
-                {
-                    new(reinterpret_cast<void*>(&data_))object_data(val.object_data_cast()->ptr_);
-                    val.object_data_cast()->type_id_ = json_type_tag::null_t;
+                    new(reinterpret_cast<void*>(&data_))string_data(std::move(*val.string_data_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_data();
                 }
                 break;
             case json_type_tag::array_t:
                 {
-                    new(reinterpret_cast<void*>(&data_))array_data(val.array_data_cast()->ptr_);
-                    val.array_data_cast()->type_id_ = json_type_tag::null_t;
+                    new(reinterpret_cast<void*>(&data_))array_data(std::move(*val.array_data_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_data();
+                }
+                break;
+            case json_type_tag::object_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))object_data(std::move(*val.object_data_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_data();
                 }
                 break;
             default:
@@ -2642,7 +2624,7 @@ public:
 
     basic_json& operator=(basic_json&& rhs) JSONCONS_NOEXCEPT
     {
-        if (this != &rhs)
+        if (this !=&rhs)
         {
             var_ = std::move(rhs.var_);
         }
@@ -2942,7 +2924,7 @@ public:
                     return 0;
                 }
                 size_t count = 0;
-                while (it != object_range().end() && it->key() == name)
+                while (it != object_range().end()&& it->key() == name)
                 {
                     ++count;
                     ++it;
@@ -2984,12 +2966,12 @@ public:
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_type_tag::integer_t || (var_.type_id() == json_type_tag::uinteger_t && (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<long long>::max)())));
+        return var_.type_id() == json_type_tag::integer_t || (var_.type_id() == json_type_tag::uinteger_t&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<long long>::max)())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_type_tag::uinteger_t || (var_.type_id() == json_type_tag::integer_t && as_integer() >= 0);
+        return var_.type_id() == json_type_tag::uinteger_t || (var_.type_id() == json_type_tag::integer_t&& as_integer() >= 0);
     }
 
     bool is_double() const JSONCONS_NOEXCEPT
@@ -4488,7 +4470,7 @@ private:
 };
 
 template <class Json>
-void swap(typename Json::key_value_pair_type & a, typename Json::key_value_pair_type & b)
+void swap(typename Json::key_value_pair_type& a, typename Json::key_value_pair_type& b)
 {
     a.swap(b);
 }
