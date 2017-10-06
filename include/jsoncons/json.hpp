@@ -1033,16 +1033,16 @@ public:
                         break;
                     case json_type_tag::array_t:
                         {
-                            auto ptr = other.array_data_cast()->ptr_;
+                            array_data temp(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))null_data();
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
-                            auto ptr = other.object_data_cast()->ptr_;
+                            object_data temp(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))null_data();
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(temp));
                         }
                         break;
                     default:
@@ -1064,16 +1064,16 @@ public:
                         break;
                     case json_type_tag::array_t:
                         {
-                            auto ptr = other.array_data_cast()->ptr_;
+                            array_data temp(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))empty_object_data();
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
-                            auto ptr = other.object_data_cast()->ptr_;
+                            object_data temp(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))empty_object_data();
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(temp));
                         }
                         break;
                     default:
@@ -1095,16 +1095,16 @@ public:
                         break;
                     case json_type_tag::array_t:
                         {
-                            auto ptr = other.array_data_cast()->ptr_;
+                            array_data temp(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
-                            auto ptr = other.object_data_cast()->ptr_;
+                            object_data temp(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(temp));
                         }
                         break;
                     default:
@@ -1126,16 +1126,16 @@ public:
                         break;
                     case json_type_tag::array_t:
                         {
-                            auto ptr = other.array_data_cast()->ptr_;
+                            array_data temp(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))integer_data(*integer_data_cast());
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
-                            auto ptr = other.object_data_cast()->ptr_;
+                            object_data temp(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))integer_data(*integer_data_cast());
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(temp));
                         }
                         break;
                     default:
@@ -1157,16 +1157,16 @@ public:
                         break;
                     case json_type_tag::array_t:
                         {
-                            auto ptr = other.array_data_cast()->ptr_;
+                            array_data temp(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))uinteger_data(*uinteger_data_cast());
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
-                            auto ptr = other.object_data_cast()->ptr_;
+                            object_data temp(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))uinteger_data(*uinteger_data_cast());
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(temp));
                         }
                         break;
                     default:
@@ -1188,16 +1188,16 @@ public:
                         break;
                     case json_type_tag::array_t:
                         {
-                            auto ptr = other.array_data_cast()->ptr_;
+                            array_data temp(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
-                            auto ptr = other.object_data_cast()->ptr_;
+                            object_data temp(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(temp));
                         }
                         break;
                     default:
@@ -1219,16 +1219,16 @@ public:
                         break;
                     case json_type_tag::array_t:
                         {
-                            auto ptr = other.array_data_cast()->ptr_;
+                            array_data temp(std::move(*other.array_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
-                            new(reinterpret_cast<void*>(&data_))array_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(temp));
                         }
                         break;
                     case json_type_tag::object_t:
                         {
-                            auto ptr = other.object_data_cast()->ptr_;
+                            object_data temp(std::move(*other.object_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
-                            new(reinterpret_cast<void*>(&data_))object_data(ptr);
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(temp));
                         }
                         break;
                     default:
