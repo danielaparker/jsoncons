@@ -1347,7 +1347,7 @@ public:
                     case json_type_tag::byte_string_t:
                         {
                             byte_string_data temp(std::move(*other.byte_string_data_cast()));
-                            new(reinterpret_cast<void*>(&(other.data_)))small_byte_string_data(*small_byte_string_data_cast());
+                            new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
                             new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
                         }
                         break;
