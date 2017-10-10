@@ -15,6 +15,24 @@ using boost::numeric::ublas::matrix;
 
 BOOST_AUTO_TEST_SUITE(json_serializer_tests)
 
+BOOST_AUTO_TEST_CASE(test_byte_string_serialization)
+{
+    const uint8_t bs[] = {'H','e','l','l','o'};
+    json j(bs,sizeof(bs));
+
+    std::ostringstream os;
+    os << j;
+
+    std::string expected; 
+    expected.push_back('\"');
+    encode_base64url(bs,bs+sizeof(bs),expected);
+    expected.push_back('\"');
+
+    //std::cout << expected << " " << os.str() << std::endl;
+
+    BOOST_CHECK(expected == os.str());
+}
+
 BOOST_AUTO_TEST_CASE(test_direct_serialization)
 {
     matrix<double> A(2, 2);

@@ -528,8 +528,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<detail::is_compatible_array_type<Json,T>::value && 
-                                                !detail::is_std_array<T>::value &&
-                                                !std::is_integral<typename std::iterator_traits<typename T::iterator>::value_type>::value>::type>
+                                                !detail::is_std_array<T>::value>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
     typedef typename Json::allocator_type allocator_type;
@@ -551,7 +550,9 @@ struct json_type_traits<Json, T,
         return result;
     }
 
-    static T as(const Json& j)
+    template <class Ty = element_type>
+    static typename std::enable_if<!std::is_integral<Ty>::value,T>::type
+    as(const Json& j)
     {
         if (j.is_array())
         {
@@ -565,62 +566,9 @@ struct json_type_traits<Json, T,
         }
     }
 
-    static Json to_json(const T& val)
-    {
-        Json j = typename Json::array();
-        auto first = std::begin(val);
-        auto last = std::end(val);
-        size_t size = std::distance(first,last);
-        j.reserve(size);
-        for (auto it = first; it != last; ++it)
-        {
-            j.push_back(*it);
-        }
-        return j;
-    }
-
-    static Json to_json(const T& val, const allocator_type& allocator)
-    {
-        Json j = typename Json::array(allocator);
-        auto first = std::begin(val);
-        auto last = std::end(val);
-        size_t size = std::distance(first, last);
-        j.reserve(size);
-        for (auto it = first; it != last; ++it)
-        {
-            j.push_back(*it);
-        }
-        return j;
-    }
-};
-
-template<class Json, typename T>
-struct json_type_traits<Json, T, 
-                        typename std::enable_if<detail::is_compatible_array_type<Json,T>::value && 
-                                                !detail::is_std_array<T>::value &&
-                                                std::is_integral<typename std::iterator_traits<typename T::iterator>::value_type>::value>::type>
-{
-    typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
-    typedef typename Json::allocator_type allocator_type;
-
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
-    {
-        bool result = j.is_array();
-        if (result)
-        {
-            for (auto e : j.array_range())
-            {
-                if (!e.template is<element_type>())
-                {
-                    result = false;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    static T as(const Json& j)
+    template <class Ty = element_type>
+    static typename std::enable_if<std::is_integral<Ty>::value,T>::type
+    as(const Json& j)
     {
         if (j.is_array())
         {
