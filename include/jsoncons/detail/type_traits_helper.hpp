@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONCONS_UTILITIES_HPP
-#define JSONCONS_JSONCONS_UTILITIES_HPP
+#ifndef JSONCONS_DETAIL_TYPETRAITSHELPER_HPP
+#define JSONCONS_DETAIL_TYPETRAITSHELPER_HPP
 
 #include <stdexcept>
 #include <string>
@@ -35,77 +35,6 @@
 
 namespace jsoncons
 {
-// bytes_view
-
-class bytes_view
-{
-    const uint8_t* data_;
-    size_t length_; 
-public:
-    typedef uint8_t value_type;
-    typedef const uint8_t& const_reference;
-    typedef const uint8_t* const_iterator;
-    typedef const uint8_t* iterator;
-    typedef std::size_t size_type;
-
-    bytes_view(const uint8_t* data, size_t length)
-        : data_(data), length_(length)
-    {
-    }
-
-    operator std::vector<uint8_t>() const
-    { 
-        return std::vector<uint8_t>(begin(),end()); 
-    }
-
-    const uint8_t* data() const
-    {
-        return data_;
-    }
-
-    size_t length() const
-    {
-        return length_;
-    }
-
-    size_t size() const
-    {
-        return length_;
-    }
-
-    // iterator support 
-    const_iterator begin() const JSONCONS_NOEXCEPT
-    {
-        return data_;
-    }
-    const_iterator end() const JSONCONS_NOEXCEPT
-    {
-        return data_ + length_;
-    }
-
-    const_reference operator[](size_type pos) const 
-    { 
-        return data_[pos]; 
-    }
-
-    friend bool operator==(const bytes_view& lhs, 
-                           const bytes_view& rhs)
-    {
-        if (lhs.length() != rhs.length())
-        {
-            return false;
-        }
-        for (size_t i = 0; i < lhs.length(); ++i)
-        {
-            if (lhs[i] != rhs[i])
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-};
-
 // static_max
 
 template <size_t arg1, size_t ... argn>

@@ -263,6 +263,11 @@ private:
         }
     }
 
+    void do_byte_string_value(const uint8_t*, size_t) override
+    {
+
+    }
+
     void do_double_value(double val, uint8_t precision) override
     {
         (void)precision;

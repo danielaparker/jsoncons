@@ -2,7 +2,7 @@
 
 ```c++
 typedef basic_json<char,
-                   JsonTraits = o_json_traits<char>,
+                   JsonPolicy = o_json_policy<char>,
                    Allocator = std::allocator<char>> ojson
 ```
 The `ojson` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The original insertion order of an object's name/value pairs is preserved. 

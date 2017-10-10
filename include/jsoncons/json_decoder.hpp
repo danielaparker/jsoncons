@@ -211,6 +211,15 @@ private:
         }
     }
 
+    void do_byte_string_value(const uint8_t* data, size_t length, const parsing_context&) override
+    {
+        stack_[top_].value_ = Json(data,length,sa_);
+        if (++top_ >= stack_.size())
+        {
+            stack_.resize(top_*2);
+        }
+    }
+
     void do_integer_value(int64_t value, const parsing_context&) override
     {
         stack_[top_].value_ = value;

@@ -29,9 +29,9 @@ typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
 template<class CharT>
-struct b_json_traits : public json_traits<CharT>
+struct b_json_policy : public json_policy<CharT>
 {
-    using typename json_traits<CharT>::char_traits_type;
+    using typename json_policy<CharT>::char_traits_type;
 
     template <class T,class Allocator>
     using object_storage = boost::interprocess::vector<T,Allocator>;
@@ -46,7 +46,7 @@ struct b_json_traits : public json_traits<CharT>
     using string_storage = boost::interprocess::basic_string<CharT, char_traits_type, Allocator>;
 };
 
-typedef basic_json<char,b_json_traits<char>,shmem_allocator> shm_json;
+typedef basic_json<char,b_json_policy<char>,shmem_allocator> shm_json;
 
 int main(int argc, char *argv[])
 {

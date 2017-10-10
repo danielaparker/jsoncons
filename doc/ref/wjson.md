@@ -2,7 +2,7 @@
 
 ```c++
 typedef basic_json<wchar_t,
-                   JsonTraits = json_traits<wchar_t>,
+                   JsonPolicy = json_policy<wchar_t>,
                    Allocator = std::allocator<wchar_t>> wjson
 ```
 The `wjson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type. The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. If you want to preserve the original insertion order, use [wojson](wojson.md) instead.

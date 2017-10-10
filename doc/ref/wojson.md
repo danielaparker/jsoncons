@@ -2,7 +2,7 @@
 
 ```c++
 typedef basic_json<wchar_t,
-                   JsonTraits = o_json_traits<wchar_t>,
+                   JsonPolicy = o_json_policy<wchar_t>,
                    Allocator = std::allocator<wchar_t>> wojson
 ```
 The `wojson` class is an instantiation of the `basic_json` class template that uses `wchar_t` as the character type. The original insertion order of an object's name/value pairs is preserved. 

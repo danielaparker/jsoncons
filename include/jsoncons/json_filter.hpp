@@ -84,6 +84,12 @@ private:
         output_handler_.string_value(value);
     }
 
+    void do_byte_string_value(const uint8_t* data, size_t length, 
+                                const parsing_context&) override
+    {
+        output_handler_.byte_string_value(data, length);
+    }
+
     void do_integer_value(int64_t value, const parsing_context&) override
     {
         output_handler_.integer_value(value);
@@ -192,6 +198,11 @@ private:
     void do_string_value(string_view_type value) override
     {
         input_handler_.string_value(value, default_context_);
+    }
+
+    void do_byte_string_value(const uint8_t* data, size_t length) override
+    {
+        input_handler_.byte_string_value(data, length, default_context_);
     }
 
     void do_integer_value(int64_t value) override
@@ -308,6 +319,12 @@ private:
                          const parsing_context& context) override
     {
         downstream_handler_.string_value(value,context);
+    }
+
+    void do_byte_string_value(const uint8_t* data, size_t length,
+                                const parsing_context& context) override
+    {
+        downstream_handler_.byte_string_value(data, length, context);
     }
 
     void do_double_value(double value, uint8_t precision,

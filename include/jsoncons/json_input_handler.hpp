@@ -9,7 +9,7 @@
 
 #include <string>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/detail/jsoncons_utilities.hpp>
+#include <jsoncons/jsoncons_utilities.hpp>
 #if !defined(JSONCONS_NO_DEPRECATED)
 #include <jsoncons/json_type_traits.hpp> // for null_type
 #endif
@@ -73,6 +73,11 @@ public:
     void string_value(string_view_type value, const parsing_context& context) 
     {
         do_string_value(value, context);
+    }
+
+    void byte_string_value(const uint8_t* data, size_t length, const parsing_context& context) 
+    {
+        do_byte_string_value(data, length, context);
     }
 
     void integer_value(int64_t value, const parsing_context& context)
@@ -204,6 +209,8 @@ private:
 
     virtual void do_string_value(string_view_type value, const parsing_context& context) = 0;
 
+    virtual void do_byte_string_value(const uint8_t* data, size_t length, const parsing_context& context) = 0;
+
     virtual void do_double_value(double value, uint8_t precision, const parsing_context& context) = 0;
 
     virtual void do_integer_value(int64_t value, const parsing_context& context) = 0;
@@ -252,6 +259,10 @@ private:
     }
 
     void do_string_value(string_view_type, const parsing_context&) override
+    {
+    }
+
+    void do_byte_string_value(const uint8_t* data, size_t length, const parsing_context&) override
     {
     }
 

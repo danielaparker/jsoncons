@@ -20,8 +20,8 @@
 #include <utility>
 #include <initializer_list>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_traits.hpp>
-#include <jsoncons/detail/jsoncons_utilities.hpp>
+#include <jsoncons/json_policy.hpp>
+#include <jsoncons/jsoncons_utilities.hpp>
 
 namespace jsoncons {
 

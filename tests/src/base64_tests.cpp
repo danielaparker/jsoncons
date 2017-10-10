@@ -17,9 +17,7 @@
 #include <new>
 #include <codecvt>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/binary/binary_utilities.hpp>
-
-using namespace jsoncons::binary::detail;
+#include <jsoncons/jsoncons_utilities.hpp>
 
 BOOST_AUTO_TEST_SUITE(base64_tests)
 

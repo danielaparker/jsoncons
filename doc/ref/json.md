@@ -2,7 +2,7 @@
 
 ```c++
 typedef basic_json<char,
-                   JsonTraits = json_traits<char>,
+                   JsonPolicy = json_policy<char>,
                    Allocator = std::allocator<char>> json
 ```
 The `json` class is an instantiation of the `basic_json` class template that uses `char` as the character type. The order of an object's name/value pairs is not preserved, they are sorted alphabetically by name. If you want to preserve the original insertion order, use [ojson](ojson.md) instead.

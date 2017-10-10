@@ -16,7 +16,7 @@
 #include <limits> // std::numeric_limits
 #include <fstream>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/detail/jsoncons_utilities.hpp>
+#include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 
@@ -316,6 +316,19 @@ private:
 
         bos_. put('\"');
         escape_string<CharT>(value.data(), value.length(), options_, bos_);
+        bos_. put('\"');
+
+        end_value();
+    }
+
+    void do_byte_string_value(const uint8_t* data, size_t length) override
+    {
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            begin_scalar_value();
+        }
+
+        bos_. put('\"');
         bos_. put('\"');
 
         end_value();

@@ -20,7 +20,7 @@
 namespace jsoncons {
 
 template <class CharT>
-struct json_traits
+struct json_policy
 {
     static const bool preserve_order = false;
 
@@ -44,7 +44,7 @@ struct json_traits
 };
 
 template <class CharT>
-struct o_json_traits : public json_traits<CharT>
+struct o_json_policy : public json_policy<CharT>
 {
     static const bool preserve_order = true;
 };
