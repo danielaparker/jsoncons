@@ -49,18 +49,6 @@ static bool is_base64(uint8_t c)
 }
 
 template <class InputIt,class CharT>
-void encode_base64url(InputIt first, InputIt last, std::basic_string<CharT>& result)
-{
-    return encode_base64(first,last,base64url_alphabet,result);
-}
-
-template <class InputIt,class CharT>
-void encode_base64(InputIt first, InputIt last, std::basic_string<CharT>& result)
-{
-    encode_base64(first,last,base64_alphabet,result);
-}
-
-template <class InputIt,class CharT>
 void encode_base64(InputIt first, InputIt last, const std::string& alphabet, std::basic_string<CharT>& result)
 {
     unsigned char a3[3];
@@ -111,6 +99,18 @@ void encode_base64(InputIt first, InputIt last, const std::string& alphabet, std
             }
         }
     }
+}
+
+template <class InputIt,class CharT>
+void encode_base64url(InputIt first, InputIt last, std::basic_string<CharT>& result)
+{
+    return encode_base64(first,last,base64url_alphabet,result);
+}
+
+template <class InputIt,class CharT>
+void encode_base64(InputIt first, InputIt last, std::basic_string<CharT>& result)
+{
+    encode_base64(first,last,base64_alphabet,result);
 }
 
 inline
