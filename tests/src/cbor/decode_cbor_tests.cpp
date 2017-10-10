@@ -25,6 +25,7 @@ void check_decode(const std::vector<uint8_t>& v, const json& expected)
     {
         json result = decode_cbor<json>(v);
         BOOST_REQUIRE_MESSAGE(expected == result, expected.to_string());
+        BOOST_REQUIRE_MESSAGE(expected == result, expected.to_string());
     }
     catch (const std::exception& e)
     {
@@ -92,17 +93,21 @@ BOOST_AUTO_TEST_CASE(cbor_decode_test)
                  json("123456789012345678901234"));
 
     // strings with undefined length
-    //check_decode({0x5f,0xff}, json("h''"));
-    //check_decode({0x7f,0xff}, json(""));
-    //check_decode({0x5f,0x40,0xff}, json("h''"));
-    //check_decode({0x7f,0x60,0xff}, json(""));
-    //check_decode({0x5f,0x40,0x40,0xff}, json("h''"));
+    const uint8_t bs[] = {0};
+    const uint8_t bs2[] = {'H','e','l','l','o'};
+
+    check_decode({0x5f,0xff}, json(bs,0));
+    check_decode({0x7f,0xff}, json(""));
+    check_decode({0x5f,0x40,0xff}, json(bs,0));
+    check_decode({0x7f,0x60,0xff}, json(""));
+    check_decode({0x5f,0x40,0x40,0xff}, json(bs,0));
     check_decode({0x7f,0x60,0x60,0xff}, json(""));
-    //check_decode({0x5f,U'\x43Hel',U'\x42lo\xff'}, json("h'48656c6c6f'"));
+
+    check_decode({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(bs2,sizeof(bs2)));
     check_decode({0x7f,0x63,'H','e','l',0x62,'l','o',0xff}, json("Hello"));
-    //check_decode({0x5f,U'\x41H\',U'\x41""e\x41l\x41l\x41o\xff'}, json("h'48656c6c6f'"));
+    check_decode({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(bs2,sizeof(bs2)));
     check_decode({0x7f,0x61,'H',0x61,'e',0x61,'l',0x61,'l',0x61,'o',0xff}, json("Hello"));
-    //check_decode({0x5f,U'\x41H\',U'\x41""e\x40\x41l\x41l\x41o\xff'}, json("h'48656c6c6f'"));
+    check_decode({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(bs2,sizeof(bs2)));
     check_decode({0x7f,0x61,'H',0x61,'e',0x61,'l',0x60,0x61,'l',0x61,'o',0xff}, json("Hello"));
 
 }

@@ -437,6 +437,22 @@ public:
                 }
             }
 
+            bool operator==(const byte_string_data& other) const
+            {
+                if (length() != other.length())
+                {
+                    return false;
+                }
+                for (size_t i = 0; i < length(); ++i)
+                {
+                    if (data()[i] != other.data()[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
             void swap(byte_string_data& val)
             {
                 std::swap(val.ptr_,ptr_);
@@ -1037,6 +1053,17 @@ public:
                     return as_string_view() == rhs.as_string_view();
                 case json_type_tag::string_t:
                     return as_string_view() == rhs.as_string_view();
+                default:
+                    return false;
+                }
+                break;
+            case json_type_tag::byte_string_t:
+                switch (rhs.type_id())
+                {
+                case json_type_tag::byte_string_t:
+                    {
+                        return *byte_string_data_cast() == *rhs.byte_string_data_cast();
+                    }
                 default:
                     return false;
                 }
@@ -1986,6 +2013,11 @@ public:
             return evaluate().array_range();
         }
 
+        range<const uint8_t*> byte_string_range() const
+        {
+            return evaluate().byte_string_range();
+        }
+
         size_t size() const JSONCONS_NOEXCEPT
         {
             return evaluate().size();
@@ -2046,6 +2078,11 @@ public:
         bool is_string() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_string();
+        }
+
+        bool is_byte_string() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_byte_string();
         }
 
         bool is_number() const JSONCONS_NOEXCEPT
@@ -2887,13 +2924,13 @@ public:
     {
     }
 
-    basic_json(const uint8_t* s, size_t length, const Allocator& allocator)
-        : var_(s, length, allocator)
+    basic_json(const uint8_t* s, size_t length)
+        : var_(s, length)
     {
     }
 
-    basic_json(const uint8_t* s, size_t length)
-        : var_(s, length)
+    basic_json(const uint8_t* s, size_t length, const Allocator& allocator)
+        : var_(s, length, allocator)
     {
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -3243,6 +3280,10 @@ public:
         return (var_.type_id() == json_type_tag::string_t) || (var_.type_id() == json_type_tag::small_string_t);
     }
 
+    bool is_byte_string() const JSONCONS_NOEXCEPT
+    {
+        return (var_.type_id() == json_type_tag::byte_string_t);
+    }
 
     bool is_bool() const JSONCONS_NOEXCEPT
     {
@@ -4684,6 +4725,17 @@ public:
             return range<const_array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
+        }
+    }
+
+    range<const uint8_t*> byte_string_range() const
+    {
+        switch (var_.type_id())
+        {
+        case json_type_tag::byte_string_t:
+            return range<const uint8_t*>(var_.byte_string_data_cast()->data(),var_.byte_string_data_cast()->data()+var_.byte_string_data_cast()->length());
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a byte string");
         }
     }
 

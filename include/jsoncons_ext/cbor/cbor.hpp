@@ -183,7 +183,7 @@ namespace detail {
         // byte string, byte strings follow, terminated by "break"
         case 0x5f:
             {
-                std::vector<uint8_t> s;
+                std::vector<uint8_t> v;
                 while (*it != 0xff)
                 {
                     if (it == end)
@@ -192,9 +192,9 @@ namespace detail {
                     }
                     std::vector<uint8_t> ss;
                     std::tie(ss,it) = detail::get_fixed_length_byte_string(it,end);
-                    s.insert(s.end(),ss.begin(),ss.end());
+                    v.insert(v.end(),ss.begin(),ss.end());
                 }
-                return std::make_tuple(s,it);
+                return std::make_tuple(v,it);
             }
         default:
             return detail::get_fixed_length_byte_string(pos,end);
@@ -207,30 +207,7 @@ namespace detail {
         switch (*pos)
         {
             // Integer 0x00..0x17 (0..23)
-            case 0x00:
-            case 0x01:
-            case 0x02:
-            case 0x03:
-            case 0x04:
-            case 0x05:
-            case 0x06:
-            case 0x07:
-            case 0x08:
-            case 0x09:
-            case 0x0a:
-            case 0x0b:
-            case 0x0c:
-            case 0x0d:
-            case 0x0e:
-            case 0x0f:
-            case 0x10:
-            case 0x11:
-            case 0x12:
-            case 0x13:
-            case 0x14:
-            case 0x15:
-            case 0x16:
-            case 0x17:
+            case JSONCONS_CBOR_0x00_0x17:
                 return *pos;
 
             // Unsigned integer (one-byte uint8_t follows)

@@ -32,10 +32,15 @@
 
 namespace jsoncons
 {
-// bytes_view
+
 static const std::string base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "abcdefghijklmnopqrstuvwxyz"
-                                           "0123456789+/";
+                                           "0123456789+/"
+                                           "=";
+static const std::string base64url_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                              "abcdefghijklmnopqrstuvwxyz"
+                                              "0123456789+/"
+                                              "\0";
 
 inline 
 static bool is_base64(uint8_t c) 
@@ -43,12 +48,24 @@ static bool is_base64(uint8_t c)
     return isalnum(c) || c == '+' || c == '/';
 }
 
-template <class InputIt>
-std::string encode_base64(InputIt first, InputIt last)
+template <class InputIt,class CharT>
+void encode_base64url(InputIt first, InputIt last, std::basic_string<CharT>& result)
 {
-    std::string result;
+    return encode_base64(first,last,base64url_alphabet,result);
+}
+
+template <class InputIt,class CharT>
+void encode_base64(InputIt first, InputIt last, std::basic_string<CharT>& result)
+{
+    encode_base64(first,last,base64_alphabet,result);
+}
+
+template <class InputIt,class CharT>
+void encode_base64(InputIt first, InputIt last, const std::string& alphabet, std::basic_string<CharT>& result)
+{
     unsigned char a3[3];
     unsigned char a4[4];
+    unsigned char fill = alphabet.back();
     int i = 0;
     int j = 0;
 
@@ -64,7 +81,7 @@ std::string encode_base64(InputIt first, InputIt last)
 
             for (i = 0; i < 4; i++) 
             {
-                result.push_back(base64_alphabet[a4[i]]);
+                result.push_back(alphabet[a4[i]]);
             }
             i = 0;
         }
@@ -74,7 +91,7 @@ std::string encode_base64(InputIt first, InputIt last)
     {
         for (j = i; j < 3; ++j) 
         {
-            a3[j] = '\0';
+            a3[j] = 0;
         }
 
         a4[0] = (a3[0] & 0xfc) >> 2;
@@ -83,22 +100,17 @@ std::string encode_base64(InputIt first, InputIt last)
 
         for (j = 0; j < i + 1; ++j) 
         {
-            result.push_back(base64_alphabet[a4[j]]);
+            result.push_back(alphabet[a4[j]]);
         }
 
-        while (i++ < 3) 
+        if (fill != 0)
         {
-            result.push_back('=');
+            while (i++ < 3) 
+            {
+                result.push_back(fill);
+            }
         }
     }
-
-    return result; 
-}
-
-inline
-std::string encode_base64(const std::string& s)
-{
-    return encode_base64(s.begin(), s.end());
 }
 
 inline

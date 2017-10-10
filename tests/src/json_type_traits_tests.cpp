@@ -98,6 +98,23 @@ BOOST_AUTO_TEST_CASE(test_as_json_value)
     BOOST_CHECK_EQUAL("second",b["second"].as<std::string>());
 }
 
+BOOST_AUTO_TEST_CASE(test_byte_string_as_vector)
+{
+    const uint8_t bs[] = {'H','e','l','l','o'};
+    json a(bs,sizeof(bs));
+
+    BOOST_REQUIRE(a.is_byte_string());
+
+    auto v = a.as<std::vector<uint8_t>>();
+
+    BOOST_REQUIRE(v.size() == sizeof(bs));
+    BOOST_CHECK_EQUAL(v[0],bs[0]);
+    BOOST_CHECK_EQUAL(v[1],bs[1]);
+    BOOST_CHECK_EQUAL(v[2],bs[2]);
+    BOOST_CHECK_EQUAL(v[3],bs[3]);
+    BOOST_CHECK_EQUAL(v[4],bs[4]);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

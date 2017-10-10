@@ -27,7 +27,9 @@ BOOST_AUTO_TEST_SUITE(base64_tests)
 
 void check_encode_base64(const std::string& input, const std::string& expected)
 {
-    BOOST_CHECK_EQUAL(encode_base64(input.begin(),input.end()), expected);
+    std::string result;
+    encode_base64(input.begin(),input.end(),result);
+    BOOST_CHECK_EQUAL(result, expected);
 }
 
 BOOST_AUTO_TEST_CASE(test_encode_base64)

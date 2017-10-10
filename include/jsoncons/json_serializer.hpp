@@ -323,15 +323,9 @@ private:
 
     void do_byte_string_value(const uint8_t* data, size_t length) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            begin_scalar_value();
-        }
-
-        bos_. put('\"');
-        bos_. put('\"');
-
-        end_value();
+        std::basic_string<char_type> s;
+        encode_base64url(data,data+length,s);
+        do_string_value(s);
     }
 
     void do_double_value(double value, uint8_t precision) override
