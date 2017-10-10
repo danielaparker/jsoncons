@@ -19,6 +19,8 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 
+using namespace jsoncons;
+
 BOOST_AUTO_TEST_SUITE(base64_tests)
 
 // https://tools.ietf.org/html/rfc4648#section-4 test vectors
