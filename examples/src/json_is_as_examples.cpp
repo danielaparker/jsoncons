@@ -43,6 +43,18 @@ void is_as_examples()
     std::cout << "(10) " << j["k6"].as<double>() << '\n';
 }
 
+void byte_string_as_vector()
+{
+    const uint8_t bs[] = {'H','e','l','l','o'};
+    json j(bs, sizeof(bs));
+    std::vector<uint8_t> v = j.as<std::vector<uint8_t>>();
+    for (auto b : v)
+    {
+        std::cout << b;
+    }
+    std::cout << std::endl;
+}
+
 void introspection_example()
 {
     json val = json::parse_file("input/books.json");
@@ -71,6 +83,8 @@ void json_is_as_examples()
     is_as_examples();
 
     introspection_example();
+
+    byte_string_as_vector();
 }
 
 

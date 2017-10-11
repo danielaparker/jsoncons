@@ -405,8 +405,6 @@ int main()
     {
         object_range_based_for_loop();
 
-        json_is_as_examples();
-
         basics_examples();
         ojson_examples();
 
@@ -456,6 +454,8 @@ int main()
         jsonpointer_examples();
 
         json_constructor_examples();
+
+        json_is_as_examples();
     }
     catch (const std::exception& e)
     {

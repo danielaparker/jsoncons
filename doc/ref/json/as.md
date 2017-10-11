@@ -86,7 +86,7 @@ Output:
 (10) 10.5
 ```
 
-#### Accessing a `json` value as a `std::vector`
+#### Accessing a `json` array value as a `std::vector`
 ```c++
 std::string s = "{\"my-array\" : [1,2,3,4]}";
 json val = json::parse(s);
@@ -104,5 +104,21 @@ std::cout << std::endl;
 Output:
 ```
 1,2,3,4
+```
+
+#### Accessing a `json` byte string as a `std::vector<uint8_t>`
+```c++
+const uint8_t bs[] = {'H','e','l','l','o'};
+json j(bs, sizeof(bs));
+std::vector<uint8_t> v = j.as<std::vector<uint8_t>>();
+for (auto b : v)
+{
+    std::cout << b;
+}
+std::cout << std::endl;
+```
+Output:
+```
+Hello
 ```
 
