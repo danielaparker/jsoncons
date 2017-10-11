@@ -39,7 +39,7 @@ static const std::string base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "=";
 static const std::string base64url_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                               "abcdefghijklmnopqrstuvwxyz"
-                                              "0123456789+/"
+                                              "0123456789-_"
                                               "\0";
 
 inline 

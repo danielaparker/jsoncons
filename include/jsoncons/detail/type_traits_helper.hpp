@@ -1029,7 +1029,7 @@ private:
     string_to_double& operator=(const string_to_double&) = delete;
 };
 
-#elif defined(JSONCONS_HAS_STRTOD_L)
+#elif defined(JSONCONS_HAS_STRTOLD_L)
 
 class string_to_double
 {
@@ -1049,7 +1049,7 @@ public:
     {
         const char *begin = s;
         char *end = nullptr;
-        double val = strtod_l(begin, &end, locale_);
+        double val = strtold_l(begin, &end, locale_);
         if (begin == end)
         {
             throw std::invalid_argument("Invalid float value");
