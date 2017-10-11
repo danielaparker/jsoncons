@@ -281,7 +281,7 @@ public:
     }
 
     template <class Action, class Result>
-    static void encode_string(string_view_type sv, Action action, Result& v)
+    static void encode_string(const string_view_type& sv, Action action, Result& v)
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(

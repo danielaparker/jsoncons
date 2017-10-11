@@ -685,19 +685,19 @@ public:
         return this->members_[i].value();
     }
 
-    iterator find(string_view_type name)
+    iterator find(const string_view_type& name)
     {
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         auto result = (it != this->members_.end() && it->key() == name) ? it : this->members_.end();
         return result;
     }
 
-    const_iterator find(string_view_type name) const
+    const_iterator find(const string_view_type& name) const
     {
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), 
                                    name, 
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});
         auto result = (it != this->members_.end() && it->key() == name) ? it : this->members_.end();
         return result;
     }
@@ -712,10 +712,10 @@ public:
         this->members_.erase(first,last);
     }
 
-    void erase(string_view_type name) 
+    void erase(const string_view_type& name) 
     {
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it != this->members_.end() && it->key() == name)
         {
             this->members_.erase(it);
@@ -755,7 +755,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::lower_bound(this->members_.begin(),this->members_.end(), it->key(), 
-                                        [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});   
+                                        [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
             if (pos == this->members_.end() )
             {
                 this->members_.emplace_back(*it);
@@ -785,12 +785,12 @@ public:
             if (hint != this->members_.end() && hint->key() <= it->key())
             {
                 pos = std::lower_bound(hint,this->members_.end(), it->key(), 
-                                      [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                      [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
             }
             else
             {
                 pos = std::lower_bound(this->members_.begin(),this->members_.end(), it->key(), 
-                                      [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                      [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
             }
             if (pos == this->members_.end() )
             {
@@ -821,7 +821,7 @@ public:
         for (; it != end; ++it)
         {
             auto pos = std::lower_bound(this->members_.begin(),this->members_.end(), it->key(), 
-                                        [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});   
+                                        [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});   
             if (pos == this->members_.end() )
             {
                 this->members_.emplace_back(*it);
@@ -851,12 +851,12 @@ public:
             if (hint != this->members_.end() && hint->key() <= it->key())
             {
                 pos = std::lower_bound(hint,this->members_.end(), it->key(), 
-                                      [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                      [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
             }
             else
             {
                 pos = std::lower_bound(this->members_.begin(),this->members_.end(), it->key(), 
-                                      [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                      [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
             }
             if (pos == this->members_.end() )
             {
@@ -875,11 +875,11 @@ public:
 
     template <class T, class A=allocator_type>
     typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
-    insert_or_assign(string_view_type name, T&& value)
+    insert_or_assign(const string_view_type& name, T&& value)
     {
         bool inserted;
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
@@ -904,11 +904,11 @@ public:
 
     template <class T, class A=allocator_type>
     typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
-    insert_or_assign(string_view_type name, T&& value)
+    insert_or_assign(const string_view_type& name, T&& value)
     {
         bool inserted;
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
@@ -935,11 +935,11 @@ public:
 
     template <class A=allocator_type, class... Args>
     typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
-    try_emplace(string_view_type name, Args&&... args)
+    try_emplace(const string_view_type& name, Args&&... args)
     {
         bool inserted;
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end()), 
@@ -963,11 +963,11 @@ public:
 
     template <class A=allocator_type, class... Args>
     typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
-    try_emplace(string_view_type name, Args&&... args)
+    try_emplace(const string_view_type& name, Args&&... args)
     {
         bool inserted;
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
             this->members_.emplace_back(key_storage_type(name.begin(),name.end(), get_allocator()), 
@@ -991,18 +991,18 @@ public:
 
     template <class A=allocator_type, class ... Args>
     typename std::enable_if<is_stateless<A>::value,iterator>::type 
-    try_emplace(iterator hint, string_view_type name, Args&&... args)
+    try_emplace(iterator hint, const string_view_type& name, Args&&... args)
     {
         iterator it;
         if (hint != this->members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,this->members_.end(), name, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == this->members_.end())
@@ -1025,18 +1025,18 @@ public:
 
     template <class A=allocator_type, class ... Args>
     typename std::enable_if<!is_stateless<A>::value,iterator>::type 
-    try_emplace(iterator hint, string_view_type name, Args&&... args)
+    try_emplace(iterator hint, const string_view_type& name, Args&&... args)
     {
         iterator it;
         if (hint != this->members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,this->members_.end(), name, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == this->members_.end())
@@ -1065,7 +1065,7 @@ public:
     {
         string_view_type s(name.data(), name.size());
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), s, 
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
             this->members_.emplace_back(std::forward<key_storage_type>(name), 
@@ -1089,7 +1089,7 @@ public:
     {
         string_view_type s(name.data(), name.size());
         auto it = std::lower_bound(this->members_.begin(),this->members_.end(), s,
-                                   [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                   [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         if (it == this->members_.end())
         {
             this->members_.emplace_back(std::forward<key_storage_type>(name), 
@@ -1109,18 +1109,18 @@ public:
 
     template <class T, class A=allocator_type>
     typename std::enable_if<is_stateless<A>::value,iterator>::type 
-    insert_or_assign(iterator hint, string_view_type name, T&& value)
+    insert_or_assign(iterator hint, const string_view_type& name, T&& value)
     {
         iterator it;
         if (hint != this->members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,this->members_.end(), name, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == this->members_.end())
@@ -1144,18 +1144,18 @@ public:
 
     template <class T, class A=allocator_type>
     typename std::enable_if<!is_stateless<A>::value,iterator>::type 
-    insert_or_assign(iterator hint, string_view_type name, T&& value)
+    insert_or_assign(iterator hint, const string_view_type& name, T&& value)
     {
         iterator it;
         if (hint != this->members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,this->members_.end(), name, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(this->members_.begin(),this->members_.end(), name, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == this->members_.end())
@@ -1186,12 +1186,12 @@ public:
         if (hint != this->members_.end() && hint->key() <= s)
         {
             it = std::lower_bound(hint,this->members_.end(), s, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(this->members_.begin(),this->members_.end(), s, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == this->members_.end())
@@ -1222,12 +1222,12 @@ public:
         if (hint != this->members_.end() && hint->key() <= s)
         {
             it = std::lower_bound(hint,this->members_.end(), s, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
         else
         {
             it = std::lower_bound(this->members_.begin(),this->members_.end(), s, 
-                                  [](const value_type& a, string_view_type k){return a.key().compare(k) < 0;});        
+                                  [](const value_type& a, const string_view_type& k){return a.key().compare(k) < 0;});        
         }
 
         if (it == this->members_.end())
@@ -1412,13 +1412,13 @@ public:
         return this->members_[i].value();
     }
 
-    iterator find(string_view_type name)
+    iterator find(const string_view_type& name)
     {
         return std::find_if(this->members_.begin(),this->members_.end(), 
                             [name](const value_type& kv){return kv.key() == name;});
     }
 
-    const_iterator find(string_view_type name) const
+    const_iterator find(const string_view_type& name) const
     {
         return std::find_if(this->members_.begin(),this->members_.end(), 
                             [name](const value_type& kv){return kv.key() == name;});
@@ -1429,7 +1429,7 @@ public:
         this->members_.erase(first,last);
     }
 
-    void erase(string_view_type name) 
+    void erase(const string_view_type& name) 
     {
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
                               [name](const value_type& kv){return kv.key() == name;});
@@ -1457,7 +1457,7 @@ public:
 
     template <class T, class A=allocator_type>
     typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
-    insert_or_assign(string_view_type name, T&& value)
+    insert_or_assign(const string_view_type& name, T&& value)
     {
         bool inserted;
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
@@ -1480,7 +1480,7 @@ public:
 
     template <class T, class A=allocator_type>
     typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
-    insert_or_assign(string_view_type name, T&& value)
+    insert_or_assign(const string_view_type& name, T&& value)
     {
         bool inserted;
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
@@ -1503,7 +1503,7 @@ public:
 
     template <class A=allocator_type, class T>
     typename std::enable_if<is_stateless<A>::value,iterator>::type 
-    insert_or_assign(iterator hint, string_view_type key, T&& value)
+    insert_or_assign(iterator hint, const string_view_type& key, T&& value)
     {
         iterator it;
         if (hint == this->members_.end())
@@ -1532,7 +1532,7 @@ public:
 
     template <class A=allocator_type, class T>
     typename std::enable_if<!is_stateless<A>::value,iterator>::type 
-    insert_or_assign(iterator hint, string_view_type key, T&& value)
+    insert_or_assign(iterator hint, const string_view_type& key, T&& value)
     {
         iterator it;
         if (hint == this->members_.end())
@@ -1667,7 +1667,7 @@ public:
     // try_emplace
     template <class A=allocator_type, class... Args>
     typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
-    try_emplace(string_view_type key, Args&&... args)
+    try_emplace(const string_view_type& key, Args&&... args)
     {
         bool inserted;
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
@@ -1690,7 +1690,7 @@ public:
 
     template <class A=allocator_type, class... Args>
     typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
-    try_emplace(string_view_type key, Args&&... args)
+    try_emplace(const string_view_type& key, Args&&... args)
     {
         bool inserted;
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
@@ -1713,7 +1713,7 @@ public:
 
     template <class A=allocator_type, class ... Args>
     typename std::enable_if<is_stateless<A>::value,iterator>::type
-    try_emplace(iterator hint, string_view_type key, Args&&... args)
+    try_emplace(iterator hint, const string_view_type& key, Args&&... args)
     {
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
                                [key](const value_type& a){return a.key() == key;});
@@ -1738,7 +1738,7 @@ public:
 
     template <class A=allocator_type, class ... Args>
     typename std::enable_if<!is_stateless<A>::value,iterator>::type
-    try_emplace(iterator hint, string_view_type key, Args&&... args)
+    try_emplace(iterator hint, const string_view_type& key, Args&&... args)
     {
         auto it = std::find_if(this->members_.begin(),this->members_.end(), 
                                [key](const value_type& a){return a.key() == key;});

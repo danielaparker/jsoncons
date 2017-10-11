@@ -197,12 +197,12 @@ private:
         top_ -= count;
     }
 
-    void do_name(string_view_type name, const parsing_context&) override
+    void do_name(const string_view_type& name, const parsing_context&) override
     {
         stack_[top_].name_ = key_storage_type(name.begin(),name.end(),sa_);
     }
 
-    void do_string_value(string_view_type val, const parsing_context&) override
+    void do_string_value(const string_view_type& val, const parsing_context&) override
     {
         stack_[top_].value_ = Json(val.data(),val.length(),sa_);
         if (++top_ >= stack_.size())

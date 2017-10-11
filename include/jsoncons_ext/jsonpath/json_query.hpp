@@ -22,7 +22,7 @@ namespace jsoncons { namespace jsonpath {
 enum class result_type {value,path};
 
 template<class Json>
-Json json_query(const Json& root, typename Json::string_view_type path, result_type result_t = result_type::value)
+Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
 {
     if (result_t == result_type::value)
     {
@@ -39,7 +39,7 @@ Json json_query(const Json& root, typename Json::string_view_type path, result_t
 }
 
 template<class Json, class T>
-void json_replace(Json& root, typename Json::string_view_type path, T&& new_value)
+void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
     detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
     evaluator.evaluate(root,path.data(),path.length());
@@ -225,7 +225,7 @@ private:
         string_type name_;
         bool positive_start_;
     public:
-        name_selector(string_view_type name, bool positive_start)
+        name_selector(const string_view_type& name, bool positive_start)
             : name_(name), positive_start_(positive_start)
         {
         }
@@ -447,7 +447,7 @@ public:
         }
     }
 
-    void evaluate(reference root, string_view_type path)
+    void evaluate(reference root, const string_view_type& path)
     {
         evaluate(root,path.data(),path.length());
     }
@@ -947,7 +947,7 @@ public:
         start_ = 0;
     }
 
-    void apply_unquoted_string(string_view_type name)
+    void apply_unquoted_string(const string_view_type& name)
     {
         if (name.length() > 0)
         {
@@ -959,7 +959,7 @@ public:
         buffer_.clear();
     }
 
-    void apply_unquoted_string(const string_type& path, reference val, string_view_type name)
+    void apply_unquoted_string(const string_type& path, reference val, const string_view_type& name)
     {
         if (val.is_object())
         {

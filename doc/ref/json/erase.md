@@ -9,7 +9,7 @@ void erase(const_object_iterator pos); // (3)
 
 void erase(const_object_iterator first, const_object_iterator last); // (4)
 
-void erase(string_view_type name); // (5)
+void erase(const string_view_type& name); // (5)
 ```
 
 (1) Remove an element from an array at the specified position.

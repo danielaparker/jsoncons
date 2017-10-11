@@ -65,7 +65,7 @@ struct PathConstructor
         return s;
     }
 
-    string_type operator()(const string_type& path, string_view_type sv) const
+    string_type operator()(const string_type& path, const string_view_type& sv) const
     {
         string_type s;
         s.append(path);

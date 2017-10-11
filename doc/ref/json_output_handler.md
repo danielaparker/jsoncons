@@ -36,10 +36,10 @@ Output begin JSON array event. Uses `do_begin_array`.
     void end_array()
 Output end JSON array event. Uses `do_end_array`.
 
-    void name(string_view_type name)
+    void name(const string_view_type& name)
 Output name event for a name-value pair. Uses `do_name`.
 
-    void string_value(string_view_type value) 
+    void string_value(const string_view_type& value) 
 Output character data event. Uses `do_string_value`.
 
     void integer_value(int64_t value) 
@@ -77,10 +77,10 @@ Receive begin JSON array event
     virtual void do_end_array()
 Receive end JSON array event
 
-    virtual void do_name(string_view_type name)
+    virtual void do_name(const string_view_type& name)
 Receive name event for name-value pair
 
-    virtual void do_string_value(string_view_type value)
+    virtual void do_string_value(const string_view_type& value)
 Receive character data event
 
     virtual void do_integer_value(int64_t value)

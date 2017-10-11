@@ -84,7 +84,7 @@ private:
         other_handler_.end_array(context);
     }
 
-    void do_name(string_view_type name, const parsing_context& context) override
+    void do_name(const string_view_type& name, const parsing_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -97,7 +97,7 @@ private:
         other_handler_.name(target, context);
     }
 
-    void do_string_value(string_view_type value, const parsing_context& context) override
+    void do_string_value(const string_view_type& value, const parsing_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(

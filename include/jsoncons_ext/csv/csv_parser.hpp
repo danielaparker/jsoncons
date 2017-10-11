@@ -686,7 +686,7 @@ private:
         value_buffer_.clear();
     }
 
-    void end_value(string_view_type value, size_t column_index)
+    void end_value(const string_view_type& value, size_t column_index)
     {
         if (column_index - offset_ < column_types_.size())
         {

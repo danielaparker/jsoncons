@@ -7,7 +7,7 @@ Returns `true` if the json doc contains the given json pointer, otherwise `false
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-bool contains(const Json& doc, typename Json::string_view_type path);
+bool contains(const Json& doc, const typename Json::string_view_type& path);
 
 ```
 

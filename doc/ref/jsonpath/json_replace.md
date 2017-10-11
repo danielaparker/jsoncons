@@ -10,7 +10,7 @@ Searches for all values that match a JsonPath expression and replaces them with 
 ```c++
 template<class Json, class T>
 void json_replace(Json& root, 
-                  typename Json::string_view_type path, 
+                  const typename Json::string_view_type& path, 
                   T&& new_value)
 ```
 #### Parameters

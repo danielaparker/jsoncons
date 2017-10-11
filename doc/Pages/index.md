@@ -742,7 +742,7 @@ template <class T>
 void push_back(T&& val)
 
 template <class T>
-void insert_or_assign(string_view_type name, T&& val)
+void insert_or_assign(const string_view_type& name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 

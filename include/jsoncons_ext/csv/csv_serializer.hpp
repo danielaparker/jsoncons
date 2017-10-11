@@ -186,7 +186,7 @@ private:
         end_value();
     }
 
-    void do_name(string_view_type name) override
+    void do_name(const string_view_type& name) override
     {
         if (stack_.size() == 2)
         {
@@ -240,7 +240,7 @@ private:
         }
     }
 
-    void do_string_value(string_view_type val) override
+    void do_string_value(const string_view_type& val) override
     {
         if (stack_.size() == 2)
         {
@@ -362,7 +362,7 @@ private:
         }
     }
 
-    void value(string_view_type value, buffered_output<CharT>& os)
+    void value(const string_view_type& value, buffered_output<CharT>& os)
     {
         begin_value(os);
         write_string(value.data(),value.length(),os);

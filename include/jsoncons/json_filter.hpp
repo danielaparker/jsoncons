@@ -72,13 +72,13 @@ private:
         output_handler_.end_array();
     }
 
-    void do_name(string_view_type name, 
+    void do_name(const string_view_type& name, 
                  const parsing_context&) override
     {
         output_handler_.name(name);
     }
 
-    void do_string_value(string_view_type value, 
+    void do_string_value(const string_view_type& value, 
                          const parsing_context&) override
     {
         output_handler_.string_value(value);
@@ -190,12 +190,12 @@ private:
         input_handler_.end_array(default_context_);
     }
 
-    void do_name(string_view_type name) override
+    void do_name(const string_view_type& name) override
     {
         input_handler_.name(name, default_context_);
     }
 
-    void do_string_value(string_view_type value) override
+    void do_string_value(const string_view_type& value) override
     {
         input_handler_.string_value(value, default_context_);
     }
@@ -309,13 +309,13 @@ private:
         downstream_handler_.end_array(context);
     }
 
-    void do_name(string_view_type name,
+    void do_name(const string_view_type& name,
                  const parsing_context& context) override
     {
         downstream_handler_.name(name,context);
     }
 
-    void do_string_value(string_view_type value,
+    void do_string_value(const string_view_type& value,
                          const parsing_context& context) override
     {
         downstream_handler_.string_value(value,context);
@@ -406,7 +406,7 @@ public:
     }
 
 private:
-    void do_name(string_view_type name,
+    void do_name(const string_view_type& name,
                  const parsing_context& context) override
     {
         if (name == name_)

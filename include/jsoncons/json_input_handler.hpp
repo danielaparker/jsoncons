@@ -63,14 +63,14 @@ public:
         do_end_array(context);
     }
 
-    void name(string_view_type name, const parsing_context& context)
+    void name(const string_view_type& name, const parsing_context& context)
     {
         do_name(name, context);
     }
 
 // new
 
-    void string_value(string_view_type value, const parsing_context& context) 
+    void string_value(const string_view_type& value, const parsing_context& context) 
     {
         do_string_value(value, context);
     }
@@ -203,11 +203,11 @@ private:
 
     virtual void do_end_array(const parsing_context& context) = 0;
 
-    virtual void do_name(string_view_type name, const parsing_context& context) = 0;
+    virtual void do_name(const string_view_type& name, const parsing_context& context) = 0;
 
     virtual void do_null_value(const parsing_context& context) = 0;
 
-    virtual void do_string_value(string_view_type value, const parsing_context& context) = 0;
+    virtual void do_string_value(const string_view_type& value, const parsing_context& context) = 0;
 
     virtual void do_byte_string_value(const uint8_t* data, size_t length, const parsing_context& context) = 0;
 
@@ -250,7 +250,7 @@ private:
     {
     }
 
-    void do_name(string_view_type, const parsing_context&) override
+    void do_name(const string_view_type&, const parsing_context&) override
     {
     }
 
@@ -258,7 +258,7 @@ private:
     {
     }
 
-    void do_string_value(string_view_type, const parsing_context&) override
+    void do_string_value(const string_view_type&, const parsing_context&) override
     {
     }
 

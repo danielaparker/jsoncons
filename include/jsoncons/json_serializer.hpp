@@ -267,7 +267,7 @@ private:
         end_value();
     }
 
-    void do_name(string_view_type name) override
+    void do_name(const string_view_type& name) override
     {
         if (!stack_.empty())
         {
@@ -307,7 +307,7 @@ private:
         end_value();
     }
 
-    void do_string_value(string_view_type value) override
+    void do_string_value(const string_view_type& value) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {

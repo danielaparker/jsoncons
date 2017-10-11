@@ -119,11 +119,11 @@ Member type                         |Definition
 
 <table border="0">
   <tr>
-    <td><code>bool has_key(string_view_type key) const</code></td>
+    <td><code>bool has_key(const string_view_type& key) const</code></td>
     <td>Returns `true` if an object has a member with the given `key`, otherwise `false`</td> 
   </tr>
   <tr>
-    <td><code>bool count(string_view_type key) const</code></td>
+    <td><code>bool count(const string_view_type& key) const</code></td>
     <td>Returns the number of object members that match `key`</td> 
   </tr>
   <tr>
@@ -141,23 +141,23 @@ Member type                         |Definition
 Returns a reference to the value at position i in a json object or array.
 Throws `std::runtime_error` if not an object or array.
 
-    json& operator[](string_view_type name)
+    json& operator[](const string_view_type& name)
 Returns a proxy to a keyed value. If written to, inserts or updates with the new value. If read, evaluates to a reference to the keyed value, if it exists, otherwise throws. 
 Throws `std::runtime_error` if not an object.
 If read, throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    const json& operator[](string_view_type name) const
+    const json& operator[](const string_view_type& name) const
 If `name` matches the name of a member in the json object, returns a reference to the json object, otherwise throws.
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    object_iterator find(string_view_type name)
-    const_object_iterator find(string_view_type name) const
+    object_iterator find(const string_view_type& name)
+    const_object_iterator find(const string_view_type& name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
 Throws `std::runtime_error` if not an object.
 
-    json& at(string_view_type name)
-    const json& at(string_view_type name) const
+    json& at(const string_view_type& name)
+    const json& at(const string_view_type& name) const
 Returns a reference to the value with the specifed name in a json object.
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
@@ -169,12 +169,12 @@ Throws `std::runtime_error` if not an array.
 Throws `std::out_of_range` if the index is outside the bounds of the array.  
 
     template <class T>
-    T get_with_default(string_view_type name, 
+    T get_with_default(const string_view_type& name, 
                        const T& default_val) const
 If `name` matches the name of a member in the json object, returns the member value converted to the default's data type, otherwise returns `default_val`.
 Throws `std::runtime_error` if not an object.
 
-    const char_type* get_with_default(string_view_type name, 
+    const char_type* get_with_default(const string_view_type& name, 
                                       const char_type* default_val) const
 Make `get_with_default` do the right thing for string literals.
 

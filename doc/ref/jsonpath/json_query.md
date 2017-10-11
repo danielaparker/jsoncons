@@ -10,7 +10,7 @@ enum class result_type {value,path};
 
 template<Json>
 Json json_query(const Json& root, 
-                typename Json::string_view_type path,
+                const typename Json::string_view_type& path,
                 result_type result_t = result_type::value);
 ```
 #### Parameters

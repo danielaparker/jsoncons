@@ -99,12 +99,12 @@ public:
         do_end_array();
     }
 
-    void name(string_view_type name)
+    void name(const string_view_type& name)
     {
         do_name(name);
     }
 
-    void string_value(string_view_type value) 
+    void string_value(const string_view_type& value) 
     {
         do_string_value(value);
     }
@@ -151,7 +151,7 @@ public:
         do_name(string_view_type(p, length));
     }
 
-    void value(string_view_type value) 
+    void value(const string_view_type& value) 
     {
         do_string_value(value);
     }
@@ -218,7 +218,7 @@ private:
 
     virtual void do_end_json() = 0;
 
-    virtual void do_name(string_view_type name) = 0;
+    virtual void do_name(const string_view_type& name) = 0;
 
     virtual void do_begin_object() = 0;
 
@@ -230,7 +230,7 @@ private:
 
     virtual void do_null_value() = 0;
 
-    virtual void do_string_value(string_view_type value) = 0;
+    virtual void do_string_value(const string_view_type& value) = 0;
 
     virtual void do_byte_string_value(const uint8_t* data, size_t length) = 0;
 
@@ -258,7 +258,7 @@ private:
     {
     }
 
-    void do_name(string_view_type) override
+    void do_name(const string_view_type&) override
     {
     }
 
@@ -282,7 +282,7 @@ private:
     {
     }
 
-    void do_string_value(string_view_type) override
+    void do_string_value(const string_view_type&) override
     {
     }
 

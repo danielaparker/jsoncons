@@ -777,7 +777,7 @@ public:
         return cbor_view(it,last-it);
     }
 
-    cbor_view at(string_view_type key) const
+    cbor_view at(const string_view_type& key) const
     {
         JSONCONS_ASSERT(is_object());
         size_t len;
@@ -802,7 +802,7 @@ public:
         JSONCONS_THROW_EXCEPTION(std::runtime_error,"Key not found");
     }
 
-    bool has_key(string_view_type key) const
+    bool has_key(const string_view_type& key) const
     {
         if (!is_object())
         {
@@ -1061,7 +1061,7 @@ struct cbor_Encoder_
     }
 
     template <class Action,class Result>
-    static void encode_string(string_view_type sv, Action action, Result& v)
+    static void encode_string(const string_view_type& sv, Action action, Result& v)
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
