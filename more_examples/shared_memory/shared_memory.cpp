@@ -10,25 +10,22 @@ using namespace jsoncons;
 typedef boost::interprocess::allocator<int,
         boost::interprocess::managed_shared_memory::segment_manager> shmem_allocator;
 
-template<class CharT>
-struct b_json_policy : public json_policy<CharT>
+struct boost_sorted_policy : public sorted_policy
 {
-    using typename json_policy<CharT>::char_traits_type;
-
     template <class T,class Allocator>
     using object_storage = boost::interprocess::vector<T,Allocator>;
 
     template <class T, class Allocator>
     using array_storage = boost::interprocess::vector<T,Allocator>;
 
-    template <class Allocator>
-    using key_storage = boost::interprocess::basic_string<CharT, char_traits_type, Allocator>;
+    template <class CharT, class CharTraits, class Allocator>
+    using key_storage = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 
-    template <class Allocator>
-    using string_storage = boost::interprocess::basic_string<CharT, char_traits_type, Allocator>;
+    template <class CharT, class CharTraits, class Allocator>
+    using string_storage = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-typedef basic_json<char,b_json_policy<char>,shmem_allocator> shm_json;
+typedef basic_json<char,boost_sorted_policy,shmem_allocator> shm_json;
 
 int main(int argc, char *argv[])
 {

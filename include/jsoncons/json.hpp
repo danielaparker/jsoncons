@@ -19,7 +19,6 @@
 #include <cstring>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
-#include <jsoncons/json_policy.hpp>
 #include <jsoncons/json_structures.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/serialization_options.hpp>
@@ -35,6 +34,30 @@
 #endif
 
 namespace jsoncons {
+
+struct sorted_policy
+{
+    static const bool preserve_order = false;
+
+    template <class T,class Allocator>
+    using object_storage = std::vector<T,Allocator>;
+
+    template <class T,class Allocator>
+    using array_storage = std::vector<T,Allocator>;
+
+    template <class CharT, class CharTraits, class Allocator>
+    using key_storage = std::basic_string<CharT, CharTraits,Allocator>;
+
+    template <class CharT, class CharTraits, class Allocator>
+    using string_storage = std::basic_string<CharT, CharTraits,Allocator>;
+
+    typedef default_parse_error_handler parse_error_handler_type;
+};
+
+struct preserve_order_policy : public sorted_policy
+{
+    static const bool preserve_order = true;
+};
 
 template <typename IteratorT>
 class range 
@@ -74,7 +97,7 @@ enum class json_type_tag : uint8_t
 };
                         
 template <class CharT, 
-          class JsonPolicy = json_policy<CharT>, 
+          class ImplementationPolicy = sorted_policy, 
           class Allocator = std::allocator<CharT>>
 class basic_json
 {
@@ -82,12 +105,12 @@ public:
 
     typedef Allocator allocator_type;
 
-    typedef JsonPolicy json_policy_type;
+    typedef ImplementationPolicy implementation_policy;
 
-    typedef typename JsonPolicy::parse_error_handler_type parse_error_handler_type;
+    typedef typename ImplementationPolicy::parse_error_handler_type parse_error_handler_type;
 
     typedef CharT char_type;
-    typedef typename json_policy_type::char_traits_type char_traits_type;
+    typedef typename std::char_traits<char_type> char_traits_type;
 
 #if !defined(JSONCONS_HAS_STRING_VIEW)
     typedef Basic_string_view_<char_type,char_traits_type> string_view_type;
@@ -98,10 +121,10 @@ public:
     typedef std::basic_string<CharT,char_traits_type> string_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    using string_storage_type = typename json_policy_type::template string_storage<char_allocator_type>;
-    using key_storage_type = typename json_policy_type::template key_storage<char_allocator_type>;
+    using string_storage_type = typename implementation_policy::template string_storage<CharT,char_traits_type,char_allocator_type>;
+    using key_storage_type = typename implementation_policy::template key_storage<CharT,char_traits_type,char_allocator_type>;
 
-    typedef basic_json<CharT,JsonPolicy,Allocator> value_type;
+    typedef basic_json<CharT,ImplementationPolicy,Allocator> value_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
     typedef value_type* pointer;
@@ -116,17 +139,17 @@ public:
 #endif
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<basic_json> val_allocator_type;
-    using array_storage_type = typename json_policy_type::template array_storage<basic_json, val_allocator_type>;
+    using array_storage_type = typename implementation_policy::template array_storage<basic_json, val_allocator_type>;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    using byte_string_storage_type = typename json_policy_type::template array_storage<uint8_t, byte_allocator_type>;
+    using byte_string_storage_type = typename implementation_policy::template array_storage<uint8_t, byte_allocator_type>;
 
     typedef json_array<basic_json> array;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_pair_type> kvp_allocator_type;
 
-    using object_storage_type = typename json_policy_type::template object_storage<key_value_pair_type , kvp_allocator_type>;
-    typedef json_object<key_storage_type,basic_json,json_policy_type::preserve_order> object;
+    using object_storage_type = typename implementation_policy::template object_storage<key_value_pair_type , kvp_allocator_type>;
+    typedef json_object<key_storage_type,basic_json,implementation_policy::preserve_order> object;
 
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
@@ -1991,7 +2014,7 @@ public:
         }
     public:
 
-        friend class basic_json<CharT,JsonPolicy,Allocator>;
+        friend class basic_json<CharT,ImplementationPolicy,Allocator>;
 
         range<object_iterator> object_range()
         {
@@ -4822,18 +4845,18 @@ void swap(typename Json::key_value_pair_type& a, typename Json::key_value_pair_t
     a.swap(b);
 }
 
-template<class CharT,class JsonPolicy,class Allocator>
-basic_json<CharT,JsonPolicy,Allocator> basic_json<CharT,JsonPolicy,Allocator>::parse(std::basic_istream<char_type>& is)
+template<class CharT,class ImplementationPolicy,class Allocator>
+basic_json<CharT,ImplementationPolicy,Allocator> basic_json<CharT,ImplementationPolicy,Allocator>::parse(std::basic_istream<char_type>& is)
 {
     parse_error_handler_type err_handler;
     return parse(is,err_handler);
 }
 
-template<class CharT,class JsonPolicy,class Allocator>
-basic_json<CharT,JsonPolicy,Allocator> basic_json<CharT,JsonPolicy,Allocator>::parse(std::basic_istream<char_type>& is, 
+template<class CharT,class ImplementationPolicy,class Allocator>
+basic_json<CharT,ImplementationPolicy,Allocator> basic_json<CharT,ImplementationPolicy,Allocator>::parse(std::basic_istream<char_type>& is, 
                                                                                             parse_error_handler& err_handler)
 {
-    json_decoder<basic_json<CharT,JsonPolicy,Allocator>> handler;
+    json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
     basic_json_reader<char_type> reader(is, handler, err_handler);
     reader.read_next();
     reader.check_done();
@@ -4923,13 +4946,13 @@ json_printable<Json> pretty_print(const Json& val,
     return json_printable<Json>(val, true, options);
 }
 
-typedef basic_json<char,json_policy<char>,std::allocator<char>> json;
-typedef basic_json<wchar_t,json_policy<wchar_t>,std::allocator<wchar_t>> wjson;
-typedef basic_json<char, o_json_policy<char>, std::allocator<char>> ojson;
-typedef basic_json<wchar_t, o_json_policy<wchar_t>, std::allocator<wchar_t>> wojson;
+typedef basic_json<char,sorted_policy,std::allocator<char>> json;
+typedef basic_json<wchar_t,sorted_policy,std::allocator<wchar_t>> wjson;
+typedef basic_json<char, preserve_order_policy, std::allocator<char>> ojson;
+typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> wojson;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_json<wchar_t, o_json_policy<wchar_t>, std::allocator<wchar_t>> owjson;
+typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> owjson;
 typedef json_decoder<json> json_deserializer;
 typedef json_decoder<wjson> wjson_deserializer;
 typedef json_decoder<ojson> ojson_deserializer;

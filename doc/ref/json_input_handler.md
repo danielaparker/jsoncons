@@ -56,73 +56,73 @@ Send non-negative integer event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_uinteger_value`.
 
     void double_value(double value, const parsing_context& context)
-Send floating point value event with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
+Send floating point value with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_double_value`.
 
     void double_value(double value, uint8_t precision, const parsing_context& context)
-Send floating point value event with specified precision. Contextual information including
+Send floating point value with specified precision. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_double_value`.
 
     void bool_value(bool value, const parsing_context& context) 
-Send boolean value event. Contextual information including
+Send boolean value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_bool_value`.
 
     void null_value(const parsing_context& context) 
-Send null value event. Contextual information including
+Send null value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_null_value`.
 
 #### Private virtual implementation methods
 
-    virtual void do_begin_json()
+    virtual void do_begin_json() = 0;
 Receive begin JSON document event
 
-    virtual void do_end_json()
+    virtual void do_end_json() = 0;
 Receive end JSON document event
 
-    virtual void do_begin_object(const parsing_context& context)
+    virtual void do_begin_object(const parsing_context& context) = 0;
 Receive begin JSON object event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
-    virtual void do_end_object(const parsing_context& context)
+    virtual void do_end_object(const parsing_context& context) = 0;
 Receive end JSON object event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
-    virtual void do_begin_array(const parsing_context& context)
+    virtual void do_begin_array(const parsing_context& context) = 0;
 Receive begin JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
-    virtual void do_end_array(const parsing_context& context)
+    virtual void do_end_array(const parsing_context& context) = 0;
 Receive end JSON array event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
     virtual void do_name(const string_view_type& name, 
-                         const parsing_context& context)
+                         const parsing_context& context) = 0;
 Receive name event for name-value pair. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter.  
 
     virtual void do_string_value(const string_view_type& val, 
-                                 const parsing_context& context)
+                                 const parsing_context& context) = 0;
 Receive character data event. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
-    virtual void do_integer_value(int64_t value, const parsing_context& context)
-Receive signed integer value event. Contextual information including
+    virtual void do_integer_value(int64_t value, const parsing_context& context) = 0;
+Receive signed integer value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
     virtual void do_uinteger_value(uint64_t value, 
-                                   const parsing_context& context)
-Receive non-negative integer value event. Contextual information including
+                                   const parsing_context& context) = 0;
+Receive non-negative integer value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
-    virtual void do_double_value(double value, uint8_t precision, const parsing_context& context)
-Receive floating point value event. Contextual information including
+    virtual void do_double_value(double value, uint8_t precision, const parsing_context& context) = 0;
+Receive floating point value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
-    virtual void do_bool_value(bool value, const parsing_context& context)
-Receive boolean value event. Contextual information including
+    virtual void do_bool_value(bool value, const parsing_context& context) = 0;
+Receive boolean value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
-    virtual void do_null_value(const parsing_context& context)
-Receive null value event. Contextual information including
+    virtual void do_null_value(const parsing_context& context) = 0;
+Receive null value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 

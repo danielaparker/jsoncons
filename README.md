@@ -107,7 +107,7 @@ Output:
 The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different character types, different policies for ordering name-value pairs, etc.
 ```c++
 typedef basic_json<char,
-                   JsonPolicy = json_policy<char>,
+                   ImplementationPolicy = sorted_policy,
                    Allocator = std::allocator<char>> json;
 ```
 The library includes four instantiations of `basic_json`:
