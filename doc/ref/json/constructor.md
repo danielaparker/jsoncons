@@ -34,6 +34,10 @@ json(double val, uint8_t precision); // (14)
 json(const char* val); // (15)
 
 json(const char* val, const allocator_type& allocator); // (16)
+
+json(const uint8_t* s, size_t length); // (17)
+
+json(const uint8_t* s, size_t length, const allocator_type& allocator); // (18)
 ```
 
 (1) Constructs a `json` value that holds an empty json object. 
@@ -64,9 +68,13 @@ json(const char* val, const allocator_type& allocator); // (16)
 
 (14) Constructs a `json` value for double value with specified precision.
 
-(15) Constructs a `json` value for character string.
+(15) Constructs a `json` value for a text string.
 
-(16) Constructs a `json` value for character string with supplied allocator.
+(16) Constructs a `json` value for a text string with supplied allocator.
+
+(17) Constructs a `json` value for a byte string, serializable as `base64url`.
+
+(18) Constructs a `json` value for a byte string with supplied allocator, serializable as `base64url`.
 
 ### Examples
 
@@ -103,17 +111,24 @@ int main()
     json j7(x,4); // A double value with specified precision
     std::cout << "(7) " << j7 << std::endl;
 
-    std::vector<int> v = {10,20,30};
-    json j8 = v; // From a sequence container
+    json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
-    std::map<std::string, int> m{ {"one", 1}, {"two", 2}, {"three", 3} };
-    json j9 = m; // From an associative container
+    const uint8_t bs[] = {'H','e','l','l','o'};
+    json j9(bs, sizeof(bs)); // A byte string
     std::cout << "(9) " << j9 << std::endl;
+
+    std::vector<int> v = {10,20,30};
+    json j10 = v; // From a sequence container
+    std::cout << "(10) " << j10 << std::endl;
+
+    std::map<std::string, int> m{ {"one", 1}, {"two", 2}, {"three", 3} };
+    json j11 = m; // From an associative container
+    std::cout << "(11) " << j11 << std::endl;
 }
 ```
 
-```json
+```
 (1) {}
 (2) {"baz":"qux","foo":"bar"}
 (3) ["bar","baz"]
@@ -121,6 +136,8 @@ int main()
 (5) true
 (6) 0.142857142857143
 (7) 0.1429
-(8) [10,20,30]
-(9) {"one":1,"three":3,"two":2}
+(8) "Hello"
+(9) "SGVsbG8_"
+(10) [10,20,30]
+(11) {"one":1,"three":3,"two":2}
 ```

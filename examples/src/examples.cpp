@@ -231,13 +231,20 @@ void json_constructor_examples()
     json j7(x,4); // A double value with specified precision
     std::cout << "(7) " << j7 << std::endl;
 
-    std::vector<int> v = {10,20,30};
-    json j8 = v; // From a sequence container
+    json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
-    std::map<std::string, int> m{ {"one", 1}, {"two", 2}, {"three", 3} };
-    json j9 = m; // From an associative container
+    const uint8_t bs[] = {'H','e','l','l','o'};
+    json j9(bs, sizeof(bs)); // A byte string
     std::cout << "(9) " << j9 << std::endl;
+
+    std::vector<int> v = {10,20,30};
+    json j10 = v; // From a sequence container
+    std::cout << "(10) " << j10 << std::endl;
+
+    std::map<std::string, int> m{ {"one", 1}, {"two", 2}, {"three", 3} };
+    json j11 = m; // From an associative container
+    std::cout << "(11) " << j11 << std::endl;
 
     // An object value with four members
     json obj;
@@ -396,8 +403,6 @@ int main()
 {
     try
     {
-        json_constructor_examples();
-
         object_range_based_for_loop();
 
         json_is_as_examples();
@@ -449,6 +454,8 @@ int main()
         jsonpatch_examples();
 
         jsonpointer_examples();
+
+        json_constructor_examples();
     }
     catch (const std::exception& e)
     {
