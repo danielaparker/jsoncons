@@ -1,3 +1,15 @@
+master
+------
+
+Changes:
+
+- `template <class CharT> json_traits<CharT>` replaced with `sorted_policy` 
+- `template <class CharT> o_json_traits<CharT>` replaced with `preserve_order_policy`
+
+Enhancements:
+
+- `decode_cbor` supports byte strings
+
 0.99.9.2
 --------
 
