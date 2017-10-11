@@ -724,10 +724,10 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
     reader.read();
     json employees = decoder.get_result();
     BOOST_CHECK_EQUAL(4,employees.size());
-    BOOST_CHECK_EQUAL("00000001",employees[0]["employee-no"].as<const char*>());
-    BOOST_CHECK_EQUAL("00000002",employees[1]["employee-no"].as<const char*>());
-    BOOST_CHECK_EQUAL("00000003",employees[2]["employee-no"].as<const char*>());
-    BOOST_CHECK_EQUAL("00000004",employees[3]["employee-no"].as<const char*>());
+    BOOST_CHECK_EQUAL(std::string("00000001"),employees[0]["employee-no"].as<std::string>());
+    BOOST_CHECK_EQUAL(std::string("00000002"),employees[1]["employee-no"].as<std::string>());
+    BOOST_CHECK_EQUAL(std::string("00000003"),employees[2]["employee-no"].as<std::string>());
+    BOOST_CHECK_EQUAL(std::string("00000004"),employees[3]["employee-no"].as<std::string>());
 }
 
 BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)

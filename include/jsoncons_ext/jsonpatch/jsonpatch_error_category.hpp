@@ -14,6 +14,7 @@ namespace jsoncons { namespace jsonpatch {
 
 enum class jsonpatch_errc 
 {
+    ok = 0,
     invalid_patch = 1,
     test_failed,
     add_failed,

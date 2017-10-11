@@ -14,6 +14,7 @@ namespace jsoncons { namespace jsonpointer {
 
 enum class jsonpointer_errc 
 {
+    ok = 0,
     expected_slash = 1,
     expected_digit_or_dash,
     unexpected_leading_zero,

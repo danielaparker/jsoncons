@@ -14,6 +14,7 @@ namespace jsoncons {
 
     enum class json_parser_errc
     {
+        ok = 0,
         unexpected_eof = 1,
         source_error,
         invalid_json_text,

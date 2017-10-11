@@ -508,8 +508,7 @@ BOOST_AUTO_TEST_CASE(test_find)
 
     json::object_iterator it3 =  obj.find("key4");
     BOOST_CHECK(it3 != obj.object_range().end());
-    BOOST_CHECK_EQUAL("value4",it3->value().as_cstring());
-    BOOST_CHECK_EQUAL("value4", it3->value().as<const char*>());
+    BOOST_CHECK_EQUAL(std::string("value4"), it3->value().as<std::string>());
 }
 
 BOOST_AUTO_TEST_CASE(test_as)

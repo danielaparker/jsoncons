@@ -126,6 +126,7 @@ enum class conv_flags
 
 enum class conv_errc 
 {
+    ok = 0,
     over_long_utf8_sequence = 1, // over long utf8 sequence
     expected_continuation_byte,  // expected continuation byte    
     unpaired_high_surrogate,     // unpaired high surrogate UTF-16
@@ -182,6 +183,7 @@ std::error_code make_error_code(conv_errc result)
 
 enum class encoding_errc
 {
+    ok = 0,
     expected_u8_found_u16 = 1,
     expected_u8_found_u32,
     expected_u16_found_fffe,

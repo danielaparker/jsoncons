@@ -551,7 +551,7 @@ struct json_type_traits<Json, T,
     }
 
     template <class Ty = element_type>
-    static typename std::enable_if<!std::is_integral<Ty>::value,T>::type
+    static typename std::enable_if<!(std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value),T>::type
     as(const Json& j)
     {
         if (j.is_array())
@@ -567,7 +567,7 @@ struct json_type_traits<Json, T,
     }
 
     template <class Ty = element_type>
-    static typename std::enable_if<std::is_integral<Ty>::value,T>::type
+    static typename std::enable_if<std::is_integral<Ty>::value && !std::is_same<Ty,bool>::value,T>::type
     as(const Json& j)
     {
         if (j.is_array())
