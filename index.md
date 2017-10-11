@@ -614,7 +614,7 @@ The [json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json.md
 and sorts object members in alphabetically order.
 ```c++
 typedef basic_json<char,
-                   JsonTraits = json_traits<char>,
+                   ImplementationPolicy = sorted_policy,
                    Allocator = std::allocator<char>> json;
 ```
 If you prefer to retain the original insertion order, use [ojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/ojson.md) instead.
@@ -622,7 +622,7 @@ If you prefer to retain the original insertion order, use [ojson](https://github
 The library includes an instantiation for wide characters as well, [wjson](https://github.com/danielaparker/jsoncons/blob/master/ref/doc/wjson.md)
 ```c++
 typedef basic_json<wchar_t,
-                   JsonTraits = json_traits<wchar_t>,
+                   ImplementationPolicy = sorted_policy,
                    Allocator = std::allocator<wchar_t>> wjson;
 ```
 If you prefer to retain the original insertion order, use [wojson](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/wojson.md) instead.
@@ -742,7 +742,7 @@ template <class T>
 void push_back(T&& val)
 
 template <class T>
-void insert_or_assign(string_view_type name, T&& val)
+void insert_or_assign(const string_view_type& name, T&& val)
 ```
 The implementations of these functions and operators make use of the class template `json_type_traits`
 
