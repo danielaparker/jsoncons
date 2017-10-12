@@ -17,6 +17,9 @@
 using namespace jsoncons;
 using namespace jsoncons::cbor;
 
+// test vectors from tinycbor https://github.com/01org/tinycbor tst_decoder.cpp
+// MIT license
+
 BOOST_AUTO_TEST_SUITE(decode_cbor_tests)
 
 void check_decode(const std::vector<uint8_t>& v, const json& expected)
@@ -86,28 +89,43 @@ BOOST_AUTO_TEST_CASE(cbor_decode_test)
     check_decode({0xfb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
     check_decode({0xfb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
 
+    // byte string
+    std::vector<uint8_t> v;
+    check_decode({0x40},json(v.data(),v.size()));
+    v = {' '};
+    check_decode({0x41,' '},json(v.data(),v.size()));
+    v = {0};
+    check_decode({0x41,0},json(v.data(),v.size()));
+    v = {'H','e','l','l','o'};
+    check_decode({0x45,'H','e','l','l','o'},json(v.data(),v.size()));
+    v = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'};
+    check_decode({0x58,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
+                 json(v.data(),v.size()));
+
     // string
     check_decode({0x60},json(""));
     check_decode({0x61,' '},json(" "));
     check_decode({0x78,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
                  json("123456789012345678901234"));
 
-    // strings with undefined length
-    const uint8_t bs[] = {0};
-    const uint8_t bs2[] = {'H','e','l','l','o'};
+    // byte strings with undefined length
+    std::vector<uint8_t> bs = {};
+    check_decode({0x5f,0xff}, json(bs.data(),bs.size()));
+    check_decode({0x5f,0x40,0xff}, json(bs.data(),bs.size()));
+    check_decode({0x5f,0x40,0x40,0xff}, json(bs.data(),bs.size()));
 
-    check_decode({0x5f,0xff}, json(bs,0));
+    bs = {'H','e','l','l','o'};
+    check_decode({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(bs.data(),bs.size()));
+    check_decode({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(bs.data(),bs.size()));
+    check_decode({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(bs.data(),bs.size()));
+
+    // text strings with undefined length
     check_decode({0x7f,0xff}, json(""));
-    check_decode({0x5f,0x40,0xff}, json(bs,0));
     check_decode({0x7f,0x60,0xff}, json(""));
-    check_decode({0x5f,0x40,0x40,0xff}, json(bs,0));
     check_decode({0x7f,0x60,0x60,0xff}, json(""));
 
-    check_decode({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(bs2,sizeof(bs2)));
     check_decode({0x7f,0x63,'H','e','l',0x62,'l','o',0xff}, json("Hello"));
-    check_decode({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(bs2,sizeof(bs2)));
     check_decode({0x7f,0x61,'H',0x61,'e',0x61,'l',0x61,'l',0x61,'o',0xff}, json("Hello"));
-    check_decode({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(bs2,sizeof(bs2)));
     check_decode({0x7f,0x61,'H',0x61,'e',0x61,'l',0x60,0x61,'l',0x61,'o',0xff}, json("Hello"));
 
 }

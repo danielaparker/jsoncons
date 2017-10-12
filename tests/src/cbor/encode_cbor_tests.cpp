@@ -17,6 +17,9 @@
 using namespace jsoncons;
 using namespace jsoncons::cbor;
 
+// test vectors from tinycbor https://github.com/01org/tinycbor tst_encoder.cpp
+// MIT license
+
 BOOST_AUTO_TEST_SUITE(cbor_tests)
 
 void check_encode(const std::vector<uint8_t>& expected, const json& j)
@@ -81,7 +84,20 @@ BOOST_AUTO_TEST_CASE(cbor_encoder_test)
     check_encode({0xfb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
     check_encode({0xfb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
 
-    // string
+    // byte string
+    std::vector<uint8_t> v;
+    check_encode({0x40},json(v.data(),v.size()));
+    v = {' '};
+    check_encode({0x41,' '},json(v.data(),v.size()));
+    v = {0};
+    check_encode({0x41,0},json(v.data(),v.size()));
+    v = {'H','e','l','l','o'};
+    check_encode({0x45,'H','e','l','l','o'},json(v.data(),v.size()));
+    v = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'};
+    check_encode({0x58,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
+                 json(v.data(),v.size()));
+
+    // text string
     check_encode({0x60},json(""));
     check_encode({0x61,' '},json(" "));
     check_encode({0x78,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},

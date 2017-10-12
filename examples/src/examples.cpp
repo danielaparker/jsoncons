@@ -26,6 +26,7 @@ void msgpack_examples();
 void streaming_examples();
 void jsonpointer_examples();
 void jsonpatch_examples();
+void cbor_examples();
 
 void comment_example()
 {
@@ -456,6 +457,8 @@ int main()
         json_constructor_examples();
 
         json_is_as_examples();
+
+        cbor_examples();
     }
     catch (const std::exception& e)
     {

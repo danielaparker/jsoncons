@@ -23,7 +23,6 @@ std::vector<uint8_t> encode_cbor(const Json& jval)
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
 
 int main()
 {
@@ -53,9 +52,9 @@ int main()
     j1["min float"] = -(std::numeric_limits<float>::max)();
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
-    std::vector<uint8_t> v = encode_cbor(j1);
+    std::vector<uint8_t> v = cbor::encode_cbor(j1);
 
-    ojson j2 = decode_cbor<ojson>(v);
+    ojson j2 = cbor::decode_cbor<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
 }
@@ -90,4 +89,37 @@ Output:
 }
 ```
 
+#### Encode CBOR byte string
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    // construct byte string value
+    std::vector<uint8_t> v = {'H','e','l','l','o'};
+    json j(v.data(), v.size());
+
+    std::vector<uint8_t> bs = cbor::encode_cbor(j);
+    std::cout << "(1) ";
+
+    std::cout << std::hex << (int)bs[0];
+    for (size_t i = 1; i < bs.size(); ++i)
+    {
+        std::cout << (char)bs[i];
+    }
+    std::cout << std::endl;
+
+    // byte string value to json becomes base64url
+    std::cout << "(2) " << j << std::endl;
+}
+```
+Output:
+```
+(1) 45Hello
+(2) "SGVsbG8_"
+```
 

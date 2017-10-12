@@ -863,74 +863,65 @@ struct cbor_Encoder_
     {
         switch (jval.type_id())
         {
-            case json_type_tag::null_t:
+        case json_type_tag::null_t:
             {
-                action(static_cast<uint8_t>(0xf6),v);
+                action(static_cast<uint8_t>(0xf6), v);
                 break;
             }
 
-            case json_type_tag::bool_t:
+        case json_type_tag::bool_t:
             {
-                action(static_cast<uint8_t>(jval.as_bool() ? 0xf5 : 0xf4),v);
+                action(static_cast<uint8_t>(jval.as_bool() ? 0xf5 : 0xf4), v);
                 break;
             }
 
-            case json_type_tag::integer_t:
+        case json_type_tag::integer_t:
             {
                 int64_t val = jval.as_integer();
                 if (val >= 0)
                 {
                     if (val <= 0x17)
                     {
-                        action(static_cast<uint8_t>(val),v);
-                    }
-                    else if (val <= (std::numeric_limits<uint8_t>::max)())
+                        action(static_cast<uint8_t>(val), v);
+                    } else if (val <= (std::numeric_limits<uint8_t>::max)())
                     {
                         action(static_cast<uint8_t>(0x18), v);
-                        action(static_cast<uint8_t>(val),v);
-                    }
-                    else if (val <= (std::numeric_limits<uint16_t>::max)())
+                        action(static_cast<uint8_t>(val), v);
+                    } else if (val <= (std::numeric_limits<uint16_t>::max)())
                     {
                         action(static_cast<uint8_t>(0x19), v);
-                        action(static_cast<uint16_t>(val),v);
-                    }
-                    else if (val <= (std::numeric_limits<uint32_t>::max)())
+                        action(static_cast<uint16_t>(val), v);
+                    } else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
                         action(static_cast<uint8_t>(0x1a), v);
-                        action(static_cast<uint32_t>(val),v);
-                    }
-                    else if (val <= (std::numeric_limits<int64_t>::max)())
+                        action(static_cast<uint32_t>(val), v);
+                    } else if (val <= (std::numeric_limits<int64_t>::max)())
                     {
                         action(static_cast<uint8_t>(0x1b), v);
-                        action(static_cast<int64_t>(val),v);
+                        action(static_cast<int64_t>(val), v);
                     }
-                }
-                else
+                } else
                 {
                     const auto posnum = -1 - val;
                     if (val >= -24)
                     {
                         action(static_cast<uint8_t>(0x20 + posnum), v);
-                    }
-                    else if (posnum <= (std::numeric_limits<uint8_t>::max)())
+                    } else if (posnum <= (std::numeric_limits<uint8_t>::max)())
                     {
                         action(static_cast<uint8_t>(0x38), v);
-                        action(static_cast<uint8_t>(posnum),v);
-                    }
-                    else if (posnum <= (std::numeric_limits<uint16_t>::max)())
+                        action(static_cast<uint8_t>(posnum), v);
+                    } else if (posnum <= (std::numeric_limits<uint16_t>::max)())
                     {
                         action(static_cast<uint8_t>(0x39), v);
-                        action(static_cast<uint16_t>(posnum),v);
-                    }
-                    else if (posnum <= (std::numeric_limits<uint32_t>::max)())
+                        action(static_cast<uint16_t>(posnum), v);
+                    } else if (posnum <= (std::numeric_limits<uint32_t>::max)())
                     {
                         action(static_cast<uint8_t>(0x3a), v);
-                        action(static_cast<uint32_t>(posnum),v);
-                    }
-                    else if (posnum <= (std::numeric_limits<int64_t>::max)())
+                        action(static_cast<uint32_t>(posnum), v);
+                    } else if (posnum <= (std::numeric_limits<int64_t>::max)())
                     {
                         action(static_cast<uint8_t>(0x3b), v);
-                        action(static_cast<int64_t>(posnum),v);
+                        action(static_cast<int64_t>(posnum), v);
                     }
                 }
                 break;
@@ -942,23 +933,19 @@ struct cbor_Encoder_
                 if (val <= 0x17)
                 {
                     action(static_cast<uint8_t>(val),v);
-                }
-                else if (val <= (std::numeric_limits<uint8_t>::max)())
+                } else if (val <=(std::numeric_limits<uint8_t>::max)())
                 {
                     action(static_cast<uint8_t>(0x18), v);
                     action(static_cast<uint8_t>(val),v);
-                }
-                else if (val <= (std::numeric_limits<uint16_t>::max)())
+                } else if (val <=(std::numeric_limits<uint16_t>::max)())
                 {
                     action(static_cast<uint8_t>(0x19), v);
                     action(static_cast<uint16_t>(val),v);
-                }
-                else if (val <= (std::numeric_limits<uint32_t>::max)())
+                } else if (val <=(std::numeric_limits<uint32_t>::max)())
                 {
                     action(static_cast<uint8_t>(0x1a), v);
                     action(static_cast<uint32_t>(val),v);
-                }
-                else if (val <= (std::numeric_limits<uint64_t>::max)())
+                } else if (val <=(std::numeric_limits<uint64_t>::max)())
                 {
                     action(static_cast<uint8_t>(0x1b), v);
                     action(static_cast<uint64_t>(val),v);
@@ -966,43 +953,45 @@ struct cbor_Encoder_
                 break;
             }
 
-            case json_type_tag::double_t:
+        case json_type_tag::double_t:
             {
                 action(static_cast<uint8_t>(0xfb), v);
                 action(jval.as_double(),v);
                 break;
             }
 
-            case json_type_tag::small_string_t:
-            case json_type_tag::string_t:
+        case json_type_tag::byte_string_t:
+            {
+                encode_byte_string(jval.as<std::vector<uint8_t>>(), action, v);
+                break;
+            }
+
+        case json_type_tag::small_string_t:
+        case json_type_tag::string_t:
             {
                 encode_string(jval.as_string_view(), action, v);
                 break;
             }
 
-            case json_type_tag::array_t:
+        case json_type_tag::array_t:
             {
                 const auto length = jval.array_value().size();
                 if (length <= 0x17)
                 {
                     action(static_cast<uint8_t>(static_cast<uint8_t>(0x80 + length)), v);
-                }
-                else if (length <= 0xff)
+                } else if (length <= 0xff)
                 {
                     action(static_cast<uint8_t>(0x98), v);
                     action(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
-                }
-                else if (length <= 0xffff)
+                } else if (length <= 0xffff)
                 {
                     action(static_cast<uint8_t>(0x99), v);
                     action(static_cast<uint16_t>(length),v);
-                }
-                else if (length <= 0xffffffff)
+                } else if (length <= 0xffffffff)
                 {
                     action(static_cast<uint8_t>(0x9a), v);
                     action(static_cast<uint32_t>(length),v);
-                }
-                else if (length <= 0xffffffffffffffff)
+                } else if (length <= 0xffffffffffffffff)
                 {
                     action(static_cast<uint8_t>(0x9b), v);
                     action(static_cast<uint64_t>(length),v);
@@ -1016,29 +1005,25 @@ struct cbor_Encoder_
                 break;
             }
 
-            case json_type_tag::object_t:
+        case json_type_tag::object_t:
             {
                 const auto length = jval.object_value().size();
                 if (length <= 0x17)
                 {
                     action(static_cast<uint8_t>(static_cast<uint8_t>(0xa0 + length)), v);
-                }
-                else if (length <= 0xff)
+                } else if (length <= 0xff)
                 {
                     action(static_cast<uint8_t>(0xb8), v);
                     action(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
-                }
-                else if (length <= 0xffff)
+                } else if (length <= 0xffff)
                 {
                     action(static_cast<uint8_t>(0xb9), v);
                     action(static_cast<uint16_t>(length),v);
-                }
-                else if (length <= 0xffffffff)
+                } else if (length <= 0xffffffff)
                 {
                     action(static_cast<uint8_t>(0xba), v);
                     action(static_cast<uint32_t>(length),v);
-                }
-                else if (length <= 0xffffffffffffffff)
+                } else if (length <= 0xffffffffffffffff)
                 {
                     action(static_cast<uint8_t>(0xbb), v);
                     action(static_cast<uint64_t>(length),v);
@@ -1053,7 +1038,7 @@ struct cbor_Encoder_
                 break;
             }
 
-            default:
+        default:
             {
                 break;
             }
@@ -1096,6 +1081,42 @@ struct cbor_Encoder_
         else if (length <= 0xffffffffffffffff)
         {
             action(static_cast<uint8_t>(0x7b), v);
+            action(static_cast<uint64_t>(length),v);
+        }
+
+        for (size_t i = 0; i < length; ++i)
+        {
+            action(static_cast<uint8_t>(target.data()[i]), v);
+        }
+    }
+
+    template <class Action,class Result>
+    static void encode_byte_string(const std::vector<uint8_t>& target, Action action, Result& v)
+    {
+        const size_t length = target.size();
+        if (length <= 0x17)
+        {
+            // fixstr stores a byte array whose length is upto 31 bytes
+            action(static_cast<uint8_t>(static_cast<uint8_t>(0x40 + length)), v);
+        }
+        else if (length <= 0xff)
+        {
+            action(static_cast<uint8_t>(0x58), v);
+            action(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
+        }
+        else if (length <= 0xffff)
+        {
+            action(static_cast<uint8_t>(0x59), v);
+            action(static_cast<uint16_t>(length), v);
+        }
+        else if (length <= 0xffffffff)
+        {
+            action(static_cast<uint8_t>(0x5a), v);
+            action(static_cast<uint32_t>(length), v);
+        }
+        else if (length <= 0xffffffffffffffff)
+        {
+            action(static_cast<uint8_t>(0x5b), v);
             action(static_cast<uint64_t>(length),v);
         }
 

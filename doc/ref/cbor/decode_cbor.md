@@ -12,6 +12,8 @@ Json decode_cbor(cbor_view v)
 
 ### Examples
 
+#### Round trip
+
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
@@ -56,6 +58,37 @@ Output:
 }
 ```
 
+#### Decode CBOR byte string
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    // byte string for five bytes
+    std::vector<uint8_t> bs = {0x45,'H','e','l','l','o'};
+    json j = cbor::decode_cbor<json>(bs);
+
+    std::vector<uint8_t> v = j.as<std::vector<uint8_t>>();
+    std::cout << "(1) ";
+    for (auto b : v)
+    {
+        std::cout << (char)b;
+    }
+    std::cout << std::endl;
+
+    // byte string value to json becomes base64url
+    std::cout << "(2) " << j << std::endl;
+}
+```
+Output:
+```
+(1) Hello
+(2) "SGVsbG8_"
+```
 
 #### See also
 
