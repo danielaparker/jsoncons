@@ -962,8 +962,7 @@ struct cbor_Encoder_
 
         case json_type_tag::byte_string_t:
             {
-                auto v = jval.as<std::vector<uint8_t>>();
-                encode_byte_string(v, action, v);
+                encode_byte_string(jval. template as<std::vector<uint8_t>>(), action, v);
                 break;
             }
 
