@@ -6,9 +6,18 @@ Changes:
 - `template <class CharT> json_traits<CharT>` replaced with `sorted_policy` 
 - `template <class CharT> o_json_traits<CharT>` replaced with `preserve_order_policy`
 
+- The return type for the json::get_with_default function overload for `const char*` has been
+  changed from `const char*` to `json::string_view_type`, which is assignable to `std::string`.
+
+- New functions `byte_string_value` and `do_byte_string_value` have been added to
+  `basic_json_input_handler` and `basic_json_output_handler`
+
+- json::as<const char*>() (supported but never documented) has been deprecated
+
 Enhancements:
 
-- `decode_cbor` supports byte strings
+- The `json` class and the `decode_cbor` and `encode_cbor` functions now support byte strings
+  A `json` byte string value will, when serialized to JSON, be converted to a base64url string.
 
 0.99.9.2
 --------

@@ -3633,6 +3633,7 @@ public:
         }
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     const char_type* as_cstring() const
     {
         switch (var_.type_id())
@@ -3645,6 +3646,8 @@ public:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
         }
     }
+#endif
+
     basic_json& at(const string_view_type& name)
     {
         switch (var_.type_id())
@@ -3848,7 +3851,7 @@ public:
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
-                    return it->value().template as<const CharT*>();
+                    return it->value().as_string_view();
                 }
                 else
                 {

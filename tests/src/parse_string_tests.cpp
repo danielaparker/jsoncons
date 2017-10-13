@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string4)
         {
         }
         BOOST_CHECK(decoder.is_valid());
-        BOOST_CHECK_EQUAL("Str\"ing",decoder.get_result().as_cstring());
+        BOOST_CHECK_EQUAL(std::string("Str\"ing"),decoder.get_result().as<std::string>());
     }
 }
 BOOST_AUTO_TEST_CASE(test_parse_big_string1)
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string1)
         {
         }
         BOOST_CHECK(decoder.is_valid());
-        BOOST_CHECK_EQUAL("Big Str\"ing",decoder.get_result().as_cstring());
+        BOOST_CHECK_EQUAL(std::string("Big Str\"ing"),decoder.get_result().as<std::string>());
     }
 }
 
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string2)
         {
         }
         BOOST_CHECK(decoder.is_valid());
-        BOOST_CHECK_EQUAL("Big\t Str\"ing",decoder.get_result().as_cstring());
+        BOOST_CHECK_EQUAL(std::string("Big\t Str\"ing"),decoder.get_result().as<std::string>());
     //}
 }
 

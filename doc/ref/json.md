@@ -174,9 +174,10 @@ Throws `std::out_of_range` if the index is outside the bounds of the array.
 If `name` matches the name of a member in the json object, returns the member value converted to the default's data type, otherwise returns `default_val`.
 Throws `std::runtime_error` if not an object.
 
-    const char_type* get_with_default(const string_view_type& name, 
+    string_view_type get_with_default(const string_view_type& name, 
                                       const char_type* default_val) const
-Make `get_with_default` do the right thing for string literals.
+Make `get_with_default` do the right thing for string literals. Returns a `string_view_type`, which is assignable to type `std::string`.
+Throws `std::runtime_error` if not an object, or if member is found but is not a `string`. 
 
 #### Modifiers
 

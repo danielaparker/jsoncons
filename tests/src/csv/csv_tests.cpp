@@ -650,14 +650,14 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
     json countries = decoder.get_result();
 
     BOOST_CHECK_EQUAL(4,countries.size());
-    BOOST_CHECK_EQUAL("ABW",countries[0]["country_code"].as<const char *>());
-    BOOST_CHECK_EQUAL("ARUBA",countries[0]["name"].as<const char *>());
-    BOOST_CHECK_EQUAL("ATF",countries[1]["country_code"].as<const char *>());
-    BOOST_CHECK_EQUAL("FRENCH SOUTHERN TERRITORIES, D.R. OF",countries[1]["name"].as<const char *>());
-    BOOST_CHECK_EQUAL("VUT",countries[2]["country_code"].as<const char *>());
-    BOOST_CHECK_EQUAL("VANUATU",countries[2]["name"].as<const char *>());
-    BOOST_CHECK_EQUAL("WLF",countries[3]["country_code"].as<const char *>());
-    BOOST_CHECK_EQUAL("WALLIS & FUTUNA ISLANDS",countries[3]["name"].as<const char *>());
+    BOOST_CHECK_EQUAL(json("ABW"),countries[0]["country_code"]);
+    BOOST_CHECK_EQUAL(json("ARUBA"),countries[0]["name"]);
+    BOOST_CHECK_EQUAL(json("ATF"),countries[1]["country_code"]);
+    BOOST_CHECK_EQUAL(json("FRENCH SOUTHERN TERRITORIES, D.R. OF"),countries[1]["name"]);
+    BOOST_CHECK_EQUAL(json("VUT"),countries[2]["country_code"]);
+    BOOST_CHECK_EQUAL(json("VANUATU"),countries[2]["name"]);
+    BOOST_CHECK_EQUAL(json("WLF"),countries[3]["country_code"]);
+    BOOST_CHECK_EQUAL(json("WALLIS & FUTUNA ISLANDS"),countries[3]["name"]);
 }
 
 BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
@@ -675,14 +675,14 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
     reader.read();
     json countries = decoder.get_result();
     BOOST_CHECK_EQUAL(4,countries.size());
-    BOOST_CHECK_EQUAL("ABW",countries[0]["Country Code"].as<const char *>());
-    BOOST_CHECK_EQUAL("ARUBA",countries[0]["Name"].as<const char *>());
-    BOOST_CHECK_EQUAL("ATF",countries[1]["Country Code"].as<const char *>());
-    BOOST_CHECK_EQUAL("FRENCH SOUTHERN TERRITORIES, D.R. OF",countries[1]["Name"].as<const char *>());
-    BOOST_CHECK_EQUAL("VUT",countries[2]["Country Code"].as<const char *>());
-    BOOST_CHECK_EQUAL("VANUATU",countries[2]["Name"].as<const char *>());
-    BOOST_CHECK_EQUAL("WLF",countries[3]["Country Code"].as<const char *>());
-    BOOST_CHECK_EQUAL("WALLIS & FUTUNA ISLANDS",countries[3]["Name"].as<const char *>());
+    BOOST_CHECK_EQUAL(json("ABW"),countries[0]["Country Code"]);
+    BOOST_CHECK_EQUAL(json("ARUBA"),countries[0]["Name"]);
+    BOOST_CHECK_EQUAL(json("ATF"),countries[1]["Country Code"]);
+    BOOST_CHECK_EQUAL(json("FRENCH SOUTHERN TERRITORIES, D.R. OF"),countries[1]["Name"]);
+    BOOST_CHECK_EQUAL(json("VUT"),countries[2]["Country Code"]);
+    BOOST_CHECK_EQUAL(json("VANUATU"),countries[2]["Name"]);
+    BOOST_CHECK_EQUAL(json("WLF"),countries[3]["Country Code"]);
+    BOOST_CHECK_EQUAL(json("WALLIS & FUTUNA ISLANDS"),countries[3]["Name"]);
 }
  
 BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)

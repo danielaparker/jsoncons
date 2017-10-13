@@ -264,10 +264,12 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     {
         return j.is_string();
     }
+#if !defined(JSONCONS_NO_DEPRECATED)
     static const char_type* as(const Json& j)
     {
         return j.as_cstring();
     }
+#endif
     template <class ... Args>
     static Json to_json(Args&&... args)
     {
