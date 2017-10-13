@@ -2285,7 +2285,7 @@ public:
             return evaluate().get_with_default(name,default_val);
         }
 
-        const CharT* get_with_default(const string_view_type& name, const CharT* default_val) const
+        string_view_type get_with_default(const string_view_type& name, const CharT* default_val) const
         {
             return evaluate().get_with_default(name,default_val);
         }
@@ -3835,7 +3835,7 @@ public:
         }
     }
 
-    const CharT* get_with_default(const string_view_type& name, const CharT* default_val) const
+    string_view_type get_with_default(const string_view_type& name, const CharT* default_val) const
     {
         switch (var_.type_id())
         {
