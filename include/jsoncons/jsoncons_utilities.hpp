@@ -33,6 +33,47 @@
 namespace jsoncons
 {
 
+class byte_string
+{
+    std::vector<uint8_t> data_;
+
+public:
+    byte_string() = default;
+
+    byte_string(const std::vector<uint8_t>& v)
+        : v_(v)
+    {
+    }
+
+    byte_string(std::vector<uint8_t>&& v)
+        : v_(std::move(v))
+    {
+    }
+
+    byte_string(const byte_string& s) = default; 
+
+    byte_string(byte_string&& s) = default; 
+
+    byte_string& operator=(const byte_string& s) = default;
+
+    byte_string& operator=(byte_string&& s) = default;
+
+    const uint8_t* data() const
+    {
+        return data_.data();
+    }
+
+    size_t size() const
+    {
+        return data_.size();
+    }
+
+    size_t length() const
+    {
+        return data_.size();
+    }
+};
+
 static const std::string base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "abcdefghijklmnopqrstuvwxyz"
                                            "0123456789+/"
