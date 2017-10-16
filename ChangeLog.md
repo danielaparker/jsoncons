@@ -12,12 +12,17 @@ Changes:
 - New functions `byte_string_value` and `do_byte_string_value` have been added to
   `basic_json_input_handler` and `basic_json_output_handler`
 
-- json::as<const char*>() (supported but never documented) has been deprecated
+- json::is<const char*>() and json::as<const char*>() specializations (supported but never 
+  documented) have been deprecated
+
+- In android specific `string_to_double`, `strtod_l` changed to `strtold_l`
 
 Enhancements:
 
 - The `json` class and the `decode_cbor` and `encode_cbor` functions now support byte strings
   A `json` byte string value will, when serialized to JSON, be converted to a base64url string.
+
+- `version.hpp` added to `include` directory
 
 0.99.9.2
 --------
