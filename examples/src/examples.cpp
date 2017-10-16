@@ -404,6 +404,8 @@ int main()
 {
     try
     {
+        std::cout << "jsoncons version: " << version() << std::endl;
+
         object_range_based_for_loop();
 
         basics_examples();
