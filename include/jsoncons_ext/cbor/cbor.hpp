@@ -18,23 +18,29 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/binary/binary_utilities.hpp>
 
+// Positive integer 0x00..0x17 (0..23)
 #define JSONCONS_CBOR_0x00_0x17 \
         0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x09:case 0x0a:case 0x0b:case 0x0c:case 0x0d:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:case 0x17
 
+// Negative integer -1-0x00..-1-0x17 (-1..-24)
 #define JSONCONS_CBOR_0x20_0x37 \
         0x20:case 0x21:case 0x22:case 0x23:case 0x24:case 0x25:case 0x26:case 0x27:case 0x28:case 0x29:case 0x2a:case 0x2b:case 0x2c:case 0x2d:case 0x2e:case 0x2f:case 0x30:case 0x31:case 0x32:case 0x33:case 0x34:case 0x35:case 0x36:case 0x37
 
+// byte string (0x00..0x17 bytes follow)
 #define JSONCONS_CBOR_0x40_0x57 \
         0x40:case 0x41:case 0x42:case 0x43:case 0x44:case 0x45:case 0x46:case 0x47:case 0x48:case 0x49:case 0x4a:case 0x4b:case 0x4c:case 0x4d:case 0x4e:case 0x4f:case 0x50:case 0x51:case 0x52:case 0x53:case 0x54:case 0x55:case 0x56:case 0x57
 
+// UTF-8 string (0x00..0x17 bytes follow)
 #define JSONCONS_CBOR_0x60_0x77 \
         0x60:case 0x61:case 0x62:case 0x63:case 0x64:case 0x65:case 0x66:case 0x67:case 0x68:case 0x69:case 0x6a:case 0x6b:case 0x6c:case 0x6d:case 0x6e:case 0x6f:case 0x70:case 0x71:case 0x72:case 0x73:case 0x74:case 0x75:case 0x76:case 0x77
 
-#define JSONCONS_CBOR_0xa0_0xb7 \
-        0xa0:case 0xa1:case 0xa2:case 0xa3:case 0xa4:case 0xa5:case 0xa6:case 0xa7:case 0xa8:case 0xa9:case 0xaa:case 0xab:case 0xac:case 0xad:case 0xae:case 0xaf:case 0xb0:case 0xb1:case 0xb2:case 0xb3:case 0xb4:case 0xb5:case 0xb6:case 0xb7
-
+// array (0x00..0x17 data items follow)
 #define JSONCONS_CBOR_0x80_0x97 \
         0x80:case 0x81:case 0x82:case 0x83:case 0x84:case 0x85:case 0x86:case 0x87:case 0x88:case 0x89:case 0x8a:case 0x8b:case 0x8c:case 0x8d:case 0x8e:case 0x8f:case 0x90:case 0x91:case 0x92:case 0x93:case 0x94:case 0x95:case 0x96:case 0x97
+
+// map (0x00..0x17 pairs of data items follow)
+#define JSONCONS_CBOR_0xa0_0xb7 \
+        0xa0:case 0xa1:case 0xa2:case 0xa3:case 0xa4:case 0xa5:case 0xa6:case 0xa7:case 0xa8:case 0xa9:case 0xaa:case 0xab:case 0xac:case 0xad:case 0xae:case 0xaf:case 0xb0:case 0xb1:case 0xb2:case 0xb3:case 0xb4:case 0xb5:case 0xb6:case 0xb7
 
 namespace jsoncons { namespace cbor {
 
@@ -46,9 +52,8 @@ namespace detail {
     {
         const uint8_t* pos = it++;
         switch (*pos)
-        {
-            // UTF-8 string (0x00..0x17 bytes follow)
-        case JSONCONS_CBOR_0x60_0x77:
+        {       
+        case JSONCONS_CBOR_0x60_0x77: // UTF-8 string (0x00..0x17 bytes follow)
             {
                 size_t len = *pos & 0x1f;
                 const uint8_t *first = it;
@@ -100,8 +105,8 @@ namespace detail {
         const uint8_t* pos = it++;
         switch (*pos)
         {
-            // UTF-8 string (0x00..0x17 bytes follow)
-        case 0x7f:
+            
+        case 0x7f: // UTF-8 string (0x00..0x17 bytes follow)
             {
                 std::string s;
                 while (*it != 0xff)
@@ -127,8 +132,8 @@ namespace detail {
         const uint8_t* pos = it++;
         switch (*pos)
         {
-        // byte string (0x00..0x17 bytes follow)
-        case JSONCONS_CBOR_0x40_0x57:
+        
+        case JSONCONS_CBOR_0x40_0x57: // byte string (0x00..0x17 bytes follow)
             {
                 size_t len = *pos & 0x1f;
                 const uint8_t *first = it;
@@ -180,8 +185,8 @@ namespace detail {
         const uint8_t* pos = it++;
         switch (*pos)
         {
-        // byte string, byte strings follow, terminated by "break"
-        case 0x5f:
+        
+        case 0x5f: // byte string, byte strings follow, terminated by "break"
             {
                 std::vector<uint8_t> v;
                 while (*it != 0xff)
@@ -205,37 +210,35 @@ namespace detail {
     {
         const uint8_t* pos = it++;
         switch (*pos)
-        {
-            // Integer 0x00..0x17 (0..23)
-            case JSONCONS_CBOR_0x00_0x17:
+        {            
+            case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
                 return *pos;
 
-            // Unsigned integer (one-byte uint8_t follows)
-            case 0x18: 
+            
+            case 0x18: // Unsigned integer (one-byte uint8_t follows) 
                 {
                     auto x = binary::detail::from_big_endian<uint8_t>(it,end);
                     it += sizeof(uint8_t); 
                     return x;
                 }
 
-            // Unsigned integer (two-byte uint16_t follows)
-            case 0x19: 
+            
+            case 0x19: // Unsigned integer (two-byte uint16_t follows)
                 {
                     auto x = binary::detail::from_big_endian<uint16_t>(it,end);
                     it += sizeof(uint16_t); 
                     return x;
                 }
 
-            // Unsigned integer (four-byte uint32_t follows)
-            case 0x1a: 
+            case 0x1a: // Unsigned integer (four-byte uint32_t follows)
                 {
                     auto x = binary::detail::from_big_endian<uint32_t>(it,end);
                     it += sizeof(uint32_t); 
                     return x;
                 }
 
-            // Unsigned integer (eight-byte uint64_t follows)
-            case 0x1b: 
+            
+            case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
                 {
                     auto x = binary::detail::from_big_endian<uint64_t>(it,end);
                     it += sizeof(uint64_t); 
@@ -296,109 +299,157 @@ namespace detail {
             return end;
         }
 
-        const uint8_t* pos = it++;
+        const uint8_t *pos = it++;
         switch (*pos)
         {
-            // Integer 0x00..0x17 (0..23)
-            case JSONCONS_CBOR_0x00_0x17:
-                return it;
+            
+        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+            return it;
 
-            // Unsigned integer (one-byte uint8_t follows)
-            case 0x18: 
-                {
-                    it += sizeof(uint8_t); 
-                    return it;
-                }
-
-            // Unsigned integer (two-byte uint16_t follows)
-            case 0x19: 
-                {
-                    it += sizeof(uint16_t); 
-                    return it;
-                }
-
-            // Unsigned integer (four-byte uint32_t follows)
-            case 0x1a: 
-                {
-                    it += sizeof(uint32_t); 
-                    return it;
-                }
-
-            // Unsigned integer (eight-byte uint64_t follows)
-            case 0x1b: 
-                {
-                    it += sizeof(uint64_t); 
-                    return it;
-                }
-
-            // Negative integer -1-0x00..-1-0x17 (-1..-24)
-            case JSONCONS_CBOR_0x20_0x37:
-                return it;
-
-            // Negative integer (one-byte uint8_t follows)
-            case 0x38: 
+            
+        case 0x18: // Unsigned integer (one-byte uint8_t follows)
             {
-                it += sizeof(uint8_t); 
+                it += sizeof(uint8_t);
                 return it;
             }
 
-            // Negative integer -1-n (two-byte uint16_t follows)
-            case 0x39: 
+            
+        case 0x19: // Unsigned integer (two-byte uint16_t follows)
             {
-                it += sizeof(uint16_t); 
+                it += sizeof(uint16_t);
                 return it;
             }
 
-            // Negative integer -1-n (four-byte uint32_t follows)
-            case 0x3a: 
+            
+        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
             {
-                it += sizeof(uint32_t); 
+                it += sizeof(uint32_t);
                 return it;
             }
 
-            // Negative integer -1-n (eight-byte uint64_t follows)
-            case 0x3b: 
+            
+        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
             {
-                it += sizeof(uint64_t); 
+                it += sizeof(uint64_t);
                 return it;
             }
 
-            // UTF-8 string (0x00..0x17 bytes follow)
-            case JSONCONS_CBOR_0x60_0x77:
-            {   
+            
+        case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
+            return it;
+
+            
+        case 0x38: // Negative integer (one-byte uint8_t follows)
+            {
+                it += sizeof(uint8_t);
+                return it;
+            }
+
+            
+        case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
+            {
+                it += sizeof(uint16_t);
+                return it;
+            }
+
+            
+        case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
+            {
+                it += sizeof(uint32_t);
+                return it;
+            }
+
+            
+        case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
+            {
+                it += sizeof(uint64_t);
+                return it;
+            }
+
+            
+        case JSONCONS_CBOR_0x40_0x57: // byte string (0x00..0x17 bytes follow)
+            {
+                size_t len = *pos & 0x1f;
+                return it + len;
+            }
+            
+        case 0x58: // byte string (one-byte uint8_t for n follows)
+            {
+                const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+                it += sizeof(uint8_t);
+                return it + len;
+            }
+            
+        case 0x59: // byte string (two-byte uint16_t for n follow)
+            {
+                const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+                it += sizeof(uint16_t);
+                return it + len;
+            }
+            
+        case 0x5a: // byte string (four-byte uint32_t for n follow)
+            {
+                const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
+                it += sizeof(uint32_t);
+                return it + len;
+            }
+            
+        case 0x5b: // byte string (eight-byte uint64_t for n follow)
+            {
+                const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
+                it += sizeof(uint64_t);
+                return it + len;
+            }
+            
+        case 0x5f: // byte string (indefinite length)
+            {
+                while (*it != 0xff)
+                {
+                    if (it == end)
+                    {
+                        JSONCONS_THROW_EXCEPTION(std::invalid_argument,"eof");
+                    }
+                    it = walk(it, end);
+                }
+                return it;
+            }
+
+        // UTF-8 string (0x00..0x17 bytes follow)
+        case JSONCONS_CBOR_0x60_0x77:
+            {
                 size_t len = *pos & 0x1f;
                 return it + len;
             }
             // UTF-8 string (one-byte uint8_t for n follows)
-            case 0x78: 
-                {
-                    const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
-                    it += sizeof(uint8_t); 
-                    return it + len;
-                }
+        case 0x78:
+            {
+                const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+                it += sizeof(uint8_t);
+                return it + len;
+            }
             // UTF-8 string (two-byte uint16_t for n follow)
-            case 0x79: 
-                {
-                    const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
-                    it += sizeof(uint16_t); 
-                    return it + len;
-                }
+        case 0x79:
+            {
+                const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+                it += sizeof(uint16_t);
+                return it + len;
+            }
             // UTF-8 string (four-byte uint32_t for n follow)
-            case 0x7a: 
-                {
-                    const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
-                    it += sizeof(uint32_t); 
-                    return it + len;
-                }
+        case 0x7a:
+            {
+                const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
+                it += sizeof(uint32_t);
+                return it + len;
+            }
             // UTF-8 string (eight-byte uint64_t for n follow)
-            case 0x7b: 
-                {
-                    const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
-                    it += sizeof(uint64_t); 
-                    return it + len;
-                }
+        case 0x7b:
+            {
+                const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
+                it += sizeof(uint64_t);
+                return it + len;
+            }
             // UTF-8 string (indefinite length)
-            case 0x7f: 
+        case 0x7f:
             {
                 while (*it != 0xff)
                 {
@@ -412,45 +463,45 @@ namespace detail {
             }
 
             // array (0x00..0x17 data items follow)
-            case JSONCONS_CBOR_0x80_0x97:
+        case JSONCONS_CBOR_0x80_0x97:
             {
                 return walk_array(it, end, *pos & 0x1f);
             }
 
             // array (one-byte uint8_t for n follows)
-            case 0x98: 
+        case 0x98:
             {
                 const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
-                it += sizeof(uint8_t); 
+                it += sizeof(uint8_t);
                 return walk_array(it, end, len);
             }
 
             // array (two-byte uint16_t for n follow)
-            case 0x99: 
+        case 0x99:
             {
                 const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
-                it += sizeof(uint16_t); 
+                it += sizeof(uint16_t);
                 return walk_array(it, end, len);
             }
 
             // array (four-byte uint32_t for n follow)
-            case 0x9a: 
+        case 0x9a:
             {
                 const auto len = binary::detail::from_big_endian<int32_t>(it,end);
-                it += sizeof(uint32_t); 
+                it += sizeof(uint32_t);
                 return walk_array(it, end, len);
             }
 
             // array (eight-byte uint64_t for n follow)
-            case 0x9b: 
+        case 0x9b:
             {
                 const auto len = binary::detail::from_big_endian<int64_t>(it,end);
-                it += sizeof(uint64_t); 
+                it += sizeof(uint64_t);
                 return walk_array(it, end, len);
             }
 
             // array (indefinite length)
-            case 0x9f: 
+        case 0x9f:
             {
                 while (*it != 0xff)
                 {
@@ -460,45 +511,45 @@ namespace detail {
             }
 
             // map (0x00..0x17 pairs of data items follow)
-            case JSONCONS_CBOR_0xa0_0xb7:
+        case JSONCONS_CBOR_0xa0_0xb7:
             {
                 return walk_object(it, end, *pos & 0x1f);
             }
 
             // map (one-byte uint8_t for n follows)
-            case 0xb8: 
+        case 0xb8:
             {
                 const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
-                it += sizeof(uint8_t); 
+                it += sizeof(uint8_t);
                 return walk_object(it, end, len);
             }
 
             // map (two-byte uint16_t for n follow)
-            case 0xb9: 
+        case 0xb9:
             {
                 const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
-                it += sizeof(uint16_t); 
+                it += sizeof(uint16_t);
                 return walk_object(it, end, len);
             }
 
             // map (four-byte uint32_t for n follow)
-            case 0xba: 
+        case 0xba:
             {
                 const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
-                it += sizeof(uint32_t); 
+                it += sizeof(uint32_t);
                 return walk_object(it, end, len);
             }
 
             // map (eight-byte uint64_t for n follow)
-            case 0xbb: 
+        case 0xbb:
             {
                 const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
-                it += sizeof(uint64_t); 
+                it += sizeof(uint64_t);
                 return walk_object(it, end, len);
             }
 
             // map (indefinite length)
-            case 0xbf: 
+        case 0xbf:
             {
                 while (*it != 0xff)
                 {
@@ -509,45 +560,45 @@ namespace detail {
             }
 
             // False
-            case 0xf4: 
+        case 0xf4:
             {
                 return it;
             }
 
             // True
-            case 0xf5: 
+        case 0xf5:
             {
                 return it;
             }
 
             // Null
-            case 0xf6: 
+        case 0xf6:
             {
                 return it;
             }
 
             // Half-Precision Float (two-byte IEEE 754)
-            case 0xf9: 
+        case 0xf9:
             {
-                it += sizeof(uint16_t); 
+                it += sizeof(uint16_t);
                 return it;
             }
 
-            // Single-Precision Float (four-byte IEEE 754) 
-            case 0xfa: 
+            // Single-Precision Float (four-byte IEEE 754)
+        case 0xfa:
             {
-                it += sizeof(float); 
+                it += sizeof(float);
                 return it;
             }
 
             //  Double-Precision Float (eight-byte IEEE 754)
-            case 0xfb: 
+        case 0xfb:
             {
-                it += sizeof(double); 
+                it += sizeof(double);
                 return it;
             }
 
-            default: 
+        default:
             {
                 JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a cbor at position %s", std::to_string(end-pos));
             }
@@ -560,7 +611,7 @@ namespace detail {
         const uint8_t* pos = it++;
         switch (*pos)
         {
-            // array (0x00..0x17 data items follow)
+        // array (0x00..0x17 data items follow)
         case JSONCONS_CBOR_0x80_0x97:
         {
             return std::make_tuple(*pos & 0x1f,it);

@@ -310,7 +310,7 @@ BOOST_AUTO_TEST_CASE(test_from_stl_container)
     BOOST_CHECK_EQUAL(2, j_map["two"].as<int>());
     BOOST_CHECK_EQUAL(3, j_map["three"].as<int>());
 
-    std::unordered_map<const char*, double> a_umap{ {"one", 1.2}, {"two", 2.3}, {"three", 3.4} };
+    std::unordered_map<std::string, double> a_umap{ {"one", 1.2}, {"two", 2.3}, {"three", 3.4} };
     json j_umap(a_umap);
     BOOST_CHECK_EQUAL(1.2, j_umap["one"].as<double>());
     BOOST_CHECK_EQUAL(2.3, j_umap["two"].as<double>());

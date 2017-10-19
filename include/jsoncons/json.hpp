@@ -17,6 +17,7 @@
 #include <memory>
 #include <typeinfo>
 #include <cstring>
+#include <jsoncons/version.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_structures.hpp>
@@ -2285,7 +2286,7 @@ public:
             return evaluate().get_with_default(name,default_val);
         }
 
-        const CharT* get_with_default(const string_view_type& name, const CharT* default_val) const
+        string_view_type get_with_default(const string_view_type& name, const CharT* default_val) const
         {
             return evaluate().get_with_default(name,default_val);
         }
@@ -3633,6 +3634,7 @@ public:
         }
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     const char_type* as_cstring() const
     {
         switch (var_.type_id())
@@ -3645,6 +3647,8 @@ public:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
         }
     }
+#endif
+
     basic_json& at(const string_view_type& name)
     {
         switch (var_.type_id())
@@ -3835,7 +3839,7 @@ public:
         }
     }
 
-    const CharT* get_with_default(const string_view_type& name, const CharT* default_val) const
+    string_view_type get_with_default(const string_view_type& name, const CharT* default_val) const
     {
         switch (var_.type_id())
         {
@@ -3848,7 +3852,7 @@ public:
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
-                    return it->value().template as<const CharT*>();
+                    return it->value().as_string_view();
                 }
                 else
                 {

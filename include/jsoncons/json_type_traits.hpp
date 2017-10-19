@@ -260,6 +260,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     typedef typename Json::char_type char_type;
     typedef typename Json::allocator_type allocator_type;
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
         return j.is_string();
@@ -268,6 +269,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     {
         return j.as_cstring();
     }
+#endif
     template <class ... Args>
     static Json to_json(Args&&... args)
     {
