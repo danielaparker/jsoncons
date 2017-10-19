@@ -994,6 +994,17 @@ public:
             }
         }
 
+        byte_string_view as_byte_string_view() const
+        {
+            switch (type_id())
+            {
+            case json_type_tag::byte_string_t:
+                return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length());
+            default:
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a byte string");
+            }
+        }
+
         bool operator==(const variant& rhs) const
         {
             if (this ==&rhs)
@@ -2037,11 +2048,6 @@ public:
             return evaluate().array_range();
         }
 
-        range<const uint8_t*> byte_string_range() const
-        {
-            return evaluate().byte_string_range();
-        }
-
         size_t size() const JSONCONS_NOEXCEPT
         {
             return evaluate().size();
@@ -2145,6 +2151,11 @@ public:
         string_view_type as_string_view() const 
         {
             return evaluate().as_string_view();
+        }
+
+        byte_string_view as_byte_string_view() const 
+        {
+            return evaluate().as_byte_string_view();
         }
 
         string_type as_string() const JSONCONS_NOEXCEPT
@@ -2953,6 +2964,11 @@ public:
     {
     }
 
+    explicit basic_json(const byte_string_view& s)
+        : var_(s.data(), s.length())
+    {
+    }
+
     basic_json(const uint8_t* s, size_t length, const Allocator& allocator)
         : var_(s, length, allocator)
     {
@@ -3581,6 +3597,11 @@ public:
     string_view_type as_string_view() const
     {
         return var_.as_string_view();
+    }
+
+    byte_string_view as_byte_string_view() const
+    {
+        return var_.as_byte_string_view();
     }
 
     string_type as_string() const JSONCONS_NOEXCEPT
@@ -4752,17 +4773,6 @@ public:
             return range<const_array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not an array");
-        }
-    }
-
-    range<const uint8_t*> byte_string_range() const
-    {
-        switch (var_.type_id())
-        {
-        case json_type_tag::byte_string_t:
-            return range<const uint8_t*>(var_.byte_string_data_cast()->data(),var_.byte_string_data_cast()->data()+var_.byte_string_data_cast()->length());
-        default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a byte string");
         }
     }
 

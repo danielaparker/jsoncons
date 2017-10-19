@@ -580,7 +580,7 @@ struct json_type_traits<Json, T,
         }
         else if (j.is_byte_string())
         {
-            T v(j.byte_string_range().begin(),j.byte_string_range().end());
+            T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
             return v;
         }
         else
@@ -863,6 +863,26 @@ public:
     static Json to_json(const std::pair<T1,T2>& val)
     {
         return typename Json::array{val.first,val.second};
+    }
+};
+
+template<class Json, class Allocator>
+struct json_type_traits<Json, basic_byte_string<Allocator>>
+{
+public:
+    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    {
+        return j.is_byte_string();
+    }
+    
+    static basic_byte_string<Allocator> as(const Json& j)
+    {
+        return basic_byte_string<Allocator>(j.as_byte_string_view());
+    }
+    
+    static Json to_json(const basic_byte_string<Allocator>& val)
+    {
+        return Json(val.data(),val.length());
     }
 };
 

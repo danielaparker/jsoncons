@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONCONS_UTILITIES_HPP
-#define JSONCONS_JSONCONS_UTILITIES_HPP
+#ifndef JSONCONS_JSONCONSUTILITIES_HPP
+#define JSONCONS_JSONCONSUTILITIES_HPP
 
 #include <stdexcept>
 #include <string>
@@ -33,30 +33,125 @@
 namespace jsoncons
 {
 
-class byte_string
+// byte_string_view
+class byte_string_view
 {
-    std::vector<uint8_t> data_;
+    const uint8_t* data_;
+    size_t length_; 
+public:
+    typedef uint8_t value_type;
+    typedef const uint8_t& const_reference;
+    typedef const uint8_t* const_iterator;
+    typedef const uint8_t* iterator;
+    typedef std::size_t size_type;
+
+    byte_string_view(const uint8_t* data, size_t length)
+        : data_(data), length_(length)
+    {
+    }
+
+    const uint8_t* data() const
+    {
+        return data_;
+    }
+
+    size_t length() const
+    {
+        return length_;
+    }
+
+    size_t size() const
+    {
+        return length_;
+    }
+
+    // iterator support 
+    const_iterator begin() const JSONCONS_NOEXCEPT
+    {
+        return data_;
+    }
+    const_iterator end() const JSONCONS_NOEXCEPT
+    {
+        return data_ + length_;
+    }
+
+    const_reference operator[](size_type pos) const 
+    { 
+        return data_[pos]; 
+    }
+
+    friend bool operator==(const byte_string_view& lhs, 
+                           const byte_string_view& rhs)
+    {
+        if (lhs.length() != rhs.length())
+        {
+            return false;
+        }
+        for (size_t i = 0; i < lhs.length(); ++i)
+        {
+            if (lhs[i] != rhs[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+// basic_byte_string
+template <class Allocator = std::allocator<uint8_t>>
+class basic_byte_string
+{
+    std::vector<uint8_t,Allocator> data_;
 
 public:
-    byte_string() = default;
+    basic_byte_string() = default;
 
-    byte_string(const std::vector<uint8_t>& v)
-        : v_(v)
+    explicit basic_byte_string(const Allocator& alloc)
+        : data_(alloc)
     {
     }
 
-    byte_string(std::vector<uint8_t>&& v)
-        : v_(std::move(v))
+    basic_byte_string(std::initializer_list<uint8_t> init)
+        : data_(std::move(init))
     {
     }
 
-    byte_string(const byte_string& s) = default; 
+    basic_byte_string(std::initializer_list<uint8_t> init, const Allocator& alloc)
+        : data_(std::move(init), alloc)
+    {
+    }
 
-    byte_string(byte_string&& s) = default; 
+    explicit basic_byte_string(const byte_string_view& v)
+        : data_(v.begin(),v.end())
+    {
+    }
 
-    byte_string& operator=(const byte_string& s) = default;
+    basic_byte_string(const byte_string_view& v, const Allocator& alloc)
+        : data_(v.begin(),v.end(),alloc)
+    {
+    }
 
-    byte_string& operator=(byte_string&& s) = default;
+    basic_byte_string(const char* s)
+    {
+        while (*s)
+        {
+            data_.push_back(*s++);
+        }
+    }
+
+    basic_byte_string(const basic_byte_string& s) = default; 
+
+    basic_byte_string(basic_byte_string&& s) = default; 
+
+    basic_byte_string& operator=(const basic_byte_string& s) = default;
+
+    basic_byte_string& operator=(basic_byte_string&& s) = default;
+
+    operator byte_string_view() const JSONCONS_NOEXCEPT
+    {
+        return byte_string_view(data(),length());
+    }
 
     const uint8_t* data() const
     {
@@ -73,6 +168,8 @@ public:
         return data_.size();
     }
 };
+
+typedef basic_byte_string<std::allocator<uint8_t>> byte_string;
 
 static const std::string base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "abcdefghijklmnopqrstuvwxyz"

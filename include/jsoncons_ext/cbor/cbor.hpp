@@ -1496,7 +1496,7 @@ std::vector<uint8_t> encode_cbor(const Json& j)
 }
 
 template<class Json>
-Json decode_cbor(cbor_view v)
+Json decode_cbor(const cbor_view& v)
 {
     Decode_cbor_<Json> decoder(v.buffer(),v.buffer()+v.buflen());
     return decoder.decode();

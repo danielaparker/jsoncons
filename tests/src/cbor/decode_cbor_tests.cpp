@@ -109,15 +109,13 @@ BOOST_AUTO_TEST_CASE(cbor_decode_test)
                  json("123456789012345678901234"));
 
     // byte strings with undefined length
-    std::vector<uint8_t> bs = {};
-    check_decode({0x5f,0xff}, json(bs.data(),bs.size()));
-    check_decode({0x5f,0x40,0xff}, json(bs.data(),bs.size()));
-    check_decode({0x5f,0x40,0x40,0xff}, json(bs.data(),bs.size()));
+    check_decode({0x5f,0xff}, json(byte_string()));
+    check_decode({0x5f,0x40,0xff}, json(byte_string()));
+    check_decode({0x5f,0x40,0x40,0xff}, json(byte_string()));
 
-    bs = {'H','e','l','l','o'};
-    check_decode({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(bs.data(),bs.size()));
-    check_decode({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(bs.data(),bs.size()));
-    check_decode({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(bs.data(),bs.size()));
+    check_decode({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(byte_string("Hello")));
+    check_decode({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
+    check_decode({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
 
     // text strings with undefined length
     check_decode({0x7f,0xff}, json(""));
