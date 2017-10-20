@@ -461,22 +461,6 @@ public:
                 }
             }
 
-            bool operator==(const byte_string_data& other) const
-            {
-                if (length() != other.length())
-                {
-                    return false;
-                }
-                for (size_t i = 0; i < length(); ++i)
-                {
-                    if (data()[i] != other.data()[i])
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
             void swap(byte_string_data& val)
             {
                 std::swap(val.ptr_,ptr_);
@@ -1097,7 +1081,7 @@ public:
                 {
                 case json_type_tag::byte_string_t:
                     {
-                        return *byte_string_data_cast() == *rhs.byte_string_data_cast();
+                        return as_byte_string_view() == rhs.as_byte_string_view();
                     }
                 default:
                     return false;

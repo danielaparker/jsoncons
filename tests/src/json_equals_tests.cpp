@@ -150,6 +150,18 @@ BOOST_AUTO_TEST_CASE(test_string_not_equals_empty_object)
     BOOST_CHECK(o2 != o1);
 }
 
+BOOST_AUTO_TEST_CASE(test_byte_strings_equal)
+{
+    json o1(byte_string("123456789"));
+    json o2(byte_string{'1','2','3','4','5','6','7','8','9'});
+    json o3(byte_string{'1','2','3','4','5','6','7','8'});
+
+    BOOST_CHECK(o1 == o2);
+    BOOST_CHECK(o2 == o1);
+    BOOST_CHECK(o3 != o1);
+    BOOST_CHECK(o2 != o3);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

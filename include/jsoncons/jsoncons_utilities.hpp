@@ -94,6 +94,11 @@ public:
         return true;
     }
 
+    friend bool operator!=(const byte_string_view& lhs, const byte_string_view& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
     template <class CharT>
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const byte_string_view& o)
     {
@@ -199,6 +204,11 @@ public:
     friend bool operator==(const basic_byte_string& lhs, const basic_byte_string& rhs)
     {
         return byte_string_view(lhs) == byte_string_view(rhs);
+    }
+
+    friend bool operator!=(const basic_byte_string& lhs, const basic_byte_string& rhs)
+    {
+        return byte_string_view(lhs) != byte_string_view(rhs);
     }
 
     template <class CharT>
