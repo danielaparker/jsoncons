@@ -100,26 +100,26 @@ using namespace jsoncons;
 int main()
 {
     // construct byte string value
-    std::vector<uint8_t> v = {'H','e','l','l','o'};
-    json j(v.data(), v.size());
+    json j(byte_string("Hello"));
 
-    std::vector<uint8_t> bs = cbor::encode_cbor(j);
-    std::cout << "(1) ";
+    std::vector<uint8_t> buf = cbor::encode_cbor(j);
 
-    std::cout << std::hex << (int)bs[0];
-    for (size_t i = 1; i < bs.size(); ++i)
+    std::cout << std::hex << std::showbase << (int)buf[0];
+    for (size_t i = 1; i < buf.size(); ++i)
     {
-        std::cout << (char)bs[i];
+        std::cout << (char)buf[i];
     }
     std::cout << std::endl;
-
-    // byte string value to json becomes base64url
-    std::cout << "(2) " << j << std::endl;
 }
 ```
 Output:
 ```
-(1) 45Hello
-(2) "SGVsbG8_"
+0x45Hello
 ```
+
+#### See also
+
+- [byte_string](../byte_string.md)
+- [cbor_view](cbor_view)
+- [decode_cbor](decode_cbor.md) decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
 

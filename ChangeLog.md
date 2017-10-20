@@ -1,3 +1,10 @@
+master
+------
+
+Enhancements:
+
+- New classes `byte_string` and `byte_string_view`
+
 0.100.0
 -------
 

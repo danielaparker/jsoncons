@@ -460,6 +460,8 @@ int main()
 
         json_is_as_examples();
 
+        json_is_as_examples();
+
         cbor_examples();
     }
     catch (const std::exception& e)

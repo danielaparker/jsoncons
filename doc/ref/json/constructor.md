@@ -35,7 +35,7 @@ json(const char* val); // (15)
 
 json(const char* val, const allocator_type& allocator); // (16)
 
-json(const uint8_t* s, size_t length); // (17)
+json(const byte_string_view& bsv); // (17)
 
 json(const uint8_t* s, size_t length, const allocator_type& allocator); // (18)
 ```
@@ -115,7 +115,7 @@ int main()
     std::cout << "(8) " << j8 << std::endl;
 
     const uint8_t bs[] = {'H','e','l','l','o'};
-    json j9(bs, sizeof(bs)); // A byte string
+    json j9(byte_string("Hello")); // A byte string
     std::cout << "(9) " << j9 << std::endl;
 
     std::vector<int> v = {10,20,30};

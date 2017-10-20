@@ -101,7 +101,7 @@ public:
         ss.flags(std::ios::hex | std::ios::showbase);
         for (auto b : o)
         {
-            ss << b;
+            ss << (int)b;
         }
         os << ss.str();
         return os;
@@ -164,6 +164,11 @@ public:
     operator byte_string_view() const JSONCONS_NOEXCEPT
     {
         return byte_string_view(data(),length());
+    }
+
+    uint8_t operator[](size_type pos) const 
+    { 
+        return data_[pos]; 
     }
 
     // iterator support 
@@ -340,75 +345,6 @@ std::string decode_base64(const std::string& base64_string)
 
     return result;
 }
-
-class bytes_view
-{
-    const uint8_t* data_;
-    size_t length_; 
-public:
-    typedef uint8_t value_type;
-    typedef const uint8_t& const_reference;
-    typedef const uint8_t* const_iterator;
-    typedef const uint8_t* iterator;
-    typedef std::size_t size_type;
-
-    bytes_view(const uint8_t* data, size_t length)
-        : data_(data), length_(length)
-    {
-    }
-
-    operator std::vector<uint8_t>() const
-    { 
-        return std::vector<uint8_t>(begin(),end()); 
-    }
-
-    const uint8_t* data() const
-    {
-        return data_;
-    }
-
-    size_t length() const
-    {
-        return length_;
-    }
-
-    size_t size() const
-    {
-        return length_;
-    }
-
-    // iterator support 
-    const_iterator begin() const JSONCONS_NOEXCEPT
-    {
-        return data_;
-    }
-    const_iterator end() const JSONCONS_NOEXCEPT
-    {
-        return data_ + length_;
-    }
-
-    const_reference operator[](size_type pos) const 
-    { 
-        return data_[pos]; 
-    }
-
-    friend bool operator==(const bytes_view& lhs, 
-                           const bytes_view& rhs)
-    {
-        if (lhs.length() != rhs.length())
-        {
-            return false;
-        }
-        for (size_t i = 0; i < lhs.length(); ++i)
-        {
-            if (lhs[i] != rhs[i])
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-};
 
 }
 

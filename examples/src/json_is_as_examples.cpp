@@ -43,16 +43,38 @@ void is_as_examples()
     std::cout << "(10) " << j["k6"].as<double>() << '\n';
 }
 
-void byte_string_as_vector()
+void byte_string_from_initializer_list()
 {
-    const uint8_t bs[] = {'H','e','l','l','o'};
-    json j(bs, sizeof(bs));
-    std::vector<uint8_t> v = j.as<std::vector<uint8_t>>();
-    for (auto b : v)
+    json j(byte_string({'H','e','l','l','o'}));
+    byte_string bs = j.as<byte_string>();
+
+    std::cout << "(1) "<< bs << "\n\n";
+
+    std::cout << "(2) ";
+    for (auto b : bs)
     {
-        std::cout << b;
+        std::cout << (char)b;
     }
-    std::cout << std::endl;
+    std::cout << "\n\n";
+
+    std::cout << "(3) " << j << std::endl;
+}
+
+void byte_string_from_char_array()
+{
+    json j(byte_string("Hello"));
+    byte_string bs = j.as<byte_string>();
+
+    std::cout << "(1) "<< bs << "\n\n";
+
+    std::cout << "(2) ";
+    for (auto b : bs)
+    {
+        std::cout << (char)b;
+    }
+    std::cout << "\n\n";
+
+    std::cout << "(3) " << j << std::endl;
 }
 
 void introspection_example()
@@ -84,7 +106,9 @@ void json_is_as_examples()
 
     introspection_example();
 
-    byte_string_as_vector();
+    byte_string_from_initializer_list();
+
+    byte_string_from_char_array();
 }
 
 

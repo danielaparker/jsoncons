@@ -10,18 +10,15 @@ using namespace jsoncons;
 void decode_cbor_byte_string()
 {
     // byte string for five bytes
-    std::vector<uint8_t> bs = {0x45,'H','e','l','l','o'};
-    json j = cbor::decode_cbor<json>(bs);
+    std::vector<uint8_t> buf = {0x45,'H','e','l','l','o'};
+    json j = cbor::decode_cbor<json>(buf);
 
     auto bs = j.as<byte_string>();
-    std::cout << "(1) ";
-    for (auto b : bs)
-    {
-        std::cout << (char)b;
-    }
-    std::cout << std::endl;
 
-    // byte string value to json becomes base64url
+    // byte_string to ostream displays as hex
+    std::cout << "(1) "<< bs << "\n\n";
+
+    // byte string value to JSON text becomes base64url
     std::cout << "(2) " << j << std::endl;
 }
 
@@ -30,18 +27,14 @@ void encode_cbor_byte_string()
     // construct byte string value
     json j(byte_string("Hello"));
 
-    std::vector<uint8_t> bs = cbor::encode_cbor(j);
-    std::cout << "(1) ";
+    std::vector<uint8_t> buf = cbor::encode_cbor(j);
 
-    std::cout << std::hex << (int)bs[0];
-    for (size_t i = 1; i < bs.size(); ++i)
+    std::cout << std::hex << std::showbase << (int)buf[0];
+    for (size_t i = 1; i < buf.size(); ++i)
     {
-        std::cout << (char)bs[i];
+        std::cout << (char)buf[i];
     }
     std::cout << std::endl;
-
-    // byte string value to json becomes base64url
-    std::cout << "(2) " << j << std::endl;
 }
 
 void cbor_examples()

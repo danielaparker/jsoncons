@@ -106,19 +106,15 @@ Output:
 1,2,3,4
 ```
 
-#### Accessing a `json` byte string as a `std::vector<uint8_t>`
+#### Accessing a `json` byte string as a [byte_string](../byte_string.md)
 ```c++
-const uint8_t bs[] = {'H','e','l','l','o'};
-json j(bs, sizeof(bs));
-std::vector<uint8_t> v = j.as<std::vector<uint8_t>>();
-for (auto b : v)
-{
-    std::cout << b;
-}
-std::cout << std::endl;
+json j(byte_string("Hello"));
+byte_string bs = j.as<byte_string>();
+
+std::cout << bs << std::endl;
 ```
 Output:
 ```
-Hello
+0x480x650x6c0x6c0x6f
 ```
 
