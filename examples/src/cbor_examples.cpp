@@ -13,9 +13,9 @@ void decode_cbor_byte_string()
     std::vector<uint8_t> bs = {0x45,'H','e','l','l','o'};
     json j = cbor::decode_cbor<json>(bs);
 
-    std::vector<uint8_t> v = j.as<std::vector<uint8_t>>();
+    auto bs = j.as<byte_string>();
     std::cout << "(1) ";
-    for (auto b : v)
+    for (auto b : bs)
     {
         std::cout << (char)b;
     }
@@ -28,8 +28,7 @@ void decode_cbor_byte_string()
 void encode_cbor_byte_string()
 {
     // construct byte string value
-    std::vector<uint8_t> v = {'H','e','l','l','o'};
-    json j(v.data(), v.size());
+    json j(byte_string("Hello"));
 
     std::vector<uint8_t> bs = cbor::encode_cbor(j);
     std::cout << "(1) ";

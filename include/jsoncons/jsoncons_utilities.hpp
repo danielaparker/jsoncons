@@ -39,8 +39,6 @@ class byte_string_view
     const uint8_t* data_;
     size_t length_; 
 public:
-    typedef uint8_t value_type;
-    typedef const uint8_t& const_reference;
     typedef const uint8_t* const_iterator;
     typedef const uint8_t* iterator;
     typedef std::size_t size_type;
@@ -75,13 +73,12 @@ public:
         return data_ + length_;
     }
 
-    const_reference operator[](size_type pos) const 
+    uint8_t operator[](size_type pos) const 
     { 
         return data_[pos]; 
     }
 
-    friend bool operator==(const byte_string_view& lhs, 
-                           const byte_string_view& rhs)
+    friend bool operator==(const byte_string_view& lhs, const byte_string_view& rhs)
     {
         if (lhs.length() != rhs.length())
         {
@@ -96,6 +93,19 @@ public:
         }
         return true;
     }
+
+    template <class CharT>
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const byte_string_view& o)
+    {
+        std::basic_ostringstream<CharT> ss;
+        ss.flags(std::ios::hex | std::ios::showbase);
+        for (auto b : o)
+        {
+            ss << b;
+        }
+        os << ss.str();
+        return os;
+    }
 };
 
 // basic_byte_string
@@ -103,8 +113,11 @@ template <class Allocator = std::allocator<uint8_t>>
 class basic_byte_string
 {
     std::vector<uint8_t,Allocator> data_;
-
 public:
+    typedef typename std::vector<uint8_t,Allocator>::const_iterator const_iterator;
+    typedef typename std::vector<uint8_t,Allocator>::const_iterator iterator;
+    typedef std::size_t size_type;
+
     basic_byte_string() = default;
 
     explicit basic_byte_string(const Allocator& alloc)
@@ -153,6 +166,16 @@ public:
         return byte_string_view(data(),length());
     }
 
+    // iterator support 
+    const_iterator begin() const JSONCONS_NOEXCEPT
+    {
+        return data_.begin();
+    }
+    const_iterator end() const JSONCONS_NOEXCEPT
+    {
+        return data_.end();
+    }
+
     const uint8_t* data() const
     {
         return data_.data();
@@ -166,6 +189,18 @@ public:
     size_t length() const
     {
         return data_.size();
+    }
+
+    friend bool operator==(const basic_byte_string& lhs, const basic_byte_string& rhs)
+    {
+        return byte_string_view(lhs) == byte_string_view(rhs);
+    }
+
+    template <class CharT>
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_byte_string& o)
+    {
+        os << byte_string_view(o);
+        return os;
     }
 };
 
