@@ -1475,7 +1475,7 @@ public:
         switch (state_)
         {
             case parse_state::minus:
-                goto minus;
+                goto minus_sign;
             case parse_state::positive_zero:
                 goto positive_zero;
             case parse_state::negative_zero:
@@ -1497,7 +1497,7 @@ public:
             default:
                 JSONCONS_UNREACHABLE();               
         }
-minus:
+minus_sign:
         if (JSONCONS_UNLIKELY(p_ >= local_end_input)) // Buffer exhausted               
         {
             state_ = parse_state::minus;
