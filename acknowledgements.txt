@@ -38,3 +38,5 @@ jakalx contributed fix for operator== throws when comparing a string
 against an empty object
 
 Alexander (rog13) for contributing fix to jsonpatch::diff
+
+Stefano Sinigardi for contributing workaround for vs2017 platform issue

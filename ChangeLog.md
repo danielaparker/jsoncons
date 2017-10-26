@@ -1,9 +1,13 @@
-master
-------
+0.100.1
+-------
+
+Fix for platform issue with vs2017:
+
+- Renamed label `minus` to `minus_sign` in `json_parser.hpp` 
 
 Enhancements:
 
-- New classes `byte_string` and `byte_string_view`
+- New classes `byte_string` and `byte_string_view`, to augment support for cbor byte strings in `json` values
 
 0.100.0
 -------
