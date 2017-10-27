@@ -22,6 +22,9 @@
 // Uncomment the following line to suppress deprecated names (recommended for new code)
 //#define JSONCONS_NO_DEPRECATED
 
+// The definitions below follow the definitions in compiler_support_p.h, https://github.com/01org/tinycbor
+// MIT license
+
 #if defined(__GNUC__) || defined(__clang__)
 #define JSONCONS_LIKELY(x) __builtin_expect(!!(x), 1)
 #define JSONCONS_UNLIKELY(x) __builtin_expect(!!(x), 0)
