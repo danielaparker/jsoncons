@@ -1,3 +1,8 @@
+0.100.2
+-------
+
+Resolved warnings on GCC Issue #127
+
 0.100.1
 -------
 
