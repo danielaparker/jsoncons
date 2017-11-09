@@ -6,6 +6,7 @@
 #endif
 
 #include <boost/test/unit_test.hpp>
+//#include <jsoncons_ext/csv/csv_parameters.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons_ext/csv/csv_serializer.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -13,6 +14,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <iostream>
 
 using namespace jsoncons;
 using namespace jsoncons::csv;
@@ -821,14 +823,18 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped2)
     //std::cout << val << std::endl;
 
     BOOST_REQUIRE(params.column_types().size() == 4);
-    BOOST_CHECK(params.column_types()[0].first == csv_column_type::integer_t);
-    BOOST_CHECK(params.column_types()[0].second == 0);
-    BOOST_CHECK(params.column_types()[1].first == csv_column_type::integer_t);
-    BOOST_CHECK(params.column_types()[1].second == 1);
-    BOOST_CHECK(params.column_types()[2].first == csv_column_type::integer_t);
-    BOOST_CHECK(params.column_types()[2].second == 1);
-    BOOST_CHECK(params.column_types()[3].first == csv_column_type::repeat_t);
-    BOOST_CHECK(params.column_types()[3].second == 2);
+    BOOST_CHECK(params.column_types()[0].col_type == csv_column_type::integer_t);
+    BOOST_CHECK(params.column_types()[0].level == 0);
+    BOOST_CHECK_EQUAL(0, params.column_types()[0].rep_count);
+    BOOST_CHECK(params.column_types()[1].col_type == csv_column_type::integer_t);
+    BOOST_CHECK(params.column_types()[1].level == 1);
+    BOOST_CHECK_EQUAL(0, params.column_types()[1].rep_count);
+    BOOST_CHECK(params.column_types()[2].col_type == csv_column_type::integer_t);
+    BOOST_CHECK(params.column_types()[2].level == 1);
+    BOOST_CHECK_EQUAL(0, params.column_types()[2].rep_count);
+    BOOST_CHECK(params.column_types()[3].col_type == csv_column_type::repeat_t);
+    BOOST_CHECK(params.column_types()[3].level == 0);
+    BOOST_CHECK_EQUAL(2, params.column_types()[3].rep_count);
 
     /*BOOST_CHECK(val.size()==3);
     BOOST_CHECK(val[0].size()==3);
@@ -843,6 +849,51 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped2)
     BOOST_CHECK(val[2][0]==json(7));
     BOOST_CHECK(val[2][1]==json(8));
     BOOST_CHECK(val[2][2]==json(9));*/
+}
+
+BOOST_AUTO_TEST_CASE(csv_test1_repeat)
+{
+    const std::string text = R"(Date,1Y,2Y,3Y,5Y
+    2017-01-09,0.0062,0.0075,0.0083,0.011,0.012
+    2017-01-08,0.0063,0.0076,0.0084,0.0112,0.013
+    2017-01-08,0.0063,0.0076,0.0084,0.0112,0.014
+    )";    
+
+    auto result = jsoncons::csv::detail::parse_column_types<char>("string,float*");
+    BOOST_REQUIRE(result.size() == 3);
+    BOOST_CHECK(result[0].col_type == csv_column_type::string_t);
+    BOOST_CHECK(result[0].level == 0);
+    BOOST_CHECK_EQUAL(0, result[0].rep_count);
+    BOOST_CHECK(result[1].col_type == csv_column_type::float_t);
+    BOOST_CHECK(result[1].level == 0);
+    BOOST_CHECK_EQUAL(0, result[1].rep_count);
+    BOOST_CHECK(result[2].col_type == csv_column_type::repeat_t);
+    BOOST_CHECK(result[2].level == 0);
+    BOOST_CHECK_EQUAL(1, result[2].rep_count);
+
+    auto result2 = jsoncons::csv::detail::parse_column_types<char>("string,[float*]");
+    BOOST_REQUIRE(result2.size() == 3);
+    BOOST_CHECK(result2[0].col_type == csv_column_type::string_t);
+    BOOST_CHECK(result2[0].level == 0);
+    BOOST_CHECK_EQUAL(0, result2[0].rep_count);
+    BOOST_CHECK(result2[1].col_type == csv_column_type::float_t);
+    BOOST_CHECK(result2[1].level == 1);
+    BOOST_CHECK_EQUAL(0, result2[1].rep_count);
+    BOOST_CHECK(result2[2].col_type == csv_column_type::repeat_t);
+    BOOST_CHECK(result2[2].level == 1);
+    BOOST_CHECK_EQUAL(1, result2[2].rep_count);
+
+    auto result3 = jsoncons::csv::detail::parse_column_types<char>("string,[float]*");
+    BOOST_REQUIRE(result3.size() == 3);
+    BOOST_CHECK(result3[0].col_type == csv_column_type::string_t);
+    BOOST_CHECK(result3[0].level == 0);
+    BOOST_CHECK_EQUAL(0, result3[0].rep_count);
+    BOOST_CHECK(result3[1].col_type == csv_column_type::float_t);
+    BOOST_CHECK(result3[1].level == 1);
+    BOOST_CHECK_EQUAL(0, result3[1].rep_count);
+    BOOST_CHECK(result3[2].col_type == csv_column_type::repeat_t);
+    BOOST_CHECK(result3[2].level == 0);
+    BOOST_CHECK_EQUAL(1, result3[2].rep_count);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
