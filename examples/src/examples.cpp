@@ -448,8 +448,6 @@ int main()
 
         serialization_examples();
 
-        csv_examples();
-
         comment_example();
 
         jsonpatch_examples();
@@ -463,6 +461,8 @@ int main()
         json_is_as_examples();
 
         cbor_examples();
+
+        csv_examples();
     }
     catch (const std::exception& e)
     {

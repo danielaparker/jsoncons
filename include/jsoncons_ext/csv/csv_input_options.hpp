@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <limits>
 #include <cwchar>
+#include <jsoncons_ext/csv/csv_parameters.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -305,35 +306,8 @@ std::vector<csv_type_info> parse_column_types(const std::basic_string<CharT>& ty
 } // end detail
 
 template <class CharT>
-class basic_csv_input_options;
-
-template <class CharT>
 class basic_csv_parameters
 {
-    friend class basic_csv_input_options<CharT>;
-
-    bool assume_header_;
-    bool ignore_empty_values_;
-    bool trim_leading_;
-    bool trim_trailing_;
-    bool trim_leading_inside_quotes_;
-    bool trim_trailing_inside_quotes_;
-    bool unquoted_empty_value_is_null_;
-    CharT field_delimiter_;
-    CharT quote_char_;
-    CharT quote_escape_char_;
-    CharT comment_starter_;
-    quote_style_type quote_style_;
-    std::pair<mapping_type,bool> mapping_;
-    unsigned long max_lines_;
-    size_t header_lines_;
-    std::basic_string<CharT> line_delimiter_;
-    std::basic_string<CharT> header_;
-    std::basic_string<CharT> data_types_;
-    std::basic_string<CharT> default_values_;
-    std::vector<std::basic_string<CharT>> column_names_;
-    std::vector<detail::csv_type_info> column_types_;
-    std::vector<std::basic_string<CharT>> column_defaults_;
 public:
     static const size_t default_indent = 4;
 
@@ -636,16 +610,7 @@ public:
         return *this;
     }
 
-};
-
-typedef basic_csv_parameters<char> csv_parameters;
-typedef basic_csv_parameters<wchar_t> wcsv_parameters;
-
-// csv_input_options
-
-template <class CharT>
-class basic_csv_input_options
-{
+private:
     bool assume_header_;
     bool ignore_empty_values_;
     bool trim_leading_;
@@ -658,7 +623,7 @@ class basic_csv_input_options
     CharT quote_escape_char_;
     CharT comment_starter_;
     quote_style_type quote_style_;
-    std::pair<mapping_type, bool> mapping_;
+    std::pair<mapping_type,bool> mapping_;
     unsigned long max_lines_;
     size_t header_lines_;
     std::basic_string<CharT> line_delimiter_;
@@ -668,10 +633,20 @@ class basic_csv_input_options
     std::vector<std::basic_string<CharT>> column_names_;
     std::vector<detail::csv_type_info> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
+};
+
+typedef basic_csv_parameters<char> csv_parameters;
+typedef basic_csv_parameters<wchar_t> wcsv_parameters;
+
+// csv_input_options
+
+template <class CharT>
+class basic_csv_input_options
+{
 public:
     static const size_t default_indent = 4;
 
-    //  Constructors
+//  Constructors
 
     basic_csv_input_options()
         :
@@ -686,7 +661,7 @@ public:
         quote_char_('\"'),
         quote_escape_char_('\"'),
         comment_starter_('\0'),
-        mapping_({std::make_pair(mapping_type::n_rows, false)}),
+        mapping_({mapping_type::n_rows,false}),
         max_lines_((std::numeric_limits<unsigned long>::max)()),
         header_lines_(0)
     {
@@ -705,15 +680,9 @@ public:
         quote_char_(params.quote_char()),
         quote_escape_char_(params.quote_escape_char()),
         comment_starter_(params.comment_starter()),
-        mapping_(params.mapping_),
+        mapping_(params.mapping()),
         max_lines_(params.max_lines()),
-        header_lines_(params.header_lines()),
-        header_(params.header_),
-        data_types_(params.data_types_),
-        default_values_(params.default_values_),
-        column_names_(params.column_names_),
-        column_types_(params.column_types_),
-        column_defaults_(params.column_defaults_)
+        header_lines_(params.header_lines())
     {
     }
 
@@ -971,6 +940,27 @@ public:
         return *this;
     }
 
+private:
+    bool assume_header_;
+    bool ignore_empty_values_;
+    bool trim_leading_;
+    bool trim_trailing_;
+    bool trim_leading_inside_quotes_;
+    bool trim_trailing_inside_quotes_;
+    bool unquoted_empty_value_is_null_;
+    CharT field_delimiter_;
+    CharT quote_char_;
+    CharT quote_escape_char_;
+    CharT comment_starter_;
+    std::pair<mapping_type,bool> mapping_;
+    unsigned long max_lines_;
+    size_t header_lines_;
+    std::basic_string<CharT> header_;
+    std::basic_string<CharT> data_types_;
+    std::basic_string<CharT> default_values_;
+    std::vector<std::basic_string<CharT>> column_names_;
+    std::vector<detail::csv_type_info> column_types_;
+    std::vector<std::basic_string<CharT>> column_defaults_;
 };
 
 typedef basic_csv_input_options<char> csv_input_options;

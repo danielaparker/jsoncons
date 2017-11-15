@@ -896,5 +896,15 @@ BOOST_AUTO_TEST_CASE(csv_test1_repeat)
     BOOST_CHECK_EQUAL(1, result3[2].rep_count);
 }
 
+BOOST_AUTO_TEST_CASE(csv_test1_repeat2)
+{
+    csv_parameters params1;
+    params1.column_types("[integer,string]*");
+    for (auto x : params1.column_types())
+    {
+        std::cout << (int)x.col_type << " " << x.level << " " << x.rep_count << std::endl;
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
