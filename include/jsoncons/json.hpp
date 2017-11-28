@@ -122,8 +122,8 @@ public:
     using string_storage_type = typename implementation_policy::template string_storage<CharT,char_traits_type,char_allocator_type>;
     using key_storage_type = typename implementation_policy::template key_storage<CharT,char_traits_type,char_allocator_type>;
 
-	// string_type is for interface only, not storage 
-	typedef std::basic_string<CharT,char_traits_type,char_allocator_type> string_type;
+    // string_type is for interface only, not storage 
+    typedef std::basic_string<CharT,char_traits_type,char_allocator_type> string_type;
 
     typedef basic_json<CharT,ImplementationPolicy,Allocator> value_type;
     typedef value_type& reference;
