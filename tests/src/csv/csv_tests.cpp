@@ -989,5 +989,13 @@ WLF,WALLIS & FUTUNA ISLANDS
     std::cout << pretty_print(j) << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_parse_string)
+{
+    std::string s = "some label\nsome value";
+    csv_parameters params;
+    params.assume_header(true);
+    std::cout << decode_csv<json>(s,params) << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
