@@ -71,8 +71,8 @@ class basic_csv_parser : private parsing_context
     size_t index_;
     unsigned long column_;
     unsigned long line_;
-    int curr_char_;
-    int prev_char_;
+    CharT curr_char_;
+    CharT prev_char_;
     std::basic_string<CharT> value_buffer_;
     int depth_;
     basic_csv_parameters<CharT> parameters_;
