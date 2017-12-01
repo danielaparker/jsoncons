@@ -332,6 +332,10 @@ all_csv_states:
                 {
                     state_ = csv_state_type::comment;
                 }
+                else if (curr_char_ == '\r' || curr_char_ == '\n')
+                {
+                    // do nothing yet: could be a blank line
+                }
                 else
                 {
                     state_ = csv_state_type::unquoted_string;
