@@ -279,7 +279,6 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols)
     BOOST_CHECK(val[2][1]==json("5"));
     BOOST_CHECK(val[2][2]==json("6"));
 }
-
 BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_leading)
 {
     std::string text = "a ,b ,c \n 1, 2, 3\n 4 , 5 , 6 ";
@@ -332,7 +331,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_trailing)
     BOOST_CHECK(val[0][0]==json("a"));
     BOOST_CHECK(val[0][1]==json("b"));
     BOOST_CHECK(val[0][2]==json("c"));
-    BOOST_CHECK(val[1][0]==json(" 1"));
+    BOOST_CHECK_EQUAL(json(" 1"),val[1][0]);
     BOOST_CHECK(val[1][1]==json(" 2"));
     BOOST_CHECK(val[1][2]==json(" 3"));
     BOOST_CHECK(val[2][0]==json(" 4"));
@@ -935,6 +934,57 @@ WLF,WALLIS & FUTUNA ISLANDS
     reader.read();
     json j = decoder.get_result();
     BOOST_CHECK(j.size() == 5);
+
+    std::cout << pretty_print(j) << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(line_with_one_space)
+{
+    std::string input = R"(country_code,name
+ABW,ARUBA
+\t
+ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+VUT,VANUATU
+WLF,WALLIS & FUTUNA ISLANDS
+)";
+
+    std::istringstream is(input);
+
+    json_decoder<json> decoder;
+
+    csv_parameters params;
+    params.assume_header(true);
+
+    csv_reader reader(is,decoder,params);
+    reader.read();
+    json j = decoder.get_result();
+    BOOST_CHECK(j.size() == 5);
+
+    std::cout << pretty_print(j) << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(line_with_one_space_and_trim)
+{
+    std::string input = R"(country_code,name
+ABW,ARUBA
+ 
+ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+VUT,VANUATU
+WLF,WALLIS & FUTUNA ISLANDS
+)";
+
+    std::istringstream is(input);
+
+    json_decoder<json> decoder;
+
+    csv_parameters params;
+    params.assume_header(true)
+          .trim(true);
+
+    csv_reader reader(is,decoder,params);
+    reader.read();
+    json j = decoder.get_result();
+    BOOST_CHECK(j.size() == 4);
 
     std::cout << pretty_print(j) << std::endl;
 }

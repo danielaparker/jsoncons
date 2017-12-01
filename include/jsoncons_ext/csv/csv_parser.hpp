@@ -190,24 +190,21 @@ public:
 
     void before_record()
     {
-        if (column_index_ == 0)
+        offset_ = 0;
+        if (stack_[top_] == csv_mode_type::data)
         {
-            offset_ = 0;
-            if (stack_[top_] == csv_mode_type::data)
+            switch (parameters_.mapping())
             {
-                switch (parameters_.mapping())
-                {
-                case mapping_type::n_rows:
-                    handler_.begin_array(*this);
-                    break;
-                case mapping_type::n_objects:
-                    handler_.begin_object(*this);
-                    break;
-                case mapping_type::m_columns:
-                    break;
-                default:
-                    break;
-                }
+            case mapping_type::n_rows:
+                handler_.begin_array(*this);
+                break;
+            case mapping_type::n_objects:
+                handler_.begin_object(*this);
+                break;
+            case mapping_type::m_columns:
+                break;
+            default:
+                break;
             }
         }
     }
@@ -361,7 +358,10 @@ all_csv_states:
                     }
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
                     {
-                        before_record();
+                        if (column_index_ == 0)
+                        {
+                            before_record();
+                        }
                         end_quoted_string_value(ec);
                         if (ec) return;
                         after_field();
@@ -378,7 +378,10 @@ all_csv_states:
                     }
                     else if (curr_char_ == parameters_.quote_char())
                     {
-                        before_record();
+                        if (column_index_ == 0)
+                        {
+                            before_record();
+                        }
                         end_quoted_string_value(ec);
                         if (ec) return;
                         after_field();
@@ -394,9 +397,16 @@ all_csv_states:
                 {
                     if (curr_char_ == '\r' || (prev_char_ != '\r' && curr_char_ == '\n'))
                     {
+                        if (parameters_.trim_leading() || parameters_.trim_trailing())
+                        {
+                            trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
+                        }
                         if (!parameters_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
                         {
-                            before_record();
+                            if (column_index_ == 0)
+                            {
+                                before_record();
+                            }
                             end_unquoted_string_value();
                             after_field();
                             after_record();
@@ -407,9 +417,16 @@ all_csv_states:
                     {
                         if (prev_char_ != '\r')
                         {
+                            if (parameters_.trim_leading() || parameters_.trim_trailing())
+                            {
+                                trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
+                            }
                             if (!parameters_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
                             {
-                                before_record();
+                                if (column_index_ == 0)
+                                {
+                                    before_record();
+                                }
                                 end_unquoted_string_value();
                                 after_field();
                                 after_record();
@@ -419,7 +436,14 @@ all_csv_states:
                     }
                     else if (curr_char_ == parameters_.field_delimiter())
                     {
-                        before_record();
+                        if (parameters_.trim_leading() || parameters_.trim_trailing())
+                        {
+                            trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
+                        }
+                        if (column_index_ == 0)
+                        {
+                            before_record();
+                        }
                         end_unquoted_string_value();
                         after_field();
                         state_ = csv_state_type::expect_value;
@@ -480,9 +504,16 @@ all_csv_states:
         switch (state_)
         {
         case csv_state_type::unquoted_string: 
+            if (parameters_.trim_leading() || parameters_.trim_trailing())
+            {
+                trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
+            }
             if (!parameters_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
             {
-                before_record();
+                if (column_index_ == 0)
+                {
+                    before_record();
+                }
                 end_unquoted_string_value();
                 after_field();
             }
@@ -490,7 +521,10 @@ all_csv_states:
         case csv_state_type::escaped_value:
             if (parameters_.quote_escape_char() == parameters_.quote_char())
             {
-                before_record();
+                if (column_index_ == 0)
+                {
+                    before_record();
+                }
                 end_quoted_string_value(ec);
                 if (ec) return;
                 after_field();
@@ -595,10 +629,6 @@ private:
 
     void end_unquoted_string_value() 
     {
-        if (parameters_.trim_leading() | parameters_.trim_trailing())
-        {
-            trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
-        }
         switch (stack_[top_])
         {
         case csv_mode_type::header:
