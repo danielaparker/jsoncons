@@ -298,3 +298,112 @@ std::cout << "\n(3)\n" << pretty_print(val3) << "\n";
     "5Y": [0.011,0.0112,0.0112]
 }
 ```
+
+#### Convert CSV to json when last column repeats
+
+```c++
+int main()
+{
+    const std::string bond_yields = R"(Date,Yield
+2017-01-09,0.0062,0.0075,0.0083,0.011,0.012
+2017-01-08,0.0063,0.0076,0.0084,0.0112,0.013
+2017-01-08,0.0063,0.0076,0.0084,0.0112,0.014
+)";
+
+    // array of arrays
+    json_decoder<ojson> decoder1;
+    csv_parameters params1;
+    params1.header_lines(1);
+    params1.assume_header(false);
+    params1.column_types("string,float*");
+    std::istringstream is1(bond_yields);
+    csv_reader reader1(is1, decoder1, params1);
+    reader1.read();
+    ojson val1 = decoder1.get_result();
+    std::cout << "\n(1)\n" << pretty_print(val1) << "\n";
+
+    // array of objects
+    json_decoder<ojson> decoder2;
+    csv_parameters params2;
+    params2.assume_header(true);
+    params2.column_types("string,[float*]");
+    std::istringstream is2(bond_yields);
+    csv_reader reader2(is2, decoder2, params2);
+    reader2.read();
+    ojson val2 = decoder2.get_result();
+    std::cout << "\n(2)\n" << pretty_print(val2) << "\n";
+}
+```
+
+Output:
+```
+(1)
+[
+    ["2017-01-09",0.0062,0.0075,0.0083,0.011,0.012],
+    ["2017-01-08",0.0063,0.0076,0.0084,0.0112,0.013],
+    ["2017-01-08",0.0063,0.0076,0.0084,0.0112,0.014]
+]
+
+(2)
+[
+    {
+        "Date": "2017-01-09",
+        "Yield": [0.0062,0.0075,0.0083,0.011,0.012]
+    },
+    {
+        "Date": "2017-01-08",
+        "Yield": [0.0063,0.0076,0.0084,0.0112,0.013]
+    },
+    {
+        "Date": "2017-01-08",
+        "Yield": [0.0063,0.0076,0.0084,0.0112,0.014]
+    }
+]
+```
+
+#### Convert CSV to json when last two columns repeat
+
+```c++
+const std::string holidays = R"(1,CAD,2,UK,3,EUR,4,US + UK,5,US
+38719,2-Jan-2006,40179,1-Jan-2010,38719,2-Jan-2006,38719,2-Jan-2006,39448,1-Jan-2008
+38733,16-Jan-2006,40270,2-Apr-2010,38733,16-Jan-2006,38733,16-Jan-2006,39468,21-Jan-2008
+)";
+
+    json_decoder<ojson> decoder;
+    csv_parameters params;
+    params.column_types("[integer,string]*");
+
+    // Default
+    std::istringstream is1(holidays);
+    csv_reader reader1(is1, decoder, params);
+    reader1.read();
+    ojson val1 = decoder.get_result();
+    std::cout << pretty_print(val1) << "\n";
+```
+
+Output:
+```
+[
+    [
+        [1,"CAD"],
+        [2,"UK"],
+        [3,"EUR"],
+        [4,"US + UK"],
+        [5,"US"]
+    ],
+    [
+        [38719,"2-Jan-2006"],
+        [40179,"1-Jan-2010"],
+        [38719,"2-Jan-2006"],
+        [38719,"2-Jan-2006"],
+        [39448,"1-Jan-2008"]
+    ],
+    [
+        [38733,"16-Jan-2006"],
+        [40270,"2-Apr-2010"],
+        [38733,"16-Jan-2006"],
+        [38733,"16-Jan-2006"],
+        [39468,"21-Jan-2008"]
+    ]
+]
+```

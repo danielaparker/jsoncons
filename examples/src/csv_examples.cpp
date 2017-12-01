@@ -179,6 +179,70 @@ void serialize_books_to_csv_file_with_reorder()
     books.dump(serializer);
 }
 
+using jsoncons::ojson;
+using jsoncons::csv::csv_parameters;
+using jsoncons::csv::csv_reader;
+using jsoncons::json_decoder;
+
+void last_column_repeats()
+{
+    const std::string bond_yields = R"(Date,Yield
+2017-01-09,0.0062,0.0075,0.0083,0.011,0.012
+2017-01-08,0.0063,0.0076,0.0084,0.0112,0.013
+2017-01-08,0.0063,0.0076,0.0084,0.0112,0.014
+)";
+
+    json_decoder<ojson> decoder1;
+    csv_parameters params1;
+    params1.header_lines(1);
+    params1.column_types("string,float*");
+    std::istringstream is1(bond_yields);
+    csv_reader reader1(is1, decoder1, params1);
+    reader1.read();
+    ojson val1 = decoder1.get_result();
+    std::cout << "\n(1)\n" << pretty_print(val1) << "\n";
+
+    json_decoder<ojson> decoder2;
+    csv_parameters params2;
+    params2.assume_header(true);
+    params2.column_types("string,[float*]");
+    std::istringstream is2(bond_yields);
+    csv_reader reader2(is2, decoder2, params2);
+    reader2.read();
+    ojson val2 = decoder2.get_result();
+    std::cout << "\n(2)\n" << pretty_print(val2) << "\n";
+}
+
+void last_two_columns_repeat()
+{
+    const std::string holidays = R"(1,CAD,2,UK,3,EUR,4,US
+38719,2-Jan-2006,40179,1-Jan-2010,38719,2-Jan-2006,39448,1-Jan-2008
+38733,16-Jan-2006,40270,2-Apr-2010,38733,16-Jan-2006,39468,21-Jan-2008
+)";
+
+    // array of arrays
+    json_decoder<ojson> decoder1;
+    csv_parameters params1;
+    params1.column_types("[integer,string]*");
+    std::istringstream is1(holidays);
+    csv_reader reader1(is1, decoder1, params1);
+    reader1.read();
+    ojson val1 = decoder1.get_result();
+    std::cout << "(1)\n" << pretty_print(val1) << "\n";
+
+    // array of objects
+    json_decoder<ojson> decoder2;
+    csv_parameters params2;
+    params2.header_lines(1);
+    params2.column_names("CAD,UK,EUR,US");
+    params2.column_types("[integer,string]*");
+    std::istringstream is2(holidays);
+    csv_reader reader2(is2, decoder2, params2);
+    reader2.read();
+    ojson val2 = decoder2.get_result();
+    std::cout << "(2)\n" << pretty_print(val2) << "\n";
+}
+
 void csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
@@ -189,6 +253,8 @@ void csv_examples()
     serialize_array_of_arrays_to_comma_delimited();
     serialize_books_to_csv_file();
     serialize_books_to_csv_file_with_reorder();
+    last_column_repeats();
+    last_two_columns_repeat();
     std::cout << std::endl;
 }
 

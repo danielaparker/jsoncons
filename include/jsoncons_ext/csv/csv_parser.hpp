@@ -78,7 +78,7 @@ class basic_csv_parser : private parsing_context
     basic_csv_parameters<CharT> parameters_;
     std::vector<std::basic_string<CharT>> column_names_;
     std::vector<std::vector<std::basic_string<CharT>>> column_values_;
-    std::vector<std::pair<csv_column_type,size_t>> column_types_;
+    std::vector<detail::csv_type_info> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
     size_t column_index_;
     basic_json_fragment_filter<CharT> filter_;
@@ -627,9 +627,20 @@ private:
             case mapping_type::n_objects:
                 if (!(parameters_.ignore_empty_values() && value_buffer_.size() == 0))
                 {
-                    if (column_index_ < column_names_.size())
+                    if (column_index_ < column_names_.size() + offset_)
                     {
-                        handler_.name(column_names_[column_index_], *this);
+                        handler_.name(column_names_[column_index_ - offset_], *this);
+                        if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
+                        {
+                            handler_.null_value(*this);
+                        }
+                        else
+                        {
+                            end_value(value_buffer_,column_index_);
+                        }
+                    }
+                    else if (level_ > 0)
+                    {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
                             handler_.null_value(*this);
@@ -679,10 +690,28 @@ private:
             case mapping_type::n_objects:
                 if (!(parameters_.ignore_empty_values() && value_buffer_.size() == 0))
                 {
-                    if (column_index_ < column_names_.size())
+                    if (column_index_ < column_names_.size() + offset_)
                     {
-                        handler_.name(column_names_[column_index_], *this);
-                        end_value(value_buffer_,column_index_);
+                        handler_.name(column_names_[column_index_ - offset_], *this);
+                        if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
+                        {
+                            handler_.null_value(*this);
+                        }
+                        else
+                        {
+                            end_value(value_buffer_,column_index_);
+                        }
+                    }
+                    else if (level_ > 0)
+                    {
+                        if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
+                        {
+                            handler_.null_value(*this);
+                        }
+                        else
+                        {
+                            end_value(value_buffer_,column_index_);
+                        }
                     }
                 }
                 break;
@@ -701,31 +730,31 @@ private:
 
     void end_value(const string_view_type& value, size_t column_index)
     {
-        if (column_index - offset_ < column_types_.size())
+        if (column_index < column_types_.size() + offset_)
         {
-            if (column_types_[column_index - offset_].first == csv_column_type::repeat_t)
+            if (column_types_[column_index - offset_].col_type == csv_column_type::repeat_t)
             {
-                offset_ = offset_ + column_types_[column_index - offset_].second;
+                offset_ = offset_ + column_types_[column_index - offset_].rep_count;
                 if (column_index - offset_ + 1 < column_types_.size())
                 {
-                    if (column_index == offset_ || level_ > column_types_[column_index - offset_ - 1].second)
+                    if (column_index == offset_ || level_ > column_types_[column_index-offset_].level)
                     {
                         handler_.end_array(*this);
                     }
-                    level_ = column_index == offset_ ? 0 : column_types_[column_index - offset_ - 1].second;
+                    level_ = column_index == offset_ ? 0 : column_types_[column_index - offset_].level;
                 }
             }
-            if (level_ < column_types_[column_index - offset_].second)
+            if (level_ < column_types_[column_index - offset_].level)
             {
                 handler_.begin_array(*this);
-                level_ = column_types_[column_index - offset_].second;
+                level_ = column_types_[column_index - offset_].level;
             }
-            else if (level_ > column_types_[column_index - offset_].second)
+            else if (level_ > column_types_[column_index - offset_].level)
             {
                 handler_.end_array(*this);
-                level_ = column_types_[column_index - offset_].second;
+                level_ = column_types_[column_index - offset_].level;
             }
-            switch (column_types_[column_index - offset_].first)
+            switch (column_types_[column_index - offset_].col_type)
             {
             case csv_column_type::integer_t:
                 {
@@ -815,7 +844,7 @@ private:
                 }
                 else
                 {
-                    if (column_index - offset_ < column_defaults_.size() && column_defaults_[column_index - offset_].length() > 0)
+                    if (column_index < column_defaults_.size() + offset_ && column_defaults_[column_index - offset_].length() > 0)
                     {
                         std::basic_stringstream<CharT> ss(column_defaults_[column_index - offset_]);
                         basic_json_reader<CharT> reader(ss,filter_);
