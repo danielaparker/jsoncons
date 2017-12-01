@@ -314,6 +314,7 @@ class basic_csv_parameters
 
     bool assume_header_;
     bool ignore_empty_values_;
+    bool ignore_empty_lines_;
     bool trim_leading_;
     bool trim_trailing_;
     bool trim_leading_inside_quotes_;
@@ -343,6 +344,7 @@ public:
         :
         assume_header_(false),
         ignore_empty_values_(false),
+        ignore_empty_lines_(true),
         trim_leading_(false),
         trim_trailing_(false),
         trim_leading_inside_quotes_(false),
@@ -392,6 +394,17 @@ public:
     basic_csv_parameters<CharT>& ignore_empty_values(bool value)
     {
         ignore_empty_values_ = value;
+        return *this;
+    }
+
+    bool ignore_empty_lines() const
+    {
+        return ignore_empty_lines_;
+    }
+
+    basic_csv_parameters<CharT>& ignore_empty_lines(bool value)
+    {
+        ignore_empty_lines_ = value;
         return *this;
     }
 
