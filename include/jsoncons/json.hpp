@@ -687,35 +687,44 @@ public:
             as<VariantType>().~VariantType();
         }
 
+		template <class T>
+		struct identity { using type = T; };
+
     public:
-        template <class T> T&          as();
-        template <> base_data&         as<base_data>()         { return base_data_; }
-        template <> null_data&         as<null_data>()         { return null_data_; }
-        template <> bool_data&         as<bool_data>()         { return bool_data_; }
-        template <> integer_data&      as<integer_data>()      { return integer_data_; }
-        template <> uinteger_data&     as<uinteger_data>()     { return uinteger_data_; }
-        template <> double_data&       as<double_data>()       { return double_data_; }
-        template <> small_string_data& as<small_string_data>() { return small_string_data_; }
-        template <> string_data&       as<string_data>()       { return string_data_; }
-        template <> byte_string_data&  as<byte_string_data>()  { return byte_string_data_; }
-        template <> array_data&        as<array_data>()        { return array_data_; }
-        template <> object_data&       as<object_data>()       { return object_data_; }
-        template <> empty_object_data& as<empty_object_data>() { return empty_object_data_; }
+		template <class T>       T& as()       { return as(identity<T>()); }
+		template <class T> const T& as() const { return as(identity<T>()); }
 
-        template <class T> const T& as_c() const;
-        template <> const base_data&         as_c<base_data>()         const { return base_data_; }
-        template <> const null_data&         as_c<null_data>()         const { return null_data_; }
-        template <> const bool_data&         as_c<bool_data>()         const { return bool_data_; }
-        template <> const integer_data&      as_c<integer_data>()      const { return integer_data_; }
-        template <> const uinteger_data&     as_c<uinteger_data>()     const { return uinteger_data_; }
-        template <> const double_data&       as_c<double_data>()       const { return double_data_; }
-        template <> const small_string_data& as_c<small_string_data>() const { return small_string_data_; }
-        template <> const string_data&       as_c<string_data>()       const { return string_data_; }
-        template <> const byte_string_data&  as_c<byte_string_data>()  const { return byte_string_data_; }
-        template <> const array_data&        as_c<array_data>()        const { return array_data_; }
-        template <> const object_data&       as_c<object_data>()       const { return object_data_; }
-        template <> const empty_object_data& as_c<empty_object_data>() const { return empty_object_data_; }
+	private:
+		template <class T>       T& as(identity<T>);
+		template <class T> const T& as(identity<T>) const;
 
+        base_data&         as(identity<base_data>)         { return base_data_; }
+        null_data&         as(identity<null_data>)         { return null_data_; }
+        bool_data&         as(identity<bool_data>)         { return bool_data_; }
+        integer_data&      as(identity<integer_data>)      { return integer_data_; }
+        uinteger_data&     as(identity<uinteger_data>)     { return uinteger_data_; }
+        double_data&       as(identity<double_data>)       { return double_data_; }
+        small_string_data& as(identity<small_string_data>) { return small_string_data_; }
+        string_data&       as(identity<string_data>)       { return string_data_; }
+        byte_string_data&  as(identity<byte_string_data>)  { return byte_string_data_; }
+        array_data&        as(identity<array_data>)        { return array_data_; }
+        object_data&       as(identity<object_data>)       { return object_data_; }
+        empty_object_data& as(identity<empty_object_data>) { return empty_object_data_; }
+        
+        const base_data&         as(identity<base_data>)         const { return base_data_; }
+		const null_data&         as(identity<null_data>)         const { return null_data_; }
+		const bool_data&         as(identity<bool_data>)         const { return bool_data_; }
+		const integer_data&      as(identity<integer_data>)      const { return integer_data_; }
+		const uinteger_data&     as(identity<uinteger_data>)     const { return uinteger_data_; }
+		const double_data&       as(identity<double_data>)       const { return double_data_; }
+		const small_string_data& as(identity<small_string_data>) const { return small_string_data_; }
+		const string_data&       as(identity<string_data>)       const { return string_data_; }
+		const byte_string_data&  as(identity<byte_string_data>)  const { return byte_string_data_; }
+		const array_data&        as(identity<array_data>)        const { return array_data_; }
+		const object_data&       as(identity<object_data>)       const { return object_data_; }
+		const empty_object_data& as(identity<empty_object_data>) const { return empty_object_data_; }
+
+	public:
         const null_data*         null_data_cast()         const { return &null_data_; }
         const empty_object_data* empty_object_data_cast() const { return &empty_object_data_; }
         const bool_data*         bool_data_cast()         const { return &bool_data_; }
@@ -1148,17 +1157,17 @@ public:
         {
             switch (val.type_id())
             {
-            case json_type_tag::null_t         : construct_var<null_data        >(                             ); break;
-            case json_type_tag::empty_object_t : construct_var<empty_object_data>(                             ); break;
-            case json_type_tag::bool_t         : construct_var<bool_data        >(val.as_c<bool_data>()        ); break;
-            case json_type_tag::integer_t      : construct_var<integer_data     >(val.as_c<integer_data>()     ); break;
-            case json_type_tag::uinteger_t     : construct_var<uinteger_data    >(val.as_c<uinteger_data>()    ); break;
-            case json_type_tag::double_t       : construct_var<double_data      >(val.as_c<double_data>()      ); break;
-            case json_type_tag::small_string_t : construct_var<small_string_data>(val.as_c<small_string_data>()); break;
-            case json_type_tag::string_t       : construct_var<string_data      >(val.as_c<string_data>()      ); break;
-            case json_type_tag::byte_string_t  : construct_var<byte_string_data >(val.as_c<byte_string_data>() ); break;
-            case json_type_tag::array_t        : construct_var<array_data       >(val.as_c<array_data>()       ); break;
-            case json_type_tag::object_t       : construct_var<object_data      >(val.as_c<object_data>()      ); break;
+            case json_type_tag::null_t         : construct_var<null_data        >(                           ); break;
+            case json_type_tag::empty_object_t : construct_var<empty_object_data>(                           ); break;
+            case json_type_tag::bool_t         : construct_var<bool_data        >(val.as<bool_data>()        ); break;
+            case json_type_tag::integer_t      : construct_var<integer_data     >(val.as<integer_data>()     ); break;
+            case json_type_tag::uinteger_t     : construct_var<uinteger_data    >(val.as<uinteger_data>()    ); break;
+            case json_type_tag::double_t       : construct_var<double_data      >(val.as<double_data>()      ); break;
+            case json_type_tag::small_string_t : construct_var<small_string_data>(val.as<small_string_data>()); break;
+            case json_type_tag::string_t       : construct_var<string_data      >(val.as<string_data>()      ); break;
+            case json_type_tag::byte_string_t  : construct_var<byte_string_data >(val.as<byte_string_data>() ); break;
+            case json_type_tag::array_t        : construct_var<array_data       >(val.as<array_data>()       ); break;
+            case json_type_tag::object_t       : construct_var<object_data      >(val.as<object_data>()      ); break;
             default:
                 JSONCONS_UNREACHABLE();
                 break;
@@ -1169,17 +1178,17 @@ public:
         {
             switch (val.type_id())
             {
-            case json_type_tag::null_t         : construct_var<null_data        >(                              ); break;
-            case json_type_tag::empty_object_t : construct_var<empty_object_data>(                              ); break;
-            case json_type_tag::bool_t         : construct_var<bool_data        >(val.as_c<bool_data>()         ); break;
-            case json_type_tag::integer_t      : construct_var<integer_data     >(val.as_c<integer_data>()      ); break;
-            case json_type_tag::uinteger_t     : construct_var<uinteger_data    >(val.as_c<uinteger_data>()     ); break;
-            case json_type_tag::double_t       : construct_var<double_data      >(val.as_c<double_data>()       ); break;
-            case json_type_tag::small_string_t : construct_var<small_string_data>(val.as_c<small_string_data>() ); break;
-            case json_type_tag::string_t       : construct_var<string_data      >(val.as_c<string_data>()     ,a); break;
-            case json_type_tag::byte_string_t  : construct_var<byte_string_data >(val.as_c<byte_string_data>(),a); break;
-            case json_type_tag::array_t        : construct_var<array_data       >(val.as_c<array_data>()      ,a); break;
-            case json_type_tag::object_t       : construct_var<object_data      >(val.as_c<object_data>()     ,a); break;
+            case json_type_tag::null_t         : construct_var<null_data        >(                            ); break;
+            case json_type_tag::empty_object_t : construct_var<empty_object_data>(                            ); break;
+            case json_type_tag::bool_t         : construct_var<bool_data        >(val.as<bool_data>()         ); break;
+            case json_type_tag::integer_t      : construct_var<integer_data     >(val.as<integer_data>()      ); break;
+            case json_type_tag::uinteger_t     : construct_var<uinteger_data    >(val.as<uinteger_data>()     ); break;
+            case json_type_tag::double_t       : construct_var<double_data      >(val.as<double_data>()       ); break;
+            case json_type_tag::small_string_t : construct_var<small_string_data>(val.as<small_string_data>() ); break;
+            case json_type_tag::string_t       : construct_var<string_data      >(val.as<string_data>()     ,a); break;
+            case json_type_tag::byte_string_t  : construct_var<byte_string_data >(val.as<byte_string_data>(),a); break;
+            case json_type_tag::array_t        : construct_var<array_data       >(val.as<array_data>()      ,a); break;
+            case json_type_tag::object_t       : construct_var<object_data      >(val.as<object_data>()     ,a); break;
             default:
                 JSONCONS_UNREACHABLE();
                 break;
