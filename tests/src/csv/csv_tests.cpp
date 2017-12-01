@@ -18,7 +18,7 @@ using namespace jsoncons;
 using namespace jsoncons::csv;
 
 BOOST_AUTO_TEST_SUITE(csv_tests)
-
+#if 0
 BOOST_AUTO_TEST_CASE(n_columns_test)
 {
     const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
@@ -802,7 +802,6 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped1)
     BOOST_CHECK(val[2][2]==json(9));*/
 }
 
-
 BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped2)
 {
     std::string text = "1,2,3,4,5\n4,5,6,7,8\n7,8,9,10,11";
@@ -829,20 +828,31 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped2)
     BOOST_CHECK(params.column_types()[2].second == 1);
     BOOST_CHECK(params.column_types()[3].first == csv_column_type::repeat_t);
     BOOST_CHECK(params.column_types()[3].second == 2);
+}
+#endif
+BOOST_AUTO_TEST_CASE(empty_line_test)
+{
+    std::string input = R"(country_code,name
+ABW,ARUBA
 
-    /*BOOST_CHECK(val.size()==3);
-    BOOST_CHECK(val[0].size()==3);
-    BOOST_CHECK(val[1].size()==3);
-    BOOST_CHECK(val[2].size()==3);
-    BOOST_CHECK(val[0][0]==json(1));
-    BOOST_CHECK(val[0][1]==json(2));
-    BOOST_CHECK(val[0][2]==json(3));
-    BOOST_CHECK(val[1][0]==json(4));
-    BOOST_CHECK(val[1][1]==json(5));
-    BOOST_CHECK(val[1][2]==json(6));
-    BOOST_CHECK(val[2][0]==json(7));
-    BOOST_CHECK(val[2][1]==json(8));
-    BOOST_CHECK(val[2][2]==json(9));*/
+ATF,"FRENCH SOUTHERN TERRITORIES, D.R. OF"
+VUT,VANUATU
+WLF,WALLIS & FUTUNA ISLANDS
+)";
+
+    std::istringstream is(input);
+
+    json_decoder<json> decoder;
+
+    csv_parameters params;
+    params.assume_header(true)
+        .ignore_empty_values(true);
+
+    csv_reader reader(is,decoder,params);
+    reader.read();
+    json j = decoder.get_result();
+
+    std::cout << pretty_print(j) << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

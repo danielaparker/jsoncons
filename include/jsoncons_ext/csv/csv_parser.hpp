@@ -361,6 +361,7 @@ all_csv_states:
                     }
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
                     {
+                        std::cout << std::boolalpha << (stack_[top_] == csv_mode_type::data) << " " << column_index_ << " " << "csv_state_type::escaped_value" << std::endl;
                         before_record();
                         end_quoted_string_value(ec);
                         if (ec) return;
@@ -378,6 +379,7 @@ all_csv_states:
                     }
                     else if (curr_char_ == parameters_.quote_char())
                     {
+                        std::cout << std::boolalpha << (stack_[top_] == csv_mode_type::data) << column_index_ << " " << "csv_state_type::quoted_string" << std::endl;
                         before_record();
                         end_quoted_string_value(ec);
                         if (ec) return;
@@ -394,25 +396,34 @@ all_csv_states:
                 {
                     if (curr_char_ == '\r' || (prev_char_ != '\r' && curr_char_ == '\n'))
                     {
-                        before_record();
-                        end_unquoted_string_value();
-                        after_field();
-                        after_record();
+                        std::cout << std::boolalpha << (stack_[top_] == csv_mode_type::data) << column_index_ << " " << "csv_state_type::unquoted_string 1" << std::endl;
+                        if (column_index_ > 0 || value_buffer_.length() > 0)
+                        {
+                            before_record();
+                            end_unquoted_string_value();
+                            after_field();
+                            after_record();
+                        }
                         state_ = csv_state_type::expect_value;
                     }
                     else if (curr_char_ == '\n')
                     {
                         if (prev_char_ != '\r')
                         {
-                            before_record();
-                            end_unquoted_string_value();
-                            after_field();
-                            after_record();
+                            std::cout << std::boolalpha << (stack_[top_] == csv_mode_type::data) << column_index_ << " " << "csv_state_type::unquoted_string 2" << std::endl;
+                            if (column_index_ > 0 || value_buffer_.length() > 0)
+                            {
+                                before_record();
+                                end_unquoted_string_value();
+                                after_field();
+                                after_record();
+                            }
                             state_ = csv_state_type::expect_value;
                         }
                     }
                     else if (curr_char_ == parameters_.field_delimiter())
                     {
+                        std::cout << std::boolalpha << (stack_[top_] == csv_mode_type::data) << column_index_ << " " << "csv_state_type::unquoted_string 3" << std::endl;
                         before_record();
                         end_unquoted_string_value();
                         after_field();
@@ -474,6 +485,7 @@ all_csv_states:
         switch (state_)
         {
         case csv_state_type::unquoted_string: 
+            std::cout << "end_parse 1" << std::endl;
             before_record();
             end_unquoted_string_value();
             after_field();
@@ -481,6 +493,7 @@ all_csv_states:
         case csv_state_type::escaped_value:
             if (parameters_.quote_escape_char() == parameters_.quote_char())
             {
+                std::cout << "end_parse 2" << std::endl;
                 before_record();
                 end_quoted_string_value(ec);
                 if (ec) return;
