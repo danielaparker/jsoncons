@@ -942,18 +942,6 @@ private:
     }
 };
 
-template <class Json>
-Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<typename Json::char_type>& params)
-{
-    json_decoder<Json> decoder;
-
-    basic_csv_parser<typename Json::char_type> parser(decoder, params);
-    parser.reset();
-    parser.parse(s.data(), 0, s.size());
-    parser.end_parse();
-    return decoder.get_result();
-}
-
 typedef basic_csv_parser<char> csv_parser;
 typedef basic_csv_parser<wchar_t> wcsv_parser;
 

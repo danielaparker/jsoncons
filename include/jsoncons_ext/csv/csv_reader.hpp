@@ -20,6 +20,7 @@
 #include <jsoncons_ext/csv/csv_parser.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
+#include <jsoncons/json_decoder.hpp>
 #include <jsoncons_ext/csv/csv_parameters.hpp>
 
 namespace jsoncons { namespace csv {
@@ -178,7 +179,20 @@ public:
 #endif
 };
 
+template <class Json>
+Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<typename Json::char_type>& params)
+{
+    json_decoder<Json> decoder;
+
+    basic_csv_parser<typename Json::char_type> parser(decoder, params);
+    parser.reset();
+    parser.parse(s.data(), 0, s.size());
+    parser.end_parse();
+    return decoder.get_result();
+}
+
 typedef basic_csv_reader<char> csv_reader;
+typedef basic_csv_reader<wchar_t> wcsv_reader;
 
 }}
 
