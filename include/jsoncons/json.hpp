@@ -687,16 +687,16 @@ public:
             as<VariantType>().~VariantType();
         }
 
-		template <class T>
-		struct identity { using type = T; };
+        template <class T>
+        struct identity { using type = T; };
 
     public:
-		template <class T>       T& as()       { return as(identity<T>()); }
-		template <class T> const T& as() const { return as(identity<T>()); }
+        template <class T>       T& as()       { return as(identity<T>()); }
+        template <class T> const T& as() const { return as(identity<T>()); }
 
-	private:
-		template <class T>       T& as(identity<T>);
-		template <class T> const T& as(identity<T>) const;
+    private:
+        template <class T>       T& as(identity<T>);
+        template <class T> const T& as(identity<T>) const;
 
         base_data&         as(identity<base_data>)         { return base_data_; }
         null_data&         as(identity<null_data>)         { return null_data_; }
@@ -712,19 +712,19 @@ public:
         empty_object_data& as(identity<empty_object_data>) { return empty_object_data_; }
         
         const base_data&         as(identity<base_data>)         const { return base_data_; }
-		const null_data&         as(identity<null_data>)         const { return null_data_; }
-		const bool_data&         as(identity<bool_data>)         const { return bool_data_; }
-		const integer_data&      as(identity<integer_data>)      const { return integer_data_; }
-		const uinteger_data&     as(identity<uinteger_data>)     const { return uinteger_data_; }
-		const double_data&       as(identity<double_data>)       const { return double_data_; }
-		const small_string_data& as(identity<small_string_data>) const { return small_string_data_; }
-		const string_data&       as(identity<string_data>)       const { return string_data_; }
-		const byte_string_data&  as(identity<byte_string_data>)  const { return byte_string_data_; }
-		const array_data&        as(identity<array_data>)        const { return array_data_; }
-		const object_data&       as(identity<object_data>)       const { return object_data_; }
-		const empty_object_data& as(identity<empty_object_data>) const { return empty_object_data_; }
+        const null_data&         as(identity<null_data>)         const { return null_data_; }
+        const bool_data&         as(identity<bool_data>)         const { return bool_data_; }
+        const integer_data&      as(identity<integer_data>)      const { return integer_data_; }
+        const uinteger_data&     as(identity<uinteger_data>)     const { return uinteger_data_; }
+        const double_data&       as(identity<double_data>)       const { return double_data_; }
+        const small_string_data& as(identity<small_string_data>) const { return small_string_data_; }
+        const string_data&       as(identity<string_data>)       const { return string_data_; }
+        const byte_string_data&  as(identity<byte_string_data>)  const { return byte_string_data_; }
+        const array_data&        as(identity<array_data>)        const { return array_data_; }
+        const object_data&       as(identity<object_data>)       const { return object_data_; }
+        const empty_object_data& as(identity<empty_object_data>) const { return empty_object_data_; }
 
-	public:
+    public:
         const null_data*         null_data_cast()         const { return &null_data_; }
         const empty_object_data* empty_object_data_cast() const { return &empty_object_data_; }
         const bool_data*         bool_data_cast()         const { return &bool_data_; }
