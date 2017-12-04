@@ -191,6 +191,16 @@ Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<ty
     return decoder.get_result();
 }
 
+template <class Json>
+Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_parameters<typename Json::char_type>& params)
+{
+    json_decoder<Json> decoder;
+
+    csv_reader reader(is,decoder,params);
+    reader.read();
+    return decoder.get_result();
+}
+
 typedef basic_csv_reader<char> csv_reader;
 typedef basic_csv_reader<wchar_t> wcsv_reader;
 
