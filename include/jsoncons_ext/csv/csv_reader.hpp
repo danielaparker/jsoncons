@@ -196,7 +196,7 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_cs
 {
     json_decoder<Json> decoder;
 
-    csv_reader reader(is,decoder,params);
+    basic_csv_reader<typename Json::char_type> reader(is,decoder,params);
     reader.read();
     return decoder.get_result();
 }
