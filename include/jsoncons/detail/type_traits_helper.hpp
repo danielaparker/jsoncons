@@ -723,6 +723,14 @@ bool operator>(const std::basic_string<CharT,Traits,Allocator>& lhs,
 }
 #endif
 
+#if !defined(JSONCONS_HAS_STRING_VIEW)
+template <class CharT, class Traits = std::char_traits<CharT>>
+using string_view = Basic_string_view_<CharT, Traits>;
+#else
+template <class CharT, class Traits = std::char_traits<CharT>>
+using string_view = std::basic_string_view<CharT, Traits>;
+#endif
+
 template <class CharT>
 class buffered_output
 {
