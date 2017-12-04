@@ -781,7 +781,8 @@ private:
             {
             case csv_column_type::integer_t:
                 {
-                    std::istringstream iss(value);
+                    std::string str(value.data(), value.size());
+                    std::istringstream iss(str);
                     int64_t val;
                     iss >> val;
                     if (!iss.fail())
@@ -805,7 +806,8 @@ private:
                 break;
             case csv_column_type::float_t:
                 {
-                    std::istringstream iss(value);
+                    std::string str(value.data(), value.size());
+                    std::istringstream iss(str);
                     double val;
                     iss >> val;
                     if (!iss.fail())
