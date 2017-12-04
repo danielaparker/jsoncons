@@ -791,11 +791,6 @@ public:
         {
             new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
         }
-        template<class InputIterator>
-        variant(InputIterator first, InputIterator last, const Allocator& a)
-        {
-            new(reinterpret_cast<void*>(&data_))array_data(first, last, a);
-        }
 
         ~variant()
         {
