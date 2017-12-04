@@ -1006,5 +1006,17 @@ BOOST_AUTO_TEST_CASE(test_decode_csv_from_stream)
     std::cout << decode_csv<json>(is,params) << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_encode_csv_to_stream)
+{
+    json j = json::array();
+    j.push_back(json::object({ {"a",1},{"b",2} }));
+    std::cout << j << std::endl;
+    csv_parameters params;
+    params.assume_header(true);
+    std::ostringstream os;
+    encode_csv(j,params,os);
+    std::cout << os.str() << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

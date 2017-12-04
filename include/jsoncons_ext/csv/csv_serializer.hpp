@@ -463,6 +463,13 @@ private:
     }
 };
 
+template <class Json>
+void encode_csv(const Json& j, const basic_csv_parameters<typename Json::char_type>& params, std::basic_ostringstream<typename Json::char_type>& os)
+{
+    basic_csv_serializer<typename Json::char_type> serializer(os,params);
+    j.dump(serializer);
+}
+
 typedef basic_csv_serializer<char> csv_serializer;
 
 }}
