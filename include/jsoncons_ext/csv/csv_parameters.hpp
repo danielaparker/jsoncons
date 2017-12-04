@@ -34,11 +34,7 @@ enum class csv_column_type
 template <class CharT>
 struct json_csv_parser_traits
 {
-#if !defined(JSONCONS_HAS_STRING_VIEW)
-    typedef Basic_string_view_<CharT> string_view_type;
-#else
-    typedef std::basic_string_view<CharT> string_view_type;
-#endif
+    typedef string_view<CharT> string_view_type;
 
     static string_view_type string_literal() 
     {

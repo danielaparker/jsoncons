@@ -55,11 +55,8 @@ enum class csv_state_type
 template<class CharT>
 class basic_csv_parser : private parsing_context
 {
-#if !defined(JSONCONS_HAS_STRING_VIEW)
-    typedef Basic_string_view_<CharT> string_view_type;
-#else
-    typedef std::basic_string_view<CharT> string_view_type;
-#endif
+    typedef string_view<CharT> string_view_type;
+
     static const int default_depth = 3;
 
     default_parse_error_handler default_err_handler_;
