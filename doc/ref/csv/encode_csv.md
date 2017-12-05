@@ -22,7 +22,7 @@ void encode_csv(const Json& j,
 
 ### Examples
 
-#### Encode a json value to csv output
+#### Write a json value to a csv output stream
 
 ```c++
 #include <iostream>

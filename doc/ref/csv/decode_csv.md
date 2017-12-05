@@ -39,7 +39,7 @@ Throws [parse_error](parse_error.md) if parsing fails.
 
 ### Examples
 
-#### Decode a json value from a string
+#### Read a json value from a string
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -81,7 +81,7 @@ Output:
 ]
 ```
 
-#### Decode a json value from a stream
+#### Read a json value from an input stream
 
 ```c++
 #include <jsoncons/json.hpp>
