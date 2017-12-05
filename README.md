@@ -764,21 +764,17 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    json_decoder<json> decoder;
     csv_parameters params;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types("integer,string,string,string");
-    csv_reader reader(is,decoder,params);
-    reader.read();
-    ojson tasks = decoder.get_result();
+    ojson tasks = decode_csv<ojson>(is, params);
 
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 
     std::cout << "(2)\n";
-    csv_serializer serializer(std::cout);
-    tasks.dump(serializer);
+    encode_csv(tasks, params, std::cout);
 }
 ```
 Output:

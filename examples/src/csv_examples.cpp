@@ -243,6 +243,82 @@ void last_two_columns_repeat()
     std::cout << "(2)\n" << pretty_print(val2) << "\n";
 }
 
+void decode_csv_string()
+{
+    std::string s = R"(employee-no,employee-name,dept,salary
+00000001,\"Smith,Matthew\",sales,150000.00
+00000002,\"Brown,Sarah\",sales,89000.00
+)";
+
+    csv_parameters params;
+    params.assume_header(true)
+          .column_types("string,string,string,float");
+    json j = decode_csv<json>(s,params);
+
+    std::cout << pretty_print(j) << std::endl;
+}
+
+void decode_csv_stream()
+{
+    const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
+2017-01-09,0.0062,0.0075,0.0083,0.011
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+2017-01-08,0.0063,0.0076,0.0084,0.0112
+)";
+
+    csv_parameters params;
+    params.assume_header(true)
+          .column_types("string,float,float,float,float");
+
+    std::istringstream is(bond_yields);
+
+    ojson j = decode_csv<ojson>(is,params);
+
+    std::cout << pretty_print(j) << std::endl;
+}
+
+void encode_csv_file_from_books()
+{
+    const json books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer"
+        }
+    ]
+    )");
+
+    csv_parameters params;
+    encode_csv(books, params, std::cout);
+}
+
+void decode_encode_csv_tasks()
+{
+    std::ifstream is("input/tasks.csv");
+
+    csv_parameters params;
+    params.assume_header(true)
+          .trim(true)
+          .ignore_empty_values(true) 
+          .column_types("integer,string,string,string");
+    ojson tasks = decode_csv<ojson>(is, params);
+
+    std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
+
+    std::cout << "(2)\n";
+    encode_csv(tasks, params, std::cout);
+}
+
 void csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
@@ -255,6 +331,10 @@ void csv_examples()
     serialize_books_to_csv_file_with_reorder();
     last_column_repeats();
     last_two_columns_repeat();
+    decode_csv_string();
+    decode_csv_stream();
+    encode_csv_file_from_books();
+    decode_encode_csv_tasks();
     std::cout << std::endl;
 }
 

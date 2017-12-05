@@ -8,4 +8,7 @@ The csv extension implements reading (writing) JSON values from (to) CSV files
 
 [csv_serializer](csv_serializer.md)
 
+[decode_csv](decode_csv.md)
+
+[encode_csv](encode_csv.md)
 
