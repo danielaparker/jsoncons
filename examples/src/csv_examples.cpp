@@ -298,8 +298,7 @@ void encode_csv_file_from_books()
     ]
     )");
 
-    csv_parameters params;
-    encode_csv(books, params, std::cout);
+    encode_csv(books, std::cout);
 }
 
 void decode_encode_csv_tasks()
@@ -316,7 +315,7 @@ void decode_encode_csv_tasks()
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 
     std::cout << "(2)\n";
-    encode_csv(tasks, params, std::cout);
+    encode_csv(tasks, std::cout);
 }
 
 void csv_examples()

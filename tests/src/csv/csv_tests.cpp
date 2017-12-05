@@ -1014,7 +1014,7 @@ BOOST_AUTO_TEST_CASE(test_encode_csv_to_stream)
     csv_parameters params;
     params.assume_header(true);
     std::ostringstream os;
-    encode_csv(j,params,os);
+    encode_csv(j, os, params);
     std::cout << os.str() << std::endl;
 }
 

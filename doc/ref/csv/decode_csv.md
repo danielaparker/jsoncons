@@ -7,13 +7,27 @@ Decodes a csv string or file to a `json` value.
 #include <jsoncons_ext/csv/csv_reader.hpp>
 
 template <class Json>
+Json decode_csv(typename Json::string_view_type s); // (1)
+
+template <class Json>
 Json decode_csv(typename Json::string_view_type s, 
-                const basic_csv_parameters<typename Json::char_type>& params); // (1)
+                const basic_csv_parameters<typename Json::char_type>& params); // (2)
+
+template <class Json>
+Json decode_csv(std::basic_istream<typename Json::char_type>& is); // (3)
 
 template <class Json>
 Json decode_csv(std::basic_istream<typename Json::char_type>& is, 
-                const basic_csv_parameters<typename Json::char_type>& params); // (2)
+                const basic_csv_parameters<typename Json::char_type>& params); // (4)
 ```
+
+(1) Decodes csv string to json value using default [parameters](csv_parameters)
+
+(2) Decodes csv string to json value using specified [parameters](csv_parameters)
+
+(3) Decodes csv input stream to json value using default [parameters](csv_parameters)
+
+(4) Decodes csv input stream to json value using specified [parameters](csv_parameters)
 
 #### Return value
 

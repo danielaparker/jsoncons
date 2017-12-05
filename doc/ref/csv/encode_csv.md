@@ -8,9 +8,17 @@ Serializes a json value to csv output.
 
 template <class Json>
 void encode_csv(const Json& j, 
-                const basic_csv_parameters<typename Json::char_type>& params, 
-                std::basic_ostream<typename Json::char_type>& os);
+                std::basic_ostream<typename Json::char_type>& os); // (1)
+
+template <class Json>
+void encode_csv(const Json& j, 
+                std::basic_ostream<typename Json::char_type>& os, 
+                const basic_csv_parameters<typename Json::char_type>& params); // (2)
 ```
+
+(1) Encodes json value to csv using default [parameters](csv_parameters)
+
+(2) Encodes json value to csv using specified [parameters](csv_parameters)
 
 ### Examples
 
@@ -45,8 +53,7 @@ int main()
     ]
     )");
 
-    csv_parameters params;
-    encode_csv(books, params, std::cout);
+    encode_csv(books, std::cout);
 }
 ```
 Output:

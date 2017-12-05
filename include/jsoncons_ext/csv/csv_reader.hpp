@@ -180,6 +180,18 @@ public:
 };
 
 template <class Json>
+Json decode_csv(typename Json::string_view_type s)
+{
+    json_decoder<Json> decoder;
+
+    basic_csv_parser<typename Json::char_type> parser(decoder);
+    parser.reset();
+    parser.parse(s.data(), 0, s.size());
+    parser.end_parse();
+    return decoder.get_result();
+}
+
+template <class Json>
 Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<typename Json::char_type>& params)
 {
     json_decoder<Json> decoder;
@@ -188,6 +200,16 @@ Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<ty
     parser.reset();
     parser.parse(s.data(), 0, s.size());
     parser.end_parse();
+    return decoder.get_result();
+}
+
+template <class Json>
+Json decode_csv(std::basic_istream<typename Json::char_type>& is)
+{
+    json_decoder<Json> decoder;
+
+    basic_csv_reader<typename Json::char_type> reader(is,decoder);
+    reader.read();
     return decoder.get_result();
 }
 

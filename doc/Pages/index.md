@@ -351,7 +351,7 @@ int main()
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 
     std::cout << "(2)\n";
-    encode_csv(tasks, params, std::cout);
+    encode_csv(tasks, std::cout);
 }
 ```
 Output:
