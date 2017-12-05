@@ -16,9 +16,9 @@ void encode_csv(const Json& j,
                 const basic_csv_parameters<typename Json::char_type>& params); // (2)
 ```
 
-(1) Encodes json value to csv using default [parameters](csv_parameters)
+(1) Writes json value to csv output stream using default [parameters](csv_parameters)
 
-(2) Encodes json value to csv using specified [parameters](csv_parameters)
+(2) Writes json value to csv output stream using specified [parameters](csv_parameters)
 
 ### Examples
 

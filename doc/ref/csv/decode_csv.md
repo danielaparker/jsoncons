@@ -21,13 +21,13 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is,
                 const basic_csv_parameters<typename Json::char_type>& params); // (4)
 ```
 
-(1) Decodes csv string to json value using default [parameters](csv_parameters)
+(1) Reads json value from csv string using default [parameters](csv_parameters)
 
-(2) Decodes csv string to json value using specified [parameters](csv_parameters)
+(2) Reads json value from csv string using specified [parameters](csv_parameters)
 
-(3) Decodes csv input stream to json value using default [parameters](csv_parameters)
+(3) Reads json value from csv input stream using default [parameters](csv_parameters)
 
-(4) Decodes csv input stream to json value using specified [parameters](csv_parameters)
+(4) Reads json value from csv input stream using specified [parameters](csv_parameters)
 
 #### Return value
 
