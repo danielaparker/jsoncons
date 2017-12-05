@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_OSEQUENCESTREAM_HPP
-#define JSONCONS_DETAIL_OSEQUENCESTREAM_HPP
+#ifndef JSONCONS_DETAIL_OBUFFEREDSTREAM_HPP
+#define JSONCONS_DETAIL_OBUFFEREDSTREAM_HPP
 
 #include <ios>
 #include <ostream>
@@ -20,10 +20,10 @@ namespace jsoncons {
 template< 
     class CharT, 
     class Traits = std::char_traits<CharT>
-> class basic_osequencestream;
+> class basic_obufferedstream;
 
 template<class CharT, class Traits>
-class basic_osequencebuf
+class basic_ovectorbuf
     : public std::basic_streambuf<CharT, Traits>
 {
 private:
@@ -39,7 +39,7 @@ public:
 
 public:
 
-    explicit basic_osequencebuf() JSONCONS_NOEXCEPT
+    explicit basic_ovectorbuf() JSONCONS_NOEXCEPT
         : mode_(std::ios_base::out | std::ios_base::binary), 
           buf_(100u)
     {  
@@ -48,7 +48,7 @@ public:
         this->setg(buf_.data(), 0, buf_.data());
     }
 
-    explicit basic_osequencebuf(std::size_t length) JSONCONS_NOEXCEPT
+    explicit basic_ovectorbuf(std::size_t length) JSONCONS_NOEXCEPT
         : mode_(std::ios_base::out | std::ios_base::binary), 
           buf_(length)
     {  
@@ -57,15 +57,15 @@ public:
         this->setg(buf_.data(), 0, buf_.data());
     }
 
-    virtual ~basic_osequencebuf() JSONCONS_NOEXCEPT {}
+    virtual ~basic_ovectorbuf() JSONCONS_NOEXCEPT {}
 
-    basic_osequencebuf(const basic_osequencebuf<CharT,Traits>&) = delete;
+    basic_ovectorbuf(const basic_ovectorbuf<CharT,Traits>&) = delete;
 
-    //basic_osequencebuf(basic_osequencebuf<CharT,Traits>&&) = default;
+    //basic_ovectorbuf(basic_ovectorbuf<CharT,Traits>&&) = default;
 
-    basic_osequencebuf<CharT,Traits>& operator=(const basic_osequencebuf<CharT,Traits>&) = delete;
+    basic_ovectorbuf<CharT,Traits>& operator=(const basic_ovectorbuf<CharT,Traits>&) = delete;
 
-    //basic_osequencebuf<CharT,Traits>& operator=(basic_osequencebuf<CharT,Traits>&&) = default;
+    //basic_ovectorbuf<CharT,Traits>& operator=(basic_ovectorbuf<CharT,Traits>&&) = default;
 
     const CharT* data() const
     {
@@ -198,7 +198,7 @@ protected:
 };
 
 template<class CharT, class Traits>
-class basic_osequencestream :
+class basic_obufferedstream :
     public std::basic_ostream<CharT, Traits>
 {
 public:
@@ -209,32 +209,32 @@ public:
     typedef typename std::basic_ios<char_type, Traits>::traits_type traits_type;
 
 private:
-    typedef basic_osequencebuf<CharT, Traits>      base_ouputbuf;
+    typedef basic_ovectorbuf<CharT, Traits>      base_ouputbuf;
     typedef std::basic_ios<char_type, Traits>      base_ios;
 
-    basic_osequencebuf<CharT, Traits> buf_;
+    basic_ovectorbuf<CharT, Traits> buf_;
 
 public:
-    basic_osequencestream() JSONCONS_NOEXCEPT
+    basic_obufferedstream() JSONCONS_NOEXCEPT
         : std::basic_ostream<CharT, Traits>( (std::basic_streambuf<CharT, Traits>*)(&buf_)),
           buf_()
     {}
-    basic_osequencestream(std::size_t length) JSONCONS_NOEXCEPT
+    basic_obufferedstream(std::size_t length) JSONCONS_NOEXCEPT
         : std::basic_ostream<CharT, Traits>( (std::basic_streambuf<CharT, Traits>*)(&buf_)),
           buf_(length)
     {}
 
-    basic_osequencestream(const basic_osequencestream<CharT,Traits>&) = delete;
+    basic_obufferedstream(const basic_obufferedstream<CharT,Traits>&) = delete;
 
-    //basic_osequencestream(basic_osequencestream<CharT,Traits>&&) = default;
+    //basic_obufferedstream(basic_obufferedstream<CharT,Traits>&&) = default;
 
-    virtual ~basic_osequencestream() JSONCONS_NOEXCEPT 
+    virtual ~basic_obufferedstream() JSONCONS_NOEXCEPT 
     { 
     }
 
-    basic_osequencestream<CharT,Traits>& operator=(const basic_osequencestream<CharT,Traits>&) = delete;
+    basic_obufferedstream<CharT,Traits>& operator=(const basic_obufferedstream<CharT,Traits>&) = delete;
 
-    //basic_osequencestream<CharT,Traits>& operator=(basic_osequencestream<CharT,Traits>&&) = default;
+    //basic_obufferedstream<CharT,Traits>& operator=(basic_obufferedstream<CharT,Traits>&&) = default;
 
     const CharT* data() const
     {

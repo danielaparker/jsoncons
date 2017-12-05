@@ -27,7 +27,7 @@
 #include <array>
 #include <initializer_list>
 #include <jsoncons/detail/jsoncons_config.hpp>
-#include <jsoncons/detail/osequencestream.hpp>
+#include <jsoncons/detail/obufferedstream.hpp>
 
 #if defined(JSONCONS_HAS_STRING_VIEW)
 #include <string_view>
@@ -923,7 +923,7 @@ template <class CharT>
 class print_double
 {
     uint8_t precision_;
-    basic_osequencestream<CharT> oss_;
+    basic_obufferedstream<CharT> oss_;
 public:
     print_double(uint8_t precision)
         : precision_(precision)

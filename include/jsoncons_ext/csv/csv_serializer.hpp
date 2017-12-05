@@ -17,7 +17,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
-#include <jsoncons/detail/osequencestream.hpp>
+#include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons_ext/csv/csv_parameters.hpp>
 
 namespace jsoncons { namespace csv {
@@ -226,7 +226,7 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_osequencestream<CharT> ss;
+                    basic_obufferedstream<CharT> ss;
                     buffered_output<CharT> bo(ss,10);
                     do_null_value(bo);
                     bo.flush();
@@ -249,7 +249,7 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_osequencestream<CharT> ss;
+                    basic_obufferedstream<CharT> ss;
                     buffered_output<CharT> bo(ss,1000);
                     value(val,bo);
                     bo.flush();
@@ -279,7 +279,7 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_osequencestream<CharT> ss;
+                    basic_obufferedstream<CharT> ss;
                     buffered_output<CharT> bo(ss,30);
                     value(val,bo);
                     bo.flush();
@@ -302,7 +302,7 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_osequencestream<CharT> ss;
+                    basic_obufferedstream<CharT> ss;
                     buffered_output<CharT> bo(ss,30);
                     value(val,bo);
                     bo.flush();
@@ -325,7 +325,7 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_osequencestream<CharT> ss;
+                    basic_obufferedstream<CharT> ss;
                     buffered_output<CharT> bo(ss,30);
                     value(val,bo);
                     bo.flush();
@@ -348,7 +348,7 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_osequencestream<CharT> ss;
+                    basic_obufferedstream<CharT> ss;
                     buffered_output<CharT> bo(ss,30);
                     value(val,bo);
                     bo.flush();

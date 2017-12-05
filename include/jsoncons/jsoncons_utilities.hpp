@@ -27,7 +27,7 @@
 #include <array>
 #include <initializer_list>
 #include <jsoncons/detail/jsoncons_config.hpp>
-#include <jsoncons/detail/osequencestream.hpp>
+#include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
 
 namespace jsoncons
