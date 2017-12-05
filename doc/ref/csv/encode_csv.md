@@ -1,6 +1,6 @@
 ### jsoncons::csv::encode_csv
 
-Serializes a json value to csv output.
+Writes a json value to a CSV output stream.
 
 #### Header
 ```c++
@@ -16,13 +16,13 @@ void encode_csv(const Json& j,
                 const basic_csv_parameters<typename Json::char_type>& params); // (2)
 ```
 
-(1) Writes json value to csv output stream using default [parameters](csv_parameters.md)
+(1) Writes json value to CSV output stream using default [parameters](csv_parameters.md)
 
-(2) Writes json value to csv output stream using specified [parameters](csv_parameters.md)
+(2) Writes json value to CSV output stream using specified [parameters](csv_parameters.md)
 
 ### Examples
 
-#### Write a json value to a csv output stream
+#### Write a json value to a CSV output stream
 
 ```c++
 #include <iostream>

@@ -1,6 +1,6 @@
 ### jsoncons::csv::decode_csv
 
-Decodes a csv string or file to a `json` value.
+Reads a `json` value from a CSV string or input stream.
 
 #### Header
 ```c++
@@ -21,13 +21,13 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is,
                 const basic_csv_parameters<typename Json::char_type>& params); // (4)
 ```
 
-(1) Reads json value from csv string using default [parameters](csv_parameters.md)
+(1) Reads json value from CSV string using default [parameters](csv_parameters.md)
 
-(2) Reads json value from csv string using specified [parameters](csv_parameters.md)
+(2) Reads json value from CSV string using specified [parameters](csv_parameters.md)
 
-(3) Reads json value from csv input stream using default [parameters](csv_parameters.md)
+(3) Reads json value from CSV input stream using default [parameters](csv_parameters.md)
 
-(4) Reads json value from csv input stream using specified [parameters](csv_parameters.md)
+(4) Reads json value from CSV input stream using specified [parameters](csv_parameters.md)
 
 #### Return value
 
@@ -39,7 +39,7 @@ Throws [parse_error](parse_error.md) if parsing fails.
 
 ### Examples
 
-#### Read a json value from a string
+#### Read a json value from a CSV string
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -81,7 +81,7 @@ Output:
 ]
 ```
 
-#### Read a json value from an input stream
+#### Read a json value from a CSV input stream
 
 ```c++
 #include <jsoncons/json.hpp>
