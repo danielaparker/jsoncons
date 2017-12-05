@@ -40,3 +40,7 @@ against an empty object
 Alexander (rog13) for contributing fix to jsonpatch::diff
 
 Stefano Sinigardi for contributing workaround for vs2017 platform issue
+
+xezon for suggesting decode_csv and encode_csv functions, and
+ignore_empty_lines option. Also for fixes and improvements
+in string_view code. 
