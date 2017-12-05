@@ -316,6 +316,7 @@ two=2
 ### Converting CSV files to json
 
 Example CSV file (tasks.csv):
+
 ```
 project_id, task_name, task_start, task_finish
 4001,task1,01/01/2003,01/31/2003
@@ -324,61 +325,67 @@ project_id, task_name, task_start, task_finish
 4002,task1,04/01/2003,04/30/2003
 4002,task2,05/01/2003,
 ```
-You can read the `CSV` file into a `json` value with the `csv_reader`.
+
+You can read the `CSV` file into a `json` value with the `decode_csv` function.
+
 ```c++
+#include <fstream>
+#include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
+#include <jsoncons_ext/csv/csv_serializer.hpp>
 
-using jsoncons::csv::csv_parameters;
-using jsoncons::csv::csv_reader;
-using jsoncons::json_decoder;
+using namespace jsoncons;
+using namespace jsoncons::csv;
 
-std::fstream is("tasks.csv");
+int main()
+{
+    std::ifstream is("input/tasks.csv");
 
-json_decoder<json> decoder;
+    csv_parameters params;
+    params.assume_header(true)
+          .trim(true)
+          .ignore_empty_values(true) 
+          .column_types("integer,string,string,string");
+    ojson tasks = decode_csv<ojson>(is, params);
 
-csv_parameters params;
-params.assume_header(true)
-      .trim(true)
-      .ignore_empty_values(true)
-      .column_types("integer,string,string,string");
+    std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 
-csv_reader reader(is,decoder,params);
-reader.read();
-json val = decoder.get_result();
-
-std::cout << pretty_print(val) << std::endl;
+    std::cout << "(2)\n";
+    encode_csv(tasks, params, std::cout);
+}
 ```
 Output:
 ```json
+(1)
 [
     {
-        "project_id":4001,
-        "task_finish":"01/31/2003",
-        "task_name":"task1",
-        "task_start":"01/01/2003"
+        "project_id": 4001,
+        "task_name": "task1",
+        "task_start": "01/01/2003",
+        "task_finish": "01/31/2003"
     },
     {
-        "project_id":4001,
-        "task_finish":"02/28/2003",
-        "task_name":"task2",
-        "task_start":"02/01/2003"
+        "project_id": 4001,
+        "task_name": "task2",
+        "task_start": "02/01/2003",
+        "task_finish": "02/28/2003"
     },
     {
-        "project_id":4001,
-        "task_finish":"03/31/2003",
-        "task_name":"task3",
-        "task_start":"03/01/2003"
+        "project_id": 4001,
+        "task_name": "task3",
+        "task_start": "03/01/2003",
+        "task_finish": "03/31/2003"
     },
     {
-        "project_id":4002,
-        "task_finish":"04/30/2003",
-        "task_name":"task1",
-        "task_start":"04/01/2003"
+        "project_id": 4002,
+        "task_name": "task1",
+        "task_start": "04/01/2003",
+        "task_finish": "04/30/2003"
     },
     {
-        "project_id":4002,
-        "task_name":"task2",
-        "task_start":"05/01/2003"
+        "project_id": 4002,
+        "task_name": "task2",
+        "task_start": "05/01/2003"
     }
 ]
 ```
