@@ -624,6 +624,7 @@ struct json_type_traits<Json, T,
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
     typedef typename Json::allocator_type allocator_type;
+	typedef typename T::allocator_type string_allocator_type;
 
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
@@ -634,7 +635,7 @@ struct json_type_traits<Json, T,
     {
         if (j.is_string())
         {
-            return j.as_string_view();
+			return j.as_string(string_allocator_type());
         }
         else
         {
