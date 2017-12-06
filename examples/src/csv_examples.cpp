@@ -77,7 +77,7 @@ void read_csv_file1()
 
 void read_write_csv_tasks()
 {
-    std::ifstream is("input/tasks.csv");
+    std::ifstream is("./input/tasks.csv");
 
     json_decoder<ojson> decoder;
     csv_parameters params;
@@ -99,7 +99,7 @@ void read_write_csv_tasks()
 
 void serialize_array_of_arrays_to_comma_delimited()
 {
-    std::string in_file = "input/countries.json";
+    std::string in_file = "./input/countries.json";
     std::ifstream is(in_file);
 
     json countries;
@@ -111,7 +111,7 @@ void serialize_array_of_arrays_to_comma_delimited()
 
 void serialize_to_tab_delimited_file()
 {
-    std::string in_file = "input/employees.json";
+    std::string in_file = "./input/employees.json";
     std::ifstream is(in_file);
 
     json employees;
@@ -303,7 +303,7 @@ void encode_csv_file_from_books()
 
 void decode_encode_csv_tasks()
 {
-    std::ifstream is("input/tasks.csv");
+    std::ifstream is("./input/tasks.csv");
 
     csv_parameters params;
     params.assume_header(true)

@@ -34,7 +34,7 @@ void json_replace(Json& root,
 
 #### Change the price of a book
 
-Example file (store.json):
+Example file (booklist.json):
 ```json
 { "store": {
     "book": [ 

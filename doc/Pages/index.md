@@ -516,7 +516,7 @@ Or define and use your own filters. See [json_filter](https://github.com/daniela
 
 [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
 
-Example JSON file (store.json):
+Example JSON file (booklist.json):
 ```json
 { "store": {
     "book": [ 
@@ -552,7 +552,8 @@ JsonPath examples:
 
 using jsoncons::jsonpath::json_query;
 
-json root = json::parse_file("store.json");
+std::ifstream is("./input/booklist.json");
+json booklist = json::parse(is);
 
 // The authors of books that are cheaper than $10
 json result1 = json_query(booklist, "$.store.book[?(@.price < 10)].author");

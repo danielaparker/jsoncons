@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_SUITE(JSONTestSuite_tests)
 
 BOOST_AUTO_TEST_CASE(test_json)
 {
-    boost::filesystem::path p("input/JSONTestSuite");
+    boost::filesystem::path p("./input/JSONTestSuite");
 
     if (exists(p) && is_directory(p))
     {

@@ -82,8 +82,8 @@ private:
 
 BOOST_AUTO_TEST_CASE(test_filter)
 {
-    std::string in_file = "input/address-book.json";
-    std::string out_file = "output/address-book-new.json";
+    std::string in_file = "./input/address-book.json";
+    std::string out_file = "./output/address-book-new.json";
     std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 
@@ -100,8 +100,8 @@ BOOST_AUTO_TEST_CASE(test_filter)
 
 BOOST_AUTO_TEST_CASE(test_filter2)
 {
-    std::string in_file = "input/address-book.json";
-    std::string out_file = "output/address-book-new.json";
+    std::string in_file = "./input/address-book.json";
+    std::string out_file = "./output/address-book-new.json";
     std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 

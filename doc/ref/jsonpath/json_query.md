@@ -37,7 +37,7 @@ Returns an empty array if there is no match.
 
 ### Examples
 
-The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (store.json).
+The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (booklist.json).
 
 ```json
 { "store": {
@@ -85,9 +85,10 @@ using namespace jsoncons::jsonpath;
 
 int main()
 {
-    json root = json::parse_file("store.json");
+    std::ifstream is("./input/booklist.json");
+    json booklist = json::parse(is);
 
-    json result = json_query(root,"$.store.book[?(@.price < 10)].author");
+    json result = json_query(booklist,"$.store.book[?(@.price < 10)].author");
 
     std::cout << pretty_print(result) << std::endl;
 }

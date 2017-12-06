@@ -2748,19 +2748,6 @@ public:
         return handler.get_result();
     }
 
-    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)
-    {
-        parse_error_handler_type err_handler;
-        return parse_file(filename,err_handler);
-    }
-
-    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
-                                 parse_error_handler& err_handler)
-    {
-        std::basic_ifstream<CharT> is(filename);
-        return parse(is,err_handler);
-    }
-
     static basic_json make_array()
     {
         return basic_json(variant(array()));
@@ -4420,6 +4407,19 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)
+    {
+        parse_error_handler_type err_handler;
+        return parse_file(filename,err_handler);
+    }
+
+    static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename,
+                                 parse_error_handler& err_handler)
+    {
+        std::basic_ifstream<CharT> is(filename);
+        return parse(is,err_handler);
+    }
 
     static basic_json parse_stream(std::basic_istream<char_type>& is)
     {

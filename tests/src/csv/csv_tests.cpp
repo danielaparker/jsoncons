@@ -638,7 +638,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_crlf)
 
 BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
 {
-    std::string in_file = "input/countries.csv";
+    std::string in_file = "./input/countries.csv";
     std::ifstream is(in_file);
 
     json_decoder<json> decoder;
@@ -663,7 +663,7 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
 
 BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
 {
-    std::string in_file = "input/countries.csv";
+    std::string in_file = "./input/countries.csv";
     std::ifstream is(in_file);
 
     json_decoder<json> decoder;
@@ -688,7 +688,7 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
  
 BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
 {
-    std::string in_file = "input/countries.json";
+    std::string in_file = "./input/countries.json";
     std::ifstream is(in_file);
 
     csv_parameters params;
@@ -713,7 +713,7 @@ BOOST_AUTO_TEST_CASE(serialize_comma_delimited_file)
 
 BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
 {
-    std::string in_file = "input/employees.txt";
+    std::string in_file = "./input/employees.txt";
     std::ifstream is(in_file);
 
     json_decoder<json> decoder;
@@ -733,7 +733,7 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
 
 BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 {
-    std::string in_file = "input/employees.json";
+    std::string in_file = "./input/employees.json";
     std::ifstream is(in_file);
 
     json_decoder<ojson> decoder;

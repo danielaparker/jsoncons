@@ -641,7 +641,7 @@ See [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) for details.
 
 #### jsonpath
 
-Example file (store.json):
+Example file (booklist.json):
 ```json
 { "store": {
     "book": [ 

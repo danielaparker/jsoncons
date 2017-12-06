@@ -47,3 +47,7 @@ test_suite/output/test.json
 test_suite/output/address-book-new.json
 examples/booklist.json
 examples/booklist2.json
+
+examples/build/vs2017/.vs/vs2017/v15/ipch/AutoPCH/2f913b3e9413499/BASICS_EXAMPLES.ipch
+examples/build/vs2017/.vs/vs2017/v15/ipch/AutoPCH/8571a45cc244269f/EXAMPLES.ipch
+examples/build/vs2017/vs2017.sln

@@ -103,7 +103,7 @@ max()|Provides the maximum value of an array of numbers|double|$.store.book[?(@.
 
 ### Examples
 
-The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (store.json).
+The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (booklist.json).
 
 ```json
 { "store": {

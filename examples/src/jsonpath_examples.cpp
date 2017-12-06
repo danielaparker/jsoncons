@@ -11,7 +11,7 @@ using namespace jsoncons::jsonpath;
 
 void json_query_examples()
 {
-    std::ifstream is("input/booklist.json");
+    std::ifstream is("./input/booklist.json");
     json booklist;
     is >> booklist;
 
@@ -46,9 +46,8 @@ void json_query_examples()
 
 void json_replace_example1()
 {
-    std::ifstream is("input/booklist.json");
-    json booklist;
-    is >> booklist;
+    std::ifstream is("./input/booklist.json");
+    json booklist = json::parse(is);
 
     json_replace(booklist,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
     std::cout << pretty_print(booklist) << std::endl;

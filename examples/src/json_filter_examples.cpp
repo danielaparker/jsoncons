@@ -61,8 +61,8 @@ private:
 
 void name_fix_up_example1()
 {
-    std::string in_file = "input/address-book.json";
-    std::string out_file = "output/new-address-book1.json";
+    std::string in_file = "./input/address-book.json";
+    std::string out_file = "./output/new-address-book1.json";
     std::ifstream is(in_file);
     std::ofstream os(out_file);
 
@@ -74,8 +74,8 @@ void name_fix_up_example1()
 
 void name_fix_up_example2()
 {
-    std::string in_file = "input/address-book.json";
-    std::string out_file = "output/new-address-book2.json";
+    std::string in_file = "./input/address-book.json";
+    std::string out_file = "./output/new-address-book2.json";
     std::ifstream is(in_file);
     std::ofstream os(out_file);
 

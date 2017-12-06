@@ -57,7 +57,14 @@ void comment_example()
 
 void first_example_a()
 {
-    json books = json::parse_file("input/books.json");
+    std::string path = "./input/books.json"; 
+    std::fstream is(path);
+    if (!is)
+    {
+        std::cout << "Cannot open " << path << std::endl;
+        return;
+    }
+    json books = json::parse(is);
 
     for (size_t i = 0; i < books.size(); ++i)
     {
@@ -78,7 +85,14 @@ void first_example_a()
 
 void first_example_b()
 {
-    json books = json::parse_file("input/books.json");
+    std::string path = "./input/books.json"; 
+    std::fstream is(path);
+    if (!is)
+    {
+        std::cout << "Cannot open " << path << std::endl;
+        return;
+    }
+    json books = json::parse(is);
 
     for (size_t i = 0; i < books.size(); ++i)
     {
@@ -139,7 +153,14 @@ void first_example_c()
 
 void first_example_d()
 {
-    json books = json::parse_file("input/books.json");
+    std::string path = "./input/books.json"; 
+    std::fstream is(path);
+    if (!is)
+    {
+        std::cout << "Cannot open " << path << std::endl;
+        return;
+    }
+    json books = json::parse(is);
 
     serialization_options options;
     //options.floatfield(std::ios::fixed);
@@ -272,7 +293,7 @@ void json_constructor_examples()
 
 void mulitple_json_objects()
 {
-    std::ifstream is("input/multiple-json-objects.json");
+    std::ifstream is("./input/multiple-json-objects.json");
     if (!is.is_open())
     {
         throw std::runtime_error("Cannot open file");

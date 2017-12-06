@@ -98,7 +98,7 @@ struct jsonpath_fixture
 
 BOOST_AUTO_TEST_CASE(test_jsonpath)
 {
-    boost::filesystem::path p("input/JSONPath");
+    boost::filesystem::path p("./input/JSONPath");
 
     if (exists(p) && is_directory(p))
     {

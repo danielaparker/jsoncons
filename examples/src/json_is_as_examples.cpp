@@ -79,7 +79,14 @@ void byte_string_from_char_array()
 
 void introspection_example()
 {
-    json val = json::parse_file("input/books.json");
+    std::string path = "./input/books.json"; 
+    std::fstream is(path);
+    if (!is)
+    {
+        std::cout << "Cannot open " << path << std::endl;
+        return;
+    }
+    json val = json::parse(is);
     std::cout << std::boolalpha;
     std::cout << "Is this an object? " << val.is<json::object>() << ", or an array? " << val.is<json::array>() << std::endl;
 
