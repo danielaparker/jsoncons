@@ -362,11 +362,11 @@ void more_examples()
     export_settings["Image Sizing"] = std::move(image_sizing);
 
     // Write to stream
-    std::ofstream os("export_settings.json");
+    std::ofstream os("./output/export_settings.json");
     os << export_settings;
 
     // Read from stream
-    std::ifstream is("export_settings.json");
+    std::ifstream is("./output/export_settings.json");
     json j = json::parse(is);
 
     // Pretty print

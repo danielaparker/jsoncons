@@ -127,14 +127,14 @@ void basics_json_example1()
     book["ratings"].erase("*");
 
     // Serialize the booklist to a file
-    std::ofstream os("booklist.json");
+    std::ofstream os("./output/booklist.json");
     os << pretty_print(booklist);
 }
 
 void basics_json_example2()
 {
     // Deserialize the booklist
-    std::ifstream is("booklist.json");
+    std::ifstream is("./output/booklist.json");
     json booklist;
     is >> booklist;
 
@@ -280,14 +280,14 @@ void basics_wjson_example1()
     book[L"ratings"].erase(L"*");
 
     // Serialize the booklist to a file
-    std::wofstream os("booklist2.json");
+    std::wofstream os("./output/booklist2.json");
     os << pretty_print(booklist);
 }
 
 void basics_wjson_example2()
 {
     // Deserialize the booklist
-    std::wifstream is("booklist2.json");
+    std::wifstream is("./output/booklist2.json");
     wjson booklist;
     is >> booklist;
 
