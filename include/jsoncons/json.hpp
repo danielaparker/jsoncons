@@ -3638,20 +3638,20 @@ public:
         switch (var_.type_id())
         {
         case json_type_tag::empty_object_t:
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
+            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", view_to_string(name));
         case json_type_tag::object_t:
             {
                 auto it = object_value().find(name);
                 if (it == object_range().end())
                 {
-                    JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
+                    JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", view_to_string(name));
                 }
                 return it->value();
             }
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -3685,20 +3685,20 @@ public:
         switch (var_.type_id())
         {
         case json_type_tag::empty_object_t:
-            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", name);
+            JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"%s not found", view_to_string(name));
         case json_type_tag::object_t:
             {
                 auto it = object_value().find(name);
                 if (it == object_range().end())
                 {
-                    JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", name);
+                    JSONCONS_THROW_EXCEPTION_1(std::out_of_range, "%s not found", view_to_string(name));
                 }
                 return it->value();
             }
             break;
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -3747,7 +3747,7 @@ public:
             return object_value().find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -3762,7 +3762,7 @@ public:
             return object_value().find(name);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -3790,7 +3790,7 @@ public:
             }
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -3818,7 +3818,7 @@ public:
             }
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -3845,7 +3845,7 @@ public:
             }
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -3950,7 +3950,7 @@ public:
             object_value().erase(name);
             break;
         default:
-            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to erase %s on a value that is not an object", name);
+            JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to erase %s on a value that is not an object", view_to_string(name));
             break;
         }
     }
@@ -3967,7 +3967,7 @@ public:
             return object_value().insert_or_assign(name, std::forward<T>(val));
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -3984,7 +3984,7 @@ public:
             return object_value().insert_or_assign(name, std::forward<T>(val));
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -4170,7 +4170,7 @@ public:
             return object_value().insert_or_assign(hint, name, std::forward<T>(val));
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -4187,7 +4187,7 @@ public:
             return object_value().insert_or_assign(hint, name, std::forward<T>(val));
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -4204,7 +4204,7 @@ public:
             return object_value().try_emplace(hint, name, std::forward<Args>(args)...);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", view_to_string(name));
             }
         }
     }
@@ -4506,7 +4506,7 @@ public:
             }
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to get %s from a value that is not an object", view_to_string(name));
             }
         }
     }
