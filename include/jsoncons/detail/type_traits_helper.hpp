@@ -731,6 +731,12 @@ template <class CharT, class Traits = std::char_traits<CharT>>
 using string_view = std::basic_string_view<CharT, Traits>;
 #endif
 
+template <class CharT, class Traits = std::char_traits<CharT>, class Alloc = std::allocator<CharT>>
+inline std::basic_string<CharT, Traits, Alloc> view_to_string(const string_view<CharT>& str, const Alloc& alloc = Alloc())
+{
+    return std::basic_string<CharT, Traits, Alloc>(str.data(), str.size(), alloc);
+}
+
 template <class CharT>
 class buffered_output
 {

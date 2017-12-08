@@ -32,7 +32,7 @@ template <class Base>
 class json_exception_0 : public Base, public virtual json_exception
 {
 public:
-    json_exception_0(std::string s) JSONCONS_NOEXCEPT
+    json_exception_0(const std::string& s) JSONCONS_NOEXCEPT
         : Base(""), message_(s)
     {
     }
