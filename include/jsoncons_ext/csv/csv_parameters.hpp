@@ -323,9 +323,6 @@ class basic_csv_parameters
     unsigned long max_lines_;
     size_t header_lines_;
     std::basic_string<CharT> line_delimiter_;
-    std::basic_string<CharT> header_;
-    std::basic_string<CharT> data_types_;
-    std::basic_string<CharT> default_values_;
     std::vector<std::basic_string<CharT>> column_names_;
     std::vector<detail::csv_type_info> column_types_;
     std::vector<std::basic_string<CharT>> column_defaults_;
