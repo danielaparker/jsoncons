@@ -306,8 +306,6 @@ class basic_csv_parameters;
 template <class CharT>
 class basic_csv_parameters
 {
-    friend class basic_csv_parameters<CharT>;
-
     bool assume_header_;
     bool ignore_empty_values_;
     bool ignore_empty_lines_;

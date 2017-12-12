@@ -3567,7 +3567,7 @@ public:
         return var_.as_byte_string_view();
     }
 
-    string_type as_string() 
+    string_type as_string() const
     {
         switch (var_.type_id())
         {
