@@ -2134,13 +2134,13 @@ public:
             return evaluate().as_byte_string_view();
         }
 
-        string_type as_string() const JSONCONS_NOEXCEPT
+        string_type as_string() const
         {
             return evaluate().as_string();
         }
 
         template <class SAllocator>
-        string_type as_string(const SAllocator& allocator) const JSONCONS_NOEXCEPT
+        string_type as_string(const SAllocator& allocator) const 
         {
             return evaluate().as_string(allocator);
         }
@@ -3567,7 +3567,7 @@ public:
         return var_.as_byte_string_view();
     }
 
-    string_type as_string() const JSONCONS_NOEXCEPT
+    string_type as_string() 
     {
         switch (var_.type_id())
         {
@@ -3580,7 +3580,7 @@ public:
     }
 
     template <class SAllocator>
-    string_type as_string(const SAllocator& allocator) const JSONCONS_NOEXCEPT
+    string_type as_string(const SAllocator& allocator) const 
     {
         switch (var_.type_id())
         {

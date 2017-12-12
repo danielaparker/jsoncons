@@ -21,16 +21,16 @@ namespace jsoncons { namespace jsonpatch {
 
 namespace detail {
 
-    JSONCONS_DEFINE_LITERAL(test_literal,"test");
-    JSONCONS_DEFINE_LITERAL(add_literal,"add");
-    JSONCONS_DEFINE_LITERAL(remove_literal,"remove");
-    JSONCONS_DEFINE_LITERAL(replace_literal,"replace");
-    JSONCONS_DEFINE_LITERAL(move_literal,"move");
-    JSONCONS_DEFINE_LITERAL(copy_literal,"copy");
-    JSONCONS_DEFINE_LITERAL(op_literal,"op");
-    JSONCONS_DEFINE_LITERAL(path_literal,"path");
-    JSONCONS_DEFINE_LITERAL(from_literal,"from");
-    JSONCONS_DEFINE_LITERAL(value_literal,"value");
+    JSONCONS_DEFINE_LITERAL(test_literal,"test")
+    JSONCONS_DEFINE_LITERAL(add_literal,"add")
+    JSONCONS_DEFINE_LITERAL(remove_literal,"remove")
+    JSONCONS_DEFINE_LITERAL(replace_literal,"replace")
+    JSONCONS_DEFINE_LITERAL(move_literal,"move")
+    JSONCONS_DEFINE_LITERAL(copy_literal,"copy")
+    JSONCONS_DEFINE_LITERAL(op_literal,"op")
+    JSONCONS_DEFINE_LITERAL(path_literal,"path")
+    JSONCONS_DEFINE_LITERAL(from_literal,"from")
+    JSONCONS_DEFINE_LITERAL(value_literal,"value")
 
     enum class op_type {add,remove,replace};
     enum class state_type {begin,abort,commit};

@@ -14,6 +14,13 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(json_object_tests)
 
+BOOST_AUTO_TEST_CASE(as_test)
+{
+    json j;
+    std::string s = j.as<std::string>();
+    BOOST_CHECK_EQUAL("{}",s);
+}
+
 BOOST_AUTO_TEST_CASE(test_last_wins_unique_sequence_1)
 {
     std::vector<std::string> u = {"a","c","a"};
@@ -457,11 +464,11 @@ BOOST_AUTO_TEST_CASE(test_object_key_proxy)
 
 BOOST_AUTO_TEST_CASE(test_get_with_string_default)
 {
-  json example;
+    json example;
 
-  std::string s("too long string for short string");
-  std::string result = example.get_with_default("test", s);
-  BOOST_CHECK_EQUAL(s,result);
+    std::string s("too long string for short string");
+    std::string result = example.get_with_default("test", s);
+    BOOST_CHECK_EQUAL(s,result);
 }
 
 BOOST_AUTO_TEST_CASE(test_compare_with_string)

@@ -99,9 +99,9 @@ struct type_wrapper<const T&>
 // json_literals
 
 namespace detail {
-JSONCONS_DEFINE_LITERAL(null_literal,"null");
-JSONCONS_DEFINE_LITERAL(true_literal,"true");
-JSONCONS_DEFINE_LITERAL(false_literal,"false");
+JSONCONS_DEFINE_LITERAL(null_literal,"null")
+JSONCONS_DEFINE_LITERAL(true_literal,"true")
+JSONCONS_DEFINE_LITERAL(false_literal,"false")
 }
 
 inline

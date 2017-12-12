@@ -20,10 +20,10 @@
 namespace jsoncons { namespace csv {
 
 namespace detail {
-    JSONCONS_DEFINE_LITERAL(string_literal,"string");
-    JSONCONS_DEFINE_LITERAL(integer_literal,"integer");
-    JSONCONS_DEFINE_LITERAL(float_literal,"float");
-    JSONCONS_DEFINE_LITERAL(boolean_literal,"boolean");
+    JSONCONS_DEFINE_LITERAL(string_literal,"string")
+    JSONCONS_DEFINE_LITERAL(integer_literal,"integer")
+    JSONCONS_DEFINE_LITERAL(float_literal,"float")
+    JSONCONS_DEFINE_LITERAL(boolean_literal,"boolean")
 }
 
 enum class csv_column_type

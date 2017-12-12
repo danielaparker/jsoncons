@@ -128,9 +128,9 @@ int c99_snprintf(char *str, size_t size, const char *format, ...)
 #endif
 
 #define JSONCONS_DEFINE_LITERAL( name, lit ) \
-template< class Ch > Ch const*const name(); \
-template<> inline char const * const name<char>() { return lit; } \
-template<> inline wchar_t const*const name<wchar_t>() { return L ## lit; } 
+template< class Ch > Ch const* name(); \
+template<> inline char const * name<char>() { return lit; } \
+template<> inline wchar_t const* name<wchar_t>() { return L ## lit; }
 
 }
 
