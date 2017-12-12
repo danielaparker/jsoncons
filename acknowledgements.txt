@@ -44,3 +44,6 @@ Stefano Sinigardi for contributing workaround for vs2017 platform issue
 xezon for suggesting decode_csv and encode_csv functions, and
 ignore_empty_lines option. Also for fixes and improvements
 in string_view code. 
+
+Vojtech Fried for contributing patches to JSONCONS_DEFINE_LITERAL 
+and to json::as_string to remove warnings
