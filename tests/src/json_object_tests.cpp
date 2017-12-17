@@ -21,6 +21,19 @@ BOOST_AUTO_TEST_CASE(as_test)
     BOOST_CHECK_EQUAL("{}",s);
 }
 
+BOOST_AUTO_TEST_CASE(as_test2)
+{
+    try
+    {
+        json j;
+        std::string s = j["empty"].as<std::string>();
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+}
+
 BOOST_AUTO_TEST_CASE(test_last_wins_unique_sequence_1)
 {
     std::vector<std::string> u = {"a","c","a"};
