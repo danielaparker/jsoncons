@@ -25,7 +25,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT>
+template<class CharT,class Allocator=std::allocator<char>>
 class basic_csv_reader 
 {
     struct stack_item
@@ -40,9 +40,9 @@ class basic_csv_reader
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
-    basic_csv_parser<CharT> parser_;
+    basic_csv_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
-    std::vector<CharT> buffer_;
+    std::vector<CharT,Allocator> buffer_;
     size_t buffer_length_;
     size_t buffer_position_;
     bool eof_;

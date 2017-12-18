@@ -18,28 +18,28 @@
 
 namespace jsoncons {
 
-template <class Json>
+template <class Json,class Allocator=std::allocator<typename Json::char_type>>
 class json_decoder : public basic_json_input_handler<typename Json::char_type>
 {
 public:
     typedef typename Json::char_type char_type;
-    using typename basic_json_input_handler<char_type>::string_view_type                                 ;
+    using typename basic_json_input_handler<char_type>::string_view_type;
 
     static const int default_stack_size = 1000;
 
     typedef typename Json::key_value_pair_type key_value_pair_type;
-    typedef typename Json::string_type string_type;
     typedef typename Json::key_storage_type key_storage_type;
-    typedef typename string_type::allocator_type char_allocator;
-    typedef typename Json::allocator_type allocator_type;
+    typedef typename Json::string_type string_type;
     typedef typename Json::array array;
-    typedef typename array::allocator_type array_allocator;
     typedef typename Json::object object;
-    typedef typename object::allocator_type object_allocator;
+    typedef typename Json::allocator_type json_allocator_type;
+    typedef typename string_type::allocator_type json_string_allocator;
+    typedef typename array::allocator_type json_array_allocator;
+    typedef typename object::allocator_type json_object_allocator;
 
-    char_allocator sa_;
-    object_allocator oa_;
-    array_allocator aa_;
+    json_string_allocator string_allocator_;
+    json_object_allocator object_allocator_;
+    json_array_allocator array_allocator_;
 
     Json result_;
     size_t top_;
@@ -49,16 +49,15 @@ public:
         key_storage_type name_;
         Json value_;
     };
-    std::vector<stack_item> stack_;
-    std::vector<size_t> stack_offsets_;
+    std::vector<stack_item,Allocator> stack_;
+    std::vector<size_t,Allocator> stack_offsets_;
     bool is_valid_;
 
 public:
-    json_decoder(const char_allocator& sa = char_allocator(),
-                            const allocator_type& allocator = allocator_type())
-        : sa_(sa),
-          oa_(allocator),
-          aa_(allocator),
+    json_decoder(const json_allocator_type& jallocator = json_allocator_type())
+        : string_allocator_(jallocator),
+          object_allocator_(jallocator),
+          array_allocator_(jallocator),
           top_(0),
           stack_(default_stack_size),
           stack_offsets_(),
@@ -107,7 +106,7 @@ private:
     void push_object()
     {
         stack_offsets_.push_back(top_);
-        stack_[top_].value_ = object(oa_);
+        stack_[top_].value_ = object(object_allocator_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -123,7 +122,7 @@ private:
     void push_array()
     {
         stack_offsets_.push_back(top_);
-        stack_[top_].value_ = array(aa_);
+        stack_[top_].value_ = array(array_allocator_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -199,12 +198,12 @@ private:
 
     void do_name(const string_view_type& name, const parsing_context&) override
     {
-        stack_[top_].name_ = key_storage_type(name.begin(),name.end(),sa_);
+        stack_[top_].name_ = key_storage_type(name.begin(),name.end(),string_allocator_);
     }
 
     void do_string_value(const string_view_type& val, const parsing_context&) override
     {
-        stack_[top_].value_ = Json(val.data(),val.length(),sa_);
+        stack_[top_].value_ = Json(val.data(),val.length(),string_allocator_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
@@ -213,7 +212,7 @@ private:
 
     void do_byte_string_value(const uint8_t* data, size_t length, const parsing_context&) override
     {
-        stack_[top_].value_ = Json(data,length,sa_);
+        stack_[top_].value_ = Json(data,length,string_allocator_);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);

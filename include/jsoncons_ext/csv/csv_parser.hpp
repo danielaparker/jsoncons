@@ -52,17 +52,19 @@ enum class csv_state_type
     done
 };
 
-template<class CharT>
+template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parser : private parsing_context
 {
     typedef string_view<CharT> string_view_type;
+
+    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
 
     static const int default_depth = 3;
 
     default_parse_error_handler default_err_handler_;
     csv_state_type state_;
     int top_;
-    std::vector<csv_mode_type> stack_;
+    std::vector<csv_mode_type,Allocator> stack_;
     basic_json_input_handler<CharT>& handler_;
     parse_error_handler& err_handler_;
     size_t index_;
@@ -70,13 +72,13 @@ class basic_csv_parser : private parsing_context
     unsigned long line_;
     CharT curr_char_;
     CharT prev_char_;
-    std::basic_string<CharT> value_buffer_;
+    string_type value_buffer_;
     int depth_;
     basic_csv_parameters<CharT> parameters_;
-    std::vector<std::basic_string<CharT>> column_names_;
-    std::vector<std::vector<std::basic_string<CharT>>> column_values_;
-    std::vector<detail::csv_type_info> column_types_;
-    std::vector<std::basic_string<CharT>> column_defaults_;
+    std::vector<string_type,Allocator> column_names_;
+    std::vector<std::vector<string_type,Allocator>,Allocator> column_values_;
+    std::vector<detail::csv_type_info,Allocator> column_types_;
+    std::vector<string_type,Allocator> column_defaults_;
     size_t column_index_;
     basic_json_fragment_filter<CharT> filter_;
     size_t level_;
@@ -262,17 +264,17 @@ public:
         push_mode(csv_mode_type::initial);
         handler_.begin_json();
 
-        if (parameters_.column_names().size() > 0)
+        for (auto name : parameters_.column_names())
         {
-            column_names_ = parameters_.column_names();
+            column_names_.emplace_back(name.data(),name.size());
         }
-        if (parameters_.column_types().size() > 0)
+        for (auto name : parameters_.column_types())
         {
-            column_types_ = parameters_.column_types();
+            column_types_.push_back(name);
         }
-        if (parameters_.column_defaults().size() > 0)
+        for (auto name : parameters_.column_defaults())
         {
-            column_defaults_ = parameters_.column_defaults();
+            column_defaults_.emplace_back(name.data(), name.size());
         }
         if (parameters_.header_lines() > 0)
         {
