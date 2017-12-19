@@ -31,36 +31,6 @@ enum class csv_column_type
     string_t,integer_t,float_t,boolean_t,repeat_t
 };
 
-template <class CharT>
-struct json_csv_parser_traits
-{
-    typedef string_view<CharT> string_view_type;
-
-    static string_view_type string_literal() 
-    {
-        static const CharT data[] = {'s','t','r','i','n','g'};
-        return string_view_type{data,sizeof(data)/sizeof(CharT)};
-    }
-
-    static string_view_type integer_literal() 
-    {
-        static const CharT data[] = {'i','n','t','e','g','e','r'};
-        return string_view_type{data,sizeof(data)/sizeof(CharT)};
-    }
-
-    static string_view_type float_literal() 
-    {
-        static const CharT data[] = {'f','l','o','a','t'};
-        return string_view_type{data,sizeof(data)/sizeof(CharT)};
-    }
-
-    static string_view_type boolean_literal() 
-    {
-        static const CharT data[] = {'b','o','o','l','e','a','n'};
-        return string_view_type{data,sizeof(data)/sizeof(CharT)};
-    }
-};
-
 enum class quote_style_type
 {
     all,minimal,none,nonnumeric
@@ -79,13 +49,13 @@ namespace detail {
 
 enum class column_state {sequence,label};
 
-template <class CharT>
-std::vector<std::basic_string<CharT>> parse_column_names(const std::basic_string<CharT>& names)
+template <class CharT,class Allocator>
+std::vector<std::basic_string<CharT, std::char_traits<CharT>, Allocator>,Allocator> parse_column_names(const std::basic_string<CharT,std::char_traits<CharT>,Allocator>& names)
 {
-    std::vector<std::basic_string<CharT>> column_names;
+    std::vector<std::basic_string<CharT,std::char_traits<CharT>,Allocator>,Allocator> column_names;
 
     column_state state = column_state::sequence;
-    std::basic_string<CharT> buffer;
+    std::basic_string<CharT, std::char_traits<CharT>, Allocator> buffer;
 
     auto p = names.begin();
     while (p != names.end())
@@ -151,22 +121,26 @@ struct csv_type_info
     size_t rep_count;
 };
 
-template <class CharT>
-std::vector<csv_type_info> parse_column_types(const std::basic_string<CharT>& types)
+template <class CharT,class Allocator>
+std::vector<csv_type_info,Allocator> parse_column_types(const std::basic_string<CharT,std::char_traits<CharT>,Allocator>& types)
 {
-    const std::unordered_map<std::basic_string<CharT>,csv_column_type> type_dictionary = 
+    typedef CharT char_type;
+    typedef std::basic_string<CharT, std::char_traits<CharT>, Allocator> string_type;
+
+    const std::map<string_type,csv_column_type,std::less<string_type>,Allocator> type_dictionary =
     {
-        {string_literal<CharT>(),csv_column_type::string_t},
-        {integer_literal<CharT>(),csv_column_type::integer_t},
-        {float_literal<CharT>(),csv_column_type::float_t},
-        {boolean_literal<CharT>(),csv_column_type::boolean_t}
+
+        {string_literal<char_type>(),csv_column_type::string_t},
+        {integer_literal<char_type>(),csv_column_type::integer_t},
+        {float_literal<char_type>(),csv_column_type::float_t},
+        {boolean_literal<char_type>(),csv_column_type::boolean_t}
     };
 
-    std::vector<csv_type_info> column_types;
+    std::vector<csv_type_info,Allocator> column_types;
 
     column_state state = column_state::sequence;
     int depth = 0;
-    std::basic_string<CharT> buffer;
+    string_type buffer;
 
     auto p = types.begin();
     while (p != types.end())
@@ -300,12 +274,11 @@ std::vector<csv_type_info> parse_column_types(const std::basic_string<CharT>& ty
 
 } // end detail
 
-template <class CharT>
-class basic_csv_parameters;
-
-template <class CharT>
+template <class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parameters
 {
+    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
+
     bool assume_header_;
     bool ignore_empty_values_;
     bool ignore_empty_lines_;
@@ -322,10 +295,10 @@ class basic_csv_parameters
     std::pair<mapping_type,bool> mapping_;
     unsigned long max_lines_;
     size_t header_lines_;
-    std::basic_string<CharT> line_delimiter_;
-    std::vector<std::basic_string<CharT>> column_names_;
-    std::vector<detail::csv_type_info> column_types_;
-    std::vector<std::basic_string<CharT>> column_defaults_;
+    string_type line_delimiter_;
+    std::vector<string_type,Allocator> column_names_;
+    std::vector<detail::csv_type_info,Allocator> column_types_;
+    std::vector<string_type,Allocator> column_defaults_;
 public:
     static const size_t default_indent = 4;
 
@@ -360,7 +333,7 @@ public:
         return (assume_header_ && header_lines_ <= 1) ? 1 : header_lines_;
     }
 
-    basic_csv_parameters<CharT>& header_lines(size_t value)
+    basic_csv_parameters& header_lines(size_t value)
     {
         header_lines_ = value;
         return *this;
@@ -371,7 +344,7 @@ public:
         return assume_header_;
     }
 
-    basic_csv_parameters<CharT>& assume_header(bool value)
+    basic_csv_parameters& assume_header(bool value)
     {
         assume_header_ = value;
         return *this;
@@ -382,7 +355,7 @@ public:
         return ignore_empty_values_;
     }
 
-    basic_csv_parameters<CharT>& ignore_empty_values(bool value)
+    basic_csv_parameters& ignore_empty_values(bool value)
     {
         ignore_empty_values_ = value;
         return *this;
@@ -393,7 +366,7 @@ public:
         return ignore_empty_lines_;
     }
 
-    basic_csv_parameters<CharT>& ignore_empty_lines(bool value)
+    basic_csv_parameters& ignore_empty_lines(bool value)
     {
         ignore_empty_lines_ = value;
         return *this;
@@ -404,7 +377,7 @@ public:
         return trim_leading_;
     }
 
-    basic_csv_parameters<CharT>& trim_leading(bool value)
+    basic_csv_parameters& trim_leading(bool value)
     {
         trim_leading_ = value;
         return *this;
@@ -415,7 +388,7 @@ public:
         return trim_trailing_;
     }
 
-    basic_csv_parameters<CharT>& trim_trailing(bool value)
+    basic_csv_parameters& trim_trailing(bool value)
     {
         trim_trailing_ = value;
         return *this;
@@ -426,7 +399,7 @@ public:
         return trim_leading_inside_quotes_;
     }
 
-    basic_csv_parameters<CharT>& trim_leading_inside_quotes(bool value)
+    basic_csv_parameters& trim_leading_inside_quotes(bool value)
     {
         trim_leading_inside_quotes_ = value;
         return *this;
@@ -437,7 +410,7 @@ public:
         return trim_trailing_inside_quotes_;
     }
 
-    basic_csv_parameters<CharT>& trim_trailing_inside_quotes(bool value)
+    basic_csv_parameters& trim_trailing_inside_quotes(bool value)
     {
         trim_trailing_inside_quotes_ = value;
         return *this;
@@ -448,7 +421,7 @@ public:
         return trim_leading_ && trim_trailing_;
     }
 
-    basic_csv_parameters<CharT>& trim(bool value)
+    basic_csv_parameters& trim(bool value)
     {
         trim_leading_ = value;
         trim_trailing_ = value;
@@ -460,7 +433,7 @@ public:
         return trim_leading_inside_quotes_ && trim_trailing_inside_quotes_;
     }
 
-    basic_csv_parameters<CharT>& trim_inside_quotes(bool value)
+    basic_csv_parameters& trim_inside_quotes(bool value)
     {
         trim_leading_inside_quotes_ = value;
         trim_trailing_inside_quotes_ = value;
@@ -472,50 +445,50 @@ public:
         return unquoted_empty_value_is_null_;
     }
 
-    basic_csv_parameters<CharT>& unquoted_empty_value_is_null(bool value)
+    basic_csv_parameters& unquoted_empty_value_is_null(bool value)
     {
         unquoted_empty_value_is_null_ = value;
         return *this;
     }
 
-    std::vector<std::basic_string<CharT>> column_names() const
+    std::vector<string_type,Allocator> column_names() const
     {
         return column_names_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    basic_csv_parameters<CharT>& column_names(const std::vector<std::basic_string<CharT>>& value)
+    basic_csv_parameters& column_names(const std::vector<string_type,Allocator>& value)
     {
         column_names_ = value;
         return *this;
     }
 
-    basic_csv_parameters<CharT>& column_defaults(const std::vector<std::basic_string<CharT>>& value)
+    basic_csv_parameters& column_defaults(const std::vector<string_type,Allocator>& value)
     {
         column_defaults_ = value;
         return *this;
     }
 
-    basic_csv_parameters<CharT>& column_types(const std::vector<std::basic_string<CharT>>& value)
+    basic_csv_parameters& column_types(const std::vector<string_type,Allocator>& value)
     {
         if (value.size() > 0)
         {
             column_types_.reserve(value.size());
             for (size_t i = 0; i < value.size(); ++i)
             {
-                if (value[i] == json_csv_parser_traits<CharT>::string_literal())
+                if (value[i] == string_literal<CharT>()())
                 {
                     column_types_.emplace_back(csv_column_type::string_t,0);
                 }
-                else if (value[i] == json_csv_parser_traits<CharT>::integer_literal())
+                else if (value[i] == integer_literal<CharT>()())
                 {
                     column_types_.emplace_back(csv_column_type::integer_t,0);
                 }
-                else if (value[i] == json_csv_parser_traits<CharT>::float_literal())
+                else if (value[i] == float_literal<CharT>()())
                 {
                     column_types_.emplace_back(csv_column_type::float_t,0);
                 }
-                else if (value[i] == json_csv_parser_traits<CharT>::boolean_literal())
+                else if (value[i] == boolean_literal<CharT>()())
                 {
                     column_types_.emplace_back(csv_column_type::boolean_t,0);
                 }
@@ -524,29 +497,29 @@ public:
         return *this;
     }
 #endif
-    basic_csv_parameters<CharT>& column_names(const std::basic_string<CharT>& names)
+    basic_csv_parameters& column_names(const string_type& names)
     {
         column_names_ = detail::parse_column_names(names);
         return *this;
     }
 
-    std::vector<detail::csv_type_info> column_types() const
+    std::vector<detail::csv_type_info,Allocator> column_types() const
     {
         return column_types_;
     }
 
-    basic_csv_parameters<CharT>& column_types(const std::basic_string<CharT>& types)
+    basic_csv_parameters& column_types(const string_type& types)
     {
         column_types_ = detail::parse_column_types(types);
         return *this;
     }
 
-    std::vector<std::basic_string<CharT>> column_defaults() const
+    std::vector<string_type,Allocator> column_defaults() const
     {
         return column_defaults_;
     }
 
-    basic_csv_parameters<CharT>& column_defaults(const std::basic_string<CharT>& defaults)
+    basic_csv_parameters& column_defaults(const string_type& defaults)
     {
         column_defaults_ = detail::parse_column_names(defaults);
         return *this;
@@ -557,18 +530,18 @@ public:
         return field_delimiter_;
     }
 
-    basic_csv_parameters<CharT>& field_delimiter(CharT value)
+    basic_csv_parameters& field_delimiter(CharT value)
     {
         field_delimiter_ = value;
         return *this;
     }
 
-    std::basic_string<CharT> line_delimiter() const
+    string_type line_delimiter() const
     {
         return line_delimiter_;
     }
 
-    basic_csv_parameters<CharT>& line_delimiter(std::basic_string<CharT> value)
+    basic_csv_parameters& line_delimiter(string_type value)
     {
         line_delimiter_ = value;
         return *this;
@@ -579,7 +552,7 @@ public:
         return quote_char_;
     }
 
-    basic_csv_parameters<CharT>& quote_char(CharT value)
+    basic_csv_parameters& quote_char(CharT value)
     {
         quote_char_ = value;
         return *this;
@@ -590,7 +563,7 @@ public:
         return quote_escape_char_;
     }
 
-    basic_csv_parameters<CharT>& quote_escape_char(CharT value)
+    basic_csv_parameters& quote_escape_char(CharT value)
     {
         quote_escape_char_ = value;
         return *this;
@@ -601,7 +574,7 @@ public:
         return comment_starter_;
     }
 
-    basic_csv_parameters<CharT>& comment_starter(CharT value)
+    basic_csv_parameters& comment_starter(CharT value)
     {
         comment_starter_ = value;
         return *this;
@@ -617,13 +590,13 @@ public:
         return mapping_.second ? (mapping_.first) : (assume_header() || column_names_.size() > 0 ? mapping_type::n_objects : mapping_type::n_rows);
     }
 
-    basic_csv_parameters<CharT>& quote_style(quote_style_type value)
+    basic_csv_parameters& quote_style(quote_style_type value)
     {
         quote_style_ = value;
         return *this;
     }
 
-    basic_csv_parameters<CharT>& mapping(mapping_type value)
+    basic_csv_parameters& mapping(mapping_type value)
     {
         mapping_ = {value,true};
         return *this;
@@ -634,7 +607,7 @@ public:
         return max_lines_;
     }
 
-    basic_csv_parameters<CharT>& max_lines(unsigned long value)
+    basic_csv_parameters& max_lines(unsigned long value)
     {
         max_lines_ = value;
         return *this;

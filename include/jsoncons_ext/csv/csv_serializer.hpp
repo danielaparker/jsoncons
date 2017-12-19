@@ -45,10 +45,12 @@ void escape_string(const CharT* s,
     }
 }
 
-template<class CharT>
+template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
 public:
+    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
+
     using typename basic_json_output_handler<CharT>::string_view_type                                 ;
 private:
     struct stack_item
@@ -64,15 +66,15 @@ private:
 
         bool is_object_;
         size_t count_;
-        std::basic_string<CharT> name_;
+        string_type name_;
     };
     buffered_output<CharT> os_;
-    basic_csv_parameters<CharT> parameters_;
+    basic_csv_parameters<CharT,Allocator> parameters_;
     basic_serialization_options<CharT> options_;
     std::vector<stack_item> stack_;
     print_double<CharT> fp_;
-    std::vector<std::basic_string<CharT>> column_names_;
-    std::map<std::basic_string<CharT>,std::basic_string<CharT>> buffered_line_;
+    std::vector<string_type,Allocator> column_names_;
+    std::map<string_type,string_type,std::less<string_type>,Allocator> buffered_line_;
 
     // Noncopyable and nonmoveable
     basic_csv_serializer(const basic_csv_serializer&) = delete;
@@ -89,7 +91,7 @@ public:
     }
 
     basic_csv_serializer(std::basic_ostream<CharT>& os,
-                         basic_csv_parameters<CharT> params)
+                         const basic_csv_parameters<CharT,Allocator>& params)
        :
        os_(os),
        parameters_(params),
@@ -470,10 +472,10 @@ void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os)
     j.dump(serializer);
 }
 
-template <class Json>
-void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_parameters<typename Json::char_type>& params)
+template <class Json,class Allocator>
+void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
 {
-    basic_csv_serializer<typename Json::char_type> serializer(os,params);
+    basic_csv_serializer<typename Json::char_type,Allocator> serializer(os,params);
     j.dump(serializer);
 }
 
