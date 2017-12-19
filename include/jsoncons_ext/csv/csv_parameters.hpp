@@ -127,7 +127,7 @@ std::vector<csv_type_info,Allocator> parse_column_types(const std::basic_string<
     typedef CharT char_type;
     typedef std::basic_string<CharT, std::char_traits<CharT>, Allocator> string_type;
 
-    const std::map<string_type,csv_column_type,std::less<string_type>,Allocator> type_dictionary =
+    const std::unordered_map<string_type,csv_column_type, std::hash<string_type>,std::equal_to<string_type>,Allocator> type_dictionary =
     {
 
         {string_literal<char_type>(),csv_column_type::string_t},
