@@ -3550,8 +3550,8 @@ public:
             return static_cast<double>(var_.integer_data_cast()->value());
         case json_type_tag::uinteger_t:
             return static_cast<double>(var_.uinteger_data_cast()->value());
-        case json_type_tag::null_t:
-            return std::numeric_limits<double>::quiet_NaN();
+        //case json_type_tag::null_t:
+        //    return std::numeric_limits<double>::quiet_NaN();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
         }
