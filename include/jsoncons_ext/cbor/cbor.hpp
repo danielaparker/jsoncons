@@ -733,11 +733,7 @@ public:
     typedef std::string string_type;
     typedef char char_type;
     typedef std::char_traits<char_type> char_traits_type;
-#if !defined(JSONCONS_HAS_STRING_VIEW)
-    typedef Basic_string_view_<char_type,char_traits_type> string_view_type;
-#else
-    typedef std::basic_string_view<char_type,char_traits_type> string_view_type;
-#endif
+    typedef basic_string_view_ext<char_type> string_view_type;
 
     cbor_view()
         : buffer_(nullptr), buflen_(0)

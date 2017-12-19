@@ -55,7 +55,7 @@ enum class csv_state_type
 template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parser : private parsing_context
 {
-    typedef string_view<CharT> string_view_type;
+    typedef basic_string_view_ext<CharT> string_view_type;
 
     typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
 
@@ -74,7 +74,7 @@ class basic_csv_parser : private parsing_context
     CharT prev_char_;
     string_type value_buffer_;
     int depth_;
-    basic_csv_parameters<CharT> parameters_;
+    basic_csv_parameters<CharT,Allocator> parameters_;
     std::vector<string_type,Allocator> column_names_;
     std::vector<std::vector<string_type,Allocator>,Allocator> column_values_;
     std::vector<detail::csv_type_info,Allocator> column_types_;
@@ -104,7 +104,7 @@ public:
     }
 
     basic_csv_parser(basic_json_input_handler<CharT>& handler,
-                     basic_csv_parameters<CharT> params)
+                     basic_csv_parameters<CharT,Allocator> params)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
@@ -144,7 +144,7 @@ public:
 
     basic_csv_parser(basic_json_input_handler<CharT>& handler,
                      parse_error_handler& err_handler,
-                     basic_csv_parameters<CharT> params)
+                     basic_csv_parameters<CharT,Allocator> params)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),

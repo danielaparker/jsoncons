@@ -70,7 +70,7 @@ public:
 
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_input_handler<CharT>& handler,
-                     basic_csv_parameters<CharT> params)
+                     basic_csv_parameters<CharT,Allocator> params)
 
        : parser_(handler,params),
          is_(is),
@@ -99,7 +99,7 @@ public:
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_input_handler<CharT>& handler,
                      parse_error_handler& err_handler,
-                     basic_csv_parameters<CharT> params)
+                     basic_csv_parameters<CharT,Allocator> params)
        :
          parser_(handler,err_handler,params),
          is_(is),
@@ -191,12 +191,12 @@ Json decode_csv(typename Json::string_view_type s)
     return decoder.get_result();
 }
 
-template <class Json>
-Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<typename Json::char_type>& params)
+template <class Json,class Allocator>
+Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
 {
-    json_decoder<Json> decoder;
+    json_decoder<Json,Allocator> decoder;
 
-    basic_csv_parser<typename Json::char_type> parser(decoder, params);
+    basic_csv_parser<typename Json::char_type,Allocator> parser(decoder, params);
     parser.reset();
     parser.parse(s.data(), 0, s.size());
     parser.end_parse();
@@ -213,12 +213,12 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is)
     return decoder.get_result();
 }
 
-template <class Json>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_parameters<typename Json::char_type>& params)
+template <class Json,class Allocator>
+Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
 {
-    json_decoder<Json> decoder;
+    json_decoder<Json,Allocator> decoder;
 
-    basic_csv_reader<typename Json::char_type> reader(is,decoder,params);
+    basic_csv_reader<typename Json::char_type,Allocator> reader(is,decoder,params);
     reader.read();
     return decoder.get_result();
 }

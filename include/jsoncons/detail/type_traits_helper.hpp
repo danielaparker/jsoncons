@@ -725,14 +725,14 @@ bool operator>(const std::basic_string<CharT,Traits,Allocator>& lhs,
 
 #if !defined(JSONCONS_HAS_STRING_VIEW)
 template <class CharT, class Traits = std::char_traits<CharT>>
-using string_view = Basic_string_view_<CharT, Traits>;
+using basic_string_view_ext = Basic_string_view_<CharT, Traits>;
 #else
 template <class CharT, class Traits = std::char_traits<CharT>>
-using string_view = std::basic_string_view<CharT, Traits>;
+using basic_string_view_ext = std::basic_string_view<CharT, Traits>;
 #endif
 
 template <class CharT, class Traits = std::char_traits<CharT>, class Alloc = std::allocator<CharT>>
-inline std::basic_string<CharT, Traits, Alloc> view_to_string(const string_view<CharT>& str, const Alloc& alloc = Alloc())
+inline std::basic_string<CharT, Traits, Alloc> view_to_string(const basic_string_view_ext<CharT>& str, const Alloc& alloc = Alloc())
 {
     return std::basic_string<CharT, Traits, Alloc>(str.data(), str.size(), alloc);
 }

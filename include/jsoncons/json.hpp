@@ -113,7 +113,7 @@ public:
     typedef CharT char_type;
     typedef typename std::char_traits<char_type> char_traits_type;
 
-    typedef string_view<char_type,char_traits_type> string_view_type;
+    typedef basic_string_view_ext<char_type,char_traits_type> string_view_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
     using string_storage_type = typename implementation_policy::template string_storage<CharT,char_traits_type,char_allocator_type>;
