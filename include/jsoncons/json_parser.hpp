@@ -81,11 +81,15 @@ enum class parse_state : uint8_t
     done
 };
 
-template <class CharT, class Allocator = std::allocator<char>>
+template <class CharT, template <typename Type> class Allocator = std::allocator>
 class basic_json_parser : private parsing_context
 {
     static const int default_initial_stack_capacity_ = 100;
     typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
+    typedef Allocator<CharT> char_t_allocator;
+    typedef Allocator<char> char_allocator;
+    typedef std::basic_string<CharT,std::char_traits<CharT>,char_t_allocator> string_t;
+    typedef std::basic_string<char,std::char_traits<char>,char_allocator> string;
 
     basic_null_json_input_handler<CharT> default_input_handler_;
     default_parse_error_handler default_err_handler_;
@@ -94,8 +98,8 @@ class basic_json_parser : private parsing_context
     parse_error_handler& err_handler_;
     uint32_t cp_;
     uint32_t cp2_;
-    std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_buffer_;
-    std::basic_string<char,std::char_traits<char>,Allocator> number_buffer_;
+    string_t string_buffer_;
+    string number_buffer_;
 
     bool is_negative_;
     uint8_t precision_;
@@ -112,7 +116,10 @@ class basic_json_parser : private parsing_context
     const CharT* p_;
 
     parse_state state_;
-    std::vector<parse_state,Allocator> state_stack_;
+    typedef Allocator<parse_state> state_allocator;
+    typedef std::vector<parse_state,state_allocator> parse_state_vector;
+
+    parse_state_vector state_stack_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;

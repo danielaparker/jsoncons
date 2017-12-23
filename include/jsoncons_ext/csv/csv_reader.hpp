@@ -25,9 +25,11 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Allocator=std::allocator<char>>
+template<class CharT,template <class Type> class Allocator=std::allocator>
 class basic_csv_reader 
 {
+    typedef Allocator<CharT> char_t_allocator;
+
     struct stack_item
     {
         stack_item()
@@ -42,7 +44,7 @@ class basic_csv_reader
 
     basic_csv_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
-    std::vector<CharT,Allocator> buffer_;
+    std::vector<CharT,char_t_allocator> buffer_;
     size_t buffer_length_;
     size_t buffer_position_;
     bool eof_;
@@ -191,7 +193,7 @@ Json decode_csv(typename Json::string_view_type s)
     return decoder.get_result();
 }
 
-template <class Json,class Allocator>
+template <class Json,template <class Type> class Allocator=std::allocator>
 Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
 {
     json_decoder<Json,Allocator> decoder;
@@ -213,7 +215,7 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is)
     return decoder.get_result();
 }
 
-template <class Json,class Allocator>
+template <class Json,template <class Type> class Allocator=std::allocator>
 Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
 {
     json_decoder<Json,Allocator> decoder;

@@ -136,15 +136,16 @@ private:
     }
 };
 
-template<class CharT,class Allocator=std::allocator<char>>
+template<class CharT,template <class Type> class Allocator=std::allocator>
 class basic_json_reader 
 {
+    typedef Allocator<CharT> char_t_allocator;
     static const size_t default_max_buffer_length = 16384;
 
     basic_json_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
     bool eof_;
-    std::vector<CharT,Allocator> buffer_;
+    std::vector<CharT,char_t_allocator> buffer_;
     size_t buffer_length_;
     bool begin_;
 

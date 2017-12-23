@@ -18,7 +18,7 @@
 
 namespace jsoncons {
 
-template <class Json,class Allocator=std::allocator<typename Json::char_type>>
+template <class Json,template <class Type> class Allocator=std::allocator>
 class json_decoder : public basic_json_input_handler<typename Json::char_type>
 {
 public:
@@ -49,8 +49,11 @@ public:
         key_storage_type name_;
         Json value_;
     };
-    std::vector<stack_item,Allocator> stack_;
-    std::vector<size_t,Allocator> stack_offsets_;
+    typedef Allocator<stack_item> stack_item_allocator;
+    typedef Allocator<size_t> size_t_allocator;
+
+    std::vector<stack_item,stack_item_allocator> stack_;
+    std::vector<size_t,size_t_allocator> stack_offsets_;
     bool is_valid_;
 
 public:
