@@ -49,13 +49,19 @@ namespace detail {
 
 enum class column_state {sequence,label};
 
-template <class CharT,class Allocator>
-std::vector<std::basic_string<CharT, std::char_traits<CharT>, Allocator>,Allocator> parse_column_names(const std::basic_string<CharT,std::char_traits<CharT>,Allocator>& names)
+template <class CharT,template <class Type> class Allocator>
+using basic_string = std::basic_string<CharT, std::char_traits<CharT>, Allocator<CharT>>;
+
+template <class Type,template <class Type> class Allocator>
+using vector = std::vector<Type, Allocator<Type>>;
+
+template <class CharT,template <class Type> class Allocator>
+vector<basic_string<CharT, Allocator>, Allocator> parse_column_names(const basic_string<CharT,Allocator>& names)
 {
-    std::vector<std::basic_string<CharT,std::char_traits<CharT>,Allocator>,Allocator> column_names;
+    vector<basic_string<CharT, Allocator>, Allocator> column_names;
 
     column_state state = column_state::sequence;
-    std::basic_string<CharT, std::char_traits<CharT>, Allocator> buffer;
+    basic_string<CharT, Allocator> buffer;
 
     auto p = names.begin();
     while (p != names.end())
@@ -121,22 +127,27 @@ struct csv_type_info
     size_t rep_count;
 };
 
-template <class CharT,class Allocator>
-std::vector<csv_type_info,Allocator> parse_column_types(const std::basic_string<CharT,std::char_traits<CharT>,Allocator>& types)
+template <template <class Type> class Allocator>
+using csv_type_info_vector = std::vector<csv_type_info,Allocator<csv_type_info>>;
+
+template <class CharT,template <class Type> class Allocator>
+csv_type_info_vector<Allocator> parse_column_types(const std::basic_string<CharT,std::char_traits<CharT>,Allocator<CharT>>& types)
 {
     typedef CharT char_type;
-    typedef std::basic_string<CharT, std::char_traits<CharT>, Allocator> string_type;
+    typedef Allocator<CharT> char_t_allocator;
+    typedef std::basic_string<CharT, std::char_traits<CharT>, char_t_allocator> string_type;
+    typedef Allocator<std::pair<const string_type,csv_column_type>> string_column_pair_allocator;
+    typedef std::unordered_map<string_type,csv_column_type,std::hash<string_type>,std::equal_to<string_type>, string_column_pair_allocator> dictionary_map;
 
-    const std::unordered_map<string_type,csv_column_type, std::hash<string_type>,std::equal_to<string_type>,Allocator> type_dictionary =
+    const dictionary_map type_dictionary =
     {
-
         {string_literal<char_type>(),csv_column_type::string_t},
         {integer_literal<char_type>(),csv_column_type::integer_t},
         {float_literal<char_type>(),csv_column_type::float_t},
         {boolean_literal<char_type>(),csv_column_type::boolean_t}
     };
 
-    std::vector<csv_type_info,Allocator> column_types;
+    csv_type_info_vector<Allocator> column_types;
 
     column_state state = column_state::sequence;
     int depth = 0;
@@ -274,10 +285,15 @@ std::vector<csv_type_info,Allocator> parse_column_types(const std::basic_string<
 
 } // end detail
 
-template <class CharT,class Allocator=std::allocator<CharT>>
+template <class CharT,template <class Type> class Allocator=std::allocator>
 class basic_csv_parameters
 {
-    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
+    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator<CharT>> string_type;
+    typedef Allocator<string_type> string_allocator;
+    typedef Allocator<detail::csv_type_info> csv_type_info_allocator;
+    typedef std::vector<string_type,string_allocator> string_vector;
+    typedef std::vector<detail::csv_type_info,Allocator<detail::csv_type_info>> csv_type_info_vector;
+
 
     bool assume_header_;
     bool ignore_empty_values_;
@@ -296,9 +312,9 @@ class basic_csv_parameters
     unsigned long max_lines_;
     size_t header_lines_;
     string_type line_delimiter_;
-    std::vector<string_type,Allocator> column_names_;
-    std::vector<detail::csv_type_info,Allocator> column_types_;
-    std::vector<string_type,Allocator> column_defaults_;
+    string_vector column_names_;
+    csv_type_info_vector column_types_;
+    string_vector column_defaults_;
 public:
     static const size_t default_indent = 4;
 
@@ -451,25 +467,25 @@ public:
         return *this;
     }
 
-    std::vector<string_type,Allocator> column_names() const
+    string_vector column_names() const
     {
         return column_names_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    basic_csv_parameters& column_names(const std::vector<string_type,Allocator>& value)
+    basic_csv_parameters& column_names(const string_vector& value)
     {
         column_names_ = value;
         return *this;
     }
 
-    basic_csv_parameters& column_defaults(const std::vector<string_type,Allocator>& value)
+    basic_csv_parameters& column_defaults(const string_vector& value)
     {
         column_defaults_ = value;
         return *this;
     }
 
-    basic_csv_parameters& column_types(const std::vector<string_type,Allocator>& value)
+    basic_csv_parameters& column_types(const string_vector& value)
     {
         if (value.size() > 0)
         {
@@ -499,29 +515,29 @@ public:
 #endif
     basic_csv_parameters& column_names(const string_type& names)
     {
-        column_names_ = detail::parse_column_names(names);
+        column_names_ = detail::parse_column_names<CharT, Allocator>(names);
         return *this;
     }
 
-    std::vector<detail::csv_type_info,Allocator> column_types() const
+    csv_type_info_vector column_types() const
     {
         return column_types_;
     }
 
     basic_csv_parameters& column_types(const string_type& types)
     {
-        column_types_ = detail::parse_column_types(types);
+        column_types_ = detail::parse_column_types<CharT, Allocator>(types);
         return *this;
     }
 
-    std::vector<string_type,Allocator> column_defaults() const
+    string_vector column_defaults() const
     {
         return column_defaults_;
     }
 
     basic_csv_parameters& column_defaults(const string_type& defaults)
     {
-        column_defaults_ = detail::parse_column_names(defaults);
+        column_defaults_ = detail::parse_column_names<CharT, Allocator>(defaults);
         return *this;
     }
 

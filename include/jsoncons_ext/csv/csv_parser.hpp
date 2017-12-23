@@ -52,19 +52,22 @@ enum class csv_state_type
     done
 };
 
-template<class CharT,class Allocator=std::allocator<CharT>>
+template<class CharT,template <class Type> class Allocator=std::allocator>
 class basic_csv_parser : private parsing_context
 {
     typedef basic_string_view_ext<CharT> string_view_type;
-
-    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
+    typedef Allocator<CharT> char_t_allocator;
+    typedef std::basic_string<CharT,std::char_traits<CharT>,char_t_allocator> string_type;
+    typedef Allocator<string_type> string_allocator;
+    typedef Allocator<std::vector<string_type, string_allocator>> string_vector_allocator;
+    typedef Allocator<detail::csv_type_info> csv_type_info_allocator;
 
     static const int default_depth = 3;
 
     default_parse_error_handler default_err_handler_;
     csv_state_type state_;
     int top_;
-    std::vector<csv_mode_type,Allocator> stack_;
+    std::vector<csv_mode_type,Allocator<csv_mode_type>> stack_;
     basic_json_input_handler<CharT>& handler_;
     parse_error_handler& err_handler_;
     size_t index_;
@@ -75,10 +78,10 @@ class basic_csv_parser : private parsing_context
     string_type value_buffer_;
     int depth_;
     basic_csv_parameters<CharT,Allocator> parameters_;
-    std::vector<string_type,Allocator> column_names_;
-    std::vector<std::vector<string_type,Allocator>,Allocator> column_values_;
-    std::vector<detail::csv_type_info,Allocator> column_types_;
-    std::vector<string_type,Allocator> column_defaults_;
+    std::vector<string_type,string_allocator> column_names_;
+    std::vector<std::vector<string_type,string_allocator>,string_vector_allocator> column_values_;
+    std::vector<detail::csv_type_info,csv_type_info_allocator> column_types_;
+    std::vector<string_type,string_allocator> column_defaults_;
     size_t column_index_;
     basic_json_fragment_filter<CharT> filter_;
     size_t level_;
