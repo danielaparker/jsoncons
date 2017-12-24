@@ -45,63 +45,7 @@ enum class mapping_type
     m_columns
 };
 
-namespace detail {
-
 enum class column_state {sequence,label};
-
-template <class CharT,class Allocator>
-std::vector<std::basic_string<CharT, std::char_traits<CharT>, Allocator>,Allocator> parse_column_names(const std::basic_string<CharT,std::char_traits<CharT>,Allocator>& names)
-{
-    std::vector<std::basic_string<CharT,std::char_traits<CharT>,Allocator>,Allocator> column_names;
-
-    column_state state = column_state::sequence;
-    std::basic_string<CharT, std::char_traits<CharT>, Allocator> buffer;
-
-    auto p = names.begin();
-    while (p != names.end())
-    {
-        switch (state)
-        {
-        case column_state::sequence:
-            {
-                switch (*p)
-                {
-                case ' ': case '\t':case '\r': case '\n':
-                    ++p;
-                    break;
-                default:
-                    buffer.clear();
-                    state = column_state::label;
-                    break;
-                }
-                break;
-            }
-        case column_state::label:
-            {
-                switch (*p)
-                {
-                case ',':
-                    column_names.push_back(buffer);
-                    buffer.clear();
-                    ++p;
-                    state = column_state::sequence;
-                    break;
-                default:
-                    buffer.push_back(*p);
-                    ++p;
-                    break;
-                }
-                break;
-            }
-        }
-    }
-    if (state == column_state::label)
-    {
-        column_names.push_back(buffer);
-        buffer.clear();
-    }
-    return column_names;
-}
 
 struct csv_type_info
 {
@@ -121,163 +65,15 @@ struct csv_type_info
     size_t rep_count;
 };
 
-template <class CharT,class Allocator>
-std::vector<csv_type_info,Allocator> parse_column_types(const std::basic_string<CharT,std::char_traits<CharT>,Allocator>& types)
-{
-    typedef CharT char_type;
-    typedef std::basic_string<CharT, std::char_traits<CharT>, Allocator> string_type;
-
-    const std::unordered_map<string_type,csv_column_type, std::hash<string_type>,std::equal_to<string_type>,Allocator> type_dictionary =
-    {
-
-        {string_literal<char_type>(),csv_column_type::string_t},
-        {integer_literal<char_type>(),csv_column_type::integer_t},
-        {float_literal<char_type>(),csv_column_type::float_t},
-        {boolean_literal<char_type>(),csv_column_type::boolean_t}
-    };
-
-    std::vector<csv_type_info,Allocator> column_types;
-
-    column_state state = column_state::sequence;
-    int depth = 0;
-    string_type buffer;
-
-    auto p = types.begin();
-    while (p != types.end())
-    {
-        switch (state)
-        {
-        case column_state::sequence:
-            {
-                switch (*p)
-                {
-                case ' ': case '\t':case '\r': case '\n':
-                    ++p;
-                    break;
-                case '[':
-                    ++depth;
-                    ++p;
-                    break;
-                case ']':
-                    JSONCONS_ASSERT(depth > 0);
-                    --depth;
-                    ++p;
-                    break;
-                case '*':
-                    {
-                        JSONCONS_ASSERT(column_types.size() != 0);
-                        size_t offset = 0;
-                        size_t level = column_types.size() > 0 ? column_types.back().level: 0;
-                        if (level > 0)
-                        {
-                            for (auto it = column_types.rbegin();
-                                 it != column_types.rend() && level == it->level;
-                                 ++it)
-                            {
-                                ++offset;
-                            }
-                        }
-                        else
-                        {
-                            offset = 1;
-                        }
-                        column_types.emplace_back(csv_column_type::repeat_t,depth,offset);
-                        ++p;
-                        break;
-                    }
-                default:
-                    buffer.clear();
-                    state = column_state::label;
-                    break;
-                }
-                break;
-            }
-        case column_state::label:
-            {
-                switch (*p)
-                {
-                case '*':
-                    {
-                        auto it = type_dictionary.find(buffer);
-                        if (it != type_dictionary.end())
-                        {
-                            column_types.emplace_back(it->second,depth);
-                            buffer.clear();
-                        }
-                        else
-                        {
-                            JSONCONS_ASSERT(false);
-                        }
-                        state = column_state::sequence;
-                    }
-                    break;
-                case ',':
-                    {
-                        auto it = type_dictionary.find(buffer);
-                        if (it != type_dictionary.end())
-                        {
-                            column_types.emplace_back(it->second,depth);
-                            buffer.clear();
-                        }
-                        else
-                        {
-                            JSONCONS_ASSERT(false);
-                        }
-                        ++p;
-                        state = column_state::sequence;
-                    }
-                    break;
-                case ']':
-                    {
-                        JSONCONS_ASSERT(depth > 0);
-                        auto it = type_dictionary.find(buffer);
-                        if (it != type_dictionary.end())
-                        {
-                            column_types.emplace_back(it->second,depth);
-                            buffer.clear();
-                        }
-                        else
-                        {
-                            JSONCONS_ASSERT(false);
-                        }
-                        --depth;
-                        ++p;
-                        state = column_state::sequence;
-                    }
-                    break;
-                default:
-                    {
-                        buffer.push_back(*p);
-                        ++p;
-                    }
-                    break;
-                }
-                break;
-            }
-        }
-    }
-    if (state == column_state::label)
-    {
-        auto it = type_dictionary.find(buffer);
-        if (it != type_dictionary.end())
-        {
-            column_types.emplace_back(it->second,depth);
-            buffer.clear();
-        }
-        else
-        {
-            JSONCONS_ASSERT(false);
-        }
-    }
-    return column_types;
-}
-
-} // end detail
-
 template <class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parameters
 {
-    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
+    typedef CharT char_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
 
     bool assume_header_;
     bool ignore_empty_values_;
@@ -296,9 +92,10 @@ class basic_csv_parameters
     unsigned long max_lines_;
     size_t header_lines_;
     string_type line_delimiter_;
-    std::vector<string_type,Allocator> column_names_;
-    std::vector<detail::csv_type_info,Allocator> column_types_;
-    std::vector<string_type,Allocator> column_defaults_;
+
+    std::vector<string_type,string_allocator_type> column_names_;
+    std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
+    std::vector<string_type,string_allocator_type> column_defaults_;
 public:
     static const size_t default_indent = 4;
 
@@ -451,25 +248,25 @@ public:
         return *this;
     }
 
-    std::vector<string_type,Allocator> column_names() const
+    std::vector<string_type,string_allocator_type> column_names() const
     {
         return column_names_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    basic_csv_parameters& column_names(const std::vector<string_type,Allocator>& value)
+    basic_csv_parameters& column_names(const std::vector<string_type,string_allocator_type>& value)
     {
         column_names_ = value;
         return *this;
     }
 
-    basic_csv_parameters& column_defaults(const std::vector<string_type,Allocator>& value)
+    basic_csv_parameters& column_defaults(const std::vector<string_type,string_allocator_type>& value)
     {
         column_defaults_ = value;
         return *this;
     }
 
-    basic_csv_parameters& column_types(const std::vector<string_type,Allocator>& value)
+    basic_csv_parameters& column_types(const std::vector<string_type,string_allocator_type>& value)
     {
         if (value.size() > 0)
         {
@@ -499,29 +296,29 @@ public:
 #endif
     basic_csv_parameters& column_names(const string_type& names)
     {
-        column_names_ = detail::parse_column_names(names);
+        column_names_ = parse_column_names(names);
         return *this;
     }
 
-    std::vector<detail::csv_type_info,Allocator> column_types() const
+    std::vector<csv_type_info,csv_type_info_allocator_type> column_types() const
     {
         return column_types_;
     }
 
     basic_csv_parameters& column_types(const string_type& types)
     {
-        column_types_ = detail::parse_column_types(types);
+        column_types_ = parse_column_types(types);
         return *this;
     }
 
-    std::vector<string_type,Allocator> column_defaults() const
+    std::vector<string_type,string_allocator_type> column_defaults() const
     {
         return column_defaults_;
     }
 
     basic_csv_parameters& column_defaults(const string_type& defaults)
     {
-        column_defaults_ = detail::parse_column_names(defaults);
+        column_defaults_ = parse_column_names(defaults);
         return *this;
     }
 
@@ -611,6 +408,208 @@ public:
     {
         max_lines_ = value;
         return *this;
+    }
+
+    static std::vector<string_type,string_allocator_type> parse_column_names(const string_type& names)
+    {
+        std::vector<string_type,string_allocator_type> column_names;
+
+        column_state state = column_state::sequence;
+        string_type buffer;
+
+        auto p = names.begin();
+        while (p != names.end())
+        {
+            switch (state)
+            {
+            case column_state::sequence:
+                {
+                    switch (*p)
+                    {
+                    case ' ': case '\t':case '\r': case '\n':
+                        ++p;
+                        break;
+                    default:
+                        buffer.clear();
+                        state = column_state::label;
+                        break;
+                    }
+                    break;
+                }
+            case column_state::label:
+                {
+                    switch (*p)
+                    {
+                    case ',':
+                        column_names.push_back(buffer);
+                        buffer.clear();
+                        ++p;
+                        state = column_state::sequence;
+                        break;
+                    default:
+                        buffer.push_back(*p);
+                        ++p;
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+        if (state == column_state::label)
+        {
+            column_names.push_back(buffer);
+            buffer.clear();
+        }
+        return column_names;
+    }
+
+    static std::vector<csv_type_info,csv_type_info_allocator_type> parse_column_types(const string_type& types)
+    {
+        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,csv_column_type>> pair_allocator_type;
+
+        const std::unordered_map<string_type,csv_column_type, std::hash<string_type>,std::equal_to<string_type>,pair_allocator_type> type_dictionary =
+        {
+
+            {detail::string_literal<char_type>(),csv_column_type::string_t},
+            {detail::integer_literal<char_type>(),csv_column_type::integer_t},
+            {detail::float_literal<char_type>(),csv_column_type::float_t},
+            {detail::boolean_literal<char_type>(),csv_column_type::boolean_t}
+        };
+
+        std::vector<csv_type_info,csv_type_info_allocator_type> column_types;
+
+        column_state state = column_state::sequence;
+        int depth = 0;
+        string_type buffer;
+
+        auto p = types.begin();
+        while (p != types.end())
+        {
+            switch (state)
+            {
+            case column_state::sequence:
+                {
+                    switch (*p)
+                    {
+                    case ' ': case '\t':case '\r': case '\n':
+                        ++p;
+                        break;
+                    case '[':
+                        ++depth;
+                        ++p;
+                        break;
+                    case ']':
+                        JSONCONS_ASSERT(depth > 0);
+                        --depth;
+                        ++p;
+                        break;
+                    case '*':
+                        {
+                            JSONCONS_ASSERT(column_types.size() != 0);
+                            size_t offset = 0;
+                            size_t level = column_types.size() > 0 ? column_types.back().level: 0;
+                            if (level > 0)
+                            {
+                                for (auto it = column_types.rbegin();
+                                     it != column_types.rend() && level == it->level;
+                                     ++it)
+                                {
+                                    ++offset;
+                                }
+                            }
+                            else
+                            {
+                                offset = 1;
+                            }
+                            column_types.emplace_back(csv_column_type::repeat_t,depth,offset);
+                            ++p;
+                            break;
+                        }
+                    default:
+                        buffer.clear();
+                        state = column_state::label;
+                        break;
+                    }
+                    break;
+                }
+            case column_state::label:
+                {
+                    switch (*p)
+                    {
+                    case '*':
+                        {
+                            auto it = type_dictionary.find(buffer);
+                            if (it != type_dictionary.end())
+                            {
+                                column_types.emplace_back(it->second,depth);
+                                buffer.clear();
+                            }
+                            else
+                            {
+                                JSONCONS_ASSERT(false);
+                            }
+                            state = column_state::sequence;
+                        }
+                        break;
+                    case ',':
+                        {
+                            auto it = type_dictionary.find(buffer);
+                            if (it != type_dictionary.end())
+                            {
+                                column_types.emplace_back(it->second,depth);
+                                buffer.clear();
+                            }
+                            else
+                            {
+                                JSONCONS_ASSERT(false);
+                            }
+                            ++p;
+                            state = column_state::sequence;
+                        }
+                        break;
+                    case ']':
+                        {
+                            JSONCONS_ASSERT(depth > 0);
+                            auto it = type_dictionary.find(buffer);
+                            if (it != type_dictionary.end())
+                            {
+                                column_types.emplace_back(it->second,depth);
+                                buffer.clear();
+                            }
+                            else
+                            {
+                                JSONCONS_ASSERT(false);
+                            }
+                            --depth;
+                            ++p;
+                            state = column_state::sequence;
+                        }
+                        break;
+                    default:
+                        {
+                            buffer.push_back(*p);
+                            ++p;
+                        }
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+        if (state == column_state::label)
+        {
+            auto it = type_dictionary.find(buffer);
+            if (it != type_dictionary.end())
+            {
+                column_types.emplace_back(it->second,depth);
+                buffer.clear();
+            }
+            else
+            {
+                JSONCONS_ASSERT(false);
+            }
+        }
+        return column_types;
     }
 
 };

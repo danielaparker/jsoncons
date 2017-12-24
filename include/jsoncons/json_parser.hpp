@@ -94,8 +94,13 @@ class basic_json_parser : private parsing_context
     parse_error_handler& err_handler_;
     uint32_t cp_;
     uint32_t cp2_;
-    std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_buffer_;
-    std::basic_string<char,std::char_traits<char>,Allocator> number_buffer_;
+
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char> numeral_allocator_type;
+
+    std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
+    std::basic_string<char,std::char_traits<char>,numeral_allocator_type> number_buffer_;
 
     bool is_negative_;
     uint8_t precision_;
@@ -112,7 +117,8 @@ class basic_json_parser : private parsing_context
     const CharT* p_;
 
     parse_state state_;
-    std::vector<parse_state,Allocator> state_stack_;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    std::vector<parse_state,parse_state_allocator_type> state_stack_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;

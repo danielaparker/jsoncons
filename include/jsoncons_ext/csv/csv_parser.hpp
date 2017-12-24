@@ -77,7 +77,7 @@ class basic_csv_parser : private parsing_context
     basic_csv_parameters<CharT,Allocator> parameters_;
     std::vector<string_type,Allocator> column_names_;
     std::vector<std::vector<string_type,Allocator>,Allocator> column_values_;
-    std::vector<detail::csv_type_info,Allocator> column_types_;
+    std::vector<csv_type_info,Allocator> column_types_;
     std::vector<string_type,Allocator> column_defaults_;
     size_t column_index_;
     basic_json_fragment_filter<CharT> filter_;

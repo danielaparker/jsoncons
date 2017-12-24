@@ -12,7 +12,7 @@
 #include <vector>
 #include <ostream>
 #include <cstdlib>
-#include <map>
+#include <unordered_map>
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/serialization_options.hpp>
@@ -49,7 +49,11 @@ template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
 public:
-    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
+
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
 
     using typename basic_json_output_handler<CharT>::string_view_type                                 ;
 private:
@@ -73,8 +77,10 @@ private:
     basic_serialization_options<CharT> options_;
     std::vector<stack_item> stack_;
     print_double<CharT> fp_;
-    std::vector<string_type,Allocator> column_names_;
-    std::map<string_type,string_type,std::less<string_type>,Allocator> buffered_line_;
+    std::vector<string_type,string_allocator_type> column_names_;
+
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
+    std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
 
     // Noncopyable and nonmoveable
     basic_csv_serializer(const basic_csv_serializer&) = delete;

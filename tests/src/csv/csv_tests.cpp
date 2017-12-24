@@ -840,7 +840,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_repeat)
     2017-01-08,0.0063,0.0076,0.0084,0.0112,0.014
     )";    
 
-    auto result = jsoncons::csv::detail::parse_column_types<char,std::allocator<char>>("string,float*");
+    auto result = csv_parameters::parse_column_types("string,float*");
     BOOST_REQUIRE(result.size() == 3);
     BOOST_CHECK(result[0].col_type == csv_column_type::string_t);
     BOOST_CHECK(result[0].level == 0);
@@ -852,7 +852,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_repeat)
     BOOST_CHECK(result[2].level == 0);
     BOOST_CHECK_EQUAL(1, result[2].rep_count);
 
-    auto result2 = jsoncons::csv::detail::parse_column_types<char, std::allocator<char>>("string,[float*]");
+    auto result2 = csv_parameters::parse_column_types("string,[float*]");
     BOOST_REQUIRE(result2.size() == 3);
     BOOST_CHECK(result2[0].col_type == csv_column_type::string_t);
     BOOST_CHECK(result2[0].level == 0);
@@ -864,7 +864,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_repeat)
     BOOST_CHECK(result2[2].level == 1);
     BOOST_CHECK_EQUAL(1, result2[2].rep_count);
 
-    auto result3 = jsoncons::csv::detail::parse_column_types<char,std::allocator<char>>("string,[float]*");
+    auto result3 = csv_parameters::parse_column_types("string,[float]*");
     BOOST_REQUIRE(result3.size() == 3);
     BOOST_CHECK(result3[0].col_type == csv_column_type::string_t);
     BOOST_CHECK(result3[0].level == 0);
