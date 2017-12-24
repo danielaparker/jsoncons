@@ -49,8 +49,14 @@ public:
         key_storage_type name_;
         Json value_;
     };
-    std::vector<stack_item,Allocator> stack_;
-    std::vector<size_t,Allocator> stack_offsets_;
+
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<size_t> size_t_allocator_type;
+
+
+    std::vector<stack_item,stack_item_allocator_type> stack_;
+    std::vector<size_t,size_t_allocator_type> stack_offsets_;
     bool is_valid_;
 
 public:
