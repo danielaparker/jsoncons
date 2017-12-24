@@ -65,8 +65,6 @@ class basic_csv_parser : private parsing_context
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
 
-    typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
-
     static const int default_depth = 3;
 
     default_parse_error_handler default_err_handler_;
