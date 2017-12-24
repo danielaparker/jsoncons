@@ -56,15 +56,23 @@ template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_csv_parser : private parsing_context
 {
     typedef basic_string_view_ext<CharT> string_view_type;
+    typedef CharT char_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_mode_type> csv_mode_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
 
-    typedef std::basic_string<CharT,std::char_traits<CharT>,Allocator> string_type;
+    typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
 
     static const int default_depth = 3;
 
     default_parse_error_handler default_err_handler_;
     csv_state_type state_;
     int top_;
-    std::vector<csv_mode_type,Allocator> stack_;
+    std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
     basic_json_input_handler<CharT>& handler_;
     parse_error_handler& err_handler_;
     size_t index_;
@@ -75,10 +83,10 @@ class basic_csv_parser : private parsing_context
     string_type value_buffer_;
     int depth_;
     basic_csv_parameters<CharT,Allocator> parameters_;
-    std::vector<string_type,Allocator> column_names_;
-    std::vector<std::vector<string_type,Allocator>,Allocator> column_values_;
-    std::vector<csv_type_info,Allocator> column_types_;
-    std::vector<string_type,Allocator> column_defaults_;
+    std::vector<string_type,string_allocator_type> column_names_;
+    std::vector<std::vector<string_type,string_allocator_type>,string_vector_allocator_type> column_values_;
+    std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
+    std::vector<string_type,string_allocator_type> column_defaults_;
     size_t column_index_;
     basic_json_fragment_filter<CharT> filter_;
     size_t level_;

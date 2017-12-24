@@ -37,12 +37,16 @@ class basic_csv_reader
 
         bool array_begun_;
     };
+    typedef CharT char_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
     basic_csv_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
-    std::vector<CharT,Allocator> buffer_;
+    std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
     size_t buffer_position_;
     bool eof_;

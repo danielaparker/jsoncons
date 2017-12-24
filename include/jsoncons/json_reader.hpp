@@ -141,10 +141,14 @@ class basic_json_reader
 {
     static const size_t default_max_buffer_length = 16384;
 
+    typedef CharT char_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+
     basic_json_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
     bool eof_;
-    std::vector<CharT,Allocator> buffer_;
+    std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
     bool begin_;
 
