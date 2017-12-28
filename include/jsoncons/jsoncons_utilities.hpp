@@ -305,7 +305,6 @@ inline
 std::string decode_base64(const std::string& base64_string)
 {
     std::string result;
-    size_t buflen = base64_string.size();
     uint8_t a4[4], a3[3];
     uint8_t i = 0;
     uint8_t j = 0;

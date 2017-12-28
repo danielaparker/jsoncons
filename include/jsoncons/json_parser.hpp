@@ -1476,7 +1476,6 @@ public:
     void parse_number(std::error_code& ec)
     {
         const CharT* local_end_input = end_input_;
-        const CharT* sb = p_;
 
         switch (state_)
         {
