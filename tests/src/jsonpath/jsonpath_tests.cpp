@@ -1450,6 +1450,48 @@ BOOST_AUTO_TEST_CASE(test_select_two)
     BOOST_CHECK_EQUAL(expected,result);
 }
 
+BOOST_AUTO_TEST_CASE(test_select_two)
+{
+    json j = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  },
+  {
+    "a": 7,
+    "b": 700,
+    "c": 7000
+  }
+]
+)");
+
+    json result = json_query(j,"$..*[?((@.a == 5 && @.b == 500) || (@.a == 6 && @.b == 600))]");
+
+    json expected = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
