@@ -1,3 +1,20 @@
+0.101.0
+-------
+
+Fixes:
+
+- Fixes to `string_view` code when `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp` 
+
+Changes:
+
+- `as_double` throws if `json` value is null (previously returned NaN)
+
+Enhancements:
+
+- Added convenience functions `decode_csv` and `encode_csv`
+- Support custom allocaor (currently stateless only) in `json_decoder`, `json_reader`, 
+  `csv_reader`, `csv_parameters`
+
 0.100.2
 -------
 
