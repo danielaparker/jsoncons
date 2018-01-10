@@ -42,39 +42,39 @@ const json example = json::parse(R"(
 void check_get(const std::string& pointer, const json& expected)
 {
 
-    json result;
-    jsonpointer::jsonpointer_errc ec;
-
-    std::tie(result,ec) = jsonpointer::get(example,pointer);
-    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    std::error_code ec;
+    json result = jsonpointer::get(example,pointer,ec);
+    BOOST_CHECK(!ec);
     BOOST_CHECK_EQUAL(expected,result);
 }
 
 void check_contains(const std::string& pointer, bool expected)
 {
-
     bool result = jsonpointer::contains(example,pointer);
     BOOST_CHECK_EQUAL(expected,result);
 }
 
 void check_add(json& example, const std::string& path, const json& value, const json& expected)
 {
-    jsonpointer::jsonpointer_errc ec = jsonpointer::insert_or_assign(example, path, value);
-    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    std::error_code ec;
+    jsonpointer::insert_or_assign(example, path, value, ec);
+    BOOST_CHECK(!ec);
     BOOST_CHECK_EQUAL(expected, example);
 }
 
 void check_replace(json& example, const std::string& path, const json& value, const json& expected)
 {
-    jsonpointer::jsonpointer_errc ec = jsonpointer::replace(example, path, value);
-    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    std::error_code ec;
+    jsonpointer::replace(example, path, value, ec);
+    BOOST_CHECK(!ec);
     BOOST_CHECK_EQUAL(expected, example);
 }
 
 void check_remove(json& example, const std::string& path, const json& expected)
 {
-    jsonpointer::jsonpointer_errc ec = jsonpointer::remove(example, path);
-    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    std::error_code ec;
+    jsonpointer::remove(example, path, ec);
+    BOOST_CHECK(!ec);
     BOOST_CHECK_EQUAL(expected, example);
 }
 

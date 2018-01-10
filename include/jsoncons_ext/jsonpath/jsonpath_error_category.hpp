@@ -14,6 +14,7 @@ namespace jsoncons { namespace jsonpath {
 
 enum class jsonpath_parser_errc 
 {
+    ok = 0,
     expected_root = 1,
     expected_right_bracket = 2,
     expected_name = 3,
