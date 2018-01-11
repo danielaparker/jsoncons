@@ -23,7 +23,7 @@ using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_tests)
-
+#if 0
 const json store = json::parse(R"(
 {
     "store": {
@@ -1490,6 +1490,32 @@ BOOST_AUTO_TEST_CASE(test_select_two)
 )");
 
     BOOST_CHECK_EQUAL(expected,result);
+}
+#endif
+BOOST_AUTO_TEST_CASE(test_select_length_4)
+{
+    json j = json::parse(R"(
+[
+      {
+        "result": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+]
+
+)");
+
+    json result = json_query(j,"$..[?(@.result.length == 4)]");
+
+    std::cout << result << std::endl;
+
+    //json expected = json::parse(R"(
+//)");
+
+    //BOOST_CHECK_EQUAL(expected,result);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
