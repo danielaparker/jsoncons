@@ -6,11 +6,11 @@ Adds a `json` value.
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json>
-void insert_or_assign(Json& target, const typename Json::string_view_type& path, const Json& value); // (1)
+template<class J>
+void insert_or_assign(J& target, const typename J::string_view_type& path, const J& value); // (1)
 
-template<class Json>
-void insert_or_assign(Json& target, const typename Json::string_view_type& path, const Json& value, std::error_code& ec); // (2)
+template<class J>
+void insert_or_assign(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); // (2)
 ```
 
 Inserts a value into the target at the specified path, or if the path specifies an object member that already has the same key, assigns the new value to that member

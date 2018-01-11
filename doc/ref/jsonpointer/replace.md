@@ -6,11 +6,11 @@ Replace a `json` element or member.
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class Json>
-void replace(Json& target, const typename Json::string_view_type& path, const Json& value); 
+template<class J>
+void replace(J& target, const typename J::string_view_type& path, const J& value); 
 
-template<class Json>
-void replace(Json& target, const typename Json::string_view_type& path, const Json& value, std::error_code& ec); 
+template<class J>
+void replace(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); 
 ```
 
 Replaces the value at the location specified by `path` with a new value. 
