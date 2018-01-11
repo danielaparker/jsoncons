@@ -92,6 +92,18 @@ void jsonpointer_select_author()
     ]
     )");
 
+    // With exceptions
+    try
+    {
+        json result = jsonpointer::get(doc, "/1/author");
+        std::cout << result << std::endl;
+    }
+    catch (const jsonpointer::jsonpointer_error& e)
+    {
+        std::cout << ec.what() << std::endl;
+    }
+
+    // With error codes
     std::error_code ec;
     json result = jsonpointer::get(doc, "/1/author", ec);
 

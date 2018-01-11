@@ -544,11 +544,26 @@ int main()
         ]
     )");
 
-    json result;
-    jsonpointer::jsonpointer_errc ec;
-    std::tie(result,ec) = jsonpointer::get(root, "/1/author");
+    // Using exceptions to report errors
+    try
+    {
+        json result = jsonpointer::get(doc, "/1/author");
+        std::cout << result << std::endl;
+    }
+    catch (const jsonpointer::jsonpointer_error& e)
+    {
+        std::cout << ec.what() << std::endl;
+    }
 
-    if (ec == jsonpointer::jsonpointer_errc())
+    // Using error codes to report errors
+    std::error_code ec;
+    json result = jsonpointer::get(doc, "/1/author", ec);
+
+    if (ec)
+    {
+        std::cout << ec.message() << std::endl;
+    }
+    else
     {
         std::cout << result << std::endl;
     }
