@@ -690,7 +690,7 @@ Json get(const Json& root, const typename Json::string_view_type& path, std::err
 {
     detail::jsonpointer_evaluator<Json,const Json&> evaluator;
     ec = evaluator.get(root,path);
-    return !ec ? evaluator.get_result() : Json::null();
+    return evaluator.get_result();
 }
 
 template<class Json>
