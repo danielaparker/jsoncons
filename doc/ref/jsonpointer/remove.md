@@ -43,14 +43,15 @@ int main()
         { "foo": "bar", "baz" : "qux"}
     )");
 
-    auto ec = jsonpointer::remove(target, "/baz");
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::remove(target, "/baz", ec);
+    if (ec)
     {
-        std::cout << target << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << target << std::endl;
     }
 }
 ```
@@ -73,14 +74,15 @@ int main()
         { "foo": [ "bar", "qux", "baz" ] }
     )");
 
-    auto ec = jsonpointer::remove(target, "/foo/1");
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::remove(target, "/foo/1", ec);
+    if (ec)
     {
-        std::cout << target << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << target << std::endl;
     }
 }
 ```

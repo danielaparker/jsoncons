@@ -46,14 +46,15 @@ int main()
         }
     )");
 
-    auto ec = jsonpointer::replace(target, "/baz", json("boo"));
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::replace(target, "/baz", json("boo"), ec);
+    if (ec)
     {
-        std::cout << target << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << target << std::endl;
     }
 }
 ```
@@ -79,14 +80,15 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::replace(target, "/foo/1", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::replace(target, "/foo/1", json("qux"), ec);
+    if (ec)
     {
-        std::cout << pretty_print(target) << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << pretty_print(target) << std::endl;
     }
 }
 ```

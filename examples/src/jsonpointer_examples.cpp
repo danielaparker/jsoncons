@@ -25,32 +25,37 @@ void jsonpointer_select_RFC6901()
        }
     )");
 
-    json result;
-
-    result = jsonpointer::get(example, "");
-    std::cout << "(1) " << result << std::endl;
-    result = jsonpointer::get(example, "/foo");
-    std::cout << "(2) " << result << std::endl;
-    result = jsonpointer::get(example, "/foo/0");
-    std::cout << "(3) " << result << std::endl;
-    result = jsonpointer::get(example, "/");
-    std::cout << "(4) " << result << std::endl;
-    result = jsonpointer::get(example, "/a~1b");
-    std::cout << "(5) " << result << std::endl;
-    result = jsonpointer::get(example, "/c%d");
-    std::cout << "(6) " << result << std::endl;
-    result = jsonpointer::get(example, "/e^f");
-    std::cout << "(7) " << result << std::endl;
-    result = jsonpointer::get(example, "/g|h");
-    std::cout << "(8) " << result << std::endl;
-    result = jsonpointer::get(example, "/i\\j");
-    std::cout << "(9) " << result << std::endl;
-    result = jsonpointer::get(example, "/k\"l");
-    std::cout << "(10) " << result << std::endl;
-    result = jsonpointer::get(example, "/ ");
-    std::cout << "(11) " << result << std::endl;
-    result = jsonpointer::get(example, "/m~0n");
-    std::cout << "(12) " << result << std::endl;
+    try
+    {
+        json result1 = jsonpointer::get(example, "");
+        std::cout << "(1) " << result1 << std::endl;
+        json result2 = jsonpointer::get(example, "/foo");
+        std::cout << "(2) " << result2 << std::endl;
+        json result3 = jsonpointer::get(example, "/foo/0");
+        std::cout << "(3) " << result3 << std::endl;
+        json result4 = jsonpointer::get(example, "/");
+        std::cout << "(4) " << result4 << std::endl;
+        json result5 = jsonpointer::get(example, "/a~1b");
+        std::cout << "(5) " << result5 << std::endl;
+        json result6 = jsonpointer::get(example, "/c%d");
+        std::cout << "(6) " << result6 << std::endl;
+        json result7 = jsonpointer::get(example, "/e^f");
+        std::cout << "(7) " << result7 << std::endl;
+        json result8 = jsonpointer::get(example, "/g|h");
+        std::cout << "(8) " << result8 << std::endl;
+        json result9 = jsonpointer::get(example, "/i\\j");
+        std::cout << "(9) " << result9 << std::endl;
+        json result10 = jsonpointer::get(example, "/k\"l");
+        std::cout << "(10) " << result10 << std::endl;
+        json result11 = jsonpointer::get(example, "/ ");
+        std::cout << "(11) " << result11 << std::endl;
+        json result12 = jsonpointer::get(example, "/m~0n");
+        std::cout << "(12) " << result12 << std::endl;
+    }
+    catch (const jsonpointer::jsonpointer_error& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 }
 
 void jsonpointer_contains()
@@ -92,20 +97,20 @@ void jsonpointer_select_author()
     ]
     )");
 
-    // With exceptions
+    // Using exceptions to report errors
     try
     {
         json result = jsonpointer::get(doc, "/1/author");
-        std::cout << result << std::endl;
+        std::cout << "(1) " << result << std::endl;
     }
     catch (const jsonpointer::jsonpointer_error& e)
     {
         std::cout << e.what() << std::endl;
     }
 
-    // With error codes
+    // Using error codes to report errors
     std::error_code ec;
-    json result = jsonpointer::get(doc, "/1/author", ec);
+    json result = jsonpointer::get(doc, "/0/title", ec);
 
     if (ec)
     {
@@ -113,7 +118,7 @@ void jsonpointer_select_author()
     }
     else
     {
-        std::cout << result << std::endl;
+        std::cout << "(2) " << result << std::endl;
     }
 }
 
@@ -124,7 +129,7 @@ void jsonpointer_add_member_to_object()
     )");
 
     std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/baz", json("qux"), ec);
+    jsonpointer::insert(target, "/baz", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -142,7 +147,7 @@ void jsonpointer_add_element_to_array()
     )");
 
     std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/foo/1", json("qux"), ec);
+    jsonpointer::insert(target, "/foo/1", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -159,9 +164,8 @@ void jsonpointer_add_element_to_end_array()
         { "foo": [ "bar", "baz" ] }
     )");
 
-
     std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/foo/-", json("qux"), ec);
+    jsonpointer::insert(target, "/foo/-", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -172,7 +176,25 @@ void jsonpointer_add_element_to_end_array()
     }
 }
 
-void jsonpointer_add_value_name_exists()
+void jsonpointer_insert_name_exists()
+{
+    json target = json::parse(R"(
+        { "foo": "bar", "baz" : "abc"}
+    )");
+
+    std::error_code ec;
+    jsonpointer::insert(target, "/baz", json("qux"), ec);
+    if (ec)
+    {
+        std::cout << ec.message() << std::endl;
+    }
+    else
+    {
+        std::cout << target << std::endl;
+    }
+}
+
+void jsonpointer_insert_or_assign_name_exists()
 {
     json target = json::parse(R"(
         { "foo": "bar", "baz" : "abc"}
@@ -346,11 +368,9 @@ void jsonpointer_examples()
 {
     std::cout << "\njsonpointer examples\n\n";
     jsonpointer_select_RFC6901();
-    jsonpointer_select_author();
     jsonpointer_add_member_to_object();
     jsonpointer_add_element_to_array();
     jsonpointer_add_element_to_end_array();
-    jsonpointer_add_value_name_exists();
     jsonpointer_add_element_outside_range();
     jsonpointer_remove_object_member();
     jsonpointer_remove_array_element();
@@ -359,6 +379,10 @@ void jsonpointer_examples()
     jsonpointer_contains();
     jsonpointer_cbor();
     jsonpointer_error_example();
+    jsonpointer_select_RFC6901();
+    jsonpointer_select_author();
+    jsonpointer_insert_name_exists();
+    jsonpointer_insert_or_assign_name_exists();
     std::cout << std::endl;
 }
 

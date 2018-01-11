@@ -31,6 +31,14 @@ Planned new features are listed on the [roadmap](doc/Roadmap.md)
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
 Results for [JSONTestSuite](https://github.com/nst/JSONTestSuite) and [JSON_checker](http://www.json.org/JSON_checker/) tests may be found [here](https://danielaparker.github.io/json_benchmarks/).
 
+### What's new on master
+
+The signatures of `jsonpointer::get`, `jsonpointer::insert`, `jsonpointer::insert_or_assign`, 
+`jsonpointer::remove` and `jsonpointer::replace` have been changed to be consistent
+with other functions in the jsoncons library. Each of these functions now has two overloads,
+one that takes an `std::error_code` parameter and uses it to report errors, and one that 
+throws a `jsonpointer_error` exception to report errors.
+
 ### A simple program using jsoncons
 
 ```c++
@@ -529,35 +537,35 @@ using namespace jsoncons;
 
 int main()
 {
-    json root = json::parse(R"(
-        [
-          { "category": "reference",
-            "author": "Nigel Rees",
-            "title": "Sayings of the Century",
-            "price": 8.95
-          },
-          { "category": "fiction",
-            "author": "Evelyn Waugh",
-            "title": "Sword of Honour",
-            "price": 12.99
-          }
-        ]
+    json doc = json::parse(R"(
+    [
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      }
+    ]
     )");
 
     // Using exceptions to report errors
     try
     {
         json result = jsonpointer::get(doc, "/1/author");
-        std::cout << result << std::endl;
+        std::cout << "(1) " << result << std::endl;
     }
     catch (const jsonpointer::jsonpointer_error& e)
     {
-        std::cout << ec.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
 
     // Using error codes to report errors
     std::error_code ec;
-    json result = jsonpointer::get(doc, "/1/author", ec);
+    json result = jsonpointer::get(doc, "/0/title", ec);
 
     if (ec)
     {
@@ -565,13 +573,14 @@ int main()
     }
     else
     {
-        std::cout << result << std::endl;
+        std::cout << "(2) " << result << std::endl;
     }
 }
 ```
 Output:
 ```json
-"Evelyn Waugh"
+(1) "Evelyn Waugh"
+(2) "Sayings of the Century"
 ```
 
 [jsonpointer::get](jsonpointer/get.md) may also be used to query packed cbor values.

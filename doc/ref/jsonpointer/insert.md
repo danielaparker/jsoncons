@@ -47,14 +47,15 @@ int main()
         { "foo": "bar"}
     )");
 
-    auto ec = jsonpointer::insert(target, "/baz", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::insert(target, "/baz", json("qux"), ec);
+    if (ec)
     {
-        std::cout << target << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << target << std::endl;
     }
 }
 ```
@@ -63,7 +64,7 @@ Output:
 {"baz":"qux","foo":"bar"}
 ```
 
-#### Add an element to the second position in an array
+#### Insert an element to the second position in an array
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -77,14 +78,15 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::insert(target, "/foo/1", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::insert(target, "/foo/1", json("qux"), ec);
+    if (ec)
     {
-        std::cout << target << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << target << std::endl;
     }
 }
 ```
@@ -93,7 +95,7 @@ Output:
 {"foo":["bar","qux","baz"]}
 ```
 
-#### Add a value to the end of an array
+#### Insert a value at the end of an array
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -107,14 +109,15 @@ int main()
         { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::insert(target, "/foo/-", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::insert(target, "/foo/-", json("qux"), ec);
+    if (ec)
     {
-        std::cout << target << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << target << std::endl;
     }
 }
 ```
@@ -123,7 +126,7 @@ Output:
 {"foo":["bar","baz","qux"]}
 ```
 
-#### Add an object member to a location that already exists
+#### Attempt to insert object member at a location that already exists
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -137,14 +140,15 @@ int main()
         { "foo": "bar", "baz" : "abc"}
     )");
 
-    auto ec = jsonpointer::insert(target, "/baz", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::insert(target, "/baz", json("qux"), ec);
+    if (ec)
     {
-        std::cout << target << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << target << std::endl;
     }
 }
 ```
@@ -153,7 +157,7 @@ Output:
 Key already exists
 ```
 
-#### Add a value to a location in an array that exceeds the size of the array
+#### Attempt to insert value to a location in an array that exceeds the size of the array
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -164,17 +168,18 @@ using namespace jsoncons;
 int main()
 {
     json target = json::parse(R"(
-        { "foo": [ "bar", "baz" ] }
+    { "foo": [ "bar", "baz" ] }
     )");
 
-    auto ec = jsonpointer::insert(target, "/foo/3", json("qux"));
-    if (ec == jsonpointer::jsonpointer_errc())
+    std::error_code ec;
+    jsonpointer::insert(target, "/foo/3", json("qux"), ec);
+    if (ec)
     {
-        std::cout << target << std::endl;
+        std::cout << ec.message() << std::endl;
     }
     else
     {
-        std::cout << make_error_code(ec).message() << std::endl;
+        std::cout << target << std::endl;
     }
 }
 ```

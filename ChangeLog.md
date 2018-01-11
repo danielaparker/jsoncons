@@ -1,3 +1,12 @@
+master
+------
+
+The signatures of `jsonpointer::get`, `jsonpointer::insert`, `jsonpointer::insert_or_assign`, 
+`jsonpointer::remove` and `jsonpointer::replace` have been changed to be consistent
+with other functions in the jsoncons library. Each of these functions now has two overloads,
+one that takes an `std::error_code` parameter and uses it to report errors, and one that 
+throws a `jsonpointer_error` exception to report errors.
+
 0.101.0
 -------
 
