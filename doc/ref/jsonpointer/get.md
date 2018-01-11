@@ -7,7 +7,10 @@ Selects a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class J>
-std::tuple<J,jsonpointer_errc> get(const J& root, typename J::string_view_type path);
+J get(const J& root, typename J::string_view_type path); // (1)
+
+template<class J>
+J get(const J& root, typename J::string_view_type path, std::error_code& ec); // (2)
 
 ```
 

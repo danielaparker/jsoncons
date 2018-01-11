@@ -7,7 +7,10 @@ Adds a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-jsonpointer_errc insert(Json& target, const typename Json::string_view_type& path, const Json& value); 
+void insert(Json& target, const typename Json::string_view_type& path, const Json& value); // (1) 
+
+template<class Json>
+void insert(Json& target, const typename Json::string_view_type& path, const Json& value, std::error_code& ec); // (2) 
 ```
 
 Inserts a value into the target at the specified path, if the path doesn't specify an object member that already has the same key.

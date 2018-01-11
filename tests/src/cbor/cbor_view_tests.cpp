@@ -69,18 +69,15 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
 
     cbor_view v(buffer); 
 
-    cbor_view application;
-    jsonpointer::jsonpointer_errc ec;
-
-    std::tie(application,ec) = jsonpointer::get(v,"/application");
-    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    std::error_code ec;
+    cbor_view application = jsonpointer::get(v, "/application", ec);
+    BOOST_CHECK(!ec);
 
     json j2 = decode_cbor<json>(application);
     std::cout << pretty_print(j2) << std::endl;
 
-    cbor_view reputons_0_rated;
-    std::tie(reputons_0_rated,ec) = jsonpointer::get(v,"/reputons");
-    BOOST_CHECK_EQUAL(ec,jsonpointer::jsonpointer_errc());
+    cbor_view reputons_0_rated = jsonpointer::get(v, "/reputons", ec);
+    BOOST_CHECK(!ec);
 
     json j3 = decode_cbor<json>(reputons_0_rated);
     std::cout << pretty_print(j3) << std::endl;
