@@ -20,6 +20,12 @@ On success, returns the selected J value and a value-initialized [jsonpointer_er
 
 On error, returns a null J value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
 
+### Exceptions
+
+(1) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
+ 
+(2) Sets the `std::error_code&' to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
+
 #### Requirements
 
 The type J satisfies the requirements for `jsonpointer::get` if it defines the following types

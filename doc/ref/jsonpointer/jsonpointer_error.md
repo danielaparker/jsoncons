@@ -24,27 +24,29 @@ Returns an error message
 
 ### Example
 
-    #include <jsoncons/json.hpp>
+```c++
+#include <jsoncons/json.hpp>
 
-    using jsoncons::json;
+using jsoncons::json;
 
-    int main()
+int main()
+{
+    string s = "[1,2,3,4,]";
+    try 
     {
-        string s = "[1,2,3,4,]";
-        try 
-        {
-            jsoncons::json val = jsoncons::json::parse(s);
-        } 
-        catch(const jsoncons::jsonpointer_error& e) 
-        {
-            std::cout << "Caught jsonpointer_error with category " 
-                      << e.code().category().name() 
-                              << ", code " << e.code().value() 
-                      << " and message " << e.what() << std::endl;
-        }
+        jsoncons::json val = jsoncons::json::parse(s);
+    } 
+    catch(const jsoncons::jsonpointer_error& e) 
+    {
+        std::cout << "Caught jsonpointer_error with category " 
+                  << e.code().category().name() 
+                          << ", code " << e.code().value() 
+                  << " and message " << e.what() << std::endl;
     }
-
+}
+```
 
 Output:
-
-    Caught jsonpointer_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+```
+Caught jsonpointer_error with category jsoncons.jsonpointer, code 0x6 and message "Name not found"
+```

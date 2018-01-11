@@ -21,6 +21,12 @@ On success, a value-initialized [jsonpointer_errc](jsonpointer_errc.md).
 
 On error, a [jsonpointer_errc](jsonpointer_errc.md) error code 
 
+### Exceptions
+
+(1) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
+ 
+(2) Sets the `std::error_code&' to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
+
 ### Examples
 
 #### Replace an object value

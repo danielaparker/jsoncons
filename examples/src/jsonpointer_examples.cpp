@@ -100,7 +100,7 @@ void jsonpointer_select_author()
     }
     catch (const jsonpointer::jsonpointer_error& e)
     {
-        std::cout << ec.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
 
     // With error codes
@@ -197,7 +197,7 @@ void jsonpointer_add_element_outside_range()
     )");
 
     std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/foo/3", json("qux"));
+    jsonpointer::insert_or_assign(target, "/foo/3", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -311,6 +311,37 @@ void jsonpointer_cbor()
     std::cout << j2 << std::endl;
 }
 
+void jsonpointer_error_example()
+{
+    json doc = json::parse(R"(
+    [
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      }
+    ]
+    )");
+
+    try
+    {
+        json result = jsonpointer::get(doc, "/1/isbn");
+        std::cout << "succeeded?" << std::endl;
+        std::cout << result << std::endl;
+    }
+    catch (const jsonpointer::jsonpointer_error& e)
+    {
+        std::cout << "Caught jsonpointer_error with category " << e.code().category().name() 
+                  << ", code " << e.code().value() 
+                  << " and message \"" << e.what() << "\"" << std::endl;
+    }
+}
+
 void jsonpointer_examples()
 {
     std::cout << "\njsonpointer examples\n\n";
@@ -327,6 +358,7 @@ void jsonpointer_examples()
     jsonpointer_replace_array_value();
     jsonpointer_contains();
     jsonpointer_cbor();
+    jsonpointer_error_example();
     std::cout << std::endl;
 }
 

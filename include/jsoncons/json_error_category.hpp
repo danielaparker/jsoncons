@@ -52,7 +52,7 @@ class json_error_category_impl
 public:
     virtual const char* name() const JSONCONS_NOEXCEPT
     {
-        return "json";
+        return "jsoncons";
     }
     virtual std::string message(int ev) const
     {

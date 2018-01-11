@@ -33,7 +33,8 @@ public:
     {
         try
         {
-            return error_code_.message().c_str();
+            const_cast<std::string&>(buffer_) = error_code_.message();
+            return buffer_.c_str();
         }
         catch (...)
         {
@@ -49,6 +50,7 @@ public:
     jsonpointer_error& operator=(const jsonpointer_error& e) = default;
     jsonpointer_error& operator=(jsonpointer_error&& e) = default;
 private:
+    std::string buffer_;
     std::error_code error_code_;
 };
 

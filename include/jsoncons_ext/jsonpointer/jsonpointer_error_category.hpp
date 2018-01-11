@@ -32,7 +32,7 @@ class jsonpointer_error_category_impl
 public:
     virtual const char* name() const JSONCONS_NOEXCEPT
     {
-        return "jsonpointer";
+        return "jsoncons.jsonpointer";
     }
     virtual std::string message(int ev) const
     {
