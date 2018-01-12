@@ -23,90 +23,7 @@ using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
 BOOST_AUTO_TEST_SUITE(jsonpath_tests)
-
-const json complex_json = json::parse(R"(
-[
-  {
-    "root": {
-      "id" : 10,
-      "second": [
-        {
-             "names": [
-            2
-          ],
-          "complex": [
-            {
-              "names": [
-                1
-              ],
-              "panels": [
-                {
-                  "result": [
-                    1
-                  ]
-                },
-                {
-                  "result": [
-                    1,
-                    2,
-                    3,
-                    4
-                  ]
-                },
-                {
-                  "result": [
-                    1
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  },
-  {
-    "root": {
-      "id" : 20,
-      "second": [
-        {
-          "names": [
-            2
-          ],
-          "complex": [
-            {
-              "names": [
-                1
-              ],
-              "panels": [
-                {
-                  "result": [
-                    1
-                  ]
-                },
-                {
-                  "result": [
-                    1,
-                    2,
-                    3,
-                    4
-                  ]
-                },
-                {
-                  "result": [
-                    1
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  }
-]
-)");
-
+#if 0
 const json store = json::parse(R"(
 {
     "store": {
@@ -475,7 +392,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_filter1)
     }
     BOOST_CHECK_EQUAL(expected,result);
 }
-
+ 
 BOOST_AUTO_TEST_CASE(test_jsonpath_filter2)
 {
     jsonpath_fixture fixture;
@@ -1018,46 +935,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation3)
 ["iPhone","0123-4567-8888","home","0123-4567-8910"]
 )");
 
-    json result2 = json_query(val, "$..['type','number']");
-    BOOST_CHECK_EQUAL(expected2, result2);
-}
-
-BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation4)
-{
-    json val = json::parse(R"(
-{
-  "firstName": "John",
-  "lastName" : "doe",
-  "age"      : 26,
-  "address"  : {
-    "streetAddress": "naist street",
-    "city"         : "Nara",
-    "postalCode"   : "630-0192"
-  },
-  "phoneNumbers": [
-    {
-      "type"  : "iPhone",
-      "number": "0123-4567-8888"
-    },
-    {
-      "type"  : "home",
-      "number": "0123-4567-8910"
-    }
-  ]
-}
-    )");
-
-    json expected2 = json::parse(R"(
-["iPhone","0123-4567-8888","home","0123-4567-8910"]
-)");
-    json test1 = json_query(val, "$.phoneNumbers");
-    std::cout << test1 << std::endl;
-    json test2 = json_query(val, "$[phoneNumbers]");
-    std::cout << test2 << std::endl;
-    json test3 = json_query(val, "$..['type']");
-    std::cout << test3 << std::endl;
-
-    json result2 = json_query(val, "$.phoneNumbers..['type','number']");
+    json result2 = json_query(val, "$..[('type'),('number')]");
     BOOST_CHECK_EQUAL(expected2, result2);
 }
 
@@ -1320,6 +1198,301 @@ BOOST_AUTO_TEST_CASE(test_select_two)
     BOOST_CHECK_EQUAL(expected,result);
 }
 
+<<<<<<< HEAD
+BOOST_AUTO_TEST_CASE(test_select_two)
+{
+    json j = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  },
+  {
+    "a": 7,
+    "b": 700,
+    "c": 7000
+  }
+]
+)");
+
+    json result = json_query(j,"$..*[?((@.a == 5 && @.b == 500) || (@.a == 6 && @.b == 600))]");
+
+    json expected = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_select_two)
+{
+    json j = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  },
+  {
+    "a": 7,
+    "b": 700,
+    "c": 7000
+  }
+]
+)");
+
+    json result = json_query(j,"$..*[?((@.a == 5 && @.b == 500) || (@.a == 6 && @.b == 600))]");
+
+    json expected = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_select_two)
+{
+    json j = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  },
+  {
+    "a": 7,
+    "b": 700,
+    "c": 7000
+  }
+]
+)");
+
+    json result = json_query(j,"$..*[?((@.a == 5 && @.b == 500) || (@.a == 6 && @.b == 600))]");
+
+    json expected = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_select_two)
+{
+    json j = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  },
+  {
+    "a": 7,
+    "b": 700,
+    "c": 7000
+  }
+]
+)");
+
+    json result = json_query(j,"$..*[?((@.a == 5 && @.b == 500) || (@.a == 6 && @.b == 600))]");
+
+    json expected = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_select_two)
+{
+    json j = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  },
+  {
+    "a": 7,
+    "b": 700,
+    "c": 7000
+  }
+]
+)");
+
+    json result = json_query(j,"$..*[?((@.a == 5 && @.b == 500) || (@.a == 6 && @.b == 600))]");
+
+    json expected = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_select_two)
+{
+    json j = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  },
+  {
+    "a": 7,
+    "b": 700,
+    "c": 7000
+  }
+]
+)");
+
+    json result = json_query(j,"$..*[?((@.a == 5 && @.b == 500) || (@.a == 6 && @.b == 600))]");
+
+    json expected = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_select_two)
+{
+    json j = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  },
+  {
+    "a": 7,
+    "b": 700,
+    "c": 7000
+  }
+]
+)");
+
+    json result = json_query(j,"$..*[?((@.a == 5 && @.b == 500) || (@.a == 6 && @.b == 600))]");
+
+    json expected = json::parse(R"(
+[
+  {
+    "a": 5,
+    "b": 500,
+    "c": 5000
+  },
+  {
+    "a": 6,
+    "b": 600,
+    "c": 6000
+  }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+#endif
 BOOST_AUTO_TEST_CASE(test_select_length_4)
 {
     json j = json::parse(R"(
@@ -1338,51 +1511,16 @@ BOOST_AUTO_TEST_CASE(test_select_length_4)
 
     json result = json_query(j,"$..[?(@.result.length == 4)]");
 
-    json expected = json::parse(R"(
-[{"result":[1,2,3,4]}]
-    )");
-
-    BOOST_CHECK_EQUAL(expected,result);
-}
-
-BOOST_AUTO_TEST_CASE(test_select_length_4_2)
-{
-
-    json result = json_query(complex_json,"$..[?(@.result.length == 4)]");
-
-    json expected = json::parse(R"(
-[{"result":[1,2,3,4]},{"result":[1,2,3,4]}]
-    )");
-
-    BOOST_CHECK_EQUAL(expected,result);
-}
-
-BOOST_AUTO_TEST_CASE(test_select_length_4_2_plus)
-{
-
-    json result = json_query(complex_json,"$..[?(@.id == 10)]..[?(@.result.length == 4)]");
     std::cout << result << std::endl;
 
-    json expected = json::parse(R"(
-[{"result":[1,2,3,4]}]
-    )");
+    //json expected = json::parse(R"(
+//)");
 
-    BOOST_CHECK_EQUAL(expected,result);
+    //BOOST_CHECK_EQUAL(expected,result);
 }
 
-BOOST_AUTO_TEST_CASE(test_select_length_4_2_plus_plus)
-{
-
-    json result = json_query(complex_json,"$..[?(@.result.length == 4)][?(@.result[2] == 3)]");
-    std::cout << result << std::endl;
-
-    json expected = json::parse(R"(
-[{"result":[1,2,3,4]},{"result":[1,2,3,4]}]
-    )");
-
-    BOOST_CHECK_EQUAL(expected,result);
-}
-
+=======
+>>>>>>> a4d0b57f82baf1e6b0a73a92489d458102c16cf0
 BOOST_AUTO_TEST_SUITE_END()
 
 

@@ -153,7 +153,7 @@ private:
         virtual ~selector()
         {
         }
-        virtual void select(const string_type& path, reference val, 
+        virtual void select(const string_type& path, reference val, bool array_container,
                             node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
@@ -167,7 +167,7 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, 
+        void select(const string_type& path, reference val, bool array_container, 
                     node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             auto index = result_.eval(val);
@@ -182,7 +182,7 @@ private:
             else if (index.is_string())
             {
                 name_selector selector(index.as_string_view(),true);
-                selector.select(path, val, nodes, temp_json_values);
+                selector.select(path, val, array_container, nodes, temp_json_values);
             }
         }
     };
@@ -197,7 +197,8 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
+        void select(const string_type& path, reference val, bool array_container, 
+                    node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
         {
             if (val.is_array())
             {
@@ -209,7 +210,7 @@ private:
                     }
                 }
             }
-            else if (val.is_object())
+            else if (!array_container && val.is_object())
             {
                 if (result_.exists(val))
                 {
@@ -230,9 +231,9 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val,
-            node_set& nodes,
-            std::vector<std::shared_ptr<Json>>& temp_json_values) override
+        void select(const string_type& path, reference val, bool array_container,
+                    node_set& nodes,
+                    std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             if (val.is_object() && val.count(name_) > 0)
             {
@@ -303,8 +304,7 @@ private:
         {
         }
 
-        void select(const string_type& path, 
-                    reference val,
+        void select(const string_type& path, reference val, bool array_container,
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>&) override
         {
@@ -1036,37 +1036,37 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                apply_selectors(stack_.back()[i].first, *(stack_.back()[i].second));
+                apply_selectors(stack_.back()[i].first, *(stack_.back()[i].second), false);
             }
             selectors_.clear();
         }
     }
 
-    void apply_selectors(const string_type& path, reference val)
+    void apply_selectors(const string_type& path, reference val, bool array_container)
     {
         for (const auto& selector : selectors_)
         {
-            selector->select(path, val, nodes_, temp_json_values_);
+            selector->select(path, val, array_container, nodes_, temp_json_values_);
         }
         if (recursive_descent_)
         {
             if (val.is_object())
             {
-                for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
+                for (auto& nvp : val.object_range())
                 {
-                    if (it->value().is_object() || it->value().is_array())
+                    if (nvp.value().is_object() || nvp.value().is_array())
                     {
-                        apply_selectors(path,it->value());
+                        apply_selectors(path,nvp.value(), false);
                     }
                 }
             }
             else if (val.is_array())
             {
-                for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
+                for (auto& elem : val.array_range())
                 {
-                    if (it->is_object() || it->is_array())
+                    if (elem.is_object() || elem.is_array())
                     {
-                        apply_selectors(path, *it);
+                        apply_selectors(path, elem, true);
                     }
                 }
             }
