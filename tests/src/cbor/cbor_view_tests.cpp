@@ -35,8 +35,9 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
        ]
     }
     )");
-
-    auto c = encode_cbor(j1);
+ 
+    std::vector<uint8_t> c;
+    encode_cbor(j1, c);
 
     cbor_view v(c); 
     BOOST_CHECK(v.is_object());
@@ -65,7 +66,8 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     }
     )");
 
-    auto buffer = encode_cbor(j);
+    std::vector<uint8_t> buffer;
+    encode_cbor(j, buffer);
 
     cbor_view v(buffer); 
 

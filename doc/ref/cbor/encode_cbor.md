@@ -7,7 +7,7 @@ Encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class Json>
-std::vector<uint8_t> encode_cbor(const Json& jval)
+void encode_cbor(const Json& jval, std::vector<uint8_t>& buffer)
 ```
 
 #### See also
@@ -52,7 +52,8 @@ int main()
     j1["min float"] = -(std::numeric_limits<float>::max)();
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
-    std::vector<uint8_t> v = cbor::encode_cbor(j1);
+    std::vector<uint8_t> v;
+    cbor::encode_cbor(j1, v);
 
     ojson j2 = cbor::decode_cbor<ojson>(v);
 
@@ -102,7 +103,8 @@ int main()
     // construct byte string value
     json j(byte_string("Hello"));
 
-    std::vector<uint8_t> buf = cbor::encode_cbor(j);
+    std::vector<uint8_t> buf;
+    cbor::encode_cbor(j, buf);
 
     std::cout << std::hex << std::showbase << (int)buf[0];
     for (size_t i = 1; i < buf.size(); ++i)

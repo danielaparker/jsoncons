@@ -27,7 +27,8 @@ void encode_cbor_byte_string()
     // construct byte string value
     json j(byte_string("Hello"));
 
-    std::vector<uint8_t> buf = cbor::encode_cbor(j);
+    std::vector<uint8_t> buf;
+    cbor::encode_cbor(j, buf);
 
     std::cout << std::hex << std::showbase << (int)buf[0];
     for (size_t i = 1; i < buf.size(); ++i)

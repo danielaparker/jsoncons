@@ -1479,16 +1479,13 @@ public:
 };
 
 template<class Json>
-std::vector<uint8_t> encode_cbor(const Json& j)
+void encode_cbor(const Json& j, std::vector<uint8_t>& v)
 {
     size_t n = 0;
     cbor_Encoder_<Json>::encode(j,Calculate_size_(),n);
 
-    std::vector<uint8_t> v;
     v.reserve(n);
-
     cbor_Encoder_<Json>::encode(j,Encode_cbor_(),v);
-    return v;
 }
 
 template<class Json>
@@ -1497,6 +1494,16 @@ Json decode_cbor(const cbor_view& v)
     Decode_cbor_<Json> decoder(v.buffer(),v.buffer()+v.buflen());
     return decoder.decode();
 }
+  
+#if !defined(JSONCONS_NO_DEPRECATED)
+template<class Json>
+std::vector<uint8_t> encode_cbor(const Json& j)
+{
+    std::vector<uint8_t> v;
+    encode_cbor(j, v);
+    return v;
+}
+#endif
 
 }}
 

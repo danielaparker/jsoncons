@@ -7,6 +7,11 @@ with other functions in the jsoncons library. Each of these functions now has tw
 one that takes an `std::error_code` parameter and uses it to report errors, and one that 
 throws a `jsonpointer_error` exception to report errors.
 
+The old signatures for `encode_cbor` and `encode_msgpack` that returned a `std::vector<uint8_t>` 
+have been deprecated and replaced by new signatures that have void return values and have
+an output parameter 'std::vector<uint8_t>&'. The rationale for this change is consistency
+with other functions in the jsoncons library.
+
 0.101.0
 -------
 

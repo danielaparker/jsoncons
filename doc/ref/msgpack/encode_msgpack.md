@@ -7,7 +7,7 @@ Encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary 
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 template<class Json>
-std::vector<uint8_t> encode_msgpack(const Json& jval)
+void encode_msgpack(const Json& jval, std::vector<uint8_t>& v)
 ```
 
 #### See also
@@ -53,7 +53,8 @@ int main()
     j1["min float"] = -(std::numeric_limits<float>::max)();
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
-    std::vector<uint8_t> v = encode_msgpack(j1);
+    std::vector<uint8_t> v;
+    encode_msgpack(j1, v);
 
     ojson j2 = decode_msgpack<ojson>(v);
 

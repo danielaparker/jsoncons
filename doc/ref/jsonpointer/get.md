@@ -216,8 +216,8 @@ int main()
     }
     )");
 
-
-    auto buffer = cbor::encode_cbor(j1);
+    std::vector<uint8_t> buffer;
+    cbor::encode_cbor(j1, buffer);
 
     cbor::cbor_view b1(buffer); 
 

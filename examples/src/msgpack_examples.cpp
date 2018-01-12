@@ -25,7 +25,8 @@ ojson j1 = ojson::parse(R"(
 ]
 )");
 
-    std::vector<uint8_t> v = jsoncons::msgpack::encode_msgpack(j1);
+    std::vector<uint8_t> v;
+    jsoncons::msgpack::encode_msgpack(j1, v);
 
     ojson j2 = decode_msgpack<ojson>(v);
 
@@ -72,7 +73,8 @@ void message_pack_example2()
     j1["min float"] = -(std::numeric_limits<float>::max)();
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
-    std::vector<uint8_t> v = encode_msgpack(j1);
+    std::vector<uint8_t> v;
+    encode_msgpack(j1, v);
 
     ojson j2 = decode_msgpack<ojson>(v);
 

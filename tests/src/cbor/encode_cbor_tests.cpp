@@ -24,7 +24,8 @@ BOOST_AUTO_TEST_SUITE(cbor_tests)
 
 void check_encode(const std::vector<uint8_t>& expected, const json& j)
 {
-    auto result = encode_cbor(j);
+    std::vector<uint8_t> result;
+    encode_cbor(j,result);
     BOOST_REQUIRE_MESSAGE(expected.size() == result.size(), j.to_string());
     for (size_t i = 0; i < expected.size(); ++i)
     {

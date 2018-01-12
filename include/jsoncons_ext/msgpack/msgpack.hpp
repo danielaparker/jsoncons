@@ -601,16 +601,14 @@ public:
 };
 
 template<class Json>
-std::vector<uint8_t> encode_msgpack(const Json& j)
+void encode_msgpack(const Json& j, std::vector<uint8_t>& v)
 {
     size_t n = 0;
     msgpack_Encoder_<Json>::encode(j,Calculate_size_(),n);
-    std::vector<uint8_t> v;
     v.reserve(n);
     //v.reserve(msgpack_Encoder_<Json>::calculate_size(j));
 
     msgpack_Encoder_<Json>::encode(j,Encode_msgpack_(),v);
-    return v;
 }
 
 template<class Json>
@@ -619,6 +617,16 @@ Json decode_msgpack(const std::vector<uint8_t>& v)
     Decode_msgpack_<Json> decoder(v.data(),v.data()+v.size());
     return decoder.decode();
 }
+  
+#if !defined(JSONCONS_NO_DEPRECATED)
+template<class Json>
+std::vector<uint8_t> encode_msgpack(const Json& j)
+{
+    std::vector<uint8_t> v;
+    encode_msgpack(j, v);
+    return v;
+}
+#endif
 
 }}
 

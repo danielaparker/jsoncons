@@ -76,7 +76,8 @@ BOOST_AUTO_TEST_CASE(msgpack_test)
     j1["An array"] = ja;
 
     size_t calculated_size = msgpack_Encoder_<json>::calculate_size(j1);
-    std::vector<uint8_t> v = encode_msgpack(j1);
+    std::vector<uint8_t> v;
+    encode_msgpack(j1, v);
     BOOST_CHECK(calculated_size == v.size());
     BOOST_CHECK(calculated_size == v.capacity());
 
@@ -144,7 +145,8 @@ BOOST_AUTO_TEST_CASE(msgpack_test2)
     j1[L"An array"] = ja;
 
     size_t calculated_size = msgpack_Encoder_<wjson>::calculate_size(j1);
-    std::vector<uint8_t> v = encode_msgpack(j1);
+    std::vector<uint8_t> v;
+    encode_msgpack(j1, v);
     BOOST_CHECK(calculated_size == v.size());
     BOOST_CHECK(calculated_size == v.capacity());
 

@@ -37,7 +37,8 @@ int main()
     }
     )");
 
-    std::vector<uint8_t> v = encode_cbor(j1);
+    std::vector<uint8_t> v;
+    encode_cbor(j1, v);
 
     ojson j2 = decode_cbor<ojson>(v);
     std::cout << pretty_print(j2) << std::endl;

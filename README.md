@@ -884,7 +884,8 @@ int main()
     is >> j1;
 
     // Encode ojson to MessagePack
-    std::vector<uint8_t> v = encode_msgpack(j1);
+    std::vector<uint8_t> v;
+    encode_msgpack(j1, v);
 
     // Decode MessagePack to ojson 
     ojson j2 = decode_msgpack<ojson>(v);
@@ -949,7 +950,8 @@ int main()
     }
     )");
 
-    std::vector<uint8_t> v = encode_cbor(j1);
+    std::vector<uint8_t> v;
+    encode_cbor(j1, v);
 
     ojson j2 = decode_cbor<ojson>(v);
     std::cout << pretty_print(j2) << std::endl;

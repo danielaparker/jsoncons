@@ -21,7 +21,8 @@ BOOST_AUTO_TEST_SUITE(encode_msgpack_tests)
 
 void check_encode(const std::vector<uint8_t>& expected, const json& j)
 {
-    std::vector<uint8_t> result = encode_msgpack(j);
+    std::vector<uint8_t> result;
+    encode_msgpack(j, result);
     if (expected.size() != result.size())
     {
         std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;

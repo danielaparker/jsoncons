@@ -27,7 +27,8 @@ void check_decode(const std::vector<uint8_t>& v, const json& expected)
 
 void print_msgpack(const json j)
 {
-    auto v = encode_msgpack(j);
+    std::vector<uint8_t> v;
+    encode_msgpack(j, v);
     for (auto b : v)
     {
         std::cout << std::hex << (int)b << ','; 
