@@ -1373,7 +1373,7 @@ BOOST_AUTO_TEST_CASE(test_select_length_4_2_plus)
 BOOST_AUTO_TEST_CASE(test_select_length_4_2_plus_plus)
 {
 
-    json result = json_query(complex_json,"$..[?(@.result.length == 4)][?(@.result[2] == 3)]");
+    json result = json_query(complex_json,"$..[?(@.result.length == 4)][?(@.result[0] == 3 || @.result[1] == 3 || @.result[2] == 3 || @.result[3] == 3)]");
     std::cout << result << std::endl;
 
     json expected = json::parse(R"(
