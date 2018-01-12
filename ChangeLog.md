@@ -7,6 +7,10 @@ with other functions in the jsoncons library. Each of these functions now has tw
 one that takes an `std::error_code` parameter and uses it to report errors, and one that 
 throws a `jsonpointer_error` exception to report errors.
 
+The function `jsonpatch::patch` has been replaced by `jsonpatch::apply_patch`, which takes
+a json document, a patch, and a `std::error_code&` to report errors. The function
+`jsonpatch::diff` has been renamed to `jsonpatch::from_diff`
+
 The old signatures for `encode_cbor` and `encode_msgpack` that returned a `std::vector<uint8_t>` 
 have been deprecated and replaced by new signatures that have void return values and have
 an output parameter 'std::vector<uint8_t>&'. The rationale for this change is consistency
