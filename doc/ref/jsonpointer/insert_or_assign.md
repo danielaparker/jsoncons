@@ -23,9 +23,7 @@ Inserts a value into the target at the specified path, or if the path specifies 
 
 #### Return value
 
-On success, a value-initialized [jsonpointer_errc](jsonpointer_errc.md). 
-
-On error, a [jsonpointer_errc](jsonpointer_errc.md) error code 
+None
 
 ### Exceptions
 

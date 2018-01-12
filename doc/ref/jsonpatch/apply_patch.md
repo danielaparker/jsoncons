@@ -1,20 +1,22 @@
-### jsoncons::jsonpatch::patch
+### jsoncons::jsonpatch::apply_patch
 
-Patch a `json` document.
+Applies a patch to a `json` document.
 
 #### Header
 ```c++
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 template <class Json>
-std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const Json& patch)
+void apply_patch(Json& target, const Json& patch, std::error_code& ec)
 ```
 
 #### Return value
 
-On success, returns a value-initialized [jsonpatch_errc](jsonpatch_errc.md) and an empty string value.  
+None
 
-On error, returns a [jsonpatch_errc](jsonpatch_errc.md) error code and the path that failed. 
+#### Exceptions
+ 
+Sets the `std::error_code&` to the [jsonpatch_error_category](jsonpatch_errc.md) if get fails. 
 
 ### Examples
 
@@ -40,9 +42,8 @@ int main()
         ]
     )"_json;
 
-    jsonpatch::jsonpatch_errc ec;
-    std::string path;
-    std::tie(ec,path) = jsonpatch::patch(target,patch);
+    std::error_code ec;
+    jsonpatch::apply_patch(target,patch,ec);
 
     std::cout << pretty_print(target) << std::endl;
 }
@@ -78,20 +79,17 @@ int main()
         ]
     )"_json;
 
-    jsonpatch::jsonpatch_errc ec;
-    std::string path;
-    std::tie(ec,path) = jsonpatch::patch(target,patch);
+    std::error_code ec;
+    jsonpatch::apply_patch(target, patch, ec);
 
-    std::cout << "(1) " << std::error_code(ec).message() << std::endl;
-    std::cout << "(2) " << path << std::endl;
-    std::cout << "(3) " << target << std::endl;
+    std::cout << "(1) " << ec.message() << std::endl;
+    std::cout << "(2) " << target << std::endl;
 }
 ```
 Output:
 ```
 (1) JSON Patch add operation failed
-(2) /baz/bat
-(3) {"foo":"bar"}
+(2) {"foo":"bar"}
 ```
 Note that all JSON Patch operations have been rolled back, and target is in its original state.
 

@@ -4,11 +4,11 @@ The jsonpatch extension implements the IETF standard [JavaScript Object Notation
 
 <table border="0">
   <tr>
-    <td><a href="patch.md">patch</a></td>
+    <td><a href="apply_patch.md">apply_patch</a></td>
     <td>Apply JSON Patch operations to a JSON document.</td> 
   </tr>
   <tr>
-    <td><a href="diff.md">diff</a></td>
+    <td><a href="from_diff.md">from_diff</a></td>
     <td>Create a JSON patch from a diff of two JSON documents.</td> 
   </tr>
 </table>

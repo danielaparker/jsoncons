@@ -615,19 +615,18 @@ int main()
         ]
     )"_json;
 
-    jsonpatch::jsonpatch_errc ec;
-    std::string path;
-    std::tie(ec,path) = jsonpatch::patch(doc,patch);
+    std::error_code ec;
+    jsonpatch::apply_patch(doc, patch, ec);
 
     std::cout << "(1)\n" << pretty_print(doc) << std::endl;
 
     // Create a JSON Patch
 
-    auto patch2 = jsonpatch::diff(doc2,doc);
+    auto patch2 = jsonpatch::from_diff(doc2,doc);
 
     std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
 
-    std::tie(ec,path) = jsonpatch::patch(doc2,patch2);
+    jsonpatch::apply_patch(doc2, patch2, ec);
 
     std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
 }

@@ -16,9 +16,9 @@ J get(const J& root, typename J::string_view_type path, std::error_code& ec); //
 
 #### Return value
 
-On success, returns the selected J value and a value-initialized [jsonpointer_errc](jsonpointer_errc.md). 
+(1) On success, returns the selected J value
 
-On error, returns a null J value and a [jsonpointer_errc](jsonpointer_errc.md) error code 
+(2) Returns the selected J value if found.
 
 ### Exceptions
 

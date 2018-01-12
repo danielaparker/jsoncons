@@ -25,19 +25,18 @@ void jsonpatch_add_add()
         ]
     )"_json;
 
-    jsonpatch::jsonpatch_errc ec;
-    std::string path;
-    std::tie(ec,path) = jsonpatch::patch(doc,patch);
+    std::error_code ec;
+    jsonpatch::apply_patch(doc, patch, ec);
 
     std::cout << "(1)\n" << pretty_print(doc) << std::endl;
 
     // Create a JSON Patch
 
-    auto patch2 = jsonpatch::diff(doc2,doc);
+    auto patch2 = jsonpatch::from_diff(doc2,doc);
 
     std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
 
-    std::tie(ec,path) = jsonpatch::patch(doc2,patch2);
+    jsonpatch::apply_patch(doc2,patch2);
 
     std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
 }
@@ -56,13 +55,11 @@ void jsonpatch_add_add_add_failed()
         ]
     )"_json;
 
-    jsonpatch::jsonpatch_errc ec;
-    std::string path;
-    std::tie(ec,path) = jsonpatch::patch(target,patch);
+    std::error_code ec;
+    jsonpatch::apply_patch(target, patch, ec);
 
     std::cout << "(1) " << std::error_code(ec).message() << std::endl;
-    std::cout << "(2) " << path << std::endl;
-    std::cout << "(3) " << target << std::endl;
+    std::cout << "(2) " << target << std::endl;
 }
 
 void create_a_json_patch()
@@ -75,11 +72,10 @@ void create_a_json_patch()
         { "baz":"qux", "foo": [ "bar", "baz" ]}
     )"_json;
 
-    auto patch = jsonpatch::diff(source, target);
+    auto patch = jsonpatch::from_diff(source, target);
 
-    jsonpatch::jsonpatch_errc ec;
-    std::string path;
-    std::tie(ec,path) = jsonpatch::patch(source,patch);
+    std::error_code ec;
+    jsonpatch::apply_patch(source, patch, ec);
 
     std::cout << "(1)\n" << pretty_print(patch) << std::endl;
     std::cout << "(2)\n" << pretty_print(source) << std::endl;

@@ -98,7 +98,7 @@ namespace detail {
     };
 
     template <class Json>
-    Json diff(const Json& source, const Json& target, const typename Json::string_type& path)
+    Json from_diff(const Json& source, const Json& target, const typename Json::string_type& path)
     {
         typedef typename Json::char_type char_type;
         typedef typename Json::string_type string_type;
@@ -118,7 +118,7 @@ namespace detail {
             {
                 std::basic_ostringstream<char_type> ss; 
                 ss << path << '/' << i;
-                auto temp_diff = diff(source[i],target[i],ss.str());
+                auto temp_diff = from_diff(source[i],target[i],ss.str());
                 result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
             }
             // Element in source, not in target - remove
@@ -155,7 +155,7 @@ namespace detail {
                 auto it = target.find(a.key());
                 if (it != target.object_range().end())
                 {
-                    auto temp_diff = diff(a.value(),it->value(),ss.str());
+                    auto temp_diff = from_diff(a.value(),it->value(),ss.str());
                     result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
                 }
                 else
@@ -196,7 +196,7 @@ namespace detail {
 }
 
 template <class Json>
-std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const Json& patch)
+void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
@@ -206,7 +206,6 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
 
     // Validate
     
-    jsonpatch_errc patch_ec = jsonpatch_errc();
     string_type bad_path;
     for (const auto& operation : patch.array_range())
     {
@@ -470,15 +469,13 @@ std::tuple<jsonpatch_errc,typename Json::string_type> patch(Json& target, const 
     {
         unwinder.state = detail::state_type::commit;
     }
-    return std::make_tuple(patch_ec,bad_path);
 }
 
-
 template <class Json>
-Json diff(const Json& source, const Json& target)
+Json from_diff(const Json& source, const Json& target)
 {
     typename Json::string_type path;
-    return detail::diff(source, target, path);
+    return detail::from_diff(source, target, path);
 }
 
 }}

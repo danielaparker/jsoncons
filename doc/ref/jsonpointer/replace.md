@@ -17,11 +17,9 @@ Replaces the value at the location specified by `path` with a new value.
 
 #### Return value
 
-On success, a value-initialized [jsonpointer_errc](jsonpointer_errc.md). 
+None
 
-On error, a [jsonpointer_errc](jsonpointer_errc.md) error code 
-
-### Exceptions
+#### Exceptions
 
 (1) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
  

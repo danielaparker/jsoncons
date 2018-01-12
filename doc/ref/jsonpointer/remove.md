@@ -17,9 +17,7 @@ Removes the value at the location specifed by `path`.
 
 #### Return value
 
-On success, a value-initialized [jsonpointer_errc](jsonpointer_errc.md). 
-
-On error, a [jsonpointer_errc](jsonpointer_errc.md) error code 
+None
 
 ### Exceptions
 
