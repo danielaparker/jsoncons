@@ -35,7 +35,7 @@ Json json_query(const Json& root,
 Returns a `json` array containing either values or normalized path expressions matching the input path expression. 
 Returns an empty array if there is no match.
 
-### Examples
+### Store examples
 
 The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (booklist.json).
 
@@ -120,3 +120,4 @@ Output:
 ]
 ```
 
+### More complex examples

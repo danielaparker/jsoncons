@@ -36,7 +36,7 @@ void jsonpatch_add_add()
 
     std::cout << "(2)\n" << pretty_print(patch2) << std::endl;
 
-    jsonpatch::apply_patch(doc2,patch2);
+    jsonpatch::apply_patch(doc2,patch2,ec);
 
     std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
 }
