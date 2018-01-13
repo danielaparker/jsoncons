@@ -120,4 +120,113 @@ Output:
 ]
 ```
 
-### More complex examples
+### More examples
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::jsonpath;
+
+int main()
+{
+    const json j = json::parse(R"(
+    [
+      {
+        "root": {
+          "id" : 10,
+          "second": [
+            {
+                 "names": [
+                2
+              ],
+              "complex": [
+                {
+                  "names": [
+                    1
+                  ],
+                  "panels": [
+                    {
+                      "result": [
+                        1
+                      ]
+                    },
+                    {
+                      "result": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    {
+                      "result": [
+                        1
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "root": {
+          "id" : 20,
+          "second": [
+            {
+              "names": [
+                2
+              ],
+              "complex": [
+                {
+                  "names": [
+                    1
+                  ],
+                  "panels": [
+                    {
+                      "result": [
+                        1
+                      ]
+                    },
+                    {
+                      "result": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    {
+                      "result": [
+                        1
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+    )");
+
+    // Find all elements in the array where result.length is 4
+    json result1 = json_query(j,"$..[?(@.result.length == 4)]");
+    std::cout << "(1) " << result1 << std::endl;
+
+    // Find element in the array that has id 10 and result.length is 4
+    json result2 = json_query(j,"$..[?(@.id == 10)]..[?(@.result.length == 4)]");
+    std::cout << "(2) " << result2 << std::endl;
+}
+```
+Output:
+
+```
+(1) [{"result":[1,2,3,4]},{"result":[1,2,3,4]}]
+(2) [{"result":[1,2,3,4]}]
+```
+

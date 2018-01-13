@@ -459,8 +459,6 @@ int main()
 
         json_filter_examples();
 
-        jsonpath_examples();
-
         msgpack_examples();
 
         streaming_examples();
@@ -484,6 +482,8 @@ int main()
         csv_examples();
 
         jsonpointer_examples();
+
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {

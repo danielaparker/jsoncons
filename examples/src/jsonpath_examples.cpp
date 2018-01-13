@@ -83,12 +83,107 @@ void json_replace_example2()
     std::cout << ("2\n") << pretty_print(j) << std::endl;
 }
 
+void jsonpath_complex_examples()
+{
+    const json j = json::parse(R"(
+    [
+      {
+        "root": {
+          "id" : 10,
+          "second": [
+            {
+                 "names": [
+                2
+              ],
+              "complex": [
+                {
+                  "names": [
+                    1
+                  ],
+                  "panels": [
+                    {
+                      "result": [
+                        1
+                      ]
+                    },
+                    {
+                      "result": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    {
+                      "result": [
+                        1
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "root": {
+          "id" : 20,
+          "second": [
+            {
+              "names": [
+                2
+              ],
+              "complex": [
+                {
+                  "names": [
+                    1
+                  ],
+                  "panels": [
+                    {
+                      "result": [
+                        1
+                      ]
+                    },
+                    {
+                      "result": [
+                        1,
+                        2,
+                        3,
+                        4
+                      ]
+                    },
+                    {
+                      "result": [
+                        1
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+    )");
+
+    json result1 = json_query(j,"$..[?(@.result.length == 4)]");
+    std::cout << "(1) " << result1 << std::endl;
+
+    json result2 = json_query(j,"$..[?(@.id == 10)]..[?(@.result.length == 4)]");
+    std::cout << "(2) " << result2 << std::endl;
+
+
+}
+
 void jsonpath_examples()
 {
     std::cout << "\nJsonPath examples\n\n";
     json_query_examples();
     json_replace_example1();
     json_replace_example2();
+    jsonpath_complex_examples();
     std::cout << std::endl;
 }
 
