@@ -629,7 +629,7 @@ int main()
 
     std::cout << "(1)\n" << pretty_print(doc) << std::endl;
 
-    // Create a JSON Patch
+    // Create a JSON Patch from two JSON documents
 
     auto patch2 = jsonpatch::from_diff(doc2,doc);
 

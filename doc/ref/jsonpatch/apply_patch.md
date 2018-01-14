@@ -7,7 +7,10 @@ Applies a patch to a `json` document.
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 template <class Json>
-void apply_patch(Json& target, const Json& patch, std::error_code& ec)
+void apply_patch(Json& target, const Json& patch); // (1)
+
+template <class Json>
+void apply_patch(Json& target, const Json& patch, std::error_code& ec); // (2)
 ```
 
 #### Return value
@@ -15,8 +18,10 @@ void apply_patch(Json& target, const Json& patch, std::error_code& ec)
 None
 
 #### Exceptions
- 
-Sets the `std::error_code&` to the [jsonpatch_error_category](jsonpatch_errc.md) if get fails. 
+
+(1) Throws a [jsonpatch_error](jsonpatch_error.md) if `apply_patch` fails.
+  
+(2) Sets the `std::error_code&` to the [jsonpatch_error_category](jsonpatch_errc.md) if `apply_patch` fails. 
 
 ### Examples
 

@@ -26,6 +26,7 @@ Returns an error message
 
 ```c++
 #include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 using jsoncons::json;
 

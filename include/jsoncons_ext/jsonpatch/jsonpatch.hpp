@@ -19,6 +19,42 @@
 
 namespace jsoncons { namespace jsonpatch {
 
+class jsonpatch_error : public std::exception
+{
+public:
+    jsonpatch_error(const std::error_code& ec)
+        : error_code_(ec)
+    {
+    }
+    jsonpatch_error(const jsonpatch_error& other) = default;
+
+    jsonpatch_error(jsonpatch_error&& other) = default;
+
+    const char* what() const JSONCONS_NOEXCEPT override
+    {
+        try
+        {
+            const_cast<std::string&>(buffer_) = error_code_.message();
+            return buffer_.c_str();
+        }
+        catch (...)
+        {
+            return "";
+        }
+    }
+
+    const std::error_code code() const
+    {
+        return error_code_;
+    }
+
+    jsonpatch_error& operator=(const jsonpatch_error& e) = default;
+    jsonpatch_error& operator=(jsonpatch_error&& e) = default;
+private:
+    std::string buffer_;
+    std::error_code error_code_;
+};
+
 namespace detail {
 
     JSONCONS_DEFINE_LITERAL(test_literal,"test")
@@ -476,6 +512,17 @@ Json from_diff(const Json& source, const Json& target)
 {
     typename Json::string_type path;
     return detail::from_diff(source, target, path);
+}
+
+template <class Json>
+void apply_patch(Json& target, const Json& patch)
+{
+    std::error_code ec;
+    apply_patch(target, patch, ec);
+    if (ec)
+    {
+        throw jsonpatch_error(ec);
+    }
 }
 
 }}

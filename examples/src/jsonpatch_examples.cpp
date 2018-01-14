@@ -41,7 +41,32 @@ void jsonpatch_add_add()
     std::cout << "(3)\n" << pretty_print(doc2) << std::endl;
 }
 
-void jsonpatch_add_add_add_failed()
+void jsonpatch_add_add_add_failed1()
+{
+    json target = R"(
+        { "foo": "bar"}
+    )"_json;
+
+    json patch = R"(
+        [
+            { "op": "add", "path": "/baz", "value": "qux" },
+            { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
+            { "op": "add", "path": "/baz/bat", "value": "qux" } // nonexistent target
+        ]
+    )"_json;
+
+    try
+    {
+        jsonpatch::apply_patch(target, patch);
+    }
+    catch (const jsonpatch::jsonpatch_error& e)
+    {
+        std::cout << "(1) " << e.what() << std::endl;
+        std::cout << "(2) " << target << std::endl;
+    }
+}
+
+void jsonpatch_add_add_add_failed2()
 {
     json target = R"(
         { "foo": "bar"}
@@ -84,9 +109,10 @@ void create_a_json_patch()
 void jsonpatch_examples()
 {
     std::cout << "\njsonpatch examples\n\n";
-    jsonpatch_add_add_add_failed();
     create_a_json_patch();
     jsonpatch_add_add();
+    jsonpatch_add_add_add_failed2();
+    jsonpatch_add_add_add_failed1();
     std::cout << std::endl;
 }
 #endif

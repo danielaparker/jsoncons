@@ -469,8 +469,6 @@ int main()
 
         comment_example();
 
-        jsonpatch_examples();
-
         json_constructor_examples();
 
         json_is_as_examples();
@@ -484,6 +482,8 @@ int main()
         jsonpointer_examples();
 
         jsonpath_examples();
+
+        jsonpatch_examples();
     }
     catch (const std::exception& e)
     {
