@@ -153,7 +153,7 @@ private:
         virtual ~selector()
         {
         }
-        virtual void select(const string_type& path, reference val, bool array_container,
+        virtual void select(const string_type& path, reference val, bool recursion_on_array,
                             node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
@@ -167,7 +167,7 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, bool array_container, 
+        void select(const string_type& path, reference val, bool recursion_on_array, 
                     node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             auto index = result_.eval(val);
@@ -182,7 +182,7 @@ private:
             else if (index.is_string())
             {
                 name_selector selector(index.as_string_view(),true);
-                selector.select(path, val, array_container, nodes, temp_json_values);
+                selector.select(path, val, recursion_on_array, nodes, temp_json_values);
             }
         }
     };
@@ -197,7 +197,7 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, bool array_container, 
+        void select(const string_type& path, reference val, bool recursion_on_array, 
                     node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
         {
             if (val.is_array())
@@ -214,7 +214,7 @@ private:
                     }
                 }
             }
-            else if (!array_container && val.is_object())
+            else if (!recursion_on_array && val.is_object())
             {
                 if (result_.exists(val))
                 {
@@ -235,7 +235,7 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, bool array_container,
+        void select(const string_type& path, reference val, bool recursion_on_array,
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
@@ -308,7 +308,7 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, bool array_container,
+        void select(const string_type& path, reference val, bool recursion_on_array,
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>&) override
         {
@@ -1046,11 +1046,11 @@ public:
         }
     }
 
-    void apply_selectors(const string_type& path, reference val, bool array_container)
+    void apply_selectors(const string_type& path, reference val, bool recursion_on_array)
     {
         for (const auto& selector : selectors_)
         {
-            selector->select(path, val, array_container, nodes_, temp_json_values_);
+            selector->select(path, val, recursion_on_array, nodes_, temp_json_values_);
         }
         if (recursive_descent_)
         {
