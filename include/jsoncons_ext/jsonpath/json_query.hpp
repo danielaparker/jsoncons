@@ -202,10 +202,6 @@ private:
         {
             if (val.is_array())
             {
-                if (result_.exists(val))
-                {
-                    nodes.emplace_back(path, std::addressof(val));
-                }
                 for (size_t i = 0; i < val.size(); ++i)
                 {
                     if (result_.exists(val[i]))
