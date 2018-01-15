@@ -215,23 +215,23 @@ int main()
     )");
 
     // Find all arrays of elements where result.length is 4
-    json result1 = json_query(j,"$..[?(@.result.length == 4)]");
+    json result1 = json_query(j,"$..result[?(@.length == 4)]");
     std::cout << "(1) " << result1 << std::endl;
 
     // Find array of elements that has id 10 and result.length is 4
-    json result2 = json_query(j,"$..[?(@.id == 10)]..[?(@.result.length == 4)]");
+    json result2 = json_query(j,"$..[?(@.id == 10)]..result[?(@.length == 4)]");
     std::cout << "(2) " << result2 << std::endl;
 
     // Find all arrays of elements where result.length is 4 and that have value 3 
-    json result3 = json_query(j,"$..[?(@.result.length == 4 && (@.result[0] == 3 || @.result[1] == 3 || @.result[2] == 3 || @.result[3] == 3))]");
+    json result3 = json_query(j,"$..result[?(@.length == 4 && (@[0] == 3 || @[1] == 3 || @[2] == 3 || @[3] == 3))]");
     std::cout << "(3) " << result3 << std::endl;
 }
 ```
 Output:
 
 ```
-(1) [{"result":[1,2,3,4]},{"result":[3,4,5,6]}]
-(2) [{"result":[1,2,3,4]}]
-(3) [{"result":[1,2,3,4]},{"result":[3,4,5,6]}]
+(1) [[1,2,3,4],[3,4,5,6]]
+(2) [[1,2,3,4]]
+(3) [[1,2,3,4],[3,4,5,6]]
 ```
 
