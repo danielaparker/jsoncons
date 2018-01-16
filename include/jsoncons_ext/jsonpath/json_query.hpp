@@ -138,7 +138,23 @@ private:
     typedef typename Json::string_view_type string_view_type;
     typedef JsonReference reference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-    typedef std::pair<string_type,pointer> node_type;
+    struct node_type
+    {
+        node_type() = default;
+        node_type(const string_type& p, const pointer& valp)
+            : path(p),val_ptr(valp)
+        {
+        }
+        node_type(string_type&& p, pointer&& valp)
+            : path(std::move(p)),val_ptr(valp)
+        {
+        }
+        node_type(const node_type&) = default;
+        node_type(node_type&&) = default;
+
+        string_type path;
+        pointer val_ptr;
+    };
     typedef std::vector<node_type> node_set;
 
     static string_view_type length_literal() 
@@ -415,7 +431,7 @@ public:
             result.reserve(stack_.back().size());
             for (const auto& p : stack_.back())
             {
-                result.push_back(*(p.second));
+                result.push_back(*(p.val_ptr));
             }
         }
         return result;
@@ -429,7 +445,7 @@ public:
             result.reserve(stack_.back().size());
             for (const auto& p : stack_.back())
             {
-                result.push_back(p.first);
+                result.push_back(p.path);
             }
         }
         return result;
@@ -442,7 +458,7 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                *(stack_.back()[i].second) = new_value;
+                *(stack_.back()[i].val_ptr) = new_value;
             }
         }
     }
@@ -925,8 +941,8 @@ public:
     {
         for (size_t i = 0; i < stack_.back().size(); ++i)
         {
-            const auto& path = stack_.back()[i].first;
-            pointer p = stack_.back()[i].second;
+            const auto& path = stack_.back()[i].path;
+            pointer p = stack_.back()[i].val_ptr;
 
             if (p->is_array())
             {
@@ -953,7 +969,7 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                apply_unquoted_string(stack_.back()[i].first, *(stack_.back()[i].second), name);
+                apply_unquoted_string(stack_.back()[i].path, *(stack_.back()[i].val_ptr), name);
             }
         }
         buffer_.clear();
@@ -1036,7 +1052,7 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                apply_selectors(stack_.back()[i].first, *(stack_.back()[i].second), false);
+                apply_selectors(stack_.back()[i].path, *(stack_.back()[i].val_ptr), false);
             }
             selectors_.clear();
         }
