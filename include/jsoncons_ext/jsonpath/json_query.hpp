@@ -142,16 +142,17 @@ private:
     {
         node_type() = default;
         node_type(const string_type& p, const pointer& valp)
-            : path(p),val_ptr(valp)
+            : skip_contained_object(false),path(p),val_ptr(valp)
         {
         }
         node_type(string_type&& p, pointer&& valp)
-            : path(std::move(p)),val_ptr(valp)
+            : skip_contained_object(false),path(std::move(p)),val_ptr(valp)
         {
         }
         node_type(const node_type&) = default;
         node_type(node_type&&) = default;
 
+        bool skip_contained_object;
         string_type path;
         pointer val_ptr;
     };
@@ -169,7 +170,7 @@ private:
         virtual ~selector()
         {
         }
-        virtual void select(const string_type& path, reference val, bool recursion_on_array,
+        virtual void select(node_type& node, const string_type& path, reference val,
                             node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
@@ -183,7 +184,7 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, bool recursion_on_array, 
+        void select(node_type& node, const string_type& path, reference val, 
                     node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
             auto index = result_.eval(val);
@@ -198,7 +199,7 @@ private:
             else if (index.is_string())
             {
                 name_selector selector(index.as_string_view(),true);
-                selector.select(path, val, recursion_on_array, nodes, temp_json_values);
+                selector.select(node, path, val, nodes, temp_json_values);
             }
         }
     };
@@ -213,11 +214,12 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, bool recursion_on_array, 
+        void select(node_type& node, const string_type& path, reference val, 
                     node_set& nodes, std::vector<std::shared_ptr<Json>>&) override
         {
             if (val.is_array())
             {
+                node.skip_contained_object =true;
                 for (size_t i = 0; i < val.size(); ++i)
                 {
                     if (result_.exists(val[i]))
@@ -226,11 +228,18 @@ private:
                     }
                 }
             }
-            else if (!recursion_on_array && val.is_object())
+            else if (val.is_object())
             {
-                if (result_.exists(val))
+                if (!node.skip_contained_object)
                 {
-                    nodes.emplace_back(path, std::addressof(val));
+                    if (result_.exists(val))
+                    {
+                        nodes.emplace_back(path, std::addressof(val));
+                    }
+                }
+                else
+                {
+                    node.skip_contained_object = false;
                 }
             }
         }
@@ -247,7 +256,7 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, bool recursion_on_array,
+        void select(node_type& node, const string_type& path, reference val,
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
@@ -320,7 +329,7 @@ private:
         {
         }
 
-        void select(const string_type& path, reference val, bool recursion_on_array,
+        void select(node_type& node, const string_type& path, reference val,
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>&) override
         {
@@ -618,7 +627,6 @@ public:
                     break;
                 case ']':
                     apply_selectors();
-                    transfer_nodes();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 case ' ':case '\t':
@@ -710,7 +718,6 @@ public:
                     selectors_.push_back(std::make_shared<name_selector>(buffer_,positive_start_));
                     buffer_.clear();
                     apply_selectors();
-                    transfer_nodes();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 default:
@@ -743,7 +750,6 @@ public:
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors();
-                    transfer_nodes();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
@@ -768,7 +774,6 @@ public:
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors();
-                    transfer_nodes();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
@@ -793,7 +798,6 @@ public:
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors();
-                    transfer_nodes();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
@@ -813,7 +817,6 @@ public:
                 case ']':
                     selectors_.push_back(std::make_shared<array_slice_selector>(start_,positive_start_,end_,positive_end_,step_,positive_step_,undefined_end_));
                     apply_selectors();
-                    transfer_nodes();
                     state_ = path_state::expect_dot_or_left_bracket;
                     break;
                 }
@@ -1052,17 +1055,19 @@ public:
         {
             for (size_t i = 0; i < stack_.back().size(); ++i)
             {
-                apply_selectors(stack_.back()[i].path, *(stack_.back()[i].val_ptr), false);
+                node_type& node = stack_.back()[i];
+                apply_selectors(node, node.path, *(node.val_ptr));
             }
             selectors_.clear();
         }
+        transfer_nodes();
     }
 
-    void apply_selectors(const string_type& path, reference val, bool recursion_on_array)
+    void apply_selectors(node_type& node, const string_type& path, reference val)
     {
         for (const auto& selector : selectors_)
         {
-            selector->select(path, val, recursion_on_array, nodes_, temp_json_values_);
+            selector->select(node, path, val, nodes_, temp_json_values_);
         }
         if (recursive_descent_)
         {
@@ -1071,8 +1076,8 @@ public:
                 for (auto& nvp : val.object_range())
                 {
                     if (nvp.value().is_object() || nvp.value().is_array())
-                    {
-                        apply_selectors(path,nvp.value(), false);
+                    {                        
+                        apply_selectors(node,PathCons()(path,nvp.key()),nvp.value());
                     }
                 }
             }
@@ -1082,7 +1087,7 @@ public:
                 {
                     if (elem.is_object() || elem.is_array())
                     {
-                        apply_selectors(path, elem, true);
+                        apply_selectors(node,path, elem);
                     }
                 }
             }

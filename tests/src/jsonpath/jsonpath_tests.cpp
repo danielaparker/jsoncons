@@ -1051,11 +1051,11 @@ BOOST_AUTO_TEST_CASE(test_jsonpath_aggregation4)
 ["iPhone","0123-4567-8888","home","0123-4567-8910"]
 )");
     json test1 = json_query(val, "$.phoneNumbers");
-    std::cout << test1 << std::endl;
+    //std::cout << test1 << std::endl;
     json test2 = json_query(val, "$[phoneNumbers]");
-    std::cout << test2 << std::endl;
+    //std::cout << test2 << std::endl;
     json test3 = json_query(val, "$..['type']");
-    std::cout << test3 << std::endl;
+    //std::cout << test3 << std::endl;
 
     json result2 = json_query(val, "$.phoneNumbers..['type','number']");
     BOOST_CHECK_EQUAL(expected2, result2);
@@ -1235,7 +1235,7 @@ BOOST_AUTO_TEST_CASE(test_max_pre)
     std::string path = "$.store.book[*].price";
     json result = json_query(store,path);
 
-    std::cout << result << std::endl;
+    //std::cout << result << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_max)
@@ -1361,7 +1361,7 @@ BOOST_AUTO_TEST_CASE(test_select_length_4_2_plus)
 {
 
     json result = json_query(complex_json,"$..[?(@.id == 10)]..[?(@.result.length == 4)]");
-    std::cout << result << std::endl;
+    //std::cout << result << std::endl;
 
     json expected = json::parse(R"(
 [{"result":[1,2,3,4]}]
@@ -1374,11 +1374,103 @@ BOOST_AUTO_TEST_CASE(test_select_length_4_2_plus_plus)
 {
 
     json result = json_query(complex_json,"$..[?(@.result.length == 4)][?(@.result[0] == 3 || @.result[1] == 3 || @.result[2] == 3 || @.result[3] == 3)]");
-    std::cout << result << std::endl;
+    //std::cout << result << std::endl;
 
     json expected = json::parse(R"(
 [{"result":[1,2,3,4]},{"result":[1,2,3,4]}]
     )");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_nested)
+{
+    json j = json::parse(R"(
+{
+    "id" : 10,
+    "b": {"id" : 10} 
+}        
+)");
+
+    json result = json_query(j,"$..[?(@.id == 10)]");
+
+    json expected = json::parse(R"(
+[
+   {
+      "id" : 10,
+      "b" : {
+         "id" : 10
+      }
+   },
+   {
+      "id" : 10
+   }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_array_nested)
+{
+    json j = json::parse(R"(
+{
+    "a" : [
+        { 
+            "id" : 10,
+            "b": {"id" : 10} 
+        }
+    ]
+}        
+)");
+
+    json result = json_query(j,"$..[?(@.id == 10)]");
+
+    json expected = json::parse(R"(
+[
+   {
+      "id" : 10,
+      "b" : {
+         "id" : 10
+      }
+   },
+   {
+      "id" : 10
+   }
+]
+)");
+
+    BOOST_CHECK_EQUAL(expected,result);
+}
+
+BOOST_AUTO_TEST_CASE(test_array_array_nested)
+{
+    json j = json::parse(R"(
+{
+    "a" : [[
+        { 
+            "id" : 10,
+            "b": {"id" : 10} 
+        }
+    ]]
+}        
+)");
+
+    json result = json_query(j,"$..[?(@.id == 10)]");
+
+    json expected = json::parse(R"(
+[
+   {
+      "id" : 10,
+      "b" : {
+         "id" : 10
+      }
+   },
+   {
+      "id" : 10
+   }
+]
+)");
 
     BOOST_CHECK_EQUAL(expected,result);
 }
