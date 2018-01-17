@@ -31,23 +31,6 @@ Planned new features are listed on the [roadmap](doc/Roadmap.md)
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
 Results for [JSONTestSuite](https://github.com/nst/JSONTestSuite) and [JSON_checker](http://www.json.org/JSON_checker/) tests may be found [here](https://danielaparker.github.io/json_benchmarks/).
 
-### What's new on master
-
-The signatures of `jsonpointer::get`, `jsonpointer::insert`, `jsonpointer::insert_or_assign`, 
-`jsonpointer::remove` and `jsonpointer::replace` have been changed to have two overloads,
-one that takes an `std::error_code` parameter and uses it to report errors, and one that 
-throws a `jsonpointer_error` exception to report errors.
-
-The function `jsonpatch::patch` has been replaced by `jsonpatch::apply_patch`, which takes
-a json document, a patch, and a `std::error_code&` to report errors. The function
-`jsonpatch::diff` has been renamed to `jsonpatch::from_diff`
-
-The old signatures for `encode_cbor` and `encode_msgpack` that returned a `std::vector<uint8_t>` 
-have been deprecated and replaced by new signatures that have void return values and have
-an output parameter 'std::vector<uint8_t>&'. 
-
-The rationale for these changes is consistency with other functions in the jsoncons library.
-
 ### A simple program using jsoncons
 
 ```c++
