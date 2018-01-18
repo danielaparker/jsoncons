@@ -9,6 +9,8 @@ void merge_or_update(object_iterator hint, json&& source); // (4)
 
 Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.
 
+The `merge_or_update` function performs only a one-level-deep shallow merge, it does not do a deep merge of nested objects.
+
 #### Parameters
 
 <table>
