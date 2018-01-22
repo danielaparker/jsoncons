@@ -282,8 +282,8 @@ private:
 typedef basic_json_input_handler<char> json_input_handler;
 typedef basic_json_input_handler<wchar_t> wjson_input_handler;
 
-typedef basic_null_json_input_handler<char> empty_json_input_handler;
-typedef basic_null_json_input_handler<wchar_t> wempty_json_input_handler;
+typedef basic_null_json_input_handler<char> null_json_input_handler;
+typedef basic_null_json_input_handler<wchar_t> wnull_json_input_handler;
 
 }
 
