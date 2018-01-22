@@ -1,5 +1,5 @@
-master
-------
+v0.102.0
+--------
 
 The signatures of `jsonpointer::get`, `jsonpointer::insert`, `jsonpointer::insert_or_assign`, 
 `jsonpointer::remove` and `jsonpointer::replace` have been changed to be consistent
@@ -16,8 +16,8 @@ have been deprecated and replaced by new signatures that have void return values
 an output parameter 'std::vector<uint8_t>&'. The rationale for this change is consistency
 with other functions in the jsoncons library.
 
-0.101.0
--------
+v0.101.0
+--------
 
 Fixes:
 
@@ -33,12 +33,12 @@ Enhancements:
 - Support custom allocaor (currently stateless only) in `json_decoder`, `json_reader`, 
   `csv_reader`, `csv_parameters`
 
-0.100.2
+v0.100.2
 -------
 
 Resolved warnings on GCC Issue #127
 
-0.100.1
+v0.100.1
 -------
 
 Fix for platform issue with vs2017:
@@ -49,7 +49,7 @@ Enhancements:
 
 - New classes `byte_string` and `byte_string_view`, to augment support for cbor byte strings in `json` values
 
-0.100.0
+v0.100.0
 -------
 
 Changes:
@@ -75,7 +75,7 @@ Enhancements:
 
 - `version.hpp` added to `include` directory
 
-0.99.9.2
+v0.99.9.2
 --------
 
 Bug fixes:
@@ -91,7 +91,7 @@ Changes (non breaking)
 
 - `jsonpointer::erase` renamed to `jsonpointer::remove`, old name deprecated
 
-0.99.9.1
+v0.99.9.1
 --------
 
 New features
@@ -128,7 +128,7 @@ Changes
 
 - Removed template parameter `CharT` from class `basic_parse_error_handler` and renamed it to `parse_error_handler`
 
-0.99.8.2
+v0.99.8.2
 --------
 
 New features
@@ -141,7 +141,7 @@ Rationale: While these functions provide the same functionality as the existing
 of the C++ library, and have been given prominence in the examples and documentation 
 (`add` is still supported.)
 
-0.99.8.1
+v0.99.8.1
 --------
 
 New features
@@ -159,7 +159,7 @@ Changed
 
 - Removed `CharT` template parameter from `json_stream_traits`
 
-0.99.8
+v0.99.8
 ------
  
 Changes
@@ -207,7 +207,7 @@ New features
 - New `json::merge_or_update` function that inserts another json object's key-value 
   pairs into a json object, or assigns them if they already exist.
 
-0.99.7.3
+v0.99.7.3
 --------
 
 - `json_type_traits` supports `std::pair` (convert to/from json array of size 2)
@@ -228,25 +228,25 @@ Rationale: avoid name clashes with other `json` libraries
 - Added json array functions `emplace_back` and `emplace`, and json object functions `try_emplace`
   and `insert_or_assign`, which are analagous to the standard library vector and map functions. 
 
-0.99.7.2
+v0.99.7.2
 --------
 
 Bug fix
 
-- A bug was introduced in 0.99.7 causing the values of existing object members to not be changed wiht set or assignment operations. This has been fixed.
+- A bug was introduced in v0.99.7 causing the values of existing object members to not be changed wiht set or assignment operations. This has been fixed.
 
 Change
 
 - jsoncons_ext/binary changed to jsoncons_ext/msgpack
 - namespace jsoncons::binary changed to jsoncons::msgpack
 
-0.99.7.1
+v0.99.7.1
 --------
 
 - Workarounds in unicode_traits and jsonpath to maintain support for vs2013 
 - Added `mapping_type::n_rows`, `mapping_type::n_objects`, and `mapping_type::m_columns` options for csv to json 
 
-0.99.7
+v0.99.7
 ------
 
 Bug fixes
@@ -304,19 +304,19 @@ Removed features:
 
 - The jsonx extension has been removed 
 
-0.99.5
+v0.99.5
 ------
 
 - Validations added to utf8 and utf16 string parsing to pass all [JSONTestSuite](https://github.com/nst/JSONTestSuite) tests
-- The name `json_encoder` introduced in 0.99.4 has been changed to `json_decoder`. Rationale: consistencty with common usage (encoding and serialization, decoding and deserialization)
+- The name `json_encoder` introduced in v0.99.4 has been changed to `json_decoder`. Rationale: consistencty with common usage (encoding and serialization, decoding and deserialization)
 
-0.99.4a
+v0.99.4a
 -------
 
 Fixes Issue #101, In json.hpp, line 3376 change "char__type" to "char_type" 
 Fixes Issue #102, include cstring and json_error_category.hpp in json.hpp
 
-0.99.4
+v0.99.4
 ------
 
 Changes
@@ -344,7 +344,7 @@ New features
 - `json` class has new method `has_key()`, which returns `true` if a `json` value is an object and has a member with that key
 - New filter class `rename_name` allows search and replace of JSON object names
 
-0.99.3a
+v0.99.3a
 -------
 
 Changes
@@ -389,7 +389,7 @@ Fixes:
 
 - Fixes to remove warnings and issues reported by VS2015 with 4-th warnings level, PVS-Studio static analyzer tool, and UBSAN. 
 
-0.99.2
+v0.99.2
 ------
 
 - Included workaround for a C++11 issue in GCC 4.8, contributed by Alex Merry
@@ -400,13 +400,13 @@ Fixes:
     json val; 
     val["key1"]["key2"] = 1; 
 
-0.99.1
+v0.99.1
 ------
 
 - Fix to json_filter class
 - Fix to readme_examples
 
-0.99
+v0.99
 ----
 
 - Fixes to deprecated json parse functions (deprecated, but still supposed to work)
@@ -417,12 +417,12 @@ Fixes:
 - The deprecated json member constants null, an_object, and an_array have been removed
 - Microsoft VC++ versions earlier than 2013 are no longer supported
 
-0.98.4
+v0.98.4
 ------
 
 - Fixes issues with compilation with clang
 
-0.98.3
+v0.98.3
 ------
 
 New features
@@ -471,7 +471,7 @@ Non-beaking API Changes
 - json_parse_exception renamed to parse_error, json_parse_exception typedef to parse_error
 - json::parse(std::istream& is) renamed to json::parse_stream. json::parse(std::istream is) is deprecated but still works.
 
-0.98.2 Release
+v0.98.2 Release
 --------------
 
 - `json` constructor is now templated, so constructors now accept extended types
@@ -503,7 +503,7 @@ array:
 
 Since C++ has possible order issues with static data members, the jsoncons examples and documentation have been changed to consistently use the other ways, and `json::null`, `json::an_object` and `json::an_array` have been, while still usable, deprecated.
 
-0.98.1 Release
+v0.98.1 Release
 --------------
 
 - Enhances parser for CSV files that outputs JSON, see example below. 
@@ -512,7 +512,7 @@ Since C++ has possible order issues with static data members, the jsoncons examp
 - Enhances json::any class, adds type checks when casting back to original value
 - Fixes some warning messages
 
-0.98 Release
+v0.98 Release
 --------------
 
 Bug fixes:
@@ -542,7 +542,7 @@ Changes to extensions:
 - Modifies csv_reader and csv_serializer so that the constructors are passed parameters in a `csv_parameters` object rather than a `json` object.
 - Adds more options to csv_reader
 
-0.97.2 Release
+v0.97.2 Release
 --------------
 
 - Incorporates test suite files from http://www.json.org/JSON_checker/ into test suite
@@ -556,7 +556,7 @@ Changes to extensions:
 
 - Incorporates a fix to operator== on json objects, contributed by Alex Merry
 
-0.97.1 Release
+v0.97.1 Release
 --------------
 
 - "Transforming JSON with filters" example fixed
@@ -565,10 +565,10 @@ Changes to extensions:
 - Incorporates validation contributed by Alex Merry for ensuring that there is an object or array on parse head.
 - Incorporates fix contributed by Milan Burda for “Switch case is in protected scope” clang build error
 
-0.97 Release
+v0.97 Release
 ------------
 
-- Reversion of 0.96 change:
+- Reversion of v0.96 change:
 
 The virtual methods `do_float_value`, `do_integer_value`, and `do_unsigned_value` of `json_input_handler` and `json_outputhandler` have been restored to `do_double_value`, `do_longlong_value` and `do_ulonglong_value`, and their typedefed parameter types `float_type`, `integer_type`, and `unsigned_type` have been restored to `double`, `long long`, and `unsigned long long`.
 
@@ -576,7 +576,7 @@ The rationale for this reversion is that the change doesn't really help to make 
 
 - Fix for "unused variable" warning message
 
-0.96 Release
+v0.96 Release
 ------------
 
 This release includes breaking changes to interfaces. Going forward, the interfaces are expected to be stable.
@@ -594,7 +594,7 @@ Breaking changes:
 
 - The virtual methods `do_double_value`, `do_integer_value` and `do_uinteger_value` of `json_input_handler` and `json_outputhandler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_value`, 
   and their parameters have been changed from `double`, `long long`, and `unsigned long long` to typedefs `float_type`, `integer_type`, and `unsigned_type`.
-  The rationale for this change is to allow different configurations for internal number types (reversed in 0.97.)
+  The rationale for this change is to allow different configurations for internal number types (reversed in v0.97.)
 
 General changes
 
@@ -623,13 +623,13 @@ Bug fixes:
 - Where &s[0] and s.length() were passed to methods, &s[0] has been replaced with s.c_str(). 
   While this shouldn't be an issue on most implementations, VS throws an exception in debug modes when the string has length zero.
 
-- Fixes two issues in 0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_error_category_impl name method.
+- Fixes two issues in v0.95 reported by Alex Merry that caused errors with GCC: a superfluous typename has been removed in csv_serializer.hpp, and a JSONCONS_NOEXCEPT specifier has been added to the json_error_category_impl name method.
 
-- Fixed a number of typename issues in the 0.96 candidate identifed by Ignatov Serguei.
+- Fixed a number of typename issues in the v0.96 candidate identifed by Ignatov Serguei.
 
 - Fixes issues with testsuite cmake and scons reported by Alex Merry and Ignatov Serguei
 
-0.95
+v0.95
 ----
 
 Enhancements:
@@ -696,14 +696,14 @@ Bug fixes:
 
 - Fixed bug in csv_reader
 
-0.94.1
+v0.94.1
 ------
 
 Bug fixes:
 
 - Incorporates fix from Alex Merry for comparison of json objects
 
-0.94
+v0.94
 ----
 
 Bug fixes 
@@ -729,7 +729,7 @@ New extensions
   extensions traits for boost types, in particular, for
   boost::gregorian dates.
 
-0.93 Release
+v0.93 Release
 ------------
 
 New features
@@ -742,17 +742,17 @@ Defect fixes:
 - The ascii character 0x7f (del) was not being considered a control character to be escaped, this is fixed.
 - Fixed two issues with serialization when the output format property escape_all_non_ascii is enabled. One, the individual bytes were being checked if they were non ascii, rather than first converting to a codepoint. Two, continuations weren't being handled when decoding.
 
-0.92a Release
+v0.92a Release
 -------------
 
 Includes contributed updates for valid compilation and execution in gcc and clang environments
 
-0.92 Release
+v0.92 Release
 ------------
 
 Breaking change (but only if you have subclassed json_input_handler or json_output_handler)
 
-- For consistency with other names, the input and output handler methods new to 0.91 - value_string, value_double, value_longlong, value_ulonglong and value_bool - have been renamed to string_value, double_value, longlong_value, ulonglong_value and bool_value.
+- For consistency with other names, the input and output handler methods new to v0.91 - value_string, value_double, value_longlong, value_ulonglong and value_bool - have been renamed to string_value, double_value, longlong_value, ulonglong_value and bool_value.
 
 Non breaking changes (previous features are deprecated but still work)
 
@@ -768,10 +768,10 @@ Preparation for allocator support:
 
 - The basic_json and related classes now have an Storage template parameter, which is currently just a placeholder, but will later provide a hook to allow users to control how json storage is allocated. This addition is transparent to users of the json and related classes.
 
-0.91 Release
+v0.91 Release
 ------------
 
-This release should be largely backwards compatible with 0.90 and 0.83 with two exceptions: 
+This release should be largely backwards compatible with v0.90 and 0.83 with two exceptions: 
 
 1. If you have used object iterators, you will need to replace uses of std::pair with name_value_pair, in particular, first becomes name() and second becomes value(). 
 
@@ -818,12 +818,12 @@ Use as<std::vector<int>> etc. instead
     as_char
 Use as<int>, as<unsigned int>, and as<char> instead
 
-Release 0.90a
+Release v0.90a
 -------------
 
 Fixed issue affecting clang compile
 
-Release 0.90
+Release v0.90
 ------------
 
 This release should be fully backwards compatible with 0.83. 
@@ -840,7 +840,7 @@ Incorporates a number of patches contributed by Marc Chevrier:
 - json template method is<T> for examining the types of json values
 - json template method as<T> for accessing json values
 
-Release 0.83
+v0.83
 ------------
 
 Optimizations (very unlikely to break earlier code)
@@ -857,7 +857,7 @@ Deprecated features removed
 
 - Removed deprecated output_format properties (too much bagage to carry around)
 
-Release 0.82a
+v0.82a
 -------------
 
 - The const version of the json operator[](const std::string& name) didn't need to return a proxy, the return value has been changed to const json& (this change is transparent to the user.) 
@@ -866,7 +866,7 @@ Release 0.82a
 
 - non-const and const methods json& at(const std::name& name) have been added to replace the old single argument get method. These have the same behavior as the corresponding operator[] functions, but the non-const at is more efficient.
 
-Release 0.81
+v0.81
 ------------
 
 - Added accessor and modifier methods floatfield to output_format to provide a supported way to set the floatfield format flag to fixed or scientific with a specified number of decimal places (this can be done in older versions, but only with deprecated methods.)
@@ -908,7 +908,7 @@ is equivalent to
 
 For consistency the json::make_array notation is now favored in the documentation. 
 
-Release 0.71
+v0.71
 -------------
 
 - Added resize_array method to json for resizing json arrays 
@@ -921,7 +921,7 @@ Release 0.71
 
 - Fixed issue with adding custom data to a json array using add_custom_data, added examples.
 
-Release 0.70
+v0.70
 -------------
 
 - Since 0.50, jsoncons has used snprintf for default serialization of double values to string values. This can result in invalid json output when running on a locale like German or Spanish. The period character (â€˜.â€™) is now always used as the decimal point, non English locales are ignored.
@@ -938,7 +938,7 @@ Release 0.70
 
 - Undeprecated the json member function precision
 
-Release 0.60b
+v0.60b
 -------------
 
 This release (0.60b) is fully backwards compatible with 0.50.
@@ -957,7 +957,7 @@ A change introduced with 0.60 has been reversed. 0.60 introduced an alternative 
 
 - csv_serializer has been added to the csv extension
 
-Release 0.50
+v0.50
 ------------
 
 This release is fully backwards compatible with 0.4*, and mostly backwards compatible to 0.32 apart from the two name changes in 0.41
@@ -984,7 +984,7 @@ Non functional enhancements
 
 - json_reader now estimates the minimum capacity for arrays and objects, and reports that information for the begin_array and begin_object events. This greatly reduces reallocations.
 
-Release 0.42
+v0.42
 ------------
 
 - Fixed another bug with multi line /**/ comments 
@@ -993,7 +993,7 @@ Release 0.42
 - Added version of as_string to json that takes output_format as a parameter
 - Reorganization of test cases and examples in source tree
 
-Release 0.41
+v0.41
 ------------
 
 - Added non-member overload swap(json& a, json& b)
@@ -1005,7 +1005,7 @@ Release 0.41
 - json::parse_file no longer reads the entire file into memory before parsing
   (it now uses json_reader default buffering)
 
-Release 0.40
+v0.40
 ------------
 
 - json_listener renamed to json_input_handler
@@ -1019,7 +1019,7 @@ Release 0.40
 - Added as_char method to json
 - Improved exception safety, some opportunites for memory leaks in the presence of exceptions removed
 
-Release 0.33
+v0.33
 ------------
 
 Added reserve method to json
@@ -1032,21 +1032,21 @@ Added csv_reader class for reading CSV files and producing JSON events
 
 Fixed bug with explicitly passing output_format in pretty_print.
 
-Release 0.32
+v0.32
 ------------
 
 Added remove_range method, operator== and  operator!= to proxy and json objects
 
 Added static methods make_array and make_2d_array to json
 
-Release 0.31
+v0.31
 ------------
 
 error_handler method content_error renamed to error
 
 Added error_code to warning, error and fatal_error methods of error_handler
 
-Release 0.30
+v0.30
 ------------
 
 json_in_stream renamed to json_listener
@@ -1055,7 +1055,7 @@ json_out_stream renamed to json_writer
 
 Added buffer accessor method to parsing_context
 
-Release 0.20
+v0.20
 ------------
 
 Added parsing_context class for providing information about the
@@ -1065,7 +1065,7 @@ error_handler methods take message and parsing_context parameters
 
 json_in_stream handlers take parsing_context parameter
 
-Release 0.19
+v0.19
 ------------
 
 Added error_handler class for json_reader
@@ -1076,7 +1076,7 @@ Added root() method to json_deserializer to get a reference to the json value
 
 Removed swap_root() method from json_deserializer
 
-Release 0.18
+v0.18
 ------------
 
 Renamed serialize() class method to to_stream() in json  
@@ -1085,7 +1085,7 @@ Custom data serialization supported through template function specialization of 
 (reverses change in 0.17)
 
 
-Release 0.17
+v0.17
 ------------
 
 Added is_custom() method to json and proxy
@@ -1105,7 +1105,7 @@ Added add_custom_data method() in json and proxy
 Custom data serialization supported through template class specialization of custom_serialization
 (replaces template function specialization of serialize)
 
-Release 0.16
+v0.16
 ------------
 
 Change to json_out_stream and json_serializer:
@@ -1119,13 +1119,13 @@ serializing custom data.
 
 pretty print tidied up for nested arrays
 
-Release 0.15
+v0.15
 ------------
 
 Made eof() method on json_reader public, to support reading
 multiple JSON objects from a stream.
 
-Release 0.14
+v0.14
 ------------
 
 Added pretty_print class
@@ -1143,7 +1143,7 @@ Changed indenting so object and array members start on new line.
 Added support for storing user data in json object, and
 serializing to JSON.
 
-Release 0.13
+v0.13
 ------------
 
 Replaced simple_string union member with json_string that 
@@ -1153,14 +1153,14 @@ name() and value() event handler methods on
 basic_json_stream_writer take const std::basic_string<Char>&
 rather than const Char* and length.
 
-Release 0.12
+v0.12
 ------------
 
 Implemented operator<< for json::proxy
 
 Added to_stream methods to json::proxy
 
-Release 0.11
+v0.11
 ------------
 
 Added members to json_parser to access and modify the buffer capacity
