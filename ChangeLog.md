@@ -1,6 +1,13 @@
 v0.102.0
 --------
 
+Bug fixes:
+
+Fixed issue with how jsonpath filters are applied to arrays in the presence of recursion, resulting in
+duplicate results.
+
+Changes:
+
 The signatures of `jsonpointer::get`, `jsonpointer::insert`, `jsonpointer::insert_or_assign`, 
 `jsonpointer::remove` and `jsonpointer::replace` have been changed to be consistent
 with other functions in the jsoncons library. Each of these functions now has two overloads,
