@@ -888,7 +888,7 @@ public:
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T>(value));
+            it->value(Json(std::forward<T>(value)));
             inserted = false; // assigned
         }
         else
@@ -1072,7 +1072,7 @@ public:
         }
         else if (string_view_type(it->key().data(),it->key().length()) == s)
         {
-            it->value(std::forward<T>(value));
+            it->value(Json(std::forward<T>(value)));
         }
         else
         {
@@ -1130,7 +1130,7 @@ public:
         }
         else if (it->key() == name)
         {
-            it->value(std::forward<T>(value));
+            it->value(Json(std::forward<T>(value)));
         }
         else
         {
