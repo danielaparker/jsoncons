@@ -3958,18 +3958,7 @@ public:
     template <class T>
     std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
     {
-        switch (var_.type_id())
-        {
-        case json_type_tag::empty_object_t:
-            create_object_implicitly();
-            // FALLTHRU
-        case json_type_tag::object_t:
-            return object_value().insert_or_assign(name, std::forward<T>(val));
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", view_to_string(name));
-            }
-        }
+        return insert_or_assign(name, std::forward<T>(val));
     }
 
     template <class T>
@@ -4161,18 +4150,7 @@ public:
     template <class T>
     object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
     {
-        switch (var_.type_id())
-        {
-        case json_type_tag::empty_object_t:
-            create_object_implicitly();
-            // FALLTHRU
-        case json_type_tag::object_t:
-            return object_value().insert_or_assign(hint, name, std::forward<T>(val));
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", view_to_string(name));
-            }
-        }
+        return insert_or_assign(hint, name, std::forward<T>(val));
     }
 
     template <class T>
@@ -4230,16 +4208,7 @@ public:
     template <class T>
     void add(T&& val)
     {
-        switch (var_.type_id())
-        {
-        case json_type_tag::array_t:
-            array_value().push_back(std::forward<T>(val));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
-            }
-        }
+        push_back(std::forward<T>(val));
     }
 
     template <class T>
@@ -4260,16 +4229,7 @@ public:
     template <class T>
     array_iterator add(const_array_iterator pos, T&& val)
     {
-        switch (var_.type_id())
-        {
-        case json_type_tag::array_t:
-            return array_value().insert(pos, std::forward<T>(val));
-            break;
-        default:
-            {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to insert into a value that is not an array");
-            }
-        }
+        return insert(pos, std::forward<T>(val));
     }
 
     template <class T>
