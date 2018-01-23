@@ -594,10 +594,10 @@ public:
     json_object(std::initializer_list<std::pair<string_view_type,Json>> init)
         : Json_object_<KeyT,Json>()
     {
-        elements_.reserve(init.size());
+        this->members_.reserve(init.size());
         for (auto& item : init)
         {
-            elements_.emplace_back(item);
+            insert_or_assign(item.first, std::move(item.second));
         }
     }
 
@@ -605,10 +605,10 @@ public:
                 const allocator_type& allocator)
         : Json_object_<KeyT,Json>(allocator)
     {
-        elements_.reserve(init.size());
+        this->members_.reserve(init.size());
         for (auto& item : init)
         {
-            elements_.emplace_back(item, allocator);
+            insert_or_assign(item.first, std::move(item.second), allocator);
         }
     }
 
