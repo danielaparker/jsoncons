@@ -150,7 +150,7 @@ public:
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool exclaim() const
+    virtual Json exclaim() const
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -162,7 +162,7 @@ public:
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool ne_term(const term&) const
+    virtual Json ne_term(const term&) const
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -170,7 +170,7 @@ public:
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual bool regex_term(const term&) const
+    virtual Json regex_term(const term&) const
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -215,7 +215,7 @@ public:
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json minus(const Json&) const
+    virtual Json  minus(const Json&) const
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -233,7 +233,7 @@ public:
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
-    virtual Json plus(const Json&) const
+    virtual Json  plus(const Json&) const
     {
         throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
     }
@@ -559,7 +559,7 @@ public:
         return value_;
     }
 
-    bool exclaim() const override
+    Json exclaim() const override
     {
         return !value_.as_bool();
     }
@@ -574,7 +574,7 @@ public:
         return value_ == rhs;
     }
 
-    bool ne_term(const term<Json>& rhs) const override
+    Json ne_term(const term<Json>& rhs) const override
     {
         return rhs.ne(value_);
     }
@@ -582,7 +582,7 @@ public:
     {
         return value_ != rhs;
     }
-    bool regex_term(const term<Json>& rhs) const override
+    Json regex_term(const term<Json>& rhs) const override
     {
         return rhs.regex2(value_.as_string());
     }
@@ -722,7 +722,7 @@ public:
         return nodes_.size() == 1 ? nodes_[0] : nodes_;
     }
 
-    bool exclaim() const override
+    Json exclaim() const override
     {
         return nodes_.size() == 0;
     }
@@ -755,7 +755,7 @@ public:
         return result;
     }
 
-    bool ne_term(const term<Json>& rhs) const override
+    Json ne_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -782,7 +782,7 @@ public:
         }
         return result;
     }
-    bool regex_term(const term<Json>& rhs) const override
+    Json regex_term(const term<Json>& rhs) const override
     {
         bool result = false;
         if (nodes_.size() > 0)
@@ -1125,19 +1125,19 @@ class jsonpath_filter_parser
 
         const binary_operator_map operators =
         {
-            {eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.regex_term(b)); }}},
+            {eqtilde_literal<char_type>(),{2,false,[](const term<Json>& a, const term<Json>& b) {return a.regex_term(b); }}},
             {star_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) {return a.mult_term(b); }}},
             {forwardslash_literal<char_type>(),{3,false,[](const term<Json>& a, const term<Json>& b) {return a.div_term(b); }}},
             {plus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) {return a.plus_term(b); }}},
             {minus_literal<char_type>(),{4,false,[](const term<Json>& a, const term<Json>& b) {return a.minus_term(b); }}},
-            {lt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.lt_term(b)); }}},
-            {lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.lt_term(b) || a.eq_term(b)); }}},
-            {gt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.gt_term(b)); }}},
-            {gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.gt_term(b) || a.eq_term(b)); }}},
-            {eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.eq_term(b)); }}},
-            {ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.ne_term(b)); }}},
-            {ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.ampamp_term(b)); }}},
-            {pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.pipepipe_term(b)); }}}
+            {lt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b); }}},
+            {lte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b) || a.eq_term(b); }}},
+            {gt_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b); }}},
+            {gte_literal<char_type>(),{5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b) || a.eq_term(b); }}},
+            {eq_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) {return a.eq_term(b); }}},
+            {ne_literal<char_type>(),{6,false,[](const term<Json>& a, const term<Json>& b) {return a.ne_term(b); }}},
+            {ampamp_literal<char_type>(),{7,false,[](const term<Json>& a, const term<Json>& b) {return a.ampamp_term(b); }}},
+            {pipepipe_literal<char_type>(),{8,false,[](const term<Json>& a, const term<Json>& b) {return a.pipepipe_term(b); }}}
         };
 
     public:
@@ -1603,7 +1603,7 @@ public:
                     break;
                 case '!':
                 {
-                    std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return Json(b.exclaim());};
+                    std::function<Json(const term<Json>&)> f = [](const term<Json>& b) {return b.exclaim();};
                     add_token(token<Json>(1, true, f));
                     ++p;
                     ++column_;
@@ -1854,19 +1854,19 @@ public:
 template <class Json>
 const operator_properties<Json> jsonpath_filter_parser<Json>::op_properties_[] =
 {
-    {2,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.regex_term(b));}},
+    {2,false,[](const term<Json>& a, const term<Json>& b) {return a.regex_term(b);}},
     {3,false,[](const term<Json>& a, const term<Json>& b) {return a.mult_term(b);}},
     {3,false,[](const term<Json>& a, const term<Json>& b) {return a.div_term(b);}},
     {4,false,[](const term<Json>& a, const term<Json>& b) {return a.plus_term(b);}},
     {4,false,[](const term<Json>& a, const term<Json>& b) {return a.minus_term(b);}},
-    {5,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.lt_term(b));}},
-    {5,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.lt_term(b) || a.eq_term(b));}},
-    {5,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.gt_term(b));}},
-    {5,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.gt_term(b) || a.eq_term(b));}},
-    {6,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.eq_term(b)); }},
-    {6,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.ne_term(b)); }},
-    {7,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.ampamp_term(b));}},
-    {8,false,[](const term<Json>& a, const term<Json>& b) {return Json(a.pipepipe_term(b));}}
+    {5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b);}},
+    {5,false,[](const term<Json>& a, const term<Json>& b) {return a.lt_term(b) || a.eq_term(b);}},
+    {5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b);}},
+    {5,false,[](const term<Json>& a, const term<Json>& b) {return a.gt_term(b) || a.eq_term(b);}},
+    {6,false,[](const term<Json>& a, const term<Json>& b) {return a.eq_term(b); }},
+    {6,false,[](const term<Json>& a, const term<Json>& b) {return a.ne_term(b); }},
+    {7,false,[](const term<Json>& a, const term<Json>& b) {return a.ampamp_term(b);}},
+    {8,false,[](const term<Json>& a, const term<Json>& b) {return a.pipepipe_term(b);}}
 };
 
 }}}
