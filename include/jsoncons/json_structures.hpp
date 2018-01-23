@@ -21,6 +21,7 @@
 #include <initializer_list>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/json_type_traits.hpp>
 
 namespace jsoncons {
 
@@ -385,9 +386,18 @@ public:
     {
     }
 
-    key_value_pair(key_storage_type&& name, ValueT&& val)
+    template <class T>
+    key_value_pair(key_storage_type&& name, T&& val)
         : key_(std::forward<key_storage_type>(name)), 
-          value_(std::forward<ValueT>(val))
+          value_(std::forward<T>(val))
+    {
+    }
+
+    template <class T>
+    key_value_pair(key_storage_type&& name, 
+                   T&& val, 
+                   const allocator_type& allocator)
+        : key_(std::forward<key_storage_type>(name)), value_(std::forward<T>(val), allocator)
     {
     }
 
@@ -398,14 +408,6 @@ public:
 
     key_value_pair(key_value_pair&& member)
         : key_(std::move(member.key_)), value_(std::move(member.value_))
-    {
-    }
-
-    template <class T>
-    key_value_pair(key_storage_type&& name, 
-                   T&& val, 
-                   const allocator_type& allocator)
-        : key_(std::forward<key_storage_type>(name)), value_(std::forward<T>(val), allocator)
     {
     }
 

@@ -2886,7 +2886,7 @@ public:
     }
 
     template <class T>
-    basic_json(const T& val)
+    explicit basic_json(const T& val)
         : var_(json_type_traits<basic_json,T>::to_json(val).var_)
     {
     }
