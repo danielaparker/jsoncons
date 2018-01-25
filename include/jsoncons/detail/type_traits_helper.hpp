@@ -26,7 +26,7 @@
 #include <exception>
 #include <array>
 #include <initializer_list>
-#include <jsoncons/detail/jsoncons_config.hpp>
+#include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 
 #if defined(JSONCONS_HAS_STRING_VIEW)
@@ -989,7 +989,7 @@ public:
                 {
                     --p;
                 }
-                const CharT* qend = *(p-2) == '.' ? p : send;
+                const CharT* qend = ((p >= sbeg+2) && *(p-2) == '.') ? p : send;
                 for (const CharT* q = sbeg; q < qend; ++q)
                 {
                     if (*q == '.')
