@@ -923,7 +923,7 @@ public:
     }
 };
 
-#else
+#elif defined(JSONCONS_HAS_STRTOLD_L)
 
 template <class CharT>
 class print_double
@@ -1008,6 +1008,112 @@ public:
         }
     }
 };
+#else
+
+template <class CharT>
+class print_double
+{
+    uint8_t precision_;
+    char decimal_point_;
+public:
+    print_double(uint8_t precision)
+        : precision_(precision)
+    {
+        struct lconv * lc = localeconv();
+        if (lc != nullptr && lc->decimal_point[0] != 0)
+        {
+            decimal_point_ = lc->decimal_point[0];    
+        }
+        else
+        {
+            decimal_point_ = '.'; 
+        }
+    }
+    void operator()(double val, uint8_t precision, buffered_output<CharT>& os)
+    {
+        char number_buffer[100]; 
+        int length = 0;
+        if (precision != 0)
+        {
+            length = snprintf(number_buffer, 100, "%1.*g", precision, val);
+        }
+        else
+        {
+            length = snprintf(number_buffer, 100, "%1.*g", precision_, val);
+        }
+
+        const char* sbeg = number_buffer;
+        const char* send = sbeg + length;
+        const char* pexp = send;
+
+        if (sbeg != send)
+        {
+            bool dot = false;
+            for (pexp = sbeg; *pexp != 'e' && *pexp != 'E' && pexp < send; ++pexp)
+            {
+            }
+
+            if (pexp != send)
+            {
+                const char* p = pexp;
+                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
+                {
+                    --p;
+                }
+                for (const char* q = sbeg; q < p; ++q)
+                {
+                    if (*q == decimal_point_)
+                    {
+                        dot = true;
+                        os.put('.');
+                    }
+                    else
+                    {
+                        os.put(*q);
+                    }
+                }
+                if (!dot)
+                {
+                    os.put('.');
+                    os.put('0');
+                    dot = true;
+                }
+                for (const char* q = pexp; q < send; ++q)
+                {
+                    os.put(*q);
+                }
+            }
+            else
+            {
+                const char* p = send;
+                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
+                {
+                    --p;
+                }
+                const char* qend = ((p >= sbeg+2) && *(p-2) == '.') ? p : send;
+                for (const char* q = sbeg; q < qend; ++q)
+                {
+                    if (*q == decimal_point_)
+                    {
+                        dot = true;
+                        os.put('.');
+                    }
+                    else
+                    {
+                        os.put(*q);
+                    }
+                }
+            }
+
+            if (!dot)
+            {
+                os.put('.');
+                os.put('0');
+            }
+        }
+    }
+};
+
 #endif
 
 #if defined(JSONCONS_HAS_MSC__STRTOD_L)
