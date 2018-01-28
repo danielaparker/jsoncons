@@ -1010,7 +1010,7 @@ public:
 };
 #endif
 
-#if defined(_MSC_VER)
+#if defined(NOT_MSC_VER)
 
 class string_to_double
 {
@@ -1026,7 +1026,12 @@ public:
         _free_locale(locale_);
     }
 
-    double operator()(const char* s, size_t)
+    char get_decimal_point() const
+    {
+        return '.';
+    }
+
+    double operator()(const char* s, size_t) const
     {
         const char *begin = s;
         char *end = nullptr;
@@ -1059,7 +1064,12 @@ public:
         freelocale(locale_);
     }
 
-    double operator()(const char* s, size_t length)
+    char get_decimal_point() const
+    {
+        return '.';
+    }
+
+    double operator()(const char* s, size_t length) const
     {
         const char *begin = s;
         char *end = nullptr;
@@ -1082,63 +1092,35 @@ class string_to_double
 {
 private:
     std::vector<char> buffer_;
-    std::string decimal_point_;
-    bool is_dot_;
+    char decimal_point_;
 public:
     string_to_double()
         : buffer_()
     {
         struct lconv * lc = localeconv();
-        if (lc != nullptr)
+        if (lc != nullptr && lc->decimal_point[0] != 0)
         {
-            decimal_point_ = std::string(lc->decimal_point);    
+            decimal_point_ = lc->decimal_point[0];    
         }
         else
         {
-            decimal_point_ = std::string("."); 
+            decimal_point_ = '.'; 
         }
         buffer_.reserve(100);
-        is_dot_ = decimal_point_ == ".";
     }
 
-    double operator()(const char* s, size_t length)
+    char get_decimal_point() const
     {
-        double val;
-        if (is_dot_)
+        return decimal_point_;
+    }
+
+    double operator()(const char* s, size_t /*length*/) const
+    {
+        char *end = nullptr;
+        double val = strtod(s, &end);
+        if (s == end)
         {
-            const char *begin = s;
-            char *end = nullptr;
-            val = strtod(begin, &end);
-            if (begin == end)
-            {
-                throw std::invalid_argument("Invalid float value");
-            }
-        }
-        else
-        {
-            buffer_.clear();
-            size_t j = 0;
-            const char* pe = s + length;
-            for (const char* p = s; p < pe; ++p)
-            {
-                if (*p == '.')
-                {
-                    buffer_.insert(buffer_.begin() + j, decimal_point_.begin(), decimal_point_.end());
-                    j += decimal_point_.length();
-                }
-                else
-                {
-                    buffer_.push_back(*p);
-                    ++j;
-                }
-            }
-            const char *begin = buffer_.data();
-            char *end = nullptr;
-            val = strtod(begin, &end);
-            if (begin == end)
-            {
-                throw std::invalid_argument("Invalid float value");
-            }
+            throw std::invalid_argument("Invalid float value");
         }
         return val;
     }

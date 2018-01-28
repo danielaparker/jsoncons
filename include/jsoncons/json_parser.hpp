@@ -1582,7 +1582,7 @@ negative_zero:
                 return;
             case '.':
                 JSONCONS_ASSERT(precision_ == number_buffer_.length());
-                number_buffer_.push_back(static_cast<char>(*p_));
+                number_buffer_.push_back(str_to_double_.get_decimal_point());
                 ++p_;
                 ++column_;
                 goto fraction1;
@@ -1680,7 +1680,7 @@ negative_integer:
                 return;
             case '.':
                 JSONCONS_ASSERT(precision_ == number_buffer_.length());
-                number_buffer_.push_back(static_cast<char>(*p_));
+                number_buffer_.push_back(str_to_double_.get_decimal_point());
                 ++p_;
                 ++column_;
                 goto fraction1;
@@ -1751,7 +1751,7 @@ positive_zero:
                 return;
             case '.':
                 JSONCONS_ASSERT(precision_ == number_buffer_.length());
-                number_buffer_.push_back(static_cast<char>(*p_));
+                number_buffer_.push_back(str_to_double_.get_decimal_point());
                 ++p_;
                 ++column_;
                 goto fraction1;
@@ -1841,7 +1841,7 @@ positive_integer:
                 goto positive_integer;
             case '.':
                 JSONCONS_ASSERT(precision_ == number_buffer_.length());
-                number_buffer_.push_back(static_cast<char>(*p_));
+                number_buffer_.push_back(str_to_double_.get_decimal_point());
                 ++p_;
                 ++column_;
                 goto fraction1;
