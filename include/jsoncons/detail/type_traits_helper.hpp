@@ -819,10 +819,10 @@ public:
 template <class CharT>
 class print_double
 {
-    uint8_t precision_;
+    uint8_t precision_override_;
 public:
     print_double(uint8_t precision)
-        : precision_(precision)
+        : precision_override_(precision)
     {
     }
 
@@ -832,7 +832,7 @@ public:
         int decimal_point = 0;
         int sign = 0;
 
-        int prec = (precision_ == 0) ? precision : precision_;
+        int prec = (precision_override_ == 0) ? precision : precision_override_;
 
         int err = _ecvt_s(buf, _CVTBUFSIZE, val, prec, &decimal_point, &sign);
         if (err != 0)
@@ -923,27 +923,29 @@ public:
     }
 };
 
-#elif defined(JSONCONS_HAS__ECVT_S) //defined(JSONCONS_NO_LOCALECONV)
+#elif defined(JSONCONS_NO_LOCALECONV)
 
 template <class CharT>
 class print_double
 {
-    uint8_t precision_;
+    uint8_t precision_override_;
     basic_obufferedstream<CharT> oss_;
 public:
     print_double(uint8_t precision)
-        : precision_(precision)
+        : precision_override_(precision)
     {
         oss_.imbue(std::locale::classic());
         oss_.precision(precision);
     }
     void operator()(double val, uint8_t precision, buffered_output<CharT>& os)
     {
+        int prec = (precision_override_ == 0) ? precision : precision_override_;
+
         oss_.clear_sequence();
-        oss_.precision((precision_ == 0) ? precision : precision_);
+        oss_.precision(prec);
         oss_ << val;
 
-        //std::cout << "precision_:" << (int)precision_ << ", precision:" << (int)precision << ", buf:" << oss_.data() << std::endl;
+        //std::cout << "precision_override_:" << (int)precision_override_ << ", precision:" << (int)precision << ", buf:" << oss_.data() << std::endl;
 
         const CharT* sbeg = oss_.data();
         const CharT* send = sbeg + oss_.length();
@@ -992,11 +994,11 @@ public:
 template <class CharT>
 class print_double
 {
-    uint8_t precision_;
+    uint8_t precision_override_;
     char decimal_point_;
 public:
     print_double(uint8_t precision)
-        : precision_(precision)
+        : precision_override_(precision)
     {
         struct lconv * lc = localeconv();
         if (lc != nullptr && lc->decimal_point[0] != 0)
@@ -1012,13 +1014,13 @@ public:
     {
         char number_buffer[100]; 
         int length = 0;
-        if (precision != 0)
+        if (precision_override_ != 0)
         {
-            length = snprintf(number_buffer, 100, "%1.*g", precision, val);
+            length = snprintf(number_buffer, 100, "%1.*g", precision_override_, val);
         }
         else
         {
-            length = snprintf(number_buffer, 100, "%1.*g", precision_, val);
+            length = snprintf(number_buffer, 100, "%1.*g", precision, val);
         }
 
         const char* sbeg = number_buffer;
