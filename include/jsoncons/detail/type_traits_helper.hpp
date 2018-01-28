@@ -1054,6 +1054,10 @@ public:
 
         char number_buffer[100]; 
         int length = snprintf(number_buffer, 100, "%1.*g", prec, val);
+        if (length < 0)
+        {
+            throw std::invalid_argument("print_double failed.");
+        }
 
         const char* sbeg = number_buffer;
         const char* send = sbeg + length;
@@ -1208,7 +1212,7 @@ public:
         double val = strtod(s, &end);
         if (s == end)
         {
-            throw std::invalid_argument("Invalid float value");
+            throw std::invalid_argument("string_to_double failed");
         }
         return val;
     }
