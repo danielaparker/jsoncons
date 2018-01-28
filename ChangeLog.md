@@ -1,3 +1,10 @@
+v0.102.1
+--------
+
+Bug fix:
+
+Fixed an off-by-one error that could lead to an out of bounds read. Reported by mickcollyer (issue #145)
+
 v0.102.0
 --------
 
