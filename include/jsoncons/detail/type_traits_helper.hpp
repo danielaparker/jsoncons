@@ -814,7 +814,7 @@ public:
 
 // print_double
 
-#ifdef JSONCONS_HAS__ECVT_S
+#if defined(JSONCONS_HAS__ECVT_S)
 
 template <class CharT>
 class print_double
@@ -923,7 +923,7 @@ public:
     }
 };
 
-#elif defined(JSONCONS_NO_LOCALECONV)
+#elif defined(JSONCONS_HAS__ECVT_S) //defined(JSONCONS_NO_LOCALECONV)
 
 template <class CharT>
 class print_double
@@ -956,54 +956,33 @@ public:
             {
             }
 
-            if (pexp != send)
+            const CharT* qend = pexp;
+            while (qend >= sbeg+2 && *(qend-1) == '0' && *(qend-2) != '.')
             {
-                const CharT* p = pexp;
-                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
-                {
-                    --p;
-                }
-                for (const CharT* q = sbeg; q < p; ++q)
-                {
-                    if (*q == '.')
-                    {
-                        dot = true;
-                    }
-                    os.put(*q);
-                }
-                if (!dot)
-                {
-                    os.put('.');
-                    os.put('0');
-                    dot = true;
-                }
-                for (const CharT* q = pexp; q < send; ++q)
-                {
-                    os.put(*q);
-                }
+                --qend;
             }
-            else
+            if (pexp == send)
             {
-                const CharT* p = send;
-                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
-                {
-                    --p;
-                }
-                const CharT* qend = ((p >= sbeg+2) && *(p-2) == '.') ? p : send;
-                for (const CharT* q = sbeg; q < qend; ++q)
-                {
-                    if (*q == '.')
-                    {
-                        dot = true;
-                    }
-                    os.put(*q);
-                }
+                qend = ((qend >= sbeg+2) && *(qend-2) == '.') ? qend : send;
             }
 
+            for (const CharT* q = sbeg; q < qend; ++q)
+            {
+                if (*q == '.')
+                {
+                    dot = true;
+                }
+                os.put(*q);
+            }
             if (!dot)
             {
                 os.put('.');
                 os.put('0');
+                dot = true;
+            }
+            for (const CharT* q = pexp; q < send; ++q)
+            {
+                os.put(*q);
             }
         }
     }
