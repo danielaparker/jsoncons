@@ -832,7 +832,19 @@ public:
         int decimal_point = 0;
         int sign = 0;
 
-        int prec = (precision_override_ == 0) ? precision : precision_override_;
+        int prec;
+        if (precision_override_ != 0)
+        {
+            prec = precision_override_;
+        }
+        else if (precision != 0)
+        {
+            prec = precision;
+        }
+        else
+        {
+            prec = std::numeric_limits<double>::digits10;
+        }             
 
         int err = _ecvt_s(buf, _CVTBUFSIZE, val, prec, &decimal_point, &sign);
         if (err != 0)
@@ -939,7 +951,20 @@ public:
     }
     void operator()(double val, uint8_t precision, buffered_output<CharT>& os)
     {
-        int prec = (precision_override_ == 0) ? precision : precision_override_;
+
+        int prec;
+        if (precision_override_ != 0)
+        {
+            prec = precision_override_;
+        }
+        else if (precision != 0)
+        {
+            prec = precision;
+        }
+        else
+        {
+            prec = std::numeric_limits<double>::digits10;
+        }             
 
         oss_.clear_sequence();
         oss_.precision(prec);
@@ -1012,16 +1037,23 @@ public:
     }
     void operator()(double val, uint8_t precision, buffered_output<CharT>& os)
     {
-        char number_buffer[100]; 
-        int length = 0;
+
+        int prec;
         if (precision_override_ != 0)
         {
-            length = snprintf(number_buffer, 100, "%1.*g", precision_override_, val);
+            prec = precision_override_;
+        }
+        else if (precision != 0)
+        {
+            prec = precision;
         }
         else
         {
-            length = snprintf(number_buffer, 100, "%1.*g", precision, val);
-        }
+            prec = std::numeric_limits<double>::digits10;
+        }             
+
+        char number_buffer[100]; 
+        int length = snprintf(number_buffer, 100, "%1.*g", prec, val);
 
         const char* sbeg = number_buffer;
         const char* send = sbeg + length;

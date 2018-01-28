@@ -4343,12 +4343,12 @@ public:
 
     static basic_json from_floating_point(double val)
     {
-        return basic_json(variant(val, std::numeric_limits<double>::digits10));
+        return basic_json(variant(val, 0));
     }
 
     static basic_json from_floating_point(double val, allocator_type)
     {
-        return basic_json(variant(val,std::numeric_limits<double>::digits10));
+        return basic_json(variant(val,0));
     }
 
     static basic_json from_bool(bool val)
