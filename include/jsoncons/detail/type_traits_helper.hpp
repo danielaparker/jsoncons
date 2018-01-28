@@ -1053,51 +1053,31 @@ public:
             {
             }
 
-            if (pexp != send)
+            for (const char* q = sbeg; q < pexp; ++q)
             {
-                for (const char* q = sbeg; q < pexp; ++q)
+                switch (*q)
                 {
-                    if (*q == decimal_point_)
-                    {
-                        dot = true;
-                        os.put('.');
-                    }
-                    else
-                    {
-                        os.put(*q);
-                    }
-                }
-                if (!dot)
-                {
-                    os.put('.');
-                    os.put('0');
-                    dot = true;
-                }
-                for (const char* q = pexp; q < send; ++q)
-                {
+                case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     os.put(*q);
-                }
-            }
-            else
-            {
-                for (const char* q = sbeg; q < send; ++q)
-                {
+                    break;
+                default:
                     if (*q == decimal_point_)
                     {
                         dot = true;
                         os.put('.');
                     }
-                    else
-                    {
-                        os.put(*q);
-                    }
+                    break;
                 }
             }
-
             if (!dot)
             {
                 os.put('.');
                 os.put('0');
+                dot = true;
+            }
+            for (const char* q = pexp; q < send; ++q)
+            {
+                os.put(*q);
             }
         }
     }
