@@ -1010,7 +1010,7 @@ public:
 };
 #endif
 
-#if defined(NOT_MSC_VER)
+#if defined(JSONCONS_HAS_MSC__STRTOD_L)
 
 class string_to_double
 {
