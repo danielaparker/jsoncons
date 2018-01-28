@@ -814,7 +814,7 @@ public:
 
 // print_double
 
-#ifdef ___JSONCONS_HAS__ECVT_S
+#ifdef JSONCONS_HAS__ECVT_S
 
 template <class CharT>
 class print_double
@@ -923,7 +923,7 @@ public:
     }
 };
 
-#elif defined(JSONCONS_HAS_STRTOLD_L)
+#elif defined(JSONCONS_NO_LOCALECONV)
 
 template <class CharT>
 class print_double
