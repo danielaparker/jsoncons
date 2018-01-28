@@ -814,7 +814,7 @@ public:
 
 // print_double
 
-#ifdef JSONCONS_HAS__ECVT_S
+#ifdef ___JSONCONS_HAS__ECVT_S
 
 template <class CharT>
 class print_double
@@ -1055,12 +1055,7 @@ public:
 
             if (pexp != send)
             {
-                const char* p = pexp;
-                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
-                {
-                    --p;
-                }
-                for (const char* q = sbeg; q < p; ++q)
+                for (const char* q = sbeg; q < pexp; ++q)
                 {
                     if (*q == decimal_point_)
                     {
@@ -1085,13 +1080,7 @@ public:
             }
             else
             {
-                const char* p = send;
-                while (p >= sbeg+2 && *(p-1) == '0' && *(p-2) != '.')
-                {
-                    --p;
-                }
-                const char* qend = ((p >= sbeg+2) && *(p-2) == '.') ? p : send;
-                for (const char* q = sbeg; q < qend; ++q)
+                for (const char* q = sbeg; q < send; ++q)
                 {
                     if (*q == decimal_point_)
                     {
