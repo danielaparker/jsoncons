@@ -15,6 +15,9 @@
 #include <cstdlib>
 #include <limits>
 #include <cwchar>
+#if !defined(JSONCONS_NO_TO_CHARS)
+#include <charconv>
+#endif
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 
@@ -28,6 +31,12 @@ template <class CharT>
 class buffered_output;
 
 enum class line_split_kind{same_line,new_line,multi_line};
+
+#if !defined(JSONCONS_NO_TO_CHARS)
+using chars_format = std::chars_format;
+#else
+enum class chars_format {fixed,scientific,hex,general=fixed|scientific};
+#endif
 
 template <class CharT>
 class basic_serialization_options
@@ -47,6 +56,8 @@ class basic_serialization_options
     line_split_kind object_array_split_lines_;
     line_split_kind array_array_split_lines_;
     line_split_kind array_object_split_lines_;
+
+    chars_format floating_point_format_;
 public:
     static const size_t default_indent = 4;
 
@@ -133,48 +144,37 @@ public:
         return indent_;
     }
 
+    basic_serialization_options<CharT>& indent(int value)
+    {
+        indent_ = value;
+        return *this;
+    }
+
+    chars_format floating_point_format() const
+    {
+        return floating_point_format_;
+    }
+
+    basic_serialization_options<CharT>& floating_point_format(chars_format value)
+    {
+        floating_point_format_ = value;
+        return *this;
+    }
+
     uint8_t precision() const
     {
         return precision_;
     }
 
-    bool escape_all_non_ascii() const
-    {
-        return escape_all_non_ascii_;
-    }
-
-    bool escape_solidus() const
-    {
-        return escape_solidus_;
-    }
-
-    bool replace_nan() const {return replace_nan_;}
-
-    bool replace_pos_inf() const {return replace_pos_inf_;}
-
-    bool replace_neg_inf() const {return replace_neg_inf_;}
-
-    std::basic_string<CharT> nan_replacement() const
-    {
-        return nan_replacement_;
-    }
-
-    std::basic_string<CharT> pos_inf_replacement() const
-    {
-        return pos_inf_replacement_;
-    }
-
-    std::basic_string<CharT> neg_inf_replacement() const
-    {
-        return neg_inf_replacement_;
-    }
-
-//  Modifiers
-
     basic_serialization_options<CharT>& precision(uint8_t prec)
     {
         precision_ = prec;
         return *this;
+    }
+
+    bool escape_all_non_ascii() const
+    {
+        return escape_all_non_ascii_;
     }
 
     basic_serialization_options<CharT>& escape_all_non_ascii(bool value)
@@ -183,17 +183,28 @@ public:
         return *this;
     }
 
+    bool escape_solidus() const
+    {
+        return escape_solidus_;
+    }
+
     basic_serialization_options<CharT>& escape_solidus(bool value)
     {
         escape_solidus_ = value;
         return *this;
     }
 
+    bool replace_nan() const {return replace_nan_;}
+
     basic_serialization_options<CharT>& replace_nan(bool replace)
     {
         replace_nan_ = replace;
         return *this;
     }
+
+    bool replace_pos_inf() const {return replace_pos_inf_;}
+
+    bool replace_neg_inf() const {return replace_neg_inf_;}
 
     basic_serialization_options<CharT>& replace_inf(bool replace)
     {
@@ -214,15 +225,14 @@ public:
         return *this;
     }
 
+    std::basic_string<CharT> nan_replacement() const
+    {
+        return nan_replacement_;
+    }
+
     basic_serialization_options<CharT>& nan_replacement(const std::basic_string<CharT>& replacement)
     {
         nan_replacement_ = replacement;
-        return *this;
-    }
-
-    basic_serialization_options<CharT>& pos_inf_replacement(const std::basic_string<CharT>& replacement)
-    {
-        pos_inf_replacement_ = replacement;
         return *this;
     }
 
@@ -232,10 +242,20 @@ public:
         return *this;
     }
 
-    basic_serialization_options<CharT>& indent(int value)
+    std::basic_string<CharT> pos_inf_replacement() const
     {
-        indent_ = value;
+        return pos_inf_replacement_;
+    }
+
+    basic_serialization_options<CharT>& pos_inf_replacement(const std::basic_string<CharT>& replacement)
+    {
+        pos_inf_replacement_ = replacement;
         return *this;
+    }
+
+    std::basic_string<CharT> neg_inf_replacement() const
+    {
+        return neg_inf_replacement_;
     }
 };
 

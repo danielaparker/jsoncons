@@ -47,6 +47,8 @@ namespace jsoncons
 #define JSONCONS_NO_CONSTEXPR
 #endif
 
+#define JSONCONS_NO_TO_CHARS
+
 #if defined(_MSC_VER)
 #if _MSC_VER >= 1900
 #define JSONCONS_HAS_USER_DEFINED_LITERALS
