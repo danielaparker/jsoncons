@@ -3541,6 +3541,28 @@ public:
         }
     }
 
+    size_t precision() const
+    {
+        switch (var_.type_id())
+        {
+        case json_type_tag::double_t:
+            return var_.double_data_cast()->precision();
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
+        }
+    }
+
+    size_t decimal_places() const
+    {
+        switch (var_.type_id())
+        {
+        case json_type_tag::double_t:
+            return var_.double_data_cast()->decimal_places();
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
+        }
+    }
+
     double as_double() const
     {
         switch (var_.type_id())

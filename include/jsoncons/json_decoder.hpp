@@ -245,7 +245,7 @@ private:
 
     void do_double_value(double value, uint8_t precision, uint8_t decimal_paces, const parsing_context&) override
     {
-        stack_[top_].value_ = Json(value,precision);
+        stack_[top_].value_ = Json(value,precision,decimal_places);
         if (++top_ >= stack_.size())
         {
             stack_.resize(top_*2);
