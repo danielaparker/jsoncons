@@ -43,6 +43,7 @@ class basic_serialization_options
 {
     int indent_;
     uint8_t precision_;
+    uint8_t decimal_places_;
     bool replace_nan_;
     bool replace_pos_inf_;
     bool replace_neg_inf_;
@@ -166,9 +167,20 @@ public:
         return precision_;
     }
 
-    basic_serialization_options<CharT>& precision(uint8_t prec)
+    basic_serialization_options<CharT>& precision(uint8_t value)
     {
-        precision_ = prec;
+        precision_ = value;
+        return *this;
+    }
+
+    uint8_t decimal_places() const
+    {
+        return decimal_places_;
+    }
+
+    basic_serialization_options<CharT>& decimal_places(uint8_t value)
+    {
+        decimal_places_ = value;
         return *this;
     }
 

@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_variant)
     BOOST_CHECK(json_type_tag::null_t == var7.type_id());
     json::variant var8{ json::allocator_type() };
     BOOST_CHECK(json_type_tag::object_t == var8.type_id());
-    json::variant var9(123456789.9,0);
+    json::variant var9(123456789.9,0,0);
     BOOST_CHECK(json_type_tag::double_t == var9.type_id());
 }
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
     BOOST_CHECK(var4.uinteger_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
-    json::variant var5(val5,0);
+    json::variant var5(val5,0,0);
     json::variant var6(std::move(var5));
     //BOOST_CHECK(json_type_tag::null_t == var5.type_id());
     BOOST_CHECK(json_type_tag::double_t == var6.type_id());
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
     BOOST_CHECK(var4.uinteger_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
-    json::variant var5(val5,0);
+    json::variant var5(val5,0,0);
     json::variant var6(var5);
     BOOST_CHECK(json_type_tag::double_t == var5.type_id());
     BOOST_CHECK(json_type_tag::double_t == var6.type_id());

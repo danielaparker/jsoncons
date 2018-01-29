@@ -322,7 +322,7 @@ private:
     }
 
     void do_byte_string_value(const uint8_t* data, size_t length,
-                                const parsing_context& context) override
+                              const parsing_context& context) override
     {
         downstream_handler_.byte_string_value(data, length, context);
     }

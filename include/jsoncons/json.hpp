@@ -250,11 +250,13 @@ public:
         class double_data : public base_data
         {
             uint8_t precision_;
+            uint8_t decimal_places_;
             double val_;
         public:
-            double_data(double val, uint8_t precision)
+            double_data(double val, uint8_t precision, uint8_t decimal_places)
                 : base_data(json_type_tag::double_t), 
                   precision_(precision), 
+                  decimal_places_(decimal_places), 
                   val_(val)
             {
             }
@@ -262,6 +264,7 @@ public:
             double_data(const double_data& val)
                 : base_data(json_type_tag::double_t),
                   precision_(val.precision_), 
+                  decimal_places_(val.decimal_places_), 
                   val_(val.val_)
             {
             }
@@ -272,6 +275,11 @@ public:
             }
 
             uint8_t precision() const
+            {
+                return precision_;
+            }
+
+            uint8_t decimal_places() const
             {
                 return precision_;
             }
@@ -711,11 +719,11 @@ public:
         }
         variant(double val)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val,std::numeric_limits<double>::digits10);
+            new(reinterpret_cast<void*>(&data_))double_data(val,0,0);
         }
-        variant(double val, uint8_t precision)
+        variant(double val, uint8_t precision, uint8_t decimal_places)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val,precision);
+            new(reinterpret_cast<void*>(&data_))double_data(val, precision, decimal_places);
         }
         variant(const char_type* s, size_t length)
         {
@@ -2908,7 +2916,12 @@ public:
     }
 
     basic_json(double val, uint8_t precision)
-        : var_(val,precision)
+        : var_(val, precision, 0)
+    {
+    }
+
+    basic_json(double val, uint8_t precision, uint8_t decimal_places)
+        : var_(val, precision, decimal_places)
     {
     }
 
@@ -4343,7 +4356,7 @@ public:
 
     static basic_json from_floating_point(double val)
     {
-        return basic_json(variant(val, 0));
+        return basic_json(variant(val, 0, 0));
     }
 
     static basic_json from_floating_point(double val, allocator_type)
