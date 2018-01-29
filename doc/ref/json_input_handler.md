@@ -63,6 +63,10 @@ line and column information is provided in the [parsing_context](parsing_context
 Send floating point value with specified precision. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_double_value`.
 
+    void double_value(double value, uint8_t precision, uint8_t decimal_places, const parsing_context& context)
+Send floating point value with specified precision. Contextual information including
+line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_double_value`.
+
     void bool_value(bool value, const parsing_context& context) 
 Send boolean value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. Uses `do_bool_value`.
@@ -114,7 +118,7 @@ line and column information is provided in the [parsing_context](parsing_context
 Receive non-negative integer value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
-    virtual void do_double_value(double value, uint8_t precision, const parsing_context& context) = 0;
+    virtual void do_double_value(double value, uint8_t precision, uint8_t decimal_places, const parsing_context& context) = 0;
 Receive floating point value. Contextual information including
 line and column information is provided in the [parsing_context](parsing_context.md) parameter. 
 
