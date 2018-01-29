@@ -3088,7 +3088,7 @@ public:
             handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
             break;
         case json_type_tag::double_t:
-            handler.double_value(var_.double_data_cast()->value(), var_.double_data_cast()->precision());
+            handler.double_value(var_.double_data_cast()->value(), var_.double_data_cast()->precision(), var_.double_data_cast()->decimal_places());
             break;
         case json_type_tag::integer_t:
             handler.integer_value(var_.integer_data_cast()->value());
