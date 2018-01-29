@@ -243,7 +243,7 @@ private:
         }
     }
 
-    void do_double_value(double value, uint8_t precision, const parsing_context&) override
+    void do_double_value(double value, uint8_t precision, uint8_t decimal_paces, const parsing_context&) override
     {
         stack_[top_].value_ = Json(value,precision);
         if (++top_ >= stack_.size())

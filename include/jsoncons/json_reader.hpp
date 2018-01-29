@@ -120,9 +120,9 @@ private:
         other_handler_.uinteger_value(value, context);
     }
 
-    void do_double_value(double value, uint8_t precision, const parsing_context& context) override
+    void do_double_value(double value, uint8_t precision, uint8_t decimal_places, const parsing_context& context) override
     {
-        other_handler_.double_value(value, precision, context);
+        other_handler_.double_value(value, precision, decimal_places, context);
     }
 
     void do_bool_value(bool value, const parsing_context& context) override

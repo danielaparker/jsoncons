@@ -328,7 +328,7 @@ private:
         do_string_value(s);
     }
 
-    void do_double_value(double value, uint8_t precision) override
+    void do_double_value(double value, uint8_t precision, uint8_t decimal_places) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {

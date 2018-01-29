@@ -104,6 +104,7 @@ class basic_json_parser : private parsing_context
 
     bool is_negative_;
     uint8_t precision_;
+    uint8_t decimal_places_;
 
     size_t line_;
     size_t column_;
@@ -133,6 +134,7 @@ public:
          cp2_(0),
          is_negative_(false),
          precision_(0), 
+         decimal_places_(0), 
          line_(1),
          column_(1),
          nesting_depth_(0), 
@@ -155,6 +157,7 @@ public:
          cp2_(0),
          is_negative_(false),
          precision_(0), 
+         decimal_places_(0), 
          line_(1),
          column_(1),
          nesting_depth_(0), 
@@ -177,6 +180,7 @@ public:
          cp2_(0),
          is_negative_(false),
          precision_(0), 
+         decimal_places_(0), 
          line_(1),
          column_(1),
          nesting_depth_(0), 
@@ -200,6 +204,7 @@ public:
          cp2_(0),
          is_negative_(false),
          precision_(0), 
+         decimal_places_(0), 
          line_(1),
          column_(1),
          nesting_depth_(0), 
@@ -1582,6 +1587,7 @@ negative_zero:
                 return;
             case '.':
                 JSONCONS_ASSERT(precision_ == number_buffer_.length());
+                decimal_places_ = 0; 
                 number_buffer_.push_back(str_to_double_.get_decimal_point());
                 ++p_;
                 ++column_;
@@ -1679,6 +1685,7 @@ negative_integer:
                 ++column_;
                 return;
             case '.':
+                decimal_places_ = 0; 
                 JSONCONS_ASSERT(precision_ == number_buffer_.length());
                 number_buffer_.push_back(str_to_double_.get_decimal_point());
                 ++p_;
@@ -1750,6 +1757,7 @@ positive_zero:
                 if (ec) return;
                 return;
             case '.':
+                decimal_places_ = 0; 
                 JSONCONS_ASSERT(precision_ == number_buffer_.length());
                 number_buffer_.push_back(str_to_double_.get_decimal_point());
                 ++p_;
@@ -1840,6 +1848,7 @@ positive_integer:
                 ++column_;
                 goto positive_integer;
             case '.':
+                decimal_places_ = 0; 
                 JSONCONS_ASSERT(precision_ == number_buffer_.length());
                 number_buffer_.push_back(str_to_double_.get_decimal_point());
                 ++p_;
@@ -1875,6 +1884,7 @@ fraction1:
         {
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 ++precision_;
+                ++decimal_places_;
                 number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
@@ -1948,6 +1958,7 @@ fraction2:
                 return;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 ++precision_;
+                ++decimal_places_;
                 number_buffer_.push_back(static_cast<char>(*p_));
                 ++p_;
                 ++column_;
@@ -2776,11 +2787,11 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                handler_.double_value(d, static_cast<uint8_t>(std::numeric_limits<double>::max_digits10), *this);
+                handler_.double_value(d, static_cast<uint8_t>(std::numeric_limits<double>::max_digits10), decimal_places_, *this);
             }
             else
             {
-                handler_.double_value(d, static_cast<uint8_t>(precision_), *this);
+                handler_.double_value(d, static_cast<uint8_t>(precision_), decimal_places_, *this);
             }
         }
         catch (...)

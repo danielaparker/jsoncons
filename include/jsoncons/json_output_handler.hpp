@@ -122,12 +122,17 @@ public:
 
     void double_value(double value) 
     {
-        do_double_value(value, std::numeric_limits<double>::digits10);
+        do_double_value(value, 0, 0);
     }
 
     void double_value(double value, uint8_t precision) 
     {
-        do_double_value(value, precision);
+        do_double_value(value, precision, 0);
+    }
+
+    void double_value(double value, uint8_t precision, uint8_t decimal_places) 
+    {
+        do_double_value(value, precision, decimal_places);
     }
 
     void bool_value(bool value) 
@@ -192,9 +197,9 @@ public:
         do_uinteger_value(value);
     }
 
-    void value(double value, uint8_t precision = 0)
+    void value(double value, uint8_t precision = 0, uint8_t decimal_places = 0)
     {
-        do_double_value(value, precision);
+        do_double_value(value, precision, decimal_places);
     }
 
     void value(bool value) 
@@ -230,7 +235,7 @@ private:
 
     virtual void do_byte_string_value(const uint8_t* data, size_t length) = 0;
 
-    virtual void do_double_value(double value, uint8_t precision) = 0;
+    virtual void do_double_value(double value, uint8_t precision, uint8_t decimal_places) = 0;
 
     virtual void do_integer_value(int64_t value) = 0;
 
@@ -286,7 +291,7 @@ private:
     {
     }
 
-    void do_double_value(double, uint8_t) override
+    void do_double_value(double, uint8_t, uint8_t) override
     {
     }
 
