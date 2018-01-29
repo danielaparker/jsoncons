@@ -3530,17 +3530,6 @@ public:
         }
     }
 
-    size_t double_precision() const
-    {
-        switch (var_.type_id())
-        {
-        case json_type_tag::double_t:
-            return var_.double_data_cast()->precision();
-        default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
-        }
-    }
-
     size_t precision() const
     {
         switch (var_.type_id())
@@ -3654,6 +3643,18 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    size_t double_precision() const
+    {
+        switch (var_.type_id())
+        {
+        case json_type_tag::double_t:
+            return var_.double_data_cast()->precision();
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
+        }
+    }
+
     const char_type* as_cstring() const
     {
         switch (var_.type_id())
