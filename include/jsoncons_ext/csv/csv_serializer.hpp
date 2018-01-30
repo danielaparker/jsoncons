@@ -23,11 +23,11 @@
 
 namespace jsoncons { namespace csv {
 
-template <class CharT>
+template <class CharT, class Writer>
 void escape_string(const CharT* s,
                    size_t length,
                    CharT quote_char, CharT quote_escape_char,
-                   buffered_output<CharT>& os)
+                   Writer& os)
 {
     const CharT* begin = s;
     const CharT* end = s + length;
@@ -209,7 +209,8 @@ private:
         }
     }
 
-    void write_string(const CharT* s, size_t length, buffered_output<CharT>& os)
+    template <class Writer>
+    void write_string(const CharT* s, size_t length, Writer& os)
     {
         bool quote = false;
         if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
@@ -370,14 +371,16 @@ private:
         }
     }
 
-    void value(const string_view_type& value, buffered_output<CharT>& os)
+    template <class Writer>
+    void value(const string_view_type& value, Writer& writer)
     {
-        begin_value(os);
-        write_string(value.data(),value.length(),os);
+        begin_value(writer);
+        write_string(value.data(),value.length(),writer);
         end_value();
     }
 
-    void value(double val, buffered_output<CharT>& os)
+    template <class Writer>
+    void value(double val, Writer& os)
     {
         begin_value(os);
 
@@ -402,7 +405,8 @@ private:
 
     }
 
-    void value(int64_t val, buffered_output<CharT>& os)
+    template <class Writer>
+    void value(int64_t val, Writer& os)
     {
         begin_value(os);
 
@@ -413,7 +417,8 @@ private:
         end_value();
     }
 
-    void value(uint64_t val, buffered_output<CharT>& os)
+    template <class Writer>
+    void value(uint64_t val, Writer& os)
     {
         begin_value(os);
 
@@ -424,7 +429,8 @@ private:
         end_value();
     }
 
-    void value(bool val, buffered_output<CharT>& os) 
+    template <class Writer>
+    void value(bool val, Writer& os) 
     {
         begin_value(os);
 
@@ -442,7 +448,8 @@ private:
         end_value();
     }
 
-    void do_null_value(buffered_output<CharT>& os) 
+    template <class Writer>
+    void do_null_value(Writer& os) 
     {
         begin_value(os);
         auto buf = jsoncons::detail::null_literal<CharT>();
@@ -451,7 +458,8 @@ private:
 
     }
 
-    void begin_value(buffered_output<CharT>& os)
+    template <class Writer>
+    void begin_value(Writer& os)
     {
         if (!stack_.empty())
         {

@@ -812,6 +812,7 @@ template <class CharT>
 class ostream_buffered_writer : public buffered_output<CharT>
 {
 public:
+    typedef CharT char_type;
     typedef std::basic_ostream<CharT> output_type;
 private:
     static const size_t default_buffer_length = 16384;
@@ -861,6 +862,10 @@ private:
 template <class CharT>
 class string_buffered_writer : public buffered_output<CharT>
 {
+public:
+    typedef CharT char_type;
+    typedef std::basic_string<CharT> output_type;
+private:
     static const size_t min_buffer_length = 10;
     static const size_t default_buffer_length = 16384;
 
@@ -873,7 +878,6 @@ class string_buffered_writer : public buffered_output<CharT>
     size_t length_ = 0;
 
 public:
-    typedef std::basic_string<CharT> output_type;
 
     string_buffered_writer(std::basic_string<CharT>& s)
         : s_(s)

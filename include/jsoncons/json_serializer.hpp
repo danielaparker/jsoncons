@@ -24,12 +24,13 @@
 
 namespace jsoncons {
 
-template<class CharT,class BufferedWriter=ostream_buffered_writer<CharT>>
+template<class CharT,class Writer=ostream_buffered_writer<CharT>>
 class basic_json_serializer : public basic_json_output_handler<CharT>
 {
 public:
     using typename basic_json_output_handler<CharT>::string_view_type;
-    typedef typename BufferedWriter::output_type output_type;
+    typedef Writer writer_type;
+    typedef typename Writer::output_type output_type;
 
 private:
     static const size_t default_buffer_length = 16384;
@@ -86,7 +87,7 @@ private:
     int indent_;
     bool indenting_;
     print_double<CharT> fp_;
-    BufferedWriter bos_;
+    Writer bos_;
 
     // Noncopyable and nonmoveable
     basic_json_serializer(const basic_json_serializer&) = delete;

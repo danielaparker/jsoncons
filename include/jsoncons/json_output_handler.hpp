@@ -16,15 +16,17 @@
 
 namespace jsoncons {
 
-template<class CharT> 
-void print_integer(int64_t value, buffered_output<CharT>& os)
+template<class Writer> 
+void print_integer(int64_t value, Writer& os)
 {
-    CharT buf[255];
+    typedef typename Writer::char_type char_type;
+
+    char_type buf[255];
     uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
-    CharT* p = buf;
+    char_type* p = buf;
     do
     {
-        *p++ = static_cast<CharT>(48 + u%10);
+        *p++ = static_cast<char_type>(48 + u%10);
     }
     while (u /= 10);
     if (value < 0)
@@ -37,14 +39,16 @@ void print_integer(int64_t value, buffered_output<CharT>& os)
     }
 }
 
-template<class CharT>
-void print_uinteger(uint64_t value, buffered_output<CharT>& os)
+template<class Writer>
+void print_uinteger(uint64_t value, Writer& os)
 {
-    CharT buf[255];
-    CharT* p = buf;
+    typedef typename Writer::char_type char_type;
+
+    char_type buf[255];
+    char_type* p = buf;
     do
     {
-        *p++ = static_cast<CharT>(48 + value % 10);
+        *p++ = static_cast<char_type>(48 + value % 10);
     } while (value /= 10);
     while (--p >= buf)
     {
