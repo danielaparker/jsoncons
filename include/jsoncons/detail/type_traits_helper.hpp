@@ -894,7 +894,7 @@ public:
 
     void flush() override
     {
-         length_ += buffer_length();
+         length_ += this->buffer_length();
         s_.resize(length_);
         set_buffer(&s_[0]+length_, 0);
     }
