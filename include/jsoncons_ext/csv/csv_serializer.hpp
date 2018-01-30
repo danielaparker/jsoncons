@@ -13,6 +13,7 @@
 #include <ostream>
 #include <cstdlib>
 #include <unordered_map>
+#include <memory>
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/serialization_options.hpp>
@@ -26,7 +27,7 @@ template <class CharT>
 void escape_string(const CharT* s,
                    size_t length,
                    CharT quote_char, CharT quote_escape_char,
-                   stream_buffered_output<CharT>& os)
+                   buffered_output<CharT>& os)
 {
     const CharT* begin = s;
     const CharT* end = s + length;
@@ -72,7 +73,7 @@ private:
         size_t count_;
         string_type name_;
     };
-    stream_buffered_output<CharT> os_;
+    std::unique_ptr<buffered_output<CharT>> bos_;
     basic_csv_parameters<CharT,Allocator> parameters_;
     basic_serialization_options<CharT> options_;
     std::vector<stack_item> stack_;
@@ -88,7 +89,7 @@ private:
 public:
     basic_csv_serializer(std::basic_ostream<CharT>& os)
        :
-       os_(os),
+       bos_(std::make_unique<stream_buffered_output<CharT>>(os)),
        options_(),
        stack_(),
        fp_(options_.precision()),
@@ -99,7 +100,7 @@ public:
     basic_csv_serializer(std::basic_ostream<CharT>& os,
                          const basic_csv_parameters<CharT,Allocator>& params)
        :
-       os_(os),
+        bos_(std::make_unique<stream_buffered_output<CharT>>(os)),
        parameters_(params),
        options_(),
        stack_(),
@@ -116,7 +117,7 @@ private:
 
     void do_end_json() override
     {
-        os_.flush();
+        bos_->flush();
     }
 
     void do_begin_object() override
@@ -134,26 +135,26 @@ private:
                 {
                     if (i > 0)
                     {
-                        os_.put(parameters_.field_delimiter());
+                        bos_->put(parameters_.field_delimiter());
                     }
-                    os_.write(column_names_[i]);
+                    bos_->write(column_names_[i]);
                 }
-                os_.write(parameters_.line_delimiter());
+                bos_->write(parameters_.line_delimiter());
             }
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
                 if (i > 0)
                 {
-                    os_.put(parameters_.field_delimiter());
+                    bos_->put(parameters_.field_delimiter());
                 }
                 auto it = buffered_line_.find(column_names_[i]);
                 if (it != buffered_line_.end())
                 {
-                    os_.write(it->second);
+                    bos_->write(it->second);
                     it->second.clear();
                 }
             }
-            os_.write(parameters_.line_delimiter());
+            bos_->write(parameters_.line_delimiter());
         }
         stack_.pop_back();
 
@@ -171,13 +172,13 @@ private:
                 {
                     if (i > 0)
                     {
-                        os_.put(parameters_.field_delimiter());
+                        bos_->put(parameters_.field_delimiter());
                     }
-                    os_.write(column_names_[i]);
+                    bos_->write(column_names_[i]);
                 }
                 if (column_names_.size() > 0)
                 {
-                    os_.write(parameters_.line_delimiter());
+                    bos_->write(parameters_.line_delimiter());
                 }
             }
         }
@@ -187,7 +188,7 @@ private:
     {
         if (stack_.size() == 2)
         {
-            os_.write(parameters_.line_delimiter());
+            bos_->write(parameters_.line_delimiter());
         }
         stack_.pop_back();
 
@@ -207,7 +208,7 @@ private:
         }
     }
 
-    void write_string(const CharT* s, size_t length, stream_buffered_output<CharT>& os)
+    void write_string(const CharT* s, size_t length, buffered_output<CharT>& os)
     {
         bool quote = false;
         if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
@@ -243,7 +244,7 @@ private:
             }
             else
             {
-                do_null_value(os_);
+                do_null_value(*bos_);
             }
         }
     }
@@ -266,7 +267,7 @@ private:
             }
             else
             {
-                value(val,os_);
+                value(val,*bos_);
             }
         }
     }
@@ -294,7 +295,7 @@ private:
             }
             else
             {
-                value(val,os_);
+                value(val,*bos_);
             }
         }
     }
@@ -317,7 +318,7 @@ private:
             }
             else
             {
-                value(val,os_);
+                value(val,*bos_);
             }
         }
     }
@@ -340,7 +341,7 @@ private:
             }
             else
             {
-                value(val,os_);
+                value(val,*bos_);
             }
         }
     }
@@ -363,19 +364,19 @@ private:
             }
             else
             {
-                value(val,os_);
+                value(val,*bos_);
             }
         }
     }
 
-    void value(const string_view_type& value, stream_buffered_output<CharT>& os)
+    void value(const string_view_type& value, buffered_output<CharT>& os)
     {
         begin_value(os);
         write_string(value.data(),value.length(),os);
         end_value();
     }
 
-    void value(double val, stream_buffered_output<CharT>& os)
+    void value(double val, buffered_output<CharT>& os)
     {
         begin_value(os);
 
@@ -400,7 +401,7 @@ private:
 
     }
 
-    void value(int64_t val, stream_buffered_output<CharT>& os)
+    void value(int64_t val, buffered_output<CharT>& os)
     {
         begin_value(os);
 
@@ -411,7 +412,7 @@ private:
         end_value();
     }
 
-    void value(uint64_t val, stream_buffered_output<CharT>& os)
+    void value(uint64_t val, buffered_output<CharT>& os)
     {
         begin_value(os);
 
@@ -422,7 +423,7 @@ private:
         end_value();
     }
 
-    void value(bool val, stream_buffered_output<CharT>& os) 
+    void value(bool val, buffered_output<CharT>& os) 
     {
         begin_value(os);
 
@@ -440,7 +441,7 @@ private:
         end_value();
     }
 
-    void do_null_value(stream_buffered_output<CharT>& os) 
+    void do_null_value(buffered_output<CharT>& os) 
     {
         begin_value(os);
         auto buf = jsoncons::detail::null_literal<CharT>();
@@ -449,7 +450,7 @@ private:
 
     }
 
-    void begin_value(stream_buffered_output<CharT>& os)
+    void begin_value(buffered_output<CharT>& os)
     {
         if (!stack_.empty())
         {
