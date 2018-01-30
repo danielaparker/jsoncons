@@ -2655,19 +2655,12 @@ escape_u9:
         return state_;
     }
 
-    void set_buffer(const CharT* input, size_t length)
+    void set_source(const CharT* input, size_t length)
     {
         begin_input_ = input;
         end_input_ = input + length;
         p_ = begin_input_;
     }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    void set_source(const CharT* input, size_t length)
-    {
-        set_buffer(input, length);
-    }
-#endif
 private:
 
     void end_negative_value(std::error_code& ec)
