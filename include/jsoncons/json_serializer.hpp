@@ -95,7 +95,7 @@ public:
        : indent_(0), 
          indenting_(false),
          fp_(options_.precision()),
-         bos_(std::make_unique<stream_buffered_output<CharT>>(os))
+         bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os)))
     {
     }
 
@@ -103,7 +103,7 @@ public:
        : indent_(0), 
          indenting_(pprint),
          fp_(options_.precision()),
-         bos_(std::make_unique<stream_buffered_output<CharT>>(os))
+         bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os)))
     {
     }
 
@@ -112,7 +112,7 @@ public:
          indent_(0), 
          indenting_(false),  
          fp_(options_.precision()),
-         bos_(std::make_unique<stream_buffered_output<CharT>>(os))
+         bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os)))
     {
     }
     basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options, bool pprint)
@@ -120,7 +120,7 @@ public:
          indent_(0), 
          indenting_(pprint),  
          fp_(options_.precision()),
-         bos_(std::make_unique<stream_buffered_output<CharT>>(os))
+         bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os)))
     {
     }
 
@@ -128,7 +128,7 @@ public:
        : indent_(0), 
          indenting_(false),
          fp_(options_.precision()),
-         bos_(std::make_unique<string_buffered_output<CharT>>(s))
+         bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s)))
     {
     }
 
@@ -136,7 +136,7 @@ public:
        : indent_(0), 
          indenting_(pprint),
          fp_(options_.precision()),
-         bos_(std::make_unique<string_buffered_output<CharT>>(s))
+         bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s)))
     {
     }
 
@@ -145,7 +145,7 @@ public:
          indent_(0), 
          indenting_(false),  
          fp_(options_.precision()),
-         bos_(std::make_unique<string_buffered_output<CharT>>(s))
+         bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s)))
     {
     }
     basic_json_serializer(std::basic_string<CharT>& s, const basic_serialization_options<CharT>& options, bool pprint)
@@ -153,7 +153,7 @@ public:
          indent_(0), 
          indenting_(pprint),  
          fp_(options_.precision()),
-         bos_(std::make_unique<string_buffered_output<CharT>>(s))
+         bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s)))
     {
     }
 
