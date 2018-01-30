@@ -19,13 +19,8 @@
 #include <cstdarg>
 #include <locale>
 #include <limits> 
-#include <type_traits>
 #include <algorithm>
-#include <memory>
-#include <iterator>
 #include <exception>
-#include <array>
-#include <initializer_list>
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 

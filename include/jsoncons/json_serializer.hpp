@@ -20,12 +20,12 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
-#include <jsoncons/detail/type_traits_helper.hpp>
+#include <jsoncons/detail/writers.hpp>
 #include <jsoncons/detail/number_printers.hpp>
 
 namespace jsoncons {
 
-template<class CharT,class Writer=ostream_buffered_writer<CharT>>
+template<class CharT,class Writer=detail::ostream_buffered_writer<CharT>>
 class basic_json_serializer : public basic_json_output_handler<CharT>
 {
 public:
@@ -578,8 +578,8 @@ private:
     }
 };
 
-typedef basic_json_serializer<char,ostream_buffered_writer<char>> json_serializer;
-typedef basic_json_serializer<wchar_t, ostream_buffered_writer<wchar_t>> wjson_serializer;
+typedef basic_json_serializer<char,detail::ostream_buffered_writer<char>> json_serializer;
+typedef basic_json_serializer<wchar_t, detail::ostream_buffered_writer<wchar_t>> wjson_serializer;
 
 }
 #endif

@@ -24,7 +24,7 @@ std::basic_string<CharT> float_to_string(double val, uint8_t precision)
     detail::print_double print(precision);
 
     std::basic_string<CharT> s;
-    string_writer<CharT> writer(s);
+    jsoncons::detail::string_writer<CharT> writer(s);
     print(val, precision, writer);
     writer.flush();
     return s;
