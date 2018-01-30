@@ -824,12 +824,12 @@ public:
     stream_buffered_output(std::basic_ostream<CharT>& os)
         : os_(os), buffer_(default_buffer_length)
     {
-        set_buffer(buffer_.data(), default_buffer_length);
+        this->set_buffer(buffer_.data(), default_buffer_length);
     }
     stream_buffered_output(std::basic_ostream<CharT>& os, size_t buflen)
         : os_(os), buffer_(buflen)
     {
-        set_buffer(buffer_.data(), default_buffer_length);
+        this->set_buffer(buffer_.data(), default_buffer_length);
     }
     ~stream_buffered_output()
     {
@@ -844,14 +844,14 @@ public:
     void flush() override
     {
         os_.write(this->buffer(), this->buffer_length());
-        set_buffer(buffer_.data(), buffer_.size());
+        this->set_buffer(buffer_.data(), buffer_.size());
     }
 private:
     void write_overflow(const CharT* buf, size_t buflen, const CharT* s, size_t length) override
     {
         os_.write(buf, buflen);
         os_.write(s, length);
-        set_buffer(buffer_.data(), default_buffer_length);
+        this->set_buffer(buffer_.data(), default_buffer_length);
     }
 };
 
@@ -881,7 +881,7 @@ public:
         {
             s.resize(default_buffer_length);
         }
-        set_buffer(&s[0], s.length());
+        this->set_buffer(&s[0], s.length());
     }
 
     ~string_buffered_output()
@@ -894,9 +894,9 @@ public:
 
     void flush() override
     {
-         length_ += this->buffer_length();
+        length_ += this->buffer_length();
         s_.resize(length_);
-        set_buffer(&s_[0]+length_, 0);
+        this->set_buffer(&s_[0]+length_, 0);
     }
 private:
     void write_overflow(const CharT* /*buf*/, size_t buflen, const CharT* s, size_t length) override
@@ -907,7 +907,7 @@ private:
             s_.insert(buflen, s, length);
             s_.resize(length_+default_buffer_length);
         }
-        set_buffer(&s_[0]+length_, s_.length()-length_);
+        this->set_buffer(&s_[0]+length_, s_.length()-length_);
     }
 };
 
