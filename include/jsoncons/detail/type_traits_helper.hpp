@@ -843,7 +843,7 @@ public:
 
     void flush() override
     {
-        os_.write(buffer(), buffer_length());
+        os_.write(this->buffer(), this->buffer_length());
         set_buffer(buffer_.data(), buffer_.size());
     }
 private:
