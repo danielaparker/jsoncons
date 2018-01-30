@@ -738,77 +738,6 @@ inline std::basic_string<CharT, Traits, Alloc> view_to_string(const basic_string
 }
 
 template <class CharT>
-class buffered_output
-{
-    CharT * begin_buffer_;
-    const CharT* end_buffer_;
-    CharT* p_;
-
-    // Noncopyable and nonmoveable
-    buffered_output(const buffered_output&) = delete;
-    buffered_output& operator=(const buffered_output&) = delete;
-
-public:
-    buffered_output()
-        : begin_buffer_(nullptr), end_buffer_(nullptr), p_(nullptr)
-    {
-    }
-    virtual ~buffered_output() = default;
-
-    const CharT * buffer() const 
-    {
-        return begin_buffer_;
-    }
-
-    void set_buffer(CharT* begin, size_t length)
-    {
-        begin_buffer_ = begin;
-        end_buffer_ = begin + length;
-        p_ = begin;
-    }
-
-    size_t buffer_length() const
-    {
-        return p_ - begin_buffer_;
-    }
-
-    virtual void flush() = 0;
-
-    virtual void write_overflow(const CharT* buf, size_t buflen, const CharT* s, size_t length) = 0;
-
-    void write(const CharT* s, size_t length)
-    {
-        size_t diff = end_buffer_ - p_;
-        if (diff >= length)
-        {
-            std::memcpy(p_, s, length*sizeof(CharT));
-            p_ += length;
-        }
-        else
-        {
-            write_overflow(begin_buffer_, buffer_length(), s, length);
-        }
-    }
-
-    void write(const std::basic_string<CharT>& s)
-    {
-        write(s.data(),s.length());
-    }
-
-    void put(CharT ch)
-    {
-        if (p_ < end_buffer_)
-        {
-            *p_++ = ch;
-        }
-        else
-        {
-            write_overflow(begin_buffer_, buffer_length(), &ch, 1);
-        }
-    }
-};
-
-template <class CharT>
 class ostream_buffered_writer
 {
 public:
@@ -891,63 +820,41 @@ private:
 };
 
 template <class CharT>
-class string_buffered_writer : public buffered_output<CharT>
+class string_writer 
 {
 public:
     typedef CharT char_type;
     typedef std::basic_string<CharT> output_type;
 private:
-    static const size_t min_buffer_length = 10;
-    static const size_t default_buffer_length = 16384;
-
     std::basic_string<CharT>& s_;
 
     // Noncopyable and nonmoveable
-    string_buffered_writer(const string_buffered_writer&) = delete;
-    string_buffered_writer& operator=(const string_buffered_writer&) = delete;
-
-    size_t length_ = 0;
-
+    string_writer(const string_writer&) = delete;
+    string_writer& operator=(const string_writer&) = delete;
 public:
 
-    string_buffered_writer(std::basic_string<CharT>& s)
+    string_writer(std::basic_string<CharT>& s)
         : s_(s)
     {
-        if (s.capacity() >= min_buffer_length)
-        {
-            s.resize(s.capacity());
-        }
-        else
-        {
-            s.resize(default_buffer_length);
-        }
-        this->set_buffer(&s[0], s.length());
     }
 
-    ~string_buffered_writer()
+    void flush()
     {
-        s_.resize(length_);
     }
-    using buffered_output<CharT>::put;
-    using buffered_output<CharT>::write;
-    using buffered_output<CharT>::flush;
 
-    void flush() override
+    void write(const CharT* s, size_t length)
     {
-        length_ += this->buffer_length();
-        s_.resize(length_);
-        this->set_buffer(&s_[0]+length_, 0);
+        s_.append(s,length);
     }
-private:
-    void write_overflow(const CharT* /*buf*/, size_t buflen, const CharT* s, size_t length) override
+
+    void write(const std::basic_string<CharT>& s)
     {
-        length_ += (buflen + length);
-        if (length > 0)
-        {
-            s_.insert(buflen, s, length);
-            s_.resize(length_+default_buffer_length);
-        }
-        this->set_buffer(&s_[0]+length_, s_.length()-length_);
+        s_.append(s.data(),s.length());
+    }
+
+    void put(CharT ch)
+    {
+        s_.push_back(ch);
     }
 };
 

@@ -238,7 +238,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_writer<CharT> bo(s);
+                    string_writer<CharT> bo(s);
                     do_null_value(bo);
                     bo.flush();
                     it->second = s;
@@ -261,7 +261,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_writer<CharT> bo(s);
+                    string_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -289,7 +289,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_writer<CharT> bo(s);
+                    string_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -312,7 +312,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_writer<CharT> bo(s);
+                    string_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -335,7 +335,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_writer<CharT> bo(s);
+                    string_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -358,7 +358,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_writer<CharT> bo(s);
+                    string_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;

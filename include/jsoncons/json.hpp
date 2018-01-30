@@ -3048,7 +3048,7 @@ public:
     template <class SAllocator>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
-        basic_json_serializer<char_type,string_buffered_writer<char_type>> serializer(s);
+        basic_json_serializer<char_type,string_writer<char_type>> serializer(s);
         dump(serializer);
     }
 
@@ -3056,7 +3056,7 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_serialization_options<char_type>& options) const
     {
-        basic_json_serializer<char_type,string_buffered_writer<char_type>> serializer(s, options);
+        basic_json_serializer<char_type,string_writer<char_type>> serializer(s, options);
         dump(serializer);
     }
 
@@ -3157,7 +3157,7 @@ public:
     string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const JSONCONS_NOEXCEPT
     {
         string_type s(allocator);
-        basic_json_serializer<char_type,string_buffered_writer<char_type>> serializer(s);
+        basic_json_serializer<char_type,string_writer<char_type>> serializer(s);
         dump_fragment(serializer);
         return s;
     }
@@ -3166,7 +3166,7 @@ public:
                           const char_allocator_type& allocator=char_allocator_type()) const
     {
         string_type s(allocator);
-        basic_json_serializer<char_type,string_buffered_writer<char_type>> serializer(s,options);
+        basic_json_serializer<char_type,string_writer<char_type>> serializer(s,options);
         dump_fragment(serializer);
         return s;
     }
