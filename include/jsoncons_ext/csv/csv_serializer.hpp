@@ -89,7 +89,7 @@ private:
 public:
     basic_csv_serializer(std::basic_ostream<CharT>& os)
        :
-       bos_(std::make_unique<stream_buffered_output<CharT>>(os)),
+       bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os))),
        options_(),
        stack_(),
        fp_(options_.precision()),
@@ -100,7 +100,28 @@ public:
     basic_csv_serializer(std::basic_ostream<CharT>& os,
                          const basic_csv_parameters<CharT,Allocator>& params)
        :
-        bos_(std::make_unique<stream_buffered_output<CharT>>(os)),
+       bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os))),
+       parameters_(params),
+       options_(),
+       stack_(),
+       fp_(options_.precision()),
+       column_names_(parameters_.column_names())
+    {
+    }
+    basic_csv_serializer(std::basic_string<CharT>& s)
+       :
+       bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s))),
+       options_(),
+       stack_(),
+       fp_(options_.precision()),
+       column_names_(parameters_.column_names())
+    {
+    }
+
+    basic_csv_serializer(std::basic_string<CharT>& s,
+                         const basic_csv_parameters<CharT,Allocator>& params)
+       :
+       bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s))),
        parameters_(params),
        options_(),
        stack_(),
