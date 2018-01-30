@@ -256,11 +256,11 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_obufferedstream<CharT> ss;
-                    stream_buffered_output<CharT> bo(ss,10);
+                    std::basic_string<CharT> s;
+                    string_buffered_output<CharT> bo(s);
                     do_null_value(bo);
                     bo.flush();
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
+                    it->second = s;
                 }
             }
             else
@@ -279,11 +279,11 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_obufferedstream<CharT> ss;
-                    stream_buffered_output<CharT> bo(ss,1000);
+                    std::basic_string<CharT> s;
+                    string_buffered_output<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
+                    it->second = s;
                 }
             }
             else
@@ -307,11 +307,11 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_obufferedstream<CharT> ss;
-                    stream_buffered_output<CharT> bo(ss,30);
+                    std::basic_string<CharT> s;
+                    string_buffered_output<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
+                    it->second = s;
                 }
             }
             else
@@ -330,11 +330,11 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_obufferedstream<CharT> ss;
-                    stream_buffered_output<CharT> bo(ss,30);
+                    std::basic_string<CharT> s;
+                    string_buffered_output<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
+                    it->second = s;
                 }
             }
             else
@@ -353,11 +353,11 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_obufferedstream<CharT> ss;
-                    stream_buffered_output<CharT> bo(ss,30);
+                    std::basic_string<CharT> s;
+                    string_buffered_output<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
+                    it->second = s;
                 }
             }
             else
@@ -376,11 +376,11 @@ private:
                 auto it = buffered_line_.find(stack_.back().name_);
                 if (it != buffered_line_.end())
                 {
-                    basic_obufferedstream<CharT> ss;
-                    stream_buffered_output<CharT> bo(ss,30);
+                    std::basic_string<CharT> s;
+                    string_buffered_output<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
-                    it->second = std::basic_string<CharT>(ss.data(),ss.length());
+                    it->second = s;
                 }
             }
             else
