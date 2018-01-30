@@ -46,10 +46,11 @@ void escape_string(const CharT* s,
     }
 }
 
-template<class CharT,class Allocator=std::allocator<CharT>>
+template<class CharT,class BufferedWriter=ostream_buffered_writer<CharT>,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
 public:
+    typedef typename BufferedWriter::output_type output_type;
 
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
@@ -73,7 +74,7 @@ private:
         size_t count_;
         string_type name_;
     };
-    std::unique_ptr<buffered_output<CharT>> bos_;
+    BufferedWriter bos_;
     basic_csv_parameters<CharT,Allocator> parameters_;
     basic_serialization_options<CharT> options_;
     std::vector<stack_item> stack_;
@@ -87,9 +88,9 @@ private:
     basic_csv_serializer(const basic_csv_serializer&) = delete;
     basic_csv_serializer& operator=(const basic_csv_serializer&) = delete;
 public:
-    basic_csv_serializer(std::basic_ostream<CharT>& os)
+    basic_csv_serializer(output_type& os)
        :
-       bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os))),
+       bos_(os),
        options_(),
        stack_(),
        fp_(options_.precision()),
@@ -97,31 +98,10 @@ public:
     {
     }
 
-    basic_csv_serializer(std::basic_ostream<CharT>& os,
+    basic_csv_serializer(output_type& os,
                          const basic_csv_parameters<CharT,Allocator>& params)
        :
-       bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os))),
-       parameters_(params),
-       options_(),
-       stack_(),
-       fp_(options_.precision()),
-       column_names_(parameters_.column_names())
-    {
-    }
-    basic_csv_serializer(std::basic_string<CharT>& s)
-       :
-       bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s))),
-       options_(),
-       stack_(),
-       fp_(options_.precision()),
-       column_names_(parameters_.column_names())
-    {
-    }
-
-    basic_csv_serializer(std::basic_string<CharT>& s,
-                         const basic_csv_parameters<CharT,Allocator>& params)
-       :
-       bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s))),
+       bos_(os),
        parameters_(params),
        options_(),
        stack_(),
@@ -138,7 +118,7 @@ private:
 
     void do_end_json() override
     {
-        bos_->flush();
+        bos_.flush();
     }
 
     void do_begin_object() override
@@ -156,26 +136,26 @@ private:
                 {
                     if (i > 0)
                     {
-                        bos_->put(parameters_.field_delimiter());
+                        bos_.put(parameters_.field_delimiter());
                     }
-                    bos_->write(column_names_[i]);
+                    bos_.write(column_names_[i]);
                 }
-                bos_->write(parameters_.line_delimiter());
+                bos_.write(parameters_.line_delimiter());
             }
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
                 if (i > 0)
                 {
-                    bos_->put(parameters_.field_delimiter());
+                    bos_.put(parameters_.field_delimiter());
                 }
                 auto it = buffered_line_.find(column_names_[i]);
                 if (it != buffered_line_.end())
                 {
-                    bos_->write(it->second);
+                    bos_.write(it->second);
                     it->second.clear();
                 }
             }
-            bos_->write(parameters_.line_delimiter());
+            bos_.write(parameters_.line_delimiter());
         }
         stack_.pop_back();
 
@@ -193,13 +173,13 @@ private:
                 {
                     if (i > 0)
                     {
-                        bos_->put(parameters_.field_delimiter());
+                        bos_.put(parameters_.field_delimiter());
                     }
-                    bos_->write(column_names_[i]);
+                    bos_.write(column_names_[i]);
                 }
                 if (column_names_.size() > 0)
                 {
-                    bos_->write(parameters_.line_delimiter());
+                    bos_.write(parameters_.line_delimiter());
                 }
             }
         }
@@ -209,7 +189,7 @@ private:
     {
         if (stack_.size() == 2)
         {
-            bos_->write(parameters_.line_delimiter());
+            bos_.write(parameters_.line_delimiter());
         }
         stack_.pop_back();
 
@@ -257,7 +237,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_output<CharT> bo(s);
+                    string_buffered_writer<CharT> bo(s);
                     do_null_value(bo);
                     bo.flush();
                     it->second = s;
@@ -265,7 +245,7 @@ private:
             }
             else
             {
-                do_null_value(*bos_);
+                do_null_value(bos_);
             }
         }
     }
@@ -280,7 +260,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_output<CharT> bo(s);
+                    string_buffered_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -288,7 +268,7 @@ private:
             }
             else
             {
-                value(val,*bos_);
+                value(val,bos_);
             }
         }
     }
@@ -308,7 +288,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_output<CharT> bo(s);
+                    string_buffered_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -316,7 +296,7 @@ private:
             }
             else
             {
-                value(val,*bos_);
+                value(val,bos_);
             }
         }
     }
@@ -331,7 +311,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_output<CharT> bo(s);
+                    string_buffered_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -339,7 +319,7 @@ private:
             }
             else
             {
-                value(val,*bos_);
+                value(val,bos_);
             }
         }
     }
@@ -354,7 +334,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_output<CharT> bo(s);
+                    string_buffered_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -362,7 +342,7 @@ private:
             }
             else
             {
-                value(val,*bos_);
+                value(val,bos_);
             }
         }
     }
@@ -377,7 +357,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    string_buffered_output<CharT> bo(s);
+                    string_buffered_writer<CharT> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -385,7 +365,7 @@ private:
             }
             else
             {
-                value(val,*bos_);
+                value(val,bos_);
             }
         }
     }
@@ -494,14 +474,16 @@ private:
 template <class Json>
 void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 {
-    basic_csv_serializer<typename Json::char_type> serializer(os);
+    typedef typename Json::char_type char_type;
+    basic_csv_serializer<char_type> serializer(os);
     j.dump(serializer);
 }
 
 template <class Json,class Allocator>
 void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
 {
-    basic_csv_serializer<typename Json::char_type,Allocator> serializer(os,params);
+    typedef typename Json::char_type char_type;
+    basic_csv_serializer<char_type,ostream_buffered_writer<char_type>,Allocator> serializer(os,params);
     j.dump(serializer);
 }
 

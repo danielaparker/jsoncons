@@ -809,29 +809,32 @@ public:
 };
 
 template <class CharT>
-class stream_buffered_output : public buffered_output<CharT>
+class ostream_buffered_writer : public buffered_output<CharT>
 {
+public:
+    typedef std::basic_ostream<CharT> output_type;
+private:
     static const size_t default_buffer_length = 16384;
 
     std::basic_ostream<CharT>& os_;
     std::vector<CharT> buffer_;
 
     // Noncopyable and nonmoveable
-    stream_buffered_output(const stream_buffered_output&) = delete;
-    stream_buffered_output& operator=(const stream_buffered_output&) = delete;
+    ostream_buffered_writer(const ostream_buffered_writer&) = delete;
+    ostream_buffered_writer& operator=(const ostream_buffered_writer&) = delete;
 
 public:
-    stream_buffered_output(std::basic_ostream<CharT>& os)
+    ostream_buffered_writer(std::basic_ostream<CharT>& os)
         : os_(os), buffer_(default_buffer_length)
     {
         this->set_buffer(buffer_.data(), default_buffer_length);
     }
-    stream_buffered_output(std::basic_ostream<CharT>& os, size_t buflen)
+    ostream_buffered_writer(std::basic_ostream<CharT>& os, size_t buflen)
         : os_(os), buffer_(buflen)
     {
         this->set_buffer(buffer_.data(), default_buffer_length);
     }
-    ~stream_buffered_output()
+    ~ostream_buffered_writer()
     {
         os_.write(this->buffer(), this->buffer_length());
         os_.flush();
@@ -856,7 +859,7 @@ private:
 };
 
 template <class CharT>
-class string_buffered_output : public buffered_output<CharT>
+class string_buffered_writer : public buffered_output<CharT>
 {
     static const size_t min_buffer_length = 10;
     static const size_t default_buffer_length = 16384;
@@ -864,13 +867,15 @@ class string_buffered_output : public buffered_output<CharT>
     std::basic_string<CharT>& s_;
 
     // Noncopyable and nonmoveable
-    string_buffered_output(const string_buffered_output&) = delete;
-    string_buffered_output& operator=(const string_buffered_output&) = delete;
+    string_buffered_writer(const string_buffered_writer&) = delete;
+    string_buffered_writer& operator=(const string_buffered_writer&) = delete;
 
     size_t length_ = 0;
 
 public:
-    string_buffered_output(std::basic_string<CharT>& s)
+    typedef std::basic_string<CharT> output_type;
+
+    string_buffered_writer(std::basic_string<CharT>& s)
         : s_(s)
     {
         if (s.capacity() >= min_buffer_length)
@@ -884,7 +889,7 @@ public:
         this->set_buffer(&s[0], s.length());
     }
 
-    ~string_buffered_output()
+    ~string_buffered_writer()
     {
         s_.resize(length_);
     }

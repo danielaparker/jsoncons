@@ -24,11 +24,12 @@
 
 namespace jsoncons {
 
-template<class CharT>
+template<class CharT,class BufferedWriter=ostream_buffered_writer<CharT>>
 class basic_json_serializer : public basic_json_output_handler<CharT>
 {
 public:
-    using typename basic_json_output_handler<CharT>::string_view_type                                 ;
+    using typename basic_json_output_handler<CharT>::string_view_type;
+    typedef typename BufferedWriter::output_type output_type;
 
 private:
     static const size_t default_buffer_length = 16384;
@@ -85,75 +86,42 @@ private:
     int indent_;
     bool indenting_;
     print_double<CharT> fp_;
-    std::unique_ptr<buffered_output<CharT>> bos_;
+    BufferedWriter bos_;
 
     // Noncopyable and nonmoveable
     basic_json_serializer(const basic_json_serializer&) = delete;
     basic_json_serializer& operator=(const basic_json_serializer&) = delete;
 public:
-    basic_json_serializer(std::basic_ostream<CharT>& os)
+    basic_json_serializer(output_type& os)
        : indent_(0), 
          indenting_(false),
          fp_(options_.precision()),
-         bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os)))
+         bos_(os)
     {
     }
 
-    basic_json_serializer(std::basic_ostream<CharT>& os, bool pprint)
+    basic_json_serializer(output_type& os, bool pprint)
        : indent_(0), 
          indenting_(pprint),
          fp_(options_.precision()),
-         bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os)))
+         bos_(os)
     {
     }
 
-    basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options)
+    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options)
        : options_(options), 
          indent_(0), 
          indenting_(false),  
          fp_(options_.precision()),
-         bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os)))
+         bos_(os)
     {
     }
-    basic_json_serializer(std::basic_ostream<CharT>& os, const basic_serialization_options<CharT>& options, bool pprint)
+    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options, bool pprint)
        : options_(options), 
          indent_(0), 
          indenting_(pprint),  
          fp_(options_.precision()),
-         bos_(std::unique_ptr<buffered_output<CharT>>(new stream_buffered_output<CharT>(os)))
-    {
-    }
-
-    basic_json_serializer(std::basic_string<CharT>& s)
-       : indent_(0), 
-         indenting_(false),
-         fp_(options_.precision()),
-         bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s)))
-    {
-    }
-
-    basic_json_serializer(std::basic_string<CharT>& s, bool pprint)
-       : indent_(0), 
-         indenting_(pprint),
-         fp_(options_.precision()),
-         bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s)))
-    {
-    }
-
-    basic_json_serializer(std::basic_string<CharT>& s, const basic_serialization_options<CharT>& options)
-       : options_(options), 
-         indent_(0), 
-         indenting_(false),  
-         fp_(options_.precision()),
-         bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s)))
-    {
-    }
-    basic_json_serializer(std::basic_string<CharT>& s, const basic_serialization_options<CharT>& options, bool pprint)
-       : options_(options), 
-         indent_(0), 
-         indenting_(pprint),  
-         fp_(options_.precision()),
-         bos_(std::unique_ptr<buffered_output<CharT>>(new string_buffered_output<CharT>(s)))
+         bos_(os)
     {
     }
 
@@ -169,7 +137,7 @@ private:
 
     void do_end_json() override
     {
-        bos_->flush();
+        bos_.flush();
     }
 
     void do_begin_object() override
@@ -180,7 +148,7 @@ private:
             {
                 if (stack_.back().count_ > 0)
                 {
-                    bos_-> put(',');
+                    bos_. put(',');
                 }
             }
         }
@@ -214,7 +182,7 @@ private:
         {
             stack_.push_back(stack_item(true));
         }
-        bos_->put('{');
+        bos_.put('{');
     }
 
     void do_end_object() override
@@ -229,7 +197,7 @@ private:
             }
         }
         stack_.pop_back();
-        bos_->put('}');
+        bos_.put('}');
 
         end_value();
     }
@@ -243,7 +211,7 @@ private:
             {
                 if (stack_.back().count_ > 0)
                 {
-                    bos_-> put(',');
+                    bos_. put(',');
                 }
             }
         }
@@ -251,7 +219,7 @@ private:
         {
             if (!stack_.empty() && stack_.back().is_object())
             {
-                bos_->put('[');
+                bos_.put('[');
                 indent();
                 if (options_.object_array_split_lines() != line_split_kind::same_line)
                 {
@@ -270,19 +238,19 @@ private:
                 }
                 stack_.push_back(stack_item(false,options_.array_array_split_lines(), false));
                 indent();
-                bos_->put('[');
+                bos_.put('[');
             }
             else 
             {
                 stack_.push_back(stack_item(false, line_split_kind::multi_line, false));
                 indent();
-                bos_->put('[');
+                bos_.put('[');
             }
         }
         else
         {
             stack_.push_back(stack_item(false));
-            bos_->put('[');
+            bos_.put('[');
         }
     }
 
@@ -298,7 +266,7 @@ private:
             }
         }
         stack_.pop_back();
-        bos_->put(']');
+        bos_.put(']');
         end_value();
     }
 
@@ -308,7 +276,7 @@ private:
         {
             if (stack_.back().count_ > 0)
             {
-                bos_-> put(',');
+                bos_. put(',');
             }
             if (indenting_)
             {
@@ -319,13 +287,13 @@ private:
             }
         }
 
-        bos_->put('\"');
-        escape_string<CharT>(name.data(), name.length(), options_, *bos_);
-        bos_->put('\"');
-        bos_->put(':');
+        bos_.put('\"');
+        escape_string<CharT>(name.data(), name.length(), options_, bos_);
+        bos_.put('\"');
+        bos_.put(':');
         if (indenting_)
         {
-            bos_->put(' ');
+            bos_.put(' ');
         }
     }
 
@@ -337,7 +305,7 @@ private:
         }
 
         auto buf = detail::null_literal<CharT>();
-        bos_->write(buf, 4);
+        bos_.write(buf, 4);
 
         end_value();
     }
@@ -349,9 +317,9 @@ private:
             begin_scalar_value();
         }
 
-        bos_-> put('\"');
-        escape_string<CharT>(value.data(), value.length(), options_, *bos_);
-        bos_-> put('\"');
+        bos_. put('\"');
+        escape_string<CharT>(value.data(), value.length(), options_, bos_);
+        bos_. put('\"');
 
         end_value();
     }
@@ -372,19 +340,19 @@ private:
 
         if ((std::isnan)(value))
         {
-            bos_->write(options_.nan_replacement());
+            bos_.write(options_.nan_replacement());
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            bos_->write(options_.pos_inf_replacement());
+            bos_.write(options_.pos_inf_replacement());
         }
         else if (!(std::isfinite)(value))
         {
-            bos_->write(options_.neg_inf_replacement());
+            bos_.write(options_.neg_inf_replacement());
         }
         else
         {
-            fp_(value,precision, *bos_);
+            fp_(value,precision, bos_);
         }
 
         end_value();
@@ -396,7 +364,7 @@ private:
         {
             begin_scalar_value();
         }
-        print_integer(value, *bos_);
+        print_integer(value, bos_);
         end_value();
     }
 
@@ -406,7 +374,7 @@ private:
         {
             begin_scalar_value();
         }
-        print_uinteger(value, *bos_);
+        print_uinteger(value, bos_);
         end_value();
     }
 
@@ -420,12 +388,12 @@ private:
         if (value)
         {
             auto buf = detail::true_literal<CharT>();
-            bos_->write(buf,4);
+            bos_.write(buf,4);
         }
         else
         {
             auto buf = detail::false_literal<CharT>();
-            bos_->write(buf,5);
+            bos_.write(buf,5);
         }
 
         end_value();
@@ -437,7 +405,7 @@ private:
         {
             if (stack_.back().count_ > 0)
             {
-                bos_-> put(',');
+                bos_. put(',');
             }
             if (indenting_)
             {
@@ -455,7 +423,7 @@ private:
         {
             if (stack_.back().count_ > 0)
             {
-                bos_-> put(',');
+                bos_. put(',');
             }
             if (indenting_)
             {
@@ -491,25 +459,25 @@ private:
         {
             stack_.back().unindent_at_end_ = true;
         }
-        bos_-> put('\n');
+        bos_. put('\n');
         for (int i = 0; i < indent_; ++i)
         {
-            bos_-> put(' ');
+            bos_. put(' ');
         }
     }
 
     void write_indent1()
     {
-        bos_-> put('\n');
+        bos_. put('\n');
         for (int i = 0; i < indent_; ++i)
         {
-            bos_-> put(' ');
+            bos_. put(' ');
         }
     }
 };
 
-typedef basic_json_serializer<char> json_serializer;
-typedef basic_json_serializer<wchar_t> wjson_serializer;
+typedef basic_json_serializer<char,ostream_buffered_writer<char>> json_serializer;
+typedef basic_json_serializer<wchar_t, ostream_buffered_writer<wchar_t>> wjson_serializer;
 
 }
 #endif
