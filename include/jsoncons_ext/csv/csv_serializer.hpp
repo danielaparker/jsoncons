@@ -89,11 +89,11 @@ public:
 
 private:
 
-    template<class Writer>
+    template<class AnyWriter>
     void escape_string(const CharT* s,
                        size_t length,
                        CharT quote_char, CharT quote_escape_char,
-                       Writer& writer)
+                       AnyWriter& writer)
     {
         const CharT* begin = s;
         const CharT* end = s + length;
@@ -209,8 +209,8 @@ private:
         }
     }
 
-    template <class Writer>
-    void write_string(const CharT* s, size_t length, Writer& writer)
+    template <class AnyWriter>
+    void write_string(const CharT* s, size_t length, AnyWriter& writer)
     {
         bool quote = false;
         if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
@@ -371,16 +371,16 @@ private:
         }
     }
 
-    template <class Writer>
-    void value(const string_view_type& value, Writer& writer)
+    template <class AnyWriter>
+    void value(const string_view_type& value, AnyWriter& writer)
     {
         begin_value(writer);
         write_string(value.data(),value.length(),writer);
         end_value();
     }
 
-    template <class Writer>
-    void value(double val, Writer& writer)
+    template <class AnyWriter>
+    void value(double val, AnyWriter& writer)
     {
         begin_value(writer);
 
@@ -405,8 +405,8 @@ private:
 
     }
 
-    template <class Writer>
-    void value(int64_t val, Writer& writer)
+    template <class AnyWriter>
+    void value(int64_t val, AnyWriter& writer)
     {
         begin_value(writer);
 
@@ -417,8 +417,8 @@ private:
         end_value();
     }
 
-    template <class Writer>
-    void value(uint64_t val, Writer& writer)
+    template <class AnyWriter>
+    void value(uint64_t val, AnyWriter& writer)
     {
         begin_value(writer);
 
@@ -429,8 +429,8 @@ private:
         end_value();
     }
 
-    template <class Writer>
-    void value(bool val, Writer& writer) 
+    template <class AnyWriter>
+    void value(bool val, AnyWriter& writer) 
     {
         begin_value(writer);
 
@@ -448,8 +448,8 @@ private:
         end_value();
     }
 
-    template <class Writer>
-    void do_null_value(Writer& writer) 
+    template <class AnyWriter>
+    void do_null_value(AnyWriter& writer) 
     {
         begin_value(writer);
         auto buf = jsoncons::detail::null_literal<CharT>();
@@ -458,8 +458,8 @@ private:
 
     }
 
-    template <class Writer>
-    void begin_value(Writer& writer)
+    template <class AnyWriter>
+    void begin_value(AnyWriter& writer)
     {
         if (!stack_.empty())
         {
