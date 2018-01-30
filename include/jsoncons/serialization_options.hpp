@@ -20,15 +20,13 @@
 #endif
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/detail/type_traits_helper.hpp>
 
 namespace jsoncons {
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 enum class block_options {next_line,same_line};
 #endif
-
-template <class CharT>
-class buffered_output;
 
 enum class line_split_kind{same_line,new_line,multi_line};
 

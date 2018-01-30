@@ -23,7 +23,7 @@ std::basic_string<CharT> float_to_string(double val, uint8_t precision)
     std::basic_ostringstream<CharT> ss;
     ss.imbue(std::locale::classic());
     {
-        buffered_output<CharT> os(ss);
+        stream_buffered_output<CharT> os(ss);
         print_double<CharT> print(precision);
         print(val, precision, os);
     }

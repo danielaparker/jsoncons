@@ -740,40 +740,45 @@ inline std::basic_string<CharT, Traits, Alloc> view_to_string(const basic_string
 template <class CharT>
 class buffered_output
 {
-    static const size_t default_buffer_length = 16384;
-
-    std::basic_ostream<CharT>& os_;
-    std::vector<CharT> buffer_;
-    CharT * const begin_buffer_;
-    const CharT* const end_buffer_;
+    CharT * begin_buffer_;
+    const CharT* end_buffer_;
     CharT* p_;
-
 
     // Noncopyable and nonmoveable
     buffered_output(const buffered_output&) = delete;
     buffered_output& operator=(const buffered_output&) = delete;
 
 public:
-    buffered_output(std::basic_ostream<CharT>& os)
-        : os_(os), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+default_buffer_length), p_(buffer_.data())
+    buffered_output()
+        : begin_buffer_(nullptr), end_buffer_(nullptr), p_(nullptr)
     {
     }
-    buffered_output(std::basic_ostream<CharT>& os, size_t buflen)
-        : os_(os), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(buffer_.data()+buflen), p_(buffer_.data())
+    virtual ~buffered_output() = default;
+
+    const CharT * buffer() const 
     {
+        return begin_buffer_;
     }
-    ~buffered_output()
+
+    void set_buffer(CharT* begin, size_t length)
     {
-        os_.write(begin_buffer_, (p_ - begin_buffer_));
-        os_.flush();
+        begin_buffer_ = begin;
+        end_buffer_ = begin + length;
+        p_ = begin;
+    }
+
+    size_t buffer_length() const
+    {
+        return p_ - begin_buffer_;
     }
 
     void flush()
     {
-        os_.write(begin_buffer_, (p_ - begin_buffer_));
+        write_overflow(begin_buffer_, buffer_length());
         p_ = begin_buffer_;
-        os_.flush();
     }
+
+    virtual void write_overflow(const CharT* s, size_t length) = 0;
 
     void write(const CharT* s, size_t length)
     {
@@ -785,8 +790,8 @@ public:
         }
         else
         {
-            os_.write(begin_buffer_, (p_ - begin_buffer_));
-            os_.write(s, length);
+            write_overflow(begin_buffer_, buffer_length());
+            write_overflow(s, length);
             p_ = begin_buffer_;
         }
     }
@@ -804,12 +809,49 @@ public:
         }
         else
         {
-            os_.write(begin_buffer_, (p_-begin_buffer_));
+            write_overflow(begin_buffer_, buffer_length());
             p_ = begin_buffer_;
             *p_++ = ch;
         }
     }
+};
 
+template <class CharT>
+class stream_buffered_output : public buffered_output<CharT>
+{
+    static const size_t default_buffer_length = 16384;
+
+    std::basic_ostream<CharT>& os_;
+    std::vector<CharT> buffer_;
+
+    // Noncopyable and nonmoveable
+    stream_buffered_output(const stream_buffered_output&) = delete;
+    stream_buffered_output& operator=(const stream_buffered_output&) = delete;
+
+public:
+    stream_buffered_output(std::basic_ostream<CharT>& os)
+        : os_(os), buffer_(default_buffer_length)
+    {
+        set_buffer(buffer_.data(), default_buffer_length);
+    }
+    stream_buffered_output(std::basic_ostream<CharT>& os, size_t buflen)
+        : os_(os), buffer_(buflen)
+    {
+        set_buffer(buffer_.data(), default_buffer_length);
+    }
+    ~stream_buffered_output()
+    {
+        os_.write(this->buffer(), this->buffer_length());
+        os_.flush();
+    }
+    using buffered_output<CharT>::put;
+    using buffered_output<CharT>::write;
+    using buffered_output<CharT>::flush;
+private:
+    void write_overflow(const CharT* s, size_t length) override
+    {
+        os_.write(s, length);
+    }
 };
 
 // print_double
