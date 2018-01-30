@@ -23,29 +23,6 @@
 
 namespace jsoncons { namespace csv {
 
-template <class CharT, class Writer>
-void escape_string(const CharT* s,
-                   size_t length,
-                   CharT quote_char, CharT quote_escape_char,
-                   Writer& os)
-{
-    const CharT* begin = s;
-    const CharT* end = s + length;
-    for (const CharT* it = begin; it != end; ++it)
-    {
-        CharT c = *it;
-        if (c == quote_char)
-        {
-            os.put(quote_escape_char); 
-            os.put(quote_char);
-        }
-        else
-        {
-            os.put(c);
-        }
-    }
-}
-
 template<class CharT,class BufferedWriter=ostream_buffered_writer<CharT>,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
@@ -111,6 +88,29 @@ public:
     }
 
 private:
+
+    template<class Writer>
+    void escape_string(const CharT* s,
+                       size_t length,
+                       CharT quote_char, CharT quote_escape_char,
+                       Writer& writer)
+    {
+        const CharT* begin = s;
+        const CharT* end = s + length;
+        for (const CharT* it = begin; it != end; ++it)
+        {
+            CharT c = *it;
+            if (c == quote_char)
+            {
+                writer.put(quote_escape_char); 
+                writer.put(quote_char);
+            }
+            else
+            {
+                writer.put(c);
+            }
+        }
+    }
 
     void do_begin_json() override
     {
@@ -210,7 +210,7 @@ private:
     }
 
     template <class Writer>
-    void write_string(const CharT* s, size_t length, Writer& os)
+    void write_string(const CharT* s, size_t length, Writer& writer)
     {
         bool quote = false;
         if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
@@ -218,12 +218,12 @@ private:
             (std::char_traits<CharT>::find(s, length, parameters_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, parameters_.quote_char()) != nullptr)))
         {
             quote = true;
-            os.put(parameters_.quote_char());
+            writer.put(parameters_.quote_char());
         }
-        jsoncons::csv::escape_string<CharT>(s, length, parameters_.quote_char(), parameters_.quote_escape_char(), os);
+        escape_string(s, length, parameters_.quote_char(), parameters_.quote_escape_char(), writer);
         if (quote)
         {
-            os.put(parameters_.quote_char());
+            writer.put(parameters_.quote_char());
         }
 
     }
@@ -380,25 +380,25 @@ private:
     }
 
     template <class Writer>
-    void value(double val, Writer& os)
+    void value(double val, Writer& writer)
     {
-        begin_value(os);
+        begin_value(writer);
 
         if ((std::isnan)(val))
         {
-            os.write(options_.nan_replacement());
+            writer.write(options_.nan_replacement());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            os.write(options_.pos_inf_replacement());
+            writer.write(options_.pos_inf_replacement());
         }
         else if (!(std::isfinite)(val))
         {
-            os.write(options_.neg_inf_replacement());
+            writer.write(options_.neg_inf_replacement());
         }
         else
         {
-            fp_(val,options_.precision(),os);
+            fp_(val,options_.precision(),writer);
         }
 
         end_value();
@@ -406,66 +406,66 @@ private:
     }
 
     template <class Writer>
-    void value(int64_t val, Writer& os)
+    void value(int64_t val, Writer& writer)
     {
-        begin_value(os);
+        begin_value(writer);
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        os.write(ss.str());
+        writer.write(ss.str());
 
         end_value();
     }
 
     template <class Writer>
-    void value(uint64_t val, Writer& os)
+    void value(uint64_t val, Writer& writer)
     {
-        begin_value(os);
+        begin_value(writer);
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        os.write(ss.str());
+        writer.write(ss.str());
 
         end_value();
     }
 
     template <class Writer>
-    void value(bool val, Writer& os) 
+    void value(bool val, Writer& writer) 
     {
-        begin_value(os);
+        begin_value(writer);
 
         if (val)
         {
             auto buf = jsoncons::detail::true_literal<CharT>();
-            os.write(buf,4);
+            writer.write(buf,4);
         }
         else
         {
             auto buf = jsoncons::detail::false_literal<CharT>();
-            os.write(buf,5);
+            writer.write(buf,5);
         }
 
         end_value();
     }
 
     template <class Writer>
-    void do_null_value(Writer& os) 
+    void do_null_value(Writer& writer) 
     {
-        begin_value(os);
+        begin_value(writer);
         auto buf = jsoncons::detail::null_literal<CharT>();
-        os.write(buf,4);
+        writer.write(buf,4);
         end_value();
 
     }
 
     template <class Writer>
-    void begin_value(Writer& os)
+    void begin_value(Writer& writer)
     {
         if (!stack_.empty())
         {
             if (!stack_.back().is_object_ && stack_.back().count_ > 0)
             {
-                os.put(parameters_.field_delimiter());
+                writer.put(parameters_.field_delimiter());
             }
         }
     }
