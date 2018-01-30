@@ -9,6 +9,7 @@
 #include <utility>
 #include <ctime>
 #include <cwchar>
+#include <jsoncons/detail/number_parsers.hpp>
 
 using namespace jsoncons;
 

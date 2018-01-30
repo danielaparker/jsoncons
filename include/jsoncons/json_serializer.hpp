@@ -21,6 +21,7 @@
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
+#include <jsoncons/detail/number_printers.hpp>
 
 namespace jsoncons {
 

@@ -16,46 +16,6 @@
 
 namespace jsoncons {
 
-template<class Writer> 
-void print_integer(int64_t value, Writer& os)
-{
-    typedef typename Writer::char_type char_type;
-
-    char_type buf[255];
-    uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
-    char_type* p = buf;
-    do
-    {
-        *p++ = static_cast<char_type>(48 + u%10);
-    }
-    while (u /= 10);
-    if (value < 0)
-    {
-        os.put('-');
-    }
-    while (--p >= buf)
-    {
-        os.put(*p);
-    }
-}
-
-template<class Writer>
-void print_uinteger(uint64_t value, Writer& os)
-{
-    typedef typename Writer::char_type char_type;
-
-    char_type buf[255];
-    char_type* p = buf;
-    do
-    {
-        *p++ = static_cast<char_type>(48 + value % 10);
-    } while (value /= 10);
-    while (--p >= buf)
-    {
-        os.put(*p);
-    }
-}
-
 template <class CharT>
 class basic_json_output_handler
 {
