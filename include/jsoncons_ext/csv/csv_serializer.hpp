@@ -23,11 +23,11 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class BufferedWriter=ostream_buffered_writer<CharT>,class Allocator=std::allocator<CharT>>
+template<class CharT,class Writer=ostream_buffered_writer<CharT>,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer : public basic_json_output_handler<CharT>
 {
 public:
-    typedef typename BufferedWriter::output_type output_type;
+    typedef typename Writer::output_type output_type;
 
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
@@ -51,11 +51,11 @@ private:
         size_t count_;
         string_type name_;
     };
-    BufferedWriter bos_;
+    Writer writer_;
     basic_csv_parameters<CharT,Allocator> parameters_;
     basic_serialization_options<CharT> options_;
     std::vector<stack_item> stack_;
-    print_double<CharT> fp_;
+    print_double fp_;
     std::vector<string_type,string_allocator_type> column_names_;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
@@ -67,7 +67,7 @@ private:
 public:
     basic_csv_serializer(output_type& os)
        :
-       bos_(os),
+       writer_(os),
        options_(),
        stack_(),
        fp_(options_.precision()),
@@ -78,7 +78,7 @@ public:
     basic_csv_serializer(output_type& os,
                          const basic_csv_parameters<CharT,Allocator>& params)
        :
-       bos_(os),
+       writer_(os),
        parameters_(params),
        options_(),
        stack_(),
@@ -118,7 +118,7 @@ private:
 
     void do_end_json() override
     {
-        bos_.flush();
+        writer_.flush();
     }
 
     void do_begin_object() override
@@ -136,26 +136,26 @@ private:
                 {
                     if (i > 0)
                     {
-                        bos_.put(parameters_.field_delimiter());
+                        writer_.put(parameters_.field_delimiter());
                     }
-                    bos_.write(column_names_[i]);
+                    writer_.write(column_names_[i]);
                 }
-                bos_.write(parameters_.line_delimiter());
+                writer_.write(parameters_.line_delimiter());
             }
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
                 if (i > 0)
                 {
-                    bos_.put(parameters_.field_delimiter());
+                    writer_.put(parameters_.field_delimiter());
                 }
                 auto it = buffered_line_.find(column_names_[i]);
                 if (it != buffered_line_.end())
                 {
-                    bos_.write(it->second);
+                    writer_.write(it->second);
                     it->second.clear();
                 }
             }
-            bos_.write(parameters_.line_delimiter());
+            writer_.write(parameters_.line_delimiter());
         }
         stack_.pop_back();
 
@@ -173,13 +173,13 @@ private:
                 {
                     if (i > 0)
                     {
-                        bos_.put(parameters_.field_delimiter());
+                        writer_.put(parameters_.field_delimiter());
                     }
-                    bos_.write(column_names_[i]);
+                    writer_.write(column_names_[i]);
                 }
                 if (column_names_.size() > 0)
                 {
-                    bos_.write(parameters_.line_delimiter());
+                    writer_.write(parameters_.line_delimiter());
                 }
             }
         }
@@ -189,7 +189,7 @@ private:
     {
         if (stack_.size() == 2)
         {
-            bos_.write(parameters_.line_delimiter());
+            writer_.write(parameters_.line_delimiter());
         }
         stack_.pop_back();
 
@@ -246,7 +246,7 @@ private:
             }
             else
             {
-                do_null_value(bos_);
+                do_null_value(writer_);
             }
         }
     }
@@ -269,7 +269,7 @@ private:
             }
             else
             {
-                value(val,bos_);
+                value(val,writer_);
             }
         }
     }
@@ -297,7 +297,7 @@ private:
             }
             else
             {
-                value(val,bos_);
+                value(val,writer_);
             }
         }
     }
@@ -320,7 +320,7 @@ private:
             }
             else
             {
-                value(val,bos_);
+                value(val,writer_);
             }
         }
     }
@@ -343,7 +343,7 @@ private:
             }
             else
             {
-                value(val,bos_);
+                value(val,writer_);
             }
         }
     }
@@ -366,7 +366,7 @@ private:
             }
             else
             {
-                value(val,bos_);
+                value(val,writer_);
             }
         }
     }

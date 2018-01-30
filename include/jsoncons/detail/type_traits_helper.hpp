@@ -809,7 +809,7 @@ public:
 };
 
 template <class CharT>
-class ostream_buffered_writer : public buffered_output<CharT>
+class ostream_buffered_writer
 {
 public:
     typedef CharT char_type;
@@ -819,6 +819,9 @@ private:
 
     std::basic_ostream<CharT>& os_;
     std::vector<CharT> buffer_;
+    CharT * begin_buffer_;
+    const CharT* end_buffer_;
+    CharT* p_;
 
     // Noncopyable and nonmoveable
     ostream_buffered_writer(const ostream_buffered_writer&) = delete;
@@ -826,36 +829,64 @@ private:
 
 public:
     ostream_buffered_writer(std::basic_ostream<CharT>& os)
-        : os_(os), buffer_(default_buffer_length)
+        : os_(os), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
-        this->set_buffer(buffer_.data(), default_buffer_length);
     }
     ostream_buffered_writer(std::basic_ostream<CharT>& os, size_t buflen)
-        : os_(os), buffer_(buflen)
+    : os_(os), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
-        this->set_buffer(buffer_.data(), default_buffer_length);
     }
     ~ostream_buffered_writer()
     {
-        os_.write(this->buffer(), this->buffer_length());
+        os_.write(begin_buffer_, buffer_length());
         os_.flush();
     }
 
-    using buffered_output<CharT>::put;
-    using buffered_output<CharT>::write;
-    using buffered_output<CharT>::flush;
-
-    void flush() override
+    void flush()
     {
-        os_.write(this->buffer(), this->buffer_length());
-        this->set_buffer(buffer_.data(), buffer_.size());
+        os_.write(begin_buffer_, buffer_length());
+        p_ = buffer_.data();
+    }
+
+    void write(const CharT* s, size_t length)
+    {
+        size_t diff = end_buffer_ - p_;
+        if (diff >= length)
+        {
+            std::memcpy(p_, s, length*sizeof(CharT));
+            p_ += length;
+        }
+        else
+        {
+            os_.write(begin_buffer_, buffer_length());
+            os_.write(s,length);
+            p_ = begin_buffer_;
+        }
+    }
+
+    void write(const std::basic_string<CharT>& s)
+    {
+        write(s.data(),s.length());
+    }
+
+    void put(CharT ch)
+    {
+        if (p_ < end_buffer_)
+        {
+            *p_++ = ch;
+        }
+        else
+        {
+            os_.write(begin_buffer_, buffer_length());
+            p_ = begin_buffer_;
+            put(ch);
+        }
     }
 private:
-    void write_overflow(const CharT* buf, size_t buflen, const CharT* s, size_t length) override
+
+    size_t buffer_length() const
     {
-        os_.write(buf, buflen);
-        os_.write(s, length);
-        this->set_buffer(buffer_.data(), default_buffer_length);
+        return p_ - begin_buffer_;
     }
 };
 
@@ -924,9 +955,9 @@ private:
 
 #if defined(JSONCONS_HAS__ECVT_S)
 
-template <class CharT>
 class print_double
 {
+private:
     uint8_t precision_override_;
 public:
     print_double(uint8_t precision)
@@ -934,8 +965,11 @@ public:
     {
     }
 
-    void operator()(double val, uint8_t precision, buffered_output<CharT>& os) 
+    template <class Writer>
+    void operator()(double val, uint8_t precision, Writer& writer) 
     {
+        typedef typename Writer::char_type char_type;
+
         char buf[_CVTBUFSIZE];
         int decimal_point = 0;
         int sign = 0;
@@ -968,14 +1002,14 @@ public:
 
         if (sign)
         {
-            os.put('-');
+            writer.put('-');
         }
         if (decimal_point <= -4 || decimal_point > se - s + 5) 
         {
-            os.put(*s++);
+            writer.put(*s++);
             if (s < se) 
             {
-                os.put('.');
+                writer.put('.');
                 while ((se-1) > s && *(se-1) == '0')
                 {
                     --se;
@@ -983,22 +1017,22 @@ public:
 
                 while(s < se)
                 {
-                    os.put(*s++);
+                    writer.put(*s++);
                 }
             }
-            os.put('e');
+            writer.put('e');
             /* sprintf(b, "%+.2d", decimal_point - 1); */
             if (--decimal_point < 0) {
-                os.put('-');
+                writer.put('-');
                 decimal_point = -decimal_point;
                 }
             else
-                os.put('+');
+                writer.put('+');
             for(j = 2, k = 10; 10*k <= decimal_point; j++, k *= 10);
             for(;;) 
             {
                 i = decimal_point / k;
-                os.put(static_cast<CharT>(i) + '0');
+                writer.put(static_cast<char_type>(i) + '0');
                 if (--j <= 0)
                     break;
                 decimal_point -= i*k;
@@ -1007,28 +1041,28 @@ public:
         }
         else if (decimal_point <= 0) 
         {
-            os.put('0');
-            os.put('.');
+            writer.put('0');
+            writer.put('.');
             while ((se-1) > s && *(se-1) == '0')
             {
                 --se;
             }
             for(; decimal_point < 0; decimal_point++)
             {
-                os.put('0');
+                writer.put('0');
             }
             while(s < se)
             {
-                os.put(*s++);
+                writer.put(*s++);
             }
         }
         else {
             while(s < se) 
             {
-                os.put(*s++);
+                writer.put(*s++);
                 if ((--decimal_point == 0) && s < se)
                 {
-                    os.put('.');
+                    writer.put('.');
                     while ((se-1) > s && *(se-1) == '0')
                     {
                         --se;
@@ -1037,7 +1071,7 @@ public:
             }
             for(; decimal_point > 0; decimal_point--)
             {
-                os.put('0');
+                writer.put('0');
             }
         }
     }
@@ -1045,20 +1079,23 @@ public:
 
 #elif defined(JSONCONS_NO_LOCALECONV)
 
-template <class CharT>
 class print_double
 {
+private:
     uint8_t precision_override_;
-    basic_obufferedstream<CharT> oss_;
+    basic_obufferedstream<char> os_;
 public:
     print_double(uint8_t precision)
         : precision_override_(precision)
     {
-        oss_.imbue(std::locale::classic());
-        oss_.precision(precision);
+        os_.imbue(std::locale::classic());
+        os_.precision(precision);
     }
-    void operator()(double val, uint8_t precision, buffered_output<CharT>& os)
+
+    template <class Writer>
+    void operator()(double val, uint8_t precision, Writer& writer)
     {
+        typedef typename Writer::char_type char_type;
 
         int prec;
         if (precision_override_ != 0)
@@ -1074,15 +1111,15 @@ public:
             prec = std::numeric_limits<double>::digits10;
         }             
 
-        oss_.clear_sequence();
-        oss_.precision(prec);
-        oss_ << val;
+        os_.clear_sequence();
+        os_.precision(prec);
+        os_ << val;
 
-        //std::cout << "precision_override_:" << (int)precision_override_ << ", precision:" << (int)precision << ", buf:" << oss_.data() << std::endl;
+        //std::cout << "precision_override_:" << (int)precision_override_ << ", precision:" << (int)precision << ", buf:" << os_.data() << std::endl;
 
-        const CharT* sbeg = oss_.data();
-        const CharT* send = sbeg + oss_.length();
-        const CharT* pexp = send;
+        const char_type* sbeg = os_.data();
+        const char_type* send = sbeg + os_.length();
+        const char_type* pexp = send;
 
         if (sbeg != send)
         {
@@ -1091,7 +1128,7 @@ public:
             {
             }
 
-            const CharT* qend = pexp;
+            const char_type* qend = pexp;
             while (qend >= sbeg+2 && *(qend-1) == '0' && *(qend-2) != '.')
             {
                 --qend;
@@ -1101,32 +1138,32 @@ public:
                 qend = ((qend >= sbeg+2) && *(qend-2) == '.') ? qend : send;
             }
 
-            for (const CharT* q = sbeg; q < qend; ++q)
+            for (const char_type* q = sbeg; q < qend; ++q)
             {
                 if (*q == '.')
                 {
                     dot = true;
                 }
-                os.put(*q);
+                writer.put(*q);
             }
             if (!dot)
             {
-                os.put('.');
-                os.put('0');
+                writer.put('.');
+                writer.put('0');
                 dot = true;
             }
-            for (const CharT* q = pexp; q < send; ++q)
+            for (const char_type* q = pexp; q < send; ++q)
             {
-                os.put(*q);
+                writer.put(*q);
             }
         }
     }
 };
 #else
 
-template <class CharT>
 class print_double
 {
+private:
     uint8_t precision_override_;
     char decimal_point_;
 public:
@@ -1143,8 +1180,11 @@ public:
             decimal_point_ = '.'; 
         }
     }
-    void operator()(double val, uint8_t precision, buffered_output<CharT>& os)
+
+    template <class Writer>
+    void operator()(double val, uint8_t precision, Writer& writer)
     {
+        typedef typename Writer::char_type char_type;
 
         int prec;
         if (precision_override_ != 0)
@@ -1183,26 +1223,26 @@ public:
                 switch (*q)
                 {
                 case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    os.put(*q);
+                    writer.put(*q);
                     break;
                 default:
                     if (*q == decimal_point_)
                     {
                         dot = true;
-                        os.put('.');
+                        writer.put('.');
                     }
                     break;
                 }
             }
             if (!dot)
             {
-                os.put('.');
-                os.put('0');
+                writer.put('.');
+                writer.put('0');
                 dot = true;
             }
             for (const char* q = pexp; q < send; ++q)
             {
-                os.put(*q);
+                writer.put(*q);
             }
         }
     }

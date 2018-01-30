@@ -8,6 +8,7 @@
 #include <boost/test/unit_test.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
+#include <jsoncons/detail/type_traits_helper.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -20,14 +21,13 @@ BOOST_AUTO_TEST_SUITE(double_to_string_tests)
 template<class CharT>
 std::basic_string<CharT> float_to_string(double val, uint8_t precision)
 {
-    std::basic_ostringstream<CharT> ss;
-    ss.imbue(std::locale::classic());
-    {
-        ostream_buffered_writer<CharT> os(ss);
-        print_double<CharT> print(precision);
-        print(val, precision, os);
-    }
-    return ss.str();
+    print_double print(precision);
+
+    std::basic_string<CharT> s;
+    string_buffered_writer<CharT> writer(s);
+    print(val, precision, writer);
+    writer.flush();
+    return s;
 }
 
 const serialization_options options;

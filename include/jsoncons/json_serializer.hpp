@@ -86,7 +86,7 @@ private:
     std::vector<stack_item> stack_;
     int indent_;
     bool indenting_;
-    print_double<CharT> fp_;
+    print_double fp_;
     Writer writer_;
 
     // Noncopyable and nonmoveable
