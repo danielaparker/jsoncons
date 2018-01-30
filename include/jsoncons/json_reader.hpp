@@ -252,12 +252,12 @@ public:
                 return;
             }
             size_t offset = result.it - buffer_.begin();
-            parser_.set_source(buffer_.data()+offset,buffer_.size()-offset);
+            parser_.set_buffer(buffer_.data()+offset,buffer_.size()-offset);
             begin_ = false;
         }
         else
         {
-            parser_.set_source(buffer_.data(),buffer_.size());
+            parser_.set_buffer(buffer_.data(),buffer_.size());
         }
     }
 

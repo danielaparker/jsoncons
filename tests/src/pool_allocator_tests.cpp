@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_pool_allocator)
 
     static std::string s("[1,2,3,4,5,6]");
 
-    parser.set_source(s.data(),s.length());
+    parser.set_buffer(s.data(),s.length());
     parser.parse();
     BOOST_CHECK(parser.done());
 
