@@ -29,6 +29,8 @@
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 
+namespace jsoncons { namespace detail {
+
 // print_integer
 
 template<class Writer> 
@@ -372,5 +374,6 @@ public:
 
 #endif
 
+}}
 
 #endif

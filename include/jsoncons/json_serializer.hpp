@@ -87,7 +87,7 @@ private:
     std::vector<stack_item> stack_;
     int indent_;
     bool indenting_;
-    print_double fp_;
+    detail::print_double fp_;
     Writer writer_;
 
     // Noncopyable and nonmoveable
@@ -466,7 +466,7 @@ private:
         {
             begin_scalar_value();
         }
-        print_integer(value, writer_);
+        detail::print_integer(value, writer_);
         end_value();
     }
 
@@ -476,7 +476,7 @@ private:
         {
             begin_scalar_value();
         }
-        print_uinteger(value, writer_);
+        detail::print_uinteger(value, writer_);
         end_value();
     }
 

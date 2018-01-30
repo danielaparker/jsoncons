@@ -18,6 +18,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/serialization_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
+#include <jsoncons/detail/number_printers.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons_ext/csv/csv_parameters.hpp>
 
@@ -55,7 +56,7 @@ private:
     basic_csv_parameters<CharT,Allocator> parameters_;
     basic_serialization_options<CharT> options_;
     std::vector<stack_item> stack_;
-    print_double fp_;
+    jsoncons::detail::print_double fp_;
     std::vector<string_type,string_allocator_type> column_names_;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;

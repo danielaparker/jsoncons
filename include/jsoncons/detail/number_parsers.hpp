@@ -29,6 +29,8 @@
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 
+namespace jsoncons { namespace detail {
+
 #if defined(JSONCONS_HAS_MSC__STRTOD_L)
 
 class string_to_double
@@ -150,5 +152,7 @@ private:
     string_to_double& operator=(const string_to_double& fr) = delete;
 };
 #endif
+
+}}
 
 #endif

@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE(double_to_string_tests)
 template<class CharT>
 std::basic_string<CharT> float_to_string(double val, uint8_t precision)
 {
-    print_double print(precision);
+    detail::print_double print(precision);
 
     std::basic_string<CharT> s;
     string_writer<CharT> writer(s);
