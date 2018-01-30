@@ -124,6 +124,39 @@ public:
     {
     }
 
+    basic_json_serializer(std::basic_string<CharT>& s)
+       : indent_(0), 
+         indenting_(false),
+         fp_(options_.precision()),
+         bos_(std::make_unique<string_buffered_output<CharT>>(s))
+    {
+    }
+
+    basic_json_serializer(std::basic_string<CharT>& s, bool pprint)
+       : indent_(0), 
+         indenting_(pprint),
+         fp_(options_.precision()),
+         bos_(std::make_unique<string_buffered_output<CharT>>(s))
+    {
+    }
+
+    basic_json_serializer(std::basic_string<CharT>& s, const basic_serialization_options<CharT>& options)
+       : options_(options), 
+         indent_(0), 
+         indenting_(false),  
+         fp_(options_.precision()),
+         bos_(std::make_unique<string_buffered_output<CharT>>(s))
+    {
+    }
+    basic_json_serializer(std::basic_string<CharT>& s, const basic_serialization_options<CharT>& options, bool pprint)
+       : options_(options), 
+         indent_(0), 
+         indenting_(pprint),  
+         fp_(options_.precision()),
+         bos_(std::make_unique<string_buffered_output<CharT>>(s))
+    {
+    }
+
     ~basic_json_serializer()
     {
     }

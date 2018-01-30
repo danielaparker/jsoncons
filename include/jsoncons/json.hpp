@@ -3048,26 +3048,16 @@ public:
     template <class SAllocator>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
-        std::basic_ostringstream<char_type,char_traits_type,SAllocator> os;
-        os.imbue(std::locale::classic());
-        {
-            basic_json_serializer<char_type> serializer(os);
-            dump(serializer);
-        }
-        s = os.str();
+        basic_json_serializer<char_type> serializer(s);
+        dump(serializer);
     }
 
     template <class SAllocator>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_serialization_options<char_type>& options) const
     {
-        std::basic_ostringstream<char_type,char_traits_type,SAllocator> os;
-        os.imbue(std::locale::classic());
-        {
-            basic_json_serializer<char_type> serializer(os,options);
-            dump(serializer);
-        }
-        s = os.str();
+        basic_json_serializer<char_type> serializer(s, options);
+        dump(serializer);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -3167,26 +3157,18 @@ public:
     string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const JSONCONS_NOEXCEPT
     {
         string_type s(allocator);
-        std::basic_ostringstream<char_type,char_traits_type,char_allocator_type> os(s);
-        os.imbue(std::locale::classic());
-        {
-            basic_json_serializer<char_type> serializer(os);
-            dump_fragment(serializer);
-        }
-        return os.str();
+        basic_json_serializer<char_type> serializer(s);
+        dump_fragment(serializer);
+        return s;
     }
 
     string_type to_string(const basic_serialization_options<char_type>& options,
                           const char_allocator_type& allocator=char_allocator_type()) const
     {
         string_type s(allocator);
-        std::basic_ostringstream<char_type> os(s);
-        os.imbue(std::locale::classic());
-        {
-            basic_json_serializer<char_type> serializer(os, options);
-            dump_fragment(serializer);
-        }
-        return os.str();
+        basic_json_serializer<char_type> serializer(s, options);
+        dump_fragment(serializer);
+        return s;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
