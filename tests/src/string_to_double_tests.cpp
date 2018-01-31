@@ -17,6 +17,8 @@ BOOST_AUTO_TEST_SUITE(string_to_double_tests)
 
 BOOST_AUTO_TEST_CASE(test_string_to_double)
 {
+    std::cout << "sizeof(json): " << sizeof(json) << std::endl; 
+
     const char* s1 = "0.0";
     json j1 = json::parse(s1);
     double expected1 = 0.0;
