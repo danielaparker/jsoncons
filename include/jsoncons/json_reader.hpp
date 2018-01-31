@@ -122,7 +122,7 @@ private:
 
     void do_double_value(double value, const number_format& fmt, const parsing_context& context) override
     {
-        other_handler_.double_value(value, precision, decimal_places, context);
+        other_handler_.double_value(value, fmt, context);
     }
 
     void do_bool_value(bool value, const parsing_context& context) override
