@@ -2788,11 +2788,11 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                handler_.double_value(d, static_cast<uint8_t>(std::numeric_limits<double>::max_digits10), decimal_places_, *this);
+                handler_.double_value(d, number_format(std::numeric_limits<double>::max_digits10, decimal_places_), *this);
             }
             else
             {
-                handler_.double_value(d, static_cast<uint8_t>(precision_), decimal_places_, *this);
+                handler_.double_value(d, number_format(static_cast<uint8_t>(precision_), decimal_places_), *this);
             }
         }
         catch (...)

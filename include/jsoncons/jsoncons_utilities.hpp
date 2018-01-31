@@ -33,6 +33,39 @@
 namespace jsoncons
 {
 
+// number_format
+
+class number_format
+{
+    uint8_t precision_;
+    uint8_t decimal_places_;
+public:
+    number_format()
+        : precision_(0), decimal_places_(0)
+    {
+    }
+
+    number_format(uint8_t precision, uint8_t decimal_places)
+        : precision_(precision), decimal_places_(decimal_places)
+    {
+    }
+
+    number_format(const number_format&) = default;
+    number_format(number_format&&) = default;
+    number_format& operator=(const number_format& e) = default;
+    number_format& operator=(number_format&& e) = default;
+
+    uint8_t precision() const
+    {
+        return precision_;
+    }
+
+    uint8_t decimal_places() const
+    {
+        return decimal_places_;
+    }
+};
+
 // byte_string_view
 class byte_string_view
 {

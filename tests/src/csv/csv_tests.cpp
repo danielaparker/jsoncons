@@ -991,8 +991,6 @@ WLF,WALLIS & FUTUNA ISLANDS
 
 BOOST_AUTO_TEST_CASE(test_decode_csv_from_string)
 {
-    std::cout << "sizeof(json): " << sizeof(json) << std::endl; 
-
     std::string s = "some label\nsome value";
     csv_parameters params;
     params.assume_header(true);

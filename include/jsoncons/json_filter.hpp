@@ -101,9 +101,9 @@ private:
         output_handler_.uinteger_value(value);
     }
 
-    void do_double_value(double value, uint8_t precision, uint8_t decimal_places, const parsing_context&) override
+    void do_double_value(double value, const number_format& fmt, const parsing_context&) override
     {
-        output_handler_.double_value(value, precision, decimal_places);
+        output_handler_.double_value(value, fmt);
     }
 
     void do_bool_value(bool value, const parsing_context&) override
@@ -215,9 +215,9 @@ private:
         input_handler_.uinteger_value(value, default_context_);
     }
 
-    void do_double_value(double value, uint8_t precision, uint8_t decimal_places) override
+    void do_double_value(double value, const number_format& fmt) override
     {
-        input_handler_.double_value(value, precision, default_context_);
+        input_handler_.double_value(value, fmt, default_context_);
     }
 
     void do_bool_value(bool value) override
@@ -327,10 +327,10 @@ private:
         downstream_handler_.byte_string_value(data, length, context);
     }
 
-    void do_double_value(double value, uint8_t precision, uint8_t decimal_places,
+    void do_double_value(double value, const number_format& fmt,
                  const parsing_context& context) override
     {
-        downstream_handler_.double_value(value, precision, decimal_places, context);
+        downstream_handler_.double_value(value, fmt, context);
     }
 
     void do_integer_value(int64_t value,

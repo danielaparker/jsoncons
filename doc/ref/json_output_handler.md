@@ -57,7 +57,7 @@ Output floating point value with default precision (`std::numeric_limits<double>
     void double_value(double value, uint8_t precision) 
 Output floating point value with specified precision. Uses `do_double_value`.
 
-    void double_value(double value, uint8_t precision, uint8_t decimal_places) 
+    void double_value(double value, const number_format& fmt) 
 Output floating point value with specified precision or decimal places. Uses `do_double_value`.
 
     void bool_value(bool value) 
@@ -98,7 +98,7 @@ Receive signed integer value
     virtual void do_uinteger_value(uint64_t value) = 0;
 Receive non-negative integer value
 
-    virtual void do_double_value(double value, uint8_t precision, uint_t decimal_places) = 0;
+    virtual void do_double_value(double value, const number_format&) = 0;
 Receive floating point value
 
     virtual void do_bool_value(bool value) = 0;

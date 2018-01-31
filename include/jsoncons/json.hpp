@@ -253,10 +253,17 @@ public:
             uint8_t decimal_places_;
             double val_;
         public:
-            double_data(double val, uint8_t precision, uint8_t decimal_places)
+            double_data(double val)
                 : base_data(json_type_tag::double_t), 
-                  precision_(precision), 
-                  decimal_places_(decimal_places), 
+                  precision_(0), 
+                  decimal_places_(0), 
+                  val_(val)
+            {
+            }
+            double_data(double val, const number_format& fmt)
+                : base_data(json_type_tag::double_t), 
+                  precision_(fmt.precision()), 
+                  decimal_places_(fmt.decimal_places()), 
                   val_(val)
             {
             }
@@ -719,11 +726,11 @@ public:
         }
         variant(double val)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val,0,0);
+            new(reinterpret_cast<void*>(&data_))double_data(val);
         }
-        variant(double val, uint8_t precision, uint8_t decimal_places)
+        variant(double val, const number_format& fmt)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val, precision, decimal_places);
+            new(reinterpret_cast<void*>(&data_))double_data(val, fmt);
         }
         variant(const char_type* s, size_t length)
         {
@@ -2920,8 +2927,8 @@ public:
     {
     }
 
-    basic_json(double val, uint8_t precision, uint8_t decimal_places)
-        : var_(val, precision, decimal_places)
+    basic_json(double val, const number_format& fmt)
+        : var_(val, fmt)
     {
     }
 
@@ -3078,7 +3085,7 @@ public:
             handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
             break;
         case json_type_tag::double_t:
-            handler.double_value(var_.double_data_cast()->value(), var_.double_data_cast()->precision(), var_.double_data_cast()->decimal_places());
+            handler.double_value(var_.double_data_cast()->value(), number_format(var_.double_data_cast()->precision(), var_.double_data_cast()->decimal_places()));
             break;
         case json_type_tag::integer_t:
             handler.integer_value(var_.integer_data_cast()->value());
@@ -4361,12 +4368,12 @@ public:
 
     static basic_json from_floating_point(double val)
     {
-        return basic_json(variant(val, 0, 0));
+        return basic_json(variant(val));
     }
 
     static basic_json from_floating_point(double val, allocator_type)
     {
-        return basic_json(variant(val,0));
+        return basic_json(variant(val));
     }
 
     static basic_json from_bool(bool val)

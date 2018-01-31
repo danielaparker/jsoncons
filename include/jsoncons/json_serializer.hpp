@@ -433,7 +433,7 @@ private:
         do_string_value(s);
     }
 
-    void do_double_value(double value, uint8_t precision, uint8_t decimal_places) override
+    void do_double_value(double value, const number_format& fmt) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -454,7 +454,7 @@ private:
         }
         else
         {
-            fp_(value,precision, writer_);
+            fp_(value, fmt.precision(), writer_);
         }
 
         end_value();

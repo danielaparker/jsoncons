@@ -281,7 +281,7 @@ private:
 
     }
 
-    void do_double_value(double val, uint8_t, uint8_t) override
+    void do_double_value(double val, const number_format&) override
     {
         if (stack_.size() == 2)
         {

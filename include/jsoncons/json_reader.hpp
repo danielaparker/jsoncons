@@ -120,7 +120,7 @@ private:
         other_handler_.uinteger_value(value, context);
     }
 
-    void do_double_value(double value, uint8_t precision, uint8_t decimal_places, const parsing_context& context) override
+    void do_double_value(double value, const number_format& fmt, const parsing_context& context) override
     {
         other_handler_.double_value(value, precision, decimal_places, context);
     }
