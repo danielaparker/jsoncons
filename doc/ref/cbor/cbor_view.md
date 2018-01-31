@@ -99,10 +99,8 @@ int main()
 
     cbor::cbor_view b1(buffer); 
 
-    cbor::cbor_view b2;
-    jsonpointer::jsonpointer_errc ec;
-
-    std::tie(b2,ec) = jsonpointer::get(b1,"/reputons/0/rated");
+    std::error_code ec;
+    cbor::cbor_view b2 = jsonpointer::get(b1,"/reputons/0/rated", ec);
 
     ojson j2 = cbor::decode_cbor<ojson>(b2);
 
