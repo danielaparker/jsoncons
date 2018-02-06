@@ -337,7 +337,7 @@ public:
         {
             typedef typename detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
-            typename pointer ptr_;
+            pointer ptr_;
         public:
             string_data(const string_data& val)
                 : base_data(json_type_tag::string_t)
