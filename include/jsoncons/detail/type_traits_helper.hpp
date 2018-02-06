@@ -133,12 +133,22 @@ struct is_stateless
 
 // type traits extensions
 
+
+namespace detail {
+
+// to_plain_pointer
+
 template<class Pointer> inline
 typename std::pointer_traits<Pointer>::element_type* to_plain_pointer(Pointer ptr)
 {       
     return (std::addressof(*ptr));
 }
-namespace detail {
+
+template<class T> inline
+T * to_plain_pointer(T * ptr)
+{       
+    return (ptr);
+}  
 
 // is_string_like
 
@@ -213,14 +223,6 @@ struct is_vector_like<T,
     : std::true_type {};
 
 }
-
-// to_plain_pointer
-
-template<class T> inline
-T * to_plain_pointer(T * ptr)
-{       
-    return (ptr);
-}  
 
 #if !defined(JSONCONS_HAS_STRING_VIEW)
 template <class CharT, class Traits = std::char_traits<CharT>>

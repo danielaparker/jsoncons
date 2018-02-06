@@ -28,6 +28,7 @@
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_error_category.hpp>
+#include <jsoncons/detail/heap_only_string.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -334,31 +335,14 @@ public:
         // string_data
         class string_data : public base_data
         {
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<string_storage_type> string_holder_allocator_type;
-            typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
+            typedef typename detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
-            pointer ptr_;
-
-            template <typename... Args>
-            void create(string_holder_allocator_type allocator, Args&& ... args)
-            {
-                typename std::allocator_traits<Allocator>:: template rebind_alloc<string_storage_type> alloc(allocator);
-                ptr_ = alloc.allocate(1);
-                try
-                {
-                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<string_storage_type>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
-                }
-                catch (...)
-                {
-                    alloc.deallocate(ptr_,1);
-                    throw;
-                }
-            }
+            typename pointer ptr_;
         public:
             string_data(const string_data& val)
                 : base_data(json_type_tag::string_t)
             {
-                create(val.ptr_->get_allocator(), *(val.ptr_));
+                ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
             string_data(string_data&& val)
@@ -370,22 +354,20 @@ public:
             string_data(const string_data& val, const Allocator& a)
                 : base_data(json_type_tag::string_t)
             {
-                create(string_holder_allocator_type(a), *(val.ptr_), a);
+                ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
             }
 
             string_data(const char_type* data, size_t length, const Allocator& a)
                 : base_data(json_type_tag::string_t)
             {
-                create(string_holder_allocator_type(a), data, length, a);
+                ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
 
             ~string_data()
             {
                 if (ptr_ != nullptr)
                 {
-                    typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<string_storage_type> alloc(ptr_->get_allocator());
-                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<string_storage_type>::destroy(alloc, to_plain_pointer(ptr_));
-                    alloc.deallocate(ptr_,1);
+                    detail::heap_only_string_factory<char_type,Allocator>::destroy(ptr_);
                 }
             }
 
@@ -430,7 +412,7 @@ public:
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::construct(alloc, detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -468,7 +450,7 @@ public:
                 if (ptr_ != nullptr)
                 {
                     typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<byte_string_storage_type> alloc(ptr_->get_allocator());
-                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::destroy(alloc, to_plain_pointer(ptr_));
+                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::destroy(alloc, detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
@@ -507,7 +489,7 @@ public:
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -550,7 +532,7 @@ public:
                 if (ptr_ != nullptr)
                 {
                     typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_allocator());
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, to_plain_pointer(ptr_));
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
@@ -589,7 +571,7 @@ public:
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -639,7 +621,7 @@ public:
                 if (ptr_ != nullptr)
                 {
                     typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_allocator());
-                    std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, to_plain_pointer(ptr_));
+                    std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
