@@ -103,10 +103,10 @@ template <class Json, class T>
 class json_array_input_iterator
 {
 public:
-    typedef typename Json::const_array_iterator base_iterator;
-    typedef typename std::iterator_traits<base_iterator>::value_type value_type;
-    typedef typename std::iterator_traits<base_iterator>::difference_type difference_type;
-    typedef typename std::iterator_traits<base_iterator>::pointer pointer;
+    typedef typename Json::const_array_iterator iterator_base;
+    typedef typename std::iterator_traits<iterator_base>::value_type value_type;
+    typedef typename std::iterator_traits<iterator_base>::difference_type difference_type;
+    typedef typename std::iterator_traits<iterator_base>::pointer pointer;
     typedef T reference;
     typedef std::input_iterator_tag iterator_category;
 
@@ -114,7 +114,7 @@ public:
     {
     }
 
-    json_array_input_iterator(base_iterator it)
+    json_array_input_iterator(iterator_base it)
         : it_(it)
     {
     }
@@ -172,17 +172,17 @@ public:
     }
 
 private:
-    base_iterator it_;
+    iterator_base it_;
 };
 
 template <class Json, class T>
 class json_object_input_iterator
 {
 public:
-    typedef typename Json::const_object_iterator base_iterator;
-    typedef typename std::iterator_traits<base_iterator>::value_type value_type;
-    typedef typename std::iterator_traits<base_iterator>::difference_type difference_type;
-    typedef typename std::iterator_traits<base_iterator>::pointer pointer;
+    typedef typename Json::const_object_iterator iterator_base;
+    typedef typename std::iterator_traits<iterator_base>::value_type value_type;
+    typedef typename std::iterator_traits<iterator_base>::difference_type difference_type;
+    typedef typename std::iterator_traits<iterator_base>::pointer pointer;
     typedef T reference;
     typedef std::input_iterator_tag iterator_category;
     typedef typename T::second_type mapped_type;
@@ -191,7 +191,7 @@ public:
     {
     }
 
-    json_object_input_iterator(base_iterator it)
+    json_object_input_iterator(iterator_base it)
         : it_(it)
     {
     }
@@ -249,7 +249,7 @@ public:
     }
 
 private:
-    base_iterator it_;
+    iterator_base it_;
 };
 
 }

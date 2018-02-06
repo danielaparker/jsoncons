@@ -160,44 +160,44 @@ public:
 
     struct variant
     {
-        struct base_data
+        struct data_base
         {
             json_type_tag type_id_;
 
-            base_data(json_type_tag id)
+            data_base(json_type_tag id)
                 : type_id_(id)
             {}
         };
 
-        class null_data : public base_data
+        class null_data : public data_base
         {
         public:
             null_data()
-                : base_data(json_type_tag::null_t)
+                : data_base(json_type_tag::null_t)
             {
             }
         };
 
-        class empty_object_data : public base_data
+        class empty_object_data : public data_base
         {
         public:
             empty_object_data()
-                : base_data(json_type_tag::empty_object_t)
+                : data_base(json_type_tag::empty_object_t)
             {
             }
         };
 
-        class bool_data : public base_data
+        class bool_data : public data_base
         {
             bool val_;
         public:
             bool_data(bool val)
-                : base_data(json_type_tag::bool_t),val_(val)
+                : data_base(json_type_tag::bool_t),val_(val)
             {
             }
 
             bool_data(const bool_data& val)
-                : base_data(json_type_tag::bool_t),val_(val.val_)
+                : data_base(json_type_tag::bool_t),val_(val.val_)
             {
             }
 
@@ -208,17 +208,17 @@ public:
 
         };
 
-        class integer_data : public base_data
+        class integer_data : public data_base
         {
             int64_t val_;
         public:
             integer_data(int64_t val)
-                : base_data(json_type_tag::integer_t),val_(val)
+                : data_base(json_type_tag::integer_t),val_(val)
             {
             }
 
             integer_data(const integer_data& val)
-                : base_data(json_type_tag::integer_t),val_(val.val_)
+                : data_base(json_type_tag::integer_t),val_(val.val_)
             {
             }
 
@@ -228,17 +228,17 @@ public:
             }
         };
 
-        class uinteger_data : public base_data
+        class uinteger_data : public data_base
         {
             uint64_t val_;
         public:
             uinteger_data(uint64_t val)
-                : base_data(json_type_tag::uinteger_t),val_(val)
+                : data_base(json_type_tag::uinteger_t),val_(val)
             {
             }
 
             uinteger_data(const uinteger_data& val)
-                : base_data(json_type_tag::uinteger_t),val_(val.val_)
+                : data_base(json_type_tag::uinteger_t),val_(val.val_)
             {
             }
 
@@ -248,21 +248,21 @@ public:
             }
         };
 
-        class double_data : public base_data
+        class double_data : public data_base
         {
             uint8_t precision_;
             uint8_t decimal_places_;
             double val_;
         public:
             double_data(double val)
-                : base_data(json_type_tag::double_t), 
+                : data_base(json_type_tag::double_t), 
                   precision_(0), 
                   decimal_places_(0), 
                   val_(val)
             {
             }
             double_data(double val, const number_format& fmt)
-                : base_data(json_type_tag::double_t), 
+                : data_base(json_type_tag::double_t), 
                   precision_(fmt.precision()), 
                   decimal_places_(fmt.decimal_places()), 
                   val_(val)
@@ -270,7 +270,7 @@ public:
             }
 
             double_data(const double_data& val)
-                : base_data(json_type_tag::double_t),
+                : data_base(json_type_tag::double_t),
                   precision_(val.precision_), 
                   decimal_places_(val.decimal_places_), 
                   val_(val.val_)
@@ -293,7 +293,7 @@ public:
             }
         };
 
-        class small_string_data : public base_data
+        class small_string_data : public data_base
         {
             static const size_t capacity = 14/sizeof(char_type);
             uint8_t length_;
@@ -302,7 +302,7 @@ public:
             static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
             small_string_data(const char_type* p, uint8_t length)
-                : base_data(json_type_tag::small_string_t), length_(length)
+                : data_base(json_type_tag::small_string_t), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
@@ -310,7 +310,7 @@ public:
             }
 
             small_string_data(const small_string_data& val)
-                : base_data(json_type_tag::small_string_t), length_(val.length_)
+                : data_base(json_type_tag::small_string_t), length_(val.length_)
             {
                 std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
                 data_[length_] = 0;
@@ -333,32 +333,32 @@ public:
         };
 
         // string_data
-        class string_data : public base_data
+        class string_data : public data_base
         {
             typedef typename detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
             pointer ptr_;
         public:
             string_data(const string_data& val)
-                : base_data(json_type_tag::string_t)
+                : data_base(json_type_tag::string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
             string_data(string_data&& val)
-                : base_data(json_type_tag::string_t), ptr_(nullptr)
+                : data_base(json_type_tag::string_t), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             string_data(const string_data& val, const Allocator& a)
-                : base_data(json_type_tag::string_t)
+                : data_base(json_type_tag::string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
             }
 
             string_data(const char_type* data, size_t length, const Allocator& a)
-                : base_data(json_type_tag::string_t)
+                : data_base(json_type_tag::string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
@@ -398,7 +398,7 @@ public:
         };
 
         // byte_string_data
-        class byte_string_data: public base_data
+        class byte_string_data: public data_base
         {
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> string_holder_allocator_type;
             typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
@@ -422,25 +422,25 @@ public:
             }
         public:
             byte_string_data(const byte_string_data& val)
-                : base_data(json_type_tag::byte_string_t)
+                : data_base(json_type_tag::byte_string_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_data(byte_string_data&& val)
-                : base_data(json_type_tag::byte_string_t), ptr_(nullptr)
+                : data_base(json_type_tag::byte_string_t), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             byte_string_data(const byte_string_data& val, const Allocator& a)
-                : base_data(json_type_tag::byte_string_t)
+                : data_base(json_type_tag::byte_string_t)
             {
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
 
             byte_string_data(const uint8_t* data, size_t length, const Allocator& a)
-                : base_data(json_type_tag::byte_string_t)
+                : data_base(json_type_tag::byte_string_t)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
@@ -477,7 +477,7 @@ public:
         };
 
         // array_data
-        class array_data : public base_data
+        class array_data : public data_base
         {
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
             pointer ptr_;
@@ -499,31 +499,31 @@ public:
             }
         public:
             array_data(const array& val)
-                : base_data(json_type_tag::array_t)
+                : data_base(json_type_tag::array_t)
             {
                 create(val.get_allocator(), val);
             }
 
             array_data(const array& val, const Allocator& a)
-                : base_data(json_type_tag::array_t)
+                : data_base(json_type_tag::array_t)
             {
                 create(array_allocator(a), val, a);
             }
 
             array_data(const array_data& val)
-                : base_data(json_type_tag::array_t)
+                : data_base(json_type_tag::array_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             array_data(array_data&& val)
-                : base_data(json_type_tag::array_t), ptr_(nullptr)
+                : data_base(json_type_tag::array_t), ptr_(nullptr)
             {
                 std::swap(val.ptr_, ptr_);
             }
 
             array_data(const array_data& val, const Allocator& a)
-                : base_data(json_type_tag::array_t)
+                : data_base(json_type_tag::array_t)
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
@@ -559,7 +559,7 @@ public:
         };
 
         // object_data
-        class object_data : public base_data
+        class object_data : public data_base
         {
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
             pointer ptr_;
@@ -581,37 +581,37 @@ public:
             }
         public:
             explicit object_data(const Allocator& a)
-                : base_data(json_type_tag::object_t)
+                : data_base(json_type_tag::object_t)
             {
                 create(a,a);
             }
 
             explicit object_data(const object& val)
-                : base_data(json_type_tag::object_t)
+                : data_base(json_type_tag::object_t)
             {
                 create(val.get_allocator(), val);
             }
 
             explicit object_data(const object& val, const Allocator& a)
-                : base_data(json_type_tag::object_t)
+                : data_base(json_type_tag::object_t)
             {
                 create(object_allocator(a), val, a);
             }
 
             explicit object_data(const object_data& val)
-                : base_data(json_type_tag::object_t)
+                : data_base(json_type_tag::object_t)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             explicit object_data(object_data&& val)
-                : base_data(json_type_tag::object_t), ptr_(nullptr)
+                : data_base(json_type_tag::object_t), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             explicit object_data(const object_data& val, const Allocator& a)
-                : base_data(json_type_tag::object_t)
+                : data_base(json_type_tag::object_t)
             {
                 create(object_allocator(a), *(val.ptr_), a);
             }
@@ -876,7 +876,7 @@ public:
 
         json_type_tag type_id() const
         {
-            return reinterpret_cast<const base_data*>(&data_)->type_id_;
+            return reinterpret_cast<const data_base*>(&data_)->type_id_;
         }
 
         const null_data* null_data_cast() const
@@ -2952,7 +2952,10 @@ public:
 
     basic_json& operator=(const basic_json& rhs)
     {
-        var_ = rhs.var_;
+        if (this != &rhs)
+        {
+            var_ = rhs.var_;
+        }
         return *this;
     }
 

@@ -83,13 +83,12 @@ private:
 template <class CharT, class Allocator>
 class heap_only_string_factory
 {
-public:
     typedef CharT char_type;
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<char> byte_allocator_type;  
     typedef std::allocator_traits<byte_allocator_type> byte_allocator_traits_type;
     typedef typename byte_allocator_traits_type::pointer byte_pointer;
-    //typedef typename heap_only_string<CharT,Allocator>::allocator_type allocator_type;
     typedef typename heap_only_string<CharT,Allocator>::pointer pointer;
+public:
 
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<heap_only_string<CharT,Allocator>> string_allocator_type;  
     typedef std::allocator_traits<string_allocator_type> string_allocator_traits_type;
