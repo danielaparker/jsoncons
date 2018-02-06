@@ -85,6 +85,8 @@ enum class parse_state : uint8_t
 template <class CharT, class Allocator = std::allocator<char>>
 class basic_json_parser : private parsing_context
 {
+    static const size_t initial_string_buffer_capacity_ = 1024;
+    static const size_t initial_number_buffer_capacity_ = 64;
     static const int default_initial_stack_capacity_ = 100;
     typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
 
@@ -145,6 +147,8 @@ public:
          input_ptr_(nullptr),
          state_(parse_state::start)
     {
+        string_buffer_.reserve(initial_string_buffer_capacity_);
+        number_buffer_.reserve(initial_number_buffer_capacity_);
         max_depth_ = (std::numeric_limits<int>::max)();
 
         state_stack_.reserve(initial_stack_capacity_);
@@ -168,6 +172,8 @@ public:
          input_ptr_(nullptr),
          state_(parse_state::start)
     {
+        string_buffer_.reserve(initial_string_buffer_capacity_);
+        number_buffer_.reserve(initial_number_buffer_capacity_);
         max_depth_ = (std::numeric_limits<int>::max)();
 
         state_stack_.reserve(initial_stack_capacity_);
@@ -191,6 +197,8 @@ public:
          input_ptr_(nullptr),
          state_(parse_state::start)
     {
+        string_buffer_.reserve(initial_string_buffer_capacity_);
+        number_buffer_.reserve(initial_number_buffer_capacity_);
         max_depth_ = (std::numeric_limits<int>::max)();
 
         state_stack_.reserve(initial_stack_capacity_);
@@ -215,6 +223,8 @@ public:
          input_ptr_(nullptr),
          state_(parse_state::start)
     {
+        string_buffer_.reserve(initial_string_buffer_capacity_);
+        number_buffer_.reserve(initial_number_buffer_capacity_);
         max_depth_ = (std::numeric_limits<int>::max)();
 
         state_stack_.reserve(initial_stack_capacity_);
