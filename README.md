@@ -185,7 +185,7 @@ Expected name separator ':' on line 4 and column 20
 #### Range-based for loops with arrays
 
 ```c++
-    json j = json::array{1,2,3,4};
+    json book = json::array{1,2,3,4};
 
     for (auto val : book.array_range())
     {
