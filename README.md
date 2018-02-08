@@ -2,6 +2,16 @@ jsoncons is a modern C++, header-only library for constructing [JSON](http://www
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
 
+### Benchmarks
+
+[json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
+
+- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
+
+- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
+
+- [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
+
 ### Get jsoncons
 
 Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
@@ -25,16 +35,6 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
-
-### Benchmarks
-
-[json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
-
-- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
-
-- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
-
-- [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
 
 ### A simple program using jsoncons
 
