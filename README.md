@@ -30,9 +30,9 @@ Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
 
-- [Performance benchmarks with text and integers](report/performance.md)
+- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
 
-- [Performance benchmarks with text and doubles](report/performance_fp.md)
+- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
 
 - [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
 
