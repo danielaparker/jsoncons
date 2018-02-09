@@ -15,9 +15,6 @@
 #include <cstdlib>
 #include <limits>
 #include <cwchar>
-#if !defined(JSONCONS_NO_TO_CHARS)
-#include <charconv>
-#endif
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
@@ -29,12 +26,6 @@ enum class block_options {next_line,same_line};
 #endif
 
 enum class line_split_kind{same_line,new_line,multi_line};
-
-#if !defined(JSONCONS_NO_TO_CHARS)
-using chars_format = std::chars_format;
-#else
-enum class chars_format {fixed,scientific,hex,general=fixed|scientific};
-#endif
 
 template <class CharT>
 class basic_serialization_options

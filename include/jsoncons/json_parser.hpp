@@ -1915,7 +1915,7 @@ fraction2:
         switch (*input_ptr_)
         {
             case '\r': 
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
@@ -1923,7 +1923,7 @@ fraction2:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
@@ -1931,12 +1931,12 @@ fraction2:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
@@ -1944,7 +1944,7 @@ fraction2:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
                 do_end_object(ec);
                 if (ec) return;
@@ -1952,7 +1952,7 @@ fraction2:
                 ++column_;
                 return;
             case ']':
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
                 do_end_array(ec);
                 if (ec) return;
@@ -1960,7 +1960,7 @@ fraction2:
                 ++column_;
                 return;
             case ',':
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -2042,7 +2042,7 @@ exp3:
         switch (*input_ptr_)
         {
             case '\r': 
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -2050,7 +2050,7 @@ exp3:
                 state_ = parse_state::cr;
                 return; 
             case '\n': 
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -2058,12 +2058,12 @@ exp3:
                 state_ = parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
                 skip_whitespace();
                 return;
             case '/': 
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
@@ -2071,7 +2071,7 @@ exp3:
                 state_ = parse_state::slash;
                 return;
             case '}':
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
                 do_end_object(ec);
                 if (ec) return;
@@ -2079,7 +2079,7 @@ exp3:
                 ++column_;
                 return;
             case ']':
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
                 do_end_array(ec);
                 if (ec) return;
@@ -2087,7 +2087,7 @@ exp3:
                 ++column_;
                 return;
             case ',':
-                end_fraction_value(ec);
+                end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -2632,23 +2632,26 @@ escape_u9:
         {
             switch (state_)
             {
-                case parse_state::positive_zero:  
-                case parse_state::positive_integer:
-                    end_positive_value(ec);
-                    if (ec) return;
-                    break;
-                case parse_state::negative_zero:  
-                case parse_state::negative_integer:
-                    end_negative_value(ec);
-                    if (ec) return;
-                    break;
-                case parse_state::fraction2:
-                case parse_state::exp3:
-                    end_fraction_value(ec);
-                    if (ec) return;
-                    break;
-                default:
-                    break;
+            case parse_state::positive_zero:  
+            case parse_state::positive_integer:
+                end_positive_value(ec);
+                if (ec) return;
+                break;
+            case parse_state::negative_zero:  
+            case parse_state::negative_integer:
+                end_negative_value(ec);
+                if (ec) return;
+                break;
+            case parse_state::fraction2:
+                end_fraction_value(chars_format::fixed,ec);
+                if (ec) return;
+                break;
+            case parse_state::exp3:
+                end_fraction_value(chars_format::scientific,ec);
+                if (ec) return;
+                break;
+            default:
+                break;
             }
         }
         if (state_ == parse_state::lf || state_ == parse_state::cr)
@@ -2731,7 +2734,7 @@ private:
         }
         else
         {
-            end_fraction_value(ec);
+            end_fraction_value(chars_format::general,ec);
         }
     }
 
@@ -2788,11 +2791,11 @@ private:
         }
         else
         {
-            end_fraction_value(ec);
+            end_fraction_value(chars_format::general,ec);
         }
     }
 
-    void end_fraction_value(std::error_code& ec)
+    void end_fraction_value(chars_format floating_point_format, std::error_code& ec)
     {
         try
         {
@@ -2802,11 +2805,11 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                handler_.double_value(d, number_format(std::numeric_limits<double>::max_digits10, decimal_places_), *this);
+                handler_.double_value(d, number_format(floating_point_format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
             }
             else
             {
-                handler_.double_value(d, number_format(static_cast<uint8_t>(precision_), decimal_places_), *this);
+                handler_.double_value(d, number_format(floating_point_format,static_cast<uint8_t>(precision_), decimal_places_), *this);
             }
         }
         catch (...)

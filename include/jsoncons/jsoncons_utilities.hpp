@@ -27,26 +27,41 @@
 #include <array>
 #include <initializer_list>
 #include <jsoncons/jsoncons_config.hpp>
+#if !defined(JSONCONS_NO_TO_CHARS)
+#include <charconv>
+#endif
 #include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
 
 namespace jsoncons
 {
 
+#if !defined(JSONCONS_NO_TO_CHARS)
+using chars_format = std::chars_format;
+#else
+enum class chars_format {fixed,scientific,hex,general=fixed|scientific};
+#endif
+
 // number_format
 
 class number_format
 {
+    chars_format floating_point_format_;
     uint8_t precision_;
     uint8_t decimal_places_;
 public:
     number_format()
-        : precision_(0), decimal_places_(0)
+        : floating_point_format_(chars_format::general), precision_(0), decimal_places_(0)
     {
     }
 
     number_format(uint8_t precision, uint8_t decimal_places)
-        : precision_(precision), decimal_places_(decimal_places)
+        : floating_point_format_(chars_format::general), precision_(precision), decimal_places_(decimal_places)
+    {
+    }
+
+    number_format(chars_format floating_point_format, uint8_t precision, uint8_t decimal_places)
+        : floating_point_format_(floating_point_format), precision_(precision), decimal_places_(decimal_places)
     {
     }
 
@@ -63,6 +78,11 @@ public:
     uint8_t decimal_places() const
     {
         return decimal_places_;
+    }
+
+    chars_format floating_point_format() const
+    {
+        return floating_point_format_;
     }
 };
 
