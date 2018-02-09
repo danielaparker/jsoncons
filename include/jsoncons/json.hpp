@@ -867,8 +867,6 @@ public:
         {
             if (this !=&val)
             {
-                Destroy_();
-                new(reinterpret_cast<void*>(&data_))null_data();
                 swap(val);
             }
             return *this;
