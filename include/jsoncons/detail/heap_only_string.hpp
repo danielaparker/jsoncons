@@ -63,7 +63,6 @@ public:
     using heap_only_string_base<Allocator>::get_allocator;
 
 
-    template <class CharT>
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const heap_only_string& s)
     {
         os.write(s.data(),s.length());
