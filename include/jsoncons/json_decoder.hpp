@@ -25,8 +25,6 @@ public:
     typedef typename Json::char_type char_type;
     using typename basic_json_input_handler<char_type>::string_view_type;
 
-    static const int default_stack_size = 1000;
-
     typedef typename Json::key_value_pair_type key_value_pair_type;
     typedef typename Json::key_storage_type key_storage_type;
     typedef typename Json::string_type string_type;
@@ -42,21 +40,41 @@ public:
     json_array_allocator array_allocator_;
 
     Json result_;
-    size_t top_;
 
     struct stack_item
     {
+        stack_item(key_storage_type&& name)
+            : name_(std::forward<key_storage_type>(name))
+        {
+        }
+        stack_item(Json&& value)
+            : value_(std::forward<Json>(value))
+        {
+        }
+
+        stack_item() = default;
+        stack_item(const stack_item&) = default;
+        stack_item(stack_item&&) = default;
+        stack_item& operator=(const stack_item&) = default;
+        stack_item& operator=(stack_item&&) = default;
+
         key_storage_type name_;
         Json value_;
     };
 
+    struct structure_offset
+    {
+        size_t offset_;
+        bool is_object_;
+    };
+
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<size_t> size_t_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<structure_offset> size_t_allocator_type;
 
 
     std::vector<stack_item,stack_item_allocator_type> stack_;
-    std::vector<size_t,size_t_allocator_type> stack_offsets_;
+    std::vector<structure_offset,size_t_allocator_type> stack_offsets_;
     bool is_valid_;
 
 public:
@@ -64,13 +82,11 @@ public:
         : string_allocator_(jallocator),
           object_allocator_(jallocator),
           array_allocator_(jallocator),
-          top_(0),
-          stack_(default_stack_size),
-          stack_offsets_(),
           is_valid_(false) 
 
     {
         stack_offsets_.reserve(100);
+        stack_.reserve(1000);
     }
 
     bool is_valid() const
@@ -93,64 +109,70 @@ public:
 
 private:
 
-    void push_initial()
-    {
-        top_ = 0;
-        if (top_ >= stack_.size())
-        {
-            stack_.resize(top_*2);
-        }
-    }
-
-    void pop_initial()
-    {
-        JSONCONS_ASSERT(top_ == 1);
-        result_.swap(stack_[0].value_);
-        --top_;
-    }
-
     void push_object()
     {
-        stack_offsets_.push_back(top_);
-        stack_[top_].value_ = object(object_allocator_);
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = Json(object(object_allocator_));
         }
+        else
+        {
+            stack_.push_back(Json(object(object_allocator_)));
+        }
+        stack_offsets_.push_back({stack_.size()-1,true});
     }
 
     void pop_object()
     {
+        stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
         stack_offsets_.pop_back();
-        JSONCONS_ASSERT(top_ > 0);
+        //if (stack_.size() == 1)
+        //{
+        //    result_.swap(stack_.front().value_);
+        //    stack_.pop_back();
+        //}
     }
 
     void push_array()
     {
-        stack_offsets_.push_back(top_);
-        stack_[top_].value_ = array(array_allocator_);
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = Json(array(array_allocator_));
         }
+        else
+        {
+            stack_.push_back(Json(array(array_allocator_)));
+        }
+        stack_offsets_.push_back({stack_.size()-1,false});
     }
 
     void pop_array()
     {
+        stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
         stack_offsets_.pop_back();
-        JSONCONS_ASSERT(top_ > 0);
+        //if (stack_.size() == 1)
+        //{
+        //    result_.swap(stack_.front().value_);
+        //    stack_.pop_back();
+        //}
     }
 
     void do_begin_json() override
     {
+        stack_offsets_.clear();
+        stack_.clear();
+        stack_offsets_.push_back({0,false});
         is_valid_ = false;
-        push_initial();
     }
 
     void do_end_json() override
     {
-        is_valid_ = true;
-        pop_initial();
+        if (stack_.size() == 1)
+        {
+            result_.swap(stack_.front().value_);
+            stack_.pop_back();
+            is_valid_ = true;
+        }
     }
 
     void do_begin_object(const parsing_context&) override
@@ -178,11 +200,13 @@ private:
     void end_structure() 
     {
         JSONCONS_ASSERT(stack_offsets_.size() > 0);
-        const size_t structure_index = stack_offsets_.back();
-        const size_t count = top_ - (structure_index + 1);
+        const size_t structure_index = stack_offsets_.back().offset_;
+        JSONCONS_ASSERT(stack_.size() > structure_index);
+        const size_t count = stack_.size() - (structure_index + 1);
+
         auto first = stack_.begin() + (structure_index+1);
         auto last = first + count;
-        if (stack_[stack_offsets_.back()].value_.is_object())
+        if (stack_offsets_.back().is_object_)
         {
             stack_[structure_index].value_.object_value().insert(
                 std::make_move_iterator(first),
@@ -199,74 +223,94 @@ private:
                 ++first;
             }
         }
-        top_ -= count;
     }
 
     void do_name(const string_view_type& name, const parsing_context&) override
     {
-        stack_[top_].name_ = key_storage_type(name.begin(),name.end(),string_allocator_);
+        stack_.push_back(key_storage_type(name.begin(),name.end(),string_allocator_));
     }
 
     void do_string_value(const string_view_type& val, const parsing_context&) override
     {
-        stack_[top_].value_ = Json(val.data(),val.length(),string_allocator_);
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = Json(val.data(),val.length(),string_allocator_);
+        }
+        else
+        {
+            stack_.push_back(Json(val.data(),val.length(),string_allocator_));
         }
     }
 
     void do_byte_string_value(const uint8_t* data, size_t length, const parsing_context&) override
     {
-        stack_[top_].value_ = Json(data,length,string_allocator_);
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = Json(data,length,string_allocator_);
+        }
+        else
+        {
+            stack_.push_back(Json(data,length,string_allocator_));
         }
     }
 
     void do_integer_value(int64_t value, const parsing_context&) override
     {
-        stack_[top_].value_ = value;
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = value;
+        }
+        else
+        {
+            stack_.push_back(Json(value));
         }
     }
 
     void do_uinteger_value(uint64_t value, const parsing_context&) override
     {
-        stack_[top_].value_ = value;
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = value;
+        }
+        else
+        {
+            stack_.push_back(Json(value));
         }
     }
 
     void do_double_value(double value, const number_format& fmt, const parsing_context&) override
     {
-        stack_[top_].value_ = Json(value,fmt);
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = Json(value,fmt);
+        }
+        else
+        {
+            stack_.push_back(Json(value,fmt));
         }
     }
 
     void do_bool_value(bool value, const parsing_context&) override
     {
-        stack_[top_].value_ = value;
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = value;
+        }
+        else
+        {
+            stack_.push_back(Json(value));
         }
     }
 
     void do_null_value(const parsing_context&) override
     {
-        stack_[top_].value_ = Json::null();
-        if (++top_ >= stack_.size())
+        if (stack_offsets_.back().is_object_)
         {
-            stack_.resize(top_*2);
+            stack_.back().value_ = Json::null();
+        }
+        else
+        {
+            stack_.push_back(Json(Json::null()));
         }
     }
 };

@@ -22,7 +22,8 @@ BOOST_AUTO_TEST_CASE(test_heap_only_string)
     std::string input = "Hello World";
     auto s = detail::heap_only_string_factory<char, std::allocator<char>>::create(input.data(), input.size());
 
-    std::cout << s->c_str() << std::endl;
+    //std::cout << s->c_str() << std::endl;
+    BOOST_CHECK(input == std::string(s->c_str()));
 
     detail::heap_only_string_factory<char,std::allocator<char>>::destroy(s);
 }
@@ -32,7 +33,9 @@ BOOST_AUTO_TEST_CASE(test_heap_only_string_wchar_t)
     std::wstring input = L"Hello World";
     auto s = detail::heap_only_string_factory<wchar_t, std::allocator<wchar_t>>::create(input.data(), input.size());
 
-    std::wcout << s->c_str() << std::endl;
+    //std::wcout << s->c_str() << std::endl;
+
+    BOOST_CHECK(input == std::wstring(s->c_str()));
 
     detail::heap_only_string_factory<wchar_t,std::allocator<wchar_t>>::destroy(s);
 }

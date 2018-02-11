@@ -11,6 +11,7 @@
 #include <string>
 #include <cstdlib>
 #include <exception>
+#include <ostream>
 #include <jsoncons/jsoncons_config.hpp>
 
 namespace jsoncons { namespace detail {
@@ -60,6 +61,14 @@ public:
     size_t length() const { return length_; }
 
     using heap_only_string_base<Allocator>::get_allocator;
+
+
+    template <class CharT>
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const heap_only_string& s)
+    {
+        os.write(s.data(),s.length());
+        return os;
+    }
 private:
     heap_only_string()
         : heap_only_string_base<Allocator>(Allocator())
