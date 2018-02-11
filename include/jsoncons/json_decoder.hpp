@@ -126,11 +126,6 @@ private:
     {
         stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
         stack_offsets_.pop_back();
-        //if (stack_.size() == 1)
-        //{
-        //    result_.swap(stack_.front().value_);
-        //    stack_.pop_back();
-        //}
     }
 
     void push_array()
@@ -150,11 +145,6 @@ private:
     {
         stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
         stack_offsets_.pop_back();
-        //if (stack_.size() == 1)
-        //{
-        //    result_.swap(stack_.front().value_);
-        //    stack_.pop_back();
-        //}
     }
 
     void do_begin_json() override
