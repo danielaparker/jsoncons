@@ -185,6 +185,7 @@ public:
     typedef typename std::iterator_traits<iterator_base>::pointer pointer;
     typedef T reference;
     typedef std::input_iterator_tag iterator_category;
+    typedef typename T::first_type key_type;
     typedef typename T::second_type mapped_type;
 
     json_object_input_iterator()
@@ -230,7 +231,7 @@ public:
 
     reference operator*() const
     {
-        return T(it_->key(),json_type_traits<Json,mapped_type>::as(it_->value()));
+        return T(key_type(it_->key()),json_type_traits<Json,mapped_type>::as(it_->value()));
     }
 
     friend bool operator==(const json_object_input_iterator& it1, const json_object_input_iterator& it2)
