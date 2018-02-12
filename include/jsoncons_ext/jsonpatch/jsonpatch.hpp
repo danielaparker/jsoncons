@@ -339,7 +339,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                     else
                     {
-                        unwinder.stack.push_back({detail::op_type::add,view_to_string(path),val});
+                        unwinder.stack.push_back({detail::op_type::add,string_type(path),val});
                     }
                 }
             }
@@ -367,7 +367,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                     else
                     {
-                        unwinder.stack.push_back({detail::op_type::replace,view_to_string(path),val});
+                        unwinder.stack.push_back({detail::op_type::replace,string_type(path),val});
                     }
                 }
             }
@@ -398,7 +398,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                         }
                         else
                         {
-                            unwinder.stack.push_back({detail::op_type::add,view_to_string(from),val});
+                            unwinder.stack.push_back({detail::op_type::add,string_type(from),val});
                             // add
                             std::error_code insert_ec;
                             auto npath = jsonpointer::normalized_path(target,path);
@@ -493,7 +493,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
             }
             if (unwinder.state != detail::state_type::begin)
             {
-                bad_path = view_to_string(path);
+                bad_path = string_type(path);
             }
         }
         if (unwinder.state != detail::state_type::begin)

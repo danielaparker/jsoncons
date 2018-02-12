@@ -733,12 +733,6 @@ template <class CharT, class Traits = std::char_traits<CharT>>
 using basic_string_view_ext = std::basic_string_view<CharT, Traits>;
 #endif
 
-template <class CharT, class Traits = std::char_traits<CharT>, class Alloc = std::allocator<CharT>>
-inline std::basic_string<CharT, Traits, Alloc> view_to_string(const basic_string_view_ext<CharT>& str, const Alloc& alloc = Alloc())
-{
-    return std::basic_string<CharT, Traits, Alloc>(str.data(), str.size(), alloc);
-}
-
 }
 
 #endif
