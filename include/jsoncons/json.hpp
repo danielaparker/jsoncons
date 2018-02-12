@@ -2268,7 +2268,7 @@ public:
             return evaluate().get_with_default(name,default_val);
         }
 
-        string_view_type get_with_default(const string_view_type& name, const CharT* default_val) const
+        const CharT* get_with_default(const string_view_type& name, const CharT* default_val) const
         {
             return evaluate().get_with_default(name,default_val);
         }
@@ -3614,19 +3614,6 @@ public:
         }
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    size_t double_precision() const
-    {
-        switch (var_.type_id())
-        {
-        case json_type_tag::double_t:
-            return var_.double_data_cast()->precision();
-        default:
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
-        }
-    }
-
     const char_type* as_cstring() const
     {
         switch (var_.type_id())
@@ -3637,6 +3624,19 @@ public:
             return var_.string_data_cast()->c_str();
         default:
             JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a cstring");
+        }
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    size_t double_precision() const
+    {
+        switch (var_.type_id())
+        {
+        case json_type_tag::double_t:
+            return var_.double_data_cast()->precision();
+        default:
+            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Not a double");
         }
     }
 #endif
@@ -3831,7 +3831,7 @@ public:
         }
     }
 
-    string_view_type get_with_default(const string_view_type& name, const CharT* default_val) const
+    const CharT* get_with_default(const string_view_type& name, const CharT* default_val) const
     {
         switch (var_.type_id())
         {
@@ -3844,7 +3844,7 @@ public:
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
-                    return it->value().as_string_view();
+                    return it->value().as_cstring();
                 }
                 else
                 {
@@ -3998,7 +3998,7 @@ public:
             return object_value().try_emplace(name, std::forward<Args>(args)...);
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::runtime_error,"Attempting to set %s on a value that is not an object", name);
+                JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempting to set on a value that is not an object");
             }
         }
     }

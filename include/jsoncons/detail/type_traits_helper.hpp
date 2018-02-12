@@ -262,7 +262,7 @@ public:
     }
 
     template <class Allocator>
-    operator std::basic_string<CharT,Traits,Allocator>() const
+    explicit operator std::basic_string<CharT,Traits,Allocator>() const
     { 
         return std::basic_string<CharT,Traits>(data_,length_); 
     }

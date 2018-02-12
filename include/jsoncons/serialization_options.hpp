@@ -27,18 +27,25 @@ enum class block_options {next_line,same_line};
 
 enum class line_split_kind{same_line,new_line,multi_line};
 
-template <class CharT>
+template <class CharT,class Allocator=std::allocator<CharT>>
 class basic_serialization_options
 {
+public:
+    typedef basic_string_view_ext<CharT> string_view_type;
+    typedef CharT char_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
+private:
     int indent_;
     uint8_t precision_;
     uint8_t decimal_places_;
     bool replace_nan_;
     bool replace_pos_inf_;
     bool replace_neg_inf_;
-    std::basic_string<CharT> nan_replacement_;
-    std::basic_string<CharT> pos_inf_replacement_;
-    std::basic_string<CharT> neg_inf_replacement_;
+    string_type nan_replacement_;
+    string_type pos_inf_replacement_;
+    string_type neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
 
@@ -226,35 +233,35 @@ public:
         return *this;
     }
 
-    std::basic_string<CharT> nan_replacement() const
+    const string_type& nan_replacement() const
     {
         return nan_replacement_;
     }
 
-    basic_serialization_options<CharT>& nan_replacement(const std::basic_string<CharT>& replacement)
+    basic_serialization_options<CharT>& nan_replacement(const string_type& replacement)
     {
         nan_replacement_ = replacement;
         return *this;
     }
 
-    basic_serialization_options<CharT>& neg_inf_replacement(const std::basic_string<CharT>& replacement)
+    basic_serialization_options<CharT>& neg_inf_replacement(const string_type& replacement)
     {
         neg_inf_replacement_ = replacement;
         return *this;
     }
 
-    std::basic_string<CharT> pos_inf_replacement() const
+    const string_type& pos_inf_replacement() const
     {
         return pos_inf_replacement_;
     }
 
-    basic_serialization_options<CharT>& pos_inf_replacement(const std::basic_string<CharT>& replacement)
+    basic_serialization_options<CharT>& pos_inf_replacement(const string_type& replacement)
     {
         pos_inf_replacement_ = replacement;
         return *this;
     }
 
-    std::basic_string<CharT> neg_inf_replacement() const
+    const string_type& neg_inf_replacement() const
     {
         return neg_inf_replacement_;
     }

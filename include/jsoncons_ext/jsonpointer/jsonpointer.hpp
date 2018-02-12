@@ -251,11 +251,11 @@ public:
         jsonpointer_errc ec = evaluate(root,path_setter<Json,reference>(),path);
         if (ec != jsonpointer_errc())
         {
-            return path;
+            return string_type(path);
         }
         if (state_ == jsonpointer::detail::pointer_state::after_last_array_reference_token)
         {
-            string_type p = path.substr(0,path.length()-1);
+            string_type p = string_type(path.substr(0,path.length()-1));
             std::string s = std::to_string(current_.back().get().size());
             for (auto c : s)
             {
@@ -265,7 +265,7 @@ public:
         }
         else
         {
-            return path;
+            return string_type(path);
         }
     }
 

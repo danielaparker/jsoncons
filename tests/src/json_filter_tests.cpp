@@ -41,7 +41,7 @@ private:
     void do_name(const string_view_type& name,
                  const parsing_context& context) override
     {
-        member_name_ = name;
+        member_name_ = view_to_string(name);
         if (member_name_ != "name")
         {
             this->downstream_handler().name(name,context);
@@ -66,7 +66,7 @@ private:
             }
             else
             {
-                warnings.push_back(warning{s,
+                warnings.push_back(warning{view_to_string(s),
                                    context.line_number(),
                                    context.column_number()});
             }

@@ -71,7 +71,7 @@ struct PathConstructor
         s.append(path);
         s.push_back('[');
         s.push_back('\'');
-        s.append(sv);
+        s.append(sv.data(),sv.length());
         s.push_back('\'');
         s.push_back(']');
         return s;

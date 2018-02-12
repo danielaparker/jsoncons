@@ -202,11 +202,11 @@ private:
     {
         if (stack_.size() == 2)
         {
-            stack_.back().name_ = name;
-            buffered_line_[name] = std::basic_string<CharT>();
+            stack_.back().name_ = string_type(name);
+            buffered_line_[string_type(name)] = std::basic_string<CharT>();
             if (stack_[0].count_ == 0 && parameters_.column_names().size() == 0)
             {
-                column_names_.push_back(name);
+                column_names_.push_back(string_type(name));
             }
         }
     }
