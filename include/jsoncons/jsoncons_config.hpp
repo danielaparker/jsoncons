@@ -137,13 +137,6 @@ template< class Ch > Ch const* name(); \
 template<> inline char const * name<char>() { return lit; } \
 template<> inline wchar_t const* name<wchar_t>() { return L ## lit; }
 
-#define JSONCONS_STR2(x)  #x
-#define JSONCONS_STR(x)  JSONCONS_STR2(x)
-
-#define JSONCONS_ASSERT(x) if (!(x)) { \
-    throw std::runtime_error("assertion '" #x "' failed at " __FILE__ ":" \
-            JSONCONS_STR(__LINE__)); }
-
 }
 
 #endif

@@ -30,14 +30,14 @@ public:
 };
 
 template <class Base>
-class json_exception_0 : public Base, public virtual json_exception
+class json_runtime_error : public Base, public virtual json_exception
 {
 public:
-    json_exception_0(const std::string& s) JSONCONS_NOEXCEPT
+    json_runtime_error(const std::string& s) JSONCONS_NOEXCEPT
         : Base(""), message_(s)
     {
     }
-    ~json_exception_0() JSONCONS_NOEXCEPT
+    ~json_runtime_error() JSONCONS_NOEXCEPT
     {
     }
     const char* what() const JSONCONS_NOEXCEPT override
@@ -61,6 +61,29 @@ public:
         buffer_.append("' not found");
     }
     ~key_not_found() JSONCONS_NOEXCEPT
+    {
+    }
+    const char* what() const JSONCONS_NOEXCEPT override
+    {
+        return buffer_.c_str();
+    }
+private:
+    std::string buffer_;
+};
+
+class not_an_object : public std::runtime_error, public virtual json_exception
+{
+public:
+    template <class CharT>
+    explicit not_an_object(const CharT* key, size_t length) JSONCONS_NOEXCEPT
+        : std::runtime_error("")
+    {
+        buffer_.append("Attempting to access or modify '");
+        unicons::convert(key, key+length, std::back_inserter(buffer_),
+                         unicons::conv_flags::strict);
+        buffer_.append("' on a value that is not an object");
+    }
+    ~not_an_object() JSONCONS_NOEXCEPT
     {
     }
     const char* what() const JSONCONS_NOEXCEPT override
@@ -108,7 +131,14 @@ private:
     char message_[255];
 };
 
-#define JSONCONS_THROW_EXCEPTION_OLD(Base,x) throw jsoncons::json_exception_0<Base>((x))
+#define JSONCONS_STR2(x)  #x
+#define JSONCONS_STR(x)  JSONCONS_STR2(x)
+
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    throw jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
+            JSONCONS_STR(__LINE__)); }
+
+#define JSONCONS_THROW_EXCEPTION_OLD(Base,x) throw jsoncons::json_runtime_error<Base>((x))
 #define JSONCONS_THROW_EXCEPTION_1(Base,fmt,arg1) throw jsoncons::json_exception_1<Base>((fmt),(arg1))
 
 #define JSONCONS_THROW_EXCEPTION(x) throw (x)
