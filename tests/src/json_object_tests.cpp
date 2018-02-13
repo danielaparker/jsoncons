@@ -865,7 +865,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
 
     BOOST_CHECK_EXCEPTION(obj["outdoor_experience"].as<std::string>(),
                           std::out_of_range,
-                          [](const std::exception& ex ) { return ex.what() == std::string("outdoor_experience not found"); });
+                          [](const std::exception& ex ) { return ex.what() == std::string("Key 'outdoor_experience' not found"); });
 
     std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
 
@@ -873,7 +873,7 @@ BOOST_AUTO_TEST_CASE(test_value_not_found_and_defaults)
 
     BOOST_CHECK_EXCEPTION(obj["first_aid_certification"].as<std::string>(),
                           std::out_of_range,
-                          [](const std::exception& ex ) { return ex.what() == std::string("first_aid_certification not found"); });
+                          [](const std::exception& ex ) { return ex.what() == std::string("Key 'first_aid_certification' not found"); });
 }
 
 BOOST_AUTO_TEST_CASE(test_set_override)

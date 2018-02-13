@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <cstdarg>
+#include <exception>
 #include <limits> // std::numeric_limits
 
 // Uncomment the following line to suppress deprecated names (recommended for new code)
@@ -135,6 +136,13 @@ int c99_snprintf(char *str, size_t size, const char *format, ...)
 template< class Ch > Ch const* name(); \
 template<> inline char const * name<char>() { return lit; } \
 template<> inline wchar_t const* name<wchar_t>() { return L ## lit; }
+
+#define JSONCONS_STR2(x)  #x
+#define JSONCONS_STR(x)  JSONCONS_STR2(x)
+
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    throw std::runtime_error("assertion '" #x "' failed at " __FILE__ ":" \
+            JSONCONS_STR(__LINE__)); }
 
 }
 

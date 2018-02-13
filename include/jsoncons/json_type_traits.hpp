@@ -20,6 +20,7 @@
 #include <limits>
 #include <type_traits>
 #include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/detail/type_traits_helper.hpp>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -563,7 +564,7 @@ struct json_type_traits<Json, T,
         }
         else
         {
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempt to cast json non-array to array");
+            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Attempt to cast json non-array to array");
         }
     }
 
@@ -584,7 +585,7 @@ struct json_type_traits<Json, T,
         }
         else
         {
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempt to cast json non-array to array");
+            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Attempt to cast json non-array to array");
         }
     }
 
@@ -923,7 +924,7 @@ struct json_type_traits<Json, std::valarray<T>>
         }
         else
         {
-            JSONCONS_THROW_EXCEPTION(std::runtime_error,"Attempt to cast json non-array to array");
+            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Attempt to cast json non-array to array");
         }
     }
     

@@ -658,7 +658,7 @@ public:
     {
         if (i >= this->members_.size())
         {
-            JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
+            JSONCONS_THROW_EXCEPTION_OLD(std::out_of_range,"Invalid array subscript");
         }
         return this->members_[i].value();
     }
@@ -667,7 +667,7 @@ public:
     {
         if (i >= this->members_.size())
         {
-            JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
+            JSONCONS_THROW_EXCEPTION_OLD(std::out_of_range,"Invalid array subscript");
         }
         return this->members_[i].value();
     }
@@ -1311,7 +1311,7 @@ public:
         {
             if (element.size() != 2 || !element[0].is_string())
             {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error, "Cannot create object from initializer list");
+                JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error, "Cannot create object from initializer list");
                 break;
             }
         }
@@ -1329,7 +1329,7 @@ public:
         {
             if (element.size() != 2 || !element[0].is_string())
             {
-                JSONCONS_THROW_EXCEPTION(std::runtime_error, "Cannot create object from initializer list");
+                JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error, "Cannot create object from initializer list");
                 break;
             }
         }
@@ -1385,7 +1385,7 @@ public:
     {
         if (i >= this->members_.size())
         {
-            JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
+            JSONCONS_THROW_EXCEPTION_OLD(std::out_of_range,"Invalid array subscript");
         }
         return this->members_[i].value();
     }
@@ -1394,7 +1394,7 @@ public:
     {
         if (i >= this->members_.size())
         {
-            JSONCONS_THROW_EXCEPTION(std::out_of_range,"Invalid array subscript");
+            JSONCONS_THROW_EXCEPTION_OLD(std::out_of_range,"Invalid array subscript");
         }
         return this->members_[i].value();
     }
