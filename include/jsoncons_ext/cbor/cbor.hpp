@@ -765,7 +765,7 @@ public:
     {
     }
 
-    explicit cbor_view(const std::vector<uint8_t>& v)
+    cbor_view(const std::vector<uint8_t>& v)
         : buffer_(v.data()), buflen_(v.size())
     {
     }
@@ -1494,13 +1494,6 @@ template<class Json>
 Json decode_cbor(const cbor_view& v)
 {
     Decode_cbor_<Json> decoder(v.buffer(),v.buffer()+v.buflen());
-    return decoder.decode();
-}
-
-template<class Json>
-Json decode_cbor(const std::vector<uint8_t>& v)
-{
-    Decode_cbor_<Json> decoder(v.data(),v.data()+v.size());
     return decoder.decode();
 }
   

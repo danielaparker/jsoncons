@@ -26,7 +26,7 @@ cbor_view(); // (1)
 
 cbor_view(const uint8_t* buffer, size_t buflen); // (2)
 
-explicit cbor_view(const std::vector<uint8_t>& buffer); // (3)
+cbor_view(const std::vector<uint8_t>& buffer); // (3)
 
 cbor_view(const cbor_view& other); // (4)
 ```

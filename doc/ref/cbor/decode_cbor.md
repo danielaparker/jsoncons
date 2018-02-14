@@ -7,9 +7,6 @@ Decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class Json>
-Json decode_cbor(const std::vector<uint8_t>& v)
-
-template<class Json>
 Json decode_cbor(cbor_view v)
 ```
 
