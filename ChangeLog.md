@@ -8,6 +8,7 @@ Changes
 
 Performance improvements
 
+- Faster json dump to string (avoids streams)
 - Faster floating point conversions for linux and MacOSX
 - Memory allocation decoding larger string values reduced by half 
 - Optimization to json_parser parse_string 
