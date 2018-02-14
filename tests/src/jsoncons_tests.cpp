@@ -25,6 +25,8 @@ BOOST_AUTO_TEST_CASE(test_1)
 
     std::basic_ostringstream<char32_t> os;
 
+    std::cout << sizeof(json) << std::endl;
+
     //os << j << U"\n";
 }
 

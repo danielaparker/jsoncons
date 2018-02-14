@@ -549,29 +549,29 @@ using basic_string_view_ext = std::basic_string_view<CharT, Traits>;
 #if !defined(JSONCONS_NO_TO_CHARS)
 using chars_format = std::chars_format;
 #else
-enum class chars_format {fixed,scientific,hex,general=fixed|scientific};
+enum class chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixed|scientific};
 #endif
 
 // number_format
 
 class number_format
 {
-    chars_format floating_point_format_;
+    chars_format format_;
     uint8_t precision_;
     uint8_t decimal_places_;
 public:
     number_format()
-        : floating_point_format_(chars_format::general), precision_(0), decimal_places_(0)
+        : format_(chars_format::general), precision_(0), decimal_places_(0)
     {
     }
 
     number_format(uint8_t precision, uint8_t decimal_places)
-        : floating_point_format_(chars_format::general), precision_(precision), decimal_places_(decimal_places)
+        : format_(chars_format::general), precision_(precision), decimal_places_(decimal_places)
     {
     }
 
     number_format(chars_format floating_point_format, uint8_t precision, uint8_t decimal_places)
-        : floating_point_format_(floating_point_format), precision_(precision), decimal_places_(decimal_places)
+        : format_(floating_point_format), precision_(precision), decimal_places_(decimal_places)
     {
     }
 
@@ -592,7 +592,7 @@ public:
 
     chars_format floating_point_format() const
     {
-        return floating_point_format_;
+        return format_;
     }
 };
 

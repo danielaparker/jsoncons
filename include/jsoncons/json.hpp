@@ -250,6 +250,7 @@ public:
 
         class double_data : public data_base
         {
+            chars_format format_;
             uint8_t precision_;
             uint8_t decimal_places_;
             double val_;
@@ -263,6 +264,7 @@ public:
             }
             double_data(double val, const number_format& fmt)
                 : data_base(json_type_tag::double_t), 
+                  format_(fmt.floating_point_format()), 
                   precision_(fmt.precision()), 
                   decimal_places_(fmt.decimal_places()), 
                   val_(val)
