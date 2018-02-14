@@ -21,7 +21,7 @@
 #include <jsoncons/detail/number_printers.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons_ext/csv/csv_parameters.hpp>
-#include <jsoncons/detail/writers.hpp>
+#include <jsoncons/detail/writer.hpp>
 
 namespace jsoncons { namespace csv {
 

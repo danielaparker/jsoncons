@@ -18,7 +18,7 @@
 
 namespace jsoncons { namespace jsonpointer {
 
-class jsonpointer_error : public std::exception
+class jsonpointer_error : public std::exception, public virtual json_exception
 {
 public:
     jsonpointer_error(const std::error_code& ec)
@@ -682,7 +682,7 @@ Json get(const Json& root, const typename Json::string_view_type& path)
     jsonpointer_errc ec = evaluator.get(root,path);
     if (ec != jsonpointer_errc())
     {
-        throw jsonpointer_error(ec);
+        JSONCONS_THROW(jsonpointer_error(ec));
     }
     return evaluator.get_result();
 }
@@ -711,7 +711,7 @@ void insert_or_assign(Json& root, const typename Json::string_view_type& path, c
     jsonpointer_errc ec = evaluator.insert_or_assign(root,path,value);
     if (ec != jsonpointer_errc())
     {
-        throw jsonpointer_error(ec);
+        JSONCONS_THROW(jsonpointer_error(ec));
     }
 }
 
@@ -731,7 +731,7 @@ void insert(Json& root, const typename Json::string_view_type& path, const Json&
     jsonpointer_errc ec = evaluator.insert(root,path,value);
     if (ec != jsonpointer_errc())
     {
-        throw jsonpointer_error(ec);
+        JSONCONS_THROW(jsonpointer_error(ec));
     }
 }
 
@@ -751,7 +751,7 @@ void remove(Json& root, const typename Json::string_view_type& path)
     jsonpointer_errc ec = evaluator.remove(root,path);
     if (ec != jsonpointer_errc())
     {
-        throw jsonpointer_error(ec);
+        JSONCONS_THROW(jsonpointer_error(ec));
     }
 }
 
@@ -771,7 +771,7 @@ void replace(Json& root, const typename Json::string_view_type& path, const Json
     jsonpointer_errc ec = evaluator.replace(root,path,value);
     if (ec != jsonpointer_errc())
     {
-        throw jsonpointer_error(ec);
+        JSONCONS_THROW(jsonpointer_error(ec));
     }
 }
 

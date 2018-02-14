@@ -19,7 +19,7 @@
 
 namespace jsoncons { namespace jsonpatch {
 
-class jsonpatch_error : public std::exception
+class jsonpatch_error : public std::exception, public virtual json_exception
 {
 public:
     jsonpatch_error(const std::error_code& ec)
@@ -521,7 +521,7 @@ void apply_patch(Json& target, const Json& patch)
     apply_patch(target, patch, ec);
     if (ec)
     {
-        throw jsonpatch_error(ec);
+        JSONCONS_THROW(jsonpatch_error(ec));
     }
 }
 

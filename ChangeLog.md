@@ -1,3 +1,16 @@
+v0.103.0
+--------
+
+Changes
+
+- Default `string_view_type` `operator std::basic_string<CharT,Traits,Allocator>() const` made explicit
+  to be consistent with `std::string_view`
+
+Performance improvements
+
+- Faster floating point conversions for linux and MacOSX.
+- Reduced memory allocation decoding larger string values by half.
+
 v0.102.1
 --------
 
