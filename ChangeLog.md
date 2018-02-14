@@ -8,8 +8,10 @@ Changes
 
 Performance improvements
 
-- Faster floating point conversions for linux and MacOSX.
-- Reduced memory allocation decoding larger string values by half.
+- Faster floating point conversions for linux and MacOSX
+- Memory allocation decoding larger string values reduced by half 
+- Optimization to json_parser parse_string 
+- Improvements to json_decoder
 
 v0.102.1
 --------
