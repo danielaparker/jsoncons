@@ -324,12 +324,10 @@ void jsonpointer_cbor()
     std::vector<uint8_t> buffer;
     cbor::encode_cbor(j1, buffer);
 
-    cbor::cbor_view b1(buffer); 
-
     std::error_code ec;
-    cbor::cbor_view b2 = jsonpointer::get(b1, "/reputons/0/rated", ec);
+    cbor::cbor_view v2 = jsonpointer::get(cbor::cbor_view(buffer), "/reputons/0/rated", ec);
 
-    ojson j2 = cbor::decode_cbor<ojson>(b2);
+    ojson j2 = cbor::decode_cbor<ojson>(v2);
 
     std::cout << j2 << std::endl;
 }

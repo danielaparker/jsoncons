@@ -765,7 +765,7 @@ public:
     {
     }
 
-    cbor_view(const std::vector<uint8_t>& v)
+    explicit cbor_view(const std::vector<uint8_t>& v)
         : buffer_(v.data()), buflen_(v.size())
     {
     }
@@ -773,27 +773,9 @@ public:
     cbor_view(const cbor_view& other)
         : buffer_(other.buffer_), buflen_(other.buflen_)
     {
-
-    }
-
-    cbor_view(cbor_view&& other)
-        : buffer_(nullptr), buflen_(0)
-    {
-        std::swap(buffer_,other.buffer_);
-        std::swap(buflen_,other.buflen_);
     }
 
     cbor_view& operator=(const cbor_view&) = default;
-
-    cbor_view& operator=(cbor_view&& other)
-    {
-        if (this != &other)
-        {
-            std::swap(buffer_,other.buffer_);
-            std::swap(buflen_,other.buflen_);
-        }
-        return *this;
-    }
 
     const uint8_t* buffer() const
     {
@@ -1512,6 +1494,13 @@ template<class Json>
 Json decode_cbor(const cbor_view& v)
 {
     Decode_cbor_<Json> decoder(v.buffer(),v.buffer()+v.buflen());
+    return decoder.decode();
+}
+
+template<class Json>
+Json decode_cbor(const std::vector<uint8_t>& v)
+{
+    Decode_cbor_<Json> decoder(v.data(),v.data()+v.size());
     return decoder.decode();
 }
   

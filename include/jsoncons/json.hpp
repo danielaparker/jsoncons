@@ -2903,7 +2903,7 @@ public:
     }
 
     basic_json(double val, uint8_t precision)
-        : var_(val, precision, 0)
+        : var_(val, number_format(precision, 0))
     {
     }
 

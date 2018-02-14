@@ -20,7 +20,7 @@ private:
     void do_name(const string_view_type& name, 
                  const parsing_context& context) override
     {
-        member_name_ = name;
+        member_name_ = std::string(name);
         if (member_name_ != "name")
         {
             this->downstream_handler().name(name, context);

@@ -19,7 +19,7 @@ using namespace jsoncons;
 using namespace jsoncons::cbor;
 
 BOOST_AUTO_TEST_SUITE(cbor_view_tests)
-/*
+
 BOOST_AUTO_TEST_CASE(cbor_view_test)
 {
     ojson j1 = ojson::parse(R"(
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
 
     cbor_view reputons_0_rated = reputons_0.at("rated");
 }
-*/
+
 BOOST_AUTO_TEST_CASE(jsonpointer_test)
 {
     ojson j = ojson::parse(R"(
@@ -69,16 +69,14 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     std::vector<uint8_t> buffer;
     encode_cbor(j, buffer);
 
-    cbor_view v(buffer); 
-
     std::error_code ec;
-    cbor_view application = jsonpointer::get(v, "/application", ec);
+    cbor_view application = jsonpointer::get(cbor_view(buffer), "/application", ec);
     BOOST_CHECK(!ec);
 
     json j2 = decode_cbor<json>(application);
     std::cout << pretty_print(j2) << std::endl;
 
-    cbor_view reputons_0_rated = jsonpointer::get(v, "/reputons", ec);
+    cbor_view reputons_0_rated = jsonpointer::get(cbor_view(buffer), "/reputons", ec);
     BOOST_CHECK(!ec);
 
     json j3 = decode_cbor<json>(reputons_0_rated);
