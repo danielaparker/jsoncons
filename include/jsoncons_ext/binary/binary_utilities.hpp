@@ -270,7 +270,7 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     if (it + sizeof(T) > end)
     {
-        JSONCONS_THROW_EXCEPTION(read_nbytes_failed(sizeof(T)));
+        JSONCONS_THROW(read_nbytes_failed(sizeof(T)));
     }
     return static_cast<T>(*(it));
 }
@@ -282,7 +282,7 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     if (it + sizeof(T) > end)
     {
-        JSONCONS_THROW_EXCEPTION(read_nbytes_failed(sizeof(T)));
+        JSONCONS_THROW(read_nbytes_failed(sizeof(T)));
     }
     return JSONCONS_BINARY_TO_BE16(*reinterpret_cast<const uint16_t*>(it));
 }
@@ -293,7 +293,7 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     if (it + sizeof(T) > end)
     {
-        JSONCONS_THROW_EXCEPTION(read_nbytes_failed(sizeof(T)));
+        JSONCONS_THROW(read_nbytes_failed(sizeof(T)));
     }
     return JSONCONS_BINARY_TO_BE32(*reinterpret_cast<const uint32_t*>(it));
 }
@@ -304,7 +304,7 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     if (it + sizeof(T) > end)
     {
-        JSONCONS_THROW_EXCEPTION(read_nbytes_failed(sizeof(T)));
+        JSONCONS_THROW(read_nbytes_failed(sizeof(T)));
     }
     return JSONCONS_BINARY_TO_BE64(*reinterpret_cast<const uint64_t*>(it));
 }

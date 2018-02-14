@@ -114,7 +114,7 @@ namespace detail {
             }
         default: 
             {
-                JSONCONS_THROW_EXCEPTION(cbor_decode_error(end-pos));
+                JSONCONS_THROW(cbor_decode_error(end-pos));
             }
         }
     }
@@ -194,7 +194,7 @@ namespace detail {
             }
         default: 
             {
-                JSONCONS_THROW_EXCEPTION(cbor_decode_error(end-pos));
+                JSONCONS_THROW(cbor_decode_error(end-pos));
             }
         }
     }
@@ -620,7 +620,7 @@ namespace detail {
 
         default:
             {
-                JSONCONS_THROW_EXCEPTION(cbor_decode_error(end-pos));
+                JSONCONS_THROW(cbor_decode_error(end-pos));
             }
         }
     }
@@ -1467,7 +1467,7 @@ public:
 
         default:
             {
-                JSONCONS_THROW_EXCEPTION(cbor_decode_error(end_-pos));
+                JSONCONS_THROW(cbor_decode_error(end_-pos));
             }
         }
     }

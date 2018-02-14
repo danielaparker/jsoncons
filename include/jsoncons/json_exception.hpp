@@ -30,14 +30,14 @@ public:
 };
 
 template <class Base>
-class json_runtime_error : public Base, public virtual json_exception
+class json_exception_impl : public Base, public virtual json_exception
 {
 public:
-    json_runtime_error(const std::string& s) JSONCONS_NOEXCEPT
+    json_exception_impl(const std::string& s) JSONCONS_NOEXCEPT
         : Base(""), message_(s)
     {
     }
-    ~json_runtime_error() JSONCONS_NOEXCEPT
+    ~json_exception_impl() JSONCONS_NOEXCEPT
     {
     }
     const char* what() const JSONCONS_NOEXCEPT override
@@ -135,12 +135,12 @@ private:
 #define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-    throw jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
+    throw jsoncons::json_exception_impl<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
             JSONCONS_STR(__LINE__)); }
 
-#define JSONCONS_THROW_EXCEPTION_OLD(Base,x) throw jsoncons::json_runtime_error<Base>((x))
+#define JSONCONS_THROW_EXCEPTION_OLD(Base,x) throw jsoncons::json_exception_impl<Base>((x))
 
-#define JSONCONS_THROW_EXCEPTION(x) throw (x)
+#define JSONCONS_THROW(x) throw (x)
 
 }
 #endif

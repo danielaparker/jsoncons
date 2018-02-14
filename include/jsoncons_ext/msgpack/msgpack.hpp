@@ -613,7 +613,7 @@ public:
 
                 default:
                 {
-                    JSONCONS_THROW_EXCEPTION(msgpack_decode_error(end_-pos));
+                    JSONCONS_THROW(msgpack_decode_error(end_-pos));
                 }
             }
         }
