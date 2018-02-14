@@ -139,7 +139,6 @@ private:
             JSONCONS_STR(__LINE__)); }
 
 #define JSONCONS_THROW_EXCEPTION_OLD(Base,x) throw jsoncons::json_runtime_error<Base>((x))
-#define JSONCONS_THROW_EXCEPTION_1(Base,fmt,arg1) throw jsoncons::json_exception_1<Base>((fmt),(arg1))
 
 #define JSONCONS_THROW_EXCEPTION(x) throw (x)
 

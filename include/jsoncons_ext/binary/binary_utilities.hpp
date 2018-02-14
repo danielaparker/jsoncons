@@ -94,6 +94,27 @@
 #endif
 
 namespace jsoncons { namespace binary { 
+  
+class read_nbytes_failed : public std::invalid_argument, public virtual json_exception
+{
+public:
+    explicit read_nbytes_failed(size_t count) JSONCONS_NOEXCEPT
+        : std::invalid_argument("")
+    {
+        buffer_.append("Failed attempting to read ");
+        buffer_.append(std::to_string(count));
+        buffer_.append(" bytes from vector");
+    }
+    ~read_nbytes_failed() JSONCONS_NOEXCEPT
+    {
+    }
+    const char* what() const JSONCONS_NOEXCEPT override
+    {
+        return buffer_.c_str();
+    }
+private:
+    std::string buffer_;
+};
 
 namespace detail {
 
@@ -249,7 +270,7 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     if (it + sizeof(T) > end)
     {
-        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
+        JSONCONS_THROW_EXCEPTION(read_nbytes_failed(sizeof(T)));
     }
     return static_cast<T>(*(it));
 }
@@ -261,7 +282,7 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     if (it + sizeof(T) > end)
     {
-        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
+        JSONCONS_THROW_EXCEPTION(read_nbytes_failed(sizeof(T)));
     }
     return JSONCONS_BINARY_TO_BE16(*reinterpret_cast<const uint16_t*>(it));
 }
@@ -272,7 +293,7 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     if (it + sizeof(T) > end)
     {
-        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
+        JSONCONS_THROW_EXCEPTION(read_nbytes_failed(sizeof(T)));
     }
     return JSONCONS_BINARY_TO_BE32(*reinterpret_cast<const uint32_t*>(it));
 }
@@ -283,7 +304,7 @@ from_big_endian(const uint8_t* it, const uint8_t* end)
 {
     if (it + sizeof(T) > end)
     {
-        JSONCONS_THROW_EXCEPTION_1(std::out_of_range,"Failed attempting to read %s bytes from vector", std::to_string(sizeof(T)));
+        JSONCONS_THROW_EXCEPTION(read_nbytes_failed(sizeof(T)));
     }
     return JSONCONS_BINARY_TO_BE64(*reinterpret_cast<const uint64_t*>(it));
 }

@@ -43,6 +43,26 @@
         0xa0:case 0xa1:case 0xa2:case 0xa3:case 0xa4:case 0xa5:case 0xa6:case 0xa7:case 0xa8:case 0xa9:case 0xaa:case 0xab:case 0xac:case 0xad:case 0xae:case 0xaf:case 0xb0:case 0xb1:case 0xb2:case 0xb3:case 0xb4:case 0xb5:case 0xb6:case 0xb7
 
 namespace jsoncons { namespace cbor {
+  
+class cbor_decode_error : public std::invalid_argument, public virtual json_exception
+{
+public:
+    explicit cbor_decode_error(size_t pos) JSONCONS_NOEXCEPT
+        : std::invalid_argument("")
+    {
+        buffer_.append("Error decoding a cbor at position ");
+        buffer_.append(std::to_string(pos));
+    }
+    ~cbor_decode_error() JSONCONS_NOEXCEPT
+    {
+    }
+    const char* what() const JSONCONS_NOEXCEPT override
+    {
+        return buffer_.c_str();
+    }
+private:
+    std::string buffer_;
+};
 
 namespace detail {
     const uint8_t* walk(const uint8_t* it, const uint8_t* end);
@@ -94,7 +114,7 @@ namespace detail {
             }
         default: 
             {
-                JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a cbor at position %s", std::to_string(end-pos));
+                JSONCONS_THROW_EXCEPTION(cbor_decode_error(end-pos));
             }
         }
     }
@@ -174,7 +194,7 @@ namespace detail {
             }
         default: 
             {
-                JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a cbor at position %s", std::to_string(end-pos));
+                JSONCONS_THROW_EXCEPTION(cbor_decode_error(end-pos));
             }
         }
     }
@@ -600,7 +620,7 @@ namespace detail {
 
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a cbor at position %s", std::to_string(end-pos));
+                JSONCONS_THROW_EXCEPTION(cbor_decode_error(end-pos));
             }
         }
     }
@@ -1447,7 +1467,7 @@ public:
 
         default:
             {
-                JSONCONS_THROW_EXCEPTION_1(std::invalid_argument,"Error decoding a cbor at position %s", std::to_string(end_-pos));
+                JSONCONS_THROW_EXCEPTION(cbor_decode_error(end_-pos));
             }
         }
     }
