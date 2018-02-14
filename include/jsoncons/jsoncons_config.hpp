@@ -97,41 +97,6 @@ namespace jsoncons
 #define JSONCONS_ALIGNOF alignof
 #endif
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4290 )
-
-inline
-int c99_vsnprintf(char *str, size_t size, const char *format, va_list ap)
-{
-    int count = -1;
-
-    if (size != 0) count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
-    if (count == -1) count = _vscprintf(format, ap);
-
-    return count;
-}
-
-inline
-int c99_snprintf(char *str, size_t size, const char *format, ...)
-{
-    int count;
-    va_list ap;
-
-    va_start(ap, format);
-    count = c99_vsnprintf(str, size, format, ap);
-    va_end(ap);
-
-    return count;
-}
-#else
-#if __cplusplus >= 201103L
-#define c99_snprintf snprintf
-#else
-#define c99_snprintf std::snprintf
-#endif
-
-#endif
-
 #define JSONCONS_DEFINE_LITERAL( name, lit ) \
 template< class Ch > Ch const* name(); \
 template<> inline char const * name<char>() { return lit; } \
