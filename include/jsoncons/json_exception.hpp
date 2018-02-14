@@ -138,8 +138,6 @@ private:
     throw jsoncons::json_exception_impl<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
             JSONCONS_STR(__LINE__)); }
 
-#define JSONCONS_THROW_EXCEPTION_OLD(Base,x) throw jsoncons::json_exception_impl<Base>((x))
-
 #define JSONCONS_THROW(x) throw (x)
 
 }

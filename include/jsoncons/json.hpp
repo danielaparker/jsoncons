@@ -3351,7 +3351,7 @@ public:
     typename std::enable_if<!is_stateless<U>::value,void>::type
     create_object_implicitly() const
     {
-        JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Cannot create object implicitly - allocator is not default constructible.");
+        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Cannot create object implicitly - allocator is not default constructible."));
     }
 
     void reserve(size_t n)
@@ -3428,7 +3428,7 @@ public:
             }
             catch (...)
             {
-                JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not a bool");
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
             }
             break;
         case json_type_tag::bool_t:
@@ -3440,7 +3440,7 @@ public:
         case json_type_tag::uinteger_t:
             return var_.uinteger_data_cast()->value() != 0;
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not a bool");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
         }
     }
 
@@ -3457,7 +3457,7 @@ public:
             }
             catch (...)
             {
-                JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not an integer");
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
             }
             break;
         case json_type_tag::double_t:
@@ -3469,7 +3469,7 @@ public:
         case json_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not an integer");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
         }
     }
 
@@ -3486,7 +3486,7 @@ public:
             }
             catch (...)
             {
-                JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not an unsigned integer");
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
             }
             break;
         case json_type_tag::double_t:
@@ -3498,7 +3498,7 @@ public:
         case json_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not an unsigned integer");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
         }
     }
 
@@ -3509,7 +3509,7 @@ public:
         case json_type_tag::double_t:
             return var_.double_data_cast()->precision();
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not a double");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
     }
 
@@ -3520,7 +3520,7 @@ public:
         case json_type_tag::double_t:
             return var_.double_data_cast()->decimal_places();
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not a double");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
     }
 
@@ -3537,7 +3537,7 @@ public:
             }
             catch (...)
             {
-                JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not a double");
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
             }
             break;
         case json_type_tag::double_t:
@@ -3549,7 +3549,7 @@ public:
         //case json_type_tag::null_t:
         //    return std::numeric_limits<double>::quiet_NaN();
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not a double");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
     }
 
@@ -3623,7 +3623,7 @@ public:
         case json_type_tag::string_t:
             return var_.string_data_cast()->c_str();
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not a cstring");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a cstring"));
         }
     }
 
@@ -3636,7 +3636,7 @@ public:
         case json_type_tag::double_t:
             return var_.double_data_cast()->precision();
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not a double");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
     }
 #endif
@@ -3718,13 +3718,13 @@ public:
         case json_type_tag::array_t:
             if (i >= array_value().size())
             {
-                JSONCONS_THROW_EXCEPTION_OLD(std::out_of_range,"Invalid array subscript");
+                JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
             }
             return array_value().operator[](i);
         case json_type_tag::object_t:
             return object_value().at(i);
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Index on non-array value not supported");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Index on non-array value not supported"));
         }
     }
 
@@ -3735,13 +3735,13 @@ public:
         case json_type_tag::array_t:
             if (i >= array_value().size())
             {
-                JSONCONS_THROW_EXCEPTION_OLD(std::out_of_range,"Invalid array subscript");
+                JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
             }
             return array_value().operator[](i);
         case json_type_tag::object_t:
             return object_value().at(i);
         default:
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Index on non-array value not supported");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Index on non-array value not supported"));
         }
     }
 

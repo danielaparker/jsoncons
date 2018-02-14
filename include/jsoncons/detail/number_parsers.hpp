@@ -53,7 +53,7 @@ public:
         double val = _strtod_l(begin, &end, locale_);
         if (begin == end)
         {
-            throw std::invalid_argument("Invalid float value");
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid float value"));
         }
         return val;
     }
@@ -91,7 +91,7 @@ public:
         double val = strtold_l(begin, &end, locale_);
         if (begin == end)
         {
-            throw std::invalid_argument("Invalid float value");
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid float value");
         }
         return val;
     }
@@ -135,7 +135,7 @@ public:
         double val = strtod(s, &end);
         if (s == end)
         {
-            throw std::invalid_argument("string_to_double failed");
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("string_to_double failed");
         }
         return val;
     }

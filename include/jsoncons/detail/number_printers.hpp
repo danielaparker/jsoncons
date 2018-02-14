@@ -110,7 +110,7 @@ public:
         int err = _ecvt_s(buf, _CVTBUFSIZE, val, prec, &decimal_point, &sign);
         if (err != 0)
         {
-            throw std::runtime_error("Failed attempting double to string conversion");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Failed attempting double to string conversion"));
         }
         //std::cout << "prec:" << prec << ", buf:" << buf << std::endl;
         char* s = buf;
@@ -323,7 +323,7 @@ public:
         int length = snprintf(number_buffer, 100, "%1.*g", prec, val);
         if (length < 0)
         {
-            throw std::invalid_argument("print_double failed.");
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
         }
 
         const char* sbeg = number_buffer;

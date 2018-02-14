@@ -144,7 +144,7 @@ public:
     {
         if (pos >= length_)
         {
-            JSONCONS_THROW_EXCEPTION_OLD(std::out_of_range, "pos exceeds length");
+            JSONCONS_THROW(json_exception_impl<std::out_of_range>("pos exceeds length"));
         }
         return data_[pos];
     }
@@ -169,7 +169,7 @@ public:
     {
         if (pos > length_)
         {
-            JSONCONS_THROW_EXCEPTION_OLD(std::out_of_range, "pos exceeds size");
+            JSONCONS_THROW(json_exception_impl<std::out_of_range>("pos exceeds size"));
         }
         if (n == npos || pos + n > length_)
         {

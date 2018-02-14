@@ -133,7 +133,7 @@ namespace detail {
                 {
                     if (it == end)
                     {
-                        JSONCONS_THROW_EXCEPTION_OLD(std::invalid_argument,"eof");
+                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("eof"));
                     }
                     std::string ss;
                     std::tie(ss,it) = detail::get_fixed_length_text_string(it,end);
@@ -213,7 +213,7 @@ namespace detail {
                 {
                     if (it == end)
                     {
-                        JSONCONS_THROW_EXCEPTION_OLD(std::invalid_argument,"eof");
+                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("eof"));
                     }
                     std::vector<uint8_t> ss;
                     std::tie(ss,it) = detail::get_fixed_length_byte_string(it,end);
@@ -265,7 +265,7 @@ namespace detail {
                     return x;
                 }
             default:
-                JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Not an unsigned integer");
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
         }
     }
 
@@ -427,7 +427,7 @@ namespace detail {
                 {
                     if (it == end)
                     {
-                        JSONCONS_THROW_EXCEPTION_OLD(std::invalid_argument,"eof");
+                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("eof"));
                     }
                     it = walk(it, end);
                 }
@@ -475,7 +475,7 @@ namespace detail {
                 {
                     if (it == end)
                     {
-                        JSONCONS_THROW_EXCEPTION_OLD(std::invalid_argument,"eof");
+                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("eof"));
                     }
                     it = walk(it, end);
                 }
@@ -866,7 +866,7 @@ public:
             const uint8_t* last = detail::walk(it, end);
             it = last;
         }
-        JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Key not found");
+        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Key not found"));
     }
 
     bool has_key(const string_view_type& key) const
@@ -1121,7 +1121,7 @@ struct cbor_Encoder_
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Illegal unicode");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
 
         const size_t length = target.length();
@@ -1314,7 +1314,7 @@ public:
                 auto result = unicons::convert(s.begin(),s.end(),std::back_inserter(target),unicons::conv_flags::strict);
                 if (result.ec != unicons::conv_errc())
                 {
-                    JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Illegal unicode");
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                 }
                 return Json(target);
             }

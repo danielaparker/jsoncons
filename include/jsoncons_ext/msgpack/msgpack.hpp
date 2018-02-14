@@ -309,7 +309,7 @@ public:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Illegal unicode");
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
 
         const size_t length = target.length();
@@ -410,7 +410,7 @@ public:
                     first, last,std::back_inserter(target),unicons::conv_flags::strict);
                 if (result.ec != unicons::conv_errc())
                 {
-                    JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Illegal unicode");
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                 }
                 return Json(target);
             }
@@ -518,7 +518,7 @@ public:
                         first, last,std::back_inserter(target),unicons::conv_flags::strict);
                     if (result.ec != unicons::conv_errc())
                     {
-                        JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Illegal unicode");
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                     }
                     return target;
                 }
@@ -535,7 +535,7 @@ public:
                         first, last,std::back_inserter(target),unicons::conv_flags::strict);
                     if (result.ec != unicons::conv_errc())
                     {
-                        JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Illegal unicode");
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                     }
                     return target;
                 }
@@ -552,7 +552,7 @@ public:
                         first, last,std::back_inserter(target),unicons::conv_flags::strict);
                     if (result.ec != unicons::conv_errc())
                     {
-                        JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Illegal unicode");
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                     }
                     return target;
                 }

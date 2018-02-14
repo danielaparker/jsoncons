@@ -184,7 +184,7 @@ private:
                     unicons::sequence_generator<const CharT*> g(it,end,unicons::conv_flags::strict);
                     if (g.done() || g.status() != unicons::conv_errc())
                     {
-                        JSONCONS_THROW_EXCEPTION_OLD(std::runtime_error,"Invalid codepoint");
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Invalid codepoint"));
                     }
                     uint32_t cp = g.get().codepoint();
                     it += (g.get().length() - 1);
