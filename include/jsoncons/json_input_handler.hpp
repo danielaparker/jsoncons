@@ -215,7 +215,7 @@ private:
 };
 
 template <class CharT>
-class basic_null_json_input_handler : public basic_json_input_handler<CharT>
+class basic_null_json_input_handler final : public basic_json_input_handler<CharT>
 {
 public:
     using typename basic_json_input_handler<CharT>::string_view_type                                 ;

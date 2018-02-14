@@ -19,7 +19,7 @@
 namespace jsoncons {
 
 template <class Json,class Allocator=std::allocator<typename Json::char_type>>
-class json_decoder : public basic_json_input_handler<typename Json::char_type>
+class json_decoder final : public basic_json_input_handler<typename Json::char_type>
 {
 public:
     typedef typename Json::char_type char_type;

@@ -26,7 +26,7 @@
 namespace jsoncons {
 
 template<class CharT,class Writer=detail::ostream_buffered_writer<CharT>>
-class basic_json_serializer : public basic_json_output_handler<CharT>
+class basic_json_serializer final : public basic_json_output_handler<CharT>
 {
 public:
     using typename basic_json_output_handler<CharT>::string_view_type;

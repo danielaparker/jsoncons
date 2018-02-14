@@ -539,7 +539,7 @@ Json minus(const Json& lhs, const Json& rhs)
 }
 
 template <class Json>
-class value_term : public term<Json>
+class value_term final : public term<Json>
 {
     Json value_;
 public:
@@ -675,7 +675,7 @@ public:
 };
 
 template <class Json>
-class regex_term : public term<Json>
+class regex_term final : public term<Json>
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_type string_type;
@@ -693,7 +693,7 @@ public:
 };
 
 template <class Json>
-class path_term : public term<Json>
+class path_term final : public term<Json>
 {
     typedef typename Json::string_type string_type;
 

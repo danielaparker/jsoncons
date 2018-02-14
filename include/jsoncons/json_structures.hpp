@@ -547,7 +547,7 @@ class json_object
 
 // Do not preserve order
 template <class KeyT,class Json>
-class json_object<KeyT,Json,false> : public Json_object_<KeyT,Json>
+class json_object<KeyT,Json,false> final : public Json_object_<KeyT,Json>
 {
 public:
     using typename Json_object_<KeyT,Json>::allocator_type;
@@ -1260,7 +1260,7 @@ private:
 
 // Preserve order
 template <class KeyT,class Json>
-class json_object<KeyT,Json,true> : public Json_object_<KeyT,Json>
+class json_object<KeyT,Json,true> final : public Json_object_<KeyT,Json>
 {
 public:
     using typename Json_object_<KeyT,Json>::allocator_type;

@@ -174,7 +174,7 @@ private:
                             node_set& nodes, std::vector<std::shared_ptr<Json>>& temp_json_values) = 0;
     };
 
-    class expr_selector : public selector
+    class expr_selector final : public selector
     {
     private:
          jsonpath_filter_expr<Json> result_;
@@ -204,7 +204,7 @@ private:
         }
     };
 
-    class filter_selector : public selector
+    class filter_selector final : public selector
     {
     private:
          jsonpath_filter_expr<Json> result_;
@@ -245,7 +245,7 @@ private:
         }
     };
 
-    class name_selector : public selector
+    class name_selector final : public selector
     {
     private:
         string_type name_;
@@ -308,7 +308,7 @@ private:
         }
     };
 
-    class array_slice_selector : public selector
+    class array_slice_selector final : public selector
     {
     private:
         size_t start_;

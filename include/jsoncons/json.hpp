@@ -169,7 +169,7 @@ public:
             {}
         };
 
-        class null_data : public data_base
+        class null_data final : public data_base
         {
         public:
             null_data()
@@ -178,7 +178,7 @@ public:
             }
         };
 
-        class empty_object_data : public data_base
+        class empty_object_data final : public data_base
         {
         public:
             empty_object_data()
@@ -187,7 +187,7 @@ public:
             }
         };
 
-        class bool_data : public data_base
+        class bool_data final : public data_base
         {
             bool val_;
         public:
@@ -208,7 +208,7 @@ public:
 
         };
 
-        class integer_data : public data_base
+        class integer_data final : public data_base
         {
             int64_t val_;
         public:
@@ -228,7 +228,7 @@ public:
             }
         };
 
-        class uinteger_data : public data_base
+        class uinteger_data final : public data_base
         {
             uint64_t val_;
         public:
@@ -248,7 +248,7 @@ public:
             }
         };
 
-        class double_data : public data_base
+        class double_data final : public data_base
         {
             chars_format format_;
             uint8_t precision_;
@@ -295,7 +295,7 @@ public:
             }
         };
 
-        class small_string_data : public data_base
+        class small_string_data final : public data_base
         {
             static const size_t capacity = 14/sizeof(char_type);
             uint8_t length_;
@@ -335,7 +335,7 @@ public:
         };
 
         // string_data
-        class string_data : public data_base
+        class string_data final : public data_base
         {
             typedef typename detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
@@ -400,7 +400,7 @@ public:
         };
 
         // byte_string_data
-        class byte_string_data: public data_base
+        class byte_string_data final : public data_base
         {
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> string_holder_allocator_type;
             typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
@@ -479,7 +479,7 @@ public:
         };
 
         // array_data
-        class array_data : public data_base
+        class array_data final : public data_base
         {
             typedef typename std::allocator_traits<array_allocator>::pointer pointer;
             pointer ptr_;
@@ -561,7 +561,7 @@ public:
         };
 
         // object_data
-        class object_data : public data_base
+        class object_data final : public data_base
         {
             typedef typename std::allocator_traits<object_allocator>::pointer pointer;
             pointer ptr_;
