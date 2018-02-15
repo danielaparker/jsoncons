@@ -6,6 +6,8 @@ Changes
 - Default `string_view_type` `operator std::basic_string<CharT,Traits,Allocator>() const` made explicit
   to be consistent with `std::string_view`
 
+- The virtual method `do_double_value` of `json_input_handler` and `json_output_handler` takes a `number_format` parameter
+
 Performance improvements
 
 - Faster json dump to string (avoids streams)
@@ -600,7 +602,7 @@ v0.97 Release
 
 - Reversion of v0.96 change:
 
-The virtual methods `do_float_value`, `do_integer_value`, and `do_unsigned_value` of `json_input_handler` and `json_outputhandler` have been restored to `do_double_value`, `do_longlong_value` and `do_ulonglong_value`, and their typedefed parameter types `float_type`, `integer_type`, and `unsigned_type` have been restored to `double`, `long long`, and `unsigned long long`.
+The virtual methods `do_float_value`, `do_integer_value`, and `do_unsigned_value` of `json_input_handler` and `json_output_handler` have been restored to `do_double_value`, `do_longlong_value` and `do_ulonglong_value`, and their typedefed parameter types `float_type`, `integer_type`, and `unsigned_type` have been restored to `double`, `long long`, and `unsigned long long`.
 
 The rationale for this reversion is that the change doesn't really help to make the software more flexible, and that it's better to leave out the typedefs. There will be future enhancements to support greater numeric precision, but these will not affect the current method signatures.
 
@@ -622,7 +624,7 @@ Breaking changes:
 
 - Only json arrays now support `operator[](size_t)` to loop over values, this is no longer supported for `json` objects. Use a json object iterator instead.
 
-- The virtual methods `do_double_value`, `do_integer_value` and `do_uinteger_value` of `json_input_handler` and `json_outputhandler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_value`, 
+- The virtual methods `do_double_value`, `do_integer_value` and `do_uinteger_value` of `json_input_handler` and `json_output_handler` have been renamed to `do_float_value`, `do_integer_value`, and `do_unsigned_value`, 
   and their parameters have been changed from `double`, `long long`, and `unsigned long long` to typedefs `float_type`, `integer_type`, and `unsigned_type`.
   The rationale for this change is to allow different configurations for internal number types (reversed in v0.97.)
 
