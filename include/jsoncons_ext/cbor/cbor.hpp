@@ -65,6 +65,7 @@ private:
 };
 
 namespace detail {
+
     const uint8_t* walk(const uint8_t* it, const uint8_t* end);
 
     inline 
@@ -267,6 +268,73 @@ namespace detail {
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
         }
+    }
+
+    inline
+    double get_double(const uint8_t* data, size_t length, const uint8_t** endp)
+    {
+        double val = 0;
+        if (JSONCONS_UNLIKELY(length == 0))
+        {
+            *endp = data; 
+        }
+        else
+        {
+            const uint8_t* p = data+1;
+            const uint8_t* last = data + length;
+            switch (*data)
+            {
+            // Half-Precision Float (two-byte IEEE 754)
+            case 0xf9:
+                {
+                    if (JSONCONS_UNLIKELY(1+sizeof(uint16_t) > length))
+                    {
+                        *endp = data; 
+                    }
+                    else
+                    {
+                        uint16_t x = binary::detail::from_big_endian<uint16_t>(p, last);
+                        val = binary::detail::decode_half(x);
+                        *endp = p + sizeof(uint16_t);
+                    }
+                }
+                break;
+
+            // Single-Precision Float (four-byte IEEE 754)
+            case 0xfa:
+                {
+                    if (JSONCONS_UNLIKELY(1+sizeof(float) > length))
+                    {
+                        *endp = data; 
+                    }
+                    else
+                    {
+                        val = binary::detail::from_big_endian<float>(p,last);
+                        *endp = p + sizeof(float);
+                    }
+                }
+                break;
+            //  Double-Precision Float (eight-byte IEEE 754)
+            case 0xfb:
+                {
+                    if (JSONCONS_UNLIKELY(1+sizeof(double) > length))
+                    {
+                        *endp = data; 
+                    }
+                    else
+                    {
+                        val = binary::detail::from_big_endian<double>(p,last);
+                        *endp = p + sizeof(double);
+                    }
+                }
+                break;
+            default:
+                {
+                    *endp = p; 
+                }
+            }
+        }
+        return val;
     }
 
     inline const uint8_t* walk_string(const uint8_t* it, size_t len)
@@ -1421,29 +1489,22 @@ public:
             }
 
             // Half-Precision Float (two-byte IEEE 754)
+            // FALLTHRU
         case 0xf9:
-            {
-                uint16_t x = binary::detail::from_big_endian<uint16_t>(it_,end_);
-                it_ += sizeof(uint16_t);
-
-                double val = binary::detail::decode_half(x);
-
-                return Json(val);
-            }
-
             // Single-Precision Float (four-byte IEEE 754)
+            // FALLTHRU
         case 0xfa:
-            {
-                const auto val = binary::detail::from_big_endian<float>(it_,end_);
-                it_ += sizeof(float);
-                return Json(val);
-            }
-
             //  Double-Precision Float (eight-byte IEEE 754)
+            // FALLTHRU
         case 0xfb:
             {
-                const auto val = binary::detail::from_big_endian<double>(it_,end_);
-                it_ += sizeof(double);
+                const uint8_t* endp;
+                double val = detail::get_double(pos,end_-pos,&endp);
+                if (endp == pos)
+                {
+                    JSONCONS_THROW(cbor_decode_error(endp-begin_));
+                }
+                it_ = endp;
                 return Json(val);
             }
 
