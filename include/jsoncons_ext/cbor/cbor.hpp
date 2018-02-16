@@ -227,47 +227,144 @@ namespace detail {
         }
     }
 
-    inline uint64_t get_uinteger(const uint8_t* it, const uint8_t* end)
+    inline
+    uint64_t get_uinteger(const uint8_t* data, size_t length, const uint8_t** endp)
     {
-        const uint8_t* pos = it++;
-        switch (*pos)
-        {            
+        uint64_t val = 0;
+        if (JSONCONS_UNLIKELY(length == 0))
+        {
+            *endp = data; 
+        }
+        else
+        {
+            const uint8_t* p = data+1;
+            const uint8_t* last = data + length;
+            switch (*data)
+            {
             case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-                return *pos;
+                val = *data;
+                *endp = p;
+                break;
 
-            
-            case 0x18: // Unsigned integer (one-byte uint8_t follows) 
+            case 0x18: // Unsigned integer (one-byte uint8_t follows)
                 {
-                    auto x = binary::detail::from_big_endian<uint8_t>(it,end);
-                    it += sizeof(uint8_t); 
-                    return x;
+                    val = binary::detail::from_big_endian<uint8_t>(p,last);
+                    *endp = p + sizeof(uint8_t);
+                    break;
                 }
 
-            
             case 0x19: // Unsigned integer (two-byte uint16_t follows)
                 {
-                    auto x = binary::detail::from_big_endian<uint16_t>(it,end);
-                    it += sizeof(uint16_t); 
-                    return x;
+                    val = binary::detail::from_big_endian<uint16_t>(p,last);
+                    *endp = p + sizeof(uint16_t);
+                    break;
                 }
 
             case 0x1a: // Unsigned integer (four-byte uint32_t follows)
                 {
-                    auto x = binary::detail::from_big_endian<uint32_t>(it,end);
-                    it += sizeof(uint32_t); 
-                    return x;
+                    val = binary::detail::from_big_endian<uint32_t>(p,last);
+                    *endp = p + sizeof(uint32_t);
+                    break;
                 }
 
-            
             case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
                 {
-                    auto x = binary::detail::from_big_endian<uint64_t>(it,end);
-                    it += sizeof(uint64_t); 
-                    return x;
+                    val = binary::detail::from_big_endian<uint64_t>(p,last);
+                    *endp = p + sizeof(uint64_t);
+                    break;
                 }
             default:
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
+                {
+                    *endp = p; 
+                }
+            }
         }
+        return val;
+    }
+
+    inline
+    int64_t get_integer(const uint8_t* data, size_t length, const uint8_t** endp)
+    {
+        int64_t val = 0;
+        if (JSONCONS_UNLIKELY(length == 0))
+        {
+            *endp = data; 
+        }
+        else
+        {
+            const uint8_t* p = data+1;
+            const uint8_t* last = data + length;
+            switch (*data)
+            {
+
+            case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
+                val = static_cast<int8_t>(0x20 - 1 - *data);
+                *endp = p;
+                break;
+
+            case 0x38: // Negative integer (one-byte uint8_t follows)
+                {
+                    auto x = binary::detail::from_big_endian<uint8_t>(p,last);
+                    *endp = p + sizeof(uint8_t);
+                    val = static_cast<int64_t>(-1)- x;
+                    break;
+                }
+
+            case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
+                {
+                    auto x = binary::detail::from_big_endian<uint16_t>(p,last);
+                    *endp = p + sizeof(uint16_t);
+                    val = static_cast<int64_t>(-1)- x;
+                    break;
+                }
+
+            case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
+                {
+                    auto x = binary::detail::from_big_endian<uint32_t>(p,last);
+                    *endp = p + sizeof(uint32_t);
+                    val = static_cast<int64_t>(-1)- x;
+                    break;
+                }
+
+            case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
+                {
+                    auto x = binary::detail::from_big_endian<uint64_t>(p,last);
+                    *endp = p + sizeof(uint64_t);
+                    val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
+                    break;
+                }
+            case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+                // FALLTHRU
+            case 0x18: // Unsigned integer (one-byte uint8_t follows)
+                // FALLTHRU
+            case 0x19: // Unsigned integer (two-byte uint16_t follows)
+                // FALLTHRU
+            case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+                // FALLTHRU
+            case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+                {
+                    const uint8_t* endp;
+                    uint64_t x = detail::get_uinteger(p,last-p,&endp);
+                    if (endp != p)
+                    {
+                        if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                        {
+                            val = x;
+                        }
+                        else
+                        {
+                            endp = data;
+                        }
+                    }
+                    break;
+                }
+            default:
+                {
+                    *endp = p; 
+                }
+            }
+        }
+        return val;
     }
 
     inline
@@ -284,8 +381,7 @@ namespace detail {
             const uint8_t* last = data + length;
             switch (*data)
             {
-            // Half-Precision Float (two-byte IEEE 754)
-            case 0xf9:
+            case 0xf9: // Half-Precision Float (two-byte IEEE 754)
                 {
                     if (JSONCONS_UNLIKELY(1+sizeof(uint16_t) > length))
                     {
@@ -300,8 +396,8 @@ namespace detail {
                 }
                 break;
 
-            // Single-Precision Float (four-byte IEEE 754)
-            case 0xfa:
+
+            case 0xfa: // Single-Precision Float (four-byte IEEE 754)
                 {
                     if (JSONCONS_UNLIKELY(1+sizeof(float) > length))
                     {
@@ -314,8 +410,8 @@ namespace detail {
                     }
                 }
                 break;
-            //  Double-Precision Float (eight-byte IEEE 754)
-            case 0xfb:
+
+            case 0xfb: //  Double-Precision Float (eight-byte IEEE 754)
                 {
                     if (JSONCONS_UNLIKELY(1+sizeof(double) > length))
                     {
@@ -943,6 +1039,28 @@ public:
         }
         return false;
     }
+
+    int64_t as_integer() const
+    {
+        const uint8_t* endp;
+        int64_t val = detail::get_integer(buffer_,buflen_,&endp);
+        if (endp == buffer_)
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+        }
+        return val;
+    }
+
+    double as_double() const
+    {
+        const uint8_t* endp;
+        double val = detail::get_double(buffer_,buflen_,&endp);
+        if (endp == buffer_)
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+        }
+        return val;
+    }
 };
 
 struct Encode_cbor_
@@ -1265,78 +1383,48 @@ public:
         const uint8_t* pos = it_++;
         switch (*pos)
         {
-            // Integer 0x00..0x17 (0..23)
-        case JSONCONS_CBOR_0x00_0x17:
-            return Json(*pos);
-
-            // Unsigned integer (one-byte uint8_t follows)
-        case 0x18:
+            
+        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+            // FALLTHRU
+        case 0x18: // Unsigned integer (one-byte uint8_t follows)
+            // FALLTHRU
+        case 0x19: // Unsigned integer (two-byte uint16_t follows)
+            // FALLTHRU
+        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+            // FALLTHRU
+        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
             {
-                auto x = binary::detail::from_big_endian<uint8_t>(it_,end_);
-                it_ += sizeof(uint8_t);
-                return Json(x);
+                const uint8_t* endp;
+                uint64_t val = detail::get_uinteger(pos,end_-pos,&endp);
+                if (endp == pos)
+                {
+                    JSONCONS_THROW(cbor_decode_error(endp-begin_));
+                }
+                it_ = endp;
+                return Json(val);
             }
+            break;
 
-            // Unsigned integer (two-byte uint16_t follows)
-        case 0x19:
+        case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
+            // FALLTHRU
+        case 0x38: // Negative integer (one-byte uint8_t follows)
+            // FALLTHRU
+        case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
+            // FALLTHRU
+        case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
+            // FALLTHRU
+        case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
             {
-                auto x = binary::detail::from_big_endian<uint16_t>(it_,end_);
-                it_ += sizeof(uint16_t);
-                return Json(x);
+                const uint8_t* endp;
+                int64_t val = detail::get_integer(pos,end_-pos,&endp);
+                if (endp == pos)
+                {
+                    JSONCONS_THROW(cbor_decode_error(endp-begin_));
+                }
+                it_ = endp;
+                return Json(val);
             }
-
-            // Unsigned integer (four-byte uint32_t follows)
-        case 0x1a:
-            {
-                auto x = binary::detail::from_big_endian<uint32_t>(it_,end_);
-                it_ += sizeof(uint32_t);
-                return Json(x);
-            }
-
-            // Unsigned integer (eight-byte uint64_t follows)
-        case 0x1b:
-            {
-                auto x = binary::detail::from_big_endian<uint64_t>(it_,end_);
-                it_ += sizeof(uint64_t);
-                return Json(x);
-            }
-
-            // Negative integer -1-0x00..-1-0x17 (-1..-24)
-        case JSONCONS_CBOR_0x20_0x37:
-            return Json(static_cast<int8_t>(0x20 - 1 - *pos));
-
-            // Negative integer (one-byte uint8_t follows)
-        case 0x38:
-            {
-                auto x = binary::detail::from_big_endian<uint8_t>(it_,end_);
-                it_ += sizeof(uint8_t);
-                return Json(static_cast<int64_t>(-1)- x);
-            }
-
-            // Negative integer -1-n (two-byte uint16_t follows)
-        case 0x39:
-            {
-                auto x = binary::detail::from_big_endian<uint16_t>(it_,end_);
-                it_ += sizeof(uint16_t);
-                return Json(static_cast<int64_t>(-1)- x);
-            }
-
-            // Negative integer -1-n (four-byte uint32_t follows)
-        case 0x3a:
-            {
-                auto x = binary::detail::from_big_endian<uint32_t>(it_,end_);
-                it_ += sizeof(uint32_t);
-                return Json(static_cast<int64_t>(-1)- x);
-            }
-
-            // Negative integer -1-n (eight-byte uint64_t follows)
-        case 0x3b:
-            {
-                auto x = binary::detail::from_big_endian<uint64_t>(it_,end_);
-                it_ += sizeof(uint64_t);
-                return Json(static_cast<int64_t>(-1)- static_cast<int64_t>(x));
-            }
-
+            break;
             // byte string (0x00..0x17 bytes follow)
         case JSONCONS_CBOR_0x40_0x57:
         case 0x58:
@@ -1488,15 +1576,12 @@ public:
                 return Json::null();
             }
 
-            // Half-Precision Float (two-byte IEEE 754)
+            
+        case 0xf9: // Half-Precision Float (two-byte IEEE 754)
             // FALLTHRU
-        case 0xf9:
-            // Single-Precision Float (four-byte IEEE 754)
+        case 0xfa: // Single-Precision Float (four-byte IEEE 754)
             // FALLTHRU
-        case 0xfa:
-            //  Double-Precision Float (eight-byte IEEE 754)
-            // FALLTHRU
-        case 0xfb:
+        case 0xfb: // Double-Precision Float (eight-byte IEEE 754)
             {
                 const uint8_t* endp;
                 double val = detail::get_double(pos,end_-pos,&endp);

@@ -3292,7 +3292,7 @@ public:
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_type_tag::integer_t || (var_.type_id() == json_type_tag::uinteger_t&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<long long>::max)())));
+        return var_.type_id() == json_type_tag::integer_t || (var_.type_id() == json_type_tag::uinteger_t&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT

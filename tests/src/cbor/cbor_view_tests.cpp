@@ -48,6 +48,9 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
     cbor_view reputons_0 = reputons.at(0);
 
     cbor_view reputons_0_rated = reputons_0.at("rated");
+
+    cbor_view rating = reputons_0.at("rating");
+    BOOST_CHECK(rating.as_double() == 0.90);
 }
 
 BOOST_AUTO_TEST_CASE(jsonpointer_test)
