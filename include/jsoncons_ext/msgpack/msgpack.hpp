@@ -440,7 +440,14 @@ public:
                 {
                     const uint8_t* endp;
                     float res = binary::from_big_endian<float>(it_,end_,&endp);
-                    it_ += sizeof(float); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return res;
                 }
 
@@ -448,7 +455,14 @@ public:
                 {
                     const uint8_t* endp;
                     double res = binary::from_big_endian<double>(it_,end_,&endp);
-                    it_ += sizeof(double); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return res;
                 }
 
@@ -456,7 +470,14 @@ public:
                 {
                     const uint8_t* endp;
                     auto x = binary::from_big_endian<uint8_t>(it_,end_,&endp);
-                    it_ += sizeof(uint8_t); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return Json(x);
                 }
 
@@ -464,7 +485,14 @@ public:
                 {
                     const uint8_t* endp;
                     auto x = binary::from_big_endian<uint16_t>(it_,end_,&endp);
-                    it_ += sizeof(uint16_t); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return x;
                 }
 
@@ -472,7 +500,14 @@ public:
                 {
                     const uint8_t* endp;
                     auto x = binary::from_big_endian<uint32_t>(it_,end_,&endp);
-                    it_ += sizeof(uint32_t); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return x;
                 }
 
@@ -480,7 +515,14 @@ public:
                 {
                     const uint8_t* endp;
                     auto x = binary::from_big_endian<uint64_t>(it_,end_,&endp);
-                    it_ += sizeof(uint64_t); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return x;
                 }
 
@@ -488,7 +530,14 @@ public:
                 {
                     const uint8_t* endp;
                     auto x = binary::from_big_endian<int8_t>(it_,end_,&endp);
-                    it_ += sizeof(int8_t); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return Json(x);
                 }
 
@@ -496,7 +545,14 @@ public:
                 {
                     const uint8_t* endp;
                     auto x = binary::from_big_endian<int16_t>(it_,end_,&endp);
-                    it_ += sizeof(int16_t); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return x;
                 }
 
@@ -504,7 +560,14 @@ public:
                 {
                     const uint8_t* endp;
                     auto x = binary::from_big_endian<int32_t>(it_,end_,&endp);
-                    it_ += sizeof(int32_t); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return x;
                 }
 
@@ -512,7 +575,14 @@ public:
                 {
                     const uint8_t* endp;
                     auto x = binary::from_big_endian<int64_t>(it_,end_,&endp);
-                    it_ += sizeof(int64_t); 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     return x;
                 }
 
@@ -520,9 +590,18 @@ public:
                 {
                     const uint8_t* endp;
                     const auto len = binary::from_big_endian<int8_t>(it_,end_,&endp);
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
+
                     const uint8_t* first = &(*(pos + 2));
                     const uint8_t* last = first + len;
-                    it_ += len+1; 
+                    it_ += len; 
 
                     std::basic_string<char_type> target;
                     auto result = unicons::convert(
@@ -538,9 +617,18 @@ public:
                 {
                     const uint8_t* endp;
                     const auto len = binary::from_big_endian<int16_t>(it_,end_,&endp);
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
+
                     const uint8_t* first = &(*(pos + 3));
                     const uint8_t* last = first + len;
-                    it_ += len + 2; 
+                    it_ += len; 
 
                     std::basic_string<char_type> target;
                     auto result = unicons::convert(
@@ -556,9 +644,18 @@ public:
                 {
                     const uint8_t* endp;
                     const auto len = binary::from_big_endian<int32_t>(it_,end_,&endp);
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
+
                     const uint8_t* first = &(*(pos + 5));
                     const uint8_t* last = first + len;
-                    it_ += len + 4; 
+                    it_ += len; 
 
                     std::basic_string<char_type> target;
                     auto result = unicons::convert(
@@ -575,7 +672,14 @@ public:
                     Json result = typename Json::array();
                     const uint8_t* endp;
                     const auto len = binary::from_big_endian<uint16_t>(it_,end_,&endp);
-                    it_ += 2; 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
@@ -589,7 +693,14 @@ public:
                     Json result = typename Json::array();
                     const uint8_t* endp;
                     const auto len = binary::from_big_endian<uint32_t>(it_,end_,&endp);
-                    it_ += 4; 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {
@@ -602,7 +713,14 @@ public:
                 {
                     const uint8_t* endp;
                     const auto len = binary::from_big_endian<uint16_t>(it_,end_,&endp);
-                    it_ += 2; 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     Json result = typename Json::object();
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
@@ -618,7 +736,14 @@ public:
                     Json result = typename Json::object();
                     const uint8_t* endp;
                     const auto len = binary::from_big_endian<uint32_t>(it_,end_,&endp);
-                    it_ += 4; 
+                    if (endp == it_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_-it_));
+                    }
+                    else
+                    {
+                        it_ = endp;
+                    }
                     result.reserve(len);
                     for (size_t i = 0; i < len; ++i)
                     {

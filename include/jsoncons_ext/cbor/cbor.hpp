@@ -85,7 +85,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-                it += sizeof(uint8_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 const uint8_t *first = it;
                 it += len;
                 return std::make_tuple(std::string(first, it), it);
@@ -94,7 +101,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-                it += sizeof(uint16_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 const uint8_t* first = it;
                 it += len;
                 return std::make_tuple(std::string(first,it),it);
@@ -103,7 +117,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-                it += sizeof(uint32_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 const uint8_t* first = it;
                 it += len;
                 return std::make_tuple(std::string(first,it),it);
@@ -112,7 +133,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-                it += sizeof(uint64_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 const uint8_t* first = it;
                 it += len;
                 return std::make_tuple(std::string(first,it),it);
@@ -169,7 +197,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-                it += sizeof(uint8_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 const uint8_t *first = it;
                 it += len;
                 return std::make_tuple(std::vector<uint8_t>(first, it), it);
@@ -178,7 +213,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-                it += sizeof(uint16_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 const uint8_t* first = it;
                 it += len;
                 return std::make_tuple(std::vector<uint8_t>(first,it),it);
@@ -187,7 +229,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-                it += sizeof(uint32_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 const uint8_t* first = it;
                 it += len;
                 return std::make_tuple(std::vector<uint8_t>(first,it),it);
@@ -196,7 +245,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-                it += sizeof(uint64_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 const uint8_t* first = it;
                 it += len;
                 return std::make_tuple(std::vector<uint8_t>(first,it),it);
@@ -557,7 +613,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-                it += sizeof(uint8_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return it + len;
             }
             
@@ -565,7 +628,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-                it += sizeof(uint16_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return it + len;
             }
             
@@ -573,7 +643,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-                it += sizeof(uint32_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return it + len;
             }
             
@@ -581,7 +658,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-                it += sizeof(uint64_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return it + len;
             }
             
@@ -609,7 +693,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-                it += sizeof(uint8_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return it + len;
             }
             // UTF-8 string (two-byte uint16_t for n follow)
@@ -617,7 +708,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-                it += sizeof(uint16_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return it + len;
             }
             // UTF-8 string (four-byte uint32_t for n follow)
@@ -625,7 +723,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-                it += sizeof(uint32_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return it + len;
             }
             // UTF-8 string (eight-byte uint64_t for n follow)
@@ -633,7 +738,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-                it += sizeof(uint64_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return it + len;
             }
             // UTF-8 string (indefinite length)
@@ -661,7 +773,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-                it += sizeof(uint8_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return walk_array(it, end, len);
             }
 
@@ -670,7 +789,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-                it += sizeof(uint16_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return walk_array(it, end, len);
             }
 
@@ -679,7 +805,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<int32_t>(it,end,&endp);
-                it += sizeof(uint32_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return walk_array(it, end, len);
             }
 
@@ -688,7 +821,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<int64_t>(it,end,&endp);
-                it += sizeof(uint64_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return walk_array(it, end, len);
             }
 
@@ -713,7 +853,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-                it += sizeof(uint8_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return walk_object(it, end, len);
             }
 
@@ -722,7 +869,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-                it += sizeof(uint16_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return walk_object(it, end, len);
             }
 
@@ -731,7 +885,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-                it += sizeof(uint32_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return walk_object(it, end, len);
             }
 
@@ -740,7 +901,14 @@ namespace detail {
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-                it += sizeof(uint64_t);
+                if (endp == it)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-it));
+                }
+                else
+                {
+                    it = endp;
+                }
                 return walk_object(it, end, len);
             }
 
@@ -818,7 +986,14 @@ namespace detail {
         {
             const uint8_t* endp;
             const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-            it += sizeof(uint8_t); 
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(end-it));
+            }
+            else
+            {
+                it = endp;
+            }
             return std::make_tuple(len,it);
         }
 
@@ -827,7 +1002,14 @@ namespace detail {
         {
             const uint8_t* endp;
             const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-            it += sizeof(uint16_t); 
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(end-it));
+            }
+            else
+            {
+                it = endp;
+            }
             return std::make_tuple(len,it);
         }
 
@@ -836,7 +1018,14 @@ namespace detail {
         {
             const uint8_t* endp;
             const auto len = binary::from_big_endian<int32_t>(it,end,&endp);
-            it += sizeof(uint32_t); 
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(end-it));
+            }
+            else
+            {
+                it = endp;
+            }
             return std::make_tuple(len,it);
         }
 
@@ -845,7 +1034,14 @@ namespace detail {
         {
             const uint8_t* endp;
             const auto len = binary::from_big_endian<int64_t>(it,end,&endp);
-            it += sizeof(uint64_t); 
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(end-it));
+            }
+            else
+            {
+                it = endp;
+            }
             return std::make_tuple(len,it);
         }
 
@@ -874,7 +1070,14 @@ namespace detail {
         {
             const uint8_t* endp;
             const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-            it += sizeof(uint8_t); 
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(end-it));
+            }
+            else
+            {
+                it = endp;
+            }
             return std::make_tuple(len,it);
         }
 
@@ -883,7 +1086,14 @@ namespace detail {
         {
             const uint8_t* endp;
             const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-            it += sizeof(uint16_t); 
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(end-it));
+            }
+            else
+            {
+                it = endp;
+            }
             return std::make_tuple(len,it);
         }
 
@@ -892,7 +1102,14 @@ namespace detail {
         {
             const uint8_t* endp;
             const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-            it += sizeof(uint32_t); 
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(end-it));
+            }
+            else
+            {
+                it = endp;
+            }
             return std::make_tuple(len,it);
         }
 
@@ -901,7 +1118,14 @@ namespace detail {
         {
             const uint8_t* endp;
             const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-            it += sizeof(uint64_t); 
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(end-it));
+            }
+            else
+            {
+                it = endp;
+            }
             return std::make_tuple(len,it);
         }
 
@@ -1488,7 +1712,14 @@ public:
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it_,end_,&endp);
-                it_ += sizeof(uint8_t);
+                if (endp == it_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-it_));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 return get_fixed_length_array(len);
             }
 
@@ -1497,7 +1728,14 @@ public:
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it_,end_,&endp);
-                it_ += sizeof(uint16_t);
+                if (endp == it_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-it_));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 return get_fixed_length_array(len);
             }
 
@@ -1506,7 +1744,14 @@ public:
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<int32_t>(it_,end_,&endp);
-                it_ += sizeof(uint32_t);
+                if (endp == it_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-it_));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 return get_fixed_length_array(len);
             }
 
@@ -1515,7 +1760,14 @@ public:
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<int64_t>(it_,end_,&endp);
-                it_ += sizeof(uint64_t);
+                if (endp == it_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-it_));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 return get_fixed_length_array(len);
             }
 
@@ -1542,7 +1794,14 @@ public:
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it_,end_,&endp);
-                it_ += sizeof(uint8_t);
+                if (endp == it_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-it_));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 return get_fixed_length_map(len);
             }
 
@@ -1551,7 +1810,14 @@ public:
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it_,end_,&endp);
-                it_ += sizeof(uint16_t);
+                if (endp == it_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-it_));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 return get_fixed_length_map(len);
             }
 
@@ -1560,7 +1826,14 @@ public:
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint32_t>(it_,end_,&endp);
-                it_ += sizeof(uint32_t);
+                if (endp == it_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-it_));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 return get_fixed_length_map(len);
             }
 
@@ -1569,7 +1842,14 @@ public:
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint64_t>(it_,end_,&endp);
-                it_ += sizeof(uint64_t);
+                if (endp == it_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-it_));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 return get_fixed_length_map(len);
             }
 
