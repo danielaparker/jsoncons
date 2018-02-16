@@ -43,6 +43,9 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
     BOOST_CHECK(v.is_object());
     BOOST_CHECK(!v.is_array());
 
+    json jv = decode_cbor<json>(v);
+    std::cout << pretty_print(jv) << std::endl;
+
     cbor_view reputons = v.at("reputons");
 
     cbor_view reputons_0 = reputons.at(0);
@@ -51,6 +54,16 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
 
     cbor_view rating = reputons_0.at("rating");
     BOOST_CHECK(rating.as_double() == 0.90);
+
+    for (const auto& member : v.object_range())
+    {
+        const auto& key = member.key();
+        const auto& val = member.value();
+        json jkey = decode_cbor<json>(key);
+        json jval = decode_cbor<json>(val);
+
+        std::cout << jkey << " " << jval << std::endl;
+    }
 }
 
 BOOST_AUTO_TEST_CASE(jsonpointer_test)

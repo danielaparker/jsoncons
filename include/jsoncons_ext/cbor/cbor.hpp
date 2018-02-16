@@ -15,6 +15,7 @@
 #include <memory>
 #include <limits>
 #include <cassert>
+#include <iterator>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/binary/binary_utilities.hpp>
 
@@ -292,50 +293,135 @@ namespace detail {
     }
 
     inline
-    uint64_t get_uinteger(const uint8_t* data, const uint8_t* last, const uint8_t** endp)
+    size_t get_fixed_object_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     {
-        uint64_t val = 0;
-        if (JSONCONS_UNLIKELY(last <= data))
+        size_t size = 0;
+
+        if (JSONCONS_UNLIKELY(last <= first))
         {
-            *endp = data; 
+            *endp = first; 
         }
         else
         {
-            const size_t length = last - data;
-            const uint8_t* p = data+1;
-            switch (*data)
+            const uint8_t* p = first+1;
+            switch (*first)
+            {
+            case JSONCONS_CBOR_0xa0_0xb7: // map (0x00..0x17 pairs of data items follow)
+                {
+                    size = *first & 0x1f;
+                    *endp = p;
+                    break;
+                }
+
+            case 0xb8: // map (one-byte uint8_t for n follows)
+                {
+                    size = binary::from_big_endian<uint8_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    break;
+                }
+
+            case 0xb9: // map (two-byte uint16_t for n follow)
+                {
+                    size = binary::from_big_endian<uint16_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    break;
+                }
+
+            case 0xba: // map (four-byte uint32_t for n follow)
+                {
+                    size = binary::from_big_endian<uint32_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    break;
+                }
+
+            case 0xbb: // map (eight-byte uint64_t for n follow)
+                {
+                    size = binary::from_big_endian<uint64_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    break;
+                }
+            default:
+                {
+                    *endp = first; 
+                }
+            }
+        }
+        return size;
+    }
+
+    inline
+    uint64_t get_uinteger(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    {
+        uint64_t val = 0;
+        if (JSONCONS_UNLIKELY(last <= first))
+        {
+            *endp = first; 
+        }
+        else
+        {
+            const size_t length = last - first;
+            const uint8_t* p = first+1;
+            switch (*first)
             {
             case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-                val = *data;
+                val = *first;
                 *endp = p;
                 break;
 
             case 0x18: // Unsigned integer (one-byte uint8_t follows)
                 {
                     val = binary::from_big_endian<uint8_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
                     break;
                 }
 
             case 0x19: // Unsigned integer (two-byte uint16_t follows)
                 {
                     val = binary::from_big_endian<uint16_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
                     break;
                 }
 
             case 0x1a: // Unsigned integer (four-byte uint32_t follows)
                 {
                     val = binary::from_big_endian<uint32_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
                     break;
                 }
 
             case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
                 {
                     val = binary::from_big_endian<uint64_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
                     break;
                 }
             default:
                 {
-                    *endp = p; 
+                    *endp = first; 
                 }
             }
         }
@@ -343,50 +429,78 @@ namespace detail {
     }
 
     inline
-    int64_t get_integer(const uint8_t* data, const uint8_t* last, const uint8_t** endp)
+    int64_t get_integer(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     {
         int64_t val = 0;
-        if (JSONCONS_UNLIKELY(last <= data))
+        if (JSONCONS_UNLIKELY(last <= first))
         {
-            *endp = data; 
+            *endp = first; 
         }
         else
         {
-            const size_t length = last - data;
-            const uint8_t* p = data+1;
-            switch (*data)
+            const size_t length = last - first;
+            const uint8_t* p = first+1;
+            switch (*first)
             {
 
             case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
-                val = static_cast<int8_t>(0x20 - 1 - *data);
+                val = static_cast<int8_t>(0x20 - 1 - *first);
                 *endp = p;
                 break;
 
             case 0x38: // Negative integer (one-byte uint8_t follows)
                 {
                     auto x = binary::from_big_endian<uint8_t>(p,last,endp);
-                    val = static_cast<int64_t>(-1)- x;
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        val = static_cast<int64_t>(-1)- x;
+                    }
                     break;
                 }
 
             case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
                 {
                     auto x = binary::from_big_endian<uint16_t>(p,last,endp);
-                    val = static_cast<int64_t>(-1)- x;
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        val = static_cast<int64_t>(-1)- x;
+                    }
                     break;
                 }
 
             case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
                 {
                     auto x = binary::from_big_endian<uint32_t>(p,last,endp);
-                    val = static_cast<int64_t>(-1)- x;
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {                       
+                        val = static_cast<int64_t>(-1)- x;
+                    }
                     break;
                 }
 
             case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
                 {
                     auto x = binary::from_big_endian<uint64_t>(p,last,endp);
-                    val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
+                    }
                     break;
                 }
             case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
@@ -408,14 +522,14 @@ namespace detail {
                         }
                         else
                         {
-                            *endp = data;
+                            *endp = first;
                         }
                     }
                     break;
                 }
             default:
                 {
-                    *endp = p; 
+                    *endp = first; 
                 }
             }
         }
@@ -423,29 +537,36 @@ namespace detail {
     }
 
     inline
-    double get_double(const uint8_t* data, const uint8_t* last, const uint8_t** endp)
+    double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     {
         double val = 0;
-        if (JSONCONS_UNLIKELY(last <= data))
+        if (JSONCONS_UNLIKELY(last <= first))
         {
-            *endp = data; 
+            *endp = first; 
         }
         else
         {
-            const size_t length = last - data;
-            const uint8_t* p = data+1;
-            switch (*data)
+            const size_t length = last - first;
+            const uint8_t* p = first+1;
+            switch (*first)
             {
             case 0xf9: // Half-Precision Float (two-byte IEEE 754)
                 {
                     if (JSONCONS_UNLIKELY(1+sizeof(uint16_t) > length))
                     {
-                        *endp = data; 
+                        *endp = first; 
                     }
                     else
                     {
                         uint16_t x = binary::from_big_endian<uint16_t>(p,last,endp);
-                        val = binary::decode_half(x);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
+                        else
+                        {
+                            val = binary::decode_half(x);
+                        }
                     }
                 }
                 break;
@@ -455,11 +576,15 @@ namespace detail {
                 {
                     if (JSONCONS_UNLIKELY(1+sizeof(float) > length))
                     {
-                        *endp = data; 
+                        *endp = first; 
                     }
                     else
                     {
                         val = binary::from_big_endian<float>(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
                     }
                 }
                 break;
@@ -468,17 +593,21 @@ namespace detail {
                 {
                     if (JSONCONS_UNLIKELY(1+sizeof(double) > length))
                     {
-                        *endp = data; 
+                        *endp = first; 
                     }
                     else
                     {
                         val = binary::from_big_endian<double>(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
                     }
                 }
                 break;
             default:
                 {
-                    *endp = p; 
+                    *endp = first; 
                 }
             }
         }
@@ -528,7 +657,8 @@ namespace detail {
         return (b >= 0xa0 && b <= 0xbb) || b == 0xb8;
     }
 
-    inline const uint8_t* walk(const uint8_t* it, const uint8_t* end)
+    inline 
+    const uint8_t* walk(const uint8_t* it, const uint8_t* end)
     {
         if (it >= end)
         {
@@ -842,14 +972,13 @@ namespace detail {
                 return it;
             }
 
-            // map (0x00..0x17 pairs of data items follow)
-        case JSONCONS_CBOR_0xa0_0xb7:
+            
+        case JSONCONS_CBOR_0xa0_0xb7: // map (0x00..0x17 pairs of data items follow)
             {
                 return walk_object(it, end, *pos & 0x1f);
             }
 
-            // map (one-byte uint8_t for n follows)
-        case 0xb8:
+        case 0xb8: // map (one-byte uint8_t for n follows)
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
@@ -864,8 +993,7 @@ namespace detail {
                 return walk_object(it, end, len);
             }
 
-            // map (two-byte uint16_t for n follow)
-        case 0xb9:
+        case 0xb9: // map (two-byte uint16_t for n follow)
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
@@ -880,8 +1008,7 @@ namespace detail {
                 return walk_object(it, end, len);
             }
 
-            // map (four-byte uint32_t for n follow)
-        case 0xba:
+        case 0xba: // map (four-byte uint32_t for n follow)
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
@@ -896,8 +1023,7 @@ namespace detail {
                 return walk_object(it, end, len);
             }
 
-            // map (eight-byte uint64_t for n follow)
-        case 0xbb:
+        case 0xbb: // map (eight-byte uint64_t for n follow)
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
@@ -1153,6 +1279,9 @@ class cbor_view
     const uint8_t* buffer_;
     size_t buflen_; 
 public:
+    class const_object_iterator;
+
+    typedef std::ptrdiff_t difference_type;
     typedef cbor_view value_type;
     typedef cbor_view& reference;
     typedef const cbor_view& const_reference;
@@ -1162,6 +1291,112 @@ public:
     typedef char char_type;
     typedef std::char_traits<char_type> char_traits_type;
     typedef basic_string_view_ext<char_type> string_view_type;
+
+    class key_value_pair
+    {
+        const uint8_t* key_begin_;
+        const uint8_t* key_end_;
+        const uint8_t* val_begin_;
+        const uint8_t* val_end_;
+
+        friend const_object_iterator;
+    public:
+        key_value_pair()
+            : key_begin_(nullptr), key_end_(nullptr), val_begin_(nullptr), val_end_(nullptr)
+        {
+        }
+        key_value_pair(const uint8_t* key_begin, const uint8_t* key_end, const uint8_t* val_begin, const uint8_t* val_end)
+            : key_begin_(key_begin), key_end_(key_end), val_begin_(val_begin), val_end_(val_end)
+        {
+        }
+        key_value_pair(const key_value_pair& other) = default;
+
+        cbor_view key() const
+        {
+            return cbor_view(key_begin_, key_end_ - key_begin_);
+        }
+
+        cbor_view value() const
+        {
+            return cbor_view(val_begin_, val_end_ - val_begin_);
+        }
+    };
+
+    class const_object_iterator
+    {
+        const uint8_t* p_;
+        const uint8_t* last_;
+        key_value_pair kvpair_;
+    public:
+        typedef cbor_view::difference_type difference_type;
+        typedef key_value_pair value_type;
+        typedef const key_value_pair& reference;
+        typedef const key_value_pair* pointer;
+        typedef std::forward_iterator_tag iterator_catagory;
+
+        const_object_iterator()
+            : p_(nullptr), last_(nullptr)
+        {
+        }
+
+        const_object_iterator(const uint8_t* p, const uint8_t* last)
+            : p_(p), last_(last)
+        {
+            if (p_ < last_)
+            {
+                const uint8_t* endp;
+                size_t length = detail::get_fixed_object_size(p_,last_,&endp);
+                p_ = endp;
+            }
+        }
+
+        const_object_iterator(const const_object_iterator& other) = default;
+
+        friend bool operator==(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+        {
+            return lhs.p_ == rhs.p_; 
+        }
+
+        friend bool operator!=(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+        {
+            return lhs.p_ != rhs.p_; 
+        }
+
+        friend bool operator<(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+        {
+            return lhs.p_ == rhs.p_; 
+        }
+
+        const_object_iterator& operator++()
+        {
+            p_ = detail::walk(p_, last_);
+            p_ = detail::walk(p_, last_);
+            return *this;
+        }
+
+        reference operator*() const
+        {
+            const_cast<key_value_pair*>(&kvpair_)->key_begin_ = p_;
+            const_cast<key_value_pair*>(&kvpair_)->key_end_ = detail::walk(kvpair_.key_begin_, last_);
+            const_cast<key_value_pair*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
+            const_cast<key_value_pair*>(&kvpair_)->val_end_ = detail::walk(kvpair_.val_begin_, last_);
+            return kvpair_;
+        }
+
+        pointer operator->() const
+        {
+            const_cast<key_value_pair*>(&kvpair_)->key_begin_ = p_;
+            const_cast<key_value_pair*>(&kvpair_)->key_end_ = detail::walk(kvpair_.key_begin_, last_);
+            const_cast<key_value_pair*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
+            const_cast<key_value_pair*>(&kvpair_)->val_end_ = detail::walk(kvpair_.val_begin_, last_);
+            return &kvpair_;
+        }
+    };
+
+    range<const_object_iterator> object_range() const
+    {
+        return range<const_object_iterator>(const_object_iterator(buffer_,buffer_+buflen_), const_object_iterator(buffer_+buflen_, buffer_ + buflen_));
+    }
 
     cbor_view()
         : buffer_(nullptr), buflen_(0)
@@ -1184,6 +1419,16 @@ public:
     }
 
     cbor_view& operator=(const cbor_view&) = default;
+
+    friend bool operator==(const cbor_view& lhs, const cbor_view& rhs) 
+    {
+        return lhs.buffer_ == rhs.buffer_ && lhs.buflen_ == rhs.buflen_; 
+    }
+
+    friend bool operator!=(const cbor_view& lhs, const cbor_view& rhs) 
+    {
+        return !(lhs == rhs); 
+    }
 
     const uint8_t* buffer() const
     {
