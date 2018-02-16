@@ -83,7 +83,8 @@ namespace detail {
             }
         case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
             {
-                const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint8_t>(it,end,&endp);
                 it += sizeof(uint8_t);
                 const uint8_t *first = it;
                 it += len;
@@ -91,7 +92,8 @@ namespace detail {
             }
         case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint16_t>(it,end,&endp);
                 it += sizeof(uint16_t);
                 const uint8_t* first = it;
                 it += len;
@@ -99,7 +101,8 @@ namespace detail {
             }
         case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint32_t>(it,end,&endp);
                 it += sizeof(uint32_t);
                 const uint8_t* first = it;
                 it += len;
@@ -107,7 +110,8 @@ namespace detail {
             }
         case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint64_t>(it,end,&endp);
                 it += sizeof(uint64_t);
                 const uint8_t* first = it;
                 it += len;
@@ -163,7 +167,8 @@ namespace detail {
             }
         case 0x58: // byte string (one-byte uint8_t for n follows)
             {
-                const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint8_t>(it,end,&endp);
                 it += sizeof(uint8_t);
                 const uint8_t *first = it;
                 it += len;
@@ -171,7 +176,8 @@ namespace detail {
             }
         case 0x59: // byte string (two-byte uint16_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint16_t>(it,end,&endp);
                 it += sizeof(uint16_t);
                 const uint8_t* first = it;
                 it += len;
@@ -179,7 +185,8 @@ namespace detail {
             }
         case 0x5a: // byte string (four-byte uint32_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint32_t>(it,end,&endp);
                 it += sizeof(uint32_t);
                 const uint8_t* first = it;
                 it += len;
@@ -187,7 +194,8 @@ namespace detail {
             }
         case 0x5b: // byte string (eight-byte uint64_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint64_t>(it,end,&endp);
                 it += sizeof(uint64_t);
                 const uint8_t* first = it;
                 it += len;
@@ -228,17 +236,17 @@ namespace detail {
     }
 
     inline
-    uint64_t get_uinteger(const uint8_t* data, size_t length, const uint8_t** endp)
+    uint64_t get_uinteger(const uint8_t* data, const uint8_t* last, const uint8_t** endp)
     {
         uint64_t val = 0;
-        if (JSONCONS_UNLIKELY(length == 0))
+        if (JSONCONS_UNLIKELY(last <= data))
         {
             *endp = data; 
         }
         else
         {
+            const size_t length = last - data;
             const uint8_t* p = data+1;
-            const uint8_t* last = data + length;
             switch (*data)
             {
             case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
@@ -248,29 +256,25 @@ namespace detail {
 
             case 0x18: // Unsigned integer (one-byte uint8_t follows)
                 {
-                    val = binary::detail::from_big_endian<uint8_t>(p,last);
-                    *endp = p + sizeof(uint8_t);
+                    val = binary::detail::from_big_endian<uint8_t>(p,last,endp);
                     break;
                 }
 
             case 0x19: // Unsigned integer (two-byte uint16_t follows)
                 {
-                    val = binary::detail::from_big_endian<uint16_t>(p,last);
-                    *endp = p + sizeof(uint16_t);
+                    val = binary::detail::from_big_endian<uint16_t>(p,last,endp);
                     break;
                 }
 
             case 0x1a: // Unsigned integer (four-byte uint32_t follows)
                 {
-                    val = binary::detail::from_big_endian<uint32_t>(p,last);
-                    *endp = p + sizeof(uint32_t);
+                    val = binary::detail::from_big_endian<uint32_t>(p,last,endp);
                     break;
                 }
 
             case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
                 {
-                    val = binary::detail::from_big_endian<uint64_t>(p,last);
-                    *endp = p + sizeof(uint64_t);
+                    val = binary::detail::from_big_endian<uint64_t>(p,last,endp);
                     break;
                 }
             default:
@@ -283,17 +287,17 @@ namespace detail {
     }
 
     inline
-    int64_t get_integer(const uint8_t* data, size_t length, const uint8_t** endp)
+    int64_t get_integer(const uint8_t* data, const uint8_t* last, const uint8_t** endp)
     {
         int64_t val = 0;
-        if (JSONCONS_UNLIKELY(length == 0))
+        if (JSONCONS_UNLIKELY(last <= data))
         {
             *endp = data; 
         }
         else
         {
+            const size_t length = last - data;
             const uint8_t* p = data+1;
-            const uint8_t* last = data + length;
             switch (*data)
             {
 
@@ -304,32 +308,28 @@ namespace detail {
 
             case 0x38: // Negative integer (one-byte uint8_t follows)
                 {
-                    auto x = binary::detail::from_big_endian<uint8_t>(p,last);
-                    *endp = p + sizeof(uint8_t);
+                    auto x = binary::detail::from_big_endian<uint8_t>(p,last,endp);
                     val = static_cast<int64_t>(-1)- x;
                     break;
                 }
 
             case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
                 {
-                    auto x = binary::detail::from_big_endian<uint16_t>(p,last);
-                    *endp = p + sizeof(uint16_t);
+                    auto x = binary::detail::from_big_endian<uint16_t>(p,last,endp);
                     val = static_cast<int64_t>(-1)- x;
                     break;
                 }
 
             case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
                 {
-                    auto x = binary::detail::from_big_endian<uint32_t>(p,last);
-                    *endp = p + sizeof(uint32_t);
+                    auto x = binary::detail::from_big_endian<uint32_t>(p,last,endp);
                     val = static_cast<int64_t>(-1)- x;
                     break;
                 }
 
             case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
                 {
-                    auto x = binary::detail::from_big_endian<uint64_t>(p,last);
-                    *endp = p + sizeof(uint64_t);
+                    auto x = binary::detail::from_big_endian<uint64_t>(p,last,endp);
                     val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
                     break;
                 }
@@ -343,9 +343,8 @@ namespace detail {
                 // FALLTHRU
             case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
                 {
-                    const uint8_t* endp;
-                    uint64_t x = detail::get_uinteger(p,last-p,&endp);
-                    if (endp != p)
+                    uint64_t x = detail::get_uinteger(p,last,endp);
+                    if (*endp != p)
                     {
                         if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                         {
@@ -353,7 +352,7 @@ namespace detail {
                         }
                         else
                         {
-                            endp = data;
+                            *endp = data;
                         }
                     }
                     break;
@@ -368,17 +367,17 @@ namespace detail {
     }
 
     inline
-    double get_double(const uint8_t* data, size_t length, const uint8_t** endp)
+    double get_double(const uint8_t* data, const uint8_t* last, const uint8_t** endp)
     {
         double val = 0;
-        if (JSONCONS_UNLIKELY(length == 0))
+        if (JSONCONS_UNLIKELY(last <= data))
         {
             *endp = data; 
         }
         else
         {
+            const size_t length = last - data;
             const uint8_t* p = data+1;
-            const uint8_t* last = data + length;
             switch (*data)
             {
             case 0xf9: // Half-Precision Float (two-byte IEEE 754)
@@ -389,9 +388,8 @@ namespace detail {
                     }
                     else
                     {
-                        uint16_t x = binary::detail::from_big_endian<uint16_t>(p, last);
+                        uint16_t x = binary::detail::from_big_endian<uint16_t>(p,last,endp);
                         val = binary::detail::decode_half(x);
-                        *endp = p + sizeof(uint16_t);
                     }
                 }
                 break;
@@ -405,8 +403,7 @@ namespace detail {
                     }
                     else
                     {
-                        val = binary::detail::from_big_endian<float>(p,last);
-                        *endp = p + sizeof(float);
+                        val = binary::detail::from_big_endian<float>(p,last,endp);
                     }
                 }
                 break;
@@ -419,8 +416,7 @@ namespace detail {
                     }
                     else
                     {
-                        val = binary::detail::from_big_endian<double>(p,last);
-                        *endp = p + sizeof(double);
+                        val = binary::detail::from_big_endian<double>(p,last,endp);
                     }
                 }
                 break;
@@ -559,28 +555,32 @@ namespace detail {
             
         case 0x58: // byte string (one-byte uint8_t for n follows)
             {
-                const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint8_t>(it,end,&endp);
                 it += sizeof(uint8_t);
                 return it + len;
             }
             
         case 0x59: // byte string (two-byte uint16_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint16_t>(it,end,&endp);
                 it += sizeof(uint16_t);
                 return it + len;
             }
             
         case 0x5a: // byte string (four-byte uint32_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint32_t>(it,end,&endp);
                 it += sizeof(uint32_t);
                 return it + len;
             }
             
         case 0x5b: // byte string (eight-byte uint64_t for n follow)
             {
-                const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint64_t>(it,end,&endp);
                 it += sizeof(uint64_t);
                 return it + len;
             }
@@ -607,28 +607,32 @@ namespace detail {
             // UTF-8 string (one-byte uint8_t for n follows)
         case 0x78:
             {
-                const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint8_t>(it,end,&endp);
                 it += sizeof(uint8_t);
                 return it + len;
             }
             // UTF-8 string (two-byte uint16_t for n follow)
         case 0x79:
             {
-                const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint16_t>(it,end,&endp);
                 it += sizeof(uint16_t);
                 return it + len;
             }
             // UTF-8 string (four-byte uint32_t for n follow)
         case 0x7a:
             {
-                const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint32_t>(it,end,&endp);
                 it += sizeof(uint32_t);
                 return it + len;
             }
             // UTF-8 string (eight-byte uint64_t for n follow)
         case 0x7b:
             {
-                const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint64_t>(it,end,&endp);
                 it += sizeof(uint64_t);
                 return it + len;
             }
@@ -655,7 +659,8 @@ namespace detail {
             // array (one-byte uint8_t for n follows)
         case 0x98:
             {
-                const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint8_t>(it,end,&endp);
                 it += sizeof(uint8_t);
                 return walk_array(it, end, len);
             }
@@ -663,7 +668,8 @@ namespace detail {
             // array (two-byte uint16_t for n follow)
         case 0x99:
             {
-                const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint16_t>(it,end,&endp);
                 it += sizeof(uint16_t);
                 return walk_array(it, end, len);
             }
@@ -671,7 +677,8 @@ namespace detail {
             // array (four-byte uint32_t for n follow)
         case 0x9a:
             {
-                const auto len = binary::detail::from_big_endian<int32_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<int32_t>(it,end,&endp);
                 it += sizeof(uint32_t);
                 return walk_array(it, end, len);
             }
@@ -679,7 +686,8 @@ namespace detail {
             // array (eight-byte uint64_t for n follow)
         case 0x9b:
             {
-                const auto len = binary::detail::from_big_endian<int64_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<int64_t>(it,end,&endp);
                 it += sizeof(uint64_t);
                 return walk_array(it, end, len);
             }
@@ -703,7 +711,8 @@ namespace detail {
             // map (one-byte uint8_t for n follows)
         case 0xb8:
             {
-                const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint8_t>(it,end,&endp);
                 it += sizeof(uint8_t);
                 return walk_object(it, end, len);
             }
@@ -711,7 +720,8 @@ namespace detail {
             // map (two-byte uint16_t for n follow)
         case 0xb9:
             {
-                const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint16_t>(it,end,&endp);
                 it += sizeof(uint16_t);
                 return walk_object(it, end, len);
             }
@@ -719,7 +729,8 @@ namespace detail {
             // map (four-byte uint32_t for n follow)
         case 0xba:
             {
-                const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint32_t>(it,end,&endp);
                 it += sizeof(uint32_t);
                 return walk_object(it, end, len);
             }
@@ -727,7 +738,8 @@ namespace detail {
             // map (eight-byte uint64_t for n follow)
         case 0xbb:
             {
-                const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint64_t>(it,end,&endp);
                 it += sizeof(uint64_t);
                 return walk_object(it, end, len);
             }
@@ -804,7 +816,8 @@ namespace detail {
         // array (one-byte uint8_t for n follows)
         case 0x98: 
         {
-            const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+            const uint8_t* endp;
+            const auto len = binary::detail::from_big_endian<uint8_t>(it,end,&endp);
             it += sizeof(uint8_t); 
             return std::make_tuple(len,it);
         }
@@ -812,7 +825,8 @@ namespace detail {
         // array (two-byte uint16_t for n follow)
         case 0x99: 
         {
-            const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+            const uint8_t* endp;
+            const auto len = binary::detail::from_big_endian<uint16_t>(it,end,&endp);
             it += sizeof(uint16_t); 
             return std::make_tuple(len,it);
         }
@@ -820,7 +834,8 @@ namespace detail {
         // array (four-byte uint32_t for n follow)
         case 0x9a: 
         {
-            const auto len = binary::detail::from_big_endian<int32_t>(it,end);
+            const uint8_t* endp;
+            const auto len = binary::detail::from_big_endian<int32_t>(it,end,&endp);
             it += sizeof(uint32_t); 
             return std::make_tuple(len,it);
         }
@@ -828,7 +843,8 @@ namespace detail {
         // array (eight-byte uint64_t for n follow)
         case 0x9b: 
         {
-            const auto len = binary::detail::from_big_endian<int64_t>(it,end);
+            const uint8_t* endp;
+            const auto len = binary::detail::from_big_endian<int64_t>(it,end,&endp);
             it += sizeof(uint64_t); 
             return std::make_tuple(len,it);
         }
@@ -856,7 +872,8 @@ namespace detail {
         // map (one-byte uint8_t for n follows)
         case 0xb8: 
         {
-            const auto len = binary::detail::from_big_endian<uint8_t>(it,end);
+            const uint8_t* endp;
+            const auto len = binary::detail::from_big_endian<uint8_t>(it,end,&endp);
             it += sizeof(uint8_t); 
             return std::make_tuple(len,it);
         }
@@ -864,7 +881,8 @@ namespace detail {
         // map (two-byte uint16_t for n follow)
         case 0xb9: 
         {
-            const auto len = binary::detail::from_big_endian<uint16_t>(it,end);
+            const uint8_t* endp;
+            const auto len = binary::detail::from_big_endian<uint16_t>(it,end,&endp);
             it += sizeof(uint16_t); 
             return std::make_tuple(len,it);
         }
@@ -872,7 +890,8 @@ namespace detail {
         // map (four-byte uint32_t for n follow)
         case 0xba: 
         {
-            const auto len = binary::detail::from_big_endian<uint32_t>(it,end);
+            const uint8_t* endp;
+            const auto len = binary::detail::from_big_endian<uint32_t>(it,end,&endp);
             it += sizeof(uint32_t); 
             return std::make_tuple(len,it);
         }
@@ -880,7 +899,8 @@ namespace detail {
         // map (eight-byte uint64_t for n follow)
         case 0xbb: 
         {
-            const auto len = binary::detail::from_big_endian<uint64_t>(it,end);
+            const uint8_t* endp;
+            const auto len = binary::detail::from_big_endian<uint64_t>(it,end,&endp);
             it += sizeof(uint64_t); 
             return std::make_tuple(len,it);
         }
@@ -1043,7 +1063,7 @@ public:
     int64_t as_integer() const
     {
         const uint8_t* endp;
-        int64_t val = detail::get_integer(buffer_,buflen_,&endp);
+        int64_t val = detail::get_integer(buffer_,buffer_+buflen_,&endp);
         if (endp == buffer_)
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -1054,7 +1074,7 @@ public:
     double as_double() const
     {
         const uint8_t* endp;
-        double val = detail::get_double(buffer_,buflen_,&endp);
+        double val = detail::get_double(buffer_,buffer_+buflen_,&endp);
         if (endp == buffer_)
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -1395,7 +1415,7 @@ public:
         case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
             {
                 const uint8_t* endp;
-                uint64_t val = detail::get_uinteger(pos,end_-pos,&endp);
+                uint64_t val = detail::get_uinteger(pos,end_,&endp);
                 if (endp == pos)
                 {
                     JSONCONS_THROW(cbor_decode_error(endp-begin_));
@@ -1416,7 +1436,7 @@ public:
         case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
             {
                 const uint8_t* endp;
-                int64_t val = detail::get_integer(pos,end_-pos,&endp);
+                int64_t val = detail::get_integer(pos,end_,&endp);
                 if (endp == pos)
                 {
                     JSONCONS_THROW(cbor_decode_error(endp-begin_));
@@ -1466,7 +1486,8 @@ public:
             // array (one-byte uint8_t for n follows)
         case 0x98:
             {
-                const auto len = binary::detail::from_big_endian<uint8_t>(it_,end_);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint8_t>(it_,end_,&endp);
                 it_ += sizeof(uint8_t);
                 return get_fixed_length_array(len);
             }
@@ -1474,7 +1495,8 @@ public:
             // array (two-byte uint16_t for n follow)
         case 0x99:
             {
-                const auto len = binary::detail::from_big_endian<uint16_t>(it_,end_);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint16_t>(it_,end_,&endp);
                 it_ += sizeof(uint16_t);
                 return get_fixed_length_array(len);
             }
@@ -1482,7 +1504,8 @@ public:
             // array (four-byte uint32_t for n follow)
         case 0x9a:
             {
-                const auto len = binary::detail::from_big_endian<int32_t>(it_,end_);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<int32_t>(it_,end_,&endp);
                 it_ += sizeof(uint32_t);
                 return get_fixed_length_array(len);
             }
@@ -1490,7 +1513,8 @@ public:
             // array (eight-byte uint64_t for n follow)
         case 0x9b:
             {
-                const auto len = binary::detail::from_big_endian<int64_t>(it_,end_);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<int64_t>(it_,end_,&endp);
                 it_ += sizeof(uint64_t);
                 return get_fixed_length_array(len);
             }
@@ -1516,7 +1540,8 @@ public:
             // map (one-byte uint8_t for n follows)
         case 0xb8:
             {
-                const auto len = binary::detail::from_big_endian<uint8_t>(it_,end_);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint8_t>(it_,end_,&endp);
                 it_ += sizeof(uint8_t);
                 return get_fixed_length_map(len);
             }
@@ -1524,7 +1549,8 @@ public:
             // map (two-byte uint16_t for n follow)
         case 0xb9:
             {
-                const auto len = binary::detail::from_big_endian<uint16_t>(it_,end_);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint16_t>(it_,end_,&endp);
                 it_ += sizeof(uint16_t);
                 return get_fixed_length_map(len);
             }
@@ -1532,7 +1558,8 @@ public:
             // map (four-byte uint32_t for n follow)
         case 0xba:
             {
-                const auto len = binary::detail::from_big_endian<uint32_t>(it_,end_);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint32_t>(it_,end_,&endp);
                 it_ += sizeof(uint32_t);
                 return get_fixed_length_map(len);
             }
@@ -1540,7 +1567,8 @@ public:
             // map (eight-byte uint64_t for n follow)
         case 0xbb:
             {
-                const auto len = binary::detail::from_big_endian<uint64_t>(it_,end_);
+                const uint8_t* endp;
+                const auto len = binary::detail::from_big_endian<uint64_t>(it_,end_,&endp);
                 it_ += sizeof(uint64_t);
                 return get_fixed_length_map(len);
             }
@@ -1584,7 +1612,7 @@ public:
         case 0xfb: // Double-Precision Float (eight-byte IEEE 754)
             {
                 const uint8_t* endp;
-                double val = detail::get_double(pos,end_-pos,&endp);
+                double val = detail::get_double(pos,end_,&endp);
                 if (endp == pos)
                 {
                     JSONCONS_THROW(cbor_decode_error(endp-begin_));

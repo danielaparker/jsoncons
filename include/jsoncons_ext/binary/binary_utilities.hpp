@@ -266,64 +266,84 @@ void to_big_endian(double val, std::vector<uint8_t>& v)
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint8_t),T>::type
-from_big_endian(const uint8_t* it, const uint8_t* end)
+from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    if (it + sizeof(T) > end)
+    if (first + sizeof(T) > last)
     {
-        JSONCONS_THROW(read_nbytes_failed(sizeof(T)));
+        *endp = first;
+        return 0;
     }
-    return static_cast<T>(*(it));
+    else
+    {
+        *endp = first + sizeof(T);
+        return static_cast<T>(*(first));
+    }
 }
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint16_t),T>::type
-from_big_endian(const uint8_t* it, const uint8_t* end)
+from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    if (it + sizeof(T) > end)
+    if (first + sizeof(T) > last)
     {
-        JSONCONS_THROW(read_nbytes_failed(sizeof(T)));
+        *endp = first;
+        return 0;
     }
-    return JSONCONS_BINARY_TO_BE16(*reinterpret_cast<const uint16_t*>(it));
+    else
+    {
+        *endp = first + sizeof(T);
+        return JSONCONS_BINARY_TO_BE16(*reinterpret_cast<const uint16_t*>(first));
+    }
 }
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
-from_big_endian(const uint8_t* it, const uint8_t* end)
+from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    if (it + sizeof(T) > end)
+    if (first + sizeof(T) > last)
     {
-        JSONCONS_THROW(read_nbytes_failed(sizeof(T)));
+        *endp = first;
+        return 0;
     }
-    return JSONCONS_BINARY_TO_BE32(*reinterpret_cast<const uint32_t*>(it));
+    else
+    {
+        *endp = first + sizeof(T);
+        return JSONCONS_BINARY_TO_BE32(*reinterpret_cast<const uint32_t*>(first));
+    }
 }
 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint64_t),T>::type
-from_big_endian(const uint8_t* it, const uint8_t* end)
+from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    if (it + sizeof(T) > end)
+    if (first + sizeof(T) > last)
     {
-        JSONCONS_THROW(read_nbytes_failed(sizeof(T)));
+        *endp = first;
+        return 0;
     }
-    return JSONCONS_BINARY_TO_BE64(*reinterpret_cast<const uint64_t*>(it));
+    else
+    {
+        *endp = first + sizeof(T);
+        return JSONCONS_BINARY_TO_BE64(*reinterpret_cast<const uint64_t*>(first));
+    }
 }
 
 template<class T>
 typename std::enable_if<std::is_floating_point<T>::value && 
 sizeof(T) == sizeof(uint32_t),T>::type
-from_big_endian(const uint8_t* it, const uint8_t* end)
+from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    uint32_t data = from_big_endian<uint32_t>(it,end);
+    uint32_t data = from_big_endian<uint32_t>(first,last,endp);
     return *reinterpret_cast<T*>(&data);
 }
 
 template<class T>
 typename std::enable_if<std::is_floating_point<T>::value && 
 sizeof(T) == sizeof(uint64_t),T>::type
-from_big_endian(const uint8_t* it, const uint8_t* end)
+from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    uint64_t data = from_big_endian<uint64_t>(it,end);
+    uint64_t data = from_big_endian<uint64_t>(first,last,endp);
     return *reinterpret_cast<T*>(&data);
 }
 
