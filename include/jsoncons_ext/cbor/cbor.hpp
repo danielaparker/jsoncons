@@ -1338,6 +1338,8 @@ namespace detail {
 
 // cbor_view
 
+namespace detail {
+
 template <class T>
 class const_array_iterator
 {
@@ -1399,13 +1401,114 @@ public:
     }
 };
 
+template <class T>
+class const_object_iterator;
+
+template <class T>
+class key_value_pair
+{
+    const uint8_t* key_begin_;
+    const uint8_t* key_end_;
+    const uint8_t* val_begin_;
+    const uint8_t* val_end_;
+
+public:
+    friend class const_object_iterator<T>;
+
+    key_value_pair()
+        : key_begin_(nullptr), key_end_(nullptr), val_begin_(nullptr), val_end_(nullptr)
+    {
+    }
+    key_value_pair(const uint8_t* key_begin, const uint8_t* key_end, const uint8_t* val_begin, const uint8_t* val_end)
+        : key_begin_(key_begin), key_end_(key_end), val_begin_(val_begin), val_end_(val_end)
+    {
+    }
+    key_value_pair(const key_value_pair& other) = default;
+
+    T key() const
+    {
+        return T(key_begin_, key_end_ - key_begin_);
+    }
+
+    T value() const
+    {
+        return T(val_begin_, val_end_ - val_begin_);
+    }
+};
+
+template <class T>
+class const_object_iterator
+{
+    const uint8_t* p_;
+    const uint8_t* last_;
+    key_value_pair<T> kvpair_;
+public:
+    typedef typename T::difference_type difference_type;
+    typedef key_value_pair<T> value_type;
+    typedef const key_value_pair<T>& reference;
+    typedef const key_value_pair<T>* pointer;
+    typedef std::forward_iterator_tag iterator_catagory;
+
+    const_object_iterator()
+        : p_(nullptr), last_(nullptr)
+    {
+    }
+
+    const_object_iterator(const uint8_t* p, const uint8_t* last)
+        : p_(p), last_(last)
+    {
+    }
+
+    const_object_iterator(const const_object_iterator& other) = default;
+
+    friend bool operator==(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+    {
+        return lhs.p_ == rhs.p_; 
+    }
+
+    friend bool operator!=(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+    {
+        return lhs.p_ != rhs.p_; 
+    }
+
+    friend bool operator<(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+    {
+        return lhs.p_ == rhs.p_; 
+    }
+
+    const_object_iterator& operator++()
+    {
+        p_ = detail::walk(p_, last_);
+        p_ = detail::walk(p_, last_);
+        return *this;
+    }
+
+    reference operator*() const
+    {
+        const_cast<key_value_pair<T>*>(&kvpair_)->key_begin_ = p_;
+        const_cast<key_value_pair<T>*>(&kvpair_)->key_end_ = detail::walk(kvpair_.key_begin_, last_);
+        const_cast<key_value_pair<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
+        const_cast<key_value_pair<T>*>(&kvpair_)->val_end_ = detail::walk(kvpair_.val_begin_, last_);
+        return kvpair_;
+    }
+
+    pointer operator->() const
+    {
+        const_cast<key_value_pair<T>*>(&kvpair_)->key_begin_ = p_;
+        const_cast<key_value_pair<T>*>(&kvpair_)->key_end_ = detail::walk(kvpair_.key_begin_, last_);
+        const_cast<key_value_pair<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
+        const_cast<key_value_pair<T>*>(&kvpair_)->val_end_ = detail::walk(kvpair_.val_begin_, last_);
+        return &kvpair_;
+    }
+};
+
+} // namespace detail
+
 class cbor_view 
 {
     const uint8_t* first_;
     const uint8_t* last_; 
 public:
-    class const_object_iterator;
-
     typedef std::ptrdiff_t difference_type;
     typedef cbor_view value_type;
     typedef cbor_view& reference;
@@ -1416,101 +1519,11 @@ public:
     typedef char char_type;
     typedef std::char_traits<char_type> char_traits_type;
     typedef basic_string_view_ext<char_type> string_view_type;
-
-    class key_value_pair
-    {
-        const uint8_t* key_begin_;
-        const uint8_t* key_end_;
-        const uint8_t* val_begin_;
-        const uint8_t* val_end_;
-
-        friend const_object_iterator;
-    public:
-        key_value_pair()
-            : key_begin_(nullptr), key_end_(nullptr), val_begin_(nullptr), val_end_(nullptr)
-        {
-        }
-        key_value_pair(const uint8_t* key_begin, const uint8_t* key_end, const uint8_t* val_begin, const uint8_t* val_end)
-            : key_begin_(key_begin), key_end_(key_end), val_begin_(val_begin), val_end_(val_end)
-        {
-        }
-        key_value_pair(const key_value_pair& other) = default;
-
-        cbor_view key() const
-        {
-            return cbor_view(key_begin_, key_end_ - key_begin_);
-        }
-
-        cbor_view value() const
-        {
-            return cbor_view(val_begin_, val_end_ - val_begin_);
-        }
-    };
-
-    class const_object_iterator
-    {
-        const uint8_t* p_;
-        const uint8_t* last_;
-        key_value_pair kvpair_;
-    public:
-        typedef cbor_view::difference_type difference_type;
-        typedef key_value_pair value_type;
-        typedef const key_value_pair& reference;
-        typedef const key_value_pair* pointer;
-        typedef std::forward_iterator_tag iterator_catagory;
-
-        const_object_iterator()
-            : p_(nullptr), last_(nullptr)
-        {
-        }
-
-        const_object_iterator(const uint8_t* p, const uint8_t* last)
-            : p_(p), last_(last)
-        {
-        }
-
-        const_object_iterator(const const_object_iterator& other) = default;
-
-        friend bool operator==(const const_object_iterator& lhs, const const_object_iterator& rhs) 
-        {
-            return lhs.p_ == rhs.p_; 
-        }
-
-        friend bool operator!=(const const_object_iterator& lhs, const const_object_iterator& rhs) 
-        {
-            return lhs.p_ != rhs.p_; 
-        }
-
-        friend bool operator<(const const_object_iterator& lhs, const const_object_iterator& rhs) 
-        {
-            return lhs.p_ == rhs.p_; 
-        }
-
-        const_object_iterator& operator++()
-        {
-            p_ = detail::walk(p_, last_);
-            p_ = detail::walk(p_, last_);
-            return *this;
-        }
-
-        reference operator*() const
-        {
-            const_cast<key_value_pair*>(&kvpair_)->key_begin_ = p_;
-            const_cast<key_value_pair*>(&kvpair_)->key_end_ = detail::walk(kvpair_.key_begin_, last_);
-            const_cast<key_value_pair*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
-            const_cast<key_value_pair*>(&kvpair_)->val_end_ = detail::walk(kvpair_.val_begin_, last_);
-            return kvpair_;
-        }
-
-        pointer operator->() const
-        {
-            const_cast<key_value_pair*>(&kvpair_)->key_begin_ = p_;
-            const_cast<key_value_pair*>(&kvpair_)->key_end_ = detail::walk(kvpair_.key_begin_, last_);
-            const_cast<key_value_pair*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
-            const_cast<key_value_pair*>(&kvpair_)->val_end_ = detail::walk(kvpair_.val_begin_, last_);
-            return &kvpair_;
-        }
-    };
+    typedef detail::const_object_iterator<cbor_view> object_iterator;
+    typedef detail::const_object_iterator<cbor_view> const_object_iterator;
+    typedef detail::const_array_iterator<cbor_view> array_iterator;
+    typedef detail::const_array_iterator<cbor_view> const_array_iterator;
+    typedef detail::key_value_pair<cbor_view> key_value_pair_type;
 
     range<const_object_iterator> object_range() const
     {
@@ -1527,7 +1540,7 @@ public:
         return range<const_object_iterator>(const_object_iterator(start,endp), const_object_iterator(endp, endp));
     }
 
-    range<const_array_iterator<cbor_view>> array_range() const
+    range<const_array_iterator> array_range() const
     {
         const uint8_t* endp;
         size_t length = detail::get_fixed_array_size(first_,last_,&endp);
@@ -1538,7 +1551,7 @@ public:
             endp = detail::walk(endp, last_);
         }
 
-        return range<const_array_iterator<cbor_view>>(const_array_iterator<cbor_view>(start,endp), const_array_iterator<cbor_view>(endp, endp));
+        return range<const_array_iterator>(const_array_iterator(start,endp), const_array_iterator(endp, endp));
     }
 
     cbor_view()
