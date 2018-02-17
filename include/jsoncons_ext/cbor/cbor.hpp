@@ -1276,8 +1276,8 @@ namespace detail {
 
 class cbor_view 
 {
-    const uint8_t* buffer_;
-    size_t buflen_; 
+    const uint8_t* first_;
+    const uint8_t* last_; 
 public:
     class const_object_iterator;
 
@@ -1342,12 +1342,6 @@ public:
         const_object_iterator(const uint8_t* p, const uint8_t* last)
             : p_(p), last_(last)
         {
-            if (p_ < last_)
-            {
-                const uint8_t* endp;
-                size_t length = detail::get_fixed_object_size(p_,last_,&endp);
-                p_ = endp;
-            }
         }
 
         const_object_iterator(const const_object_iterator& other) = default;
@@ -1395,26 +1389,36 @@ public:
 
     range<const_object_iterator> object_range() const
     {
-        return range<const_object_iterator>(const_object_iterator(buffer_,buffer_+buflen_), const_object_iterator(buffer_+buflen_, buffer_ + buflen_));
+        const uint8_t* endp;
+        size_t length = detail::get_fixed_object_size(first_,last_,&endp);
+        const uint8_t* start = endp;
+
+        for (size_t i = 0; i < length; ++i)
+        {
+            endp = detail::walk(endp, last_);
+            endp = detail::walk(endp, last_);
+        }
+
+        return range<const_object_iterator>(const_object_iterator(start,endp), const_object_iterator(endp, endp));
     }
 
     cbor_view()
-        : buffer_(nullptr), buflen_(0)
+        : first_(nullptr), last_(nullptr)
     {
     }
 
     cbor_view(const uint8_t* buffer, size_t buflen)
-        : buffer_(buffer), buflen_(buflen)
+        : first_(buffer), last_(buffer+buflen)
     {
     }
 
     cbor_view(const std::vector<uint8_t>& v)
-        : buffer_(v.data()), buflen_(v.size())
+        : first_(v.data()), last_(v.data()+v.size())
     {
     }
 
     cbor_view(const cbor_view& other)
-        : buffer_(other.buffer_), buflen_(other.buflen_)
+        : first_(other.first_), last_(other.last_)
     {
     }
 
@@ -1422,7 +1426,7 @@ public:
 
     friend bool operator==(const cbor_view& lhs, const cbor_view& rhs) 
     {
-        return lhs.buffer_ == rhs.buffer_ && lhs.buflen_ == rhs.buflen_; 
+        return lhs.first_ == rhs.first_ && lhs.last_ == rhs.last_; 
     }
 
     friend bool operator!=(const cbor_view& lhs, const cbor_view& rhs) 
@@ -1432,31 +1436,31 @@ public:
 
     const uint8_t* buffer() const
     {
-        return buffer_;
+        return first_;
     }
 
     const size_t buflen() const
     {
-        return buflen_;
+        return last_ - first_;
     }
 
     bool is_array() const
     {
-        JSONCONS_ASSERT(buflen_ > 0);
-        return detail::is_array(buffer_[0]);
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_array(first_[0]);
     }
 
     bool is_object() const
     {
-        JSONCONS_ASSERT(buflen_ > 0);
-        return detail::is_object(buffer_[0]);
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_object(first_[0]);
     }
 
     size_t size() const
     {
         size_t len;
         const uint8_t* it;
-        std::tie(len, it) = detail::size(buffer_,buffer_+buflen_);
+        std::tie(len, it) = detail::size(first_,last_);
         return len;
     }
 
@@ -1464,17 +1468,16 @@ public:
     {
         JSONCONS_ASSERT(is_array());
         size_t len;
-        const uint8_t* it = buffer_;
-        const uint8_t* end = buffer_ + buflen_;
+        const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::size(it, end);
+        std::tie(len, it) = detail::size(it, last_);
 
         for (size_t i = 0; i < index; ++i)
         {
-            it = detail::walk(it, end);
+            it = detail::walk(it, last_);
         }
 
-        const uint8_t* last = detail::walk(it,end);
+        const uint8_t* last = detail::walk(it,last_);
 
         return cbor_view(it,last-it);
     }
@@ -1483,22 +1486,21 @@ public:
     {
         JSONCONS_ASSERT(is_object());
         size_t len;
-        const uint8_t* it = buffer_;
-        const uint8_t* end = buffer_ + buflen_;
+        const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::size(buffer_, end);
+        std::tie(len, it) = detail::size(first_, last_);
 
         for (size_t i = 0; i < len; ++i)
         {
             string_type a_key;
-            std::tie(a_key,it) = detail::get_fixed_length_text_string(it, end);
+            std::tie(a_key,it) = detail::get_fixed_length_text_string(it, last_);
             if (a_key == key)
             {
-                const uint8_t* last = detail::walk(it, end);
+                const uint8_t* last = detail::walk(it, last_);
                 JSONCONS_ASSERT(last >= it);
                 return cbor_view(it,last-it);
             }
-            const uint8_t* last = detail::walk(it, end);
+            const uint8_t* last = detail::walk(it, last_);
             it = last;
         }
         JSONCONS_THROW(json_exception_impl<std::runtime_error>("Key not found"));
@@ -1511,20 +1513,19 @@ public:
             return false;
         }
         size_t len;
-        const uint8_t* it = buffer_;
-        const uint8_t* end = buffer_ + buflen_;
+        const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::size(it, end);
+        std::tie(len, it) = detail::size(it, last_);
 
         for (size_t i = 0; i < len; ++i)
         {
             string_type a_key;
-            std::tie(a_key,it) = detail::get_fixed_length_text_string(it, end);
+            std::tie(a_key,it) = detail::get_fixed_length_text_string(it, last_);
             if (a_key == key)
             {
                 return true;
             }
-            it = detail::walk(it, end);
+            it = detail::walk(it, last_);
         }
         return false;
     }
@@ -1532,8 +1533,8 @@ public:
     int64_t as_integer() const
     {
         const uint8_t* endp;
-        int64_t val = detail::get_integer(buffer_,buffer_+buflen_,&endp);
-        if (endp == buffer_)
+        int64_t val = detail::get_integer(first_,last_,&endp);
+        if (endp == first_)
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
@@ -1543,8 +1544,8 @@ public:
     double as_double() const
     {
         const uint8_t* endp;
-        double val = detail::get_double(buffer_,buffer_+buflen_,&endp);
-        if (endp == buffer_)
+        double val = detail::get_double(first_,last_,&endp);
+        if (endp == first_)
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
