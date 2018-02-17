@@ -1389,14 +1389,16 @@ public:
     reference operator*() const
     {
         const uint8_t* endp = detail::walk(p_, last_);
-        *const_cast<T*>(&current_) = cbor_view(p_,endp-p_);
+        const_cast<T*>(&current_)->first_ = p_;
+        const_cast<T*>(&current_)->last_ = endp;
         return current_;
     }
 
     pointer operator->() const
     {
         const uint8_t* endp = detail::walk(p_, last_);
-        *const_cast<T*>(&current_) = cbor_view(p_,endp-p_);
+        const_cast<T*>(&current_)->first_ = p_;
+        const_cast<T*>(&current_)->last_ = endp;
         return &current_;
     }
 };
@@ -1524,6 +1526,8 @@ public:
     typedef detail::const_array_iterator<cbor_view> array_iterator;
     typedef detail::const_array_iterator<cbor_view> const_array_iterator;
     typedef detail::key_value_pair<cbor_view> key_value_pair_type;
+
+    friend class const_array_iterator;
 
     range<const_object_iterator> object_range() const
     {
