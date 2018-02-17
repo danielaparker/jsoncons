@@ -47,6 +47,7 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
     std::cout << pretty_print(jv) << std::endl;
 
     cbor_view reputons = v.at("reputons");
+    BOOST_CHECK(reputons.is_array());
 
     cbor_view reputons_0 = reputons.at(0);
 
@@ -64,6 +65,14 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
 
         std::cout << jkey << " " << jval << std::endl;
     }
+    std::cout << std::endl;
+
+    for (auto element : reputons.array_range())
+    {
+        json j = decode_cbor<json>(element);
+        std::cout << j << std::endl;
+    }
+    std::cout << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(jsonpointer_test)

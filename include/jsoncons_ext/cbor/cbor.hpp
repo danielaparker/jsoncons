@@ -362,6 +362,75 @@ namespace detail {
     }
 
     inline
+    size_t get_fixed_array_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    {
+        size_t size = 0;
+
+        if (JSONCONS_UNLIKELY(last <= first))
+        {
+            *endp = first; 
+        }
+        else
+        {
+            const uint8_t* p = first+1;
+            switch (*first)
+            {
+            case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
+                {
+                    size = *first & 0x1f;
+                    *endp = p;
+                    break;
+                }
+
+            case 0x98: // array (one-byte uint8_t for n follows)
+                {
+                    size = binary::from_big_endian<uint8_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    break;
+                }
+
+            case 0x99: // array (two-byte uint16_t for n follow)
+                {
+                    size = binary::from_big_endian<uint16_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    break;
+                }
+
+            case 0x9a: // array (four-byte uint32_t for n follow)
+                {
+                    size = binary::from_big_endian<int32_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    break;
+                }
+
+            case 0x9b: // array (eight-byte uint64_t for n follow)
+                {
+                    size = binary::from_big_endian<int64_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    break;
+                }
+            default:
+                {
+                    *endp = first; 
+                }
+            }
+        }
+        return size;
+    }
+
+    inline
     uint64_t get_uinteger(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     {
         uint64_t val = 0;
@@ -892,14 +961,13 @@ namespace detail {
                 return it;
             }
 
-            // array (0x00..0x17 data items follow)
-        case JSONCONS_CBOR_0x80_0x97:
+            
+        case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
             {
                 return walk_array(it, end, *pos & 0x1f);
             }
 
-            // array (one-byte uint8_t for n follows)
-        case 0x98:
+        case 0x98: // array (one-byte uint8_t for n follows)
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
@@ -914,8 +982,7 @@ namespace detail {
                 return walk_array(it, end, len);
             }
 
-            // array (two-byte uint16_t for n follow)
-        case 0x99:
+        case 0x99: // array (two-byte uint16_t for n follow)
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
@@ -930,8 +997,7 @@ namespace detail {
                 return walk_array(it, end, len);
             }
 
-            // array (four-byte uint32_t for n follow)
-        case 0x9a:
+        case 0x9a: // array (four-byte uint32_t for n follow)
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<int32_t>(it,end,&endp);
@@ -946,8 +1012,7 @@ namespace detail {
                 return walk_array(it, end, len);
             }
 
-            // array (eight-byte uint64_t for n follow)
-        case 0x9b:
+        case 0x9b: // array (eight-byte uint64_t for n follow)
             {
                 const uint8_t* endp;
                 const auto len = binary::from_big_endian<int64_t>(it,end,&endp);
@@ -962,8 +1027,7 @@ namespace detail {
                 return walk_array(it, end, len);
             }
 
-            // array (indefinite length)
-        case 0x9f:
+        case 0x9f: // array (indefinite length)
             {
                 while (*it != 0xff)
                 {
@@ -1274,6 +1338,67 @@ namespace detail {
 
 // cbor_view
 
+template <class T>
+class const_array_iterator
+{
+    const uint8_t* p_;
+    const uint8_t* last_;
+    T current_;
+public:
+    typedef typename T::difference_type difference_type;
+    typedef typename T::value_type value_type;
+    typedef typename T::const_reference reference;
+    typedef typename T::const_pointer pointer;
+    typedef std::forward_iterator_tag iterator_catagory;
+
+    const_array_iterator()
+        : p_(nullptr), last_(nullptr)
+    {
+    }
+
+    const_array_iterator(const uint8_t* p, const uint8_t* last)
+        : p_(p), last_(last)
+    {
+    }
+
+    const_array_iterator(const const_array_iterator& other) = default;
+
+    friend bool operator==(const const_array_iterator& lhs, const const_array_iterator& rhs) 
+    {
+        return lhs.p_ == rhs.p_; 
+    }
+
+    friend bool operator!=(const const_array_iterator& lhs, const const_array_iterator& rhs) 
+    {
+        return lhs.p_ != rhs.p_; 
+    }
+
+    friend bool operator<(const const_array_iterator& lhs, const const_array_iterator& rhs) 
+    {
+        return lhs.p_ == rhs.p_; 
+    }
+
+    const_array_iterator& operator++()
+    {
+        p_ = detail::walk(p_, last_);
+        return *this;
+    }
+
+    reference operator*() const
+    {
+        const uint8_t* endp = detail::walk(p_, last_);
+        *const_cast<T*>(&current_) = cbor_view(p_,endp-p_);
+        return current_;
+    }
+
+    pointer operator->() const
+    {
+        const uint8_t* endp = detail::walk(p_, last_);
+        *const_cast<T*>(&current_) = cbor_view(p_,endp-p_);
+        return &current_;
+    }
+};
+
 class cbor_view 
 {
     const uint8_t* first_;
@@ -1400,6 +1525,20 @@ public:
         }
 
         return range<const_object_iterator>(const_object_iterator(start,endp), const_object_iterator(endp, endp));
+    }
+
+    range<const_array_iterator<cbor_view>> array_range() const
+    {
+        const uint8_t* endp;
+        size_t length = detail::get_fixed_array_size(first_,last_,&endp);
+        const uint8_t* start = endp;
+
+        for (size_t i = 0; i < length; ++i)
+        {
+            endp = detail::walk(endp, last_);
+        }
+
+        return range<const_array_iterator<cbor_view>>(const_array_iterator<cbor_view>(start,endp), const_array_iterator<cbor_view>(endp, endp));
     }
 
     cbor_view()
