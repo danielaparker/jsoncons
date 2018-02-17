@@ -1527,7 +1527,7 @@ public:
     typedef detail::const_array_iterator<cbor_view> const_array_iterator;
     typedef detail::key_value_pair<cbor_view> key_value_pair_type;
 
-    friend class const_array_iterator;
+    friend class detail::const_array_iterator<cbor_view>;
 
     range<const_object_iterator> object_range() const
     {
