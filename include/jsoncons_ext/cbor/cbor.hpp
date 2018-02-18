@@ -280,7 +280,6 @@ namespace detail {
                 }
                 return std::make_tuple(s, endp);
             }
-            //return detail::get_fixed_length_text_string(pos,end);
         }
     }
 
@@ -1779,8 +1778,16 @@ public:
 
         for (size_t i = 0; i < len; ++i)
         {
-            string_type a_key;
-            std::tie(a_key,it) = detail::get_fixed_length_text_string(it, last_);
+            const uint8_t* endp;
+            string_type a_key = detail::get_text_string(it, last_,&endp);
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(last_-it));
+            }
+            else
+            {
+                it = endp;
+            }
             if (a_key == key)
             {
                 return true;
