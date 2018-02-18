@@ -72,7 +72,7 @@ cbor_view(const cbor_view& other); // (4)
     <td>Returns a view of the CBOR array element at specified index <code>pos</code>.</td> 
   </tr>
   <tr>
-    <td><code>cbor_view at(const std::string& key) const</code></td>
+    <td><code>cbor_view at(const string_view_type& key) const</code></td>
     <td>Returns a view of the CBOR object member value with key equivalent to <code>key</code>.</td> 
   </tr>
 </table>

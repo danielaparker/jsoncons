@@ -117,6 +117,7 @@ BOOST_AUTO_TEST_CASE(cbor_decode_test)
     check_decode({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
     check_decode({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
 
+
     // text strings with undefined length
     check_decode({0x7f,0xff}, json(""));
     check_decode({0x7f,0x60,0xff}, json(""));

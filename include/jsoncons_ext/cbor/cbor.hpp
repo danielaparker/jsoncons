@@ -70,6 +70,96 @@ namespace detail {
     const uint8_t* walk(const uint8_t* it, const uint8_t* end);
 
     inline 
+    std::string get_text_string(const uint8_t* first, const uint8_t* last, 
+                                const uint8_t** endp)
+    {
+        std::string s;
+        if (JSONCONS_UNLIKELY(last <= first))
+        {
+            *endp = first; 
+        }
+        else
+        {
+            const uint8_t* p = first+1;
+            switch (*first)
+            {
+            case JSONCONS_CBOR_0x60_0x77: // UTF-8 string (0x00..0x17 bytes follow)
+                {
+                    size_t length = *first & 0x1f;
+                    *endp = p + length;
+                    s = std::string(p, *endp);
+                    break;
+                }
+            case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
+                {
+                    const auto length = binary::from_big_endian<uint8_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        p = *endp;
+                        *endp = p + length;
+                        s = std::string(p, *endp);
+                    }
+                    break;
+                }
+            case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
+                {
+                    const auto length = binary::from_big_endian<uint16_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        p = *endp;
+                        *endp = p + length;
+                        s = std::string(p, *endp);
+                    }
+                    break;
+                }
+            case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
+                {
+                    const auto length = binary::from_big_endian<uint32_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        p = *endp;
+                        *endp = p + length;
+                        s = std::string(p, *endp);
+                    }
+                    break;
+                }
+            case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
+                {
+                    const auto length = binary::from_big_endian<uint64_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        p = *endp;
+                        *endp = p + length;
+                        s = std::string(p, *endp);
+                    }
+                    break;
+                }
+            default: 
+                {
+                    JSONCONS_THROW(cbor_decode_error(last-p));
+                }
+            }
+        }
+        return s;
+    }
+
+    inline 
     std::tuple<std::string,const uint8_t*> get_fixed_length_text_string(const uint8_t* it, const uint8_t* end)
     {
         const uint8_t* pos = it++;
@@ -169,14 +259,28 @@ namespace detail {
                     {
                         JSONCONS_THROW(json_exception_impl<std::invalid_argument>("eof"));
                     }
-                    std::string ss;
-                    std::tie(ss,it) = detail::get_fixed_length_text_string(it,end);
+                    const uint8_t* endp;
+                    std::string ss = detail::get_text_string(it,end,&endp);
+                    if (endp == it)
+                    {
+                        JSONCONS_THROW(cbor_decode_error(end-it));
+                    }
+                    it = endp;
                     s.append(std::move(ss));
                 }
                 return std::make_tuple(s,it);
             }
         default:
-            return detail::get_fixed_length_text_string(pos,end);
+            {
+                const uint8_t* endp;
+                std::string s = detail::get_text_string(pos,end,&endp);
+                if (endp == pos)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end-pos));
+                }
+                return std::make_tuple(s, endp);
+            }
+            //return detail::get_fixed_length_text_string(pos,end);
         }
     }
 
@@ -688,7 +792,7 @@ namespace detail {
         return it + len;
     }
 
-    inline const uint8_t* walk_array(const uint8_t* it, const uint8_t* end, size_t len)
+    inline const uint8_t* walk_fixed_length_array(const uint8_t* it, const uint8_t* end, size_t len)
     {
         for (size_t i = 0; i < len; ++i)
         {
@@ -698,7 +802,7 @@ namespace detail {
     }
 
     inline 
-    const uint8_t* walk_object(const uint8_t* it, const uint8_t* end, size_t len)
+    const uint8_t* walk_fixed_length_object(const uint8_t* it, const uint8_t* end, size_t len)
     {
         for (size_t i = 0; i < len; ++i)
         {
@@ -964,7 +1068,7 @@ namespace detail {
             
         case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
             {
-                return walk_array(it, end, *pos & 0x1f);
+                return walk_fixed_length_array(it, end, *pos & 0x1f);
             }
 
         case 0x98: // array (one-byte uint8_t for n follows)
@@ -979,7 +1083,7 @@ namespace detail {
                 {
                     it = endp;
                 }
-                return walk_array(it, end, len);
+                return walk_fixed_length_array(it, end, len);
             }
 
         case 0x99: // array (two-byte uint16_t for n follow)
@@ -994,7 +1098,7 @@ namespace detail {
                 {
                     it = endp;
                 }
-                return walk_array(it, end, len);
+                return walk_fixed_length_array(it, end, len);
             }
 
         case 0x9a: // array (four-byte uint32_t for n follow)
@@ -1009,7 +1113,7 @@ namespace detail {
                 {
                     it = endp;
                 }
-                return walk_array(it, end, len);
+                return walk_fixed_length_array(it, end, len);
             }
 
         case 0x9b: // array (eight-byte uint64_t for n follow)
@@ -1024,7 +1128,7 @@ namespace detail {
                 {
                     it = endp;
                 }
-                return walk_array(it, end, len);
+                return walk_fixed_length_array(it, end, len);
             }
 
         case 0x9f: // array (indefinite length)
@@ -1039,7 +1143,7 @@ namespace detail {
             
         case JSONCONS_CBOR_0xa0_0xb7: // map (0x00..0x17 pairs of data items follow)
             {
-                return walk_object(it, end, *pos & 0x1f);
+                return walk_fixed_length_object(it, end, *pos & 0x1f);
             }
 
         case 0xb8: // map (one-byte uint8_t for n follows)
@@ -1054,7 +1158,7 @@ namespace detail {
                 {
                     it = endp;
                 }
-                return walk_object(it, end, len);
+                return walk_fixed_length_object(it, end, len);
             }
 
         case 0xb9: // map (two-byte uint16_t for n follow)
@@ -1069,7 +1173,7 @@ namespace detail {
                 {
                     it = endp;
                 }
-                return walk_object(it, end, len);
+                return walk_fixed_length_object(it, end, len);
             }
 
         case 0xba: // map (four-byte uint32_t for n follow)
@@ -1084,7 +1188,7 @@ namespace detail {
                 {
                     it = endp;
                 }
-                return walk_object(it, end, len);
+                return walk_fixed_length_object(it, end, len);
             }
 
         case 0xbb: // map (eight-byte uint64_t for n follow)
@@ -1099,7 +1203,7 @@ namespace detail {
                 {
                     it = endp;
                 }
-                return walk_object(it, end, len);
+                return walk_fixed_length_object(it, end, len);
             }
 
             // map (indefinite length)
