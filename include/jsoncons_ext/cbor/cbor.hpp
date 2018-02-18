@@ -150,137 +150,30 @@ namespace detail {
                     }
                     break;
                 }
+            case 0x7f: // UTF-8 indefinite length string
+                {
+                    while (*p != 0xff)
+                    {
+                        std::string ss = detail::get_text_string(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
+                        else
+                        {
+                            p = *endp;
+                            s.append(std::move(ss));
+                        }
+                    }
+                    break;
+                }
             default: 
                 {
-                    JSONCONS_THROW(cbor_decode_error(last-p));
+                    p = *endp;
                 }
             }
         }
         return s;
-    }
-
-    inline 
-    std::tuple<std::string,const uint8_t*> get_fixed_length_text_string(const uint8_t* it, const uint8_t* end)
-    {
-        const uint8_t* pos = it++;
-        switch (*pos)
-        {       
-        case JSONCONS_CBOR_0x60_0x77: // UTF-8 string (0x00..0x17 bytes follow)
-            {
-                size_t len = *pos & 0x1f;
-                const uint8_t *first = it;
-                it += len;
-                return std::make_tuple(std::string(first, it), it);
-            }
-        case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-                if (endp == it)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-it));
-                }
-                else
-                {
-                    it = endp;
-                }
-                const uint8_t *first = it;
-                it += len;
-                return std::make_tuple(std::string(first, it), it);
-            }
-        case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-                if (endp == it)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-it));
-                }
-                else
-                {
-                    it = endp;
-                }
-                const uint8_t* first = it;
-                it += len;
-                return std::make_tuple(std::string(first,it),it);
-            }
-        case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-                if (endp == it)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-it));
-                }
-                else
-                {
-                    it = endp;
-                }
-                const uint8_t* first = it;
-                it += len;
-                return std::make_tuple(std::string(first,it),it);
-            }
-        case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-                if (endp == it)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-it));
-                }
-                else
-                {
-                    it = endp;
-                }
-                const uint8_t* first = it;
-                it += len;
-                return std::make_tuple(std::string(first,it),it);
-            }
-        default: 
-            {
-                JSONCONS_THROW(cbor_decode_error(end-pos));
-            }
-        }
-    }
-
-    inline
-    std::tuple<std::string,const uint8_t*> get_text_string(const uint8_t* it, const uint8_t* end)
-    {
-        const uint8_t* pos = it++;
-        switch (*pos)
-        {
-            
-        case 0x7f: // UTF-8 string (0x00..0x17 bytes follow)
-            {
-                std::string s;
-                while (*it != 0xff)
-                {
-                    if (it == end)
-                    {
-                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("eof"));
-                    }
-                    const uint8_t* endp;
-                    std::string ss = detail::get_text_string(it,end,&endp);
-                    if (endp == it)
-                    {
-                        JSONCONS_THROW(cbor_decode_error(end-it));
-                    }
-                    it = endp;
-                    s.append(std::move(ss));
-                }
-                return std::make_tuple(s,it);
-            }
-        default:
-            {
-                const uint8_t* endp;
-                std::string s = detail::get_text_string(pos,end,&endp);
-                if (endp == pos)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-pos));
-                }
-                return std::make_tuple(s, endp);
-            }
-        }
     }
 
     inline 
@@ -1751,8 +1644,16 @@ public:
 
         for (size_t i = 0; i < len; ++i)
         {
-            string_type a_key;
-            std::tie(a_key,it) = detail::get_fixed_length_text_string(it, last_);
+            const uint8_t* endp;
+            string_type a_key = detail::get_text_string(it, last_, &endp);
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(last_-it));
+            }
+            else
+            {
+                it = endp;
+            }
             if (a_key == key)
             {
                 const uint8_t* last = detail::walk(it, last_);
@@ -2203,8 +2104,16 @@ public:
         case 0x7b:
         case 0x7f:
             {
-                std::string s;
-                std::tie(s,it_) = detail::get_text_string(pos,end_);
+                const uint8_t* endp;
+                std::string s = detail::get_text_string(pos,end_,&endp);
+                if (endp == pos)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-pos));
+                }
+                else
+                {
+                    it_ = endp;
+                }
                 std::basic_string<char_type> target;
                 auto result = unicons::convert(s.begin(),s.end(),std::back_inserter(target),unicons::conv_flags::strict);
                 if (result.ec != unicons::conv_errc())
