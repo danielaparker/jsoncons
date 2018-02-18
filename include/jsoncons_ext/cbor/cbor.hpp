@@ -70,6 +70,113 @@ namespace detail {
     const uint8_t* walk(const uint8_t* it, const uint8_t* end);
 
     inline 
+    std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last, 
+                                         const uint8_t** endp)
+    {
+        std::vector<uint8_t> v;
+        if (JSONCONS_UNLIKELY(last <= first))
+        {
+            *endp = first; 
+        }
+        else
+        {
+            const uint8_t* p = first+1;
+            switch (*first)
+            {
+            case JSONCONS_CBOR_0x40_0x57: // byte string (0x00..0x17 bytes follow)
+                {
+                    size_t length = *first & 0x1f;
+                    *endp = p + length;
+                    v = std::vector<uint8_t>(p, *endp);
+                    break;
+                }
+            case 0x58: // byte string (one-byte uint8_t for n follows)
+                {
+                    const auto length = binary::from_big_endian<uint8_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        p = *endp;
+                        *endp = p + length;
+                        v = std::vector<uint8_t>(p, *endp);
+                    }
+                    break;
+                }
+            case 0x59: // byte string (two-byte uint16_t for n follow)
+                {
+                    const auto length = binary::from_big_endian<uint16_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        p = *endp;
+                        *endp = p + length;
+                        v = std::vector<uint8_t>(p, *endp);
+                    }
+                    break;
+                }
+            case 0x5a: // byte string (four-byte uint32_t for n follow)
+                {
+                    const auto length = binary::from_big_endian<uint32_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        p = *endp;
+                        *endp = p + length;
+                        v = std::vector<uint8_t>(p, *endp);
+                    }
+                    break;
+                }
+            case 0x5b: // byte string (eight-byte uint64_t for n follow)
+                {
+                    const auto length = binary::from_big_endian<uint64_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        p = *endp;
+                        *endp = p + length;
+                        v = std::vector<uint8_t>(p, *endp);
+                    }
+                    break;
+                }
+            case 0x5f: // byte string, byte strings follow, terminated by "break"
+                {
+                    while (*p != 0xff)
+                    {
+                        std::vector<uint8_t> ss = detail::get_byte_string(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
+                        else
+                        {
+                            p = *endp;
+                            v.insert(v.end(),ss.begin(),ss.end());
+                        }
+                    }
+                    break;
+                }
+            default: 
+                {
+                    p = *endp;
+                }
+            }
+        }
+        return v;
+    }
+
+    inline 
     std::string get_text_string(const uint8_t* first, const uint8_t* last, 
                                 const uint8_t** endp)
     {
@@ -150,7 +257,7 @@ namespace detail {
                     }
                     break;
                 }
-            case 0x7f: // UTF-8 indefinite length string
+            case 0x7f: // UTF-8 string, text strings follow, terminated by "break"
                 {
                     while (*p != 0xff)
                     {
@@ -174,118 +281,6 @@ namespace detail {
             }
         }
         return s;
-    }
-
-    inline 
-    std::tuple<std::vector<uint8_t>,const uint8_t*> get_fixed_length_byte_string(const uint8_t* it, const uint8_t* end)
-    {
-        const uint8_t* pos = it++;
-        switch (*pos)
-        {
-        
-        case JSONCONS_CBOR_0x40_0x57: // byte string (0x00..0x17 bytes follow)
-            {
-                size_t len = *pos & 0x1f;
-                const uint8_t *first = it;
-                it += len;
-                return std::make_tuple(std::vector<uint8_t>(first, it), it);
-            }
-        case 0x58: // byte string (one-byte uint8_t for n follows)
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-                if (endp == it)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-it));
-                }
-                else
-                {
-                    it = endp;
-                }
-                const uint8_t *first = it;
-                it += len;
-                return std::make_tuple(std::vector<uint8_t>(first, it), it);
-            }
-        case 0x59: // byte string (two-byte uint16_t for n follow)
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-                if (endp == it)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-it));
-                }
-                else
-                {
-                    it = endp;
-                }
-                const uint8_t* first = it;
-                it += len;
-                return std::make_tuple(std::vector<uint8_t>(first,it),it);
-            }
-        case 0x5a: // byte string (four-byte uint32_t for n follow)
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-                if (endp == it)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-it));
-                }
-                else
-                {
-                    it = endp;
-                }
-                const uint8_t* first = it;
-                it += len;
-                return std::make_tuple(std::vector<uint8_t>(first,it),it);
-            }
-        case 0x5b: // byte string (eight-byte uint64_t for n follow)
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-                if (endp == it)
-                {
-                    JSONCONS_THROW(cbor_decode_error(end-it));
-                }
-                else
-                {
-                    it = endp;
-                }
-                const uint8_t* first = it;
-                it += len;
-                return std::make_tuple(std::vector<uint8_t>(first,it),it);
-            }
-        default: 
-            {
-                JSONCONS_THROW(cbor_decode_error(end-pos));
-            }
-        }
-    }
-
-    inline
-    std::tuple<std::vector<uint8_t>,const uint8_t*> get_byte_string(const uint8_t* it, const uint8_t* end)
-    {
-        const uint8_t* pos = it++;
-        switch (*pos)
-        {
-        
-        case 0x5f: // byte string, byte strings follow, terminated by "break"
-            {
-                std::vector<uint8_t> v;
-                while (*it != 0xff)
-                {
-                    if (it == end)
-                    {
-                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("eof"));
-                    }
-                    std::vector<uint8_t> ss;
-                    std::tie(ss,it) = detail::get_fixed_length_byte_string(it,end);
-                    v.insert(v.end(),ss.begin(),ss.end());
-                }
-                return std::make_tuple(v,it);
-            }
-        default:
-            return detail::get_fixed_length_byte_string(pos,end);
-        }
     }
 
     inline
@@ -2091,8 +2086,17 @@ public:
         case 0x5b:
         case 0x5f:
             {
-                std::vector<uint8_t> v;
-                std::tie(v,it_) = detail::get_byte_string(pos,end_);
+                const uint8_t* endp;
+                std::vector<uint8_t> v = detail::get_byte_string(pos,end_,&endp);
+                if (endp == pos)
+                {
+                    JSONCONS_THROW(cbor_decode_error(end_-pos));
+                }
+                else
+                {
+                    it_ = endp;
+                }
+
                 return Json(v.data(),v.size());
             }
 
