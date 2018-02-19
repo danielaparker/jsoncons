@@ -1177,10 +1177,15 @@ namespace detail {
 
                 
             case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
+                // FALLTHRU
             case 0x98: // array (one-byte uint8_t for n follows)
+                // FALLTHRU
             case 0x99: // array (two-byte uint16_t for n follow)
+                // FALLTHRU
             case 0x9a: // array (four-byte uint32_t for n follow)
+                // FALLTHRU
             case 0x9b: // array (eight-byte uint64_t for n follow)
+                // FALLTHRU
             case 0x9f: // array (indefinite length)
                 {
                     walk_array(first,last,endp);
@@ -1672,15 +1677,30 @@ public:
     range<const_array_iterator> array_range() const
     {
         const uint8_t* endp;
-        size_t length = detail::get_fixed_array_size(first_,last_,&endp);
-        const uint8_t* start = endp;
+        const uint8_t* begin;
 
-        for (size_t i = 0; i < length; ++i)
+        switch (*first_)
         {
-            detail::walk(endp, last_, &endp);
+        case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
+            // FALLTHRU
+        case 0x98: // array (one-byte uint8_t for n follows)
+            // FALLTHRU
+        case 0x99: // array (two-byte uint16_t for n follow)
+            // FALLTHRU
+        case 0x9a: // array (four-byte uint32_t for n follow)
+            // FALLTHRU
+        case 0x9b: // array (eight-byte uint64_t for n follow)
+            detail::get_fixed_array_size(first_,last_,&begin);
+            break;
+        case 0x9f: // array (indefinite length)
+            begin = first_ + 1;
+            break;
+        default:
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an array"));
+            break;
         }
-
-        return range<const_array_iterator>(const_array_iterator(start,endp), const_array_iterator(endp, endp));
+        detail::walk_array(begin,last_,&endp);
+        return range<const_array_iterator>(const_array_iterator(begin,endp), const_array_iterator(endp, endp));
     }
 
     cbor_view()
