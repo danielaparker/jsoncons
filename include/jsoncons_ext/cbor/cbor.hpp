@@ -1263,178 +1263,182 @@ namespace detail {
     }
 
     inline 
-    std::tuple<size_t,const uint8_t*> get_size(const uint8_t* it, const uint8_t* end)
+    size_t get_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     {
-        const uint8_t* pos = it++;
-        switch (*pos)
+        const uint8_t* p = first + 1;
+        switch (*first)
         {
         // array (0x00..0x17 data items follow)
         case JSONCONS_CBOR_0x80_0x97:
         {
-            return std::make_tuple(*pos & 0x1f,it);
+            *endp = p;
+            return *first & 0x1f;
         }
 
         // array (one-byte uint8_t for n follows)
         case 0x98: 
         {
-            const uint8_t* endp;
-            const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-            if (endp == it)
+            const auto len = binary::from_big_endian<uint8_t>(p,last,endp);
+            if (*endp == p)
             {
-                JSONCONS_THROW(cbor_decode_error(end-it));
+                JSONCONS_THROW(cbor_decode_error(last-p));
             }
             else
             {
-                it = endp;
+                p = *endp;
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // array (two-byte uint16_t for n follow)
         case 0x99: 
         {
-            const uint8_t* endp;
-            const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-            if (endp == it)
+            const auto len = binary::from_big_endian<uint16_t>(p,last,endp);
+            if (*endp == p)
             {
-                JSONCONS_THROW(cbor_decode_error(end-it));
+                JSONCONS_THROW(cbor_decode_error(last-p));
             }
             else
             {
-                it = endp;
+                p = *endp;
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // array (four-byte uint32_t for n follow)
         case 0x9a: 
         {
-            const uint8_t* endp;
-            const auto len = binary::from_big_endian<int32_t>(it,end,&endp);
-            if (endp == it)
+            const auto len = binary::from_big_endian<int32_t>(p,last,endp);
+            if (*endp == p)
             {
-                JSONCONS_THROW(cbor_decode_error(end-it));
+                JSONCONS_THROW(cbor_decode_error(last-p));
             }
             else
             {
-                it = endp;
+                p = *endp;
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // array (eight-byte uint64_t for n follow)
         case 0x9b: 
         {
-            const uint8_t* endp;
-            const auto len = binary::from_big_endian<int64_t>(it,end,&endp);
-            if (endp == it)
+            const auto len = binary::from_big_endian<int64_t>(p,last,endp);
+            if (*endp == p)
             {
-                JSONCONS_THROW(cbor_decode_error(end-it));
+                JSONCONS_THROW(cbor_decode_error(last-p));
             }
             else
             {
-                it = endp;
+                p = *endp;
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // array (indefinite length)
         case 0x9f: 
         {
             size_t len = 0;
-            while (*it != 0xff)
+            while (*p != 0xff)
             {
-                size_t sz;
-                std::tie(sz,it) = get_size(it,end);
+                size_t sz = get_size(p,last,&p);
                 len += sz;
-                walk(it, end, &it);
+                walk(p, last, &p);
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // map (0x00..0x17 pairs of data items follow)
         case JSONCONS_CBOR_0xa0_0xb7:
         {
-            return std::make_tuple(*pos & 0x1f,it);
+            *endp = p;
+            return *first & 0x1f;
         }
 
         // map (one-byte uint8_t for n follows)
         case 0xb8: 
         {
-            const uint8_t* endp;
-            const auto len = binary::from_big_endian<uint8_t>(it,end,&endp);
-            if (endp == it)
+            const auto len = binary::from_big_endian<uint8_t>(p,last,endp);
+            if (*endp == p)
             {
-                JSONCONS_THROW(cbor_decode_error(end-it));
+                JSONCONS_THROW(cbor_decode_error(last-p));
             }
             else
             {
-                it = endp;
+                p = *endp;
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // map (two-byte uint16_t for n follow)
         case 0xb9: 
         {
-            const uint8_t* endp;
-            const auto len = binary::from_big_endian<uint16_t>(it,end,&endp);
-            if (endp == it)
+            const auto len = binary::from_big_endian<uint16_t>(p,last,endp);
+            if (*endp == p)
             {
-                JSONCONS_THROW(cbor_decode_error(end-it));
+                JSONCONS_THROW(cbor_decode_error(last-p));
             }
             else
             {
-                it = endp;
+                p = *endp;
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // map (four-byte uint32_t for n follow)
         case 0xba: 
         {
-            const uint8_t* endp;
-            const auto len = binary::from_big_endian<uint32_t>(it,end,&endp);
-            if (endp == it)
+            const auto len = binary::from_big_endian<uint32_t>(p,last,endp);
+            if (*endp == p)
             {
-                JSONCONS_THROW(cbor_decode_error(end-it));
+                JSONCONS_THROW(cbor_decode_error(last-p));
             }
             else
             {
-                it = endp;
+                p = *endp;
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // map (eight-byte uint64_t for n follow)
         case 0xbb: 
         {
-            const uint8_t* endp;
-            const auto len = binary::from_big_endian<uint64_t>(it,end,&endp);
-            if (endp == it)
+            const auto len = binary::from_big_endian<uint64_t>(p,last,endp);
+            if (*endp == p)
             {
-                JSONCONS_THROW(cbor_decode_error(end-it));
+                JSONCONS_THROW(cbor_decode_error(last-p));
             }
             else
             {
-                it = endp;
+                p = *endp;
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
 
         // map (indefinite length)
         case 0xbf: 
         {
             size_t len = 0;
-            while (*it != 0xff)
+            while (*p != 0xff)
             {
-                walk(it, end, &it);
-                walk(it, end, &it);
+                walk(p, last, &p);
+                walk(p, last, &p);
             }
-            return std::make_tuple(len,it);
+            *endp = p;
+            return len;
         }
         default:
-            return std::make_tuple(0,end);
+            *endp = last;
+            return 0;
         }
     }
 }
@@ -1759,19 +1763,17 @@ public:
 
     size_t size() const
     {
-        size_t len;
         const uint8_t* it;
-        std::tie(len, it) = detail::get_size(first_,last_);
+        size_t len = detail::get_size(first_,last_,&it);
         return len;
     }
 
     cbor_view at(size_t index) const
     {
         JSONCONS_ASSERT(is_array());
-        size_t len;
         const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::get_size(it, last_);
+        size_t len = detail::get_size(it, last_, &it);
 
         for (size_t i = 0; i < index; ++i)
         {
@@ -1787,10 +1789,9 @@ public:
     cbor_view at(const string_view_type& key) const
     {
         JSONCONS_ASSERT(is_object());
-        size_t len;
         const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::get_size(first_, last_);
+        size_t len = detail::get_size(first_, last_, &it);
 
         for (size_t i = 0; i < len; ++i)
         {
@@ -1824,10 +1825,9 @@ public:
         {
             return false;
         }
-        size_t len;
         const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::get_size(it, last_);
+        size_t len = detail::get_size(it, last_, &it);
 
         for (size_t i = 0; i < len; ++i)
         {
