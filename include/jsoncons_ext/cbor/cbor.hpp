@@ -353,6 +353,127 @@ namespace detail {
     }
 
     inline
+    void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    {
+        size_t size = 0;
+
+        if (JSONCONS_UNLIKELY(last <= first))
+        {
+            *endp = first; 
+        }
+        else
+        {
+            const uint8_t* p = first+1;
+            switch (*first)
+            {
+            case JSONCONS_CBOR_0xa0_0xb7: // map (0x00..0x17 pairs of data items follow)
+                {
+                    size = *first & 0x1f;
+                    *endp = p;
+                    for (size_t i = 0; i < size; ++i)
+                    {
+                        walk(*endp, last, endp);
+                        walk(*endp, last, endp);
+                    }
+                    break;
+                }
+
+            case 0xb8: // map (one-byte uint8_t for n follows)
+                {
+                    size = binary::from_big_endian<uint8_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            walk(*endp, last, endp);
+                            walk(*endp, last, endp);
+                        }
+                    }
+                    break;
+                }
+
+            case 0xb9: // map (two-byte uint16_t for n follow)
+                {
+                    size = binary::from_big_endian<uint16_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            walk(*endp, last, endp);
+                            walk(*endp, last, endp);
+                        }
+                    }
+                    break;
+                }
+
+            case 0xba: // map (four-byte uint32_t for n follow)
+                {
+                    size = binary::from_big_endian<uint32_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            walk(*endp, last, endp);
+                            walk(*endp, last, endp);
+                        }
+                    }
+                    break;
+                }
+
+            case 0xbb: // map (eight-byte uint64_t for n follow)
+                {
+                    size = binary::from_big_endian<uint64_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            walk(*endp, last, endp);
+                            walk(*endp, last, endp);
+                        }
+                    }
+                    break;
+                }
+            case 0xbf:
+                {
+                    *endp = p;
+                    while (*p != 0xff)
+                    {
+                        walk(p, last, endp);
+                        p = *endp;
+                        walk(p, last, endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            default:
+                {
+                    *endp = first; 
+                }
+            }
+        }
+    }
+
+    inline
     size_t get_fixed_array_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     {
         size_t size = 0;
@@ -1044,82 +1165,19 @@ namespace detail {
                     break;
                 }
 
-                
             case JSONCONS_CBOR_0xa0_0xb7: // map (0x00..0x17 pairs of data items follow)
-                {
-                    *endp = walk_fixed_length_object(p, last, *first & 0x1f);
-                    break;
-                }
-
+                // FALLTHRU
             case 0xb8: // map (one-byte uint8_t for n follows)
-                {
-                    const auto len = binary::from_big_endian<uint8_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                    *endp =  walk_fixed_length_object(p, last, len);
-                    break;
-                }
-
+                // FALLTHRU
             case 0xb9: // map (two-byte uint16_t for n follow)
-                {
-                    const auto len = binary::from_big_endian<uint16_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                    *endp = walk_fixed_length_object(p, last, len);
-                    break;
-                }
-
+                // FALLTHRU
             case 0xba: // map (four-byte uint32_t for n follow)
-                {
-                    const auto len = binary::from_big_endian<uint32_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                    *endp = walk_fixed_length_object(p, last, len);
-                    break;
-                }
-
+                // FALLTHRU
             case 0xbb: // map (eight-byte uint64_t for n follow)
-                {
-                    const auto len = binary::from_big_endian<uint64_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                    *endp = walk_fixed_length_object(p, last, len);
-                    break;
-                }
-
-                // map (indefinite length)
+                // FALLTHRU
             case 0xbf:
                 {
-                    while (*p != 0xff)
-                    {
-                        walk(p, last, &p);
-                        walk(p, last, &p);
-                    }
-                    *endp = p;
+                    walk_object(first,last,endp);
                     break;
                 }
 
