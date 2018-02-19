@@ -454,9 +454,121 @@ namespace detail {
                     *endp = p;
                     while (*p != 0xff)
                     {
-                        walk(p, last, endp);
-                        p = *endp;
-                        walk(p, last, endp);
+                        walk_object(p, last, endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            default:
+                {
+                    *endp = first; 
+                }
+            }
+        }
+    }
+
+    inline
+    void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    {
+        size_t size = 0;
+
+        if (JSONCONS_UNLIKELY(last <= first))
+        {
+            *endp = first; 
+        }
+        else
+        {
+            const uint8_t* p = first+1;
+            switch (*first)
+            {
+            case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
+                {
+                    size = *first & 0x1f;
+                    *endp = p;
+                    for (size_t i = 0; i < size; ++i)
+                    {
+                        walk(*endp, last, endp);
+                    }
+                    break;
+                }
+
+            case 0x98: // array (one-byte uint8_t for n follows)
+                {
+                    size = binary::from_big_endian<uint8_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            walk(*endp, last, endp);
+                        }
+                    }
+                    break;
+                }
+
+            case 0x99: // array (two-byte uint16_t for n follow)
+                {
+                    size = binary::from_big_endian<uint16_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            walk(*endp, last, endp);
+                        }
+                    }
+                    break;
+                }
+
+            case 0x9a: // array (four-byte uint32_t for n follow)
+                {
+                    size = binary::from_big_endian<uint32_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            walk(*endp, last, endp);
+                        }
+                    }
+                    break;
+                }
+
+            case 0x9b: // array (eight-byte uint64_t for n follow)
+                {
+                    size = binary::from_big_endian<uint64_t>(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                    }
+                    else
+                    {
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            walk(*endp, last, endp);
+                        }
+                    }
+                    break;
+                }
+            case 0x9f: // array (indefinite length)
+                {
+                    *endp = p;
+                    while (*p != 0xff)
+                    {
+                        walk_array(p, last, endp);
                         if (*endp == p)
                         {
                             *endp = first;
@@ -795,31 +907,6 @@ namespace detail {
         return val;
     }
 
-    inline const uint8_t* walk_string(const uint8_t* it, size_t len)
-    {
-        return it + len;
-    }
-
-    inline const uint8_t* walk_fixed_length_array(const uint8_t* it, const uint8_t* end, size_t len)
-    {
-        for (size_t i = 0; i < len; ++i)
-        {
-            walk(it, end, &it);
-        }
-        return it;
-    }
-
-    inline 
-    const uint8_t* walk_fixed_length_object(const uint8_t* it, const uint8_t* end, size_t len)
-    {
-        for (size_t i = 0; i < len; ++i)
-        {
-            walk(it, end, &it);
-            walk(it, end, &it);
-        }
-        return it;
-    }
-
     inline
     bool is_string(uint8_t b)
     {
@@ -1090,78 +1177,13 @@ namespace detail {
 
                 
             case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
-                {
-                    *endp = walk_fixed_length_array(p, last, *first & 0x1f);
-                    break;
-                }
-
             case 0x98: // array (one-byte uint8_t for n follows)
-                {
-                    const auto len = binary::from_big_endian<uint8_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                    *endp = walk_fixed_length_array(p, last, len);
-                    break;
-                }
-
             case 0x99: // array (two-byte uint16_t for n follow)
-                {
-                    const auto len = binary::from_big_endian<uint16_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                    *endp = walk_fixed_length_array(p, last, len);
-                    break;
-                }
-
             case 0x9a: // array (four-byte uint32_t for n follow)
-                {
-                    const auto len = binary::from_big_endian<int32_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                    *endp = walk_fixed_length_array(p, last, len);
-                    break;
-                }
-
             case 0x9b: // array (eight-byte uint64_t for n follow)
-                {
-                    const auto len = binary::from_big_endian<int64_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                    *endp = walk_fixed_length_array(p, last, len);
-                    break;
-                }
-
             case 0x9f: // array (indefinite length)
                 {
-                    while (*p != 0xff)
-                    {
-                        walk(p, last, &p);
-                    }
-                    *endp = p;
+                    walk_array(first,last,endp);
                     break;
                 }
 
@@ -1236,7 +1258,7 @@ namespace detail {
     }
 
     inline 
-    std::tuple<size_t,const uint8_t*> size(const uint8_t* it, const uint8_t* end)
+    std::tuple<size_t,const uint8_t*> get_size(const uint8_t* it, const uint8_t* end)
     {
         const uint8_t* pos = it++;
         switch (*pos)
@@ -1318,7 +1340,7 @@ namespace detail {
             while (*it != 0xff)
             {
                 size_t sz;
-                std::tie(sz,it) = size(it,end);
+                std::tie(sz,it) = get_size(it,end);
                 len += sz;
                 walk(it, end, &it);
             }
@@ -1620,16 +1642,31 @@ public:
     range<const_object_iterator> object_range() const
     {
         const uint8_t* endp;
-        size_t length = detail::get_fixed_object_size(first_,last_,&endp);
-        const uint8_t* start = endp;
+        const uint8_t* begin;
 
-        for (size_t i = 0; i < length; ++i)
+        switch (*first_)
         {
-            detail::walk(endp, last_, &endp);
-            detail::walk(endp, last_, &endp);
+        case JSONCONS_CBOR_0xa0_0xb7: // map (0x00..0x17 pairs of data items follow)
+            // FALLTHRU
+        case 0xb8: // map (one-byte uint8_t for n follows)
+            // FALLTHRU
+        case 0xb9: // map (two-byte uint16_t for n follow)
+            // FALLTHRU
+        case 0xba: // map (four-byte uint32_t for n follow)
+            // FALLTHRU
+        case 0xbb: // map (eight-byte uint64_t for n follow)
+            detail::get_fixed_object_size(first_,last_,&begin);
+            break;
+        case 0xbf:
+            begin = first_ + 1;
+            break;
+        default:
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an object"));
+            break;
         }
+        detail::walk_object(first_,last_,&endp);
 
-        return range<const_object_iterator>(const_object_iterator(start,endp), const_object_iterator(endp, endp));
+        return range<const_object_iterator>(const_object_iterator(begin,endp), const_object_iterator(endp, endp));
     }
 
     range<const_array_iterator> array_range() const
@@ -1704,7 +1741,7 @@ public:
     {
         size_t len;
         const uint8_t* it;
-        std::tie(len, it) = detail::size(first_,last_);
+        std::tie(len, it) = detail::get_size(first_,last_);
         return len;
     }
 
@@ -1714,7 +1751,7 @@ public:
         size_t len;
         const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::size(it, last_);
+        std::tie(len, it) = detail::get_size(it, last_);
 
         for (size_t i = 0; i < index; ++i)
         {
@@ -1733,7 +1770,7 @@ public:
         size_t len;
         const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::size(first_, last_);
+        std::tie(len, it) = detail::get_size(first_, last_);
 
         for (size_t i = 0; i < len; ++i)
         {
@@ -1770,7 +1807,7 @@ public:
         size_t len;
         const uint8_t* it = first_;
 
-        std::tie(len, it) = detail::size(it, last_);
+        std::tie(len, it) = detail::get_size(it, last_);
 
         for (size_t i = 0; i < len; ++i)
         {
