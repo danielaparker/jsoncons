@@ -284,75 +284,6 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
 }
 
 inline
-size_t get_fixed_object_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    size_t size = 0;
-
-    if (JSONCONS_UNLIKELY(last <= first))
-    {
-        *endp = first; 
-    }
-    else
-    {
-        const uint8_t* p = first+1;
-        switch (*first)
-        {
-        case JSONCONS_CBOR_0xa0_0xb7: // map (0x00..0x17 pairs of data items follow)
-            {
-                size = *first & 0x1f;
-                *endp = p;
-                break;
-            }
-
-        case 0xb8: // map (one-byte uint8_t for n follows)
-            {
-                size = binary::from_big_endian<uint8_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-
-        case 0xb9: // map (two-byte uint16_t for n follow)
-            {
-                size = binary::from_big_endian<uint16_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-
-        case 0xba: // map (four-byte uint32_t for n follow)
-            {
-                size = binary::from_big_endian<uint32_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-
-        case 0xbb: // map (eight-byte uint64_t for n follow)
-            {
-                size = binary::from_big_endian<uint64_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-        default:
-            {
-                *endp = first; 
-            }
-        }
-    }
-    return size;
-}
-
-inline
 void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     size_t size = 0;
@@ -583,75 +514,6 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
             }
         }
     }
-}
-
-inline
-size_t get_fixed_array_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    size_t size = 0;
-
-    if (JSONCONS_UNLIKELY(last <= first))
-    {
-        *endp = first; 
-    }
-    else
-    {
-        const uint8_t* p = first+1;
-        switch (*first)
-        {
-        case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
-            {
-                size = *first & 0x1f;
-                *endp = p;
-                break;
-            }
-
-        case 0x98: // array (one-byte uint8_t for n follows)
-            {
-                size = binary::from_big_endian<uint8_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-
-        case 0x99: // array (two-byte uint16_t for n follow)
-            {
-                size = binary::from_big_endian<uint16_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-
-        case 0x9a: // array (four-byte uint32_t for n follow)
-            {
-                size = binary::from_big_endian<int32_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-
-        case 0x9b: // array (eight-byte uint64_t for n follow)
-            {
-                size = binary::from_big_endian<int64_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-        default:
-            {
-                *endp = first; 
-            }
-        }
-    }
-    return size;
 }
 
 inline
@@ -1349,7 +1211,7 @@ size_t get_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
             len += sz;
             walk(p, last, &p);
         }
-        *endp = p;
+        *endp = first + 1;
         return len;
     }
 
@@ -1433,7 +1295,7 @@ size_t get_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
             walk(p, last, &p);
             walk(p, last, &p);
         }
-        *endp = p;
+        *endp = first + 1;
         return len;
     }
     default:
@@ -1659,10 +1521,9 @@ public:
         case 0xba: // map (four-byte uint32_t for n follow)
             // FALLTHRU
         case 0xbb: // map (eight-byte uint64_t for n follow)
-            detail::get_fixed_object_size(first_,last_,&begin);
-            break;
+            // FALLTHRU
         case 0xbf:
-            begin = first_ + 1;
+            detail::get_size(first_,last_,&begin);
             break;
         default:
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an object"));
@@ -1689,10 +1550,9 @@ public:
         case 0x9a: // array (four-byte uint32_t for n follow)
             // FALLTHRU
         case 0x9b: // array (eight-byte uint64_t for n follow)
-            detail::get_fixed_array_size(first_,last_,&begin);
-            break;
+            // FALLTHRU
         case 0x9f: // array (indefinite length)
-            begin = first_ + 1;
+            detail::get_size(first_,last_,&begin);
             break;
         default:
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an array"));
