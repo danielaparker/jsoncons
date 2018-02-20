@@ -72,18 +72,6 @@ cbor_view(const cbor_view& other); // (4)
 
 #### Accessors
 
-```
-bool as_bool() const; // (1)
-
-int64_t as_integer() const; // (2)
-
-uint64_t as_uinteger() const; // (3)
-
-double as_double() const; // (4)
-
-std::string as_string() const; // (5)
-```
-
 <table border="0">
   <tr>
     <td><code>bool is_null() const</code></td>
