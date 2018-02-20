@@ -1687,6 +1687,12 @@ public:
         return last_ - first_;
     }
 
+    bool is_null() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        return first_[0] == 0xf6;
+    }
+
     bool is_array() const
     {
         JSONCONS_ASSERT(buflen() > 0);
@@ -1854,6 +1860,22 @@ public:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
         }
         return val;
+    }
+
+    bool as_bool() const
+    {
+        if (*first_ == 0xf5)
+        {
+            return true;
+        }
+        else if (*first_ == 0xf4)
+        {
+            return false;
+        }
+        else
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
+        }
     }
 
     uint64_t as_uinteger() const

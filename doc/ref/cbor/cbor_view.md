@@ -74,12 +74,40 @@ cbor_view(const cbor_view& other); // (4)
 
 <table border="0">
   <tr>
+    <td><code>bool is_null() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a null tag, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_string() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a text string tag, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_byte_string() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a byte string tag, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_integer() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with int64_t, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_uinteger() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with uint84_t, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_double() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag that represents a floating point, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_bool() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a boolean tag, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
     <td><code>bool is_array() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a CBOR tag that indicates an array, otherwise <code>false</code>.</td> 
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag for a CBOR array, otherwise <code>false</code>.</td> 
   </tr>
   <tr>
     <td><code>bool is_object() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a CBOR tag that indicates a map, otherwise <code>false</code>.</td> 
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag for a CBOR map, otherwise <code>false</code>.</td> 
   </tr>
   <tr>
     <td><code>size_t size() const</code></td>
