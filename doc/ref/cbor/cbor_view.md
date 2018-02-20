@@ -106,26 +106,6 @@ std::string as_string() const; // (5)
     <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with uint84_t, otherwise <code>false</code>.</td> 
   </tr>
   <tr>
-    <td><code>bool is_null() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a null tag, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_string() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a text string tag, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_byte_string() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a byte string tag, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_integer() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with int64_t, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_uinteger() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with uint84_t, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
     <td><code>bool is_double() const</code></td>
     <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag that represents a floating point, otherwise <code>false</code>.</td> 
   </tr>
