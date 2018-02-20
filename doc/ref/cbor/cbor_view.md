@@ -17,7 +17,12 @@ Member type          |Definition
 `pointer`            |`cbor_view*`
 `const_pointer`      |`const cbor_view*`
 `string_type`        |`std::string`
+`key_value_pair_type`|[key_value_pair_type](key_value_pair_type) is a class that stores a name and a json value
 `string_view_type`   |A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied. 
+`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_pair_type](key_value_pair_type)
+`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_pair_type](key_value_pair_type)
+`array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `json`
+`const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const json`
 
 #### Constructors
 
@@ -49,6 +54,19 @@ cbor_view(const cbor_view& other); // (4)
   <tr>
     <td><code>size_t buflen() const</code></td>
     <td>Returns length of CBOR buffer view.</td> 
+  </tr>
+</table>
+
+#### Ranges and Iterators
+
+<table border="0">
+  <tr>
+    <td><a href="cbor_view/array_range.md">array_range</a></td>
+    <td>Returns a "range" that supports a range-based for loop over the elements of a `cbor_view` array.</td> 
+  </tr>
+  <tr>
+    <td><a href="cbor_view/object_range.md">obect_range</a></td>
+    <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `cbor_view` object.</td> 
   </tr>
 </table>
 

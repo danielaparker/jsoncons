@@ -475,8 +475,6 @@ int main()
 
         json_is_as_examples();
 
-        cbor_examples();
-
         csv_examples();
 
         jsonpointer_examples();
@@ -484,6 +482,8 @@ int main()
         jsonpath_examples();
 
         jsonpatch_examples();
+
+        cbor_examples();
     }
     catch (const std::exception& e)
     {

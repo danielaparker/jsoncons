@@ -597,7 +597,6 @@ int64_t get_integer(const uint8_t* first, const uint8_t* last, const uint8_t** e
         const uint8_t* p = first+1;
         switch (*first)
         {
-
         case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
             val = static_cast<int8_t>(0x20 - 1 - *first);
             *endp = p;
@@ -668,8 +667,8 @@ int64_t get_integer(const uint8_t* first, const uint8_t* last, const uint8_t** e
             // FALLTHRU
         case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
             {
-                uint64_t x = detail::get_uinteger(p,last,endp);
-                if (*endp != p)
+                uint64_t x = detail::get_uinteger(first,last,endp);
+                if (*endp != first)
                 {
                     if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                     {
@@ -769,12 +768,6 @@ double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** end
     return val;
 }
 
-inline
-bool is_string(uint8_t b)
-{
-    return (b >= 0x60 && b <= 0x7b) || b == 0x7f;
-}
-
 inline 
 bool is_array(uint8_t b) 
 {
@@ -785,6 +778,95 @@ inline
 bool is_object(uint8_t b) 
 {
     return (b >= 0xa0 && b <= 0xbb) || b == 0xb8;
+}
+
+inline
+bool is_string(uint8_t b)
+{
+    return (b >= 0x60 && b <= 0x7b) || b == 0x7f;
+}
+
+inline
+bool is_bool(uint8_t b)
+{
+    return b == 0xf5 || b == 0xf4;
+}
+
+inline
+bool is_double(uint8_t b)
+{
+    return b == 0xf9 || b == 0xfa || b == 0xfb;
+}
+
+inline
+bool is_integer(const uint8_t* first, const uint8_t* last)
+{
+    bool result;
+
+    switch (*first)
+    {
+    case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
+    case 0x38: // Negative integer (one-byte uint8_t follows)
+    case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
+    case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
+    case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
+    case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+    case 0x18: // Unsigned integer (one-byte uint8_t follows)
+    case 0x19: // Unsigned integer (two-byte uint16_t follows)
+    case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+        result = true;
+        break;
+    case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+        {
+        const uint8_t* endp;
+            uint64_t x = detail::get_uinteger(first,last,&endp);
+            if (endp != first)
+            {
+                if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                {
+                    result = true;
+                }
+                else
+                {
+                    result = false;
+                }
+            }
+            else
+            {
+                result = false;
+            }
+            break;
+        }
+    default:
+        result = false; 
+        break;
+    }
+    return result;
+}
+
+inline
+bool is_uinteger(uint8_t b)
+{
+    bool result;
+
+    switch (b)
+    {
+    case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+        // FALLTHRU
+    case 0x18: // Unsigned integer (one-byte uint8_t follows)
+        // FALLTHRU
+    case 0x19: // Unsigned integer (two-byte uint16_t follows)
+        // FALLTHRU
+    case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+        // FALLTHRU
+    case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+        result = true;
+        break;
+    default:
+        result = false; 
+        break;
+    }
+    return result;
 }
 
 inline 
@@ -1393,9 +1475,10 @@ public:
     }
     key_value_pair(const key_value_pair& other) = default;
 
-    T key() const
+    std::string key() const
     {
-        return T(key_begin_, key_end_ - key_begin_);
+        const uint8_t* endp;
+        return get_text_string(key_begin_, key_end_, &endp);
     }
 
     T value() const
@@ -1558,7 +1641,7 @@ public:
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an array"));
             break;
         }
-        detail::walk_array(begin,last_,&endp);
+        detail::walk_array(first_,last_,&endp);
         return range<const_array_iterator>(const_array_iterator(begin,endp), const_array_iterator(endp, endp));
     }
 
@@ -1614,6 +1697,63 @@ public:
     {
         JSONCONS_ASSERT(buflen() > 0);
         return detail::is_object(first_[0]);
+    }
+
+    bool is_string() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_string(first_[0]);
+    }
+
+    bool is_byte_string() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+
+        bool result;
+        switch (first_[0])
+        {
+        case JSONCONS_CBOR_0x40_0x57: // byte string (0x00..0x17 bytes follow)
+            // FALLTHRU
+        case 0x58: // byte string (one-byte uint8_t for n follows)
+            // FALLTHRU
+        case 0x59: // byte string (two-byte uint16_t for n follow)
+            // FALLTHRU
+        case 0x5a: // byte string (four-byte uint32_t for n follow)
+            // FALLTHRU
+        case 0x5b: // byte string (eight-byte uint64_t for n follow)
+            // FALLTHRU
+        case 0x5f: // byte string, byte strings follow, terminated by "break"
+            result = true;
+            break;
+        default: 
+            result = false;
+            break;
+        }
+        return result;
+    }
+
+    bool is_bool() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_bool(first_[0]);
+    }
+
+    bool is_double() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_double(first_[0]);
+    }
+
+    bool is_integer() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_integer(first_,last_);
+    }
+
+    bool is_uinteger() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_uinteger(first_[0]);
     }
 
     size_t size() const
@@ -1711,7 +1851,18 @@ public:
         int64_t val = detail::get_integer(first_,last_,&endp);
         if (endp == first_)
         {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+        }
+        return val;
+    }
+
+    uint64_t as_uinteger() const
+    {
+        const uint8_t* endp;
+        uint64_t val = detail::get_uinteger(first_, last_, &endp);
+        if (endp == first_)
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
         }
         return val;
     }
@@ -1723,6 +1874,17 @@ public:
         if (endp == first_)
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+        }
+        return val;
+    }
+
+    std::string as_string() const
+    {
+        const uint8_t* endp;
+        std::string val = detail::get_text_string(first_,last_,&endp);
+        if (endp == first_)
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
         }
         return val;
     }

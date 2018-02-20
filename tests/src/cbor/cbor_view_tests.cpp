@@ -60,10 +60,9 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
     {
         const auto& key = member.key();
         const auto& val = member.value();
-        json jkey = decode_cbor<json>(key);
         json jval = decode_cbor<json>(val);
 
-        std::cout << jkey << " " << jval << std::endl;
+        std::cout << key << ": " << jval << std::endl;
     }
     std::cout << std::endl;
 
