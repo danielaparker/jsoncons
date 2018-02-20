@@ -70,68 +70,29 @@ cbor_view(const cbor_view& other); // (4)
   </tr>
 </table>
 
+#### Capacity
+
+<table border="0">
+  <tr>
+    <td><code>size_t size() const</code></td>
+    <td>Returns the length of the array or map if the first byte in the CBOR buffer is a CBOR tag that indicates an array or map, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><a>bool empty() const</a></td>
+    <td>Returns <code>true</code> if a CBOR string, object or array has no elements, otherwise <code>false</code></td> 
+  </tr>
+</table>
+
 #### Accessors
 
 <table border="0">
   <tr>
-    <td><code>bool is_null() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a null tag, otherwise <code>false</code>.</td> 
+    <td><a href="cbor_view/is.md">is</a></td>
+    <td>Checks if a CBOR packed value matches a type.</td> 
   </tr>
   <tr>
-    <td><code>bool is_string() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a text string tag, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_byte_string() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a byte string tag, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_integer() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with int64_t, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_uinteger() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with uint84_t, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_double() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag that represents a floating point, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_bool() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a boolean tag, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_array() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag for a CBOR array, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool is_object() const</code></td>
-    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag for a CBOR map, otherwise <code>false</code>.</td> 
-  </tr>
-  <tr>
-    <td><code>bool as_bool() const</code></td>
-    <td></td> 
-  </tr>
-  <tr>
-    <td><code>int64_t as_integer() const</code></td>
-    <td></td> 
-  </tr>
-  <tr>
-    <td><code>uint64_t as_uinteger() const</code></td>
-    <td></td> 
-  </tr>
-  <tr>
-    <td><code>double as_double() const</code></td>
-    <td></td> 
-  </tr>
-  <tr>
-    <td><code>std::string as_string() const</code></td>
-    <td></td> 
-  </tr>
-  <tr>
-    <td><code>size_t size() const</code></td>
-    <td>Returns the length of the array or map if the first byte in the CBOR buffer is a CBOR tag that indicates an array or map, otherwise <code>false</code>.</td> 
+    <td><a href="cbor_view/as.md">as</a></td>
+    <td>Attempts to convert a CBOR packed value to a value of a type.</td> 
   </tr>
   <tr>
     <td><code>cbor_view at(size_t pos) const</code></td>

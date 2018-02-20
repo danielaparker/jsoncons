@@ -91,7 +91,7 @@ Member type                         |Definition
   </tr>
   <tr>
     <td><a>bool empty() const noexcept</a></td>
-    <td>Returns `true` if a json string, object or array has no elements, otherwise `false`</td> 
+    <td>Returns <code>true</code> if a json string, object or array has no elements, otherwise <code>false</code></td> 
   </tr>
   <tr>
     <td><a>size_t capacity() const</a></td>
@@ -120,7 +120,7 @@ Member type                         |Definition
 <table border="0">
   <tr>
     <td><code>bool has_key(const string_view_type& key) const</code></td>
-    <td>Returns `true` if an object has a member with the given `key`, otherwise `false`</td> 
+    <td>Returns <code>true</code> if an object has a member with the given `key`, otherwise <code>false</code></td> 
   </tr>
   <tr>
     <td><code>bool count(const string_view_type& key) const</code></td>

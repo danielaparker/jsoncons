@@ -70,6 +70,86 @@ namespace detail {
 void walk(const uint8_t* first, const uint8_t* last, const uint8_t** endp);
 
 inline 
+size_t get_byte_string_length(const uint8_t* first, const uint8_t* last, 
+                              const uint8_t** endp)
+{
+    size_t length = 0;
+    if (JSONCONS_UNLIKELY(last <= first))
+    {
+        *endp = first; 
+    }
+    else
+    {
+        const uint8_t* p = first+1;
+        switch (*first)
+        {
+        case JSONCONS_CBOR_0x40_0x57: // byte string (0x00..0x17 bytes follow)
+            {
+                length = *first & 0x1f;
+                *endp = p;
+                break;
+            }
+        case 0x58: // byte string (one-byte uint8_t for n follows)
+            {
+                length = binary::from_big_endian<uint8_t>(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                }
+                break;
+            }
+        case 0x59: // byte string (two-byte uint16_t for n follow)
+            {
+                length = binary::from_big_endian<uint16_t>(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                }
+                break;
+            }
+        case 0x5a: // byte string (four-byte uint32_t for n follow)
+            {
+                length = binary::from_big_endian<uint32_t>(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                }
+                break;
+            }
+        case 0x5b: // byte string (eight-byte uint64_t for n follow)
+            {
+                length = binary::from_big_endian<uint64_t>(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                }
+                break;
+            }
+        case 0x5f: // byte string, byte strings follow, terminated by "break"
+            {
+                length = 0;
+                while (*p != 0xff)
+                {
+                    size_t len = detail::get_byte_string_length(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                        break;
+                    }
+                    length += len;
+                }
+                break;
+            }
+        default: 
+            {
+                *endp = first;
+            }
+        }
+    }
+    return length;
+}
+
+inline 
 std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last, 
                                      const uint8_t** endp)
 {
@@ -158,6 +238,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                     if (*endp == p)
                     {
                         *endp = first;
+                        break;
                     }
                     else
                     {
@@ -169,11 +250,90 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
             }
         default: 
             {
-                p = *endp;
+                *endp = first;
             }
         }
     }
     return v;
+}
+
+inline 
+size_t get_text_string_length(const uint8_t* first, const uint8_t* last, 
+                              const uint8_t** endp)
+{
+    size_t length = 0;
+    if (JSONCONS_UNLIKELY(last <= first))
+    {
+        *endp = first; 
+    }
+    else
+    {
+        const uint8_t* p = first+1;
+        switch (*first)
+        {
+        case JSONCONS_CBOR_0x60_0x77: // UTF-8 string (0x00..0x17 bytes follow)
+            {
+                length = *first & 0x1f;
+                *endp = p;
+                break;
+            }
+        case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
+            {
+                length = binary::from_big_endian<uint8_t>(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                }
+                break;
+            }
+        case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
+            {
+                length = binary::from_big_endian<uint16_t>(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                }
+                break;
+            }
+        case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
+            {
+                length = binary::from_big_endian<uint32_t>(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                }
+                break;
+            }
+        case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
+            {
+                length = binary::from_big_endian<uint64_t>(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                }
+                break;
+            }
+        case 0x7f: // UTF-8 string, text strings follow, terminated by "break"
+            {
+                length = 0;
+                while (*p != 0xff)
+                {
+                    size_t len = detail::get_text_string_length(p,last,endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                        break;
+                    }
+                    length += len;
+                }
+                break;
+            }
+        default: 
+            *endp = first;
+            break;
+        }
+    }
+    return length;
 }
 
 inline 
@@ -265,6 +425,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
                     if (*endp == p)
                     {
                         *endp = first;
+                        break;
                     }
                     else
                     {
@@ -275,9 +436,8 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
                 break;
             }
         default: 
-            {
-                p = *endp;
-            }
+            *endp = first;
+            break;
         }
     }
     return s;
@@ -1691,6 +1851,33 @@ public:
     {
         JSONCONS_ASSERT(buflen() > 0);
         return first_[0] == 0xf6;
+    }
+
+    bool empty() const
+    {
+        bool is_empty;
+        if (is_array() || is_object())
+        {
+            is_empty = (size() == 0);
+        }
+        else if (is_string())
+        {
+            const uint8_t* endp;
+            size_t length = detail::get_text_string_length(first_,last_,&endp);
+            is_empty = (length == 0);
+        }
+        else if (is_byte_string())
+        {
+            const uint8_t* endp;
+            size_t length = detail::get_byte_string_length(first_, last_, &endp);
+            is_empty = (length == 0);
+        }
+        else
+        {
+            is_empty = false;
+        }
+
+        return is_empty;
     }
 
     bool is_array() const
