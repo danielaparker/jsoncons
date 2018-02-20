@@ -72,7 +72,39 @@ cbor_view(const cbor_view& other); // (4)
 
 #### Accessors
 
+```
+bool as_bool() const; // (1)
+
+int64_t as_integer() const; // (2)
+
+uint64_t as_uinteger() const; // (3)
+
+double as_double() const; // (4)
+
+std::string as_string() const; // (5)
+```
+
 <table border="0">
+  <tr>
+    <td><code>bool is_null() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a null tag, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_string() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a text string tag, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_byte_string() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a byte string tag, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_integer() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with int64_t, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool is_uinteger() const</code></td>
+    <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag compatible with uint84_t, otherwise <code>false</code>.</td> 
+  </tr>
   <tr>
     <td><code>bool is_null() const</code></td>
     <td>Returns <code>true</code> if the first byte in the CBOR buffer is a null tag, otherwise <code>false</code>.</td> 
@@ -108,6 +140,26 @@ cbor_view(const cbor_view& other); // (4)
   <tr>
     <td><code>bool is_object() const</code></td>
     <td>Returns <code>true</code> if the first byte in the CBOR buffer is a tag for a CBOR map, otherwise <code>false</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>bool as_bool() const</code></td>
+    <td></td> 
+  </tr>
+  <tr>
+    <td><code>int64_t as_integer() const</code></td>
+    <td></td> 
+  </tr>
+  <tr>
+    <td><code>uint64_t as_uinteger() const</code></td>
+    <td></td> 
+  </tr>
+  <tr>
+    <td><code>double as_double() const</code></td>
+    <td></td> 
+  </tr>
+  <tr>
+    <td><code>std::string as_string() const</code></td>
+    <td></td> 
   </tr>
   <tr>
     <td><code>size_t size() const</code></td>
