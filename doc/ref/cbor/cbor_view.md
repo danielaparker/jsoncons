@@ -62,11 +62,11 @@ cbor_view(const cbor_view& other); // (4)
 <table border="0">
   <tr>
     <td><a href="cbor_view/array_range.md">array_range</a></td>
-    <td>Returns a "range" that supports a range-based for loop over the elements of a `cbor_view` array.</td> 
+    <td>Returns a "range" that supports a range-based for loop over the elements of a <code>cbor_view</code> array.</td> 
   </tr>
   <tr>
     <td><a href="cbor_view/object_range.md">obect_range</a></td>
-    <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `cbor_view` object.</td> 
+    <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a <code>cbor_view</code> object.</td> 
   </tr>
 </table>
 
