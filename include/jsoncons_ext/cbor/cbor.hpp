@@ -2078,9 +2078,26 @@ public:
 
     double as_double() const
     {
-        const uint8_t* endp;
-        double val = detail::get_double(first_,last_,&endp);
-        if (endp == first_)
+        double val;
+
+        if (is_double())
+        {
+            const uint8_t* endp;
+            val = detail::get_double(first_,last_,&endp);
+            if (endp == first_)
+            {
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Invalid CBOR"));
+            }
+        }
+        else if (is_uinteger())
+        {
+            val = static_cast<double>(as_uinteger());
+        }
+        else if (is_integer())
+        {
+            val = static_cast<double>(as_integer());
+        }
+        else
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
