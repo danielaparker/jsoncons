@@ -17,12 +17,12 @@ Member type          |Definition
 `pointer`            |`cbor_view*`
 `const_pointer`      |`const cbor_view*`
 `string_type`        |`std::string`
-`key_value_pair_type`|[key_value_pair_type](key_value_pair_type) is a class that stores a name and a json value
+`key_value_pair_type`|`key_value_pair_type` is a class that has `std::string key()` and `cbor_view value()` member functions
 `string_view_type`   |A non-owning view of a string, holds a pointer to character data and length. Supports conversion to and from strings. Will be typedefed to the C++ 17 [string view](http://en.cppreference.com/w/cpp/string/basic_string_view) if `JSONCONS_HAS_STRING_VIEW` is defined in `jsoncons_config.hpp`, otherwise proxied. 
-`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_pair_type](key_value_pair_type)
-`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_pair_type](key_value_pair_type)
-`array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `json`
-`const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const json`
+`object_iterator`|A const [ForwardIterator](http://en.cppreference.com/w/cpp/concept/ForwardIterator) to key_value_pair_type
+`const_object_iterator`|A const [ForwardIterator](http://en.cppreference.com/w/cpp/concept/ForwardIterator) to const key_value_pair_type
+`array_iterator`|A const [ForwardIterator](http://en.cppreference.com/w/cpp/concept/ForwardIterator) to `cbor_view`
+`const_array_iterator`|A const [ForwardIterator](http://en.cppreference.com/w/cpp/concept/ForwardIterator) to `cbor_view`
 
 #### Constructors
 
