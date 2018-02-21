@@ -44,7 +44,7 @@ int main()
     ojson j2 = cbor::decode_cbor<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
-    // Iterating and accessing the nested data items of a packed CBOR value
+    // Iterating over and accessing the nested data items of a packed CBOR value
     cbor::cbor_view datav{data};    
     cbor::cbor_view reputons = datav.at("reputons");    
 
