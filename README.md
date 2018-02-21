@@ -30,9 +30,9 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 - [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
 - [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
-- [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
 - [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
 - [msgpack](doc/ref/msgpack/msgpack.md) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+- [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
@@ -758,91 +758,6 @@ Output:
 
 See [jsonpath](doc/ref/jsonpath/jsonpath.md) for details.
 
-<div id="ext_csv"/>
-
-#### csv
-Example file (tasks.csv)
-```csv
-project_id, task_name, task_start, task_finish
-4001,task1,01/01/2003,01/31/2003
-4001,task2,02/01/2003,02/28/2003
-4001,task3,03/01/2003,03/31/2003
-4002,task1,04/01/2003,04/30/2003
-4002,task2,05/01/2003,
-```
-
-```c++
-#include <fstream>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
-
-using namespace jsoncons;
-using namespace jsoncons::csv;
-
-int main()
-{
-    std::ifstream is("input/tasks.csv");
-
-    csv_parameters params;
-    params.assume_header(true)
-          .trim(true)
-          .ignore_empty_values(true) 
-          .column_types("integer,string,string,string");
-    ojson tasks = decode_csv<ojson>(is, params);
-
-    std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
-
-    std::cout << "(2)\n";
-    encode_csv(tasks, std::cout);
-}
-```
-Output:
-```json
-(1)
-[
-    {
-        "project_id": 4001,
-        "task_name": "task1",
-        "task_start": "01/01/2003",
-        "task_finish": "01/31/2003"
-    },
-    {
-        "project_id": 4001,
-        "task_name": "task2",
-        "task_start": "02/01/2003",
-        "task_finish": "02/28/2003"
-    },
-    {
-        "project_id": 4001,
-        "task_name": "task3",
-        "task_start": "03/01/2003",
-        "task_finish": "03/31/2003"
-    },
-    {
-        "project_id": 4002,
-        "task_name": "task1",
-        "task_start": "04/01/2003",
-        "task_finish": "04/30/2003"
-    },
-    {
-        "project_id": 4002,
-        "task_name": "task2",
-        "task_start": "05/01/2003"
-    }
-]
-```
-```csv
-(2)
-project_id,task_name,task_start,task_finish
-4001,task2,02/01/2003,02/28/2003
-4001,task3,03/01/2003,03/31/2003
-4002,task1,04/01/2003,04/30/2003
-4002,task2,05/01/2003,
-```
-
-See [csv](doc/ref/csv/csv.md) for details.
-
 <div id="ext_cbor"/>
 
 #### cbor
@@ -971,6 +886,91 @@ Output:
 ```
 
 See [msgpack](doc/ref/msgpack/msgpack.md) for details.
+
+<div id="ext_csv"/>
+
+#### csv
+Example file (tasks.csv)
+```csv
+project_id, task_name, task_start, task_finish
+4001,task1,01/01/2003,01/31/2003
+4001,task2,02/01/2003,02/28/2003
+4001,task3,03/01/2003,03/31/2003
+4002,task1,04/01/2003,04/30/2003
+4002,task2,05/01/2003,
+```
+
+```c++
+#include <fstream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv_reader.hpp>
+#include <jsoncons_ext/csv/csv_serializer.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::csv;
+
+int main()
+{
+    std::ifstream is("input/tasks.csv");
+
+    csv_parameters params;
+    params.assume_header(true)
+          .trim(true)
+          .ignore_empty_values(true) 
+          .column_types("integer,string,string,string");
+    ojson tasks = decode_csv<ojson>(is, params);
+
+    std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
+
+    std::cout << "(2)\n";
+    encode_csv(tasks, std::cout);
+}
+```
+Output:
+```json
+(1)
+[
+    {
+        "project_id": 4001,
+        "task_name": "task1",
+        "task_start": "01/01/2003",
+        "task_finish": "01/31/2003"
+    },
+    {
+        "project_id": 4001,
+        "task_name": "task2",
+        "task_start": "02/01/2003",
+        "task_finish": "02/28/2003"
+    },
+    {
+        "project_id": 4001,
+        "task_name": "task3",
+        "task_start": "03/01/2003",
+        "task_finish": "03/31/2003"
+    },
+    {
+        "project_id": 4002,
+        "task_name": "task1",
+        "task_start": "04/01/2003",
+        "task_finish": "04/30/2003"
+    },
+    {
+        "project_id": 4002,
+        "task_name": "task2",
+        "task_start": "05/01/2003"
+    }
+]
+```
+```csv
+(2)
+project_id,task_name,task_start,task_finish
+4001,task2,02/01/2003,02/28/2003
+4001,task3,03/01/2003,03/31/2003
+4002,task1,04/01/2003,04/30/2003
+4002,task2,05/01/2003,
+```
+
+See [csv](doc/ref/csv/csv.md) for details.
 
 ### Building the test suite and examples with CMake
 
