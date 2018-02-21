@@ -30,7 +30,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 - [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
 - [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
-- [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
+- [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/). It also supports a set of operations for iterating over and accessing CBOR data items.
 - [msgpack](doc/ref/msgpack/msgpack.md) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 - [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
 
@@ -580,7 +580,7 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-[jsonpointer::get](jsonpointer/get.md) may also be used to query packed cbor values.
+[jsonpointer::get](jsonpointer/get.md) may also be used to query packed CBOR data items.
 
 See [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) for details. 
 
@@ -762,7 +762,9 @@ See [jsonpath](doc/ref/jsonpath/jsonpath.md) for details.
 
 #### cbor
 
-The `cbor` extension supports encoding json to and decoding from the [cbor](http://cbor.io/) binary serialization format.
+The `cbor` extension supports decoding a packed CBOR data item to an unpacked (json) value and
+encoding an unpacked (json) value to a packed  CBOR data item. It also supports a set of operations 
+on a view of a CBOR data item for iterating over and accessing nested CBOR data items.
 
 This example illustrates encoding a [Reputation Interchange](https://tools.ietf.org/rfc/rfc7071.txt) data object to and from cbor.
 
@@ -811,7 +813,7 @@ Output:
 }
 ```
 
-[jsonpointer::get](jsonpointer/get.md) may be used to query packed cbor values.
+[jsonpointer::get](jsonpointer/get.md) may be used to query packed CBOR data items.
 
 See [cbor](doc/ref/cbor/cbor.md) for details.
 
