@@ -739,6 +739,27 @@ public:
         return byte_string_view(data(),length());
     }
 
+    void push_back(uint8_t b)
+    {
+        data_.push_back(b);
+    }
+
+    void assign(const uint8_t* s, size_t count)
+    {
+        data_.clear();
+        data_.insert(s, s+count);
+    }
+
+    void append(const uint8_t* s, size_t count)
+    {
+        data_.insert(s, s+count);
+    }
+
+    void clear()
+    {
+        data_.clear();
+    }
+
     uint8_t operator[](size_type pos) const 
     { 
         return data_[pos]; 
