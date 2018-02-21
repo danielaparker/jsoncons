@@ -580,7 +580,7 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-[jsonpointer::get](jsonpointer/get.md) may also be used to query the nested data items of a packed CBOR value.
+[jsonpointer::get](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/jsonpointer/get.md) may also be used to query the nested data items of a packed CBOR value.
 
 See [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) for details. 
 
