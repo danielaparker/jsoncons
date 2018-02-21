@@ -721,6 +721,11 @@ public:
         }
     }
 
+    basic_byte_string(const uint8_t* data, size_t length)
+    {
+        data_.insert(data,data+length);
+    }
+
     basic_byte_string(const basic_byte_string& s) = default; 
 
     basic_byte_string(basic_byte_string&& s) = default; 
