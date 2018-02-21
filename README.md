@@ -31,8 +31,8 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
 - [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
 - [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
-- [msgpack](doc/ref/msgpack/msgpack.md) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 - [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/).
+- [msgpack](doc/ref/msgpack/msgpack.md) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
@@ -843,6 +843,63 @@ project_id,task_name,task_start,task_finish
 
 See [csv](doc/ref/csv/csv.md) for details.
 
+<div id="ext_cbor"/>
+
+#### cbor
+
+The `cbor` extension supports encoding json to and decoding from the [cbor](http://cbor.io/) binary serialization format.
+
+This example illustrates encoding a [Reputation Interchange](https://tools.ietf.org/rfc/rfc7071.txt) data object to and from cbor.
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::cbor;
+
+int main()
+{
+    ojson j1 = ojson::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+       {
+           "rater": "HikingAsylum.example.com",
+           "assertion": "is-good",
+           "rated": "sk",
+           "rating": 0.90
+         }
+       ]
+    }
+    )");
+
+    std::vector<uint8_t> v;
+    encode_cbor(j1, v);
+
+    ojson j2 = decode_cbor<ojson>(v);
+    std::cout << pretty_print(j2) << std::endl;
+}
+```
+Output:
+```json
+{
+    "application": "hiking",
+    "reputons": [
+        {
+            "rater": "HikingAsylum.example.com",
+            "assertion": "is-good",
+            "rated": "sk",
+            "rating": 0.9
+        }
+    ]
+}
+```
+
+[jsonpointer::get](jsonpointer/get.md) may be used to query packed cbor values.
+
+See [cbor](doc/ref/cbor/cbor.md) for details.
+
 <div id="ext_msgpack"/>
 
 #### msgpack
@@ -914,63 +971,6 @@ Output:
 ```
 
 See [msgpack](doc/ref/msgpack/msgpack.md) for details.
-
-<div id="ext_cbor"/>
-
-#### cbor
-
-The `cbor` extension supports encoding json to and decoding from the [cbor](http://cbor.io/) binary serialization format.
-
-This example illustrates encoding a [Reputation Interchange](https://tools.ietf.org/rfc/rfc7071.txt) data object to and from cbor.
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/cbor/cbor.hpp>
-
-using namespace jsoncons;
-using namespace jsoncons::cbor;
-
-int main()
-{
-    ojson j1 = ojson::parse(R"(
-    {
-       "application": "hiking",
-       "reputons": [
-       {
-           "rater": "HikingAsylum.example.com",
-           "assertion": "is-good",
-           "rated": "sk",
-           "rating": 0.90
-         }
-       ]
-    }
-    )");
-
-    std::vector<uint8_t> v;
-    encode_cbor(j1, v);
-
-    ojson j2 = decode_cbor<ojson>(v);
-    std::cout << pretty_print(j2) << std::endl;
-}
-```
-Output:
-```json
-{
-    "application": "hiking",
-    "reputons": [
-        {
-            "rater": "HikingAsylum.example.com",
-            "assertion": "is-good",
-            "rated": "sk",
-            "rating": 0.9
-        }
-    ]
-}
-```
-
-[jsonpointer::get](jsonpointer/get.md) may be used to query packed cbor values.
-
-See [cbor](doc/ref/cbor/cbor.md) for details.
 
 ### Building the test suite and examples with CMake
 
