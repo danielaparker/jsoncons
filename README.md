@@ -30,8 +30,8 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 - [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
 - [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JsonPath expressions.
-- [cbor](doc/ref/cbor/cbor.md) implements encode to and decode from the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/). It also supports a set of operations for iterating over and accessing the nested data items of a packed CBOR value.
-- [msgpack](doc/ref/msgpack/msgpack.md) implements encode to and decode from the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+- [cbor](doc/ref/cbor/cbor.md) implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/). It also supports a set of operations for iterating over and accessing the nested data items of a packed CBOR value.
+- [msgpack](doc/ref/msgpack/msgpack.md) implements decode from and encode to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 - [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
@@ -763,17 +763,17 @@ See [jsonpath](doc/ref/jsonpath/jsonpath.md) for details.
 #### cbor
 
 The `cbor` extension supports decoding a packed CBOR value to an unpacked (json) value and
-encoding an unpacked (json) value to a packed  CBOR data item. It also supports a set of operations 
-on a view of a CBOR data item for iterating over and accessing the nested CBOR data items of a packed CBOR value.
+encoding an unpacked (json) value to a packed CBOR value. It also supports a set of operations 
+on a view of a packed CBOR value for iterating over and accessing nested CBOR data items.
 
 This example illustrates encoding a [Reputation Interchange](https://tools.ietf.org/rfc/rfc7071.txt) data object to and from cbor.
 
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
 
 int main()
 {
@@ -791,15 +791,37 @@ int main()
     }
     )");
 
-    std::vector<uint8_t> v;
-    encode_cbor(j1, v);
+    // Encoding an unpacked (json) value to a packed CBOR value
+    std::vector<uint8_t> data;
+    cbor::encode_cbor(j1, data);
 
-    ojson j2 = decode_cbor<ojson>(v);
-    std::cout << pretty_print(j2) << std::endl;
-}
+    // Decoding a packed CBOR value to an unpacked (json) value
+    ojson j2 = cbor::decode_cbor<ojson>(data);
+    std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
+
+    // Iterating and accessing the nested data items of a packed CBOR value
+    cbor::cbor_view datav{data};    
+    cbor::cbor_view reputons = datav.at("reputons");    
+
+    std::cout << "(2)\n";
+    for (auto element : reputons.array_range())
+    {
+        std::cout << element.at("rated").as_string() << ", ";
+        std::cout << element.at("rating").as_double() << "\n";
+    }
+    std::cout << std::endl;
+
+    // Querying a packed CBOR value for a nested data item with jsonpointer
+    std::error_code ec;
+    cbor::cbor_view rated = jsonpointer::get(datav, "/reputons/0/rated", ec);
+    if (!ec)
+    {
+        std::cout << "(3) " << rated.as_string() << "\n";
+    }
 ```
 Output:
-```json
+```
+(1)
 {
     "application": "hiking",
     "reputons": [
@@ -811,9 +833,12 @@ Output:
         }
     ]
 }
-```
 
-[jsonpointer::get](jsonpointer/get.md) may be used to query packed CBOR values.
+(2)
+sk, 0.9
+
+(3) sk
+```
 
 See [cbor](doc/ref/cbor/cbor.md) for details.
 
