@@ -307,7 +307,7 @@ void jsonpointer_replace_array_value()
 
 void jsonpointer_cbor()
 {
-    ojson j1 = ojson::parse(R"(
+    ojson j = ojson::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -321,15 +321,14 @@ void jsonpointer_cbor()
     }
     )");
 
-    std::vector<uint8_t> buffer;
-    cbor::encode_cbor(j1, buffer);
+    std::vector<uint8_t> data;
+    cbor::encode_cbor(j, data);
 
     std::error_code ec;
-    cbor::cbor_view v2 = jsonpointer::get(cbor::cbor_view(buffer), "/reputons/0/rated", ec);
+    cbor::cbor_view rated = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rated", ec);
+    cbor::cbor_view rating = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rating", ec);
 
-    ojson j2 = cbor::decode_cbor<ojson>(v2);
-
-    std::cout << j2 << std::endl;
+    std::cout << rated.as_string() << ", " << rating.as_double() << std::endl;
 }
 
 void jsonpointer_error_example()
@@ -376,12 +375,12 @@ void jsonpointer_examples()
     jsonpointer_replace_object_value();
     jsonpointer_replace_array_value();
     jsonpointer_contains();
-    jsonpointer_cbor();
     jsonpointer_error_example();
     jsonpointer_select_RFC6901();
     jsonpointer_select_author();
     jsonpointer_insert_name_exists();
     jsonpointer_insert_or_assign_name_exists();
+    jsonpointer_cbor();
     std::cout << std::endl;
 }
 

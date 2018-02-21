@@ -477,13 +477,13 @@ int main()
 
         csv_examples();
 
-        jsonpointer_examples();
-
         jsonpath_examples();
 
         jsonpatch_examples();
 
         cbor_examples();
+
+        jsonpointer_examples();
     }
     catch (const std::exception& e)
     {

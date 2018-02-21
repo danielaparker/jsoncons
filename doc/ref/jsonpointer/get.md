@@ -202,7 +202,7 @@ using namespace jsoncons;
 
 int main()
 {
-    ojson j1 = ojson::parse(R"(
+    ojson j = ojson::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -216,20 +216,19 @@ int main()
     }
     )");
 
-    std::vector<uint8_t> buffer;
-    cbor::encode_cbor(j1, buffer);
+    std::vector<uint8_t> data;
+    cbor::encode_cbor(j, data);
 
     std::error_code ec;
-    cbor::cbor_view v2 = jsonpointer::get(cbor::cbor_view(buffer), "/reputons/0/rated", ec);
+    cbor::cbor_view rated = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rated", ec);
+    cbor::cbor_view rating = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rating", ec);
 
-    ojson j2 = cbor::decode_cbor<ojson>(v2);
-
-    std::cout << j2 << std::endl;
+    std::cout << rated.as_string() << ", " << rating.as_double() << std::endl;
 }
 ```
 
 Output:
 
 ```
-"sk"
+sk, 0.9
 ```
