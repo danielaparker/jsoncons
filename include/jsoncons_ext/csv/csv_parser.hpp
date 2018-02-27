@@ -21,6 +21,7 @@
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_filter.hpp>
+#include <jsoncons/json.hpp>
 #include <jsoncons/detail/number_parsers.hpp>
 #include <jsoncons_ext/csv/csv_error_category.hpp>
 #include <jsoncons_ext/csv/csv_parameters.hpp>
@@ -91,6 +92,7 @@ class basic_csv_parser : private parsing_context
     size_t level_;
     size_t offset_;
     jsoncons::detail::string_to_double to_double_; 
+    basic_json<CharT,preserve_order_policy,Allocator> j_;
 
 public:
     basic_csv_parser(basic_json_input_handler<CharT>& handler)
@@ -242,7 +244,6 @@ public:
                     for (const auto& name : column_names_)
                     {
                         handler_.string_value(name, *this);
-                        //end_value(name,column_index_);
                     }
                     handler_.end_array(*this);
                 }
@@ -276,6 +277,10 @@ public:
         for (auto name : parameters_.column_names())
         {
             column_names_.emplace_back(name.data(),name.size());
+            if (parameters_.mapping() == mapping_type::m_columns)
+            {
+                j_[name] = basic_json<CharT,preserve_order_policy,Allocator>::array();
+            }
         }
         for (auto name : parameters_.column_types())
         {
@@ -558,18 +563,8 @@ all_csv_states:
         }
         if (parameters_.mapping() == mapping_type::m_columns)
         {
-            handler_.begin_object(*this);
-            for (size_t i = 0; i < column_values_.size(); ++i)
-            {
-                handler_.name(string_view_type(column_names_[i].data(),column_names_[i].size()),*this);
-                handler_.begin_array(*this);
-                for (const auto& val : column_values_[i])
-                {
-                    end_value(val,i,parameters_.numeric_check());
-                }
-                handler_.end_array(*this);
-            }
-            handler_.end_object(*this);
+            basic_json_fragment_filter<CharT> fragment_filter(handler_);
+            j_.dump(fragment_filter);
         }
         else
         {
@@ -643,6 +638,10 @@ private:
             if (parameters_.assume_header() && line_ == 1)
             {
                 column_names_.push_back(value_buffer_);
+                if (parameters_.mapping() == mapping_type::m_columns)
+                {
+                    j_[value_buffer_] = basic_json<CharT,preserve_order_policy,Allocator>::array();
+                }
             }
             break;
         case csv_mode_type::data:
@@ -687,9 +686,11 @@ private:
                 }
                 break;
             case mapping_type::m_columns:
-                if (column_index_ < column_values_.size())
+                //if (column_index_ < column_values_.size())
+                if (column_index_ < column_names_.size())
                 {
-                    column_values_[column_index_].push_back(value_buffer_);
+                    //column_values_[column_index_].push_back(value_buffer_);
+                    j_[column_names_[column_index_]].push_back(value_buffer_);
                 }
                 break;
             }
@@ -713,6 +714,10 @@ private:
             if (parameters_.assume_header() && line_ == 1)
             {
                 column_names_.push_back(value_buffer_);
+                if (parameters_.mapping() == mapping_type::m_columns)
+                {
+                    j_[value_buffer_] = basic_json<CharT,preserve_order_policy,Allocator>::array();
+                }
             }
             break;
         case csv_mode_type::data:
@@ -792,7 +797,7 @@ private:
             {
             case csv_column_type::integer_t:
                 {
-                std::istringstream iss{ std::string(value) };
+                    std::istringstream iss{ std::string(value) };
                     int64_t val;
                     iss >> val;
                     if (!iss.fail())
