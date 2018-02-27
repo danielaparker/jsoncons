@@ -1,3 +1,13 @@
+master
+------
+
+Changes
+
+- `decode_csv` by default now attempts to infer null, true, false, integer and floating point values
+  in the CSV source. In previous versions the default was to read everything as strings,
+  and other types had to be specified explicitly. If the new default behavior is not desired, the
+  `csv_parameters` option `infer_types` can be set to `false`. Column types can still be set explicitly.
+
 v0.103.0
 --------
 

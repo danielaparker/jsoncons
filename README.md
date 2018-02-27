@@ -25,6 +25,13 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
+### What's new on master
+
+`decode_csv` by default now attempts to infer null, true, false, integer and floating point values
+in the CSV source. In previous versions the default was to read everything as strings,
+and other types had to be specified explicitly. If the new default behavior is not desired, the
+`csv_parameters` option `infer_types` can be set to `false`. Column types can still be set explicitly.
+
 ### Extensions
 
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
@@ -939,12 +946,12 @@ int main()
     csv_parameters params;
     params.assume_header(true);
 
-    params.mapping(mapping_type::n_rows);
+    params.mapping(mapping_type::n_objects);
     std::ifstream is1("input/sales.csv");
     ojson j1 = decode_csv<ojson>(is1,params);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    params.mapping(mapping_type::n_objects);
+    params.mapping(mapping_type::n_rows);
     std::ifstream is2("input/sales.csv");
     ojson j2 = decode_csv<ojson>(is2,params);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
@@ -958,15 +965,6 @@ int main()
 Output:
 ```json
 (1)
-[
-    ["customer_name","has_coupon","phone_number","zip_code","sales_tax_rate","total_amount"],
-    ["John Roe",true,"0272561313","01001",0.05,431.65],
-    ["Jane Doe",false,"416-272-2561",55416,0.15,480.7],
-    ["Joe Bloggs",false,"4162722561","55416",0.15,300.7],
-    ["John Smith",false,null,"22313-1450",0.15,300.7]
-]
-
-(2)
 [
     {
         "customer_name": "John Roe",
@@ -1000,6 +998,15 @@ Output:
         "sales_tax_rate": 0.15,
         "total_amount": 300.7
     }
+]
+
+(2)
+[
+    ["customer_name","has_coupon","phone_number","zip_code","sales_tax_rate","total_amount"],
+    ["John Roe",true,"0272561313","01001",0.05,431.65],
+    ["Jane Doe",false,"416-272-2561",55416,0.15,480.7],
+    ["Joe Bloggs",false,"4162722561","55416",0.15,300.7],
+    ["John Smith",false,null,"22313-1450",0.15,300.7]
 ]
 
 (3)

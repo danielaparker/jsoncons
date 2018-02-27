@@ -3,7 +3,7 @@
 Parameter          | Description        | Default       
 -------------      | -------------  | ------------- 
 assume_header      | Assume first row in file is header, use field names to construct objects | false         
-infer_types      | Decode null, true, false, integers and floating point values | true         
+infer_types      | Infer null, true, false, integers and floating point values in the CSV source | true         
 header_lines      | Number of header lines in the CSV text | 1 if assume_header is true, otherwise 0         
 column_names      | A comma separated list of names corresponding to the fields in the file | "bool-field,float-field,string-field"
 column_types      | A comma separated list of data types corresponding to the columns in the file. The following data types are supported: string, integer, float and boolean | "bool,float,string"}
