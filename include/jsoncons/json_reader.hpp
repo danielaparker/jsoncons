@@ -285,7 +285,7 @@ public:
             }
             if (!eof_)
             {
-                parser_.parse(ec);
+                parser_.parse_some(ec);
                 if (ec) return;
             }
         }

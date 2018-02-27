@@ -2735,7 +2735,7 @@ public:
         }
         size_t offset = result.it - s.begin();
         parser.set_source(s.data()+offset,s.size()-offset);
-        parser.parse();
+        parser.parse_some();
         parser.end_parse();
         parser.check_done();
         if (!decoder.is_valid())

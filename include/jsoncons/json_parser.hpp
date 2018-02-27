@@ -446,7 +446,7 @@ public:
         }
     }
 
-    void parse(std::error_code& ec)
+    void parse_some(std::error_code& ec)
     {
         const CharT* local_input_end = input_end_;
 
@@ -2436,10 +2436,10 @@ escape_u9:
         }
     }
 
-    void parse()
+    void parse_some()
     {
         std::error_code ec;
-        parse(ec);
+        parse_some(ec);
         if (ec)
         {
             throw parse_error(ec,line_,column_);
