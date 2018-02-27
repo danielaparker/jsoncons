@@ -94,6 +94,7 @@ class basic_csv_parser : private parsing_context
     size_t offset_;
     jsoncons::detail::string_to_double to_double_; 
     json_type j_;
+    std::vector<json_decoder<json_type>> decoders_;
 
 public:
     basic_csv_parser(basic_json_input_handler<CharT>& handler)
@@ -247,6 +248,14 @@ public:
                         handler_.string_value(name, *this);
                     }
                     handler_.end_array(*this);
+                }
+                break;
+            case mapping_type::m_columns:
+                for (const auto& name : column_names_)
+                {
+                    decoders_.push_back(json_decoder<json_type>());
+                    decoders_.back().begin_json();
+                    decoders_.back().begin_array(*this);
                 }
                 break;
             default:
@@ -655,7 +664,7 @@ private:
                 }
                 else
                 {
-                    end_value(value_buffer_,column_index_,parameters_.numeric_check());
+                    end_value(value_buffer_,column_index_,parameters_.numeric_check(),handler_);
                 }
                 break;
             case mapping_type::n_objects:
@@ -670,7 +679,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_,parameters_.numeric_check());
+                            end_value(value_buffer_,column_index_,parameters_.numeric_check(),handler_);
                         }
                     }
                     else if (level_ > 0)
@@ -681,7 +690,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_,parameters_.numeric_check());
+                            end_value(value_buffer_,column_index_,parameters_.numeric_check(),handler_);
                         }
                     }
                 }
@@ -693,6 +702,11 @@ private:
                     //column_values_[column_index_].push_back(value_buffer_);
                     j_[column_names_[column_index_]].push_back(value_buffer_);
                 }
+                if (column_index_ < decoders_.size())
+                {
+                    end_value(value_buffer_,column_index_,parameters_.numeric_check(),decoders_[column_index_]);
+                }
+
                 break;
             }
             break;
@@ -725,7 +739,7 @@ private:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
-                end_value(value_buffer_,column_index_,false);
+                end_value(value_buffer_,column_index_,false,handler_);
                 break;
             case mapping_type::n_objects:
                 if (!(parameters_.ignore_empty_values() && value_buffer_.size() == 0))
@@ -739,7 +753,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_,false);
+                            end_value(value_buffer_,column_index_,false,handler_);
                         }
                     }
                     else if (level_ > 0)
@@ -750,7 +764,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_,false);
+                            end_value(value_buffer_,column_index_,false,handler_);
                         }
                     }
                 }
@@ -768,7 +782,7 @@ private:
         value_buffer_.clear();
     }
 
-    void end_value(const string_view_type& value, size_t column_index, bool numeric_check)
+    void end_value(const string_view_type& value, size_t column_index, bool numeric_check, basic_json_input_handler<CharT>& handler)
     {
         if (column_index < column_types_.size() + offset_)
         {
@@ -779,19 +793,19 @@ private:
                 {
                     if (column_index == offset_ || level_ > column_types_[column_index-offset_].level)
                     {
-                        handler_.end_array(*this);
+                        handler.end_array(*this);
                     }
                     level_ = column_index == offset_ ? 0 : column_types_[column_index - offset_].level;
                 }
             }
             if (level_ < column_types_[column_index - offset_].level)
             {
-                handler_.begin_array(*this);
+                handler.begin_array(*this);
                 level_ = column_types_[column_index - offset_].level;
             }
             else if (level_ > column_types_[column_index - offset_].level)
             {
-                handler_.end_array(*this);
+                handler.end_array(*this);
                 level_ = column_types_[column_index - offset_].level;
             }
             switch (column_types_[column_index - offset_].col_type)
@@ -803,7 +817,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler_.integer_value(val, *this);
+                        handler.integer_value(val, *this);
                     }
                     else
                     {
@@ -816,7 +830,7 @@ private:
                         }
                         else
                         {
-                            handler_.null_value(*this);
+                            handler.null_value(*this);
                         }
                     }
                 }
@@ -828,7 +842,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler_.double_value(val, *this);
+                        handler.double_value(val, *this);
                     }
                     else
                     {
@@ -841,7 +855,7 @@ private:
                         }
                         else
                         {
-                            handler_.null_value(*this);
+                            handler.null_value(*this);
                         }
                     }
                 }
@@ -850,19 +864,19 @@ private:
                 {
                     if (value.length() == 1 && value[0] == '0')
                     {
-                        handler_.bool_value(false, *this);
+                        handler.bool_value(false, *this);
                     }
                     else if (value.length() == 1 && value[0] == '1')
                     {
-                        handler_.bool_value(true, *this);
+                        handler.bool_value(true, *this);
                     }
                     else if (value.length() == 5 && ((value[0] == 'f' || value[0] == 'F') && (value[1] == 'a' || value[1] == 'A') && (value[2] == 'l' || value[2] == 'L') && (value[3] == 's' || value[3] == 'S') && (value[4] == 'e' || value[4] == 'E')))
                     {
-                        handler_.bool_value(false, *this);
+                        handler.bool_value(false, *this);
                     }
                     else if (value.length() == 4 && ((value[0] == 't' || value[0] == 'T') && (value[1] == 'r' || value[1] == 'R') && (value[2] == 'u' || value[2] == 'U') && (value[3] == 'e' || value[3] == 'E')))
                     {
-                        handler_.bool_value(true, *this);
+                        handler.bool_value(true, *this);
                     }
                     else
                     {
@@ -875,7 +889,7 @@ private:
                         }
                         else
                         {
-                            handler_.null_value(*this);
+                            handler.null_value(*this);
                         }
                     }
                 }
@@ -883,7 +897,7 @@ private:
             default:
                 if (value.length() > 0)
                 {
-                    handler_.string_value(value, *this);
+                    handler.string_value(value, *this);
                 }
                 else
                 {
@@ -896,7 +910,7 @@ private:
                     }
                     else
                     {
-                        handler_.string_value(string_view_type(), *this);
+                        handler.string_value(string_view_type(), *this);
                     }
                 }
                 break;  
@@ -906,11 +920,11 @@ private:
         {
             if (numeric_check)
             {
-                end_value_with_numeric_check(value);
+                end_value_with_numeric_check(value, handler);
             }
             else
             {
-                handler_.string_value(value, *this);
+                handler.string_value(value, *this);
             }
         }
     }
@@ -928,7 +942,7 @@ private:
         done
     };
 
-    void end_value_with_numeric_check(const string_view_type& value)
+    void end_value_with_numeric_check(const string_view_type& value, basic_json_input_handler<CharT>& handler)
     {
         numeric_check_state state = numeric_check_state::initial;
         bool is_negative = false;
@@ -1121,12 +1135,12 @@ private:
                     jsoncons::detail::to_integer_result result = jsoncons::detail::to_integer(value.data(), value.length());
                     if (!result.overflow)
                     {
-                        handler_.integer_value(result.value,*this);
+                        handler.integer_value(result.value,*this);
                     }
                     else
                     {
                         double d = to_double_(buffer.data(), buffer.length());
-                        handler_.double_value(d, number_format(format), *this);
+                        handler.double_value(d, number_format(format), *this);
                     }
                 }
                 else
@@ -1134,12 +1148,12 @@ private:
                     jsoncons::detail::to_uinteger_result result = jsoncons::detail::to_uinteger(value.data(), value.length());
                     if (!result.overflow)
                     {
-                        handler_.uinteger_value(result.value,*this);
+                        handler.uinteger_value(result.value,*this);
                     }
                     else
                     {
                         double d = to_double_(buffer.data(), buffer.length());
-                        handler_.double_value(d, number_format(format), *this);
+                        handler.double_value(d, number_format(format), *this);
                     }
                 }
                 break;
@@ -1148,11 +1162,11 @@ private:
         case numeric_check_state::exp:
             {
                 double d = to_double_(buffer.data(), buffer.length());
-                handler_.double_value(d, number_format(format, precision, decimal_places), *this);
+                handler.double_value(d, number_format(format, precision, decimal_places), *this);
                 break;
             }
         default:
-            handler_.string_value(value, *this);
+            handler.string_value(value, *this);
         }
     }
 
