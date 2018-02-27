@@ -93,7 +93,6 @@ class basic_csv_parser : private parsing_context
     size_t level_;
     size_t offset_;
     jsoncons::detail::string_to_double to_double_; 
-    json_type j_;
     std::vector<json_decoder<json_type>> decoders_;
 
 public:
@@ -287,10 +286,6 @@ public:
         for (auto name : parameters_.column_names())
         {
             column_names_.emplace_back(name.data(),name.size());
-            if (parameters_.mapping() == mapping_type::m_columns)
-            {
-                j_[name] = typename json_type::array();
-            }
         }
         for (auto name : parameters_.column_types())
         {
@@ -574,7 +569,15 @@ all_csv_states:
         if (parameters_.mapping() == mapping_type::m_columns)
         {
             basic_json_fragment_filter<CharT> fragment_filter(handler_);
-            j_.dump(fragment_filter);
+            handler_.begin_object(*this);
+            for (size_t i = 0; i < column_names_.size(); ++i)
+            {
+                handler_.name(column_names_[i],*this);
+                decoders_[i].end_array(*this);
+                decoders_[i].end_json();
+                decoders_[i].get_result().dump_fragment(fragment_filter);
+            }
+            handler_.end_object(*this);
         }
         else
         {
@@ -648,10 +651,6 @@ private:
             if (parameters_.assume_header() && line_ == 1)
             {
                 column_names_.push_back(value_buffer_);
-                if (parameters_.mapping() == mapping_type::m_columns)
-                {
-                    j_[value_buffer_] = typename json_type::array();
-                }
             }
             break;
         case csv_mode_type::data:
@@ -664,7 +663,7 @@ private:
                 }
                 else
                 {
-                    end_value(value_buffer_,column_index_,parameters_.numeric_check(),handler_);
+                    end_value(value_buffer_,column_index_,parameters_.infer_types(),handler_);
                 }
                 break;
             case mapping_type::n_objects:
@@ -679,7 +678,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_,parameters_.numeric_check(),handler_);
+                            end_value(value_buffer_,column_index_,parameters_.infer_types(),handler_);
                         }
                     }
                     else if (level_ > 0)
@@ -690,23 +689,16 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_,parameters_.numeric_check(),handler_);
+                            end_value(value_buffer_,column_index_,parameters_.infer_types(),handler_);
                         }
                     }
                 }
                 break;
             case mapping_type::m_columns:
-                //if (column_index_ < column_values_.size())
-                if (column_index_ < column_names_.size())
-                {
-                    //column_values_[column_index_].push_back(value_buffer_);
-                    j_[column_names_[column_index_]].push_back(value_buffer_);
-                }
                 if (column_index_ < decoders_.size())
                 {
-                    end_value(value_buffer_,column_index_,parameters_.numeric_check(),decoders_[column_index_]);
+                    end_value(value_buffer_,column_index_,parameters_.infer_types(),decoders_[column_index_]);
                 }
-
                 break;
             }
             break;
@@ -729,10 +721,6 @@ private:
             if (parameters_.assume_header() && line_ == 1)
             {
                 column_names_.push_back(value_buffer_);
-                if (parameters_.mapping() == mapping_type::m_columns)
-                {
-                    j_[value_buffer_] = typename json_type::array();
-                }
             }
             break;
         case csv_mode_type::data:
@@ -770,6 +758,10 @@ private:
                 }
                 break;
             case mapping_type::m_columns:
+                if (column_index_ < decoders_.size())
+                {
+                    end_value(value_buffer_,column_index_,parameters_.infer_types(),decoders_[column_index_]);
+                }
                 break;
             }
             break;
@@ -782,7 +774,7 @@ private:
         value_buffer_.clear();
     }
 
-    void end_value(const string_view_type& value, size_t column_index, bool numeric_check, basic_json_input_handler<CharT>& handler)
+    void end_value(const string_view_type& value, size_t column_index, bool infer_types, basic_json_input_handler<CharT>& handler)
     {
         if (column_index < column_types_.size() + offset_)
         {
@@ -918,7 +910,7 @@ private:
         }
         else
         {
-            if (numeric_check)
+            if (infer_types)
             {
                 end_value_with_numeric_check(value, handler);
             }
@@ -932,6 +924,9 @@ private:
     enum class numeric_check_state 
     {
         initial,
+        null,
+        boolean_true,
+        boolean_false,
         minus,
         zero,
         integer,
@@ -961,6 +956,36 @@ private:
                 {
                     switch (*p)
                     {
+                    case 'n':case 'N':
+                        if ((last-p) == 4 && (p[1] == 'u' || p[1] == 'U') && (p[2] == 'l' || p[2] == 'L') && (p[3] == 'l' || p[3] == 'L'))
+                        {
+                            state = numeric_check_state::null;
+                        }
+                        else
+                        {
+                            state = numeric_check_state::done;
+                        }
+                        break;
+                    case 't':case 'T':
+                        if ((last-p) == 4 && (p[1] == 'r' || p[1] == 'R') && (p[2] == 'u' || p[2] == 'U') && (p[3] == 'e' || p[3] == 'U'))
+                        {
+                            state = numeric_check_state::boolean_true;
+                        }
+                        else
+                        {
+                            state = numeric_check_state::done;
+                        }
+                        break;
+                    case 'f':case 'F':
+                        if ((last-p) == 5 && (p[1] == 'a' || p[1] == 'A') && (p[2] == 'l' || p[2] == 'L') && (p[3] == 's' || p[3] == 'S') && (p[4] == 'e' || p[4] == 'E'))
+                        {
+                            state = numeric_check_state::boolean_false;
+                        }
+                        else
+                        {
+                            state = numeric_check_state::done;
+                        }
+                        break;
                     case '-':
                         is_negative = true;
                         buffer.push_back(*p);
@@ -986,11 +1011,6 @@ private:
                 {
                     switch (*p)
                     {
-                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                        ++precision;
-                        buffer.push_back(*p);
-                        state = numeric_check_state::integer;
-                        break;
                     case '.':
                         buffer.push_back(*p);
                         state = numeric_check_state::fraction1;
@@ -1127,6 +1147,15 @@ private:
 
         switch (state)
         {
+        case numeric_check_state::null:
+            handler.null_value(*this);
+            break;
+        case numeric_check_state::boolean_true:
+            handler.bool_value(true,*this);
+            break;
+        case numeric_check_state::boolean_false:
+            handler.bool_value(false,*this);
+            break;
         case numeric_check_state::zero:
         case numeric_check_state::integer:
             {

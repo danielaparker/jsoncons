@@ -21,7 +21,7 @@ using namespace jsoncons::csv;
 
 BOOST_AUTO_TEST_SUITE(csv_tests)
 
-BOOST_AUTO_TEST_CASE(n_columns_test)
+BOOST_AUTO_TEST_CASE(n_objects_test)
 {
     const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
@@ -50,19 +50,33 @@ BOOST_AUTO_TEST_CASE(n_columns_test)
     //std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
     BOOST_REQUIRE(val2.size() == 3);
     BOOST_CHECK("2017-01-09" == val2[0]["Date"].as<std::string>());
+}
 
+BOOST_AUTO_TEST_CASE(m_columns_test)
+{
+    const std::string bond_yields = R"(Date,ProductType,1Y,2Y,3Y,5Y
+2017-01-09,"Bond",0.0062,0.0075,0.0083,0.011
+2017-01-08,"Bond",0.0063,0.0076,0.0084,0.0112
+2017-01-08,"Bond",0.0063,0.0076,0.0084,0.0112
+)";
+    std::cout << bond_yields << std::endl <<std::endl;
+
+    json_decoder<ojson> decoder;
+    csv_parameters params;
+    params.assume_header(true);
     params.mapping(mapping_type::m_columns);
-    std::istringstream is3(bond_yields);
-    csv_reader reader3(is3, decoder, params);
-    reader3.read();
-    ojson val3 = decoder.get_result();
-    //std::cout << "\n(3)\n"<< pretty_print(val3) << "\n";
-    BOOST_CHECK(5 == val3.size());
-    BOOST_CHECK(3 == val3["Date"].size());
-    BOOST_CHECK(3 == val3["1Y"].size());
-    BOOST_CHECK(3 == val3["2Y"].size());
-    BOOST_CHECK(3 == val3["3Y"].size());
-    BOOST_CHECK(3 == val3["5Y"].size());
+
+    std::istringstream is(bond_yields);
+    csv_reader reader(is, decoder, params);
+    reader.read();
+    ojson j = decoder.get_result();
+    std::cout << "\n(1)\n"<< pretty_print(j) << "\n";
+    BOOST_CHECK(6 == j.size());
+    BOOST_CHECK(3 == j["Date"].size());
+    BOOST_CHECK(3 == j["1Y"].size());
+    BOOST_CHECK(3 == j["2Y"].size());
+    BOOST_CHECK(3 == j["3Y"].size());
+    BOOST_CHECK(3 == j["5Y"].size());
 }
 
 BOOST_AUTO_TEST_CASE(csv_test_empty_values)
@@ -240,7 +254,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col_skip1_b)
 
     csv_parameters params;
     params.header_lines(1);
-    params.numeric_check(false);
+    params.infer_types(false);
 
     csv_reader reader(is,decoder,params);
     reader.read();
@@ -283,7 +297,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col_b)
 
     csv_parameters params;
     params.assume_header(false);
-    params.numeric_check(false);
+    params.infer_types(false);
 
     csv_reader reader(is,decoder,params);
     reader.read();
@@ -1061,6 +1075,38 @@ BOOST_AUTO_TEST_CASE(test_encode_csv_to_stream)
     std::ostringstream os;
     encode_csv(j, os, params);
     std::cout << os.str() << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_type_inference)
+{
+    const std::string input = R"(customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
+"John Roe",true,0272561313,01001,0.05,431.65
+"Jane Doe",false,416-272-2561,55416,0.15,480.70
+"Joe Bloggs",false,"4162722561","55416",0.15,300.70
+"John Smith",FALSE,NULL,22313-1450,0.15,300.70
+)";
+
+    std::cout << input << std::endl;
+
+    json_decoder<ojson> decoder;
+
+    csv_parameters params;
+    params.assume_header(true);
+
+    params.mapping(mapping_type::n_rows);
+    ojson j1 = decode_csv<ojson>(input,params);
+    std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
+    //BOOST_CHECK(j1.size() == 4);
+
+    params.mapping(mapping_type::n_objects);
+    ojson j2 = decode_csv<ojson>(input,params);
+    std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
+
+    params.mapping(mapping_type::m_columns);
+    ojson j3 = decode_csv<ojson>(input,params);
+    std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
+    //BOOST_REQUIRE(j2.size() == 3);
+    //BOOST_CHECK("2017-01-09" == j2[0]["Date"].as<std::string>());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

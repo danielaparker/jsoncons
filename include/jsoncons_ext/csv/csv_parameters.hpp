@@ -92,7 +92,7 @@ class basic_csv_parameters
     unsigned long max_lines_;
     size_t header_lines_;
     string_type line_delimiter_;
-    bool numeric_check_;
+    bool infer_types_;
 
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
@@ -120,7 +120,7 @@ public:
         mapping_({mapping_type::n_rows,false}),
         max_lines_((std::numeric_limits<unsigned long>::max)()),
         header_lines_(0),
-        numeric_check_(true)
+        infer_types_(true)
     {
         line_delimiter_.push_back('\n');
     }
@@ -357,14 +357,14 @@ public:
         return *this;
     }
 
-    bool numeric_check() const
+    bool infer_types() const
     {
-        return numeric_check_;
+        return infer_types_;
     }
 
-    basic_csv_parameters& numeric_check(bool value)
+    basic_csv_parameters& infer_types(bool value)
     {
-        numeric_check_ = value;
+        infer_types_ = value;
         return *this;
     }
 

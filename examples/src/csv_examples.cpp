@@ -11,68 +11,45 @@ using namespace jsoncons::csv;
 
 void mapping_types()
 {
-    const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
+    const std::string s = R"(Date,1Y,2Y,3Y,5Y
 2017-01-09,0.0062,0.0075,0.0083,0.011
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    json_decoder<ojson> decoder;
     csv_parameters params;
     params.assume_header(true)
           .column_types("string,float,float,float,float");
 
-    // Default
-    std::istringstream is1(bond_yields);
-    csv_reader reader1(is1,decoder,params);
-    reader1.read();
-    ojson val1 = decoder.get_result();
-    std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
+    // mapping_type::n_objects
+    params.mapping(mapping_type::n_objects);
+    ojson j1 = decode_csv<ojson>(s,params);
+    std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
     // mapping_type::n_rows
     params.mapping(mapping_type::n_rows);
-    std::istringstream is2(bond_yields);
-    csv_reader reader2(is2,decoder,params);
-    reader2.read();
-    ojson val2 = decoder.get_result();
-    std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
-
-    // mapping_type::n_objects
-    params.mapping(mapping_type::n_objects);
-    std::istringstream is3(bond_yields);
-    csv_reader reader3(is3,decoder,params);
-    reader3.read();
-    ojson val3 = decoder.get_result();
-    std::cout << "\n(3)\n"<< pretty_print(val3) << "\n";
+    ojson j2 = decode_csv<ojson>(s,params);
+    std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
     // mapping_type::m_columns
     params.mapping(mapping_type::m_columns);
-    std::istringstream is4(bond_yields);
-    csv_reader reader4(is4, decoder, params);
-    reader4.read();
-    ojson val4 = decoder.get_result();
-    std::cout << "\n(4)\n" << pretty_print(val4) << "\n";
+    ojson j3 = decode_csv<ojson>(s,params);
+    std::cout << "\n(3)\n" << pretty_print(j3) << "\n";
 }
 
-void read_csv_file1()
+void csv_decode_without_type_inference()
 {
-    std::string text = R"(employee-no,employee-name,dept,salary
-00000001,\"Smith,Matthew\",sales,150000.00
-00000002,\"Brown,Sarah\",sales,89000.00
+    std::string s = R"(employee-no,employee-name,dept,salary
+00000001,"Smith,Matthew",sales,150000.00
+00000002,"Brown,Sarah",sales,89000.00
 )";
-
-    std::istringstream is(text);
-
-    json_decoder<json> decoder;
 
     csv_parameters params;
     params.assume_header(true)
-          .column_types("string,string,string,float");
-    csv_reader reader(is,decoder,params);
-    reader.read();
-    json val = decoder.get_result();
+          .infer_types(false);
+    ojson j = decode_csv<ojson>(s,params);
 
-    std::cout << pretty_print(val) << std::endl;
+    std::cout << pretty_print(j) << std::endl;
 }
 
 void read_write_csv_tasks()
@@ -318,11 +295,30 @@ void decode_encode_csv_tasks()
     encode_csv(tasks, std::cout);
 }
 
+void csv_parser_type_inference()
+{
+    csv_parameters params;
+    params.assume_header(true);
+
+    params.mapping(mapping_type::n_rows);
+    std::ifstream is1("input/sales.csv");
+    ojson j1 = decode_csv<ojson>(is1,params);
+    std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
+
+    params.mapping(mapping_type::n_objects);
+    std::ifstream is2("input/sales.csv");
+    ojson j2 = decode_csv<ojson>(is2,params);
+    std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
+
+    params.mapping(mapping_type::m_columns);
+    std::ifstream is3("input/sales.csv");
+    ojson j3 = decode_csv<ojson>(is3,params);
+    std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
+} 
+
 void csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
-    mapping_types();
-    read_csv_file1();
     read_write_csv_tasks();
     serialize_to_tab_delimited_file();
     serialize_array_of_arrays_to_comma_delimited();
@@ -334,6 +330,10 @@ void csv_examples()
     decode_csv_stream();
     encode_csv_file_from_books();
     decode_encode_csv_tasks();
+
+    csv_parser_type_inference();
+    csv_decode_without_type_inference();
+    mapping_types();
     std::cout << std::endl;
 }
 

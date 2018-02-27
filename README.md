@@ -917,84 +917,100 @@ See [msgpack](doc/ref/msgpack/msgpack.md) for details.
 <div id="ext_csv"/>
 
 #### csv
-Example file (tasks.csv)
+Example file (sales.csv)
 ```csv
-project_id, task_name, task_start, task_finish
-4001,task1,01/01/2003,01/31/2003
-4001,task2,02/01/2003,02/28/2003
-4001,task3,03/01/2003,03/31/2003
-4002,task1,04/01/2003,04/30/2003
-4002,task2,05/01/2003,
+customer_name,has_coupon,phone_number,zip_code,sales_tax_rate,total_amount
+"John Roe",true,0272561313,01001,0.05,431.65
+"Jane Doe",false,416-272-2561,55416,0.15,480.70
+"Joe Bloggs",false,"4162722561","55416",0.15,300.70
+"John Smith",FALSE,NULL,22313-1450,0.15,300.70
 ```
 
 ```c++
 #include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
-#include <jsoncons_ext/csv/csv_serializer.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::csv;
 
 int main()
 {
-    std::ifstream is("input/tasks.csv");
-
     csv_parameters params;
-    params.assume_header(true)
-          .trim(true)
-          .ignore_empty_values(true) 
-          .column_types("integer,string,string,string");
-    ojson tasks = decode_csv<ojson>(is, params);
+    params.assume_header(true);
 
-    std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
+    params.mapping(mapping_type::n_rows);
+    std::ifstream is1("input/sales.csv");
+    ojson j1 = decode_csv<ojson>(is1,params);
+    std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    std::cout << "(2)\n";
-    encode_csv(tasks, std::cout);
+    params.mapping(mapping_type::n_objects);
+    std::ifstream is2("input/sales.csv");
+    ojson j2 = decode_csv<ojson>(is2,params);
+    std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
+
+    params.mapping(mapping_type::m_columns);
+    std::ifstream is3("input/sales.csv");
+    ojson j3 = decode_csv<ojson>(is3,params);
+    std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
 }
 ```
 Output:
 ```json
 (1)
 [
+    ["customer_name","has_coupon","phone_number","zip_code","sales_tax_rate","total_amount"],
+    ["John Roe",true,"0272561313","01001",0.05,431.65],
+    ["Jane Doe",false,"416-272-2561",55416,0.15,480.7],
+    ["Joe Bloggs",false,"4162722561","55416",0.15,300.7],
+    ["John Smith",false,null,"22313-1450",0.15,300.7]
+]
+
+(2)
+[
     {
-        "project_id": 4001,
-        "task_name": "task1",
-        "task_start": "01/01/2003",
-        "task_finish": "01/31/2003"
+        "customer_name": "John Roe",
+        "has_coupon": true,
+        "phone_number": "0272561313",
+        "zip_code": "01001",
+        "sales_tax_rate": 0.05,
+        "total_amount": 431.65
     },
     {
-        "project_id": 4001,
-        "task_name": "task2",
-        "task_start": "02/01/2003",
-        "task_finish": "02/28/2003"
+        "customer_name": "Jane Doe",
+        "has_coupon": false,
+        "phone_number": "416-272-2561",
+        "zip_code": 55416,
+        "sales_tax_rate": 0.15,
+        "total_amount": 480.7
     },
     {
-        "project_id": 4001,
-        "task_name": "task3",
-        "task_start": "03/01/2003",
-        "task_finish": "03/31/2003"
+        "customer_name": "Joe Bloggs",
+        "has_coupon": false,
+        "phone_number": "4162722561",
+        "zip_code": "55416",
+        "sales_tax_rate": 0.15,
+        "total_amount": 300.7
     },
     {
-        "project_id": 4002,
-        "task_name": "task1",
-        "task_start": "04/01/2003",
-        "task_finish": "04/30/2003"
-    },
-    {
-        "project_id": 4002,
-        "task_name": "task2",
-        "task_start": "05/01/2003"
+        "customer_name": "John Smith",
+        "has_coupon": false,
+        "phone_number": null,
+        "zip_code": "22313-1450",
+        "sales_tax_rate": 0.15,
+        "total_amount": 300.7
     }
 ]
-```
-```csv
-(2)
-project_id,task_name,task_start,task_finish
-4001,task2,02/01/2003,02/28/2003
-4001,task3,03/01/2003,03/31/2003
-4002,task1,04/01/2003,04/30/2003
-4002,task2,05/01/2003,
+
+(3)
+{
+    "customer_name": ["John Roe","Jane Doe","Joe Bloggs","John Smith"],
+    "has_coupon": [true,false,false,false],
+    "phone_number": ["0272561313","416-272-2561",4162722561,null],
+    "zip_code": ["01001",55416,55416,"22313-1450"],
+    "sales_tax_rate": [0.05,0.15,0.15,0.15],
+    "total_amount": [431.65,480.7,300.7,300.7]
+}
 ```
 
 See [csv](doc/ref/csv/csv.md) for details.
