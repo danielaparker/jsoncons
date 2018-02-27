@@ -21,6 +21,7 @@
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_filter.hpp>
+#include <jsoncons/detail/number_parsers.hpp>
 #include <jsoncons_ext/csv/csv_error_category.hpp>
 #include <jsoncons_ext/csv/csv_parameters.hpp>
 
@@ -89,6 +90,7 @@ class basic_csv_parser : private parsing_context
     basic_json_fragment_filter<CharT> filter_;
     size_t level_;
     size_t offset_;
+    jsoncons::detail::string_to_double to_double_; 
 
 public:
     basic_csv_parser(basic_json_input_handler<CharT>& handler)
@@ -239,7 +241,8 @@ public:
                     handler_.begin_array(*this);
                     for (const auto& name : column_names_)
                     {
-                        end_value(name,column_index_);
+                        handler_.string_value(name, *this);
+                        //end_value(name,column_index_);
                     }
                     handler_.end_array(*this);
                 }
@@ -562,7 +565,7 @@ all_csv_states:
                 handler_.begin_array(*this);
                 for (const auto& val : column_values_[i])
                 {
-                    end_value(val,i);
+                    end_value(val,i,parameters_.numeric_check());
                 }
                 handler_.end_array(*this);
             }
@@ -652,7 +655,7 @@ private:
                 }
                 else
                 {
-                    end_value(value_buffer_,column_index_);
+                    end_value(value_buffer_,column_index_,parameters_.numeric_check());
                 }
                 break;
             case mapping_type::n_objects:
@@ -667,7 +670,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_);
+                            end_value(value_buffer_,column_index_,parameters_.numeric_check());
                         }
                     }
                     else if (level_ > 0)
@@ -678,7 +681,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_);
+                            end_value(value_buffer_,column_index_,parameters_.numeric_check());
                         }
                     }
                 }
@@ -716,7 +719,7 @@ private:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
-                end_value(value_buffer_,column_index_);
+                end_value(value_buffer_,column_index_,false);
                 break;
             case mapping_type::n_objects:
                 if (!(parameters_.ignore_empty_values() && value_buffer_.size() == 0))
@@ -730,7 +733,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_);
+                            end_value(value_buffer_,column_index_,false);
                         }
                     }
                     else if (level_ > 0)
@@ -741,7 +744,7 @@ private:
                         }
                         else
                         {
-                            end_value(value_buffer_,column_index_);
+                            end_value(value_buffer_,column_index_,false);
                         }
                     }
                 }
@@ -759,7 +762,7 @@ private:
         value_buffer_.clear();
     }
 
-    void end_value(const string_view_type& value, size_t column_index)
+    void end_value(const string_view_type& value, size_t column_index, bool numeric_check)
     {
         if (column_index < column_types_.size() + offset_)
         {
@@ -891,6 +894,254 @@ private:
         }
         else
         {
+            if (numeric_check)
+            {
+                end_value_with_numeric_check(value);
+            }
+            else
+            {
+                handler_.string_value(value, *this);
+            }
+        }
+    }
+
+    enum class numeric_check_state 
+    {
+        initial,
+        minus,
+        zero,
+        integer,
+        fraction1,
+        fraction,
+        exp1,
+        exp,
+        done
+    };
+
+    void end_value_with_numeric_check(const string_view_type& value)
+    {
+        numeric_check_state state = numeric_check_state::initial;
+        bool is_negative = false;
+        uint8_t precision = 0;
+        uint8_t decimal_places = 0;
+        chars_format format = chars_format::general;
+
+        auto last = value.end();
+
+        std::string buffer;
+        for (auto p = value.begin(); state != numeric_check_state::done && p != last; ++p)
+        {
+            switch (state)
+            {
+            case numeric_check_state::initial:
+                {
+                    switch (*p)
+                    {
+                    case '-':
+                        is_negative = true;
+                        buffer.push_back(*p);
+                        state = numeric_check_state::minus;
+                        break;
+                    case '0':
+                        ++precision;
+                        buffer.push_back(*p);
+                        state = numeric_check_state::zero;
+                        break;
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        ++precision;
+                        buffer.push_back(*p);
+                        state = numeric_check_state::integer;
+                        break;
+                    default:
+                        state = numeric_check_state::done;
+                        break;
+                    }
+                    break;
+                }
+            case numeric_check_state::zero:
+                {
+                    switch (*p)
+                    {
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        ++precision;
+                        buffer.push_back(*p);
+                        state = numeric_check_state::integer;
+                        break;
+                    case '.':
+                        buffer.push_back(*p);
+                        state = numeric_check_state::fraction1;
+                        break;
+                    case 'e':case 'E':
+                        buffer.push_back(*p);
+                        state = numeric_check_state::exp1;
+                        break;
+                    default:
+                        state = numeric_check_state::done;
+                        break;
+                    }
+                    break;
+                }
+            case numeric_check_state::integer:
+                {
+                    switch (*p)
+                    {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        ++precision;
+                        buffer.push_back(*p);
+                        break;
+                    case '.':
+                        buffer.push_back(*p);
+                        state = numeric_check_state::fraction1;
+                        break;
+                    case 'e':case 'E':
+                        buffer.push_back(*p);
+                        state = numeric_check_state::exp1;
+                        break;
+                    default:
+                        state = numeric_check_state::done;
+                        break;
+                    }
+                    break;
+                }
+            case numeric_check_state::minus:
+                {
+                    switch (*p)
+                    {
+                    case '0':
+                        ++precision;
+                        buffer.push_back(*p);
+                        state = numeric_check_state::zero;
+                        break;
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        ++precision;
+                        buffer.push_back(*p);
+                        state = numeric_check_state::integer;
+                        break;
+                    case 'e':case 'E':
+                        buffer.push_back(*p);
+                        state = numeric_check_state::exp1;
+                        break;
+                    default:
+                        state = numeric_check_state::done;
+                        break;
+                    }
+                    break;
+                }
+            case numeric_check_state::fraction1:
+                {
+                    format = chars_format::fixed;
+                    switch (*p)
+                    {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        ++precision;
+                        ++decimal_places;
+                        buffer.push_back(*p);
+                        state = numeric_check_state::fraction;
+                        break;
+                    default:
+                        state = numeric_check_state::done;
+                        break;
+                    }
+                    break;
+                }
+            case numeric_check_state::fraction:
+                {
+                    switch (*p)
+                    {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        ++precision;
+                        ++decimal_places;
+                        buffer.push_back(*p);
+                        break;
+                    case 'e':case 'E':
+                        buffer.push_back(*p);
+                        state = numeric_check_state::exp1;
+                        break;
+                    default:
+                        state = numeric_check_state::done;
+                        break;
+                    }
+                    break;
+                }
+            case numeric_check_state::exp1:
+                {
+                    format = chars_format::scientific;
+                    switch (*p)
+                    {
+                    case '-':
+                        buffer.push_back(*p);
+                        state = numeric_check_state::exp;
+                        break;
+                    case '+':
+                        state = numeric_check_state::exp;
+                        break;
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        buffer.push_back(*p);
+                        state = numeric_check_state::integer;
+                        break;
+                    default:
+                        state = numeric_check_state::done;
+                        break;
+                    }
+                    break;
+                }
+            case numeric_check_state::exp:
+                {
+                    switch (*p)
+                    {
+                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                        buffer.push_back(*p);
+                        break;
+                    default:
+                        state = numeric_check_state::done;
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+
+        switch (state)
+        {
+        case numeric_check_state::zero:
+        case numeric_check_state::integer:
+            {
+                if (is_negative)
+                {
+                    jsoncons::detail::to_integer_result result = jsoncons::detail::to_integer(value.data(), value.length());
+                    if (!result.overflow)
+                    {
+                        handler_.integer_value(result.value,*this);
+                    }
+                    else
+                    {
+                        double d = to_double_(buffer.data(), buffer.length());
+                        handler_.double_value(d, number_format(format), *this);
+                    }
+                }
+                else
+                {
+                    jsoncons::detail::to_uinteger_result result = jsoncons::detail::to_uinteger(value.data(), value.length());
+                    if (!result.overflow)
+                    {
+                        handler_.uinteger_value(result.value,*this);
+                    }
+                    else
+                    {
+                        double d = to_double_(buffer.data(), buffer.length());
+                        handler_.double_value(d, number_format(format), *this);
+                    }
+                }
+                break;
+            }
+        case numeric_check_state::fraction:
+        case numeric_check_state::exp:
+            {
+                double d = to_double_(buffer.data(), buffer.length());
+                handler_.double_value(d, number_format(format, precision, decimal_places), *this);
+                break;
+            }
+        default:
             handler_.string_value(value, *this);
         }
     }

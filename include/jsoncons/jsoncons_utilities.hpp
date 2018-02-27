@@ -570,8 +570,13 @@ public:
     {
     }
 
-    number_format(chars_format floating_point_format, uint8_t precision, uint8_t decimal_places)
-        : format_(floating_point_format), precision_(precision), decimal_places_(decimal_places)
+    number_format(chars_format format, uint8_t precision, uint8_t decimal_places)
+        : format_(format), precision_(precision), decimal_places_(decimal_places)
+    {
+    }
+
+    number_format(chars_format format)
+        : format_(format), precision_(0), decimal_places_(0)
     {
     }
 

@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_empty_defaults)
     BOOST_CHECK(val[0]["string-f"].is<std::string>());
 }
 
-BOOST_AUTO_TEST_CASE(csv_test1_array_1col_skip1)
+BOOST_AUTO_TEST_CASE(csv_test1_array_1col_skip1_a)
 {
     std::string text = "a\n1\n4";
     std::istringstream is(text);
@@ -225,12 +225,33 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col_skip1)
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
     BOOST_CHECK(val[1].size()==1);
+    BOOST_CHECK(val[0][0]==json(1));
+    BOOST_CHECK(val[1][0]==json(4));
+}
+
+BOOST_AUTO_TEST_CASE(csv_test1_array_1col_skip1_b)
+{
+    std::string text = "a\n1\n4";
+    std::istringstream is(text);
+
+    json_decoder<json> decoder;
+
+    csv_parameters params;
+    params.header_lines(1);
+    params.numeric_check(false);
+
+    csv_reader reader(is,decoder,params);
+    reader.read();
+    json val = decoder.get_result();
+
+    BOOST_CHECK(val.size()==2);
+    BOOST_CHECK(val[0].size()==1);
+    BOOST_CHECK(val[1].size()==1);
     BOOST_CHECK(val[0][0]==json("1"));
     BOOST_CHECK(val[1][0]==json("4"));
 }
 
-
-BOOST_AUTO_TEST_CASE(csv_test1_array_1col)
+BOOST_AUTO_TEST_CASE(csv_test1_array_1col_a)
 {
     std::string text = "1\n4";
     std::istringstream is(text);
@@ -239,6 +260,28 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col)
 
     csv_parameters params;
     params.assume_header(false);
+
+    csv_reader reader(is,decoder,params);
+    reader.read();
+    json val = decoder.get_result();
+
+    BOOST_CHECK(val.size()==2);
+    BOOST_CHECK(val[0].size()==1);
+    BOOST_CHECK(val[1].size()==1);
+    BOOST_CHECK(val[0][0]==json(1));
+    BOOST_CHECK(val[1][0]==json(4));
+}
+
+BOOST_AUTO_TEST_CASE(csv_test1_array_1col_b)
+{
+    std::string text = "1\n4";
+    std::istringstream is(text);
+
+    json_decoder<json> decoder;
+
+    csv_parameters params;
+    params.assume_header(false);
+    params.numeric_check(false);
 
     csv_reader reader(is,decoder,params);
     reader.read();
@@ -272,12 +315,12 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols)
     BOOST_CHECK(val[0][0]==json("a"));
     BOOST_CHECK(val[0][1]==json("b"));
     BOOST_CHECK(val[0][2]==json("c"));
-    BOOST_CHECK(val[1][0]==json("1"));
-    BOOST_CHECK(val[1][1]==json("2"));
-    BOOST_CHECK(val[1][2]==json("3"));
-    BOOST_CHECK(val[2][0]==json("4"));
-    BOOST_CHECK(val[2][1]==json("5"));
-    BOOST_CHECK(val[2][2]==json("6"));
+    BOOST_CHECK(val[1][0]==json(1));
+    BOOST_CHECK(val[1][1]==json(2));
+    BOOST_CHECK(val[1][2]==json(3));
+    BOOST_CHECK(val[2][0]==json(4));
+    BOOST_CHECK(val[2][1]==json(5));
+    BOOST_CHECK(val[2][2]==json(6));
 }
 BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_leading)
 {
@@ -301,9 +344,9 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_leading)
     BOOST_CHECK(val[0][0]==json("a "));
     BOOST_CHECK(val[0][1]==json("b "));
     BOOST_CHECK(val[0][2]==json("c "));
-    BOOST_CHECK(val[1][0]==json("1"));
-    BOOST_CHECK(val[1][1]==json("2"));
-    BOOST_CHECK(val[1][2]==json("3"));
+    BOOST_CHECK(val[1][0]==json(1));
+    BOOST_CHECK(val[1][1]==json(2));
+    BOOST_CHECK(val[1][2]==json(3));
     BOOST_CHECK(val[2][0]==json("4 "));
     BOOST_CHECK(val[2][1]==json("5 "));
     BOOST_CHECK(val[2][2]==json("6 "));
@@ -362,12 +405,12 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim)
     BOOST_CHECK(val[0][0]==json("a"));
     BOOST_CHECK(val[0][1]==json::null());
     BOOST_CHECK(val[0][2]==json::null());
-    BOOST_CHECK(val[1][0]==json("1"));
-    BOOST_CHECK(val[1][1]==json("2"));
-    BOOST_CHECK(val[1][2]==json("3"));
-    BOOST_CHECK(val[2][0]==json("4"));
-    BOOST_CHECK(val[2][1]==json("5"));
-    BOOST_CHECK(val[2][2]==json("6"));
+    BOOST_CHECK(val[1][0]==json(1));
+    BOOST_CHECK(val[1][1]==json(2));
+    BOOST_CHECK(val[1][2]==json(3));
+    BOOST_CHECK(val[2][0]==json(4));
+    BOOST_CHECK(val[2][1]==json(5));
+    BOOST_CHECK(val[2][2]==json(6));
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_comment)
@@ -390,9 +433,9 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_comment)
     BOOST_CHECK(val[0][0]==json("a"));
     BOOST_CHECK(val[0][1]==json("b"));
     BOOST_CHECK(val[0][2]==json("c"));
-    BOOST_CHECK(val[1][0]==json("4"));
-    BOOST_CHECK(val[1][1]==json("5"));
-    BOOST_CHECK(val[1][2]==json("6"));
+    BOOST_CHECK(val[1][0]==json(4));
+    BOOST_CHECK(val[1][1]==json(5));
+    BOOST_CHECK(val[1][2]==json(6));
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_object_1col)
@@ -412,8 +455,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_1col)
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
     BOOST_CHECK(val[1].size()==1);
-    BOOST_CHECK(val[0]["a"]==json("1"));
-    BOOST_CHECK(val[1]["a"]==json("4"));
+    BOOST_CHECK(val[0]["a"]==json(1));
+    BOOST_CHECK(val[1]["a"]==json(4));
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_object_3cols)
@@ -433,12 +476,12 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols)
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
     BOOST_CHECK(val[1].size()==3);
-    BOOST_CHECK(val[0]["a"]==json("1"));
-    BOOST_CHECK(val[0]["b"]==json("2"));
-    BOOST_CHECK(val[0]["c"]==json("3"));
-    BOOST_CHECK(val[1]["a"]==json("4"));
-    BOOST_CHECK(val[1]["b"]==json("5"));
-    BOOST_CHECK(val[1]["c"]==json("6"));
+    BOOST_CHECK(val[0]["a"]==json(1));
+    BOOST_CHECK(val[0]["b"]==json(2));
+    BOOST_CHECK(val[0]["c"]==json(3));
+    BOOST_CHECK(val[1]["a"]==json(4));
+    BOOST_CHECK(val[1]["b"]==json(5));
+    BOOST_CHECK(val[1]["c"]==json(6));
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
@@ -459,12 +502,12 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
     BOOST_CHECK(val[1].size()==3);
-    BOOST_CHECK(val[0]["x"]==json("1"));
-    BOOST_CHECK(val[0]["y"]==json("2"));
-    BOOST_CHECK(val[0]["z"]==json("3"));
-    BOOST_CHECK(val[1]["x"]==json("4"));
-    BOOST_CHECK(val[1]["y"]==json("5"));
-    BOOST_CHECK(val[1]["z"]==json("6"));
+    BOOST_CHECK(val[0]["x"]==json(1));
+    BOOST_CHECK(val[0]["y"]==json(2));
+    BOOST_CHECK(val[0]["z"]==json(3));
+    BOOST_CHECK(val[1]["x"]==json(4));
+    BOOST_CHECK(val[1]["y"]==json(5));
+    BOOST_CHECK(val[1]["z"]==json(6));
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_bool)
@@ -535,8 +578,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_quoted)
     BOOST_CHECK(val[0]["a"]==json("1"));
     BOOST_CHECK(val[0]["b"]==json("2"));
     BOOST_CHECK(val[0]["c"]==json("3"));
-    BOOST_CHECK(val[1]["a"]==json("4"));
-    BOOST_CHECK(val[1]["b"]==json("5"));
+    BOOST_CHECK(val[1]["a"]==json(4));
+    BOOST_CHECK(val[1]["b"]==json(5));
     BOOST_CHECK(val[1]["c"]==json("6"));
 }
 
@@ -557,8 +600,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col_crlf)
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
     BOOST_CHECK(val[1].size()==1);
-    BOOST_CHECK(val[0][0]==json("1"));
-    BOOST_CHECK(val[1][0]==json("4"));
+    BOOST_CHECK(val[0][0]==json(1));
+    BOOST_CHECK(val[1][0]==json(4));
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_crlf)
@@ -582,12 +625,12 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_crlf)
     BOOST_CHECK(val[0][0]==json("a"));
     BOOST_CHECK(val[0][1]==json("b"));
     BOOST_CHECK(val[0][2]==json("c"));
-    BOOST_CHECK(val[1][0]==json("1"));
-    BOOST_CHECK(val[1][1]==json("2"));
-    BOOST_CHECK(val[1][2]==json("3"));
-    BOOST_CHECK(val[2][0]==json("4"));
-    BOOST_CHECK(val[2][1]==json("5"));
-    BOOST_CHECK(val[2][2]==json("6"));
+    BOOST_CHECK(val[1][0]==json(1));
+    BOOST_CHECK(val[1][1]==json(2));
+    BOOST_CHECK(val[1][2]==json(3));
+    BOOST_CHECK(val[2][0]==json(4));
+    BOOST_CHECK(val[2][1]==json(5));
+    BOOST_CHECK(val[2][2]==json(6));
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_object_1col_crlf)
@@ -607,8 +650,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_1col_crlf)
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==1);
     BOOST_CHECK(val[1].size()==1);
-    BOOST_CHECK(val[0]["a"]==json("1"));
-    BOOST_CHECK(val[1]["a"]==json("4"));
+    BOOST_CHECK(val[0]["a"]==json(1));
+    BOOST_CHECK(val[1]["a"]==json(4));
 }
 
 BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_crlf)
@@ -628,12 +671,12 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_crlf)
     BOOST_CHECK(val.size()==2);
     BOOST_CHECK(val[0].size()==3);
     BOOST_CHECK(val[1].size()==3);
-    BOOST_CHECK(val[0]["a"]==json("1"));
-    BOOST_CHECK(val[0]["b"]==json("2"));
-    BOOST_CHECK(val[0]["c"]==json("3"));
-    BOOST_CHECK(val[1]["a"]==json("4"));
-    BOOST_CHECK(val[1]["b"]==json("5"));
-    BOOST_CHECK(val[1]["c"]==json("6"));
+    BOOST_CHECK(val[0]["a"]==json(1));
+    BOOST_CHECK(val[0]["b"]==json(2));
+    BOOST_CHECK(val[0]["c"]==json(3));
+    BOOST_CHECK(val[1]["a"]==json(4));
+    BOOST_CHECK(val[1]["b"]==json(5));
+    BOOST_CHECK(val[1]["c"]==json(6));
 }
 
 BOOST_AUTO_TEST_CASE(read_comma_delimited_file)
