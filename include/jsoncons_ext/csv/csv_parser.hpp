@@ -717,7 +717,7 @@ private:
                 column_names_.push_back(value_buffer_);
                 if (parameters_.mapping() == mapping_type::m_columns)
                 {
-                    j_[value_buffer_] = json_type::array();
+                    j_[value_buffer_] = typename json_type::array();
                 }
             }
             break;
