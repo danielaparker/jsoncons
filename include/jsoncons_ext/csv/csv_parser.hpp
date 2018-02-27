@@ -1012,7 +1012,7 @@ private:
                     switch (*p)
                     {
                     case '.':
-                        buffer.push_back(*p);
+                        buffer.push_back(to_double_.get_decimal_point());
                         state = numeric_check_state::fraction1;
                         break;
                     case 'e':case 'E':
@@ -1034,7 +1034,7 @@ private:
                         buffer.push_back(*p);
                         break;
                     case '.':
-                        buffer.push_back(*p);
+                        buffer.push_back(to_double_.get_decimal_point());
                         state = numeric_check_state::fraction1;
                         break;
                     case 'e':case 'E':

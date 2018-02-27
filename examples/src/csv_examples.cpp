@@ -300,12 +300,12 @@ void csv_parser_type_inference()
     csv_parameters params;
     params.assume_header(true);
 
-    params.mapping(mapping_type::n_rows);
+    params.mapping(mapping_type::n_objects);
     std::ifstream is1("input/sales.csv");
     ojson j1 = decode_csv<ojson>(is1,params);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    params.mapping(mapping_type::n_objects);
+    params.mapping(mapping_type::n_rows);
     std::ifstream is2("input/sales.csv");
     ojson j2 = decode_csv<ojson>(is2,params);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
@@ -331,9 +331,9 @@ void csv_examples()
     encode_csv_file_from_books();
     decode_encode_csv_tasks();
 
-    csv_parser_type_inference();
     csv_decode_without_type_inference();
     mapping_types();
+    csv_parser_type_inference();
     std::cout << std::endl;
 }
 
