@@ -132,6 +132,8 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_defaults)
     reader.read();
     json val = decoder.get_result();
 
+    std::cout << pretty_print(val) << std::endl;
+
     BOOST_CHECK(val[0]["bool-f"].as<bool>() == false);
     BOOST_CHECK(val[0]["bool-f"].is<bool>());
     BOOST_CHECK(val[0]["int-f"] .as<int>()== 0);
