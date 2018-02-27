@@ -280,7 +280,7 @@ public:
             column_names_.emplace_back(name.data(),name.size());
             if (parameters_.mapping() == mapping_type::m_columns)
             {
-                j_[name] = json_type::array();
+                j_[name] = typename json_type::array();
             }
         }
         for (auto name : parameters_.column_types())
