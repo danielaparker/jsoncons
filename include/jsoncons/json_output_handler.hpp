@@ -44,6 +44,11 @@ public:
         do_begin_object();
     }
 
+    void begin_object(size_t length)
+    {
+        do_begin_object(length);
+    }
+
     void end_object()
     {
         do_end_object();
@@ -52,6 +57,11 @@ public:
     void begin_array()
     {
         do_begin_array();
+    }
+
+    void begin_array(size_t length)
+    {
+        do_begin_array(length);
     }
 
     void end_array()
@@ -187,9 +197,19 @@ private:
 
     virtual void do_begin_object() = 0;
 
+    virtual void do_begin_object(size_t length) 
+    {
+        do_begin_object();
+    }
+
     virtual void do_end_object() = 0;
 
     virtual void do_begin_array() = 0;
+
+    virtual void do_begin_array(size_t length) 
+    {
+        do_begin_array();
+    }
 
     virtual void do_end_array() = 0;
 

@@ -57,6 +57,11 @@ private:
         output_handler_.begin_object();
     }
 
+    void do_begin_object(size_t length, const parsing_context&) override
+    {
+        output_handler_.begin_object(length);
+    }
+
     void do_end_object(const parsing_context&) override
     {
         output_handler_.end_object();
@@ -65,6 +70,11 @@ private:
     void do_begin_array(const parsing_context&) override
     {
         output_handler_.begin_array();
+    }
+
+    void do_begin_array(size_t length, const parsing_context&) override
+    {
+        output_handler_.begin_array(length);
     }
 
     void do_end_array(const parsing_context&) override
@@ -175,6 +185,11 @@ private:
         input_handler_.begin_object(default_context_);
     }
 
+    void do_begin_object(size_t length) override
+    {
+        input_handler_.begin_object(length, default_context_);
+    }
+
     void do_end_object() override
     {
         input_handler_.end_object(default_context_);
@@ -183,6 +198,11 @@ private:
     void do_begin_array() override
     {
         input_handler_.begin_array(default_context_);
+    }
+
+    void do_begin_array(size_t length) override
+    {
+        input_handler_.begin_array(length, default_context_);
     }
 
     void do_end_array() override
@@ -294,6 +314,11 @@ private:
         downstream_handler_.begin_object(context);
     }
 
+    void do_begin_object(size_t length, const parsing_context& context) override
+    {
+        downstream_handler_.begin_object(length, context);
+    }
+
     void do_end_object(const parsing_context& context) override
     {
         downstream_handler_.end_object(context);
@@ -302,6 +327,11 @@ private:
     void do_begin_array(const parsing_context& context) override
     {
         downstream_handler_.begin_array(context);
+    }
+
+    void do_begin_array(size_t length, const parsing_context& context) override
+    {
+        downstream_handler_.begin_array(length, context);
     }
 
     void do_end_array(const parsing_context& context) override

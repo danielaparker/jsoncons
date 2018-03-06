@@ -44,6 +44,11 @@ public:
         do_begin_object(context);
     }
 
+    void begin_object(size_t length, const parsing_context& context)
+    {
+        do_begin_object(length, context);
+    }
+
     void end_object(const parsing_context& context)
     {
         do_end_object(context);
@@ -52,6 +57,11 @@ public:
     void begin_array(const parsing_context& context)
     {
         do_begin_array(context);
+    }
+
+    void begin_array(size_t length, const parsing_context& context)
+    {
+        do_begin_array(length, context);
     }
 
     void end_array(const parsing_context& context)
@@ -191,9 +201,19 @@ private:
 
     virtual void do_begin_object(const parsing_context& context) = 0;
 
+    virtual void do_begin_object(size_t length, const parsing_context& context) 
+    {
+        do_begin_object(context);
+    }
+
     virtual void do_end_object(const parsing_context& context) = 0;
 
     virtual void do_begin_array(const parsing_context& context) = 0;
+
+    virtual void do_begin_array(size_t length, const parsing_context& context) 
+    {
+        do_begin_array(context);
+    }
 
     virtual void do_end_array(const parsing_context& context) = 0;
 

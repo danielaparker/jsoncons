@@ -3085,12 +3085,12 @@ public:
             handler.null_value();
             break;
         case json_type_tag::empty_object_t:
-            handler.begin_object();
+            handler.begin_object(0);
             handler.end_object();
             break;
         case json_type_tag::object_t:
             {
-                handler.begin_object();
+                handler.begin_object(size());
                 const object& o = object_value();
                 for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                 {
@@ -3102,7 +3102,7 @@ public:
             break;
         case json_type_tag::array_t:
             {
-                handler.begin_array();
+                handler.begin_array(size());
                 const array& o = array_value();
                 for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                 {
