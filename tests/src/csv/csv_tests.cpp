@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(m_columns_test)
 
     json_decoder<ojson> decoder;
     csv_parameters params;
-    params.assume_header(true);
-    params.mapping(mapping_type::m_columns);
+    params.assume_header(true)
+          .mapping(mapping_type::m_columns);
 
     std::istringstream is(bond_yields);
     csv_reader reader(is, decoder, params);

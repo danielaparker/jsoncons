@@ -84,6 +84,7 @@ class basic_csv_parameters
     bool trim_trailing_inside_quotes_;
     bool unquoted_empty_value_is_null_;
     CharT field_delimiter_;
+    CharT subfield_delimiter_;
     CharT quote_char_;
     CharT quote_escape_char_;
     CharT comment_starter_;
@@ -113,6 +114,7 @@ public:
         trim_trailing_inside_quotes_(false),
         unquoted_empty_value_is_null_(false),
         field_delimiter_(','),
+        subfield_delimiter_(','),
         quote_char_('\"'),
         quote_escape_char_('\"'),
         comment_starter_('\0'),
@@ -329,9 +331,20 @@ public:
         return field_delimiter_;
     }
 
+    CharT subfield_delimiter() const
+    {
+        return subfield_delimiter_;
+    }
+
     basic_csv_parameters& field_delimiter(CharT value)
     {
         field_delimiter_ = value;
+        return *this;
+    }
+
+    basic_csv_parameters& subfield_delimiter(CharT value)
+    {
+        subfield_delimiter_ = value;
         return *this;
     }
 

@@ -32,7 +32,8 @@ enum class csv_mode_type
 {
     initial,
     header,
-    data
+    data,
+    subfields
 };
 
 enum class csv_state_type 
@@ -193,8 +194,65 @@ public:
         return column_names_;
     }
 
+    void before_field()
+    {
+        switch (stack_[top_])
+        {
+        case csv_mode_type::header:
+            if (parameters_.assume_header() && line_ == 1)
+            {
+                column_names_.push_back(value_buffer_);
+            }
+            break;
+        case csv_mode_type::data:
+        case csv_mode_type::subfields:
+            switch (parameters_.mapping())
+            {
+            case mapping_type::n_objects:
+                if (!(parameters_.ignore_empty_values() && value_buffer_.size() == 0))
+                {
+                    if (column_index_ < column_names_.size() + offset_)
+                    {
+                        handler_.name(column_names_[column_index_ - offset_], *this);
+                    }
+                }
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    void before_multi_valued_field()
+    {
+        push_mode(csv_mode_type::subfields);
+        switch (parameters_.mapping())
+        {
+        case mapping_type::n_rows:
+        case mapping_type::n_objects:
+            handler_.begin_array(*this);
+            break;
+        default:
+            break;
+        }
+    }
+
     void after_field()
     {
+        if (stack_[top_] == csv_mode_type::subfields)
+        {
+            pop_mode(csv_mode_type::subfields);
+            switch (parameters_.mapping())
+            {
+            case mapping_type::n_rows:
+            case mapping_type::n_objects:
+                handler_.end_array(*this);
+                break;
+            default:
+                break;
+            }
+        }
         ++column_index_;
     }
 
@@ -261,7 +319,7 @@ public:
                 break;
             }
         }
-        else if (stack_[top_] == csv_mode_type::data)
+        else if (stack_[top_] == csv_mode_type::data || stack_[top_] == csv_mode_type::subfields)
         {
             switch (parameters_.mapping())
             {
@@ -356,17 +414,6 @@ all_csv_states:
                     goto all_csv_states;
                 }
                 break;
-            case csv_state_type::between_fields:
-                if (curr_char_ == '\r' || (prev_char_ != '\r' && curr_char_ == '\n'))
-                {
-                    after_record();
-                    state_ = csv_state_type::expect_value;
-                }
-                else if (curr_char_ == parameters_.field_delimiter())
-                {
-                    state_ = csv_state_type::expect_value;
-                }
-                break;
             case csv_state_type::escaped_value: 
                 {
                     if (curr_char_ == parameters_.quote_char())
@@ -376,13 +423,6 @@ all_csv_states:
                     }
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
                     {
-                        if (column_index_ == 0)
-                        {
-                            before_record();
-                        }
-                        end_quoted_string_value(ec);
-                        if (ec) return;
-                        after_field();
                         state_ = csv_state_type::between_fields;
                         goto all_csv_states;
                     }
@@ -396,13 +436,6 @@ all_csv_states:
                     }
                     else if (curr_char_ == parameters_.quote_char())
                     {
-                        if (column_index_ == 0)
-                        {
-                            before_record();
-                        }
-                        end_quoted_string_value(ec);
-                        if (ec) return;
-                        after_field();
                         state_ = csv_state_type::between_fields;
                     }
                     else
@@ -411,9 +444,66 @@ all_csv_states:
                     }
                 }
                 break;
+            case csv_state_type::between_fields:
+                if (prev_char_ == '\r' && curr_char_ == '\n')
+                {
+                }
+                else if (curr_char_ == '\r' || curr_char_ == '\n')
+                {
+                    if (parameters_.trim_leading() || parameters_.trim_trailing())
+                    {
+                        trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
+                    }
+                    if (!parameters_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
+                    {
+                        if (column_index_ == 0)
+                        {
+                            before_record();
+                        }
+                        if (stack_[top_] != csv_mode_type::subfields)
+                        {
+                            before_field();
+                        }
+                        end_quoted_string_value(ec);
+                        if (ec) return;
+                        after_field();
+                        after_record();
+                    }
+                    state_ = csv_state_type::expect_value;
+                }
+                else if (curr_char_ == parameters_.field_delimiter() || curr_char_ == parameters_.subfield_delimiter())
+                {
+                    if (column_index_ == 0 && stack_[top_] != csv_mode_type::subfields)
+                    {
+                        before_record();
+                    }
+                    if (parameters_.trim_leading() || parameters_.trim_trailing())
+                    {
+                        trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
+                    }
+                    if (stack_[top_] != csv_mode_type::subfields)
+                    {
+                        before_field();
+                        if (curr_char_ == parameters_.subfield_delimiter())
+                        {
+                            before_multi_valued_field();
+                        }
+                    }
+                    end_quoted_string_value(ec);
+                    if (ec) return;
+                    if (curr_char_ == parameters_.field_delimiter())
+                    {
+                        after_field();
+                    }
+                    state_ = csv_state_type::unquoted_string;
+                }
+                break;
             case csv_state_type::unquoted_string: 
                 {
-                    if (curr_char_ == '\r' || (prev_char_ != '\r' && curr_char_ == '\n'))
+                    if (prev_char_ == '\r' && curr_char_ == '\n')
+                    {
+                    }
+                    else if (curr_char_ == '\r' || curr_char_ == '\n')
                     {
                         if (parameters_.trim_leading() || parameters_.trim_trailing())
                         {
@@ -425,46 +515,40 @@ all_csv_states:
                             {
                                 before_record();
                             }
+                            if (stack_[top_] != csv_mode_type::subfields)
+                            {
+                                before_field();
+                            }
                             end_unquoted_string_value();
                             after_field();
                             after_record();
                         }
                         state_ = csv_state_type::expect_value;
                     }
-                    else if (curr_char_ == '\n')
+                    else if (curr_char_ == parameters_.field_delimiter() || curr_char_ == parameters_.subfield_delimiter())
                     {
-                        if (prev_char_ != '\r')
+                        if (column_index_ == 0 && stack_[top_] != csv_mode_type::subfields)
                         {
-                            if (parameters_.trim_leading() || parameters_.trim_trailing())
-                            {
-                                trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
-                            }
-                            if (!parameters_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
-                            {
-                                if (column_index_ == 0)
-                                {
-                                    before_record();
-                                }
-                                end_unquoted_string_value();
-                                after_field();
-                                after_record();
-                            }
-                            state_ = csv_state_type::expect_value;
+                            before_record();
                         }
-                    }
-                    else if (curr_char_ == parameters_.field_delimiter())
-                    {
                         if (parameters_.trim_leading() || parameters_.trim_trailing())
                         {
                             trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
                         }
-                        if (column_index_ == 0)
+                        if (stack_[top_] != csv_mode_type::subfields)
                         {
-                            before_record();
+                            before_field();
+                            if (curr_char_ == parameters_.subfield_delimiter())
+                            {
+                                before_multi_valued_field();
+                            }
                         }
                         end_unquoted_string_value();
-                        after_field();
-                        state_ = csv_state_type::expect_value;
+                        if (curr_char_ == parameters_.field_delimiter())
+                        {
+                            after_field();
+                        }
+                        state_ = csv_state_type::unquoted_string;
                     }
                     else if (curr_char_ == parameters_.quote_char())
                     {
@@ -532,6 +616,10 @@ all_csv_states:
                 {
                     before_record();
                 }
+                if (stack_[top_] != csv_mode_type::subfields)
+                {
+                    before_field();
+                }
                 end_unquoted_string_value();
                 after_field();
             }
@@ -542,6 +630,10 @@ all_csv_states:
                 if (column_index_ == 0)
                 {
                     before_record();
+                }
+                if (stack_[top_] != csv_mode_type::subfields)
+                {
+                    before_field();
                 }
                 end_quoted_string_value(ec);
                 if (ec) return;
@@ -647,13 +739,8 @@ private:
     {
         switch (stack_[top_])
         {
-        case csv_mode_type::header:
-            if (parameters_.assume_header() && line_ == 1)
-            {
-                column_names_.push_back(value_buffer_);
-            }
-            break;
         case csv_mode_type::data:
+        case csv_mode_type::subfields:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
@@ -671,7 +758,6 @@ private:
                 {
                     if (column_index_ < column_names_.size() + offset_)
                     {
-                        handler_.name(column_names_[column_index_ - offset_], *this);
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
                             handler_.null_value(*this);
@@ -718,12 +804,9 @@ private:
         switch (stack_[top_])
         {
         case csv_mode_type::header:
-            if (parameters_.assume_header() && line_ == 1)
-            {
-                column_names_.push_back(value_buffer_);
-            }
             break;
         case csv_mode_type::data:
+        case csv_mode_type::subfields:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
@@ -734,7 +817,6 @@ private:
                 {
                     if (column_index_ < column_names_.size() + offset_)
                     {
-                        handler_.name(column_names_[column_index_ - offset_], *this);
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
                             handler_.null_value(*this);

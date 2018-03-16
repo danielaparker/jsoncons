@@ -167,22 +167,26 @@ private:
 
     void do_begin_object(const parsing_context&) override
     {
+        std::cout << "do_begin_object" << std::endl;
         push_object();
     }
 
     void do_end_object(const parsing_context&) override
     {
+        std::cout << "do_end_object" << std::endl;
         end_structure();
         pop_object();
     }
 
     void do_begin_array(const parsing_context&) override
     {
+        std::cout << "do_begin_array" << std::endl;
         push_array();
     }
 
     void do_end_array(const parsing_context&) override
     {
+        std::cout << "do_end_array" << std::endl;
         end_structure();
         pop_array();
     }
@@ -217,11 +221,13 @@ private:
 
     void do_name(const string_view_type& name, const parsing_context&) override
     {
+        std::cout << "do_name " << name.data() << std::endl;
         stack_.push_back(key_storage_type(name.begin(),name.end(),string_allocator_));
     }
 
     void do_string_value(const string_view_type& val, const parsing_context&) override
     {
+        std::cout << "do_string_value " << val.data() << std::endl;
         if (stack_offsets_.back().is_object_)
         {
             stack_.back().value_ = Json(val.data(),val.length(),string_allocator_);
