@@ -260,4 +260,98 @@ Output:
     "5Y": [0.011,0.0112,0.0112]
 }
 ```
+#### Decode a CSV string with mulit-valued fields
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv_reader.hpp>
+
+using namespace jsoncons;
+using namespace jsoncons::csv;
+
+int main()
+{
+    const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
+NY;LON,TOR,LON
+NY,LON,TOR;LON
+"NY";"LON","TOR","LON"
+"NY","LON","TOR";"LON"
+)";
+    csv_parameters params1;
+    params1.assume_header(true)
+           .subfield_delimiter(';');
+
+    json j1 = decode_csv<json>(s,params1);
+    std::cout << "(1)\n" << pretty_print(j1) << "\n\n";
+
+    csv_parameters params2;
+    params2.mapping(mapping_type::n_rows)
+           .subfield_delimiter(';');
+
+    json j2 = decode_csv<json>(s,params2);
+    std::cout << "(2)\n" << pretty_print(j2) << "\n\n";
+
+    csv_parameters params3;
+    params3.assume_header(true)
+           .mapping(mapping_type::m_columns)
+           .subfield_delimiter(';');
+
+    json j3 = decode_csv<json>(s,params3);
+    std::cout << "(3)\n" << pretty_print(j3) << "\n\n";
+}
+```
+Output:
+```json
+(1)
+[
+    {
+        "calculationPeriodCenters": ["NY","LON"],
+        "paymentCenters": "TOR",
+        "resetCenters": "LON"
+    },
+    {
+        "calculationPeriodCenters": "NY",
+        "paymentCenters": "LON",
+        "resetCenters": ["TOR","LON"]
+    },
+    {
+        "calculationPeriodCenters": ["NY","LON"],
+        "paymentCenters": "TOR",
+        "resetCenters": "LON"
+    },
+    {
+        "calculationPeriodCenters": "NY",
+        "paymentCenters": "LON",
+        "resetCenters": ["TOR","LON"]
+    }
+]
+(2)
+[
+    ["calculationPeriodCenters","paymentCenters","resetCenters"],
+    [
+        ["NY","LON"],"TOR","LON"
+    ],
+    ["NY","LON",
+        ["TOR","LON"]
+    ],
+    [
+        ["NY","LON"],"TOR","LON"
+    ],
+    ["NY","LON",
+        ["TOR","LON"]
+    ]
+]
+(3)
+{
+    "calculationPeriodCenters": [
+        ["NY","LON"],"NY",
+        ["NY","LON"],"NY"
+    ],
+    "paymentCenters": ["TOR","LON","TOR","LON"],
+    "resetCenters": ["LON",
+        ["TOR","LON"],"LON",
+        ["TOR","LON"]
+    ]
+}
+```
 

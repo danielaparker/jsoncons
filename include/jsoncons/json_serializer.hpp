@@ -244,7 +244,6 @@ private:
 
     void do_begin_object() override
     {
-        std::cout << "do_begin_object" << std::endl;
         if (!stack_.empty() && !stack_.back().is_object())
         {
             if (!stack_.empty())
@@ -290,7 +289,6 @@ private:
 
     void do_end_object() override
     {
-        std::cout << "do_end_object()" << std::endl;
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
         {
@@ -309,7 +307,6 @@ private:
 
     void do_begin_array() override
     {
-        std::cout << "do_begin_array()" << std::endl;
         if (!stack_.empty() && !stack_.back().is_object())
         {
             if (!stack_.empty())
@@ -361,7 +358,6 @@ private:
 
     void do_end_array() override
     {
-        std::cout << "do_end_array" << std::endl;
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
         {
@@ -378,7 +374,6 @@ private:
 
     void do_name(const string_view_type& name) override
     {
-        std::cout << "do_name " << name << std::endl;
         if (!stack_.empty())
         {
             if (stack_.back().count_ > 0)
@@ -419,7 +414,6 @@ private:
 
     void do_string_value(const string_view_type& value) override
     {
-        std::cout << "do_string_value " << value << std::endl;
         if (!stack_.empty() && !stack_.back().is_object())
         {
             begin_scalar_value();

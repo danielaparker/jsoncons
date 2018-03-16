@@ -233,6 +233,9 @@ public:
         case mapping_type::n_objects:
             handler_.begin_array(*this);
             break;
+        case mapping_type::m_columns:
+            decoders_[column_index_].begin_array(*this);
+            break;
         default:
             break;
         }
@@ -248,6 +251,9 @@ public:
             case mapping_type::n_rows:
             case mapping_type::n_objects:
                 handler_.end_array(*this);
+                break;
+            case mapping_type::m_columns:
+                decoders_[column_index_].end_array(*this);
                 break;
             default:
                 break;
@@ -471,7 +477,7 @@ all_csv_states:
                     }
                     state_ = csv_state_type::expect_value;
                 }
-                else if (curr_char_ == parameters_.field_delimiter() || curr_char_ == parameters_.subfield_delimiter())
+                else if (curr_char_ == parameters_.field_delimiter() || (parameters_.subfield_delimiter().second && curr_char_ == parameters_.subfield_delimiter().first))
                 {
                     if (column_index_ == 0 && stack_[top_] != csv_mode_type::subfields)
                     {
@@ -484,7 +490,7 @@ all_csv_states:
                     if (stack_[top_] != csv_mode_type::subfields)
                     {
                         before_field();
-                        if (curr_char_ == parameters_.subfield_delimiter())
+                        if (parameters_.subfield_delimiter().second && curr_char_ == parameters_.subfield_delimiter().first)
                         {
                             before_multi_valued_field();
                         }
@@ -525,7 +531,7 @@ all_csv_states:
                         }
                         state_ = csv_state_type::expect_value;
                     }
-                    else if (curr_char_ == parameters_.field_delimiter() || curr_char_ == parameters_.subfield_delimiter())
+                    else if (curr_char_ == parameters_.field_delimiter() || (parameters_.subfield_delimiter().second && curr_char_ == parameters_.subfield_delimiter().first))
                     {
                         if (column_index_ == 0 && stack_[top_] != csv_mode_type::subfields)
                         {
@@ -538,7 +544,7 @@ all_csv_states:
                         if (stack_[top_] != csv_mode_type::subfields)
                         {
                             before_field();
-                            if (curr_char_ == parameters_.subfield_delimiter())
+                            if (parameters_.subfield_delimiter().second && curr_char_ == parameters_.subfield_delimiter().first)
                             {
                                 before_multi_valued_field();
                             }

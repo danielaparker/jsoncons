@@ -314,7 +314,41 @@ void csv_parser_type_inference()
     std::ifstream is3("input/sales.csv");
     ojson j3 = decode_csv<ojson>(is3,params);
     std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
-} 
+}
+ 
+// Examples with subfields
+ 
+
+void decode_csv_with_subfields()
+{
+    const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
+NY;LON,TOR,LON
+NY,LON,TOR;LON
+"NY";"LON","TOR","LON"
+"NY","LON","TOR";"LON"
+)";
+    csv_parameters params1;
+    params1.assume_header(true)
+           .subfield_delimiter(';');
+
+    json j1 = decode_csv<json>(s,params1);
+    std::cout << "(1)\n" << pretty_print(j1) << "\n\n";
+
+    csv_parameters params2;
+    params2.mapping(mapping_type::n_rows)
+           .subfield_delimiter(';');
+
+    json j2 = decode_csv<json>(s,params2);
+    std::cout << "(2)\n" << pretty_print(j2) << "\n\n";
+
+    csv_parameters params3;
+    params3.assume_header(true)
+           .mapping(mapping_type::m_columns)
+           .subfield_delimiter(';');
+
+    json j3 = decode_csv<json>(s,params3);
+    std::cout << "(3)\n" << pretty_print(j3) << "\n\n";
+}
 
 void csv_examples()
 {
@@ -334,6 +368,8 @@ void csv_examples()
     csv_decode_without_type_inference();
     mapping_types();
     csv_parser_type_inference();
+
+    decode_csv_with_subfields();
     std::cout << std::endl;
 }
 

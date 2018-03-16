@@ -84,6 +84,7 @@ class basic_csv_parameters
     bool trim_trailing_inside_quotes_;
     bool unquoted_empty_value_is_null_;
     CharT field_delimiter_;
+    bool has_subfield_delimiter_;
     CharT subfield_delimiter_;
     CharT quote_char_;
     CharT quote_escape_char_;
@@ -114,6 +115,7 @@ public:
         trim_trailing_inside_quotes_(false),
         unquoted_empty_value_is_null_(false),
         field_delimiter_(','),
+        has_subfield_delimiter_(false),
         subfield_delimiter_(','),
         quote_char_('\"'),
         quote_escape_char_('\"'),
@@ -331,9 +333,9 @@ public:
         return field_delimiter_;
     }
 
-    CharT subfield_delimiter() const
+    std::pair<CharT,bool> subfield_delimiter() const
     {
-        return subfield_delimiter_;
+        return std::make_pair(subfield_delimiter_,has_subfield_delimiter_);
     }
 
     basic_csv_parameters& field_delimiter(CharT value)
@@ -344,6 +346,7 @@ public:
 
     basic_csv_parameters& subfield_delimiter(CharT value)
     {
+        has_subfield_delimiter_ = true;
         subfield_delimiter_ = value;
         return *this;
     }

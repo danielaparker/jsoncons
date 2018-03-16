@@ -18,9 +18,10 @@
 
 using namespace jsoncons;
 using namespace jsoncons::csv;
+using namespace jsoncons::literals;
 
 BOOST_AUTO_TEST_SUITE(csv_subfield_tests)
-/*
+
 BOOST_AUTO_TEST_CASE(test_n_objects)
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
@@ -33,19 +34,85 @@ NY,LON,TOR;LON
     params.assume_header(true)
           .subfield_delimiter(';');
 
+    json expected = R"(
+[
+    {
+        "calculationPeriodCenters": ["NY","LON"],
+        "paymentCenters": "TOR",
+        "resetCenters": "LON"
+    },
+    {
+        "calculationPeriodCenters": "NY",
+        "paymentCenters": "LON",
+        "resetCenters": ["TOR","LON"]
+    },
+    {
+        "calculationPeriodCenters": ["NY","LON"],
+        "paymentCenters": "TOR",
+        "resetCenters": "LON"
+    },
+    {
+        "calculationPeriodCenters": "NY",
+        "paymentCenters": "LON",
+        "resetCenters": ["TOR","LON"]
+    }
+]
+    )"_json;
+
     try
     {
         json j = decode_csv<json>(s,params);
-
-        std::cout << "\nserialize" << std::endl;
-        std::cout << pretty_print(j) << std::endl;
+        BOOST_CHECK_EQUAL(expected, j);
+        //std::cout << pretty_print(j) << std::endl;
     }
     catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
     }
 }
-*/
+
+BOOST_AUTO_TEST_CASE(test_n_rows)
+{
+    const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
+NY;LON,TOR,LON
+NY,LON,TOR;LON
+"NY";"LON","TOR","LON"
+"NY","LON","TOR";"LON"
+)";
+    csv_parameters params;
+    params.mapping(mapping_type::n_rows)
+          .subfield_delimiter(';');
+
+    json expected = R"(
+[
+    ["calculationPeriodCenters","paymentCenters","resetCenters"],
+    [
+        ["NY","LON"],"TOR","LON"
+    ],
+    ["NY","LON",
+        ["TOR","LON"]
+    ],
+    [
+        ["NY","LON"],"TOR","LON"
+    ],
+    ["NY","LON",
+        ["TOR","LON"]
+    ]
+]
+    )"_json;
+
+    try
+    {
+        json j = decode_csv<json>(s,params);
+        BOOST_CHECK_EQUAL(expected, j);
+        //std::cout << pretty_print(j) << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+}
+
 BOOST_AUTO_TEST_CASE(test_m_columns)
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
@@ -59,12 +126,25 @@ NY,LON,TOR;LON
           .mapping(mapping_type::m_columns)
           .subfield_delimiter(';');
 
+    json expected = R"(
+{
+    "calculationPeriodCenters": [
+        ["NY","LON"],"NY",
+        ["NY","LON"],"NY"
+    ],
+    "paymentCenters": ["TOR","LON","TOR","LON"],
+    "resetCenters": ["LON",
+        ["TOR","LON"],"LON",
+        ["TOR","LON"]
+    ]
+}
+    )"_json;
+
     try
     {
         json j = decode_csv<json>(s,params);
-
-        std::cout << "\nserialize" << std::endl;
-        std::cout << pretty_print(j) << std::endl;
+        BOOST_CHECK_EQUAL(expected, j);
+        //std::cout << pretty_print(j) << std::endl;
     }
     catch (const std::exception& e)
     {

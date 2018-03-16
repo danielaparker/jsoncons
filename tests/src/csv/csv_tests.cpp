@@ -32,7 +32,8 @@ BOOST_AUTO_TEST_CASE(n_objects_test)
     json_decoder<ojson> decoder;
     csv_parameters params;
     params.assume_header(true)
-          .column_types("string,float,float,float,float");
+          .subfield_delimiter(0);
+          //.column_types("string,float,float,float,float");
 
     params.mapping(mapping_type::n_rows);
     std::istringstream is1(bond_yields);
