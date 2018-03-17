@@ -18,7 +18,7 @@ max_lines         | Maximum number of lines to read | Unlimited
 quote_char         | Quote character              | "             
 quote_escape_char  | Character to escape quote character (by default the quote character is doubled)| "             
 quote_style|quote_style_type::all, quote_style_type::minimal, quote_style_type::none, or quote_style_type::nonnumeric|quote_style_type::minimal
-subfield_delimiter    |A delimiter character that indicates the end of a single value in a multi-valued field| ,             
+subfield_delimiter    |A delimiter character that indicates the end of a single value in a multi-valued field|None
 trim_leading      | Trim leading whitespace | false         
 trim_trailing      | Trim trailing whitespace | false         
 trim      | Trim both leading and trailing whitespace | false        

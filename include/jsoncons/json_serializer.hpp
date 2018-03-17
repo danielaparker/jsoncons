@@ -385,9 +385,6 @@ private:
             }
             else 
             {
-                //stack_.push_back(line_split_context(structure_type::array, line_split_kind::multi_line, false));
-                //indent();
-                //writer_.put('[');
                 stack_.push_back(line_split_context(structure_type::array, line_split_kind::multi_line, false));
                 writer_.put('[');
                 write_indent();
