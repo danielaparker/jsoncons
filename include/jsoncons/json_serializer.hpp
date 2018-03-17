@@ -85,9 +85,14 @@ private:
             return type_ == structure_type::array;
         }
 
+        bool is_same_line() const
+        {
+            return split_lines_ == line_split_kind::same_line;
+        }
+
         bool is_new_line() const
         {
-            return split_lines_ != line_split_kind::same_line;
+            return split_lines_ == line_split_kind::new_line;
         }
 
         bool is_multi_line() const
@@ -337,34 +342,56 @@ private:
         }
         if (indenting_)
         {
-            if (!stack_.empty() && stack_.back().is_object())
+            if (!stack_.empty())
             {
-                writer_.put('[');
-                indent();
-                if (options_.object_array_split_lines() != line_split_kind::same_line)
+                if (stack_.back().is_object())
                 {
-                    stack_.push_back(line_split_context(structure_type::array,options_.object_array_split_lines(),true));
+                    writer_.put('[');
+                    indent();
+                    if (options_.object_array_split_lines() != line_split_kind::same_line)
+                    {
+                        stack_.push_back(line_split_context(structure_type::array,options_.object_array_split_lines(),true));
+                    }
+                    else
+                    {
+                        stack_.push_back(line_split_context(structure_type::array,options_.object_array_split_lines(),false));
+                    }
                 }
-                else
+                else // array
                 {
-                    stack_.push_back(line_split_context(structure_type::array,options_.object_array_split_lines(),false));
+                    if (options_.array_array_split_lines() == line_split_kind::same_line)
+                    {
+                        if (stack_.back().is_multi_line())
+                        {
+                            write_indent();
+                        }
+                        stack_.push_back(line_split_context(structure_type::array,line_split_kind::same_line, false));
+                        indent();
+                    }
+                    else if (options_.array_array_split_lines() == line_split_kind::multi_line)
+                    {
+                        write_indent();
+                        stack_.push_back(line_split_context(structure_type::array,options_.array_array_split_lines(), false));
+                        indent();
+                    }
+                    else // new_line
+                    {
+                        write_indent();
+                        stack_.push_back(line_split_context(structure_type::array,options_.array_array_split_lines(), false));
+                        indent();
+                    }
+                    writer_.put('[');
                 }
-            }
-            else if (!stack_.empty())
-            {
-                if (options_.array_array_split_lines() != line_split_kind::same_line)
-                {
-                    write_indent();
-                }
-                stack_.push_back(line_split_context(structure_type::array,options_.array_array_split_lines(), false));
-                indent();
-                writer_.put('[');
             }
             else 
             {
+                //stack_.push_back(line_split_context(structure_type::array, line_split_kind::multi_line, false));
+                //indent();
+                //writer_.put('[');
                 stack_.push_back(line_split_context(structure_type::array, line_split_kind::multi_line, false));
-                indent();
                 writer_.put('[');
+                write_indent();
+                indent();
             }
         }
         else
@@ -547,7 +574,7 @@ private:
             }
             if (indenting_)
             {
-                if (stack_.back().is_new_line())
+                if (!stack_.back().is_same_line())
                 {
                     write_indent();
                 }
