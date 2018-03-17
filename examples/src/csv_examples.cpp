@@ -327,19 +327,22 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
+    serialization_options print_options;
+    print_options.array_array_split_lines(line_split_kind::same_line);
+
     csv_parameters params1;
     params1.assume_header(true)
            .subfield_delimiter(';');
 
     json j1 = decode_csv<json>(s,params1);
-    std::cout << "(1)\n" << pretty_print(j1) << "\n\n";
+    std::cout << "(1)\n" << pretty_print(j1,print_options) << "\n\n";
 
     csv_parameters params2;
     params2.mapping(mapping_type::n_rows)
            .subfield_delimiter(';');
 
     json j2 = decode_csv<json>(s,params2);
-    std::cout << "(2)\n" << pretty_print(j2) << "\n\n";
+    std::cout << "(2)\n" << pretty_print(j2,print_options) << "\n\n";
 
     csv_parameters params3;
     params3.assume_header(true)
@@ -347,7 +350,7 @@ NY,LON,TOR;LON
            .subfield_delimiter(';');
 
     json j3 = decode_csv<json>(s,params3);
-    std::cout << "(3)\n" << pretty_print(j3) << "\n\n";
+    std::cout << "(3)\n" << pretty_print(j3,print_options) << "\n\n";
 }
 
 void csv_examples()

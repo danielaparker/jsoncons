@@ -36,14 +36,22 @@ public:
 private:
     static const size_t default_buffer_length = 16384;
 
-    struct stack_item
+    enum class structure_type {object, array};
+
+    class line_split_context
     {
-        stack_item(bool is_object)
-           : is_object_(is_object), count_(0), split_lines_(line_split_kind::same_line), indent_once_(false), unindent_at_end_(false)
+        structure_type type_;
+        size_t count_;
+        line_split_kind split_lines_;
+        bool indent_before_;
+        bool unindent_after_;
+    public:
+        line_split_context(structure_type type)
+           : type_(type), count_(0), split_lines_(line_split_kind::same_line), indent_before_(false), unindent_after_(false)
         {
         }
-        stack_item(bool is_object, line_split_kind split_lines, bool indent_once = false)
-           : is_object_(is_object), count_(0), split_lines_(split_lines), indent_once_(indent_once), unindent_at_end_(false)
+        line_split_context(structure_type type, line_split_kind split_lines, bool indent_once)
+           : type_(type), count_(0), split_lines_(split_lines), indent_before_(indent_once), unindent_after_(false)
         {
         }
 
@@ -52,14 +60,29 @@ private:
             return count_;
         }
 
-        bool unindent_at_end() const
+        void increment_count()
         {
-            return unindent_at_end_;
+            ++count_;
+        }
+
+        bool unindent_after() const
+        {
+            return unindent_after_;
+        }
+
+        void unindent_after(bool value) 
+        {
+            unindent_after_ = value;
         }
 
         bool is_object() const
         {
-            return is_object_;
+            return type_ == structure_type::object;
+        }
+
+        bool is_array() const
+        {
+            return type_ == structure_type::array;
         }
 
         bool is_new_line() const
@@ -74,17 +97,12 @@ private:
 
         bool is_indent_once() const
         {
-            return count_ == 0 ? indent_once_ : false;
+            return count_ == 0 ? indent_before_ : false;
         }
 
-        bool is_object_;
-        size_t count_;
-        line_split_kind split_lines_;
-        bool indent_once_;
-        bool unindent_at_end_;
     };
     basic_serialization_options<CharT> options_;
-    std::vector<stack_item> stack_;
+    std::vector<line_split_context> stack_;
     int indent_;
     bool indenting_;
     detail::print_double fp_;
@@ -244,11 +262,11 @@ private:
 
     void do_begin_object() override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_array())
         {
             if (!stack_.empty())
             {
-                if (stack_.back().count_ > 0)
+                if (stack_.back().count() > 0)
                 {
                     writer_. put(',');
                 }
@@ -259,30 +277,30 @@ private:
         {
             if (!stack_.empty() && stack_.back().is_object())
             {
-                stack_.push_back(stack_item(true,options_.object_object_split_lines(), false));
+                stack_.push_back(line_split_context(structure_type::object,options_.object_object_split_lines(), false));
             }
             else if (!stack_.empty())
             {
                 if (options_.array_object_split_lines() != line_split_kind::same_line)
                 {
-                    stack_.back().unindent_at_end_ = true;
-                    stack_.push_back(stack_item(true,options_.array_object_split_lines(), false));
+                    stack_.back().unindent_after(true);
+                    stack_.push_back(line_split_context(structure_type::object,options_.array_object_split_lines(), false));
                     write_indent1();
                 }
                 else
                 {
-                    stack_.push_back(stack_item(true,options_.array_object_split_lines(), false));
+                    stack_.push_back(line_split_context(structure_type::object,options_.array_object_split_lines(), false));
                 }
             }
             else 
             {
-                stack_.push_back(stack_item(true, line_split_kind::multi_line, false));
+                stack_.push_back(line_split_context(structure_type::object, line_split_kind::multi_line, false));
             }
             indent();
         }
         else
         {
-            stack_.push_back(stack_item(true));
+            stack_.push_back(line_split_context(structure_type::object));
         }
         writer_.put('{');
     }
@@ -293,7 +311,7 @@ private:
         if (indenting_)
         {
             unindent();
-            if (stack_.back().unindent_at_end())
+            if (stack_.back().unindent_after())
             {
                 write_indent();
             }
@@ -307,11 +325,11 @@ private:
 
     void do_begin_array() override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_array())
         {
             if (!stack_.empty())
             {
-                if (stack_.back().count_ > 0)
+                if (stack_.back().count() > 0)
                 {
                     writer_. put(',');
                 }
@@ -325,11 +343,11 @@ private:
                 indent();
                 if (options_.object_array_split_lines() != line_split_kind::same_line)
                 {
-                    stack_.push_back(stack_item(false,options_.object_array_split_lines(),true));
+                    stack_.push_back(line_split_context(structure_type::array,options_.object_array_split_lines(),true));
                 }
                 else
                 {
-                    stack_.push_back(stack_item(false,options_.object_array_split_lines(),false));
+                    stack_.push_back(line_split_context(structure_type::array,options_.object_array_split_lines(),false));
                 }
             }
             else if (!stack_.empty())
@@ -338,20 +356,20 @@ private:
                 {
                     write_indent();
                 }
-                stack_.push_back(stack_item(false,options_.array_array_split_lines(), false));
+                stack_.push_back(line_split_context(structure_type::array,options_.array_array_split_lines(), false));
                 indent();
                 writer_.put('[');
             }
             else 
             {
-                stack_.push_back(stack_item(false, line_split_kind::multi_line, false));
+                stack_.push_back(line_split_context(structure_type::array, line_split_kind::multi_line, false));
                 indent();
                 writer_.put('[');
             }
         }
         else
         {
-            stack_.push_back(stack_item(false));
+            stack_.push_back(line_split_context(structure_type::array));
             writer_.put('[');
         }
     }
@@ -362,7 +380,7 @@ private:
         if (indenting_)
         {
             unindent();
-            if (stack_.back().unindent_at_end())
+            if (stack_.back().unindent_after())
             {
                 write_indent();
             }
@@ -376,7 +394,7 @@ private:
     {
         if (!stack_.empty())
         {
-            if (stack_.back().count_ > 0)
+            if (stack_.back().count() > 0)
             {
                 writer_. put(',');
             }
@@ -401,7 +419,7 @@ private:
 
     void do_null_value() override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
         }
@@ -414,7 +432,7 @@ private:
 
     void do_string_value(const string_view_type& value) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
         }
@@ -435,7 +453,7 @@ private:
 
     void do_double_value(double value, const number_format& fmt) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
         }
@@ -462,7 +480,7 @@ private:
 
     void do_integer_value(int64_t value) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
         }
@@ -472,7 +490,7 @@ private:
 
     void do_uinteger_value(uint64_t value) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
         }
@@ -482,7 +500,7 @@ private:
 
     void do_bool_value(bool value) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
         }
@@ -505,7 +523,7 @@ private:
     {
         if (!stack_.empty())
         {
-            if (stack_.back().count_ > 0)
+            if (stack_.back().count() > 0)
             {
                 writer_. put(',');
             }
@@ -523,7 +541,7 @@ private:
     {
         if (!stack_.empty())
         {
-            if (stack_.back().count_ > 0)
+            if (stack_.back().count() > 0)
             {
                 writer_. put(',');
             }
@@ -541,7 +559,7 @@ private:
     {
         if (!stack_.empty())
         {
-            ++stack_.back().count_;
+            stack_.back().increment_count();
         }
     }
 
@@ -559,7 +577,7 @@ private:
     {
         if (!stack_.empty())
         {
-            stack_.back().unindent_at_end_ = true;
+            stack_.back().unindent_after(true);
         }
         writer_. put('\n');
         for (int i = 0; i < indent_; ++i)
