@@ -1,4 +1,4 @@
-### jsoncons::cbor::decode_cbor
+### jsoncons::cbors::decode_cbor
 
 Decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
 
@@ -7,7 +7,7 @@ Decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class Json>
-Json decode_cbor(cbor_view v)
+Json decode_cbor(cbor_ref v)
 ```
 
 ### Examples
@@ -19,7 +19,7 @@ Json decode_cbor(cbor_view v)
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
+using namespace jsoncons::cbors;
 
 int main()
 {
@@ -71,7 +71,7 @@ int main()
 {
     // byte string for five bytes
     std::vector<uint8_t> buf = {0x45,'H','e','l','l','o'};
-    json j = cbor::decode_cbor<json>(buf);
+    json j = cbors::decode_cbor<json>(buf);
 
     auto bs = j.as<byte_string>();
 
@@ -92,7 +92,7 @@ Output:
 #### See also
 
 - [byte_string](../byte_string.md)
-- [cbor_view](cbor_view)
+- [cbor_ref](cbor_ref)
 - [encode_cbor](encode_cbor.md) encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
 
 

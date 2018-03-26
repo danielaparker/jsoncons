@@ -189,9 +189,9 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-#### Select values from `cbor_view` object
+#### Select values from `cbor_ref` object
 
-A [cbor_view](../cbor/cbor_view.md) satisfies the requirements for `jsonpointer::get`.
+A [cbor_ref](../cbor/cbor_ref.md) satisfies the requirements for `jsonpointer::get`.
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -217,11 +217,11 @@ int main()
     )");
 
     std::vector<uint8_t> data;
-    cbor::encode_cbor(j, data);
+    cbors::encode_cbor(j, data);
 
     std::error_code ec;
-    cbor::cbor_view rated = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rated", ec);
-    cbor::cbor_view rating = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rating", ec);
+    cbors::cbor_ref rated = jsonpointer::get(cbors::cbor_ref(data), "/reputons/0/rated", ec);
+    cbors::cbor_ref rating = jsonpointer::get(cbors::cbor_ref(data), "/reputons/0/rating", ec);
 
     std::cout << rated.as_string() << ", " << rating.as_double() << std::endl;
 }

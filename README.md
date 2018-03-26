@@ -2,6 +2,15 @@ jsoncons is a modern C++, header-only library for constructing [JSON](http://www
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
 
+### What's new on master
+
+- The csv extension now supports multi-valued fields separated by subfield delimiters
+
+- The cbor extension namespace has been changed to `cbors`, and the msgpack extension namespace has been
+  changed to `msgpacks` (classes cbor and msgpack will be added.)  
+
+- The cbor extension class `cbor_view` has been renamed to `cbor_ref`.
+
 ### Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
@@ -800,15 +809,15 @@ int main()
 
     // Encoding an unpacked (json) value to a packed CBOR value
     std::vector<uint8_t> data;
-    cbor::encode_cbor(j1, data);
+    cbors::encode_cbor(j1, data);
 
     // Decoding a packed CBOR value to an unpacked (json) value
-    ojson j2 = cbor::decode_cbor<ojson>(data);
+    ojson j2 = cbors::decode_cbor<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
     // Iterating over and accessing the nested data items of a packed CBOR value
-    cbor::cbor_view datav{data};    
-    cbor::cbor_view reputons = datav.at("reputons");    
+    cbors::cbor_ref datav{data};    
+    cbors::cbor_ref reputons = datav.at("reputons");    
 
     std::cout << "(2)\n";
     for (auto element : reputons.array_range())
@@ -820,7 +829,7 @@ int main()
 
     // Querying a packed CBOR value for a nested data item with jsonpointer
     std::error_code ec;
-    cbor::cbor_view rated = jsonpointer::get(datav, "/reputons/0/rated", ec);
+    cbors::cbor_ref rated = jsonpointer::get(datav, "/reputons/0/rated", ec);
     if (!ec)
     {
         std::cout << "(3) " << rated.as_string() << "\n";
@@ -877,7 +886,7 @@ Example file (book.json):
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpack;
+using namespace jsoncons::msgpacks;
 
 int main()
 {

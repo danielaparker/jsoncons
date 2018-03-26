@@ -1,7 +1,16 @@
 master
 ------
 
-The CSV extension now supports multi-valued fields separated by subfield delimiters
+Enhancements
+
+- The CSV extension now supports multi-valued fields separated by subfield delimiters
+
+Changes
+
+- The cbor extension namespace has been changed to `cbors`, and the msgpack extension namespace has been
+  changed to `msgpacks` (classes cbor and msgpack will be added.)  
+
+- The cbor extension class `cbor_view` has been renamed to `cbor_ref`.
 
 v0.104.0
 --------

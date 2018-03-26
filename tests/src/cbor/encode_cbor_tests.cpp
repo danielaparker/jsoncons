@@ -15,7 +15,7 @@
 #include <limits>
 
 using namespace jsoncons;
-using namespace jsoncons::cbor;
+using namespace jsoncons::cbors;
 
 // test vectors from tinycbor https://github.com/01org/tinycbor tst_encoder.cpp
 // MIT license

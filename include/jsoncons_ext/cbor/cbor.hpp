@@ -43,7 +43,7 @@
 #define JSONCONS_CBOR_0xa0_0xb7 \
         0xa0:case 0xa1:case 0xa2:case 0xa3:case 0xa4:case 0xa5:case 0xa6:case 0xa7:case 0xa8:case 0xa9:case 0xaa:case 0xab:case 0xac:case 0xad:case 0xae:case 0xaf:case 0xb0:case 0xb1:case 0xb2:case 0xb3:case 0xb4:case 0xb5:case 0xb6:case 0xb7
 
-namespace jsoncons { namespace cbor {
+namespace jsoncons { namespace cbors {
   
 class cbor_decode_error : public std::invalid_argument, public virtual json_exception
 {
@@ -1725,28 +1725,28 @@ public:
 
 } // namespace detail
 
-class cbor_view 
+class cbor_ref 
 {
     const uint8_t* first_;
     const uint8_t* last_; 
 public:
     typedef std::ptrdiff_t difference_type;
-    typedef cbor_view value_type;
-    typedef cbor_view& reference;
-    typedef const cbor_view& const_reference;
-    typedef cbor_view* pointer;
-    typedef const cbor_view* const_pointer;
+    typedef cbor_ref value_type;
+    typedef cbor_ref& reference;
+    typedef const cbor_ref& const_reference;
+    typedef cbor_ref* pointer;
+    typedef const cbor_ref* const_pointer;
     typedef std::string string_type;
     typedef char char_type;
     typedef std::char_traits<char_type> char_traits_type;
     typedef basic_string_view_ext<char_type> string_view_type;
-    typedef detail::const_object_iterator<cbor_view> object_iterator;
-    typedef detail::const_object_iterator<cbor_view> const_object_iterator;
-    typedef detail::const_array_iterator<cbor_view> array_iterator;
-    typedef detail::const_array_iterator<cbor_view> const_array_iterator;
-    typedef detail::key_value_pair_view<cbor_view> key_value_pair_type;
+    typedef detail::const_object_iterator<cbor_ref> object_iterator;
+    typedef detail::const_object_iterator<cbor_ref> const_object_iterator;
+    typedef detail::const_array_iterator<cbor_ref> array_iterator;
+    typedef detail::const_array_iterator<cbor_ref> const_array_iterator;
+    typedef detail::key_value_pair_view<cbor_ref> key_value_pair_type;
 
-    friend class detail::const_array_iterator<cbor_view>;
+    friend class detail::const_array_iterator<cbor_ref>;
 
     range<const_object_iterator> object_range() const
     {
@@ -1805,34 +1805,34 @@ public:
         return range<const_array_iterator>(const_array_iterator(begin,endp), const_array_iterator(endp, endp));
     }
 
-    cbor_view()
+    cbor_ref()
         : first_(nullptr), last_(nullptr)
     {
     }
 
-    cbor_view(const uint8_t* buffer, size_t buflen)
+    cbor_ref(const uint8_t* buffer, size_t buflen)
         : first_(buffer), last_(buffer+buflen)
     {
     }
 
-    cbor_view(const std::vector<uint8_t>& v)
+    cbor_ref(const std::vector<uint8_t>& v)
         : first_(v.data()), last_(v.data()+v.size())
     {
     }
 
-    cbor_view(const cbor_view& other)
+    cbor_ref(const cbor_ref& other)
         : first_(other.first_), last_(other.last_)
     {
     }
 
-    cbor_view& operator=(const cbor_view&) = default;
+    cbor_ref& operator=(const cbor_ref&) = default;
 
-    friend bool operator==(const cbor_view& lhs, const cbor_view& rhs) 
+    friend bool operator==(const cbor_ref& lhs, const cbor_ref& rhs) 
     {
         return lhs.first_ == rhs.first_ && lhs.last_ == rhs.last_; 
     }
 
-    friend bool operator!=(const cbor_view& lhs, const cbor_view& rhs) 
+    friend bool operator!=(const cbor_ref& lhs, const cbor_ref& rhs) 
     {
         return !(lhs == rhs); 
     }
@@ -1956,7 +1956,7 @@ public:
         return len;
     }
 
-    cbor_view at(size_t index) const
+    cbor_ref at(size_t index) const
     {
         JSONCONS_ASSERT(is_array());
         const uint8_t* it = first_;
@@ -1971,10 +1971,10 @@ public:
         const uint8_t* endp;
         detail::walk(it, last_, &endp);
 
-        return cbor_view(it,endp-it);
+        return cbor_ref(it,endp-it);
     }
 
-    cbor_view at(const string_view_type& key) const
+    cbor_ref at(const string_view_type& key) const
     {
         JSONCONS_ASSERT(is_object());
         const uint8_t* it = first_;
@@ -1998,7 +1998,7 @@ public:
                 const uint8_t* last;
                 detail::walk(it, last_, &last);
                 JSONCONS_ASSERT(last >= it);
-                return cbor_view(it,last-it);
+                return cbor_ref(it,last-it);
             }
             const uint8_t* last;
             detail::walk(it, last_, &last);
@@ -2114,6 +2114,13 @@ public:
         }
         return val;
     }
+protected:
+
+    void set_data(const uint8_t* data, size_t length)
+    {
+        first_ = data;
+        last_ = data + length;
+    }    
 };
 
 struct Encode_cbor_
@@ -2758,6 +2765,36 @@ public:
         }
         return result;
     }
+
+};
+
+class cbor : public cbor_ref
+{
+    std::vector<uint8_t> data_;
+public:
+
+    cbor() = default;
+    cbor(const cbor& val)
+        : data_(val.data_)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    cbor(cbor&& val)
+        : data_(std::move(val.data_))
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    cbor(const std::vector<uint8_t>& val)
+        : data_(val)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    cbor(std::vector<uint8_t>&& val)
+        : data_(val)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+
 };
 
 template<class Json>
@@ -2771,7 +2808,7 @@ void encode_cbor(const Json& j, std::vector<uint8_t>& v)
 }
 
 template<class Json>
-Json decode_cbor(const cbor_view& v)
+Json decode_cbor(const cbor_ref& v)
 {
     Decode_cbor_<Json> decoder(v.buffer(),v.buffer()+v.buflen());
     return decoder.decode();
