@@ -260,7 +260,7 @@ Output:
     "5Y": [0.011,0.0112,0.0112]
 }
 ```
-#### Decode a CSV string with multi-valued fields separated by subfield delimiters
+#### Decode a CSV string with multi-valued fields
 
 ```c++
 #include <jsoncons/json.hpp>
