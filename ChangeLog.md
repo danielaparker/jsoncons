@@ -3,7 +3,7 @@ master
 
 Enhancements
 
-- The csv extension now supports multi-valued fields separated by subfield delimiters
+- The CSV extension now supports multi-valued fields separated by subfield delimiters
 
 Changes
 
