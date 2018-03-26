@@ -18,7 +18,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/binary/binary_utilities.hpp>
 
-namespace jsoncons { namespace msgpacks {
+namespace jsoncons { namespace msgpack {
   
 class msgpack_decode_error : public std::invalid_argument, public virtual json_exception
 {

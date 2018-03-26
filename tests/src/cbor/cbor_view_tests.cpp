@@ -16,11 +16,11 @@
 #include <limits>
 
 using namespace jsoncons;
-using namespace jsoncons::cbors;
+using namespace jsoncons::cbor;
 
-BOOST_AUTO_TEST_SUITE(cbor_ref_tests)
+BOOST_AUTO_TEST_SUITE(cbor_view_tests)
 
-BOOST_AUTO_TEST_CASE(cbor_ref_test)
+BOOST_AUTO_TEST_CASE(cbor_view_test)
 {
     ojson j1 = ojson::parse(R"(
     {
@@ -39,21 +39,21 @@ BOOST_AUTO_TEST_CASE(cbor_ref_test)
     std::vector<uint8_t> c;
     encode_cbor(j1, c);
 
-    cbor_ref v(c); 
+    cbor_view v(c); 
     BOOST_CHECK(v.is_object());
     BOOST_CHECK(!v.is_array());
 
     json jv = decode_cbor<json>(v);
     std::cout << pretty_print(jv) << std::endl;
 
-    cbor_ref reputons = v.at("reputons");
+    cbor_view reputons = v.at("reputons");
     BOOST_CHECK(reputons.is_array());
 
-    cbor_ref reputons_0 = reputons.at(0);
+    cbor_view reputons_0 = reputons.at(0);
 
-    cbor_ref reputons_0_rated = reputons_0.at("rated");
+    cbor_view reputons_0_rated = reputons_0.at("rated");
 
-    cbor_ref rating = reputons_0.at("rating");
+    cbor_view rating = reputons_0.at("rating");
     BOOST_CHECK(rating.as_double() == 0.90);
 
     for (const auto& member : v.object_range())
@@ -94,13 +94,13 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     encode_cbor(j, buffer);
 
     std::error_code ec;
-    cbor_ref application = jsonpointer::get(cbor_ref(buffer), "/application", ec);
+    cbor_view application = jsonpointer::get(cbor_view(buffer), "/application", ec);
     BOOST_CHECK(!ec);
 
     json j2 = decode_cbor<json>(application);
     std::cout << pretty_print(j2) << std::endl;
 
-    cbor_ref reputons_0_rated = jsonpointer::get(cbor_ref(buffer), "/reputons", ec);
+    cbor_view reputons_0_rated = jsonpointer::get(cbor_view(buffer), "/reputons", ec);
     BOOST_CHECK(!ec);
 
     json j3 = decode_cbor<json>(reputons_0_rated);
