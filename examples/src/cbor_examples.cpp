@@ -26,15 +26,15 @@ void cbor_reputon_example()
 
     // Encoding an unpacked (json) value to a packed CBOR value
     std::vector<uint8_t> data;
-    cbor::encode_cbor(j1, data);
+    cbors::encode_cbor(j1, data);
 
     // Decoding a packed CBOR value to an unpacked (json) value
-    ojson j2 = cbor::decode_cbor<ojson>(data);
+    ojson j2 = cbors::decode_cbor<ojson>(data);
     std::cout << "(1)\n" << pretty_print(j2) << "\n\n";
 
     // Iterating over and accessing the nested data items of a packed CBOR value
-    cbor::cbor_view datav{data};    
-    cbor::cbor_view reputons = datav.at("reputons");    
+    cbors::cbor_view datav{data};    
+    cbors::cbor_view reputons = datav.at("reputons");    
 
     std::cout << "(2)\n";
     for (auto element : reputons.array_range())
@@ -46,7 +46,7 @@ void cbor_reputon_example()
 
     // Querying a packed CBOR value for a nested data item with jsonpointer
     std::error_code ec;
-    cbor::cbor_view rated = jsonpointer::get(datav, "/reputons/0/rated", ec);
+    cbors::cbor_view rated = jsonpointer::get(datav, "/reputons/0/rated", ec);
     if (!ec)
     {
         std::cout << "(3) " << rated.as_string() << "\n";
@@ -59,7 +59,7 @@ void decode_cbor_byte_string()
 {
     // byte string for five bytes
     std::vector<uint8_t> buf = {0x45,'H','e','l','l','o'};
-    json j = cbor::decode_cbor<json>(buf);
+    json j = cbors::decode_cbor<json>(buf);
 
     auto bs = j.as<byte_string>();
 
@@ -76,7 +76,7 @@ void encode_cbor_byte_string()
     json j(byte_string("Hello"));
 
     std::vector<uint8_t> buf;
-    cbor::encode_cbor(j, buf);
+    cbors::encode_cbor(j, buf);
 
     std::cout << std::hex << std::showbase << (int)buf[0];
     for (size_t i = 1; i < buf.size(); ++i)
@@ -92,7 +92,7 @@ void cbor_view_object_range()
 
     std::vector<uint8_t> packed = {0xa2,0x63,'f','o','o',0x83,'\0','\1','\2',0x63,'b','a','r',0x83,'\3','\4','\5'};
 
-    cbor::cbor_view v{packed};
+    cbors::cbor_view v{packed};
     for (auto member : v.object_range())
     {
         std::cout << member.key() << ":" << std::endl;
@@ -109,7 +109,7 @@ void cbor_view_array_range()
 
     std::vector<uint8_t> packed = {0x83,0x67,'T','o','r','o','n','t','o',0x69,'V','a','n','c','o','u','v','e','r',0x68,'M','o','n','t','r','e','a','l'};
 
-    cbor::cbor_view v{packed};
+    cbors::cbor_view v{packed};
     for (auto element : v.array_range())
     {
         std::cout << element.as_string() << std::endl;

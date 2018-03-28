@@ -217,11 +217,11 @@ int main()
     )");
 
     std::vector<uint8_t> data;
-    cbor::encode_cbor(j, data);
+    cbors::encode_cbor(j, data);
 
     std::error_code ec;
-    cbor::cbor_view rated = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rated", ec);
-    cbor::cbor_view rating = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rating", ec);
+    cbors::cbor_view rated = jsonpointer::get(cbors::cbor_view(data), "/reputons/0/rated", ec);
+    cbors::cbor_view rating = jsonpointer::get(cbors::cbor_view(data), "/reputons/0/rating", ec);
 
     std::cout << rated.as_string() << ", " << rating.as_double() << std::endl;
 }

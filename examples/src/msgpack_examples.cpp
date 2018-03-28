@@ -6,7 +6,7 @@
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpack;
+using namespace jsoncons::msgpacks;
 
 void message_pack_example1()
 {
@@ -26,7 +26,7 @@ ojson j1 = ojson::parse(R"(
 )");
 
     std::vector<uint8_t> v;
-    jsoncons::msgpack::encode_msgpack(j1, v);
+    jsoncons::msgpacks::encode_msgpack(j1, v);
 
     ojson j2 = decode_msgpack<ojson>(v);
 

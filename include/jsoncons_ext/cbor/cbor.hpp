@@ -43,7 +43,7 @@
 #define JSONCONS_CBOR_0xa0_0xb7 \
         0xa0:case 0xa1:case 0xa2:case 0xa3:case 0xa4:case 0xa5:case 0xa6:case 0xa7:case 0xa8:case 0xa9:case 0xaa:case 0xab:case 0xac:case 0xad:case 0xae:case 0xaf:case 0xb0:case 0xb1:case 0xb2:case 0xb3:case 0xb4:case 0xb5:case 0xb6:case 0xb7
 
-namespace jsoncons { namespace cbor {
+namespace jsoncons { namespace cbors {
   
 class cbor_decode_error : public std::invalid_argument, public virtual json_exception
 {
@@ -2114,6 +2114,13 @@ public:
         }
         return val;
     }
+protected:
+
+    void set_data(const uint8_t* data, size_t length)
+    {
+        first_ = data;
+        last_ = data + length;
+    }    
 };
 
 struct Encode_cbor_
@@ -2758,6 +2765,36 @@ public:
         }
         return result;
     }
+
+};
+
+class cbor : public cbor_view
+{
+    std::vector<uint8_t> data_;
+public:
+
+    cbor() = default;
+    cbor(const cbor& val)
+        : data_(val.data_)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    cbor(cbor&& val)
+        : data_(std::move(val.data_))
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    cbor(const std::vector<uint8_t>& val)
+        : data_(val)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    cbor(std::vector<uint8_t>&& val)
+        : data_(val)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+
 };
 
 template<class Json>

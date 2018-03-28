@@ -1,4 +1,4 @@
-### jsoncons::msgpack::encode_msgpack
+### jsoncons::msgpacks::encode_msgpack
 
 Encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 
@@ -23,7 +23,7 @@ void encode_msgpack(const Json& jval, std::vector<uint8_t>& v)
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpack;
+using namespace jsoncons::msgpacks;
 
 int main()
 {

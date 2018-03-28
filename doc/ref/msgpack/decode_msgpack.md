@@ -1,4 +1,4 @@
-### jsoncons::msgpack::decode_msgpack
+### jsoncons::msgpacks::decode_msgpack
 
 Decodes a [MessagePack](http://msgpack.org/index.html) binary serialization format to a json value.
 
