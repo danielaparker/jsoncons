@@ -1,4 +1,4 @@
-### jsoncons::cbors::cbor_view::is
+### jsoncons::cbor::cbor_view::is
 
 ```c++
 bool is_null() const; // (1)

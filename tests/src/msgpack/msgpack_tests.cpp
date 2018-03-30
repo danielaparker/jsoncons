@@ -15,7 +15,7 @@
 #include <limits>
 
 using namespace jsoncons;
-using namespace jsoncons::msgpacks;
+using namespace jsoncons::msgpack;
 
 BOOST_AUTO_TEST_SUITE(msgpack_tests)
 

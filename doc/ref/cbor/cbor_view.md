@@ -1,4 +1,4 @@
-### jsoncons::cbors::cbor_view
+### jsoncons::cbor::cbor_view
 
 A `cbor_view` is a non-owning reference to a contiguous sequence of bytes within a packed cbor object.
 The first byte in the sequence contains the type of the CBOR value.
@@ -133,11 +133,11 @@ int main()
     )");
 
     std::vector<uint8_t> data;
-    cbors::encode_cbor(j, data);
+    cbor::encode_cbor(j, data);
 
     std::error_code ec;
-    cbors::cbor_view rated = jsonpointer::get(cbors::cbor_view(data), "/reputons/0/rated", ec);
-    cbors::cbor_view rating = jsonpointer::get(cbors::cbor_view(data), "/reputons/0/rating", ec);
+    cbor::cbor_view rated = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rated", ec);
+    cbor::cbor_view rating = jsonpointer::get(cbor::cbor_view(data), "/reputons/0/rating", ec);
 
     std::cout << rated.as_string() << ", " << rating.as_double() << std::endl;
 }

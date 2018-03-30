@@ -16,7 +16,7 @@
 #include <limits>
 
 using namespace jsoncons;
-using namespace jsoncons::cbors;
+using namespace jsoncons::cbor;
 
 BOOST_AUTO_TEST_SUITE(cbor_view_tests)
 

@@ -1,4 +1,4 @@
-### jsoncons::cbors::encode_cbor
+### jsoncons::cbor::encode_cbor
 
 Encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
 
@@ -53,9 +53,9 @@ int main()
     j1["Key too long for small string optimization"] = "String too long for small string optimization";
 
     std::vector<uint8_t> v;
-    cbors::encode_cbor(j1, v);
+    cbor::encode_cbor(j1, v);
 
-    ojson j2 = cbors::decode_cbor<ojson>(v);
+    ojson j2 = cbor::decode_cbor<ojson>(v);
 
     std::cout << pretty_print(j2) << std::endl;
 }
@@ -104,7 +104,7 @@ int main()
     json j(byte_string("Hello"));
 
     std::vector<uint8_t> buf;
-    cbors::encode_cbor(j, buf);
+    cbor::encode_cbor(j, buf);
 
     std::cout << std::hex << std::showbase << (int)buf[0];
     for (size_t i = 1; i < buf.size(); ++i)
