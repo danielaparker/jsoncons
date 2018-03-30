@@ -2114,6 +2114,42 @@ public:
         }
         return val;
     }
+protected:
+
+    void set_data(const uint8_t* data, size_t length)
+    {
+        first_ = data;
+        last_ = data + length;
+    }    
+};
+
+class packed_cbor : public cbor_view
+{
+    std::vector<uint8_t> data_;
+public:
+
+    packed_cbor() = default;
+    packed_cbor(const packed_cbor& val)
+        : data_(val.data_)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    packed_cbor(packed_cbor&& val)
+        : data_(std::move(val.data_))
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    packed_cbor(const std::vector<uint8_t>& val)
+        : data_(val)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+    packed_cbor(std::vector<uint8_t>&& val)
+        : data_(val)
+    {
+        this->set_data(data_.data(),data_.size());
+    }
+
 };
 
 struct Encode_cbor_

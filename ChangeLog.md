@@ -1,6 +1,8 @@
 master
 ------
 
+Enhancements
+
 The CSV extension now supports multi-valued fields separated by subfield delimiters
 
 v0.104.0
