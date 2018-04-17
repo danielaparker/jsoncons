@@ -1256,8 +1256,7 @@ private:
                     }
                     else
                     {
-                        double d = to_double_(buffer.data(), buffer.length());
-                        handler.double_value(d, number_format(format), *this);
+                        handler.string_value(value, *this);
                     }
                 }
                 else
@@ -1269,8 +1268,7 @@ private:
                     }
                     else
                     {
-                        double d = to_double_(buffer.data(), buffer.length());
-                        handler.double_value(d, number_format(format), *this);
+                        handler.string_value(value, *this);
                     }
                 }
                 break;
