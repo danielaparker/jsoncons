@@ -45,6 +45,13 @@ struct json_convert
         auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
         j.dump(s);
     }
+
+    template <class CharT>
+    static void encode(const T& val, basic_json_output_handler<CharT>& serializer)
+    {
+        auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
+        j.dump(serializer);
+    }
 };
 
 // vector like
@@ -67,15 +74,17 @@ struct json_convert<T,
     static void encode(const T& val, std::basic_string<CharT>& s)
     {
         basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s);
+        encode(val,serializer);
+    }
+
+    template <class CharT>
+    static void encode(const T& val, basic_json_output_handler<CharT>& serializer)
+    {
         serializer.begin_json();
         serializer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            if (it != std::begin(val))
-            {
-                s.push_back(',');
-            }
-            json_convert<value_type>::encode(*it,s);
+            json_convert<value_type>::encode(*it,serializer);
         }
         serializer.end_array();
         serializer.end_json();
@@ -100,15 +109,17 @@ struct json_convert<std::array<T,N>>
     static void encode(const std::array<T, N>& val, std::basic_string<CharT>& s)
     {
         basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s);
+        encode(val,serializer);
+    }
+
+    template <class CharT>
+    static void encode(const std::array<T, N>& val, basic_json_output_handler<CharT>& serializer)
+    {
         serializer.begin_json();
         serializer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            if (it != std::begin(val))
-            {
-                s.push_back(',');
-            }
-            json_convert<value_type>::encode(*it,s);
+            json_convert<value_type>::encode(*it,serializer);
         }
         serializer.end_array();
         serializer.end_json();
@@ -136,18 +147,18 @@ struct json_convert<T,
     static void encode(const T& val, std::basic_string<CharT>& s)
     {
         basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s);
+        encode(val,serializer);
+    }
+
+    template <class CharT>
+    static void encode(const T& val, basic_json_output_handler<CharT>& serializer)
+    {
         serializer.begin_json();
         serializer.begin_object();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            if (it != std::begin(val))
-            {
-                s.push_back(',');
-            }
-            s.push_back('\"');
-            s.append(it->first);
-            s.append("\":");
-            json_convert<mapped_type>::encode(it->second,s);
+            serializer.name(it->first);
+            json_convert<mapped_type>::encode(it->second,serializer);
         }
         serializer.end_object();
         serializer.end_json();
