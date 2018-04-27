@@ -36,7 +36,7 @@ struct json_convert
     static T decode(const std::basic_string<CharT>& s)
     {
         basic_json<CharT> j = basic_json<CharT>::parse(s);
-        return j.as<T>();
+        return j. template as<T>();
     }
 
     template <class CharT>
@@ -60,7 +60,7 @@ struct json_convert<T,
     static T decode(const std::basic_string<CharT>& s)
     {
         basic_json<CharT> j = basic_json<CharT>::parse(s);
-        return j.as<T>();
+        return j. template as<T>();
     }
 
     template <class CharT>
@@ -96,7 +96,7 @@ struct json_convert<T,
     static T decode(const std::basic_string<CharT>& s)
     {
         basic_json<CharT> j = basic_json<CharT>::parse(s);
-        return j.as<T>();
+        return j. template as<T>();
     }
 
     template <class CharT>
