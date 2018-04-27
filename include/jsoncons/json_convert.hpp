@@ -40,19 +40,14 @@ struct json_convert
     }
 
     template <class CharT>
-    static void encode(const T& val, std::basic_string<CharT>& s)
-    {
-        auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
-        j.dump(s);
-    }
-
-    template <class CharT>
     static void encode(const T& val, basic_json_output_handler<CharT>& serializer)
     {
         auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
         j.dump(serializer);
     }
 };
+
+// json_convert specializations
 
 // vector like
 
@@ -68,13 +63,6 @@ struct json_convert<T,
     {
         basic_json<CharT> j = basic_json<CharT>::parse(s);
         return j. template as<T>();
-    }
-
-    template <class CharT>
-    static void encode(const T& val, std::basic_string<CharT>& s)
-    {
-        basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s);
-        encode(val,serializer);
     }
 
     template <class CharT>
@@ -144,13 +132,6 @@ struct json_convert<T,
     }
 
     template <class CharT>
-    static void encode(const T& val, std::basic_string<CharT>& s)
-    {
-        basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s);
-        encode(val,serializer);
-    }
-
-    template <class CharT>
     static void encode(const T& val, basic_json_output_handler<CharT>& serializer)
     {
         serializer.begin_json();
@@ -164,6 +145,90 @@ struct json_convert<T,
         serializer.end_json();
     }
 };
+
+// decode_json
+
+template <class T, class CharT>
+T decode_json(const std::basic_string<CharT>& s)
+{
+    return json_convert<T>::decode(s);
+}
+
+// encode_json
+
+template <class T, class CharT>
+void encode_json(const T& val, basic_json_output_handler<CharT>& handler)
+{
+    handler.begin_json();
+    json_convert<T>::encode(val,handler);
+    handler.end_json();
+}
+
+template <class T, class CharT>
+void dump_fragment(const T& val, basic_json_output_handler<CharT>& handler)
+{
+    json_convert<T>::encode(val,handler);
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, std::basic_ostream<CharT>& os)
+{
+    basic_json_serializer<CharT> serializer(os);
+    encode_json(val, serializer);
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, const basic_serialization_options<CharT>& options,
+          std::basic_ostream<CharT>& os)
+{
+    basic_json_serializer<CharT> serializer(os, options);
+    encode_json(val, serializer);
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, std::basic_ostream<CharT>& os, bool pprint)
+{
+    basic_json_serializer<CharT> serializer(os, pprint);
+    encode_json(val, serializer);
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, const basic_serialization_options<CharT>& options,
+          std::basic_ostream<CharT>& os, bool pprint)
+{
+    basic_json_serializer<CharT> serializer(os, options, pprint);
+    encode_json(val, serializer);
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, std::basic_string<CharT>& s)
+{
+    basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s);
+    encode_json(val, serializer);
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, const basic_serialization_options<CharT>& options,
+          std::basic_string<CharT>& s)
+{
+    basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s, options);
+    encode_json(val, serializer);
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, std::basic_string<CharT>& s, bool pprint)
+{
+    basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s, pprint);
+    encode_json(val, serializer);
+}
+
+template <class T, class CharT>
+void encode_json(const T& val, const basic_serialization_options<CharT>& options,
+          std::basic_string<CharT,detail::string_writer<CharT>>& s, bool pprint)
+{
+    basic_json_serializer<CharT> serializer(s, options, pprint);
+    encode_json(val, serializer);
+}
 
 }
 #if defined(__GNUC__)
