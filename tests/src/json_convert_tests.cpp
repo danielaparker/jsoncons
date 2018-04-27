@@ -47,8 +47,25 @@ BOOST_AUTO_TEST_CASE(convert_map_test)
 
     std::string s;
     jsoncons::json_convert<std::map<std::string,double>>::encode(m,s);
+    auto result = jsoncons::json_convert<std::map<std::string,double>>::decode(s);
 
-    std::cout << s << std::endl;
+    BOOST_REQUIRE(result.size() == m.size());
+    BOOST_CHECK(m["a"] == result["a"]);
+    BOOST_CHECK(m["b"] == result["b"]);
+}
+
+BOOST_AUTO_TEST_CASE(convert_array_test)
+{
+    std::array<double,4> v{1,2,3,4};
+
+    std::string s;
+    jsoncons::json_convert<std::array<double,4>>::encode(v,s);
+    std::array<double, 4> result = jsoncons::json_convert<std::array<double,4>>::decode(s);
+    BOOST_REQUIRE(result.size() == v.size());
+    for (size_t i = 0; i < result.size(); ++i)
+    {
+        BOOST_CHECK_EQUAL(v[i],result[i]);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

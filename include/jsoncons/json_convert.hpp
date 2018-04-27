@@ -82,6 +82,39 @@ struct json_convert<T,
     }
 };
 
+// std::array
+
+template <class T, size_t N>
+struct json_convert<std::array<T,N>>
+{
+    typedef typename std::array<T,N>::value_type value_type;
+
+    template <class CharT>
+    static std::array<T, N> decode(const std::basic_string<CharT>& s)
+    {
+        basic_json<CharT> j = basic_json<CharT>::parse(s);
+        return j. template as<std::array<T, N>>();
+    }
+
+    template <class CharT>
+    static void encode(const std::array<T, N>& val, std::basic_string<CharT>& s)
+    {
+        basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s);
+        serializer.begin_json();
+        serializer.begin_array();
+        for (auto it = std::begin(val); it != std::end(val); ++it)
+        {
+            if (it != std::begin(val))
+            {
+                s.push_back(',');
+            }
+            json_convert<value_type>::encode(*it,s);
+        }
+        serializer.end_array();
+        serializer.end_json();
+    }
+};
+
 // map like
 
 template <class T>
