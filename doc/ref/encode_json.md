@@ -20,11 +20,11 @@ void encode_json(const T& val, const basic_serialization_options<CharT>& options
                  std::basic_ostream<CharT>& os); // (4)
 
 template <class T, class CharT>
-void encode_json(const T& val, std::basic_ostream<CharT>& os, bool pprint); // (5)
+void encode_json(const T& val, std::basic_ostream<CharT>& os, pretty_printer pprinter); // (5)
 
 template <class T, class CharT>
 void encode_json(const T& val, const basic_serialization_options<CharT>& options,
-                 std::basic_ostream<CharT>& os, bool pprint); // (6)
+                 std::basic_ostream<CharT>& os, pretty_printer pprinter); // (6)
 ```
 
 (1) Calls `begin_json()` on `handler`, applies `json_convert_traits` to serialize `val` to JSON output stream, and calls `end_json()` on `handler`.
@@ -88,8 +88,8 @@ int main()
     };
 
     std::string s;
-    jsoncons::encode_json(employees,s);
-    std::cout << "(1) " << s << std::endl;
+    jsoncons::encode_json(employees, s, jsoncons::pretty_printer());
+    std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employees_collection>(s);
 
     std::cout << "\n(2)\n";
@@ -101,7 +101,11 @@ int main()
 ```
 Output:
 ```
-(1) {"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
+(1)
+{
+    "Jane Doe": ["Commission","Sales",20000.0],
+    "John Smith": ["Hourly","Software Engineer",10000.0]
+}
 
 (2)
 Jane Doe: Sales

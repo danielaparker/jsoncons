@@ -11,6 +11,23 @@
 #include <cstdint>
 
 using namespace jsoncons;
+// own vector will always be of an even length 
+struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
+
+namespace jsoncons {
+template<class Json>
+struct json_type_traits<Json, own_vector> {
+    static bool is(const Json& rhs) noexcept { return true; }
+    static own_vector as(const Json& rhs) { return own_vector(); }
+    static Json to_json(const own_vector& val) {
+        Json j;
+        for (uint64_t i = 0; i<val.size(); i = i + 2) {
+            j[std::to_string(val[i])] = val[i + 1];
+        }
+        return j;
+    }
+};
+};
 
 BOOST_AUTO_TEST_SUITE(json_type_traits_tests)
 
@@ -114,6 +131,10 @@ BOOST_AUTO_TEST_CASE(test_byte_string_as_vector)
     BOOST_CHECK('o' == bs[4]);
 }
 
+BOOST_AUTO_TEST_CASE(test_own_vector)
+{
+    jsoncons::json j = own_vector({0,9,8,7});
+    std::cout << j;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
-
-

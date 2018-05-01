@@ -386,8 +386,8 @@ int main()
     };
 
     std::string s;
-    jsoncons::encode_json(employees,s);
-    std::cout << "(1) " << s << std::endl;
+    jsoncons::encode_json(employees, s, jsoncons::pretty_printer());
+    std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employees_collection>(s);
 
     std::cout << "\n(2)\n";
@@ -399,7 +399,11 @@ int main()
 ```
 Output:
 ```
-(1) {"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
+(1)
+{
+    "Jane Doe": ["Commission","Sales",20000.0],
+    "John Smith": ["Hourly","Software Engineer",10000.0]
+}
 
 (2)
 Jane Doe: Sales

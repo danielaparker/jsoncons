@@ -139,8 +139,8 @@ BOOST_AUTO_TEST_CASE(convert_tuple_test)
     };
 
     std::string s;
-    jsoncons::encode_json(employees,s);
-    std::cout << "(1) " << s << std::endl;
+    jsoncons::encode_json(employees, s, jsoncons::pretty_printer());
+    std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employees_collection>(s);
     BOOST_REQUIRE(employees2.size() == employees.size());
 
