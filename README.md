@@ -39,10 +39,13 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 ### What's new on master
 
-`decode_csv` by default now attempts to infer null, true, false, integer and floating point values
-in the CSV source. In previous versions the default was to read everything as strings,
-and other types had to be specified explicitly. If the new default behavior is not desired, the
-`csv_parameters` option `infer_types` can be set to `false`. Column types can still be set explicitly.
+- The CSV extension now supports multi-valued fields separated by subfield delimiters
+
+- New functions `decode_json` and `encode_json` have been added that convert JSON 
+  formatted strings to C++ objects and back. These functions attempts to 
+  perform the conversion by streaming using `json_convert_traits`, and if
+  streaming is not supported, fall back to using `json_type_traits`. `decode_json` 
+  and `encode_json` will work for all types that have `json_type_traits` defined.
 
 ### Extensions
 
