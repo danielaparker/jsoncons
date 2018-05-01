@@ -23,9 +23,15 @@
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/json.hpp>
 
 namespace jsoncons {
+
+struct sorted_policy;
+
+template <class CharT, 
+          class ImplementationPolicy = sorted_policy, 
+          class Allocator = std::allocator<CharT>>
+class basic_json;
 
 // json_convert_traits
 
