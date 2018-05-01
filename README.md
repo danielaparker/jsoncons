@@ -127,7 +127,10 @@ Output:
 
 ### About jsoncons::basic_json
 
-The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different character types, different policies for ordering name-value pairs, etc.
+The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different 
+character types, different policies for ordering name-value pairs, etc. A `basic_json` provides an unpacked representation 
+of JSON-like string or binary data formats, and defines an interface for accessing and modifying that data.
+
 ```c++
 typedef basic_json<char,
                    ImplementationPolicy = sorted_policy,
@@ -142,9 +145,6 @@ The library includes four instantiations of `basic_json`:
 - [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
 
 - [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
-
-A `basic_json` value is an unpacked representation of JSON-like string or binary data formats, and defines an interface
-for accessing and modifying that data.
 
 ### Features
 
