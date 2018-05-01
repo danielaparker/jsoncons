@@ -2,7 +2,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 ### Core
 
-#### json container
+#### Unpacked Representation
 
 [json](ref/json.md)  
 [json_reader](ref/json_reader.md)  
@@ -15,9 +15,13 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [wojson](ref/wojson.md)  
 
-#### Streaming
+#### C++/JSON Conversion
 
-[dump](ref/dump.md)
+[encode_json](ref/encode_json.md)
+
+[decode_json](ref/decode_json.md)
+
+#### Streaming
 
 [json_input_handler](ref/json_input_handler.md)  
 
