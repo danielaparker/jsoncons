@@ -1,4 +1,15 @@
-jsoncons is a modern C++, header-only library for constructing [JSON](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
+jsoncons is a modern C++, header-only library for constructing [JSON](http://www.json.org). It supports 
+
+- Parsing JSON-like text or binary (e.g. CBOR) data formats into an unpacked represenation
+  that defines an interface for accessing and modifying that data.
+
+- Serializing the unpacked representation into different JSON-like text or binary data formats.
+
+- Converting from JSON-like text or binary data to C++ objects and back.
+
+- Streaming JSON events, somewhat analogously to SAX processing in the XML world. 
+
+It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
 
@@ -314,16 +325,15 @@ and [json::merge_or_update](doc/ref/json/merge_or_update.md) for details.
 #### Convert json values from and to standard library types
 
 ```c++
-    std::vector<int> v{1, 2, 3, 4};
-    json j(v);
-    std::cout << "(1) "<< j << std::endl;
-    std::deque<int> d = j.as<std::deque<int>>();
+std::vector<int> v{1, 2, 3, 4};
+json j(v);
+std::cout << "(1) "<< j << std::endl;
+std::deque<int> d = j.as<std::deque<int>>();
 
-    std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
-    json j(m);
-    std::cout << "(2) " << j << std::endl;
-    std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
-
+std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
+json j(m);
+std::cout << "(2) " << j << std::endl;
+std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
 ```
 Output:
 ```

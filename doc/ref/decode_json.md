@@ -17,4 +17,50 @@ T decode_json(const std::basic_string<CharT>& s)
 }
 ```
 
+### Examples
+
+#### Map with string-tuple pairs
+
+```c++
+#include <iostream>
+#include <map>
+#include <tuple>
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employees_collection;
+
+    employees_collection employees = 
+    { 
+        {"John Smith",{"Hourly","Software Engineer",10000}},
+        {"Jane Doe",{"Commission","Sales",20000}}
+    };
+
+    std::string s;
+    jsoncons::encode_json(employees, s, jsoncons::pretty_printer());
+    std::cout << "(1)\n" << s << std::endl;
+    auto employees2 = jsoncons::decode_json<employees_collection>(s);
+
+    std::cout << "\n(2)\n";
+    for (const auto& pair : employees2)
+    {
+        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
+    }
+}
+```
+Output:
+```
+(1)
+{
+    "Jane Doe": ["Commission","Sales",20000.0],
+    "John Smith": ["Hourly","Software Engineer",10000.0]
+}
+
+(2)
+Jane Doe: Sales
+John Smith: Software Engineer
+```
 
