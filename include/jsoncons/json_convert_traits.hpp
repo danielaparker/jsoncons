@@ -145,6 +145,58 @@ struct json_convert_traits<T,
     }
 };
 
+// std::tuple
+
+namespace detail { namespace streaming {
+
+template<size_t Pos, class Tuple>
+struct tuple_helper
+{
+    using element_type = typename std::tuple_element<std::tuple_size<Tuple>::value - Pos, Tuple>::type;
+    using next = tuple_helper<Pos - 1, Tuple>;
+    
+    template <class CharT>
+    static void encode(const Tuple& tuple, basic_json_output_handler<CharT>& handler)
+    {
+        json_convert_traits<element_type>::encode(std::get<std::tuple_size<Tuple>::value - Pos>(tuple),handler);
+        next::encode(tuple, handler);
+    }
+};
+
+template<class Tuple>
+struct tuple_helper<0, Tuple>
+{
+    template <class CharT>
+    static void encode(const Tuple&, basic_json_output_handler<CharT>&)
+    {
+    }
+};
+
+}}
+
+template<typename... E>
+struct json_convert_traits<std::tuple<E...>>
+{
+private:
+    using helper = detail::streaming::tuple_helper<sizeof...(E), std::tuple<E...>>;
+public:
+
+    template <class CharT>
+    static std::tuple<E...> decode(const std::basic_string<CharT>& s)
+    {
+        basic_json<CharT> j = basic_json<CharT>::parse(s);
+        return j. template as<std::tuple<E...>>();
+    }
+
+    template <class CharT>
+    static void encode(const std::tuple<E...>& val, basic_json_output_handler<CharT>& serializer)
+    {
+        serializer.begin_array();
+        helper::encode(val, serializer);
+        serializer.end_array();
+    }
+};
+
 // decode_json
 
 template <class T, class CharT>
@@ -164,7 +216,7 @@ void encode_json(const T& val, basic_json_output_handler<CharT>& handler)
 }
 
 template <class T, class CharT>
-void dump_fragment(const T& val, basic_json_output_handler<CharT>& handler)
+void encode_fragment(const T& val, basic_json_output_handler<CharT>& handler)
 {
     json_convert_traits<T>::encode(val,handler);
 }
@@ -185,17 +237,17 @@ void encode_json(const T& val, const basic_serialization_options<CharT>& options
 }
 
 template <class T, class CharT>
-void encode_json(const T& val, std::basic_ostream<CharT>& os, bool pprint)
+void encode_json(const T& val, std::basic_ostream<CharT>& os, pretty_printer pprinter)
 {
-    basic_json_serializer<CharT> serializer(os, pprint);
+    basic_json_serializer<CharT> serializer(os, true);
     encode_json(val, serializer);
 }
 
 template <class T, class CharT>
 void encode_json(const T& val, const basic_serialization_options<CharT>& options,
-          std::basic_ostream<CharT>& os, bool pprint)
+          std::basic_ostream<CharT>& os, pretty_printer pprinter)
 {
-    basic_json_serializer<CharT> serializer(os, options, pprint);
+    basic_json_serializer<CharT> serializer(os, options, true);
     encode_json(val, serializer);
 }
 
@@ -215,17 +267,17 @@ void encode_json(const T& val, const basic_serialization_options<CharT>& options
 }
 
 template <class T, class CharT>
-void encode_json(const T& val, std::basic_string<CharT>& s, bool pprint)
+void encode_json(const T& val, std::basic_string<CharT>& s, pretty_printer pprinter)
 {
-    basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s, pprint);
+    basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s, true);
     encode_json(val, serializer);
 }
 
 template <class T, class CharT>
 void encode_json(const T& val, const basic_serialization_options<CharT>& options,
-          std::basic_string<CharT,detail::string_writer<CharT>>& s, bool pprint)
+          std::basic_string<CharT,detail::string_writer<CharT>>& s, pretty_printer pprinter)
 {
-    basic_json_serializer<CharT> serializer(s, options, pprint);
+    basic_json_serializer<CharT> serializer(s, options, true);
     encode_json(val, serializer);
 }
 

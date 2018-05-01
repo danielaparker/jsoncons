@@ -132,6 +132,9 @@ The library includes four instantiations of `basic_json`:
 
 - [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
+A `basic_json` value is an unpacked representation of JSON-like string or binary data formats, and defines an interface
+for accessing and modifying that data.
+
 ### Features
 
 #### By default, accepts and ignores C-style comments
@@ -362,45 +365,51 @@ See [json_type_traits](doc/ref/json_type_traits.md)
 
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
-#### Serialize C++ objects directly to JSON formatted streams
+#### Convert JSON formatted text to C++ objects, and back
 
 ```c++
 #include <iostream>
 #include <map>
 #include <tuple>
-#include <jsoncons/serialization_traits.hpp>
+#include <jsoncons/json.hpp>
 
 using namespace jsoncons;
 
 int main()
 {
-    std::map<std::string,std::tuple<std::string,std::string,double>> employees = 
+    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employees_collection;
+
+    employees_collection employees = 
     { 
         {"John Smith",{"Hourly","Software Engineer",10000}},
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
-    std::cout << "(1)\n" << std::endl; 
-    dump(employees,std::cout);
-    std::cout << "\n\n";
+    std::string s;
+    jsoncons::encode_json(employees,s);
+    std::cout << "(1) " << s << std::endl;
+    auto employees2 = jsoncons::decode_json<employees_collection>(s);
 
-    std::cout << "(2) Again, with pretty print\n" << std::endl; 
-    dump(employees,std::cout,true);
+    std::cout << "\n(2)\n";
+    for (const auto& pair : employees2)
+    {
+        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
+    }
 }
-```
 ```
 Output:
-(1)
-{"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
+```
+(1) {"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
 
-(2) Again, with pretty print
-{
-    "Jane Doe": ["Commission","Sales",20000.0],
-    "John Smith": ["Hourly","Software Engineer",10000.0]
-}
+(2)
+Jane Doe: Sales
+John Smith: Software Engineer
 ```
 
-See [dump](doc/ref/dump.md)
+`decode_json` and `encode_json` are supported for many standard library types, and for  
+[user defined types](doc/Tutorials/Type%20Extensibility.md)
+
+See [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
 
 #### Dump json fragments into a larger document
 
