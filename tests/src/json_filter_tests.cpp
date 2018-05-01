@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
     BOOST_CHECK_CLOSE(31.96,j["store"]["book"][0]["price"].as<double>(),0.001);
 
     std::stringstream ss;
-    json_serializer serializer(ss, false);
+    json_serializer serializer(ss);
     rename_object_member_filter filter("price","price2",serializer);
     j.dump(filter);
 
