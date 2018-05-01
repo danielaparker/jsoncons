@@ -620,7 +620,10 @@ private:
 };
 
 typedef basic_json_serializer<char,detail::ostream_buffered_writer<char>> json_serializer;
-typedef basic_json_serializer<wchar_t, detail::ostream_buffered_writer<wchar_t>> wjson_serializer;
+typedef basic_json_serializer<wchar_t,detail::ostream_buffered_writer<wchar_t>> wjson_serializer;
+
+typedef basic_json_serializer<char,detail::string_writer<char>> json_string_serializer;
+typedef basic_json_serializer<wchar_t,detail::string_writer<wchar_t>> wjson_string_serializer;
 
 }
 #endif

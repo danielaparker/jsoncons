@@ -3,7 +3,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <jsoncons/json_convert.hpp>
+#include <jsoncons/json.hpp>
 #include <sstream>
 #include <vector>
 #include <map>

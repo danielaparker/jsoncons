@@ -27,6 +27,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_convert_traits.hpp>
 #include <jsoncons/json_error_category.hpp>
 #include <jsoncons/detail/heap_only_string.hpp>
 

@@ -27,10 +27,10 @@
 
 namespace jsoncons {
 
-// json_convert
+// json_convert_traits
 
 template <class T, class Enable = void>
-struct json_convert
+struct json_convert_traits
 {
     template <class CharT>
     static T decode(const std::basic_string<CharT>& s)
@@ -47,12 +47,12 @@ struct json_convert
     }
 };
 
-// json_convert specializations
+// json_convert_traits specializations
 
 // vector like
 
 template <class T>
-struct json_convert<T,
+struct json_convert_traits<T,
     typename std::enable_if<detail::is_vector_like<T>::value
 >::type>
 {
@@ -72,7 +72,7 @@ struct json_convert<T,
         serializer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            json_convert<value_type>::encode(*it,serializer);
+            json_convert_traits<value_type>::encode(*it,serializer);
         }
         serializer.end_array();
         serializer.end_json();
@@ -82,7 +82,7 @@ struct json_convert<T,
 // std::array
 
 template <class T, size_t N>
-struct json_convert<std::array<T,N>>
+struct json_convert_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;
 
@@ -107,7 +107,7 @@ struct json_convert<std::array<T,N>>
         serializer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            json_convert<value_type>::encode(*it,serializer);
+            json_convert_traits<value_type>::encode(*it,serializer);
         }
         serializer.end_array();
         serializer.end_json();
@@ -117,7 +117,7 @@ struct json_convert<std::array<T,N>>
 // map like
 
 template <class T>
-struct json_convert<T,
+struct json_convert_traits<T,
     typename std::enable_if<detail::is_map_like<T>::value
 >::type>
 {
@@ -139,7 +139,7 @@ struct json_convert<T,
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             serializer.name(it->first);
-            json_convert<mapped_type>::encode(it->second,serializer);
+            json_convert_traits<mapped_type>::encode(it->second,serializer);
         }
         serializer.end_object();
         serializer.end_json();
@@ -151,7 +151,7 @@ struct json_convert<T,
 template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s)
 {
-    return json_convert<T>::decode(s);
+    return json_convert_traits<T>::decode(s);
 }
 
 // encode_json
@@ -160,14 +160,14 @@ template <class T, class CharT>
 void encode_json(const T& val, basic_json_output_handler<CharT>& handler)
 {
     handler.begin_json();
-    json_convert<T>::encode(val,handler);
+    json_convert_traits<T>::encode(val,handler);
     handler.end_json();
 }
 
 template <class T, class CharT>
 void dump_fragment(const T& val, basic_json_output_handler<CharT>& handler)
 {
-    json_convert<T>::encode(val,handler);
+    json_convert_traits<T>::encode(val,handler);
 }
 
 template <class T, class CharT>
