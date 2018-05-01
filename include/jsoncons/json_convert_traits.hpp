@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONCONVERT_HPP
-#define JSONCONS_JSONCONVERT_HPP
+#ifndef JSONCONS_JSONCONVERTTRAITS_HPP
+#define JSONCONS_JSONCONVERTTRAITS_HPP
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -25,13 +25,6 @@
 #include <jsoncons/json_type_traits.hpp>
 
 namespace jsoncons {
-
-struct sorted_policy;
-
-template <class CharT, 
-          class ImplementationPolicy = sorted_policy, 
-          class Allocator = std::allocator<CharT>>
-class basic_json;
 
 // json_convert_traits
 
