@@ -3,7 +3,23 @@ master
 
 Enhancements
 
-The CSV extension now supports multi-valued fields separated by subfield delimiters
+- The CSV extension now supports multi-valued fields separated by subfield delimiters
+
+- New functions `decode_json` and `encode_json` have been added that convert JSON 
+  formatted strings to C++ objects and back. These functions attempt to perform the 
+  conversion through streaming via `json_convert_traits`, and fall back to using 
+  `json_type_traits` if necessary. These functions will work for all types that 
+  have `json_type_traits` defined.
+
+Changes
+
+- `serialization_traits` and the related `dump` free functions have been deprecated,
+  as their functionality has been subsumed by `json_convert_traits` and the
+  `encode_json` functions. 
+
+- The option bool argument to indicate pretty printing in the `json` `dump` functions 
+  and the `json_serializer` has been deprecated. In its place, pass `jsoncons::pretty_printer()`.
+
 
 v0.104.0
 --------

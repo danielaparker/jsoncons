@@ -57,7 +57,7 @@ int main()
     A(1, 1) = 4;
 
     serialization_options options;
-    json_serializer os(std::cout, options, true); // pretty printing
+    json_serializer os(std::cout, options, jsoncons::pretty_printer()); 
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
     {

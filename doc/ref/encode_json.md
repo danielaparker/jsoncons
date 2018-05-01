@@ -1,6 +1,9 @@
 ### jsoncons::encode_json
 
-Serialize C++ object to a JSON formatted stream, governed by `json_convert_traits`
+Serializes a C++ object to a JSON formatted string or stream. `encode_json` attempts to 
+perform the conversion by streaming using `json_convert_traits`, and if
+streaming is not supported, falls back to using `json_type_traits`. `encode_json` will work for all types that
+have `json_type_traits` defined.
 
 #### Header
 ```c++
@@ -131,7 +134,7 @@ int main()
     };
 
     // `true` means pretty print
-    json_serializer serializer(std::cout, true); 
+    json_serializer serializer(std::cout, jsoncons::pretty_printer()); 
 
     serializer.begin_json();       
     serializer.begin_object();       
@@ -194,7 +197,7 @@ int main()
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    encode_json(A,oss,true);
+    encode_json(A, oss, jsoncons::pretty_printer());
 
     std::cout << oss.str() << std::endl;
 }

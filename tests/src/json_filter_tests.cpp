@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(test_filter)
     std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_serializer serializer(os, true);
+    json_serializer serializer(os, jsoncons::pretty_printer());
     name_fix_up_filter filter(serializer);
     json_reader reader(is, filter);
     reader.read_next();
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(test_filter2)
     std::ifstream is(in_file, std::ofstream::binary);
     std::ofstream os(out_file);
 
-    json_serializer serializer(os, true);
+    json_serializer serializer(os, jsoncons::pretty_printer());
 
     name_fix_up_filter filter2(serializer);
 

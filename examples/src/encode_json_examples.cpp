@@ -4,11 +4,11 @@
 #include <iostream>
 #include <map>
 #include <tuple>
-#include <jsoncons/serialization_traits.hpp>
+#include <jsoncons/json.hpp>
 
 using namespace jsoncons;
 
-namespace examples { namespace serialization_traits {
+namespace examples { namespace encode_json {
 
 class Employee
 {
@@ -53,12 +53,12 @@ public:
 };
 
 }}
-using namespace examples::serialization_traits;
+using namespace examples::encode_json;
 
 namespace jsoncons
 {
     template <>
-    struct serialization_traits<std::shared_ptr<Employee>>
+    struct json_convert_traits<std::shared_ptr<Employee>>
     {
         static void encode(const std::shared_ptr<Employee>& val, json_output_handler& handler)
         {
@@ -82,11 +82,11 @@ void streaming_example1()
     };
 
     std::cout << "(1)\n" << std::endl; 
-    dump(employees,std::cout);
+    encode_json(employees,std::cout);
     std::cout << "\n\n";
 
     std::cout << "(2) Again, with pretty print\n" << std::endl; 
-    dump(employees,std::cout,true);
+    encode_json(employees, std::cout, jsoncons::pretty_printer());
 
     std::cout << "\n\n";
 }
@@ -100,12 +100,12 @@ void streaming_example2()
     };
 
     // `true` means pretty print
-    json_serializer serializer(std::cout, true); 
+    json_serializer serializer(std::cout, jsoncons::pretty_printer()); 
 
     serializer.begin_json();       
     serializer.begin_object();       
     serializer.name("Employees");       
-    dump_fragment(employees, serializer);
+    encode_fragment(employees, serializer);
     serializer.end_object();       
     serializer.end_json();       
 
@@ -120,12 +120,12 @@ void streaming_example3()
     employees.push_back(std::make_shared<HourlyEmployee>("John Smith"));
     employees.push_back(std::make_shared<CommissionedEmployee>("Jane Doe"));
 
-    dump(employees,std::cout,true);
+    encode_json(employees, std::cout, jsoncons::pretty_printer());
 
     std::cout << "\n\n";
 }
 
-void streaming_examples()
+void encode_json_examples()
 {
     std::cout << "\nStreaming examples\n\n";
 

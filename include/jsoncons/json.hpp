@@ -2474,9 +2474,9 @@ public:
             evaluate().dump(os);
         }
 
-        void dump(std::basic_ostream<char_type>& os, bool pprint) const
+        void dump(std::basic_ostream<char_type>& os, pretty_printer pprinter) const
         {
-            evaluate().dump(os, pprint);
+            evaluate().dump(os, pprinter);
         }
 
         void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options) const
@@ -2484,11 +2484,21 @@ public:
             evaluate().dump(os,options);
         }
 
+        void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, pretty_printer pprinter) const
+        {
+            evaluate().dump(os,options,pprinter);
+        }
+#if !defined(JSONCONS_NO_DEPRECATED)
+
         void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, bool pprint) const
         {
             evaluate().dump(os,options,pprint);
         }
-#if !defined(JSONCONS_NO_DEPRECATED)
+
+        void dump(std::basic_ostream<char_type>& os, bool pprint) const
+        {
+            evaluate().dump(os, pprint);
+        }
 
         string_type to_string(const char_allocator_type& allocator = char_allocator_type()) const JSONCONS_NOEXCEPT
         {
@@ -3127,9 +3137,9 @@ public:
         dump(serializer);
     }
 
-    void dump(std::basic_ostream<char_type>& os, bool pprint) const
+    void dump(std::basic_ostream<char_type>& os, pretty_printer pprinter) const
     {
-        basic_json_serializer<char_type> serializer(os, pprint);
+        basic_json_serializer<char_type> serializer(os, pprinter);
         dump(serializer);
     }
 
@@ -3139,9 +3149,9 @@ public:
         dump(serializer);
     }
 
-    void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, bool pprint) const
+    void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, pretty_printer pprinter) const
     {
-        basic_json_serializer<char_type> serializer(os, options, pprint);
+        basic_json_serializer<char_type> serializer(os, options, pprinter);
         dump(serializer);
     }
 
@@ -3163,6 +3173,18 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    void dump(std::basic_ostream<char_type>& os, bool pprint) const
+    {
+        basic_json_serializer<char_type> serializer(os, pprint);
+        dump(serializer);
+    }
+
+    void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, bool pprint) const
+    {
+        basic_json_serializer<char_type> serializer(os, options, pprint);
+        dump(serializer);
+    }
 
     void write_body(basic_json_output_handler<char_type>& handler) const
     {

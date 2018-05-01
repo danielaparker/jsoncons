@@ -130,11 +130,12 @@ BOOST_AUTO_TEST_CASE(test_byte_string_as_vector)
     BOOST_CHECK('l' == bs[3]);
     BOOST_CHECK('o' == bs[4]);
 }
-
+/*
 BOOST_AUTO_TEST_CASE(test_own_vector)
 {
     jsoncons::json j = own_vector({0,9,8,7});
     std::cout << j;
 }
+*/
 
 BOOST_AUTO_TEST_SUITE_END()

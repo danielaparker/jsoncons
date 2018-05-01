@@ -23,10 +23,10 @@ void csv_examples();
 void jsonpath_examples();
 void json_is_as_examples();
 void msgpack_examples();
-void streaming_examples();
 void jsonpointer_examples();
 void jsonpatch_examples();
 void cbor_examples();
+void encode_json_examples();
 
 void comment_example()
 {
@@ -461,8 +461,6 @@ int main()
 
         msgpack_examples();
 
-        streaming_examples();
-
         validation_example();
 
         serialization_examples();
@@ -484,6 +482,8 @@ int main()
         jsonpointer_examples();
 
         csv_examples();
+
+        encode_json_examples();
     }
     catch (const std::exception& e)
     {

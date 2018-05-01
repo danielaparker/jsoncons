@@ -125,9 +125,9 @@ public:
     {
     }
 
-    basic_json_serializer(output_type& os, bool pprint)
+    basic_json_serializer(output_type& os, pretty_printer pprinter)
        : indent_(0), 
-         indenting_(pprint),
+         indenting_(true),
          fp_(options_.precision()),
          writer_(os)
     {
@@ -141,10 +141,11 @@ public:
          writer_(os)
     {
     }
-    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options, bool pprint)
+
+    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options, pretty_printer pprinter)
        : options_(options), 
          indent_(0), 
-         indenting_(pprint),  
+         indenting_(true),  
          fp_(options_.precision()),
          writer_(os)
     {
@@ -153,6 +154,27 @@ public:
     ~basic_json_serializer()
     {
     }
+
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    basic_json_serializer(output_type& os, bool pprint)
+       : indent_(0), 
+         indenting_(pprint),
+         fp_(options_.precision()),
+         writer_(os)
+    {
+    }
+
+    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options, bool pprint)
+       : options_(options), 
+         indent_(0), 
+         indenting_(pprint),  
+         fp_(options_.precision()),
+         writer_(os)
+    {
+    }
+#endif
 
 private:
     void escape_string(const CharT* s,
