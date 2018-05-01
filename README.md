@@ -344,7 +344,7 @@ Output:
 
 See [json_type_traits](doc/ref/json_type_traits.md)
 
-#### Convert from and to user defined types (and standard library containers of user defined types)
+#### Convert unpacked `json` values from and to user defined types (and standard library containers of user defined types)
 
 ```c++
     struct book
