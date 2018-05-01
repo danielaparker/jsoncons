@@ -4863,39 +4863,44 @@ std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<type
     return is;
 }
 
-template<class Json>
+template<class Json, class PrettyPrinter = void>
 class json_printable
 {
 public:
     typedef typename Json::char_type char_type;
 
-    json_printable(const Json& o,
-                   bool is_pretty_print)
-       : o_(&o), is_pretty_print_(is_pretty_print)
+    json_printable(const Json& o)
+       : o_(&o)
     {
     }
 
     json_printable(const Json& o,
-                   bool is_pretty_print,
                    const basic_serialization_options<char_type>& options)
-       : o_(&o), is_pretty_print_(is_pretty_print), options_(options)
+       : o_(&o), options_(options)
     {
-        ;
     }
 
-    void dump(std::basic_ostream<char_type>& os) const
+    template <class P = PrettyPrinter>
+    typename std::enable_if<std::is_void<P>::value,void>::type
+    dump(std::basic_ostream<char_type>& os) const
     {
-        o_->dump(os, options_, is_pretty_print_);
+        o_->dump(os, options_);
     }
 
-    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json>& o)
+    template <class P = PrettyPrinter>
+    typename std::enable_if<!std::is_void<P>::value,void>::type
+    dump(std::basic_ostream<char_type>& os) const
+    {
+        o_->dump(os, options_, PrettyPrinter());
+    }
+
+    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json,PrettyPrinter>& o)
     {
         o.dump(os);
         return os;
     }
 
     const Json *o_;
-    bool is_pretty_print_;
     basic_serialization_options<char_type> options_;
 private:
     json_printable();
@@ -4904,27 +4909,27 @@ private:
 template<class Json>
 json_printable<Json> print(const Json& val)
 {
-    return json_printable<Json>(val,false);
+    return json_printable<Json>(val);
 }
 
 template<class Json>
 json_printable<Json> print(const Json& val,
-                            const basic_serialization_options<typename Json::char_type>& options)
+                           const basic_serialization_options<typename Json::char_type>& options)
 {
-    return json_printable<Json>(val, false, options);
+    return json_printable<Json>(val, options);
 }
 
 template<class Json>
-json_printable<Json> pretty_print(const Json& val)
+json_printable<Json,pretty_printer> pretty_print(const Json& val)
 {
-    return json_printable<Json>(val,true);
+    return json_printable<Json, pretty_printer>(val);
 }
 
 template<class Json>
-json_printable<Json> pretty_print(const Json& val,
-                                   const basic_serialization_options<typename Json::char_type>& options)
+json_printable<Json, pretty_printer> pretty_print(const Json& val,
+                                                  const basic_serialization_options<typename Json::char_type>& options)
 {
-    return json_printable<Json>(val, true, options);
+    return json_printable<Json, pretty_printer>(val, options);
 }
 
 typedef basic_json<char,sorted_policy,std::allocator<char>> json;
