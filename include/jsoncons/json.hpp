@@ -17,6 +17,7 @@
 #include <memory>
 #include <typeinfo>
 #include <cstring>
+#include <jsoncons/json_fwd.hpp>
 #include <jsoncons/version.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
@@ -98,9 +99,7 @@ enum class json_type_tag : uint8_t
     object_t
 };
                         
-template <class CharT, 
-          class ImplementationPolicy = sorted_policy, 
-          class Allocator = std::allocator<CharT>>
+template <class CharT, class ImplementationPolicy, class Allocator>
 class basic_json
 {
 public:
