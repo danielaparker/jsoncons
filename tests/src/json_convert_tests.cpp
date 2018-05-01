@@ -130,9 +130,9 @@ BOOST_AUTO_TEST_CASE(convert_array_test)
 
 BOOST_AUTO_TEST_CASE(convert_tuple_test)
 {
-    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employees_collection;
+    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
 
-    employees_collection employees = 
+    employee_collection employees = 
     { 
         {"John Smith",{"Hourly","Software Engineer",10000}},
         {"Jane Doe",{"Commission","Sales",20000}}
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(convert_tuple_test)
     std::string s;
     jsoncons::encode_json(employees, s, jsoncons::pretty_printer());
     std::cout << "(1)\n" << s << std::endl;
-    auto employees2 = jsoncons::decode_json<employees_collection>(s);
+    auto employees2 = jsoncons::decode_json<employee_collection>(s);
     BOOST_REQUIRE(employees2.size() == employees.size());
 
     std::cout << "\n(2)\n";
