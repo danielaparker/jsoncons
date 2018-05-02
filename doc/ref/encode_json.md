@@ -54,8 +54,8 @@ void encode_json(const T& val, const basic_serialization_options<CharT>& options
     <td>Output stream</td> 
   </tr>
   <tr>
-    <td>pprint</td>
-    <td><code>true</code> to pretty print, otherwise <code>false</code></td> 
+    <td>indentation</td>
+    <td><code>indentation::indent</code> to pretty print, <code>indentation::no_indent</code> for compact output</td> 
   </tr>
 </table>
 
