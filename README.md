@@ -326,7 +326,7 @@ Output:
 See [json::merge](doc/ref/json/merge.md) 
 and [json::merge_or_update](doc/ref/json/merge_or_update.md) for details.
 
-#### Convert json values from and to standard library types
+#### Convert unpacked json values to standard library types and back
 
 ```c++
 std::vector<int> v{1, 2, 3, 4};
@@ -348,7 +348,7 @@ Output:
 
 See [json_type_traits](doc/ref/json_type_traits.md)
 
-#### Convert unpacked `json` values from and to user defined types (and standard library containers of user defined types)
+#### Convert unpacked `json` values to user defined types and back (also standard library containers of user defined types)
 
 ```c++
     struct book
