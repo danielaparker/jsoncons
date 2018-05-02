@@ -133,7 +133,6 @@ int main()
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
-    // `true` means pretty print
     json_serializer serializer(std::cout, jsoncons::indenting::indent); 
 
     serializer.begin_json();       
