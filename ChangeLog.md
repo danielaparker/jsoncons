@@ -5,8 +5,8 @@ Enhancements
 
 - The CSV extension now supports multi-valued fields separated by subfield delimiters
 
-- New functions `decode_json` and `encode_json` have been added that convert JSON 
-  formatted strings to C++ objects and back. These functions attempts to 
+- New functions `decode_json` and `encode_json` convert JSON 
+  formatted strings to C++ objects and back. These functions attempt to 
   perform the conversion by streaming using `json_convert_traits`, and if
   streaming is not supported, fall back to using `json_type_traits`. `decode_json` 
   and `encode_json` will work for all types that have `json_type_traits` defined.

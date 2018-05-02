@@ -41,7 +41,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 - The CSV extension now supports multi-valued fields separated by subfield delimiters
 
-- New functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) have been added that convert JSON 
+- New functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) convert JSON 
   formatted strings to C++ objects and back. These functions attempts to 
   perform the conversion by streaming using `json_convert_traits`, and if
   streaming is not supported, fall back to using `json_type_traits`. `decode_json` 
