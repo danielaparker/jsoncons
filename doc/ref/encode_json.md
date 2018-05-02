@@ -121,7 +121,7 @@ John Smith: Software Engineer
 #include <iostream>
 #include <map>
 #include <tuple>
-#include <jsoncons/serialization_traits.hpp>
+#include <jsoncons/json.hpp>
 
 using namespace jsoncons;
 
