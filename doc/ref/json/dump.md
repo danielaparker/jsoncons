@@ -10,11 +10,11 @@ void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
 
 void dump(std::ostream& os) const; // (3)
 
-void dump(std::ostream<CharT> os, bool pprint) const; // (4)
+void dump(std::ostream<CharT> os, indentation line_indent) const; // (4)
 
 void dump(std::ostream<CharT> os, const serialization_options& options) const; // (5)
 
-void dump(std::ostream<CharT> os, const serialization_options& options, bool pprint) const; // (6)
+void dump(std::ostream<CharT> os, const serialization_options& options, indentation line_indent) const; // (6)
 
 void dump(basic_json_output_handler<char_type>& output_handler) const; // (7)
 
@@ -27,11 +27,11 @@ void dump_fragment(json_output_handler& handler) const; // (8)
 
 (3) Inserts json value into stream with default serialization options. 
 
-(4) Inserts json value into stream using default serialization options and pretty print flag. 
+(4) Inserts json value into stream using default serialization options and the specified [indentation](../indentation.md). 
 
 (5) Inserts json value into stream using specified [serialization_options](../serialization_options.md). 
 
-(6) Inserts json value into stream using specified [serialization_options](../serialization_options.md) and pretty print flag. 
+(6) Inserts json value into stream using the specified [serialization_options](../serialization_options.md) and [indentation](../indentation.md). 
 
 (7) Calls `begin_json()` on [output_handler](../json_output_handler.md), emits json value to the [output_handler](../json_output_handler.md), and calls `end_json()` on [output_handler](../json_output_handler.md). 
 
