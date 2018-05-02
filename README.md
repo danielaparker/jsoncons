@@ -1,4 +1,4 @@
-jsoncons is a modern C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
+jsoncons is a C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
 data formats (e.g. CBOR). It supports 
 
 - Parsing JSON-like text or binary data into an unpacked representation
@@ -8,7 +8,7 @@ data formats (e.g. CBOR). It supports
 
 - Converting from JSON-like text or binary data to C++ objects and back.
 
-- Streaming JSON events, somewhat analogously to SAX processing in the XML world. 
+- Streaming JSON read and write events, somewhat analogously to SAX processing in the XML world. 
 
 It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
@@ -380,6 +380,12 @@ See [json_type_traits](doc/ref/json_type_traits.md)
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
 #### Convert JSON formatted text to C++ objects, and back
+
+The functions `decode_json` and `encode_json` convert JSON 
+formatted strings to C++ objects and back. These functions attempt to 
+perform the conversion by streaming json read and write events with the help of 'json_convert_traits', and if
+that is not supported, fall back to using `json_type_traits`. `decode_json` 
+and `encode_json` will work for all types that have `json_type_traits` defined.
 
 ```c++
 #include <iostream>
