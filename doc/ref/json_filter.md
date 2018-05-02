@@ -166,7 +166,7 @@ private:
 Configure a [rename_object_member_filter](rename_object_member_filter.md) to emit json events to a [json_serializer](json_serializer.md). 
 ```c++
 std::ofstream os("output/new-address-book.json");
-json_serializer serializer(os, jsoncons::pretty_printer());
+json_serializer serializer(os, jsoncons::indentation::indent);
 name_fix_up_filter filter(serializer);
 ```
 Parse the input and send the json events into the filter ...

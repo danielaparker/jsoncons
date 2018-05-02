@@ -40,7 +40,7 @@ int main()
     };
 
     std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::pretty_printer());
+    jsoncons::encode_json(employees, s, jsoncons::indentation::indent);
     std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employee_collection>(s);
 

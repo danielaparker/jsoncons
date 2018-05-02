@@ -86,7 +86,7 @@ void streaming_example1()
     std::cout << "\n\n";
 
     std::cout << "(2) Again, with pretty print\n" << std::endl; 
-    encode_json(employees, std::cout, jsoncons::pretty_printer());
+    encode_json(employees, std::cout, jsoncons::indentation::indent);
 
     std::cout << "\n\n";
 }
@@ -100,7 +100,7 @@ void streaming_example2()
     };
 
     // `true` means pretty print
-    json_serializer serializer(std::cout, jsoncons::pretty_printer()); 
+    json_serializer serializer(std::cout, jsoncons::indentation::indent); 
 
     serializer.begin_json();       
     serializer.begin_object();       
@@ -120,7 +120,7 @@ void streaming_example3()
     employees.push_back(std::make_shared<HourlyEmployee>("John Smith"));
     employees.push_back(std::make_shared<CommissionedEmployee>("Jane Doe"));
 
-    encode_json(employees, std::cout, jsoncons::pretty_printer());
+    encode_json(employees, std::cout, jsoncons::indentation::indent);
 
     std::cout << "\n\n";
 }

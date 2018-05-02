@@ -125,9 +125,9 @@ public:
     {
     }
 
-    basic_json_serializer(output_type& os, pretty_printer pprinter)
+    basic_json_serializer(output_type& os, indentation line_indent)
        : indent_(0), 
-         indenting_(true),
+         indenting_(line_indent == indentation::indent),
          fp_(options_.precision()),
          writer_(os)
     {
@@ -142,10 +142,10 @@ public:
     {
     }
 
-    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options, pretty_printer pprinter)
+    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options, indentation line_indent)
        : options_(options), 
          indent_(0), 
-         indenting_(true),  
+         indenting_(line_indent == indentation::indent),  
          fp_(options_.precision()),
          writer_(os)
     {

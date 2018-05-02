@@ -21,9 +21,7 @@
 
 namespace jsoncons {
 
-class pretty_printer
-{
-};
+enum class indentation {no_indent = 0, indent = 1};
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 enum class block_options {next_line,same_line};

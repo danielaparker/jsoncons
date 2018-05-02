@@ -23,11 +23,11 @@ void encode_json(const T& val, const basic_serialization_options<CharT>& options
                  std::basic_ostream<CharT>& os); // (4)
 
 template <class T, class CharT>
-void encode_json(const T& val, std::basic_ostream<CharT>& os, pretty_printer pprinter); // (5)
+void encode_json(const T& val, std::basic_ostream<CharT>& os, indentation line_indent); // (5)
 
 template <class T, class CharT>
 void encode_json(const T& val, const basic_serialization_options<CharT>& options,
-                 std::basic_ostream<CharT>& os, pretty_printer pprinter); // (6)
+                 std::basic_ostream<CharT>& os, indentation line_indent); // (6)
 ```
 
 (1) Calls `begin_json()` on `handler`, applies `json_convert_traits` to serialize `val` to JSON output stream, and calls `end_json()` on `handler`.
@@ -91,7 +91,7 @@ int main()
     };
 
     std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::pretty_printer());
+    jsoncons::encode_json(employees, s, jsoncons::indentation::indent);
     std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employee_collection>(s);
 
@@ -134,7 +134,7 @@ int main()
     };
 
     // `true` means pretty print
-    json_serializer serializer(std::cout, jsoncons::pretty_printer()); 
+    json_serializer serializer(std::cout, jsoncons::indentation::indent); 
 
     serializer.begin_json();       
     serializer.begin_object();       
@@ -197,7 +197,7 @@ int main()
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    encode_json(A, oss, jsoncons::pretty_printer());
+    encode_json(A, oss, jsoncons::indentation::indent);
 
     std::cout << oss.str() << std::endl;
 }

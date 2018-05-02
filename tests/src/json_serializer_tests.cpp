@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
 
     std::ostringstream os1;
 
-    json_serializer os(os1, options, jsoncons::pretty_printer()); // pretty printing
+    json_serializer os(os1, options, jsoncons::indentation::indent); // pretty printing
     os.begin_json();
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)

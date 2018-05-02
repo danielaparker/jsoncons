@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(convert_tuple_test)
     };
 
     std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::pretty_printer());
+    jsoncons::encode_json(employees, s, jsoncons::indentation::indent);
     std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employee_collection>(s);
     BOOST_REQUIRE(employees2.size() == employees.size());
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(test_boost_matrix)
     A(1, 1) = 4.1;
 
     std::string s;
-    jsoncons::encode_json(A,s,pretty_printer());
+    jsoncons::encode_json(A,s,indentation::indent);
     std::cout << "(1) " << s << std::endl;
     auto A2 = jsoncons::decode_json<matrix<double>>(s);
 
