@@ -18,7 +18,8 @@ Changes
   `encode_json` functions. 
 
 - The option bool argument to indicate pretty printing in the `json` `dump` functions 
-  and the `json_serializer` has been deprecated. In its place, pass `jsoncons::pretty_printer()`.
+  and the `json_serializer` class has been deprecated. It is replaced by the enum class 
+  `indentation` with enumerators `indentation::no_indent` and `indentation::indent`.
 
 
 v0.104.0
