@@ -21,17 +21,17 @@ The `json_serializer` class is an instantiation of the `basic_json_serializer` c
 Constructs a new serializer that writes to the specified output stream.
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, indentation line_indent)
-Constructs a new serializer that writes to the output stream `os` with the specified [indentation](indentation.md).
+    json_serializer(std::ostream& os, indenting line_indent)
+Constructs a new serializer that writes to the output stream `os` with the specified [indenting](indenting.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
     json_serializer(std::ostream& os, const serialization_options& options)
 Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, const serialization_options& options, indentation line_indent)
+    json_serializer(std::ostream& os, const serialization_options& options, indenting line_indent)
 Constructs a new serializer that writes to output stream `os` using the specified [serialization_options](serialization_options.md)
-and [indentation](indentation.md).
+and [indenting](indenting.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
 #### Destructor
@@ -58,7 +58,7 @@ int main()
     A(1, 1) = 4;
 
     serialization_options options;
-    json_serializer os(std::cout, options, jsoncons::indentation::indent); 
+    json_serializer os(std::cout, options, jsoncons::indenting::indent); 
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
     {

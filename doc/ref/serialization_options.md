@@ -26,7 +26,7 @@ Constructs an `serialization_options` with default values.
 #### Accessors
 
     int indent() const
-Returns the level of indentation, the default is 4
+Returns the level of indenting, the default is 4
 
     uint8_t precision() const 
 If set, returns an override for the number of significant digits, otherwise zero.

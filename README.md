@@ -406,7 +406,7 @@ int main()
     };
 
     std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::indentation::indent);
+    jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
     std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employee_collection>(s);
 
@@ -474,7 +474,7 @@ int main()
     ]
     )");
 
-    json_serializer serializer(std::cout, jsoncons::indentation::indent); // pretty print
+    json_serializer serializer(std::cout, jsoncons::indenting::indent); // pretty print
     serializer.begin_json();
     serializer.begin_array();
     for (const auto& book : some_books.array_range())

@@ -1,7 +1,7 @@
-### jsoncons::indentation
+### jsoncons::indenting
 
 ```c++
-enum class indentation {no_indent, indent}
+enum class indenting {no_indent, indent}
 ```
 
 #### Header

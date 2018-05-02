@@ -21,7 +21,7 @@
 
 namespace jsoncons {
 
-enum class indentation {no_indent = 0, indent = 1};
+enum class indenting {no_indent = 0, indent = 1};
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 enum class block_options {next_line,same_line};

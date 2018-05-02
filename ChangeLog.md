@@ -19,7 +19,7 @@ Changes
 
 - The option bool argument to indicate pretty printing in the `json` `dump` functions 
   and the `json_serializer` class has been deprecated. It is replaced by the enum class 
-  `indentation` with enumerators `indentation::no_indent` and `indentation::indent`.
+  `indenting` with enumerators `indenting::no_indent` and `indenting::indent`.
 
 
 v0.104.0

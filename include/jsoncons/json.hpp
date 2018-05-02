@@ -2474,7 +2474,7 @@ public:
             evaluate().dump(os);
         }
 
-        void dump(std::basic_ostream<char_type>& os, indentation line_indent) const
+        void dump(std::basic_ostream<char_type>& os, indenting line_indent) const
         {
             evaluate().dump(os, line_indent);
         }
@@ -2484,7 +2484,7 @@ public:
             evaluate().dump(os,options);
         }
 
-        void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, indentation line_indent) const
+        void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, indenting line_indent) const
         {
             evaluate().dump(os,options,line_indent);
         }
@@ -3137,7 +3137,7 @@ public:
         dump(serializer);
     }
 
-    void dump(std::basic_ostream<char_type>& os, indentation line_indent) const
+    void dump(std::basic_ostream<char_type>& os, indenting line_indent) const
     {
         basic_json_serializer<char_type> serializer(os, line_indent);
         dump(serializer);
@@ -3149,7 +3149,7 @@ public:
         dump(serializer);
     }
 
-    void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, indentation line_indent) const
+    void dump(std::basic_ostream<char_type>& os, const basic_serialization_options<char_type>& options, indenting line_indent) const
     {
         basic_json_serializer<char_type> serializer(os, options, line_indent);
         dump(serializer);
@@ -4869,21 +4869,21 @@ class json_printable
 public:
     typedef typename Json::char_type char_type;
 
-    json_printable(const Json& o, indentation line_indent)
-       : o_(&o), indentation_(line_indent)
+    json_printable(const Json& o, indenting line_indent)
+       : o_(&o), indenting_(line_indent)
     {
     }
 
     json_printable(const Json& o,
                    const basic_serialization_options<char_type>& options,
-                   indentation line_indent)
-       : o_(&o), options_(options), indentation_(line_indent)
+                   indenting line_indent)
+       : o_(&o), options_(options), indenting_(line_indent)
     {
     }
 
     void dump(std::basic_ostream<char_type>& os) const
     {
-        o_->dump(os, options_, indentation_);
+        o_->dump(os, options_, indenting_);
     }
 
     friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json>& o)
@@ -4894,7 +4894,7 @@ public:
 
     const Json *o_;
     basic_serialization_options<char_type> options_;
-    indentation indentation_;
+    indenting indenting_;
 private:
     json_printable();
 };
@@ -4902,27 +4902,27 @@ private:
 template<class Json>
 json_printable<Json> print(const Json& val)
 {
-    return json_printable<Json>(val, indentation::no_indent);
+    return json_printable<Json>(val, indenting::no_indent);
 }
 
 template<class Json>
 json_printable<Json> print(const Json& val,
                            const basic_serialization_options<typename Json::char_type>& options)
 {
-    return json_printable<Json>(val, options, indentation::no_indent);
+    return json_printable<Json>(val, options, indenting::no_indent);
 }
 
 template<class Json>
 json_printable<Json> pretty_print(const Json& val)
 {
-    return json_printable<Json>(val, indentation::indent);
+    return json_printable<Json>(val, indenting::indent);
 }
 
 template<class Json>
 json_printable<Json> pretty_print(const Json& val,
                                   const basic_serialization_options<typename Json::char_type>& options)
 {
-    return json_printable<Json>(val, options, indentation::indent);
+    return json_printable<Json>(val, options, indenting::indent);
 }
 
 typedef basic_json<char,sorted_policy,std::allocator<char>> json;
