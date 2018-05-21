@@ -74,9 +74,9 @@ public:
 
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_input_handler<CharT>& handler,
-                     basic_csv_serializing_options<CharT,Allocator> params)
+                     basic_csv_serializing_options<CharT,Allocator> options)
 
-       : parser_(handler,params),
+       : parser_(handler,options),
          is_(is),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
@@ -103,9 +103,9 @@ public:
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_input_handler<CharT>& handler,
                      parse_error_handler& err_handler,
-                     basic_csv_serializing_options<CharT,Allocator> params)
+                     basic_csv_serializing_options<CharT,Allocator> options)
        :
-         parser_(handler,err_handler,params),
+         parser_(handler,err_handler,options),
          is_(is),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
@@ -196,11 +196,11 @@ Json decode_csv(typename Json::string_view_type s)
 }
 
 template <class Json,class Allocator>
-Json decode_csv(typename Json::string_view_type s, const basic_csv_serializing_options<typename Json::char_type,Allocator>& params)
+Json decode_csv(typename Json::string_view_type s, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
 {
     json_decoder<Json,Allocator> decoder;
 
-    basic_csv_parser<typename Json::char_type,Allocator> parser(decoder, params);
+    basic_csv_parser<typename Json::char_type,Allocator> parser(decoder, options);
     parser.reset();
     parser.parse(s.data(), 0, s.size());
     parser.end_parse();
@@ -218,11 +218,11 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is)
 }
 
 template <class Json,class Allocator>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_serializing_options<typename Json::char_type,Allocator>& params)
+Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
 {
     json_decoder<Json,Allocator> decoder;
 
-    basic_csv_reader<typename Json::char_type,Allocator> reader(is,decoder,params);
+    basic_csv_reader<typename Json::char_type,Allocator> reader(is,decoder,options);
     reader.read();
     return decoder.get_result();
 }

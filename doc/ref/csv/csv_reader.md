@@ -19,7 +19,7 @@ You must ensure that the input stream and input handler exist as long as does `c
 
     csv_reader(std::istream& is,
                json_input_handler& handler,
-               const csv_serializing_options& params)
+               const csv_serializing_options& options)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_input_handler](json_input_handler.md) that receives
 JSON events, and [csv_serializing_options](csv_serializing_options.md).
@@ -37,7 +37,7 @@ You must ensure that the input stream, input handler, and error handler exist as
     csv_reader(std::istream& is,
                json_input_handler& handler,
                parse_error_handler& err_handler,
-               const csv_serializing_options& params)
+               const csv_serializing_options& options)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_input_handler](json_input_handler.md) that receives
 JSON events, the specified [parse_error_handler](parse_error_handler.md),
@@ -119,11 +119,11 @@ std::string in_file = "employees.txt";
 std::ifstream is(in_file);
 
 json_decoder<json> decoder;
-csv_serializing_options params;
+csv_serializing_options options;
 params.field_delimiter = '\t'
       .assume_header = true;
 
-csv_reader reader(is,decoder,params);
+csv_reader reader(is,decoder,options);
 reader.read();
 json employees = decoder.get_result();
 
@@ -178,11 +178,11 @@ std::ifstream is(in_file);
 
 json_decoder<json> decoder;
 
-csv_serializing_options params;
+csv_serializing_options options;
 params.column_names("Country Code,Name")
       .header_lines(1);
 
-csv_reader reader(is,decoder,params);
+csv_reader reader(is,decoder,options);
 reader.read();
 json countries = decoder.get_result();
 
@@ -227,27 +227,27 @@ Date,1Y,2Y,3Y,5Y
 
 ```c++
 json_decoder<ojson> decoder;
-csv_serializing_options params;
+csv_serializing_options options;
 params.assume_header(true)
        .column_types("string,float,float,float,float");
 
 params.mapping(mapping_type::n_rows);
 std::istringstream is1("bond_yields.csv");
-csv_reader reader1(is1,decoder,params);
+csv_reader reader1(is1,decoder,options);
 reader1.read();
 ojson val1 = decoder.get_result();
 std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
 
 params.mapping(mapping_type::n_objects);
 std::istringstream is2("bond_yields.csv");
-csv_reader reader2(is2,decoder,params);
+csv_reader reader2(is2,decoder,options);
 reader2.read();
 ojson val2 = decoder.get_result();
 std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
 
 params.mapping(mapping_type::m_columns);
 std::istringstream is3("bond_yields.csv");
-csv_reader reader3(is3, decoder, params);
+csv_reader reader3(is3, decoder, options);
 reader3.read();
 ojson val3 = decoder.get_result();
 std::cout << "\n(3)\n" << pretty_print(val3) << "\n";
@@ -312,23 +312,23 @@ int main()
 
     // array of arrays
     json_decoder<ojson> decoder1;
-    csv_serializing_options params1;
+    csv_serializing_options options1;
     params1.header_lines(1);
     params1.assume_header(false);
     params1.column_types("string,float*");
     std::istringstream is1(bond_yields);
-    csv_reader reader1(is1, decoder1, params1);
+    csv_reader reader1(is1, decoder1, options1);
     reader1.read();
     ojson val1 = decoder1.get_result();
     std::cout << "\n(1)\n" << pretty_print(val1) << "\n";
 
     // array of objects
     json_decoder<ojson> decoder2;
-    csv_serializing_options params2;
+    csv_serializing_options options2;
     params2.assume_header(true);
     params2.column_types("string,[float*]");
     std::istringstream is2(bond_yields);
-    csv_reader reader2(is2, decoder2, params2);
+    csv_reader reader2(is2, decoder2, options2);
     reader2.read();
     ojson val2 = decoder2.get_result();
     std::cout << "\n(2)\n" << pretty_print(val2) << "\n";
@@ -370,12 +370,12 @@ const std::string holidays = R"(1,CAD,2,UK,3,EUR,4,US + UK,5,US
 )";
 
     json_decoder<ojson> decoder;
-    csv_serializing_options params;
+    csv_serializing_options options;
     params.column_types("[integer,string]*");
 
     // Default
     std::istringstream is1(holidays);
-    csv_reader reader1(is1, decoder, params);
+    csv_reader reader1(is1, decoder, options);
     reader1.read();
     ojson val1 = decoder.get_result();
     std::cout << pretty_print(val1) << "\n";

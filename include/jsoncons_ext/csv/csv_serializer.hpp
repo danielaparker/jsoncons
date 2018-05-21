@@ -78,10 +78,10 @@ public:
     }
 
     basic_csv_serializer(output_type& os,
-                         const basic_csv_serializing_options<CharT,Allocator>& params)
+                         const basic_csv_serializing_options<CharT,Allocator>& options)
        :
        writer_(os),
-       parameters_(params),
+       parameters_(options),
        options_(),
        stack_(),
        fp_(options_.precision()),
@@ -490,10 +490,10 @@ void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 }
 
 template <class Json,class Allocator>
-void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_serializing_options<typename Json::char_type,Allocator>& params)
+void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_serializer<char_type,jsoncons::detail::ostream_buffered_writer<char_type>,Allocator> serializer(os,params);
+    basic_csv_serializer<char_type,jsoncons::detail::ostream_buffered_writer<char_type>,Allocator> serializer(os,options);
     j.dump(serializer);
 }
 

@@ -976,22 +976,22 @@ using namespace jsoncons::csv;
 
 int main()
 {
-    csv_serializing_options params;
+    csv_serializing_options options;
     params.assume_header(true);
 
     params.mapping(mapping_type::n_objects);
     std::ifstream is1("input/sales.csv");
-    ojson j1 = decode_csv<ojson>(is1,params);
+    ojson j1 = decode_csv<ojson>(is1,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
     params.mapping(mapping_type::n_rows);
     std::ifstream is2("input/sales.csv");
-    ojson j2 = decode_csv<ojson>(is2,params);
+    ojson j2 = decode_csv<ojson>(is2,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
     params.mapping(mapping_type::m_columns);
     std::ifstream is3("input/sales.csv");
-    ojson j3 = decode_csv<ojson>(is3,params);
+    ojson j3 = decode_csv<ojson>(is3,options);
     std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
 }
 ```

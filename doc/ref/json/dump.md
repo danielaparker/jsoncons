@@ -68,10 +68,10 @@ int main()
     ]
     )");
 
-    csv_serializing_options params;
+    csv_serializing_options options;
     params.column_names("author,title,price");
 
-    csv_serializer serializer(std::cout, params);
+    csv_serializer serializer(std::cout, options);
 
     books.dump(serializer);
 }

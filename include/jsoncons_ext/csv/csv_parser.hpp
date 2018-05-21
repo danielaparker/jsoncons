@@ -116,13 +116,13 @@ public:
     }
 
     basic_csv_parser(basic_json_input_handler<CharT>& handler,
-                     basic_csv_serializing_options<CharT,Allocator> params)
+                     basic_csv_serializing_options<CharT,Allocator> options)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
          err_handler_(default_err_handler_),
          index_(0),
-         parameters_(params),
+         parameters_(options),
          filter_(handler),
          level_(0),
          offset_(0)
@@ -156,13 +156,13 @@ public:
 
     basic_csv_parser(basic_json_input_handler<CharT>& handler,
                      parse_error_handler& err_handler,
-                     basic_csv_serializing_options<CharT,Allocator> params)
+                     basic_csv_serializing_options<CharT,Allocator> options)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
          err_handler_(err_handler),
          index_(0),
-         parameters_(params),
+         parameters_(options),
          filter_(handler),
          level_(0),
          offset_(0)

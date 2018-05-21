@@ -353,12 +353,12 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    csv_serializing_options params;
+    csv_serializing_options options;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types("integer,string,string,string");
-    ojson tasks = decode_csv<ojson>(is, params);
+    ojson tasks = decode_csv<ojson>(is, options);
 
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 

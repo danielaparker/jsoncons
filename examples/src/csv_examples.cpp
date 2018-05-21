@@ -17,23 +17,23 @@ void mapping_types()
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    csv_serializing_options params;
-    params.assume_header(true)
+    csv_serializing_options options;
+    options.assume_header(true)
           .column_types("string,float,float,float,float");
 
     // mapping_type::n_objects
-    params.mapping(mapping_type::n_objects);
-    ojson j1 = decode_csv<ojson>(s,params);
+    options.mapping(mapping_type::n_objects);
+    ojson j1 = decode_csv<ojson>(s,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
     // mapping_type::n_rows
-    params.mapping(mapping_type::n_rows);
-    ojson j2 = decode_csv<ojson>(s,params);
+    options.mapping(mapping_type::n_rows);
+    ojson j2 = decode_csv<ojson>(s,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
     // mapping_type::m_columns
-    params.mapping(mapping_type::m_columns);
-    ojson j3 = decode_csv<ojson>(s,params);
+    options.mapping(mapping_type::m_columns);
+    ojson j3 = decode_csv<ojson>(s,options);
     std::cout << "\n(3)\n" << pretty_print(j3) << "\n";
 }
 
@@ -44,10 +44,10 @@ void csv_decode_without_type_inference()
 00000002,"Brown,Sarah",sales,89000.00
 )";
 
-    csv_serializing_options params;
-    params.assume_header(true)
+    csv_serializing_options options;
+    options.assume_header(true)
           .infer_types(false);
-    ojson j = decode_csv<ojson>(s,params);
+    ojson j = decode_csv<ojson>(s,options);
 
     std::cout << pretty_print(j) << std::endl;
 }
@@ -57,12 +57,12 @@ void read_write_csv_tasks()
     std::ifstream is("./input/tasks.csv");
 
     json_decoder<ojson> decoder;
-    csv_serializing_options params;
-    params.assume_header(true)
+    csv_serializing_options options;
+    options.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types("integer,string,string,string");
-    csv_reader reader(is,decoder,params);
+    csv_reader reader(is,decoder,options);
     reader.read();
     ojson tasks = decoder.get_result();
 
@@ -94,9 +94,9 @@ void serialize_to_tab_delimited_file()
     json employees;
     is >> employees;
 
-    csv_serializing_options params;
-    params.field_delimiter('\t');
-    csv_serializer serializer(std::cout,params);
+    csv_serializing_options options;
+    options.field_delimiter('\t');
+    csv_serializer serializer(std::cout,options);
 
     employees.dump(serializer);
 }
@@ -148,10 +148,10 @@ void serialize_books_to_csv_file_with_reorder()
     ]
     )");
 
-    csv_serializing_options params;
-    params.column_names("author,title,price");
+    csv_serializing_options options;
+    options.column_names("author,title,price");
 
-    csv_serializer serializer(std::cout, params);
+    csv_serializer serializer(std::cout, options);
 
     books.dump(serializer);
 }
@@ -170,21 +170,21 @@ void last_column_repeats()
 )";
 
     json_decoder<ojson> decoder1;
-    csv_serializing_options params1;
-    params1.header_lines(1);
-    params1.column_types("string,float*");
+    csv_serializing_options options1;
+    options1.header_lines(1);
+    options1.column_types("string,float*");
     std::istringstream is1(bond_yields);
-    csv_reader reader1(is1, decoder1, params1);
+    csv_reader reader1(is1, decoder1, options1);
     reader1.read();
     ojson val1 = decoder1.get_result();
     std::cout << "\n(1)\n" << pretty_print(val1) << "\n";
 
     json_decoder<ojson> decoder2;
-    csv_serializing_options params2;
-    params2.assume_header(true);
-    params2.column_types("string,[float*]");
+    csv_serializing_options options2;
+    options2.assume_header(true);
+    options2.column_types("string,[float*]");
     std::istringstream is2(bond_yields);
-    csv_reader reader2(is2, decoder2, params2);
+    csv_reader reader2(is2, decoder2, options2);
     reader2.read();
     ojson val2 = decoder2.get_result();
     std::cout << "\n(2)\n" << pretty_print(val2) << "\n";
@@ -199,22 +199,22 @@ void last_two_columns_repeat()
 
     // array of arrays
     json_decoder<ojson> decoder1;
-    csv_serializing_options params1;
-    params1.column_types("[integer,string]*");
+    csv_serializing_options options1;
+    options1.column_types("[integer,string]*");
     std::istringstream is1(holidays);
-    csv_reader reader1(is1, decoder1, params1);
+    csv_reader reader1(is1, decoder1, options1);
     reader1.read();
     ojson val1 = decoder1.get_result();
     std::cout << "(1)\n" << pretty_print(val1) << "\n";
 
     // array of objects
     json_decoder<ojson> decoder2;
-    csv_serializing_options params2;
-    params2.header_lines(1);
-    params2.column_names("CAD,UK,EUR,US");
-    params2.column_types("[integer,string]*");
+    csv_serializing_options options2;
+    options2.header_lines(1);
+    options2.column_names("CAD,UK,EUR,US");
+    options2.column_types("[integer,string]*");
     std::istringstream is2(holidays);
-    csv_reader reader2(is2, decoder2, params2);
+    csv_reader reader2(is2, decoder2, options2);
     reader2.read();
     ojson val2 = decoder2.get_result();
     std::cout << "(2)\n" << pretty_print(val2) << "\n";
@@ -227,10 +227,10 @@ void decode_csv_string()
 00000002,\"Brown,Sarah\",sales,89000.00
 )";
 
-    csv_serializing_options params;
-    params.assume_header(true)
+    csv_serializing_options options;
+    options.assume_header(true)
           .column_types("string,string,string,float");
-    json j = decode_csv<json>(s,params);
+    json j = decode_csv<json>(s,options);
 
     std::cout << pretty_print(j) << std::endl;
 }
@@ -243,13 +243,13 @@ void decode_csv_stream()
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    csv_serializing_options params;
-    params.assume_header(true)
+    csv_serializing_options options;
+    options.assume_header(true)
           .column_types("string,float,float,float,float");
 
     std::istringstream is(bond_yields);
 
-    ojson j = decode_csv<ojson>(is,params);
+    ojson j = decode_csv<ojson>(is,options);
 
     std::cout << pretty_print(j) << std::endl;
 }
@@ -282,12 +282,12 @@ void decode_encode_csv_tasks()
 {
     std::ifstream is("./input/tasks.csv");
 
-    csv_serializing_options params;
-    params.assume_header(true)
+    csv_serializing_options options;
+    options.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types("integer,string,string,string");
-    ojson tasks = decode_csv<ojson>(is, params);
+    ojson tasks = decode_csv<ojson>(is, options);
 
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 
@@ -297,22 +297,22 @@ void decode_encode_csv_tasks()
 
 void csv_parser_type_inference()
 {
-    csv_serializing_options params;
-    params.assume_header(true);
+    csv_serializing_options options;
+    options.assume_header(true);
 
-    params.mapping(mapping_type::n_objects);
+    options.mapping(mapping_type::n_objects);
     std::ifstream is1("input/sales.csv");
-    ojson j1 = decode_csv<ojson>(is1,params);
+    ojson j1 = decode_csv<ojson>(is1,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
 
-    params.mapping(mapping_type::n_rows);
+    options.mapping(mapping_type::n_rows);
     std::ifstream is2("input/sales.csv");
-    ojson j2 = decode_csv<ojson>(is2,params);
+    ojson j2 = decode_csv<ojson>(is2,options);
     std::cout << "\n(2)\n"<< pretty_print(j2) << "\n";
 
-    params.mapping(mapping_type::m_columns);
+    options.mapping(mapping_type::m_columns);
     std::ifstream is3("input/sales.csv");
-    ojson j3 = decode_csv<ojson>(is3,params);
+    ojson j3 = decode_csv<ojson>(is3,options);
     std::cout << "\n(3)\n"<< pretty_print(j3) << "\n";
 }
  
@@ -330,26 +330,26 @@ NY,LON,TOR;LON
     json_serializing_options print_options;
     print_options.array_array_split_lines(line_split_kind::same_line);
 
-    csv_serializing_options params1;
-    params1.assume_header(true)
+    csv_serializing_options options1;
+    options1.assume_header(true)
            .subfield_delimiter(';');
 
-    json j1 = decode_csv<json>(s,params1);
+    json j1 = decode_csv<json>(s,options1);
     std::cout << "(1)\n" << pretty_print(j1,print_options) << "\n\n";
 
-    csv_serializing_options params2;
-    params2.mapping(mapping_type::n_rows)
+    csv_serializing_options options2;
+    options2.mapping(mapping_type::n_rows)
            .subfield_delimiter(';');
 
-    json j2 = decode_csv<json>(s,params2);
+    json j2 = decode_csv<json>(s,options2);
     std::cout << "(2)\n" << pretty_print(j2,print_options) << "\n\n";
 
-    csv_serializing_options params3;
-    params3.assume_header(true)
+    csv_serializing_options options3;
+    options3.assume_header(true)
            .mapping(mapping_type::m_columns)
            .subfield_delimiter(';');
 
-    json j3 = decode_csv<json>(s,params3);
+    json j3 = decode_csv<json>(s,options3);
     std::cout << "(3)\n" << pretty_print(j3,print_options) << "\n\n";
 }
 
