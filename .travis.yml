@@ -2,6 +2,7 @@ dist: trusty
 sudo: required
 addons:
   apt:
+    update: true
     sources:
       - ubuntu-toolchain-r-test
     packages:
@@ -26,3 +27,4 @@ script:
   - cmake $CMAKEFLAGS .
   - make -j2
   - ./run_tests.sh
+
