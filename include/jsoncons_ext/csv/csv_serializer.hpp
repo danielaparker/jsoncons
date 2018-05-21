@@ -16,11 +16,11 @@
 #include <memory>
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/serialization_options.hpp>
+#include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/detail/number_printers.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
-#include <jsoncons_ext/csv/csv_parameters.hpp>
+#include <jsoncons_ext/csv/csv_serializing_options.hpp>
 #include <jsoncons/detail/writer.hpp>
 
 namespace jsoncons { namespace csv {
@@ -54,8 +54,8 @@ private:
         string_type name_;
     };
     Writer writer_;
-    basic_csv_parameters<CharT,Allocator> parameters_;
-    basic_serialization_options<CharT> options_;
+    basic_csv_serializing_options<CharT,Allocator> parameters_;
+    basic_json_serializing_options<CharT> options_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
     std::vector<string_type,string_allocator_type> column_names_;
@@ -78,7 +78,7 @@ public:
     }
 
     basic_csv_serializer(output_type& os,
-                         const basic_csv_parameters<CharT,Allocator>& params)
+                         const basic_csv_serializing_options<CharT,Allocator>& params)
        :
        writer_(os),
        parameters_(params),
@@ -490,7 +490,7 @@ void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os)
 }
 
 template <class Json,class Allocator>
-void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
+void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_serializing_options<typename Json::char_type,Allocator>& params)
 {
     typedef typename Json::char_type char_type;
     basic_csv_serializer<char_type,jsoncons::detail::ostream_buffered_writer<char_type>,Allocator> serializer(os,params);

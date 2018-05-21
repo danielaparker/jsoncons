@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    serialization_options options;
+    json_serializing_options options;
 
     std::ostringstream os1;
 

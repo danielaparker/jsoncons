@@ -18,7 +18,7 @@
 #include <memory>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
-#include <jsoncons/serialization_options.hpp>
+#include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/detail/writer.hpp>
 #include <jsoncons/detail/number_printers.hpp>
@@ -106,7 +106,7 @@ private:
         }
 
     };
-    basic_serialization_options<CharT> options_;
+    basic_json_serializing_options<CharT> options_;
     std::vector<line_split_context> stack_;
     int indent_;
     bool indenting_;
@@ -133,7 +133,7 @@ public:
     {
     }
 
-    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options)
+    basic_json_serializer(output_type& os, const basic_json_serializing_options<CharT>& options)
        : options_(options), 
          indent_(0), 
          indenting_(false),  
@@ -142,7 +142,7 @@ public:
     {
     }
 
-    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options, indenting line_indent)
+    basic_json_serializer(output_type& os, const basic_json_serializing_options<CharT>& options, indenting line_indent)
        : options_(options), 
          indent_(0), 
          indenting_(line_indent == indenting::indent),  
@@ -166,7 +166,7 @@ public:
     {
     }
 
-    basic_json_serializer(output_type& os, const basic_serialization_options<CharT>& options, bool pprint)
+    basic_json_serializer(output_type& os, const basic_json_serializing_options<CharT>& options, bool pprint)
        : options_(options), 
          indent_(0), 
          indenting_(pprint),  
@@ -179,7 +179,7 @@ public:
 private:
     void escape_string(const CharT* s,
                        size_t length,
-                       const basic_serialization_options<CharT>& options,
+                       const basic_json_serializing_options<CharT>& options,
                        writer_type& writer)
     {
         const CharT* begin = s;

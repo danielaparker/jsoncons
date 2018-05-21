@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE( test_surrogate_pair )
 {
     std::string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
     json value = json::parse(input);
-    serialization_options options;
+    json_serializing_options options;
     options.escape_all_non_ascii(true);
     std::string output;
     value.dump(output,options);
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(test_wide_surrogate_pair)
 {
     std::wstring input = L"[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
     wjson value = wjson::parse(input);
-    wserialization_options options;
+    wjson_serializing_options options;
     options.escape_all_non_ascii(true);
     std::wstring output;
     value.dump(output,options);

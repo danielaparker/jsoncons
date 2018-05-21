@@ -62,7 +62,7 @@ for (size_t i = 0; i < s.size(); ++i)
 std::cout << "]" << std::endl;
 
 std::ostringstream os;
-serialization_options options;
+json_serializing_options options;
 format.escape_all_non_ascii(true);
 os << print(arr,options);
 std::string outputStr = os.str();
@@ -95,7 +95,7 @@ Since the escaped unicode consists of a control character (0x7f) and non-ascii, 
 ```c++
 string input = "[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
 json value = json::parse(input);
-serialization_options options;
+json_serializing_options options;
 format.escape_all_non_ascii(true);
 string output;
 value.dump(output,options);
@@ -166,7 +166,7 @@ std::cout << "]" << std::endl;
 std::wofstream os("output/xxx.txt");
 os.imbue(std::locale(os.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
 
-wserialization_options options;
+wjson_serializing_options options;
 format.escape_all_non_ascii(true);
 
 os << pretty_print(val,options) << L"\n";

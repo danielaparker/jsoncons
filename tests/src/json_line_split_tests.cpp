@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os1 << pretty_print(val);
     BOOST_CHECK_EQUAL(expected1,os1.str());
 
-    serialization_options options2 ;
+    json_serializing_options options2 ;
     options2 .array_array_split_lines(line_split_kind::same_line);
     std::string expected2 = R"({
     "data": {
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os2 << pretty_print(val,options2 );
     BOOST_CHECK_EQUAL(expected2,os2.str());
 
-    serialization_options options3;
+    json_serializing_options options3;
     options3.array_array_split_lines(line_split_kind::new_line);
     std::string expected3 = R"({
     "data": {
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os3 << pretty_print(val,options3);
     BOOST_CHECK_EQUAL(expected3,os3.str());
 
-    serialization_options options4;
+    json_serializing_options options4;
     options4.array_array_split_lines(line_split_kind::multi_line);
     std::string expected4 = R"({
     "data": {
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os4 << pretty_print(val,options4);
     BOOST_CHECK_EQUAL(expected4,os4.str());
 
-    serialization_options options5;
+    json_serializing_options options5;
     options5.object_array_split_lines(line_split_kind::same_line);
     std::string expected5 = R"({
     "data": {
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os5 << pretty_print(val,options5);
     BOOST_CHECK_EQUAL(expected5,os5.str());
 
-    serialization_options options6;
+    json_serializing_options options6;
     options6.object_array_split_lines(line_split_kind::new_line);
     std::string expected6 = R"({
     "data": {
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(test_serialization_1)
     os6 << pretty_print(val,options6);
     BOOST_CHECK_EQUAL(expected6,os6.str());
 
-    serialization_options options7;
+    json_serializing_options options7;
     options7.object_array_split_lines(line_split_kind::multi_line);
     std::string expected7 = R"({
     "data": {

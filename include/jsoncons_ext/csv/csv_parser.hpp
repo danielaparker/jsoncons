@@ -24,7 +24,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/detail/number_parsers.hpp>
 #include <jsoncons_ext/csv/csv_error_category.hpp>
-#include <jsoncons_ext/csv/csv_parameters.hpp>
+#include <jsoncons_ext/csv/csv_serializing_options.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -84,7 +84,7 @@ class basic_csv_parser : private parsing_context
     CharT prev_char_;
     string_type value_buffer_;
     int depth_;
-    basic_csv_parameters<CharT,Allocator> parameters_;
+    basic_csv_serializing_options<CharT,Allocator> parameters_;
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<std::vector<string_type,string_allocator_type>,string_vector_allocator_type> column_values_;
     std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
@@ -116,7 +116,7 @@ public:
     }
 
     basic_csv_parser(basic_json_input_handler<CharT>& handler,
-                     basic_csv_parameters<CharT,Allocator> params)
+                     basic_csv_serializing_options<CharT,Allocator> params)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
@@ -156,7 +156,7 @@ public:
 
     basic_csv_parser(basic_json_input_handler<CharT>& handler,
                      parse_error_handler& err_handler,
-                     basic_csv_parameters<CharT,Allocator> params)
+                     basic_csv_serializing_options<CharT,Allocator> params)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),

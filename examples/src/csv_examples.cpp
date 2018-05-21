@@ -17,7 +17,7 @@ void mapping_types()
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true)
           .column_types("string,float,float,float,float");
 
@@ -44,7 +44,7 @@ void csv_decode_without_type_inference()
 00000002,"Brown,Sarah",sales,89000.00
 )";
 
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true)
           .infer_types(false);
     ojson j = decode_csv<ojson>(s,params);
@@ -57,7 +57,7 @@ void read_write_csv_tasks()
     std::ifstream is("./input/tasks.csv");
 
     json_decoder<ojson> decoder;
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
@@ -94,7 +94,7 @@ void serialize_to_tab_delimited_file()
     json employees;
     is >> employees;
 
-    csv_parameters params;
+    csv_serializing_options params;
     params.field_delimiter('\t');
     csv_serializer serializer(std::cout,params);
 
@@ -148,7 +148,7 @@ void serialize_books_to_csv_file_with_reorder()
     ]
     )");
 
-    csv_parameters params;
+    csv_serializing_options params;
     params.column_names("author,title,price");
 
     csv_serializer serializer(std::cout, params);
@@ -157,7 +157,7 @@ void serialize_books_to_csv_file_with_reorder()
 }
 
 using jsoncons::ojson;
-using jsoncons::csv::csv_parameters;
+using jsoncons::csv::csv_serializing_options;
 using jsoncons::csv::csv_reader;
 using jsoncons::json_decoder;
 
@@ -170,7 +170,7 @@ void last_column_repeats()
 )";
 
     json_decoder<ojson> decoder1;
-    csv_parameters params1;
+    csv_serializing_options params1;
     params1.header_lines(1);
     params1.column_types("string,float*");
     std::istringstream is1(bond_yields);
@@ -180,7 +180,7 @@ void last_column_repeats()
     std::cout << "\n(1)\n" << pretty_print(val1) << "\n";
 
     json_decoder<ojson> decoder2;
-    csv_parameters params2;
+    csv_serializing_options params2;
     params2.assume_header(true);
     params2.column_types("string,[float*]");
     std::istringstream is2(bond_yields);
@@ -199,7 +199,7 @@ void last_two_columns_repeat()
 
     // array of arrays
     json_decoder<ojson> decoder1;
-    csv_parameters params1;
+    csv_serializing_options params1;
     params1.column_types("[integer,string]*");
     std::istringstream is1(holidays);
     csv_reader reader1(is1, decoder1, params1);
@@ -209,7 +209,7 @@ void last_two_columns_repeat()
 
     // array of objects
     json_decoder<ojson> decoder2;
-    csv_parameters params2;
+    csv_serializing_options params2;
     params2.header_lines(1);
     params2.column_names("CAD,UK,EUR,US");
     params2.column_types("[integer,string]*");
@@ -227,7 +227,7 @@ void decode_csv_string()
 00000002,\"Brown,Sarah\",sales,89000.00
 )";
 
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true)
           .column_types("string,string,string,float");
     json j = decode_csv<json>(s,params);
@@ -243,7 +243,7 @@ void decode_csv_stream()
 2017-01-08,0.0063,0.0076,0.0084,0.0112
 )";
 
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true)
           .column_types("string,float,float,float,float");
 
@@ -282,7 +282,7 @@ void decode_encode_csv_tasks()
 {
     std::ifstream is("./input/tasks.csv");
 
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
@@ -297,7 +297,7 @@ void decode_encode_csv_tasks()
 
 void csv_parser_type_inference()
 {
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true);
 
     params.mapping(mapping_type::n_objects);
@@ -327,24 +327,24 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    serialization_options print_options;
+    json_serializing_options print_options;
     print_options.array_array_split_lines(line_split_kind::same_line);
 
-    csv_parameters params1;
+    csv_serializing_options params1;
     params1.assume_header(true)
            .subfield_delimiter(';');
 
     json j1 = decode_csv<json>(s,params1);
     std::cout << "(1)\n" << pretty_print(j1,print_options) << "\n\n";
 
-    csv_parameters params2;
+    csv_serializing_options params2;
     params2.mapping(mapping_type::n_rows)
            .subfield_delimiter(';');
 
     json j2 = decode_csv<json>(s,params2);
     std::cout << "(2)\n" << pretty_print(j2,print_options) << "\n\n";
 
-    csv_parameters params3;
+    csv_serializing_options params3;
     params3.assume_header(true)
            .mapping(mapping_type::m_columns)
            .subfield_delimiter(';');

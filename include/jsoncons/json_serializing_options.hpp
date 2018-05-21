@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_SERIALIZATION_OPTIONS_HPP
-#define JSONCONS_SERIALIZATION_OPTIONS_HPP
+#ifndef JSONCONS_JSON_SERIALIZING_OPTIONS_HPP
+#define JSONCONS_JSON_SERIALIZING_OPTIONS_HPP
 
 #include <string>
 #include <sstream>
@@ -30,7 +30,7 @@ enum class block_options {next_line,same_line};
 enum class line_split_kind{same_line,new_line,multi_line};
 
 template <class CharT,class Allocator=std::allocator<CharT>>
-class basic_serialization_options
+class basic_json_serializing_options
 {
 public:
     typedef basic_string_view_ext<CharT> string_view_type;
@@ -62,7 +62,7 @@ public:
 
 //  Constructors
 
-    basic_serialization_options()
+    basic_json_serializing_options()
         :
         indent_(default_indent),
         precision_(0),
@@ -87,10 +87,10 @@ public:
     line_split_kind object_array_split_lines() const {return object_array_split_lines_;}
     line_split_kind array_array_split_lines() const {return array_array_split_lines_;}
 
-    basic_serialization_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_split_lines_ = value; return *this;}
-    basic_serialization_options<CharT>& array_object_split_lines(line_split_kind value) {array_object_split_lines_ = value; return *this;}
-    basic_serialization_options<CharT>& object_array_split_lines(line_split_kind value) {object_array_split_lines_ = value; return *this;}
-    basic_serialization_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
+    basic_json_serializing_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_split_lines_ = value; return *this;}
+    basic_json_serializing_options<CharT>& array_object_split_lines(line_split_kind value) {array_object_split_lines_ = value; return *this;}
+    basic_json_serializing_options<CharT>& object_array_split_lines(line_split_kind value) {object_array_split_lines_ = value; return *this;}
+    basic_json_serializing_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     block_options array_array_block_option()
@@ -98,7 +98,7 @@ public:
         return (array_array_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
-    basic_serialization_options<CharT>& array_array_block_option(block_options value)
+    basic_json_serializing_options<CharT>& array_array_block_option(block_options value)
     {
         array_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
@@ -109,7 +109,7 @@ public:
         return (array_object_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
-    basic_serialization_options<CharT>& array_object_block_option(block_options value)
+    basic_json_serializing_options<CharT>& array_object_block_option(block_options value)
     {
         array_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
@@ -120,7 +120,7 @@ public:
         return (object_array_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
-    basic_serialization_options<CharT>& object_array_block_option(block_options value)
+    basic_json_serializing_options<CharT>& object_array_block_option(block_options value)
     {
         object_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
@@ -131,7 +131,7 @@ public:
         return (object_object_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
     }
 
-    basic_serialization_options<CharT>& object_object_block_option(block_options value)
+    basic_json_serializing_options<CharT>& object_object_block_option(block_options value)
     {
         object_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
         return *this;
@@ -143,7 +143,7 @@ public:
         return indent_;
     }
 
-    basic_serialization_options<CharT>& indent(int value)
+    basic_json_serializing_options<CharT>& indent(int value)
     {
         indent_ = value;
         return *this;
@@ -154,7 +154,7 @@ public:
         return floating_point_format_;
     }
 
-    basic_serialization_options<CharT>& floating_point_format(chars_format value)
+    basic_json_serializing_options<CharT>& floating_point_format(chars_format value)
     {
         floating_point_format_ = value;
         return *this;
@@ -165,7 +165,7 @@ public:
         return precision_;
     }
 
-    basic_serialization_options<CharT>& precision(uint8_t value)
+    basic_json_serializing_options<CharT>& precision(uint8_t value)
     {
         precision_ = value;
         return *this;
@@ -176,7 +176,7 @@ public:
         return decimal_places_;
     }
 
-    basic_serialization_options<CharT>& decimal_places(uint8_t value)
+    basic_json_serializing_options<CharT>& decimal_places(uint8_t value)
     {
         decimal_places_ = value;
         return *this;
@@ -187,7 +187,7 @@ public:
         return escape_all_non_ascii_;
     }
 
-    basic_serialization_options<CharT>& escape_all_non_ascii(bool value)
+    basic_json_serializing_options<CharT>& escape_all_non_ascii(bool value)
     {
         escape_all_non_ascii_ = value;
         return *this;
@@ -198,7 +198,7 @@ public:
         return escape_solidus_;
     }
 
-    basic_serialization_options<CharT>& escape_solidus(bool value)
+    basic_json_serializing_options<CharT>& escape_solidus(bool value)
     {
         escape_solidus_ = value;
         return *this;
@@ -206,7 +206,7 @@ public:
 
     bool replace_nan() const {return replace_nan_;}
 
-    basic_serialization_options<CharT>& replace_nan(bool replace)
+    basic_json_serializing_options<CharT>& replace_nan(bool replace)
     {
         replace_nan_ = replace;
         return *this;
@@ -216,20 +216,20 @@ public:
 
     bool replace_neg_inf() const {return replace_neg_inf_;}
 
-    basic_serialization_options<CharT>& replace_inf(bool replace)
+    basic_json_serializing_options<CharT>& replace_inf(bool replace)
     {
         replace_pos_inf_ = replace;
         replace_neg_inf_ = replace;
         return *this;
     }
 
-    basic_serialization_options<CharT>& replace_pos_inf(bool replace)
+    basic_json_serializing_options<CharT>& replace_pos_inf(bool replace)
     {
         replace_pos_inf_ = replace;
         return *this;
     }
 
-    basic_serialization_options<CharT>& replace_neg_inf(bool replace)
+    basic_json_serializing_options<CharT>& replace_neg_inf(bool replace)
     {
         replace_neg_inf_ = replace;
         return *this;
@@ -240,13 +240,13 @@ public:
         return nan_replacement_;
     }
 
-    basic_serialization_options<CharT>& nan_replacement(const string_type& replacement)
+    basic_json_serializing_options<CharT>& nan_replacement(const string_type& replacement)
     {
         nan_replacement_ = replacement;
         return *this;
     }
 
-    basic_serialization_options<CharT>& neg_inf_replacement(const string_type& replacement)
+    basic_json_serializing_options<CharT>& neg_inf_replacement(const string_type& replacement)
     {
         neg_inf_replacement_ = replacement;
         return *this;
@@ -257,7 +257,7 @@ public:
         return pos_inf_replacement_;
     }
 
-    basic_serialization_options<CharT>& pos_inf_replacement(const string_type& replacement)
+    basic_json_serializing_options<CharT>& pos_inf_replacement(const string_type& replacement)
     {
         pos_inf_replacement_ = replacement;
         return *this;
@@ -269,12 +269,14 @@ public:
     }
 };
 
-typedef basic_serialization_options<char> serialization_options;
-typedef basic_serialization_options<wchar_t> wserialization_options;
+typedef basic_json_serializing_options<char> json_serializing_options;
+typedef basic_json_serializing_options<wchar_t> wjson_serializing_options;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_serialization_options<char> output_format;
-typedef basic_serialization_options<wchar_t> woutput_format;
+typedef basic_json_serializing_options<char> output_format;
+typedef basic_json_serializing_options<wchar_t> woutput_format;
+typedef basic_json_serializing_options<char> serialization_options;
+typedef basic_json_serializing_options<wchar_t> wserialization_options;
 #endif
 
 }

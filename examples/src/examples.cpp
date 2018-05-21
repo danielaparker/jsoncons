@@ -132,7 +132,7 @@ void first_example_c()
     ]
     )");
 
-    serialization_options options;
+    json_serializing_options options;
 
     for (const auto& book : books.array_range())
     {
@@ -162,7 +162,7 @@ void first_example_d()
     }
     json books = json::parse(is);
 
-    serialization_options options;
+    json_serializing_options options;
     //options.floatfield(std::ios::fixed);
     options.precision(2);
 
@@ -287,7 +287,7 @@ void json_constructor_examples()
     arr.push_back(j3);
     arr.push_back(j4);
 
-    serialization_options options;
+    json_serializing_options options;
     std::cout << pretty_print(arr) << std::endl;
 }
 

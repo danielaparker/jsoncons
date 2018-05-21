@@ -13,12 +13,12 @@ void encode_csv(const Json& j,
 template <class Json>
 void encode_csv(const Json& j, 
                 std::basic_ostream<typename Json::char_type>& os, 
-                const basic_csv_parameters<typename Json::char_type>& params); // (2)
+                const basic_csv_serializing_options<typename Json::char_type>& params); // (2)
 ```
 
-(1) Writes json value to CSV output stream using default [parameters](csv_parameters.md)
+(1) Writes json value to CSV output stream using default [parameters](csv_serializing_options.md)
 
-(2) Writes json value to CSV output stream using specified [parameters](csv_parameters.md)
+(2) Writes json value to CSV output stream using specified [parameters](csv_serializing_options.md)
 
 ### Examples
 

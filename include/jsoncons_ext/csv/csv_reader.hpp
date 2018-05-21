@@ -21,7 +21,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_decoder.hpp>
-#include <jsoncons_ext/csv/csv_parameters.hpp>
+#include <jsoncons_ext/csv/csv_serializing_options.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -74,7 +74,7 @@ public:
 
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_input_handler<CharT>& handler,
-                     basic_csv_parameters<CharT,Allocator> params)
+                     basic_csv_serializing_options<CharT,Allocator> params)
 
        : parser_(handler,params),
          is_(is),
@@ -103,7 +103,7 @@ public:
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_input_handler<CharT>& handler,
                      parse_error_handler& err_handler,
-                     basic_csv_parameters<CharT,Allocator> params)
+                     basic_csv_serializing_options<CharT,Allocator> params)
        :
          parser_(handler,err_handler,params),
          is_(is),
@@ -196,7 +196,7 @@ Json decode_csv(typename Json::string_view_type s)
 }
 
 template <class Json,class Allocator>
-Json decode_csv(typename Json::string_view_type s, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
+Json decode_csv(typename Json::string_view_type s, const basic_csv_serializing_options<typename Json::char_type,Allocator>& params)
 {
     json_decoder<Json,Allocator> decoder;
 
@@ -218,7 +218,7 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is)
 }
 
 template <class Json,class Allocator>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_parameters<typename Json::char_type,Allocator>& params)
+Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_serializing_options<typename Json::char_type,Allocator>& params)
 {
     json_decoder<Json,Allocator> decoder;
 

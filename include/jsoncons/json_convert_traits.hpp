@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <memory>
 #include <jsoncons/json_output_handler.hpp>
-#include <jsoncons/serialization_options.hpp>
+#include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>
@@ -229,7 +229,7 @@ void encode_json(const T& val, std::basic_ostream<CharT>& os)
 }
 
 template <class T, class CharT>
-void encode_json(const T& val, const basic_serialization_options<CharT>& options,
+void encode_json(const T& val, const basic_json_serializing_options<CharT>& options,
           std::basic_ostream<CharT>& os)
 {
     basic_json_serializer<CharT> serializer(os, options);
@@ -244,7 +244,7 @@ void encode_json(const T& val, std::basic_ostream<CharT>& os, indenting line_ind
 }
 
 template <class T, class CharT>
-void encode_json(const T& val, const basic_serialization_options<CharT>& options,
+void encode_json(const T& val, const basic_json_serializing_options<CharT>& options,
           std::basic_ostream<CharT>& os, indenting line_indent)
 {
     basic_json_serializer<CharT> serializer(os, options, line_indent);
@@ -259,7 +259,7 @@ void encode_json(const T& val, std::basic_string<CharT>& s)
 }
 
 template <class T, class CharT>
-void encode_json(const T& val, const basic_serialization_options<CharT>& options,
+void encode_json(const T& val, const basic_json_serializing_options<CharT>& options,
           std::basic_string<CharT>& s)
 {
     basic_json_serializer<CharT,detail::string_writer<CharT>> serializer(s, options);
@@ -274,7 +274,7 @@ void encode_json(const T& val, std::basic_string<CharT>& s, indenting line_inden
 }
 
 template <class T, class CharT>
-void encode_json(const T& val, const basic_serialization_options<CharT>& options,
+void encode_json(const T& val, const basic_json_serializing_options<CharT>& options,
           std::basic_string<CharT,detail::string_writer<CharT>>& s, indenting line_indent)
 {
     basic_json_serializer<CharT> serializer(s, options, line_indent);

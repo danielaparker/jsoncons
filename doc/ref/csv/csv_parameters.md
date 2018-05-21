@@ -1,4 +1,4 @@
-### jsoncons::csv::csv_parameters
+### jsoncons::csv::csv_serializing_options
 
 Parameter          | Description        | Default       
 -------------      | -------------  | ------------- 

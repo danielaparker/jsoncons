@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
     obj["field2"] = 1.79e308 * 1000;
     obj["field3"] = -1.79e308 * 1000;
 
-    serialization_options options;
+    json_serializing_options options;
     options.nan_replacement("null");
     options.pos_inf_replacement("1e9999");
     options.neg_inf_replacement("-1e9999");
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(test_uHHHH)
     BOOST_CHECK(static_cast<uint8_t>(s[5]) == 0x80);
 
     std::ostringstream os;
-    serialization_options options;
+    json_serializing_options options;
     options.escape_all_non_ascii(true);
     arr.dump(os, options);
     std::string outputStr = os.str();

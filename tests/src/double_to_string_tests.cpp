@@ -30,7 +30,7 @@ std::basic_string<CharT> float_to_string(double val, uint8_t precision)
     return s;
 }
 
-const serialization_options options;
+const json_serializing_options options;
 
 BOOST_AUTO_TEST_CASE(test_double_to_string)
 {

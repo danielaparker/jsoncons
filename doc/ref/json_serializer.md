@@ -25,12 +25,12 @@ You must ensure that the output stream exists as long as does `json_serializer`,
 Constructs a new serializer that writes to the output stream `os` with the specified [indenting](indenting.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, const serialization_options& options)
-Constructs a new serializer that writes to the specified output stream using the specified [serialization_options](serialization_options.md).
+    json_serializer(std::ostream& os, const json_serializing_options& options)
+Constructs a new serializer that writes to the specified output stream using the specified [json_serializing_options](json_serializing_options.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, const serialization_options& options, indenting line_indent)
-Constructs a new serializer that writes to output stream `os` using the specified [serialization_options](serialization_options.md)
+    json_serializer(std::ostream& os, const json_serializing_options& options, indenting line_indent)
+Constructs a new serializer that writes to output stream `os` using the specified [json_serializing_options](json_serializing_options.md)
 and [indenting](indenting.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
@@ -57,7 +57,7 @@ int main()
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    serialization_options options;
+    json_serializing_options options;
     json_serializer os(std::cout, options, jsoncons::indenting::indent); 
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)

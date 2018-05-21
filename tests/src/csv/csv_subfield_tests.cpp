@@ -6,7 +6,7 @@
 #endif
 
 #include <boost/test/unit_test.hpp>
-//#include <jsoncons_ext/csv/csv_parameters.hpp>
+//#include <jsoncons_ext/csv/csv_serializing_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons_ext/csv/csv_serializer.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -30,7 +30,7 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true)
           .subfield_delimiter(';');
 
@@ -79,7 +79,7 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_parameters params;
+    csv_serializing_options params;
     params.mapping(mapping_type::n_rows)
           .subfield_delimiter(';');
 
@@ -121,7 +121,7 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true)
           .mapping(mapping_type::m_columns)
           .subfield_delimiter(';');

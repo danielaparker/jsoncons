@@ -42,7 +42,7 @@ void wjson_escape_u2()
     std::wofstream os("./output/xxx.txt");
     os.imbue(std::locale(os.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
     
-    wserialization_options options;
+    wjson_serializing_options options;
     options.escape_all_non_ascii(true);
 
     os << pretty_print(val,options) << L"\n";

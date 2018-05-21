@@ -267,12 +267,12 @@ Reads a `json` value from a stream.
 Inserts json value into stream.
 
     std::ostream& print(const json& val)  
-    std::ostream& print(const json& val, const serialization_options<CharT>& options)  
-Inserts json value into stream using the specified [serialization_options](serialization_options.md) if supplied.
+    std::ostream& print(const json& val, const json_serializing_options<CharT>& options)  
+Inserts json value into stream using the specified [json_serializing_options](json_serializing_options.md) if supplied.
 
     std::ostream& pretty_print(const json& val)  
-    std::ostream& pretty_print(const json& val, const serialization_options<CharT>& options)  
-Inserts json value into stream using the specified [serialization_options](serialization_options.md) if supplied.
+    std::ostream& pretty_print(const json& val, const json_serializing_options<CharT>& options)  
+Inserts json value into stream using the specified [json_serializing_options](json_serializing_options.md) if supplied.
 
     void swap(json& a, json& b)
 Exchanges the values of `a` and `b`

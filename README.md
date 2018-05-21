@@ -976,7 +976,7 @@ using namespace jsoncons::csv;
 
 int main()
 {
-    csv_parameters params;
+    csv_serializing_options params;
     params.assume_header(true);
 
     params.mapping(mapping_type::n_objects);
