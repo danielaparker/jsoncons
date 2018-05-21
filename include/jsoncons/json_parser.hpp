@@ -229,6 +229,110 @@ public:
         push_state(parse_state::root);
     }
 
+    basic_json_parser(const basic_json_serializing_options<CharT>& options)
+       : handler_(default_input_handler_),
+         err_handler_(default_err_handler_),
+         cp_(0),
+         cp2_(0),
+         is_negative_(false),
+         precision_(0), 
+         decimal_places_(0), 
+         line_(1),
+         column_(1),
+         nesting_depth_(0), 
+         initial_stack_capacity_(default_initial_stack_capacity_),
+         begin_input_(nullptr),
+         input_end_(nullptr),
+         input_ptr_(nullptr),
+         state_(parse_state::start)
+    {
+        string_buffer_.reserve(initial_string_buffer_capacity_);
+        number_buffer_.reserve(initial_number_buffer_capacity_);
+        max_depth_ = (std::numeric_limits<int>::max)();
+
+        state_stack_.reserve(initial_stack_capacity_);
+        push_state(parse_state::root);
+    }
+
+    basic_json_parser(const basic_json_serializing_options<CharT>& options, 
+                      parse_error_handler& err_handler)
+       : handler_(default_input_handler_),
+         err_handler_(err_handler),
+         cp_(0),
+         cp2_(0),
+         is_negative_(false),
+         precision_(0), 
+         decimal_places_(0), 
+         line_(1),
+         column_(1),
+         nesting_depth_(0), 
+         initial_stack_capacity_(default_initial_stack_capacity_),
+         begin_input_(nullptr),
+         input_end_(nullptr),
+         input_ptr_(nullptr),
+         state_(parse_state::start)
+    {
+        string_buffer_.reserve(initial_string_buffer_capacity_);
+        number_buffer_.reserve(initial_number_buffer_capacity_);
+        max_depth_ = (std::numeric_limits<int>::max)();
+
+        state_stack_.reserve(initial_stack_capacity_);
+        push_state(parse_state::root);
+    }
+
+    basic_json_parser(basic_json_input_handler<CharT>& handler,
+                      const basic_json_serializing_options<CharT>& options)
+       : handler_(handler),
+         err_handler_(default_err_handler_),
+         cp_(0),
+         cp2_(0),
+         is_negative_(false),
+         precision_(0), 
+         decimal_places_(0), 
+         line_(1),
+         column_(1),
+         nesting_depth_(0), 
+         initial_stack_capacity_(default_initial_stack_capacity_),
+         begin_input_(nullptr),
+         input_end_(nullptr),
+         input_ptr_(nullptr),
+         state_(parse_state::start)
+    {
+        string_buffer_.reserve(initial_string_buffer_capacity_);
+        number_buffer_.reserve(initial_number_buffer_capacity_);
+        max_depth_ = (std::numeric_limits<int>::max)();
+
+        state_stack_.reserve(initial_stack_capacity_);
+        push_state(parse_state::root);
+    }
+
+    basic_json_parser(basic_json_input_handler<CharT>& handler, 
+                      const basic_json_serializing_options<CharT>& options,
+                      parse_error_handler& err_handler)
+       : handler_(handler),
+         err_handler_(err_handler),
+         cp_(0),
+         cp2_(0),
+         is_negative_(false),
+         precision_(0), 
+         decimal_places_(0), 
+         line_(1),
+         column_(1),
+         nesting_depth_(0), 
+         initial_stack_capacity_(default_initial_stack_capacity_),
+         begin_input_(nullptr),
+         input_end_(nullptr),
+         input_ptr_(nullptr),
+         state_(parse_state::start)
+    {
+        string_buffer_.reserve(initial_string_buffer_capacity_);
+        number_buffer_.reserve(initial_number_buffer_capacity_);
+        max_depth_ = (std::numeric_limits<int>::max)();
+
+        state_stack_.reserve(initial_stack_capacity_);
+        push_state(parse_state::root);
+    }
+
     size_t line_number() const
     {
         return line_;

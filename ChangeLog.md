@@ -21,6 +21,13 @@ Changes
   and the `json_serializer` class has been deprecated. It is replaced by the enum class 
   `indenting` with enumerators `indenting::no_indent` and `indenting::indent`.
 
+- The name `serialization_options` has been deprecated (still works) and changed to 
+  `json_serializing_options`. Rationale: naming consistency.
+
+- The name `csv_parameters` has been deprecated (still works) and changed to 
+  `csv_serializing_options`. Rationale: naming consistency.
+
+
 
 v0.104.0
 --------

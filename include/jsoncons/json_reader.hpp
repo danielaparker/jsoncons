@@ -202,6 +202,54 @@ public:
         buffer_.reserve(buffer_length_);
     }
 
+    basic_json_reader(std::basic_istream<CharT>& is, 
+                      const basic_json_serializing_options<CharT>& options)
+        : parser_(options),
+          is_(is),
+          eof_(false),
+          buffer_length_(default_max_buffer_length),
+          begin_(true)
+    {
+        buffer_.reserve(buffer_length_);
+    }
+
+    basic_json_reader(std::basic_istream<CharT>& is, 
+                      const basic_json_serializing_options<CharT>& options,
+                      parse_error_handler& err_handler)
+       : parser_(options,err_handler),
+         is_(is),
+         eof_(false),
+         buffer_length_(default_max_buffer_length),
+         begin_(true)
+    {
+        buffer_.reserve(buffer_length_);
+    }
+
+    basic_json_reader(std::basic_istream<CharT>& is, 
+                      const basic_json_serializing_options<CharT>& options, 
+                      basic_json_input_handler<CharT>& handler)
+        : parser_(handler,options),
+          is_(is),
+          eof_(false),
+          buffer_length_(default_max_buffer_length),
+          begin_(true)
+    {
+        buffer_.reserve(buffer_length_);
+    }
+
+    basic_json_reader(std::basic_istream<CharT>& is,
+                      basic_json_input_handler<CharT>& handler, 
+                      const basic_json_serializing_options<CharT>& options,
+                      parse_error_handler& err_handler)
+       : parser_(handler,options,err_handler),
+         is_(is),
+         eof_(false),
+         buffer_length_(default_max_buffer_length),
+         begin_(true)
+    {
+        buffer_.reserve(buffer_length_);
+    }
+
     size_t buffer_length() const
     {
         return buffer_length_;
