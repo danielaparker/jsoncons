@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_input_handler.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/parse_error_handler.hpp>
@@ -28,6 +29,48 @@
         case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f 
 
 namespace jsoncons {
+
+namespace detail {
+
+template <class CharT>
+class replacement_filter : public basic_json_filter<CharT>
+{
+    basic_null_json_input_handler<CharT> default_input_handler_;
+    basic_json_serializing_options<CharT> options_;
+public:
+    replacement_filter()
+        : basic_json_filter<CharT>(default_input_handler_)
+    {
+    }
+
+    replacement_filter(basic_json_input_handler<CharT>& handler, const basic_json_serializing_options<CharT>& options)
+        : basic_json_filter<CharT>(handler), options_(options)
+    {
+    }
+
+    void do_string_value(const string_view_type& s, const parsing_context& context) override
+    {
+        if (!options_.can_read_nan_replacement() && s == options_.nan_replacement())
+        {
+            this->downstream_handler().double_value(std::nan(""), context);
+        }
+        else if (!options_.can_read_pos_inf_replacement() && s == options_.pos_inf_replacement())
+        {
+            this->downstream_handler().double_value(std::numeric_limits<double>::infinity(), context);
+        }
+        else if (!options_.can_read_neg_inf_replacement() && s == options_.neg_inf_replacement())
+        {
+            this->downstream_handler().double_value(-std::numeric_limits<double>::infinity(), context);
+        }
+        else
+        {
+            this->downstream_handler().string_value(s, context);
+        }
+    }
+
+};
+
+}
 
 enum class parse_state : uint8_t 
 {
@@ -89,6 +132,7 @@ class basic_json_parser : private parsing_context
     static const int default_initial_stack_capacity_ = 100;
     typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
 
+    detail::replacement_filter<CharT> replacement_filter_;
     basic_null_json_input_handler<CharT> default_input_handler_;
     default_parse_error_handler default_err_handler_;
 
@@ -231,7 +275,7 @@ public:
     }
 
     basic_json_parser(const basic_json_serializing_options<CharT>& options)
-       : handler_(default_input_handler_),
+       : handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_(default_input_handler_,options) : default_input_handler_),
          err_handler_(default_err_handler_),
          cp_(0),
          cp2_(0),
@@ -257,7 +301,7 @@ public:
 
     basic_json_parser(const basic_json_serializing_options<CharT>& options, 
                       parse_error_handler& err_handler)
-       : handler_(default_input_handler_),
+       : handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_(default_input_handler_,options) : default_input_handler_),
          err_handler_(err_handler),
          cp_(0),
          cp2_(0),
@@ -283,7 +327,8 @@ public:
 
     basic_json_parser(basic_json_input_handler<CharT>& handler,
                       const basic_json_serializing_options<CharT>& options)
-       : handler_(handler),
+       : replacement_filter_(handler,options),
+         handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_ : handler),
          err_handler_(default_err_handler_),
          cp_(0),
          cp2_(0),
@@ -310,7 +355,8 @@ public:
     basic_json_parser(basic_json_input_handler<CharT>& handler, 
                       const basic_json_serializing_options<CharT>& options,
                       parse_error_handler& err_handler)
-       : handler_(handler),
+       : replacement_filter_(handler,options),
+         handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_ : handler),
          err_handler_(err_handler),
          cp_(0),
          cp2_(0),

@@ -171,39 +171,6 @@ BOOST_AUTO_TEST_CASE(test_to_string)
     BOOST_CHECK(root["escaped-string"].as<std::string>() == std::string("\\\n"));
 }
 
-BOOST_AUTO_TEST_CASE(test_nan_replacement)
-{
-    json obj;
-    obj["field1"] = std::sqrt(-1.0);
-    obj["field2"] = 1.79e308 * 1000;
-    obj["field3"] = -1.79e308 * 1000;
-
-    std::ostringstream os;
-    os << print(obj);
-    std::string expected = R"({"field1":null,"field2":null,"field3":null})";
-
-    BOOST_CHECK_EQUAL(expected,os.str());
-}
-
-BOOST_AUTO_TEST_CASE(test_custom_nan_replacement)
-{
-    json obj;
-    obj["field1"] = std::sqrt(-1.0);
-    obj["field2"] = 1.79e308 * 1000;
-    obj["field3"] = -1.79e308 * 1000;
-
-    json_serializing_options options;
-    options.nan_replacement("null");
-    options.pos_inf_replacement("1e9999");
-    options.neg_inf_replacement("-1e9999");
-
-    std::ostringstream os;
-    os << print(obj, options);
-    std::string expected = R"({"field1":null,"field2":1e9999,"field3":-1e9999})";
-
-    BOOST_CHECK_EQUAL(expected,os.str());
-}
-
 BOOST_AUTO_TEST_CASE(test_u0000)
 {
     std::string inputStr("[\"\\u0040\\u0040\\u0000\\u0011\"]");

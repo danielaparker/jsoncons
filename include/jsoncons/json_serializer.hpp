@@ -507,15 +507,36 @@ private:
 
         if ((std::isnan)(value))
         {
-            writer_.write(options_.nan_replacement());
+            if (options_.can_write_nan_replacement())
+            {
+                writer_.write(options_.nan_replacement());
+            }
+            else
+            {
+                writer_.write(detail::null_literal<CharT>());
+            }
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            writer_.write(options_.pos_inf_replacement());
+            if (options_.can_write_pos_inf_replacement())
+            {
+                writer_.write(options_.pos_inf_replacement());
+            }
+            else
+            {
+                writer_.write(detail::null_literal<CharT>());
+            }
         }
         else if (!(std::isfinite)(value))
         {
-            writer_.write(options_.neg_inf_replacement());
+            if (options_.can_write_neg_inf_replacement())
+            {
+                writer_.write(options_.neg_inf_replacement());
+            }
+            else
+            {
+                writer_.write(detail::null_literal<CharT>());
+            }
         }
         else
         {

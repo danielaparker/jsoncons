@@ -2712,8 +2712,24 @@ public:
 #endif
     };
 
-    static basic_json parse(std::basic_istream<char_type>& is);
-    static basic_json parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler);
+    static basic_json parse(std::basic_istream<char_type>& is)
+    {
+        parse_error_handler_type err_handler;
+        return parse(is,err_handler);
+    }
+
+    static basic_json parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
+    {
+        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
+        basic_json_reader<char_type> reader(is, handler, err_handler);
+        reader.read_next();
+        reader.check_done();
+        if (!handler.is_valid())
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Failed to parse json stream"));
+        }
+        return handler.get_result();
+    }
 
     static basic_json parse(const string_view_type& s)
     {
@@ -2721,6 +2737,7 @@ public:
         return parse(s,err_handler);
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     static basic_json parse(const char_type* s, size_t length)
     {
         parse_error_handler_type err_handler;
@@ -2731,11 +2748,59 @@ public:
     {
         return parse(string_view_type(s,length),err_handler);
     }
+#endif
 
     static basic_json parse(const string_view_type& s, parse_error_handler& err_handler)
     {
         json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(decoder,err_handler);
+
+        auto result = unicons::skip_bom(s.begin(), s.end());
+        if (result.ec != unicons::encoding_errc())
+        {
+            throw parse_error(result.ec,1,1);
+        }
+        size_t offset = result.it - s.begin();
+        parser.set_source(s.data()+offset,s.size()-offset);
+        parser.parse_some();
+        parser.end_parse();
+        parser.check_done();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Failed to parse json string"));
+        }
+        return decoder.get_result();
+    }
+
+    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_serializing_options<CharT>& options)
+    {
+        parse_error_handler_type err_handler;
+        return parse(is,options,err_handler);
+    }
+
+    static basic_json parse(std::basic_istream<char_type>& is, const basic_json_serializing_options<CharT>& options, parse_error_handler& err_handler)
+    {
+        json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
+        basic_json_reader<char_type> reader(is, handler, options, err_handler);
+        reader.read_next();
+        reader.check_done();
+        if (!handler.is_valid())
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Failed to parse json stream"));
+        }
+        return handler.get_result();
+    }
+
+    static basic_json parse(const string_view_type& s, const basic_json_serializing_options<CharT>& options)
+    {
+        parse_error_handler_type err_handler;
+        return parse(s,options,err_handler);
+    }
+
+    static basic_json parse(const string_view_type& s, const basic_json_serializing_options<CharT>& options, parse_error_handler& err_handler)
+    {
+        json_decoder<basic_json> decoder;
+        basic_json_parser<char_type> parser(decoder,options,err_handler);
 
         auto result = unicons::skip_bom(s.begin(), s.end());
         if (result.ec != unicons::encoding_errc())
@@ -4824,28 +4889,6 @@ template <class Json>
 void swap(typename Json::key_value_pair_type& a, typename Json::key_value_pair_type& b)
 {
     a.swap(b);
-}
-
-template<class CharT,class ImplementationPolicy,class Allocator>
-basic_json<CharT,ImplementationPolicy,Allocator> basic_json<CharT,ImplementationPolicy,Allocator>::parse(std::basic_istream<char_type>& is)
-{
-    parse_error_handler_type err_handler;
-    return parse(is,err_handler);
-}
-
-template<class CharT,class ImplementationPolicy,class Allocator>
-basic_json<CharT,ImplementationPolicy,Allocator> basic_json<CharT,ImplementationPolicy,Allocator>::parse(std::basic_istream<char_type>& is, 
-                                                                                            parse_error_handler& err_handler)
-{
-    json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
-    basic_json_reader<char_type> reader(is, handler, err_handler);
-    reader.read_next();
-    reader.check_done();
-    if (!handler.is_valid())
-    {
-        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Failed to parse json stream"));
-    }
-    return handler.get_result();
 }
 
 template <class Json>

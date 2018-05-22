@@ -42,9 +42,9 @@ private:
     int indent_;
     uint8_t precision_;
     uint8_t decimal_places_;
-    bool replace_nan_;
-    bool replace_pos_inf_;
-    bool replace_neg_inf_;
+    bool can_read_nan_replacement_;
+    bool can_read_pos_inf_replacement_;
+    bool can_read_neg_inf_replacement_;
     string_type nan_replacement_;
     string_type pos_inf_replacement_;
     string_type neg_inf_replacement_;
@@ -66,12 +66,9 @@ public:
         :
         indent_(default_indent),
         precision_(0),
-        replace_nan_(true),
-        replace_pos_inf_(true),
-        replace_neg_inf_(true),
-        nan_replacement_(detail::null_literal<CharT>()),
-        pos_inf_replacement_(detail::null_literal<CharT>()),
-        neg_inf_replacement_(detail::null_literal<CharT>()),
+        can_read_nan_replacement_(false),
+        can_read_pos_inf_replacement_(false),
+        can_read_neg_inf_replacement_(false),
         escape_all_non_ascii_(false),
         escape_solidus_(false),
         object_object_split_lines_(line_split_kind::multi_line),
@@ -204,34 +201,34 @@ public:
         return *this;
     }
 
-    bool replace_nan() const {return replace_nan_;}
+    bool can_read_nan_replacement() const {return can_read_nan_replacement_;}
 
-    basic_json_serializing_options<CharT>& replace_nan(bool replace)
-    {
-        replace_nan_ = replace;
-        return *this;
-    }
+    bool can_read_pos_inf_replacement() const {return can_read_pos_inf_replacement_;}
 
-    bool replace_pos_inf() const {return replace_pos_inf_;}
+    bool can_read_neg_inf_replacement() const {return can_read_neg_inf_replacement_;}
 
-    bool replace_neg_inf() const {return replace_neg_inf_;}
+    bool can_write_nan_replacement() const {return !nan_replacement_.empty();}
+
+    bool can_write_pos_inf_replacement() const {return !pos_inf_replacement_.empty();}
+
+    bool can_write_neg_inf_replacement() const {return !neg_inf_replacement_.empty();}
 
     basic_json_serializing_options<CharT>& replace_inf(bool replace)
     {
-        replace_pos_inf_ = replace;
-        replace_neg_inf_ = replace;
+        can_read_pos_inf_replacement_ = replace;
+        can_read_neg_inf_replacement_ = replace;
         return *this;
     }
 
     basic_json_serializing_options<CharT>& replace_pos_inf(bool replace)
     {
-        replace_pos_inf_ = replace;
+        can_read_pos_inf_replacement_ = replace;
         return *this;
     }
 
     basic_json_serializing_options<CharT>& replace_neg_inf(bool replace)
     {
-        replace_neg_inf_ = replace;
+        can_read_neg_inf_replacement_ = replace;
         return *this;
     }
 
@@ -243,12 +240,9 @@ public:
     basic_json_serializing_options<CharT>& nan_replacement(const string_type& replacement)
     {
         nan_replacement_ = replacement;
-        return *this;
-    }
 
-    basic_json_serializing_options<CharT>& neg_inf_replacement(const string_type& replacement)
-    {
-        neg_inf_replacement_ = replacement;
+        can_read_nan_replacement_ = basic_json<CharT>::parse(replacement).is_string();
+
         return *this;
     }
 
@@ -260,12 +254,20 @@ public:
     basic_json_serializing_options<CharT>& pos_inf_replacement(const string_type& replacement)
     {
         pos_inf_replacement_ = replacement;
+        can_read_pos_inf_replacement_ = basic_json<CharT>::parse(replacement).is_string();
         return *this;
     }
 
     const string_type& neg_inf_replacement() const
     {
         return neg_inf_replacement_;
+    }
+
+    basic_json_serializing_options<CharT>& neg_inf_replacement(const string_type& replacement)
+    {
+        neg_inf_replacement_ = replacement;
+        can_read_neg_inf_replacement_ = basic_json<CharT>::parse(replacement).is_string();
+        return *this;
     }
 };
 
