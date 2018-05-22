@@ -45,7 +45,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
   formatted strings to C++ objects and back. These functions attempts to 
   perform the conversion by streaming using `json_convert_traits`, and if
   streaming is not supported, fall back to using `json_type_traits`. `decode_json` 
-  and `encode_json` will work for all types that have `json_type_traits` defined.
+  and `encode_json` will work for all C++ classes that have `json_type_traits` defined.
 
 ### Extensions
 
@@ -385,7 +385,7 @@ The functions `decode_json` and `encode_json` convert JSON
 formatted strings to C++ objects and back. These functions attempt to 
 perform the conversion by streaming json read and write events with the help of 'json_convert_traits', and if
 that is not supported, fall back to using `json_type_traits`. `decode_json` 
-and `encode_json` will work for all types that have `json_type_traits` defined.
+and `encode_json` will work for all C++ classes that have `json_type_traits` defined.
 
 ```c++
 #include <iostream>
