@@ -116,7 +116,7 @@ or
 ```
 std::cout << j << std::endl; // compressed
 
-std::cout << pretty_print(j) << std::endl; // pretty_print
+std::cout << pretty_print(j) << std::endl; // pretty print
 ```
 
 #### How can I iterate over a json array?
