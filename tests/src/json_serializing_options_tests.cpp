@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_read_nan_replacement)
 
     json j = json::parse(s,options);
 
-    //std::cout << pretty_print(j,options) << std::endl;
+    std::cout << pretty_print(j) << std::endl;
 
     json expected;
     expected["field1"] = std::nan("");
@@ -71,6 +71,7 @@ BOOST_AUTO_TEST_CASE(test_read_nan_replacement)
     expected["field3"] = -std::numeric_limits<double>::infinity();
 
     BOOST_CHECK(expected.to_string(options) == j.to_string(options));
+    BOOST_CHECK(expected.to_string() == j.to_string());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

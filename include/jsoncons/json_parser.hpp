@@ -52,15 +52,15 @@ public:
 
     void do_string_value(const string_view_type& s, const parsing_context& context) override
     {
-        if (!options_.can_read_nan_replacement() && s == options_.nan_replacement())
+        if (options_.can_read_nan_replacement() && s == options_.nan_replacement().substr(1,options_.nan_replacement().length()-2))
         {
             this->downstream_handler().double_value(std::nan(""), context);
         }
-        else if (!options_.can_read_pos_inf_replacement() && s == options_.pos_inf_replacement())
+        else if (options_.can_read_pos_inf_replacement() && s == options_.pos_inf_replacement().substr(1,options_.pos_inf_replacement().length()-2))
         {
             this->downstream_handler().double_value(std::numeric_limits<double>::infinity(), context);
         }
-        else if (!options_.can_read_neg_inf_replacement() && s == options_.neg_inf_replacement())
+        else if (options_.can_read_neg_inf_replacement() && s == options_.neg_inf_replacement().substr(1,options_.neg_inf_replacement().length()-2))
         {
             this->downstream_handler().double_value(-std::numeric_limits<double>::infinity(), context);
         }

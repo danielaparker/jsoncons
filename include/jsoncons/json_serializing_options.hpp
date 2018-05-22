@@ -302,10 +302,10 @@ private:
                     state = input_state::character;
                     break;
                 default:
+                    state = input_state::character;
                     break;
                 }
             default:
-                state = input_state::error;
                 break;
             }
 
