@@ -28,6 +28,14 @@ private:
     virtual size_t do_column_number() const = 0;
 };
 
+class null_serializing_context : public serializing_context
+{
+private:
+    size_t do_line_number() const override { return 0; }
+
+    size_t do_column_number() const override { return 0; }
+};
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef serializing_context parsing_context;
 #endif

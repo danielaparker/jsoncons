@@ -56,7 +56,7 @@ enum class csv_state_type
 };
 
 template<class CharT,class Allocator=std::allocator<CharT>>
-class basic_csv_parser : private parsing_context
+class basic_csv_parser : private serializing_context
 {
     typedef basic_string_view_ext<CharT> string_view_type;
     typedef CharT char_type;
@@ -179,7 +179,7 @@ public:
     {
     }
 
-    const parsing_context& parsing_context() const
+    const serializing_context& parsing_context() const
     {
         return *this;
     }

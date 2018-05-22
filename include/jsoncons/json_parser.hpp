@@ -50,7 +50,7 @@ public:
     {
     }
 
-    void do_string_value(const string_view_type& s, const parsing_context& context) override
+    void do_string_value(const string_view_type& s, const serializing_context& context) override
     {
         if (options_.can_read_nan_replacement() && s == options_.nan_replacement().substr(1,options_.nan_replacement().length()-2))
         {
@@ -127,7 +127,7 @@ enum class parse_state : uint8_t
 };
 
 template <class CharT, class Allocator = std::allocator<char>>
-class basic_json_parser : private parsing_context
+class basic_json_parser : private serializing_context
 {
     static const size_t initial_string_buffer_capacity_ = 1024;
     static const size_t initial_number_buffer_capacity_ = 64;
@@ -402,7 +402,7 @@ public:
         return input_ptr_ == input_end_;
     }
 
-    const parsing_context& parsing_context() const
+    const serializing_context& parsing_context() const
     {
         return *this;
     }

@@ -187,7 +187,7 @@ struct path_setter
 };
 
 template<class Json,class JsonReference>
-class jsonpointer_evaluator : private parsing_context
+class jsonpointer_evaluator : private serializing_context
 {
     typedef typename Json::string_type string_type;
     typedef typename string_type::value_type char_type;
@@ -653,7 +653,7 @@ public:
 
 private:
 
-    // parsing_context
+    // serializing_context
 
     size_t do_line_number() const override
     {

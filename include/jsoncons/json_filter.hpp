@@ -52,76 +52,76 @@ private:
         output_handler_.end_json();
     }
 
-    void do_begin_object(const parsing_context&) override
+    void do_begin_object(const serializing_context&) override
     {
         output_handler_.begin_object();
     }
 
-    void do_begin_object(size_t length, const parsing_context&) override
+    void do_begin_object(size_t length, const serializing_context&) override
     {
         output_handler_.begin_object(length);
     }
 
-    void do_end_object(const parsing_context&) override
+    void do_end_object(const serializing_context&) override
     {
         output_handler_.end_object();
     }
 
-    void do_begin_array(const parsing_context&) override
+    void do_begin_array(const serializing_context&) override
     {
         output_handler_.begin_array();
     }
 
-    void do_begin_array(size_t length, const parsing_context&) override
+    void do_begin_array(size_t length, const serializing_context&) override
     {
         output_handler_.begin_array(length);
     }
 
-    void do_end_array(const parsing_context&) override
+    void do_end_array(const serializing_context&) override
     {
         output_handler_.end_array();
     }
 
     void do_name(const string_view_type& name, 
-                 const parsing_context&) override
+                 const serializing_context&) override
     {
         output_handler_.name(name);
     }
 
     void do_string_value(const string_view_type& value, 
-                         const parsing_context&) override
+                         const serializing_context&) override
     {
         output_handler_.string_value(value);
     }
 
     void do_byte_string_value(const uint8_t* data, size_t length, 
-                                const parsing_context&) override
+                                const serializing_context&) override
     {
         output_handler_.byte_string_value(data, length);
     }
 
-    void do_integer_value(int64_t value, const parsing_context&) override
+    void do_integer_value(int64_t value, const serializing_context&) override
     {
         output_handler_.integer_value(value);
     }
 
     void do_uinteger_value(uint64_t value, 
-                           const parsing_context&) override
+                           const serializing_context&) override
     {
         output_handler_.uinteger_value(value);
     }
 
-    void do_double_value(double value, const number_format& fmt, const parsing_context&) override
+    void do_double_value(double value, const number_format& fmt, const serializing_context&) override
     {
         output_handler_.double_value(value, fmt);
     }
 
-    void do_bool_value(bool value, const parsing_context&) override
+    void do_bool_value(bool value, const serializing_context&) override
     {
         output_handler_.bool_value(value);
     }
 
-    void do_null_value(const parsing_context&) override
+    void do_null_value(const serializing_context&) override
     {
         output_handler_.null_value();
     }
@@ -133,13 +133,13 @@ class basic_json_input_output_adapter : public basic_json_output_handler<CharT>
 public:
     using typename basic_json_output_handler<CharT>::string_view_type                                 ;
 private:
-    class null_parsing_context : public parsing_context
+    class null_serializing_context : public serializing_context
     {
         size_t do_line_number() const override { return 0; }
 
         size_t do_column_number() const override { return 0; }
     };
-    const null_parsing_context default_context_ = null_parsing_context();
+    const null_serializing_context default_context_ = null_serializing_context();
 
     basic_null_json_content_handler<CharT> null_input_handler_;
     basic_json_output_input_adapter<CharT> default_input_output_adapter_;
@@ -309,79 +309,79 @@ private:
         downstream_handler_.end_json();
     }
 
-    void do_begin_object(const parsing_context& context) override
+    void do_begin_object(const serializing_context& context) override
     {
         downstream_handler_.begin_object(context);
     }
 
-    void do_begin_object(size_t length, const parsing_context& context) override
+    void do_begin_object(size_t length, const serializing_context& context) override
     {
         downstream_handler_.begin_object(length, context);
     }
 
-    void do_end_object(const parsing_context& context) override
+    void do_end_object(const serializing_context& context) override
     {
         downstream_handler_.end_object(context);
     }
 
-    void do_begin_array(const parsing_context& context) override
+    void do_begin_array(const serializing_context& context) override
     {
         downstream_handler_.begin_array(context);
     }
 
-    void do_begin_array(size_t length, const parsing_context& context) override
+    void do_begin_array(size_t length, const serializing_context& context) override
     {
         downstream_handler_.begin_array(length, context);
     }
 
-    void do_end_array(const parsing_context& context) override
+    void do_end_array(const serializing_context& context) override
     {
         downstream_handler_.end_array(context);
     }
 
     void do_name(const string_view_type& name,
-                 const parsing_context& context) override
+                 const serializing_context& context) override
     {
         downstream_handler_.name(name,context);
     }
 
     void do_string_value(const string_view_type& value,
-                         const parsing_context& context) override
+                         const serializing_context& context) override
     {
         downstream_handler_.string_value(value,context);
     }
 
     void do_byte_string_value(const uint8_t* data, size_t length,
-                              const parsing_context& context) override
+                              const serializing_context& context) override
     {
         downstream_handler_.byte_string_value(data, length, context);
     }
 
     void do_double_value(double value, const number_format& fmt,
-                 const parsing_context& context) override
+                 const serializing_context& context) override
     {
         downstream_handler_.double_value(value, fmt, context);
     }
 
     void do_integer_value(int64_t value,
-                 const parsing_context& context) override
+                 const serializing_context& context) override
     {
         downstream_handler_.integer_value(value,context);
     }
 
     void do_uinteger_value(uint64_t value,
-                 const parsing_context& context) override
+                 const serializing_context& context) override
     {
         downstream_handler_.uinteger_value(value,context);
     }
 
     void do_bool_value(bool value,
-                 const parsing_context& context) override
+                 const serializing_context& context) override
     {
         downstream_handler_.bool_value(value,context);
     }
 
-    void do_null_value(const parsing_context& context) override
+    void do_null_value(const serializing_context& context) override
     {
         downstream_handler_.null_value(context);
     }
@@ -437,7 +437,7 @@ public:
 
 private:
     void do_name(const string_view_type& name,
-                 const parsing_context& context) override
+                 const serializing_context& context) override
     {
         if (name == name_)
         {
