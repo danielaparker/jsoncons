@@ -2354,10 +2354,10 @@ struct cbor_Encoder_
                 }
 
                 // append each element
-                for (const auto& kv: jval.object_range())
+                for (const auto& member: jval.object_range())
                 {
-                    encode_string(kv.key(), action, v);
-                    encode(kv.value(), action, v);
+                    encode_string(member.key(), action, v);
+                    encode(member.value(), action, v);
                 }
                 break;
             }

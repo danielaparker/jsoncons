@@ -27,9 +27,9 @@ int main()
 }
 )");
 
-    for (const auto& kv : j.object_range())
+    for (const auto& member : j.object_range())
     {
-        std::cout << kv.key() << " => " << kv.value().as<std::string>() << std::endl;
+        std::cout << member.key() << " => " << member.value().as<std::string>() << std::endl;
     }
 }
 ```
