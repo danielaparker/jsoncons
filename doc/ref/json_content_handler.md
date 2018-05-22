@@ -2,8 +2,9 @@
 
 ```c++
 typedef basic_json_content_handler<char> json_content_handler
+```
 
-The `json_content_handler` class is an instantiation of the `basic_json_content_handler` class template that uses `char` as the character type. It defines an interface for a listener to JSON events.
+Defines an interface for receiving JSON events. The `json_content_handler` class is an instantiation of the `basic_json_content_handler` class template that uses `char` as the character type. 
 
 #### Header
 ```c++
