@@ -75,7 +75,9 @@ namespace jsoncons
 
 void streaming_example1()
 {
-    std::map<std::string,std::tuple<std::string,std::string,double>> employees = 
+    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+
+    employee_collection employees = 
     { 
         {"John Smith",{"Hourly","Software Engineer",10000}},
         {"Jane Doe",{"Commission","Sales",20000}}
@@ -124,14 +126,35 @@ void streaming_example3()
     std::cout << "\n\n";
 }
 
-void encode_json_examples()
+void json_decode_example()
 {
-    std::cout << "\nStreaming examples\n\n";
+    std::string s = R"(
+    {
+        "Jane Doe": ["Commission","Sales",20000.0],
+        "John Smith": ["Hourly","Software Engineer",10000.0]
+    }
+    )";
+
+    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+
+    employee_collection employees = jsoncons::decode_json<employee_collection>(s);
+
+    for (const auto& pair : employees)
+    {
+        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
+    }
+}
+
+void json_convert_examples()
+{
+    std::cout << "\njson convert examples\n\n";
 
     streaming_example1();
     streaming_example2();
     streaming_example3();
+    json_decode_example();
 
     std::cout << std::endl;
 }
+
 

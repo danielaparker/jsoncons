@@ -19,14 +19,16 @@ template <class T, class CharT>
 void encode_json(const T& val, std::basic_ostream<CharT>& os); // (3)
 
 template <class T, class CharT>
-void encode_json(const T& val, const basic_json_serializing_options<CharT>& options,
+void encode_json(const T& val, 
+                 const basic_json_serializing_options<CharT>& options,
                  std::basic_ostream<CharT>& os); // (4)
 
 template <class T, class CharT>
 void encode_json(const T& val, std::basic_ostream<CharT>& os, indenting line_indent); // (5)
 
 template <class T, class CharT>
-void encode_json(const T& val, const basic_json_serializing_options<CharT>& options,
+void encode_json(const T& val, 
+                 const basic_json_serializing_options<CharT>& options,
                  std::basic_ostream<CharT>& os, indenting line_indent); // (6)
 ```
 
@@ -90,29 +92,26 @@ int main()
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
-    std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
-    std::cout << "(1)\n" << s << std::endl;
-    auto employees2 = jsoncons::decode_json<employee_collection>(s);
+    std::cout << "(1)\n" << std::endl; 
+    encode_json(employees,std::cout);
+    std::cout << "\n\n";
 
-    std::cout << "\n(2)\n";
-    for (const auto& pair : employees2)
-    {
-        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
-    }
+    std::cout << "(2) Again, with pretty print\n" << std::endl; 
+    encode_json(employees, std::cout, jsoncons::indenting::indent);
 }
 ```
 Output:
 ```
 (1)
+
+{"Jane Doe":["Commission","Sales",20000.0],"John Smith":["Hourly","Software Engineer",10000.0]}
+
+(2) Again, with pretty print
+
 {
     "Jane Doe": ["Commission","Sales",20000.0],
     "John Smith": ["Hourly","Software Engineer",10000.0]
 }
-
-(2)
-Jane Doe: Sales
-John Smith: Software Engineer
 ```
     
 #### Contain JSON output in an object
@@ -242,5 +241,9 @@ Output:
     [3.0,4.0]
 ]
 ```
+
+#### See also
+
+- [decode_json](decode_json.md)
 
 

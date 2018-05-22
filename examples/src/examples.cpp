@@ -26,7 +26,7 @@ void msgpack_examples();
 void jsonpointer_examples();
 void jsonpatch_examples();
 void cbor_examples();
-void encode_json_examples();
+void json_convert_examples();
 
 void comment_example()
 {
@@ -483,7 +483,7 @@ int main()
 
         csv_examples();
 
-        encode_json_examples();
+        json_convert_examples();
     }
     catch (const std::exception& e)
     {

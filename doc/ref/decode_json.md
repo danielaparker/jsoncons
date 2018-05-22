@@ -11,10 +11,7 @@ work for all types that have `json_type_traits` defined.
 #include <jsoncons/json.hpp>
 
 template <class T, class CharT>
-T decode_json(const std::basic_string<CharT>& s)
-{
-    return json_convert_traits<T>::decode(s);
-}
+T decode_json(const std::basic_string<CharT>& s);
 ```
 
 ### Examples
@@ -33,19 +30,16 @@ int main()
 {
     typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
 
-    employee_collection employees = 
-    { 
-        {"John Smith",{"Hourly","Software Engineer",10000}},
-        {"Jane Doe",{"Commission","Sales",20000}}
-    };
+    std::string s = R"(
+    {
+        "Jane Doe": ["Commission","Sales",20000.0],
+        "John Smith": ["Hourly","Software Engineer",10000.0]
+    }
+    )";
 
-    std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
-    std::cout << "(1)\n" << s << std::endl;
-    auto employees2 = jsoncons::decode_json<employee_collection>(s);
+    employee_collection employees = jsoncons::decode_json<employee_collection>(s);
 
-    std::cout << "\n(2)\n";
-    for (const auto& pair : employees2)
+    for (const auto& pair : employees)
     {
         std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
     }
@@ -53,14 +47,11 @@ int main()
 ```
 Output:
 ```
-(1)
-{
-    "Jane Doe": ["Commission","Sales",20000.0],
-    "John Smith": ["Hourly","Software Engineer",10000.0]
-}
-
-(2)
 Jane Doe: Sales
 John Smith: Software Engineer
 ```
+
+#### See also
+
+- [encode_json](encode_json.md)
 
