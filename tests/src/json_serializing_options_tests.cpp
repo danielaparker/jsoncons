@@ -63,7 +63,9 @@ BOOST_AUTO_TEST_CASE(test_read_nan_replacement)
 
     json j = json::parse(s,options);
 
-    std::cout << pretty_print(j) << std::endl;
+    std::cout << "\n(1)\n" << pretty_print(j) << std::endl;
+
+    std::cout << "\n(2)\n" << pretty_print(j,options) << std::endl;
 
     json expected;
     expected["field1"] = std::nan("");

@@ -88,10 +88,20 @@ options.neg_inf_replacement("\"NegativeInfinity\"");
 
 json j = json::parse(s,options);
 
-std::cout << pretty_print(j,options) << std::endl;
+std::cout << "\n(1)\n" << pretty_print(j) << std::endl;
+
+std::cout << "\n(2)\n" << pretty_print(j,options) << std::endl;
 ```
 Output:
 ```
+(1)
+{
+    "field1": null,
+    "field2": null,
+    "field3": null
+}
+
+(2)
 {
     "field1": "NaN",
     "field2": "PositiveInfinity",
