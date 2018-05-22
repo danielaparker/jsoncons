@@ -27,7 +27,19 @@
 <div id="A1"/>
 ### Preliminaries
 
-jsoncons is a C++ library for the construction of [JavaScript Object Notation (JSON)](http://www.json.org). It supports parsing a JSON file or string into a `json` value, building a `json` value in C++ code, and serializing a `json` value to a file or string. It supports converting to and from the standard library sequence and associative containers. It also provides an API for generating json read and write events in code, somewhat analogously to SAX processing in the XML world. For more information, consult the latest [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/doc/Roadmap.md). 
+jsoncons is a C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
+data formats (e.g. CBOR). It supports 
+
+- Parsing JSON-like text or binary data into an unpacked representation
+  that defines an interface for accessing and modifying that data.
+
+- Serializing the unpacked representation into different JSON-like text or binary data.
+
+- Converting from JSON-like text or binary data to C++ objects and back.
+
+- Streaming JSON read and write events, somewhat analogously to SAX processing in the XML world. 
+
+For more information, consult the latest [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/doc/Roadmap.md). 
 
 jsoncons uses some features that are new to C++ 11, particularly [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler.
 
@@ -341,12 +353,12 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    csv_parameters params;
+    csv_serializing_options options;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
           .column_types("integer,string,string,string");
-    ojson tasks = decode_csv<ojson>(is, params);
+    ojson tasks = decode_csv<ojson>(is, options);
 
     std::cout << "(1)\n" << pretty_print(tasks) << "\n\n";
 
@@ -420,10 +432,10 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [serialization_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/serialization_options.md), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [json_serializing_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_serializing_options.md), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
 ```c++
-serialization_options options;
+json_serializing_options options;
 format.object_array_split_lines(line_split_kind::new_line);
 std::cout << pretty_print(val,options) << std::endl;
 ```
@@ -443,7 +455,7 @@ produces
 ```
 To display the elements of array values on multiple lines, set the `object_array_split_lines` property to `line_split_kind::multi_line`. The code
 ```c++
-serialization_options options;
+json_serializing_options options;
 format.object_array_split_lines(line_split_kind::multi_line);
 std::cout << pretty_print(val,options) << std::endl;
 ```
@@ -730,7 +742,7 @@ Output:
 ```
 
 <div id="A12"/>
-### Convert `json` to/from user defined type
+### Convert unpacked `json` value to user defined type and back
 
 In the json class, constructors, accessors and modifiers are templated, for example,
 ```c++
@@ -904,4 +916,5 @@ Output:
     "SalesRep": "Jane Doe"
 }
 ```
+
 
