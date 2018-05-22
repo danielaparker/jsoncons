@@ -266,7 +266,7 @@ public:
     basic_json_serializing_options<CharT>& neg_inf_replacement(const string_type& replacement)
     {
         neg_inf_replacement_ = replacement;
-        can_read_neg_inf_replacement_ = basic_json<CharT>::parse(replacement).is_string();
+        can_read_neg_inf_replacement_ = is_string(replacement);
         return *this;
     }
 private:
