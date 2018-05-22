@@ -241,7 +241,7 @@ public:
     {
         nan_replacement_ = replacement;
 
-        can_read_nan_replacement_ = basic_json<CharT>::parse(replacement).is_string();
+        can_read_nan_replacement_ = is_string(replacement);
 
         return *this;
     }
@@ -254,7 +254,7 @@ public:
     basic_json_serializing_options<CharT>& pos_inf_replacement(const string_type& replacement)
     {
         pos_inf_replacement_ = replacement;
-        can_read_pos_inf_replacement_ = basic_json<CharT>::parse(replacement).is_string();
+        can_read_pos_inf_replacement_ = is_string(replacement);
         return *this;
     }
 
@@ -268,6 +268,49 @@ public:
         neg_inf_replacement_ = replacement;
         can_read_neg_inf_replacement_ = basic_json<CharT>::parse(replacement).is_string();
         return *this;
+    }
+private:
+    enum class input_state {initial,begin_quote,character,end_quote,escape,error};
+    bool is_string(const string_view_type& s) const
+    {
+        input_state state = input_state::initial;
+        for (CharT c : s)
+        {
+            switch (c)
+            {
+            case '\t': case ' ': case '\n': case'\r':
+                break;
+            case '\\':
+                state = input_state::escape;
+                break;
+            case '\"':
+                switch (state)
+                {
+                case input_state::initial:
+                    state = input_state::begin_quote;
+                    break;
+                case input_state::begin_quote:
+                    state = input_state::end_quote;
+                    break;
+                case input_state::character:
+                    state = input_state::end_quote;
+                    break;
+                case input_state::end_quote:
+                    state = input_state::error;
+                    break;
+                case input_state::escape:
+                    state = input_state::character;
+                    break;
+                default:
+                    break;
+                }
+            default:
+                state = input_state::error;
+                break;
+            }
+
+        }
+        return state == input_state::end_quote;
     }
 };
 
