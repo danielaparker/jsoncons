@@ -37,7 +37,7 @@ private:
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef serializing_context parsing_context;
+typedef serializing_context serializing_context;
 #endif
 
 }

@@ -39,7 +39,7 @@ public:
 
 private:
     void do_name(const string_view_type& name,
-                 const parsing_context& context) override
+                 const serializing_context& context) override
     {
         member_name_ = std::string(name);
         if (member_name_ != "name")
@@ -49,7 +49,7 @@ private:
     }
 
     void do_string_value(const string_view_type& s,
-                         const parsing_context& context) override
+                         const serializing_context& context) override
     {
         if (member_name_ == "name")
         {

@@ -179,7 +179,7 @@ public:
     {
     }
 
-    const serializing_context& parsing_context() const
+    const serializing_context& serializing_context() const
     {
         return *this;
     }
