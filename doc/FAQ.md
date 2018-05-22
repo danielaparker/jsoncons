@@ -122,9 +122,9 @@ std::cout << pretty_print(j) << std::endl; // pretty_print
 #### How can I iterate over a json array?
 
 ```c++
-json book = json::array{1,2,3,4};
+json j = json::array{1,2,3,4};
 
-for (auto val : book.array_range())
+for (auto val : j.array_range())
 {
     std::cout << val << std::endl;
 }
@@ -133,16 +133,16 @@ for (auto val : book.array_range())
 #### How can I iterate over a json object?
 
 ```c++
-json book = json::object{
+json j = json::object{
     {"author", "Haruki Murakami"},
     {"title", "Kafka on the Shore"},
     {"price", 25.17}
 };
 
-for (const auto& kv : book.object_range())
+for (const auto& member : j.object_range())
 {
-    std::cout << kv.key() << "=" 
-              << kv.value() << std::endl;
+    std::cout << member.key() << "=" 
+              << member.value() << std::endl;
 }
 ```
 
