@@ -544,7 +544,7 @@ int main()
     reader.read();
     std::cout << std::endl;
 
-    // or a json_output_handler    
+    // or a json_content_handler    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);

@@ -19,17 +19,17 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_serializing_options.hpp>
-#include <jsoncons/json_output_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/writer.hpp>
 #include <jsoncons/detail/number_printers.hpp>
 
 namespace jsoncons {
 
 template<class CharT,class Writer=detail::ostream_buffered_writer<CharT>>
-class basic_json_serializer final : public basic_json_output_handler<CharT>
+class basic_json_serializer final : public basic_json_content_handler<CharT>
 {
 public:
-    using typename basic_json_output_handler<CharT>::string_view_type;
+    using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Writer writer_type;
     typedef typename Writer::output_type output_type;
 
@@ -289,7 +289,7 @@ private:
         writer_.flush();
     }
 
-    void do_begin_object() override
+    void do_begin_object(const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -334,7 +334,7 @@ private:
         writer_.put('{');
     }
 
-    void do_end_object() override
+    void do_end_object(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -352,7 +352,7 @@ private:
     }
 
 
-    void do_begin_array() override
+    void do_begin_array(const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -421,7 +421,7 @@ private:
         }
     }
 
-    void do_end_array() override
+    void do_end_array(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -437,7 +437,7 @@ private:
         end_value();
     }
 
-    void do_name(const string_view_type& name) override
+    void do_name(const string_view_type& name, const serializing_context&) override
     {
         if (!stack_.empty())
         {
@@ -464,7 +464,7 @@ private:
         }
     }
 
-    void do_null_value() override
+    void do_null_value(const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -477,7 +477,7 @@ private:
         end_value();
     }
 
-    void do_string_value(const string_view_type& value) override
+    void do_string_value(const string_view_type& value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -491,14 +491,14 @@ private:
         end_value();
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length) override
+    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
         std::basic_string<CharT> s;
         encode_base64url(data,data+length,s);
-        do_string_value(s);
+        do_string_value(s, context);
     }
 
-    void do_double_value(double value, const number_format& fmt) override
+    void do_double_value(double value, const number_format& fmt, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -546,7 +546,7 @@ private:
         end_value();
     }
 
-    void do_integer_value(int64_t value) override
+    void do_integer_value(int64_t value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -556,7 +556,7 @@ private:
         end_value();
     }
 
-    void do_uinteger_value(uint64_t value) override
+    void do_uinteger_value(uint64_t value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -566,7 +566,7 @@ private:
         end_value();
     }
 
-    void do_bool_value(bool value) override
+    void do_bool_value(bool value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {

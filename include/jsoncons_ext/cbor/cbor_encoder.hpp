@@ -18,16 +18,16 @@
 #include <memory>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
-#include <jsoncons/json_output_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/writer.hpp>
 
 namespace jsoncons { cbor {
 
 template<class CharT,class Writer=detail::ostream_buffered_writer<CharT>>
-class basic_cbor_encoder final : public basic_json_output_handler<CharT>
+class basic_cbor_encoder final : public basic_json_content_handler<CharT>
 {
 public:
-    using typename basic_json_output_handler<CharT>::string_view_type;
+    using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Writer writer_type;
     typedef typename Writer::output_type output_type;
 

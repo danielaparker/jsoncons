@@ -52,7 +52,7 @@ namespace jsoncons
             }
         }
 
-        static void encode(const matrix<double>& val, json_output_handler& handler)
+        static void encode(const matrix<double>& val, json_content_handler& handler)
         {
             handler.begin_array();
             for (size_t i = 0; i < val.size1(); ++i)

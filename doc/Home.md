@@ -25,7 +25,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 [json_content_handler](ref/json_content_handler.md)  
 
-[json_output_handler](ref/json_output_handler.md)  
+[json_content_handler](ref/json_content_handler.md)  
 [json_serializer](ref/json_serializer.md)  
 [json_serializing_options](ref/json_serializing_options.md)  
 

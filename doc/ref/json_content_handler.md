@@ -18,115 +18,142 @@ Member type                         |Definition
 #### Public interface methods
 
     void begin_json()
-Send begin JSON document event. Uses `do_begin_json`.
+Sends a notification of the beginning of a sequence of JSON events. 
 
     void end_json()
-Send end JSON document event. Uses `do_end_json`.
+Sends a notification of the end of a sequence of JSON events. 
 
+    void begin_object()
     void begin_object(const serializing_context& context)
-Send begin JSON object event. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_begin_object`.
+Sends a notification of the begining of an object. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter.
 
+    void end_object()
     void end_object(const serializing_context& context)
-Send end JSON object event. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_end_object`.
+Sends a notification of the end of an object. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void begin_array()
     void begin_array(const serializing_context& context)
-Send begin JSON array event. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_begin_array`.
+Sends a notification of the beginning of an array. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void begin_array(size_t length)
+    void begin_array(size_t length, const serializing_context& context)
+Sends a notification of the beginning of an array of known length. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
+
+    void end_array()
     void end_array(const serializing_context& context)
-Send end JSON array event. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_end_array`.
+Sends a notification of the end of an array. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void name(const string_view_type& name)
     void name(const string_view_type& name, const serializing_context& context)
-Send name event for a name-value pair. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter.  Uses `do_name`.
+Sends the name part of a name-value pair inside an object. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter.  
 
+    void string_value(const string_view_type& value) 
     void string_value(const string_view_type& value, const serializing_context& context) 
-Send character data event. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_string_value`.
+Sends a string value. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void byte_string_value(const uint8_t* data, size_t length) 
+    void byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
+Sends a byte string value. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
+
+    void integer_value(int64_t value) 
     void integer_value(int64_t value, const serializing_context& context)
-Send signed integer event. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_integer_value`.
+Sends a signed integer value. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void uinteger_value(uint64_t value) 
     void uinteger_value(uint64_t value, const serializing_context& context)
-Send non-negative integer event. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_uinteger_value`.
+Sends a non-negative integer value. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void double_value(double value) 
     void double_value(double value, const serializing_context& context)
-Send floating point value with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_double_value`.
+Sends a floating point value with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void double_value(double value, uint8_t precision) 
     void double_value(double value, uint8_t precision, const serializing_context& context)
-Send floating point value with specified precision. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_double_value`.
+Sends a floating point value with specified precision. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void double_value(double value, const number_format& fmt) 
     void double_value(double value, const number_format& fmt, const serializing_context& context)
-Send floating point value with specified precision. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_double_value`.
+Sends a floating point value with specified precision. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void bool_value(bool value) 
     void bool_value(bool value, const serializing_context& context) 
-Send boolean value. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_bool_value`.
+Sends a boolean value. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
+    void null_value() 
     void null_value(const serializing_context& context) 
-Send null value. Contextual information including
-line and column information is provided in the [serializing_context](serializing_context.md) parameter. Uses `do_null_value`.
+Sends a null value. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
 #### Private virtual implementation methods
 
     virtual void do_begin_json() = 0;
-Receive begin JSON document event
+Receives a notification of the beginning of a sequence of JSON events.
 
     virtual void do_end_json() = 0;
-Receive end JSON document event
+Receives a notification of the end of a sequence of JSON events.
 
     virtual void do_begin_object(const serializing_context& context) = 0;
-Receive begin JSON object event. Contextual information including
+Receives a notification of the beginning of an object. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_end_object(const serializing_context& context) = 0;
-Receive end JSON object event. Contextual information including
+Receives a notification of the end of an object. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_begin_array(const serializing_context& context) = 0;
-Receive begin JSON array event. Contextual information including
+Receives a notification of the beginning of an array. Contextual information including
+line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
+
+    virtual void do_begin_array(size_t length, const serializing_context& context);
+Receives a notification of the beginning of an array of known length. Defaults to calling `do_begin_array(const serializing_context& context)`. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_end_array(const serializing_context& context) = 0;
-Receive end JSON array event. Contextual information including
+Receives a notification of the end of an array. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_name(const string_view_type& name, 
                          const serializing_context& context) = 0;
-Receive name event for name-value pair. Contextual information including
+Receives the name part of a name-value pair inside an object. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter.  
 
     virtual void do_string_value(const string_view_type& val, 
                                  const serializing_context& context) = 0;
-Receive character data event. Contextual information including
+Receives a string value. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_integer_value(int64_t value, const serializing_context& context) = 0;
-Receive signed integer value. Contextual information including
+Receives a signed integer value. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_uinteger_value(uint64_t value, 
                                    const serializing_context& context) = 0;
-Receive non-negative integer value. Contextual information including
+Receives a non-negative integer value. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_double_value(double value, const number_format& fmt, const serializing_context& context) = 0;
-Receive floating point value. Contextual information including
+Receives a floating point value. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_bool_value(bool value, const serializing_context& context) = 0;
-Receive boolean value. Contextual information including
+Receives a boolean value. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 
     virtual void do_null_value(const serializing_context& context) = 0;
-Receive null value. Contextual information including
+Receives a null value. Contextual information including
 line and column information is provided in the [serializing_context](serializing_context.md) parameter. 
 

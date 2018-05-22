@@ -18,7 +18,7 @@
 #include <array>
 #include <type_traits>
 #include <memory>
-#include <jsoncons/json_output_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
@@ -39,7 +39,7 @@ struct json_convert_traits
     }
 
     template <class CharT>
-    static void encode(const T& val, basic_json_output_handler<CharT>& serializer)
+    static void encode(const T& val, basic_json_content_handler<CharT>& serializer)
     {
         auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
         j.dump(serializer);
@@ -65,7 +65,7 @@ struct json_convert_traits<T,
     }
 
     template <class CharT>
-    static void encode(const T& val, basic_json_output_handler<CharT>& serializer)
+    static void encode(const T& val, basic_json_content_handler<CharT>& serializer)
     {
         serializer.begin_json();
         serializer.begin_array();
@@ -100,7 +100,7 @@ struct json_convert_traits<std::array<T,N>>
     }
 
     template <class CharT>
-    static void encode(const std::array<T, N>& val, basic_json_output_handler<CharT>& serializer)
+    static void encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& serializer)
     {
         serializer.begin_json();
         serializer.begin_array();
@@ -131,7 +131,7 @@ struct json_convert_traits<T,
     }
 
     template <class CharT>
-    static void encode(const T& val, basic_json_output_handler<CharT>& serializer)
+    static void encode(const T& val, basic_json_content_handler<CharT>& serializer)
     {
         serializer.begin_json();
         serializer.begin_object();
@@ -156,7 +156,7 @@ struct tuple_helper
     using next = tuple_helper<Pos - 1, Tuple>;
     
     template <class CharT>
-    static void encode(const Tuple& tuple, basic_json_output_handler<CharT>& handler)
+    static void encode(const Tuple& tuple, basic_json_content_handler<CharT>& handler)
     {
         json_convert_traits<element_type>::encode(std::get<std::tuple_size<Tuple>::value - Pos>(tuple),handler);
         next::encode(tuple, handler);
@@ -167,7 +167,7 @@ template<class Tuple>
 struct tuple_helper<0, Tuple>
 {
     template <class CharT>
-    static void encode(const Tuple&, basic_json_output_handler<CharT>&)
+    static void encode(const Tuple&, basic_json_content_handler<CharT>&)
     {
     }
 };
@@ -189,7 +189,7 @@ public:
     }
 
     template <class CharT>
-    static void encode(const std::tuple<E...>& val, basic_json_output_handler<CharT>& serializer)
+    static void encode(const std::tuple<E...>& val, basic_json_content_handler<CharT>& serializer)
     {
         serializer.begin_array();
         helper::encode(val, serializer);
@@ -208,7 +208,7 @@ T decode_json(const std::basic_string<CharT>& s)
 // encode_json
 
 template <class T, class CharT>
-void encode_json(const T& val, basic_json_output_handler<CharT>& handler)
+void encode_json(const T& val, basic_json_content_handler<CharT>& handler)
 {
     handler.begin_json();
     json_convert_traits<T>::encode(val,handler);
@@ -216,7 +216,7 @@ void encode_json(const T& val, basic_json_output_handler<CharT>& handler)
 }
 
 template <class T, class CharT>
-void encode_fragment(const T& val, basic_json_output_handler<CharT>& handler)
+void encode_fragment(const T& val, basic_json_content_handler<CharT>& handler)
 {
     json_convert_traits<T>::encode(val,handler);
 }

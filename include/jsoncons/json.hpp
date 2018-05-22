@@ -22,7 +22,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_structures.hpp>
-#include <jsoncons/json_output_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_decoder.hpp>
@@ -2464,7 +2464,7 @@ public:
         {
             evaluate().dump(s,options);
         }
-        void dump(basic_json_output_handler<char_type>& handler) const
+        void dump(basic_json_content_handler<char_type>& handler) const
         {
             evaluate().dump(handler);
         }
@@ -2504,7 +2504,7 @@ public:
         {
             return evaluate().to_string(allocator);
         }
-        void write(basic_json_output_handler<char_type>& handler) const
+        void write(basic_json_content_handler<char_type>& handler) const
         {
             evaluate().write(handler);
         }
@@ -2548,7 +2548,7 @@ public:
         {
             return evaluate().elements();
         }
-        void to_stream(basic_json_output_handler<char_type>& handler) const
+        void to_stream(basic_json_content_handler<char_type>& handler) const
         {
             evaluate().to_stream(handler);
         }
@@ -3127,12 +3127,12 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    void dump_body(basic_json_output_handler<char_type>& handler) const
+    void dump_body(basic_json_content_handler<char_type>& handler) const
     {
         dump_fragment(handler);
     }
 #endif
-    void dump_fragment(basic_json_output_handler<char_type>& handler) const
+    void dump_fragment(basic_json_content_handler<char_type>& handler) const
     {
         switch (var_.type_id())
         {
@@ -3189,7 +3189,7 @@ public:
             break;
         }
     }
-    void dump(basic_json_output_handler<char_type>& handler) const
+    void dump(basic_json_content_handler<char_type>& handler) const
     {
         handler.begin_json();
         dump_fragment(handler);
@@ -3251,11 +3251,11 @@ public:
         dump(serializer);
     }
 
-    void write_body(basic_json_output_handler<char_type>& handler) const
+    void write_body(basic_json_content_handler<char_type>& handler) const
     {
         dump(handler);
     }
-    void write(basic_json_output_handler<char_type>& handler) const
+    void write(basic_json_content_handler<char_type>& handler) const
     {
         dump(handler);
     }
@@ -3275,7 +3275,7 @@ public:
         dump(os,options,pprint);
     }
 
-    void to_stream(basic_json_output_handler<char_type>& handler) const
+    void to_stream(basic_json_content_handler<char_type>& handler) const
     {
         handler.begin_json();
         dump_fragment(handler);

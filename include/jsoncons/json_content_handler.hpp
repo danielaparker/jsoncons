@@ -38,9 +38,19 @@ public:
         do_end_json();
     }
 
+    void begin_object()
+    {
+        do_begin_object(null_serializing_context());
+    }
+
     void begin_object(const serializing_context& context)
     {
         do_begin_object(context);
+    }
+
+    void begin_object(size_t length)
+    {
+        do_begin_object(length, null_serializing_context());
     }
 
     void begin_object(size_t length, const serializing_context& context)
@@ -48,9 +58,24 @@ public:
         do_begin_object(length, context);
     }
 
+    void end_object()
+    {
+        do_end_object(null_serializing_context());
+    }
+
     void end_object(const serializing_context& context)
     {
         do_end_object(context);
+    }
+
+    void begin_array()
+    {
+        do_begin_array(null_serializing_context());
+    }
+
+    void begin_array(size_t length)
+    {
+        do_begin_array(length, null_serializing_context());
     }
 
     void begin_array(const serializing_context& context)
@@ -63,9 +88,19 @@ public:
         do_begin_array(length, context);
     }
 
+    void end_array()
+    {
+        do_end_array(null_serializing_context());
+    }
+
     void end_array(const serializing_context& context)
     {
         do_end_array(context);
+    }
+
+    void name(const string_view_type& name)
+    {
+        do_name(name, null_serializing_context());
     }
 
     void name(const string_view_type& name, const serializing_context& context)
@@ -73,11 +108,19 @@ public:
         do_name(name, context);
     }
 
-// new
+    void string_value(const string_view_type& value) 
+    {
+        do_string_value(value, null_serializing_context());
+    }
 
     void string_value(const string_view_type& value, const serializing_context& context) 
     {
         do_string_value(value, context);
+    }
+
+    void byte_string_value(const uint8_t* data, size_t length) 
+    {
+        do_byte_string_value(data, length, null_serializing_context());
     }
 
     void byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
@@ -85,14 +128,39 @@ public:
         do_byte_string_value(data, length, context);
     }
 
+    void integer_value(int64_t value)
+    {
+        do_integer_value(value,null_serializing_context());
+    }
+
     void integer_value(int64_t value, const serializing_context& context)
     {
         do_integer_value(value,context);
     }
 
+    void uinteger_value(uint64_t value)
+    {
+        do_uinteger_value(value,null_serializing_context());
+    }
+
     void uinteger_value(uint64_t value, const serializing_context& context)
     {
         do_uinteger_value(value,context);
+    }
+
+    void double_value(double value)
+    {
+        do_double_value(value, number_format(), null_serializing_context());
+    }
+
+    void double_value(double value, uint8_t precision)
+    {
+        do_double_value(value, number_format(precision, 0), null_serializing_context());
+    }
+
+    void double_value(double value, const number_format& fmt)
+    {
+        do_double_value(value, fmt, null_serializing_context());
     }
 
     void double_value(double value, const serializing_context& context)
@@ -110,9 +178,19 @@ public:
         do_double_value(value, fmt, context);
     }
 
+    void bool_value(bool value) 
+    {
+        do_bool_value(value,null_serializing_context());
+    }
+
     void bool_value(bool value, const serializing_context& context) 
     {
         do_bool_value(value,context);
+    }
+
+    void null_value() 
+    {
+        do_null_value(null_serializing_context());
     }
 
     void null_value(const serializing_context& context) 

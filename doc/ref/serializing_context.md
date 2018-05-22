@@ -4,7 +4,7 @@
 class serializing_context;
 ```
 
-Provides contextual information for serializing and deserializing. This information may be used for error reporting.
+Provides contextual information for serializing and deserializing JSON and JSON-like data formats. This information may be used for error reporting.
 
 #### Header
 

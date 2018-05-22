@@ -3,7 +3,7 @@
 ```c++
 typedef basic_json_serializing_options<char> json_serializing_options
 ```
-The `json_serializing_options` class is an instantiation of the `basic_json_serializing_options` class template that uses `char` as the character type.
+Specifies options for serializing and deserializing JSON text. The `json_serializing_options` class is an instantiation of the `basic_json_serializing_options` class template that uses `char` as the character type.
 
 The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A `precision` gives the maximum number of significant digits, the default precision is `15`. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, conversion to text becomes an issue for floating point numbers that do not have an exact representation, e.g. 1.1 read may become 1.1000000000000001 when written. 
 

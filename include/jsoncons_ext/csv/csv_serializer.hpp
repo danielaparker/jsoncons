@@ -17,7 +17,7 @@
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_serializing_options.hpp>
-#include <jsoncons/json_output_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/number_printers.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons_ext/csv/csv_serializing_options.hpp>
@@ -26,7 +26,7 @@
 namespace jsoncons { namespace csv {
 
 template<class CharT,class Writer=jsoncons::detail::ostream_buffered_writer<CharT>,class Allocator=std::allocator<CharT>>
-class basic_csv_serializer final : public basic_json_output_handler<CharT>
+class basic_csv_serializer final : public basic_json_content_handler<CharT>
 {
 public:
     typedef typename Writer::output_type output_type;
@@ -36,7 +36,7 @@ public:
     typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
 
-    using typename basic_json_output_handler<CharT>::string_view_type                                 ;
+    using typename basic_json_content_handler<CharT>::string_view_type                                 ;
 private:
     struct stack_item
     {
@@ -123,12 +123,12 @@ private:
         writer_.flush();
     }
 
-    void do_begin_object() override
+    void do_begin_object(const serializing_context&) override
     {
         stack_.push_back(stack_item(true));
     }
 
-    void do_end_object() override
+    void do_end_object(const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -164,7 +164,7 @@ private:
         end_value();
     }
 
-    void do_begin_array() override
+    void do_begin_array(const serializing_context&) override
     {
         stack_.push_back(stack_item(false));
         if (stack_.size() == 2)
@@ -187,7 +187,7 @@ private:
         }
     }
 
-    void do_end_array() override
+    void do_end_array(const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -198,7 +198,7 @@ private:
         end_value();
     }
 
-    void do_name(const string_view_type& name) override
+    void do_name(const string_view_type& name, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -230,7 +230,7 @@ private:
 
     }
 
-    void do_null_value() override
+    void do_null_value(const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -253,7 +253,7 @@ private:
         }
     }
 
-    void do_string_value(const string_view_type& val) override
+    void do_string_value(const string_view_type& val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -276,35 +276,12 @@ private:
         }
     }
 
-    void do_byte_string_value(const uint8_t*, size_t) override
+    void do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
     {
 
     }
 
-    void do_double_value(double val, const number_format&) override
-    {
-        if (stack_.size() == 2)
-        {
-            if (stack_.back().is_object())
-            {
-                auto it = buffered_line_.find(stack_.back().name_);
-                if (it != buffered_line_.end())
-                {
-                    std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<CharT> bo(s);
-                    value(val,bo);
-                    bo.flush();
-                    it->second = s;
-                }
-            }
-            else
-            {
-                value(val,writer_);
-            }
-        }
-    }
-
-    void do_integer_value(int64_t val) override
+    void do_double_value(double val, const number_format&, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -327,7 +304,7 @@ private:
         }
     }
 
-    void do_uinteger_value(uint64_t val) override
+    void do_integer_value(int64_t val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -350,7 +327,30 @@ private:
         }
     }
 
-    void do_bool_value(bool val) override
+    void do_uinteger_value(uint64_t val, const serializing_context&) override
+    {
+        if (stack_.size() == 2)
+        {
+            if (stack_.back().is_object())
+            {
+                auto it = buffered_line_.find(stack_.back().name_);
+                if (it != buffered_line_.end())
+                {
+                    std::basic_string<CharT> s;
+                    jsoncons::detail::string_writer<CharT> bo(s);
+                    value(val,bo);
+                    bo.flush();
+                    it->second = s;
+                }
+            }
+            else
+            {
+                value(val,writer_);
+            }
+        }
+    }
+
+    void do_bool_value(bool val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {

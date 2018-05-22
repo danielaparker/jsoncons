@@ -32,7 +32,7 @@ class name_fix_up_filter : public json_filter
 public:
     std::vector<warning> warnings;
 
-    name_fix_up_filter(json_output_handler& handler)
+    name_fix_up_filter(json_content_handler& handler)
         : json_filter(handler)
     {
     }

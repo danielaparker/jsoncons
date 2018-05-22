@@ -28,14 +28,14 @@ Member type                         |Definition
 All JSON events that pass through the `json_filter` go to the specified `json_content_handler` (i.e. another filter.)
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 
-    json_filter(json_output_handler& handler)
-All JSON events that pass through the `json_filter` go to the specified `json_output_handler`.
+    json_filter(json_content_handler& handler)
+All JSON events that pass through the `json_filter` go to the specified `json_content_handler`.
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 
 #### Accessors
 
-    operator json_output_handler&() 
-Adapts a `json_filter` to a `json_output_handler`
+    operator json_content_handler&() 
+Adapts a `json_filter` to a `json_content_handler`
 
     json_content_handler& downstream_handler()
 Returns a reference to the JSON handler that sends json events to downstream handlers. 
@@ -69,7 +69,7 @@ int main()
     reader.read();
     std::cout << std::endl;
 
-    // or a json_output_handler    
+    // or a json_content_handler    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);
@@ -115,7 +115,7 @@ using namespace jsoncons;
 class name_fix_up_filter : public json_filter
 {
 public:
-    name_fix_up_filter(json_output_handler& handler)
+    name_fix_up_filter(json_content_handler& handler)
         : json_filter(handler)
     {
     }

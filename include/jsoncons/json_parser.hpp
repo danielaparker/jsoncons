@@ -37,11 +37,11 @@ class replacement_filter : public basic_json_filter<CharT>
 {
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
 
-    basic_null_json_content_handler<CharT> default_input_handler_;
+    basic_null_json_content_handler<CharT> default_content_handler_;
     basic_json_serializing_options<CharT> options_;
 public:
     replacement_filter()
-        : basic_json_filter<CharT>(default_input_handler_)
+        : basic_json_filter<CharT>(default_content_handler_)
     {
     }
 
@@ -135,7 +135,7 @@ class basic_json_parser : private serializing_context
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
 
     detail::replacement_filter<CharT> replacement_filter_;
-    basic_null_json_content_handler<CharT> default_input_handler_;
+    basic_null_json_content_handler<CharT> default_content_handler_;
     default_parse_error_handler default_err_handler_;
 
     basic_json_content_handler<CharT>& handler_;
@@ -176,7 +176,7 @@ class basic_json_parser : private serializing_context
 public:
 
     basic_json_parser()
-       : handler_(default_input_handler_),
+       : handler_(default_content_handler_),
          err_handler_(default_err_handler_),
          cp_(0),
          cp2_(0),
@@ -201,7 +201,7 @@ public:
     }
 
     basic_json_parser(parse_error_handler& err_handler)
-       : handler_(default_input_handler_),
+       : handler_(default_content_handler_),
          err_handler_(err_handler),
          cp_(0),
          cp2_(0),
@@ -277,7 +277,7 @@ public:
     }
 
     basic_json_parser(const basic_json_serializing_options<CharT>& options)
-       : handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_(default_input_handler_,options) : default_input_handler_),
+       : handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_(default_content_handler_,options) : default_content_handler_),
          err_handler_(default_err_handler_),
          cp_(0),
          cp2_(0),
@@ -303,7 +303,7 @@ public:
 
     basic_json_parser(const basic_json_serializing_options<CharT>& options, 
                       parse_error_handler& err_handler)
-       : handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_(default_input_handler_,options) : default_input_handler_),
+       : handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_(default_content_handler_,options) : default_content_handler_),
          err_handler_(err_handler),
          cp_(0),
          cp2_(0),

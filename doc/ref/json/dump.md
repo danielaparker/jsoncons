@@ -16,9 +16,9 @@ void dump(std::ostream<CharT> os, const json_serializing_options& options) const
 
 void dump(std::ostream<CharT> os, const json_serializing_options& options, indenting line_indent) const; // (6)
 
-void dump(basic_json_output_handler<char_type>& output_handler) const; // (7)
+void dump(basic_json_content_handler<char_type>& content_handler) const; // (7)
 
-void dump_fragment(json_output_handler& handler) const; // (8)
+void dump_fragment(json_content_handler& handler) const; // (8)
 ```
 
 (1) Inserts json value into string using default json_serializing_options.
@@ -33,9 +33,9 @@ void dump_fragment(json_output_handler& handler) const; // (8)
 
 (6) Inserts json value into stream using the specified [json_serializing_options](../json_serializing_options.md) and [indenting](../indenting.md). 
 
-(7) Calls `begin_json()` on [output_handler](../json_output_handler.md), emits json value to the [output_handler](../json_output_handler.md), and calls `end_json()` on [output_handler](../json_output_handler.md). 
+(7) Calls `begin_json()` on [json_content_handler](../json_content_handler.md), emits json value to the [json_content_handler](../json_content_handler.md), and calls `end_json()` on [json_content_handler](../json_content_handler.md). 
 
-(8) Emits json value to the [output_handler](../json_output_handler.md) (does not call `begin_json()` or `end_json()`.)
+(8) Emits json value to the [json_content_handler](../json_content_handler.md) (does not call `begin_json()` or `end_json()`.)
 
 ### Examples
 

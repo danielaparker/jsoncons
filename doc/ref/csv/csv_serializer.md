@@ -1,6 +1,6 @@
 ### jsoncons::csv::csv_serializer
 
-The `csv_serializer` class is an instantiation of the `basic_csv_serializer` class template that uses `char` as the character type.  It implements [json_output_handler](json_output_handler.md) and supports formatting a JSON value as a [CSV file](http://tools.ietf.org/html/rfc4180).
+The `csv_serializer` class is an instantiation of the `basic_csv_serializer` class template that uses `char` as the character type.  It implements [json_content_handler](json_content_handler.md) and supports formatting a JSON value as a [CSV file](http://tools.ietf.org/html/rfc4180).
 
 `csv_serializer` is noncopyable and nonmoveable.
 

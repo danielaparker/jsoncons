@@ -10,10 +10,10 @@ have `json_type_traits` defined.
 #include <jsoncons/json.hpp>
 
 template <class T, class CharT>
-void encode_json(const T& val, basic_json_output_handler<CharT>& handler); // (1)
+void encode_json(const T& val, basic_json_content_handler<CharT>& handler); // (1)
 
 template <class T, class CharT>
-void encode_fragment(const T& val, basic_json_output_handler<CharT>& handler); // (2)
+void encode_fragment(const T& val, basic_json_content_handler<CharT>& handler); // (2)
 
 template <class T, class CharT>
 void encode_json(const T& val, std::basic_ostream<CharT>& os); // (3)
@@ -65,7 +65,7 @@ None
 
 #### See also
 
-- [json_output_handler](json_output_handler.md)
+- [json_content_handler](json_content_handler.md)
 - [json_serializing_options](json_serializing_options.md)
     
 ### Examples
@@ -201,7 +201,7 @@ namespace jsoncons
             }
         }
 
-        static void encode(const matrix<double>& val, json_output_handler& handler)
+        static void encode(const matrix<double>& val, json_content_handler& handler)
         {
             handler.begin_array();
             for (size_t i = 0; i < val.size1(); ++i)

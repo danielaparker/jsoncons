@@ -11,7 +11,7 @@ using namespace jsoncons;
 class name_fix_up_filter : public json_filter
 {
 public:
-    name_fix_up_filter(json_output_handler& handler)
+    name_fix_up_filter(json_content_handler& handler)
         : json_filter(handler)
     {
     }
@@ -105,7 +105,7 @@ void change_member_name_example()
     reader.read();
     std::cout << std::endl;
 
-    // or a json_output_handler    
+    // or a json_content_handler    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);

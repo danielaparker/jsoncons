@@ -26,26 +26,26 @@ namespace jsoncons {
 // utf8_other_json_input_adapter
 
 template <class CharT>
-class json_utf8_other_input_handler_adapter : public json_content_handler
+class json_utf8_other_content_handler_adapter : public json_content_handler
 {
 public:
     using json_content_handler::string_view_type;
 private:
-    basic_null_json_content_handler<CharT> default_input_handler_;
+    basic_null_json_content_handler<CharT> default_content_handler_;
     basic_json_content_handler<CharT>& other_handler_;
     //parse_error_handler& err_handler_;
 
     // noncopyable and nonmoveable
-    json_utf8_other_input_handler_adapter<CharT>(const json_utf8_other_input_handler_adapter<CharT>&) = delete;
-    json_utf8_other_input_handler_adapter<CharT>& operator=(const json_utf8_other_input_handler_adapter<CharT>&) = delete;
+    json_utf8_other_content_handler_adapter<CharT>(const json_utf8_other_content_handler_adapter<CharT>&) = delete;
+    json_utf8_other_content_handler_adapter<CharT>& operator=(const json_utf8_other_content_handler_adapter<CharT>&) = delete;
 
 public:
-    json_utf8_other_input_handler_adapter()
-        : other_handler_(default_input_handler_)
+    json_utf8_other_content_handler_adapter()
+        : other_handler_(default_content_handler_)
     {
     }
 
-    json_utf8_other_input_handler_adapter(basic_json_content_handler<CharT>& other_handler/*,
+    json_utf8_other_content_handler_adapter(basic_json_content_handler<CharT>& other_handler/*,
                                           parse_error_handler& err_handler*/)
         : other_handler_(other_handler)/*,
           err_handler_(err_handler)*/
