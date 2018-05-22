@@ -3511,7 +3511,7 @@ public:
         case json_type_tag::string_t:
             try
             {
-                basic_json j = basic_json::parse(as_string_view().data(),as_string_view().length());
+                basic_json j = basic_json::parse(as_string_view());
                 return j.as_bool();
             }
             catch (...)
@@ -3540,7 +3540,7 @@ public:
         case json_type_tag::string_t:
             try
             {
-                basic_json j = basic_json::parse(as_string_view().data(),as_string_view().length());
+                basic_json j = basic_json::parse(as_string_view());
                 return j.as<int64_t>();
             }
             catch (...)
@@ -3569,7 +3569,7 @@ public:
         case json_type_tag::string_t:
             try
             {
-                basic_json j = basic_json::parse(as_string_view().data(),as_string_view().length());
+                basic_json j = basic_json::parse(as_string_view());
                 return j.as<uint64_t>();
             }
             catch (...)
@@ -3620,7 +3620,7 @@ public:
         case json_type_tag::string_t:
             try
             {
-                basic_json j = basic_json::parse(as_string_view().data(),as_string_view().length());
+                basic_json j = basic_json::parse(as_string_view());
                 return j.as<double>();
             }
             catch (...)
