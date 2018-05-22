@@ -33,11 +33,6 @@ public:
     {
     }
 
-    operator basic_json_content_handler<CharT>&() 
-    { 
-        return content_handler_; 
-    }
-
 #if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_content_handler<CharT>& input_handler()
     {

@@ -25,17 +25,10 @@ Member type                         |Definition
 #### Constructors
 
     json_filter(json_content_handler& handler)
-All JSON events that pass through the `json_filter` go to the specified `json_content_handler` (i.e. another filter.)
-You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
-
-    json_filter(json_content_handler& handler)
-All JSON events that pass through the `json_filter` go to the specified `json_content_handler`.
+All JSON events that pass through the `json_filter` go to the specified `json_content_handler` (e.g. another filter.)
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 
 #### Accessors
-
-    operator json_content_handler&() 
-Adapts a `json_filter` to a `json_content_handler`
 
     json_content_handler& downstream_handler()
 Returns a reference to the JSON handler that sends json events to downstream handlers. 
