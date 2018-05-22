@@ -15,7 +15,21 @@ Enhancements
   optionally take a json_serializing_options parameter, which allows replacing
   a string that matches nan_replacement(), pos_inf_replacement(), and neg_inf_replacement(). 
 
-Changes
+Changes to Streaming
+
+- The `basic_json_input_handler` and `basic_json_output_handler` interfaces have been 
+  combined into one class `basic_json_content_handler`. This greatly simplifies the
+  implementation of `basic_json_filter`. Also, the name `parsing_context` has been 
+  deprecated and renamed to `serializing_context`, as it now applies to both 
+  serializing and deserializing.
+
+  If you have subclassed `json_filter` or have fed JSON events directlty to a 
+  `json_serializer`, you shouldn't have to make any changes. In the less likely
+  case that you've implemented the `basic_json_input_handler` or 
+  `basic_json_output_handler` interfaces, you'll need to change that to
+  `json_content_handler`.
+
+Other Changes
 
 - `serialization_traits` and the related `dump` free functions have been deprecated,
   as their functionality has been subsumed by `json_convert_traits` and the
@@ -25,12 +39,11 @@ Changes
   and the `json_serializer` class has been deprecated. It is replaced by the enum class 
   `indenting` with enumerators `indenting::no_indent` and `indenting::indent`.
 
-- The name `serialization_options` has been deprecated (still works) and changed to 
+- The name `serialization_options` has been deprecated (still works) and renamed to 
   `json_serializing_options`. Rationale: naming consistency.
 
-- The name `csv_parameters` has been deprecated (still works) and changed to 
+- The name `csv_parameters` has been deprecated (still works) and renamed to 
   `csv_serializing_options`. Rationale: naming consistency.
-
 
 
 v0.104.0
