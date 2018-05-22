@@ -35,6 +35,8 @@ namespace detail {
 template <class CharT>
 class replacement_filter : public basic_json_filter<CharT>
 {
+    typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
+
     basic_null_json_input_handler<CharT> default_input_handler_;
     basic_json_serializing_options<CharT> options_;
 public:

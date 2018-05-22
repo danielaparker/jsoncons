@@ -11,6 +11,10 @@ Enhancements
   streaming is not supported, fall back to using `json_type_traits`. `decode_json` 
   and `encode_json` will work for all types that have `json_type_traits` defined.
 
+- The json::parse functions and the json_parser and json_reader constructors 
+  optionally take a json_serializing_options parameter, which allows replacing
+  a string that matches nan_replacement(), pos_inf_replacement(), and neg_inf_replacement(). 
+
 Changes
 
 - `serialization_traits` and the related `dump` free functions have been deprecated,
