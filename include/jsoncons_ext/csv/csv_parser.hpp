@@ -17,7 +17,7 @@
 #include <system_error>
 #include <cctype>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_input_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_filter.hpp>
@@ -75,7 +75,7 @@ class basic_csv_parser : private parsing_context
     csv_state_type state_;
     int top_;
     std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
-    basic_json_input_handler<CharT>& handler_;
+    basic_json_content_handler<CharT>& handler_;
     parse_error_handler& err_handler_;
     size_t index_;
     unsigned long column_;
@@ -97,7 +97,7 @@ class basic_csv_parser : private parsing_context
     std::vector<json_decoder<json_type>> decoders_;
 
 public:
-    basic_csv_parser(basic_json_input_handler<CharT>& handler)
+    basic_csv_parser(basic_json_content_handler<CharT>& handler)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
@@ -115,7 +115,7 @@ public:
         column_index_ = 0;
     }
 
-    basic_csv_parser(basic_json_input_handler<CharT>& handler,
+    basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      basic_csv_serializing_options<CharT,Allocator> options)
        : top_(-1),
          stack_(default_depth),
@@ -135,7 +135,7 @@ public:
         column_index_ = 0;
     }
 
-    basic_csv_parser(basic_json_input_handler<CharT>& handler,
+    basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler)
        : top_(-1),
          stack_(default_depth),
@@ -154,7 +154,7 @@ public:
         column_index_ = 0;
     }
 
-    basic_csv_parser(basic_json_input_handler<CharT>& handler,
+    basic_csv_parser(basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler,
                      basic_csv_serializing_options<CharT,Allocator> options)
        : top_(-1),
@@ -864,7 +864,7 @@ private:
         value_buffer_.clear();
     }
 
-    void end_value(const string_view_type& value, size_t column_index, bool infer_types, basic_json_input_handler<CharT>& handler)
+    void end_value(const string_view_type& value, size_t column_index, bool infer_types, basic_json_content_handler<CharT>& handler)
     {
         if (column_index < column_types_.size() + offset_)
         {
@@ -1027,7 +1027,7 @@ private:
         done
     };
 
-    void end_value_with_numeric_check(const string_view_type& value, basic_json_input_handler<CharT>& handler)
+    void end_value_with_numeric_check(const string_view_type& value, basic_json_content_handler<CharT>& handler)
     {
         numeric_check_state state = numeric_check_state::initial;
         bool is_negative = false;

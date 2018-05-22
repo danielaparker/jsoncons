@@ -11,11 +11,10 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#if !defined(JSONCONS_NO_DEPRECATED)
-#include <jsoncons/json_type_traits.hpp> // for null_type
-#endif
 
 namespace jsoncons {
+
+#if !defined(JSONCONS_NO_DEPRECATED)
 
 template <class CharT>
 using basic_json_input_handler = basic_json_content_handler<CharT>;
@@ -28,6 +27,8 @@ typedef basic_json_input_handler<wchar_t> wjson_input_handler;
 
 typedef basic_null_json_input_handler<char> null_json_input_handler;
 typedef basic_null_json_input_handler<wchar_t> wnull_json_input_handler;
+
+#endif
 
 }
 

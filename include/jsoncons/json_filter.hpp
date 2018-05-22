@@ -9,17 +9,17 @@
 
 #include <string>
 
-#include <jsoncons/json_input_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_output_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 
 namespace jsoncons {
 
 template <class CharT>
-class basic_json_output_input_adapter : public basic_json_input_handler<CharT>
+class basic_json_output_input_adapter : public basic_json_content_handler<CharT>
 {
 public:
-    using typename basic_json_input_handler<CharT>::string_view_type;
+    using typename basic_json_content_handler<CharT>::string_view_type;
 private:
 
     basic_null_json_output_handler<CharT> null_output_handler_;
@@ -141,9 +141,9 @@ private:
     };
     const null_parsing_context default_context_ = null_parsing_context();
 
-    basic_null_json_input_handler<CharT> null_input_handler_;
+    basic_null_json_content_handler<CharT> null_input_handler_;
     basic_json_output_input_adapter<CharT> default_input_output_adapter_;
-    basic_json_input_handler<CharT>& input_handler_;
+    basic_json_content_handler<CharT>& input_handler_;
     const basic_json_output_input_adapter<CharT>& input_output_adapter_;
 
     // noncopyable and nonmoveable
@@ -156,12 +156,12 @@ public:
           input_output_adapter_(default_input_output_adapter_)
     {
     }
-    basic_json_input_output_adapter(basic_json_input_handler<CharT>& input_handler)
+    basic_json_input_output_adapter(basic_json_content_handler<CharT>& input_handler)
         : input_handler_(input_handler),
           input_output_adapter_(default_input_output_adapter_)
     {
     }
-    basic_json_input_output_adapter(basic_json_input_handler<CharT>& input_handler,
+    basic_json_input_output_adapter(basic_json_content_handler<CharT>& input_handler,
                                     const basic_json_output_input_adapter<CharT>& input_output_adapter)
         : input_handler_(input_handler),
           input_output_adapter_(input_output_adapter)
@@ -252,15 +252,15 @@ private:
 };
 
 template <class CharT>
-class basic_json_filter : public basic_json_input_handler<CharT>
+class basic_json_filter : public basic_json_content_handler<CharT>
 {
 public:
-    using typename basic_json_input_handler<CharT>::string_view_type                                 ;
+    using typename basic_json_content_handler<CharT>::string_view_type                                 ;
 private:
     basic_json_output_input_adapter<CharT> input_output_adapter_;
     basic_json_input_output_adapter<CharT> output_input_adapter_;
     basic_json_output_handler<CharT>& output_handler_;
-    basic_json_input_handler<CharT>& downstream_handler_;
+    basic_json_content_handler<CharT>& downstream_handler_;
 
     // noncopyable and nonmoveable
     basic_json_filter<CharT>(const basic_json_filter<CharT>&) = delete;
@@ -274,7 +274,7 @@ public:
     {
     }
 
-    basic_json_filter(basic_json_input_handler<CharT>& handler)
+    basic_json_filter(basic_json_content_handler<CharT>& handler)
         : output_input_adapter_(*this),
           output_handler_(output_input_adapter_),
           downstream_handler_(handler)
@@ -287,13 +287,13 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    basic_json_input_handler<CharT>& input_handler()
+    basic_json_content_handler<CharT>& input_handler()
     {
         return downstream_handler_;
     }
 #endif
 
-    basic_json_input_handler<CharT>& downstream_handler()
+    basic_json_content_handler<CharT>& downstream_handler()
     {
         return downstream_handler_;
     }
@@ -395,7 +395,7 @@ class basic_json_fragment_filter : public basic_json_filter<CharT>
 public:
     using typename basic_json_filter<CharT>::string_view_type;
 
-    basic_json_fragment_filter(basic_json_input_handler<CharT>& handler)
+    basic_json_fragment_filter(basic_json_content_handler<CharT>& handler)
         : basic_json_filter<CharT>(handler)
     {
     }
@@ -429,7 +429,7 @@ public:
 
     basic_rename_object_member_filter(const std::basic_string<CharT>& name,
                              const std::basic_string<CharT>& new_name,
-                             basic_json_input_handler<CharT>& handler)
+                             basic_json_content_handler<CharT>& handler)
         : basic_json_filter<CharT>(handler), 
           name_(name), new_name_(new_name)
     {

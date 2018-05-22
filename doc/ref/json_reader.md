@@ -14,14 +14,14 @@ A `json_reader` can read a sequence of JSON texts from a stream.
 #### Constructors
 
     json_reader(std::istream& is,
-                json_input_handler& handler,
+                json_content_handler& handler,
                 parse_error_handler& err_handler)
-Constructs a `json_reader` that is associated with an input stream `is` of JSON text, a [json_input_handler](json_input_handler.md) that receives JSON events, and the specified [parse_error_handler](parse_error_handler.md).
+Constructs a `json_reader` that is associated with an input stream `is` of JSON text, a [json_content_handler](json_content_handler.md) that receives JSON events, and the specified [parse_error_handler](parse_error_handler.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `json_reader`, as `json_reader` holds pointers to but does not own these objects.
 
     json_reader(std::istream& is,
-                json_input_handler& handler)
-Constructs a `json_reader` that is associated with an input stream `is` of JSON text, a [json_input_handler](json_input_handler.md) that receives JSON events, and a [default_parse_error_handler](default_parse_error_handler.md).
+                json_content_handler& handler)
+Constructs a `json_reader` that is associated with an input stream `is` of JSON text, a [json_content_handler](json_content_handler.md) that receives JSON events, and a [default_parse_error_handler](default_parse_error_handler.md).
 You must ensure that the input stream and input handler exist as long as does `json_reader`, as `json_reader` holds pointers to does not own these objects.
 
 #### Member functions
@@ -30,20 +30,20 @@ You must ensure that the input stream and input handler exist as long as does `j
 Returns `true` when there are no more JSON texts to be read from the stream, `false` otherwise
 
     void read()
-Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler.md), such as a [json_decoder](json_decoder.md).
+Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Throws if there are any unconsumed non-whitespace characters left in the input.
 Throws [parse_error](parse_error.md) if parsing fails.
 
     void read(std::error_code& ec)
-Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler.md), such as a [json_decoder](json_decoder.md).
+Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
 The error code `ec` is set if parsing fails or if there are any unconsumed non-whitespace characters left in the input.
 
     void read_next()
-Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler.md), such as a [json_decoder](json_decoder.md).
+Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Throws [parse_error](parse_error.md) if parsing fails.
 
     void read_next(std::error_code& ec)
-Reads the next JSON text from the stream and reports JSON events to a [json_input_handler](json_input_handler.md), such as a [json_decoder](json_decoder.md).
+Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
 The error code `ec` is set if parsing fails.
 
     void check_done()

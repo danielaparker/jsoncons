@@ -537,7 +537,7 @@ int main()
     rename_object_member_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
-    // a json_input_handler ...
+    // a json_content_handler ...
     std::cout << "(1) ";
     std::istringstream is(s);
     json_reader reader(is, filter1);

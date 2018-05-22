@@ -17,7 +17,7 @@
 #include <system_error>
 #include <ios>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_input_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_parser.hpp>
 
@@ -26,13 +26,13 @@ namespace jsoncons {
 // utf8_other_json_input_adapter
 
 template <class CharT>
-class json_utf8_other_input_handler_adapter : public json_input_handler
+class json_utf8_other_input_handler_adapter : public json_content_handler
 {
 public:
-    using json_input_handler::string_view_type;
+    using json_content_handler::string_view_type;
 private:
-    basic_null_json_input_handler<CharT> default_input_handler_;
-    basic_json_input_handler<CharT>& other_handler_;
+    basic_null_json_content_handler<CharT> default_input_handler_;
+    basic_json_content_handler<CharT>& other_handler_;
     //parse_error_handler& err_handler_;
 
     // noncopyable and nonmoveable
@@ -45,7 +45,7 @@ public:
     {
     }
 
-    json_utf8_other_input_handler_adapter(basic_json_input_handler<CharT>& other_handler/*,
+    json_utf8_other_input_handler_adapter(basic_json_content_handler<CharT>& other_handler/*,
                                           parse_error_handler& err_handler*/)
         : other_handler_(other_handler)/*,
           err_handler_(err_handler)*/
@@ -180,7 +180,7 @@ public:
     }
 
     basic_json_reader(std::basic_istream<CharT>& is, 
-                      basic_json_input_handler<CharT>& handler)
+                      basic_json_content_handler<CharT>& handler)
         : parser_(handler),
           is_(is),
           eof_(false),
@@ -191,7 +191,7 @@ public:
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
-                      basic_json_input_handler<CharT>& handler,
+                      basic_json_content_handler<CharT>& handler,
                       parse_error_handler& err_handler)
        : parser_(handler,err_handler),
          is_(is),
@@ -227,7 +227,7 @@ public:
 
     basic_json_reader(std::basic_istream<CharT>& is, 
                       const basic_json_serializing_options<CharT>& options, 
-                      basic_json_input_handler<CharT>& handler)
+                      basic_json_content_handler<CharT>& handler)
         : parser_(handler,options),
           is_(is),
           eof_(false),
@@ -238,7 +238,7 @@ public:
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
-                      basic_json_input_handler<CharT>& handler, 
+                      basic_json_content_handler<CharT>& handler, 
                       const basic_json_serializing_options<CharT>& options,
                       parse_error_handler& err_handler)
        : parser_(handler,options,err_handler),

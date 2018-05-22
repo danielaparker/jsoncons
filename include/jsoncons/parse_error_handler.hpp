@@ -7,9 +7,10 @@
 #ifndef JSONCONS_PARSE_ERROR_HANDLER_HPP
 #define JSONCONS_PARSE_ERROR_HANDLER_HPP
 
+#include <system_error>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_error_category.hpp>
-#include <system_error>
+#include <jsoncons/serializing_context.hpp>
 
 namespace jsoncons {
 
@@ -85,25 +86,6 @@ typedef parse_error json_parse_exception;
 typedef parse_error parse_exception;
 #endif
 
-class parsing_context
-{
-public:
-    virtual ~parsing_context() = default;
-
-    size_t line_number() const
-    {
-        return do_line_number();
-    }
-    size_t column_number() const 
-    {
-        return do_column_number();
-    }
-
-private:
-    virtual size_t do_line_number() const = 0;
-    virtual size_t do_column_number() const = 0;
-};
-
 class parse_error_handler
 {
 public:
@@ -112,23 +94,23 @@ public:
     }
 
     bool error(std::error_code ec,
-               const parsing_context& context) JSONCONS_NOEXCEPT 
+               const serializing_context& context) JSONCONS_NOEXCEPT 
     {
         return do_error(ec,context);
     }
 
     void fatal_error(std::error_code ec,
-                     const parsing_context& context) JSONCONS_NOEXCEPT 
+                     const serializing_context& context) JSONCONS_NOEXCEPT 
     {
         do_fatal_error(ec,context);
     }
 
 private:
     virtual bool do_error(std::error_code,
-                          const parsing_context& context) JSONCONS_NOEXCEPT = 0;
+                          const serializing_context& context) JSONCONS_NOEXCEPT = 0;
 
     virtual void do_fatal_error(std::error_code,
-                                const parsing_context&) JSONCONS_NOEXCEPT
+                                const serializing_context&) JSONCONS_NOEXCEPT
     {
     }
 };
@@ -137,7 +119,7 @@ class default_parse_error_handler : public parse_error_handler
 {
 private:
     bool do_error(std::error_code code,
-                  const parsing_context&) JSONCONS_NOEXCEPT override
+                  const serializing_context&) JSONCONS_NOEXCEPT override
     {
         static const std::error_code illegal_comment = make_error_code(json_parser_errc::illegal_comment);
 
@@ -155,7 +137,7 @@ private:
 class strict_parse_error_handler : public parse_error_handler
 {
 private:
-    bool do_error(std::error_code, const parsing_context&) JSONCONS_NOEXCEPT override
+    bool do_error(std::error_code, const serializing_context&) JSONCONS_NOEXCEPT override
     {
         return true;
     }

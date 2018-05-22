@@ -11,35 +11,35 @@ The `csv_reader` class is an instantiation of the `basic_csv_reader` class templ
 #### Constructors
 
     csv_reader(std::istream& is,
-               json_input_handler& handler)
+               json_content_handler& handler)
 Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text and a [json_input_handler](json_input_handler.md) that receives
+`is` of CSV text and a [json_content_handler](json_content_handler.md) that receives
 JSON events. Uses default [csv_serializing_options](csv_serializing_options.md).
 You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
-               json_input_handler& handler,
+               json_content_handler& handler,
                const csv_serializing_options& options)
 Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [json_input_handler](json_input_handler.md) that receives
+`is` of CSV text, a [json_content_handler](json_content_handler.md) that receives
 JSON events, and [csv_serializing_options](csv_serializing_options.md).
 You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
-               json_input_handler& handler,
+               json_content_handler& handler,
                parse_error_handler& err_handler)
 Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [json_input_handler](json_input_handler.md) that receives
+`is` of CSV text, a [json_content_handler](json_content_handler.md) that receives
 JSON events and the specified [parse_error_handler](parse_error_handler.md).
 Uses default [csv_serializing_options](csv_serializing_options.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
-               json_input_handler& handler,
+               json_content_handler& handler,
                parse_error_handler& err_handler,
                const csv_serializing_options& options)
 Constructs a `csv_reader` that is associated with an input stream
-`is` of CSV text, a [json_input_handler](json_input_handler.md) that receives
+`is` of CSV text, a [json_content_handler](json_content_handler.md) that receives
 JSON events, the specified [parse_error_handler](parse_error_handler.md),
 and [csv_serializing_options](csv_serializing_options.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
@@ -50,7 +50,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 Returns `true` when there is no more data to be read from the stream, `false` otherwise
 
     void read()
-Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_input_handler](json_input_handler.md), such as a [json_decoder](json_decoder.md).
+Reports JSON related events for JSON objects, arrays, object members and array elements to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Throws [parse_error](parse_error.md) if parsing fails.
 
     size_t buffer_length() const

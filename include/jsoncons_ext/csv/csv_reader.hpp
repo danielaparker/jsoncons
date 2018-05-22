@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_input_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons_ext/csv/csv_error_category.hpp>
 #include <jsoncons_ext/csv/csv_parser.hpp>
@@ -60,7 +60,7 @@ public:
     */
 
     basic_csv_reader(std::basic_istream<CharT>& is,
-                     basic_json_input_handler<CharT>& handler)
+                     basic_json_content_handler<CharT>& handler)
 
        : parser_(handler),
          is_(is),
@@ -73,7 +73,7 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
-                     basic_json_input_handler<CharT>& handler,
+                     basic_json_content_handler<CharT>& handler,
                      basic_csv_serializing_options<CharT,Allocator> options)
 
        : parser_(handler,options),
@@ -87,7 +87,7 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
-                     basic_json_input_handler<CharT>& handler,
+                     basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler)
        :
          parser_(handler,err_handler),
@@ -101,7 +101,7 @@ public:
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
-                     basic_json_input_handler<CharT>& handler,
+                     basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler,
                      basic_csv_serializing_options<CharT,Allocator> options)
        :

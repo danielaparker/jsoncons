@@ -14,7 +14,7 @@ The `json_filter` class is an instantiation of the `basic_json_filter` class tem
 
 #### Base classes
 
-[json_input_handler](json_input_handler.md)
+[json_content_handler](json_content_handler.md)
 
 #### Member types
 
@@ -24,8 +24,8 @@ Member type                         |Definition
 
 #### Constructors
 
-    json_filter(json_input_handler& handler)
-All JSON events that pass through the `json_filter` go to the specified `json_input_handler` (i.e. another filter.)
+    json_filter(json_content_handler& handler)
+All JSON events that pass through the `json_filter` go to the specified `json_content_handler` (i.e. another filter.)
 You must ensure that the `handler` exists as long as does `json_filter`, as `json_filter` holds a pointer to but does not own this object.
 
     json_filter(json_output_handler& handler)
@@ -37,7 +37,7 @@ You must ensure that the `handler` exists as long as does `json_filter`, as `jso
     operator json_output_handler&() 
 Adapts a `json_filter` to a `json_output_handler`
 
-    json_input_handler& downstream_handler()
+    json_content_handler& downstream_handler()
 Returns a reference to the JSON handler that sends json events to downstream handlers. 
 
 ### Examples
@@ -62,7 +62,7 @@ int main()
     rename_object_member_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
-    // a json_input_handler ...
+    // a json_content_handler ...
     std::cout << "(1) ";
     std::istringstream is(s);
     json_reader reader(is, filter1);
@@ -103,7 +103,7 @@ Example address book file (`address-book.json`):
 
 Suppose you want to break the name into a first name and last name, and report a warning when `name` does not contain a space or tab separated part. 
 
-You can achieve the desired result by subclassing the [json_filter](json_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_input_handler](json_input_handler.md) (which in this example will forward them to a [json_serializer](json_serializer.md).) 
+You can achieve the desired result by subclassing the [json_filter](json_filter.md) class, overriding the default methods for receiving name and string value events, and passing modified events on to the parent [json_content_handler](json_content_handler.md) (which in this example will forward them to a [json_serializer](json_serializer.md).) 
 ```c++
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_filter.hpp>

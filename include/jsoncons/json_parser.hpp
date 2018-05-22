@@ -17,7 +17,7 @@
 #include <system_error>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
-#include <jsoncons/json_input_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error_category.hpp>
@@ -35,9 +35,9 @@ namespace detail {
 template <class CharT>
 class replacement_filter : public basic_json_filter<CharT>
 {
-    typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
+    typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
 
-    basic_null_json_input_handler<CharT> default_input_handler_;
+    basic_null_json_content_handler<CharT> default_input_handler_;
     basic_json_serializing_options<CharT> options_;
 public:
     replacement_filter()
@@ -45,7 +45,7 @@ public:
     {
     }
 
-    replacement_filter(basic_json_input_handler<CharT>& handler, const basic_json_serializing_options<CharT>& options)
+    replacement_filter(basic_json_content_handler<CharT>& handler, const basic_json_serializing_options<CharT>& options)
         : basic_json_filter<CharT>(handler), options_(options)
     {
     }
@@ -132,13 +132,13 @@ class basic_json_parser : private parsing_context
     static const size_t initial_string_buffer_capacity_ = 1024;
     static const size_t initial_number_buffer_capacity_ = 64;
     static const int default_initial_stack_capacity_ = 100;
-    typedef typename basic_json_input_handler<CharT>::string_view_type string_view_type;
+    typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
 
     detail::replacement_filter<CharT> replacement_filter_;
-    basic_null_json_input_handler<CharT> default_input_handler_;
+    basic_null_json_content_handler<CharT> default_input_handler_;
     default_parse_error_handler default_err_handler_;
 
-    basic_json_input_handler<CharT>& handler_;
+    basic_json_content_handler<CharT>& handler_;
     parse_error_handler& err_handler_;
     uint32_t cp_;
     uint32_t cp2_;
@@ -225,7 +225,7 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(basic_json_input_handler<CharT>& handler)
+    basic_json_parser(basic_json_content_handler<CharT>& handler)
        : handler_(handler),
          err_handler_(default_err_handler_),
          cp_(0),
@@ -250,7 +250,7 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(basic_json_input_handler<CharT>& handler,
+    basic_json_parser(basic_json_content_handler<CharT>& handler,
                       parse_error_handler& err_handler)
        : handler_(handler),
          err_handler_(err_handler),
@@ -327,7 +327,7 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(basic_json_input_handler<CharT>& handler,
+    basic_json_parser(basic_json_content_handler<CharT>& handler,
                       const basic_json_serializing_options<CharT>& options)
        : replacement_filter_(handler,options),
          handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_ : handler),
@@ -354,7 +354,7 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(basic_json_input_handler<CharT>& handler, 
+    basic_json_parser(basic_json_content_handler<CharT>& handler, 
                       const basic_json_serializing_options<CharT>& options,
                       parse_error_handler& err_handler)
        : replacement_filter_(handler,options),

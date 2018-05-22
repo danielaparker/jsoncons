@@ -14,16 +14,16 @@
 #include <cstdlib>
 #include <memory>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_input_handler.hpp>
+#include <jsoncons/json_content_handler.hpp>
 
 namespace jsoncons {
 
 template <class Json,class Allocator=std::allocator<typename Json::char_type>>
-class json_decoder final : public basic_json_input_handler<typename Json::char_type>
+class json_decoder final : public basic_json_content_handler<typename Json::char_type>
 {
 public:
     typedef typename Json::char_type char_type;
-    using typename basic_json_input_handler<char_type>::string_view_type;
+    using typename basic_json_content_handler<char_type>::string_view_type;
 
     typedef typename Json::key_value_pair_type key_value_pair_type;
     typedef typename Json::key_storage_type key_storage_type;
@@ -165,23 +165,23 @@ private:
         }
     }
 
-    void do_begin_object(const parsing_context&) override
+    void do_begin_object(const serializing_context&) override
     {
         push_object();
     }
 
-    void do_end_object(const parsing_context&) override
+    void do_end_object(const serializing_context&) override
     {
         end_structure();
         pop_object();
     }
 
-    void do_begin_array(const parsing_context&) override
+    void do_begin_array(const serializing_context&) override
     {
         push_array();
     }
 
-    void do_end_array(const parsing_context&) override
+    void do_end_array(const serializing_context&) override
     {
         end_structure();
         pop_array();
@@ -215,12 +215,12 @@ private:
         }
     }
 
-    void do_name(const string_view_type& name, const parsing_context&) override
+    void do_name(const string_view_type& name, const serializing_context&) override
     {
         stack_.push_back(key_storage_type(name.begin(),name.end(),string_allocator_));
     }
 
-    void do_string_value(const string_view_type& val, const parsing_context&) override
+    void do_string_value(const string_view_type& val, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -232,7 +232,7 @@ private:
         }
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length, const parsing_context&) override
+    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -244,7 +244,7 @@ private:
         }
     }
 
-    void do_integer_value(int64_t value, const parsing_context&) override
+    void do_integer_value(int64_t value, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -256,7 +256,7 @@ private:
         }
     }
 
-    void do_uinteger_value(uint64_t value, const parsing_context&) override
+    void do_uinteger_value(uint64_t value, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -268,7 +268,7 @@ private:
         }
     }
 
-    void do_double_value(double value, const number_format& fmt, const parsing_context&) override
+    void do_double_value(double value, const number_format& fmt, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -280,7 +280,7 @@ private:
         }
     }
 
-    void do_bool_value(bool value, const parsing_context&) override
+    void do_bool_value(bool value, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -292,7 +292,7 @@ private:
         }
     }
 
-    void do_null_value(const parsing_context&) override
+    void do_null_value(const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
