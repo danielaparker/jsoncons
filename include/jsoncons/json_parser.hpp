@@ -402,11 +402,6 @@ public:
         return input_ptr_ == input_end_;
     }
 
-    const serializing_context& serializing_context() const
-    {
-        return *this;
-    }
-
     ~basic_json_parser()
     {
     }

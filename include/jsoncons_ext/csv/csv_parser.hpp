@@ -179,11 +179,6 @@ public:
     {
     }
 
-    const serializing_context& serializing_context() const
-    {
-        return *this;
-    }
-
     bool done() const
     {
         return state_ == csv_state_type::done;
