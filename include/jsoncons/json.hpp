@@ -2460,10 +2460,26 @@ public:
 
         template <class SAllocator>
         void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+                  indenting line_indent) const
+        {
+            evaluate().dump(s, line_indent);
+        }
+
+        template <class SAllocator>
+        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
                   const basic_json_serializing_options<char_type>& options) const
         {
             evaluate().dump(s,options);
         }
+
+        template <class SAllocator>
+        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+                  const basic_json_serializing_options<char_type>& options,
+                  indenting line_indent) const
+        {
+            evaluate().dump(s,options,line_indent);
+        }
+
         void dump(basic_json_content_handler<char_type>& handler) const
         {
             evaluate().dump(handler);
@@ -3119,10 +3135,26 @@ public:
     }
 
     template <class SAllocator>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, indenting line_indent) const
+    {
+        basic_json_serializer<char_type,detail::string_writer<char_type>> serializer(s, line_indent);
+        dump(serializer);
+    }
+
+    template <class SAllocator>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_json_serializing_options<char_type>& options) const
     {
         basic_json_serializer<char_type,detail::string_writer<char_type>> serializer(s, options);
+        dump(serializer);
+    }
+
+    template <class SAllocator>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+              const basic_json_serializing_options<char_type>& options, 
+              indenting line_indent) const
+    {
+        basic_json_serializer<char_type,detail::string_writer<char_type>> serializer(s, options, line_indent);
         dump(serializer);
     }
 

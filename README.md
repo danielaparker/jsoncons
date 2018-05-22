@@ -33,6 +33,7 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 ### How to use it
 
 - For a quick guide, see [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). 
+- For answers to basic questions, check the [FAQ](doc/FAQ.md).
 - For the details, see the [documentation](doc/Home.md). 
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
@@ -151,106 +152,6 @@ The library includes four instantiations of `basic_json`:
 - [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
 ### Features
-
-#### By default, accepts and ignores C-style comments
-
-```c++
-    std::string s = R"(
-    {
-        // Single line comments
-        /*
-            Multi line comments 
-        */
-    }
-    )";
-
-    // Default
-    json j = json::parse(s);
-    std::cout << "(1) " << j << std::endl;
-
-    // Strict
-    try
-    {
-        strict_parse_error_handler err_handler;
-        json j = json::parse(s, err_handler);
-    }
-    catch (const parse_error& e)
-    {
-        std::cout << "(2) " << e.what() << std::endl;
-    }
-```
-Output:
-```
-(1) {}
-(2) Illegal comment at line 3 and column 10
-```
-
-#### Validation without parse exceptions
-
-```c++
-    std::string s = R"(
-    {
-        "StartDate" : "2017-03-01",
-        "MaturityDate" "2020-12-30"          
-    }
-    )";
-    std::stringstream is(s);
-
-    json_reader reader(is);
-
-    std::error_code ec;
-    reader.read(ec);
-    if (ec)
-    {
-        std::cout << ec.message() 
-                  << " on line " << reader.line_number()
-                  << " and column " << reader.column_number()
-                  << std::endl;
-    }
-```
-Output:
-```
-Expected name separator ':' on line 4 and column 20
-```
-#### Range-based for loops with arrays
-
-```c++
-    json book = json::array{1,2,3,4};
-
-    for (auto val : book.array_range())
-    {
-        std::cout << val << std::endl;
-    }
-```
-
-#### Range-based for loops with objects
-
-```c++
-    json book = json::object{
-        {"author", "Haruki Murakami"},
-        {"title", "Kafka on the Shore"},
-        {"price", 25.17}
-    };
-
-    for (const auto& kv : book.object_range())
-    {
-        std::cout << kv.key() << "=" 
-                  << kv.value() << std::endl;
-    }
-```
-#### _json and _ojson literal operators
-
-```c++
-    using namespace jsoncons::literals;
-
-
-    ojson j2 = R"(
-    {
-        "StartDate" : "2017-03-01",
-        "MaturityDate" : "2020-12-30"          
-    }
-    )"_ojson;
-```
 
 #### Multi-dimensional json arrays
 ```c++
