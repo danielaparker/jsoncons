@@ -217,6 +217,8 @@ public:
                     }
                 }
                 break;
+            default:
+                break;
             }
             break;
         default:
@@ -1230,6 +1232,8 @@ private:
                     }
                     break;
                 }
+            default:
+                break;
             }
         }
 
