@@ -146,3 +146,91 @@ for (const auto& member : j.object_range())
 }
 ```
 
+### Construction
+
+#### How do I create arrays of arrays of arrays of ...
+
+Like this:
+
+```c++
+json j = json::make_array<3>(4, 3, 2, 0.0);
+double val = 1.0;
+for (size_t i = 0; i < a.size(); ++i)
+{
+    for (size_t j = 0; j < j[i].size(); ++j)
+    {
+        for (size_t k = 0; k < j[i][j].size(); ++k)
+        {
+            j[i][j][k] = val;
+            val += 1.0;
+        }
+    }
+}
+std::cout << pretty_print(j) << std::endl;
+```
+Output:
+```json
+[
+    [
+        [1.0,2.0],
+        [3.0,4.0],
+        [5.0,6.0]
+    ],
+    [
+        [7.0,8.0],
+        [9.0,10.0],
+        [11.0,12.0]
+    ],
+    [
+        [13.0,14.0],
+        [15.0,16.0],
+        [17.0,18.0]
+    ],
+    [
+        [19.0,20.0],
+        [21.0,22.0],
+        [23.0,24.0]
+    ]
+]
+```
+
+
+#### Is it possible to merge two json objects?
+
+[json::merge](doc/ref/json/merge.md) inserts another json object's key-value pairs into a json object,
+unless they already exist with an equivalent key.
+
+[json::merge_or_update](doc/ref/json/merge_or_update.md) inserts another json object's key-value pairs 
+into a json object, or assigns them if they already exist.
+
+The `merge` and `merge_or_update` functions perform only a one-level-deep shallow merge,
+not a deep merge of nested objects.
+
+```c++
+json another = json::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+json j = json::parse(R"(
+{
+    "a" : "1",
+    "b" : [1,2,3]
+}
+)");
+
+j.merge(std::move(another));
+std::cout << pretty_print(j) << std::endl;
+```
+Output:
+```json
+{
+    "a": "1",
+    "b": [1,2,3],
+    "c": [4,5,6]
+}
+```
+
+
