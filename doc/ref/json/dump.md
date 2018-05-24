@@ -6,36 +6,49 @@ void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const; //
 
 template <class SAllocator>
 void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-          const json_serializing_options& options) const; // (2)
+          indenting line_indent) const; // (2)
 
-void dump(std::ostream& os) const; // (3)
+template <class SAllocator>
+void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+          const json_serializing_options& options) const; // (3)
 
-void dump(std::ostream<CharT> os, indenting line_indent) const; // (4)
+template <class SAllocator>
+void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+          const basic_json_serializing_options<char_type>& options, 
+          indenting line_indent) const; // (4)
 
-void dump(std::ostream<CharT> os, const json_serializing_options& options) const; // (5)
+void dump(std::ostream& os) const; // (5)
 
-void dump(std::ostream<CharT> os, const json_serializing_options& options, indenting line_indent) const; // (6)
+void dump(std::ostream<CharT> os, indenting line_indent) const; // (6)
 
-void dump(basic_json_content_handler<char_type>& content_handler) const; // (7)
+void dump(std::ostream<CharT> os, const json_serializing_options& options) const; // (7)
 
-void dump_fragment(json_content_handler& handler) const; // (8)
+void dump(std::ostream<CharT> os, const json_serializing_options& options, indenting line_indent) const; // (8)
+
+void dump(basic_json_content_handler<char_type>& content_handler) const; // (9)
+
+void dump_fragment(json_content_handler& handler) const; // (10)
 ```
 
-(1) Inserts json value into string using default json_serializing_options.
+(1) Dumps json value to string using default json_serializing_options.
 
-(2) Inserts json value into string using specified [json_serializing_options](../json_serializing_options.md). 
+(2) Dumps json value to string using default serialization options and the specified [indenting](../indenting.md). 
 
-(3) Inserts json value into stream with default serialization options. 
+(3) Dumps json value to string using specified [json_serializing_options](../json_serializing_options.md). 
 
-(4) Inserts json value into stream using default serialization options and the specified [indenting](../indenting.md). 
+(4) Dumps json value to string using the specified [json_serializing_options](../json_serializing_options.md) and [indenting](../indenting.md). 
 
-(5) Inserts json value into stream using specified [json_serializing_options](../json_serializing_options.md). 
+(5) Dumps json value to stream with default serialization options. 
 
-(6) Inserts json value into stream using the specified [json_serializing_options](../json_serializing_options.md) and [indenting](../indenting.md). 
+(6) Dumps json value to stream using default serialization options and the specified [indenting](../indenting.md). 
 
-(7) Calls `begin_json()` on [json_content_handler](../json_content_handler.md), emits json value to the [json_content_handler](../json_content_handler.md), and calls `end_json()` on [json_content_handler](../json_content_handler.md). 
+(7) Dumps json value to stream using specified [json_serializing_options](../json_serializing_options.md). 
 
-(8) Emits json value to the [json_content_handler](../json_content_handler.md) (does not call `begin_json()` or `end_json()`.)
+(8) Dumps json value to stream using the specified [json_serializing_options](../json_serializing_options.md) and [indenting](../indenting.md). 
+
+(9) Calls `begin_json()` on [json_content_handler](../json_content_handler.md), emits json value to the [json_content_handler](../json_content_handler.md), and calls `end_json()` on [json_content_handler](../json_content_handler.md). 
+
+(10) Emits json value to the [json_content_handler](../json_content_handler.md) (does not call `begin_json()` or `end_json()`.)
 
 ### Examples
 
