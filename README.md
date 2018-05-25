@@ -340,49 +340,6 @@ Output:
 ]
 ```
 
-#### Filter json names and values
-
-You can rename object members with the built in filter [rename_object_member_filter](doc/ref/rename_object_member_filter.md)
-
-```c++
-#include <sstream>
-#include <jsoncons/json.hpp>
-#include <jsoncons/json_filter.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
-
-    json_serializer serializer(std::cout);
-
-    // Filters can be chained
-    rename_object_member_filter filter2("fifth", "fourth", serializer);
-    rename_object_member_filter filter1("fourth", "third", filter2);
-
-    // A filter can be passed to any function that takes
-    // a json_content_handler ...
-    std::cout << "(1) ";
-    std::istringstream is(s);
-    json_reader reader(is, filter1);
-    reader.read();
-    std::cout << std::endl;
-
-    // or a json_content_handler    
-    std::cout << "(2) ";
-    ojson j = ojson::parse(s);
-    j.dump(filter1);
-    std::cout << std::endl;
-}
-```
-Output:
-```json
-(1) {"first":1,"second":2,"third":3,"fourth":4}
-(2) {"first":1,"second":2,"third":3,"fourth":4}
-```
-Or define and use your own filters. See [json_filter](doc/ref/json_filter.md) for details.
-
 ### Extensions
 
 <div id="ext_jsonpointer"/>
