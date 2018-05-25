@@ -252,7 +252,7 @@ Output:
 
 ### Modify
 
-#### How can I rename object member keys?
+#### How can I rename all object member keys in a JSON document?
 
 You can rename object members with the built in filter [rename_object_member_filter](doc/ref/rename_object_member_filter.md)
 
