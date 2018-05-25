@@ -260,7 +260,7 @@ public:
         buffer_length_ = length;
         buffer_.reserve(buffer_length_);
     }
-
+#if !defined(JSONCONS_NO_DEPRECATED)
     size_t max_nesting_depth() const
     {
         return parser_.max_nesting_depth();
@@ -270,7 +270,7 @@ public:
     {
         parser_.max_nesting_depth(depth);
     }
-
+#endif
     void read_next()
     {
         std::error_code ec;

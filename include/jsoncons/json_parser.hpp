@@ -156,10 +156,10 @@ class basic_json_parser : private serializing_context
 
     size_t line_;
     size_t column_;
-    int nesting_depth_;
+    size_t nesting_depth_;
     int initial_stack_capacity_;
 
-    int max_depth_;
+    size_t max_nesting_depth_;
     detail::string_to_double to_double_;
     const CharT* begin_input_;
     const CharT* input_end_;
@@ -194,7 +194,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_depth_ = (std::numeric_limits<int>::max)();
+        max_nesting_depth_ = (std::numeric_limits<size_t>::max)();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
@@ -219,7 +219,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_depth_ = (std::numeric_limits<int>::max)();
+        max_nesting_depth_ = (std::numeric_limits<size_t>::max)();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
@@ -244,7 +244,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_depth_ = (std::numeric_limits<int>::max)();
+        max_nesting_depth_ = (std::numeric_limits<size_t>::max)();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
@@ -270,7 +270,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_depth_ = (std::numeric_limits<int>::max)();
+        max_nesting_depth_ = (std::numeric_limits<size_t>::max)();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
@@ -295,7 +295,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_depth_ = (std::numeric_limits<int>::max)();
+        max_nesting_depth_ = options.max_nesting_depth();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
@@ -321,7 +321,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_depth_ = (std::numeric_limits<int>::max)();
+        max_nesting_depth_ = options.max_nesting_depth();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
@@ -348,7 +348,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_depth_ = (std::numeric_limits<int>::max)();
+        max_nesting_depth_ = options.max_nesting_depth();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
@@ -376,7 +376,7 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_depth_ = (std::numeric_limits<int>::max)();
+        max_nesting_depth_ = options.max_nesting_depth();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
@@ -406,16 +406,17 @@ public:
     {
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     size_t max_nesting_depth() const
     {
-        return static_cast<size_t>(max_depth_);
+        return max_nesting_depth_;
     }
 
-    void max_nesting_depth(size_t max_nesting_depth)
+    void max_nesting_depth(size_t value)
     {
-        max_depth_ = static_cast<int>((std::min)(max_nesting_depth,static_cast<size_t>((std::numeric_limits<int>::max)())));
+        max_nesting_depth_ = value;
     }
-
+#endif
     parse_state parent() const
     {
         JSONCONS_ASSERT(state_stack_.size() >= 1);
@@ -450,7 +451,7 @@ public:
 
     void do_begin_object(std::error_code& ec)
     {
-        if (++nesting_depth_ >= max_depth_)
+        if (++nesting_depth_ >= max_nesting_depth_)
         {
             if (err_handler_.error(json_parser_errc::max_depth_exceeded, *this))
             {
@@ -465,6 +466,7 @@ public:
 
     void do_end_object(std::error_code& ec)
     {
+        JSONCONS_ASSERT(nesting_depth_ >= 1);
         --nesting_depth_;
         state_ = pop_state();
         if (state_ == parse_state::object)
@@ -497,7 +499,7 @@ public:
 
     void do_begin_array(std::error_code& ec)
     {
-        if (++nesting_depth_ >= max_depth_)
+        if (++nesting_depth_ >= max_nesting_depth_)
         {
             if (err_handler_.error(json_parser_errc::max_depth_exceeded, *this))
             {
@@ -513,6 +515,7 @@ public:
 
     void do_end_array(std::error_code& ec)
     {
+        JSONCONS_ASSERT(nesting_depth_ >= 1);
         --nesting_depth_;
         state_ = pop_state();
         if (state_ == parse_state::array)

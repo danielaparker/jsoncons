@@ -57,24 +57,25 @@ private:
     line_split_kind array_object_split_lines_;
 
     chars_format floating_point_format_;
+    size_t max_nesting_depth_;
 public:
     static const size_t default_indent = 4;
 
 //  Constructors
 
     basic_json_serializing_options()
-        :
-        indent_(default_indent),
-        precision_(0),
-        can_read_nan_replacement_(false),
-        can_read_pos_inf_replacement_(false),
-        can_read_neg_inf_replacement_(false),
-        escape_all_non_ascii_(false),
-        escape_solidus_(false),
-        object_object_split_lines_(line_split_kind::multi_line),
-        object_array_split_lines_(line_split_kind::same_line),
-        array_array_split_lines_(line_split_kind::new_line),
-        array_object_split_lines_(line_split_kind::multi_line)
+        : indent_(default_indent),
+          precision_(0),
+          can_read_nan_replacement_(false),
+          can_read_pos_inf_replacement_(false),
+          can_read_neg_inf_replacement_(false),
+          escape_all_non_ascii_(false),
+          escape_solidus_(false),
+          object_object_split_lines_(line_split_kind::multi_line),
+          object_array_split_lines_(line_split_kind::same_line),
+          array_array_split_lines_(line_split_kind::new_line),
+          array_object_split_lines_(line_split_kind::multi_line),
+          max_nesting_depth_((std::numeric_limits<size_t>::max)())
     {
     }
 
@@ -268,6 +269,16 @@ public:
         neg_inf_replacement_ = replacement;
         can_read_neg_inf_replacement_ = is_string(replacement);
         return *this;
+    }
+
+    size_t max_nesting_depth() const
+    {
+        return max_nesting_depth_;
+    }
+
+    void max_nesting_depth(size_t value)
+    {
+        max_nesting_depth_ = value;
     }
 private:
     enum class input_state {initial,begin_quote,character,end_quote,escape,error};

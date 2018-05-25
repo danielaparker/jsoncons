@@ -46,6 +46,9 @@ The default is "null"
     std::string neg_inf_replacement() const 
 The default is "null"
 
+    size_t max_nesting_depth() const
+By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
+
 #### Modifiers
 
     json_serializing_options& indent(int value)
@@ -75,6 +78,9 @@ For an array whose parent is an object, set whether that array is split on a new
 
     json_serializing_options& array_array_split_lines(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind).
+
+    void max_nesting_depth(size_t depth)
+Sets the maximum nesting depth allowed when deserializing.
 
 ### Examples
 

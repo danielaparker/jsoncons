@@ -58,11 +58,6 @@ The error code `ec` is set if there are any unconsumed non-whitespace characters
 
     void buffer_length(size_t length)
 
-    size_t max_nesting_depth() const
-By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
-
-    void max_nesting_depth(size_t depth)
-
     size_t line_number() const
 
     size_t column_number() const

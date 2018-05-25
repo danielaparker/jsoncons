@@ -353,11 +353,9 @@ BOOST_AUTO_TEST_CASE(test_fail18)
     BOOST_REQUIRE(is);
     try
     {
-        json_decoder<json> decoder;
-        json_reader reader(is,decoder);
-        reader.max_nesting_depth(20);
-        reader.read_next();
-        reader.check_done();
+        json_serializing_options options;
+        options.max_nesting_depth(20);
+        json::parse(is, options);
     }
     catch (const parse_error& e)
     {
