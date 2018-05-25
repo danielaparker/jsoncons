@@ -19,9 +19,10 @@ namespace jsoncons
     struct json_convert_traits<matrix<double>>
     {
         template <class CharT>
-        static matrix<double> decode(const std::basic_string<CharT>& s)
+        static matrix<double> decode(std::basic_istringstream<CharT>& is,
+                                     const basic_json_serializing_options<CharT>& options)
         {
-            basic_json<CharT> j = basic_json<CharT>::parse(s);
+            basic_json<CharT> j = basic_json<CharT>::parse(is, options);
             if (j.is_array() && j.size() > 0)
             {
                 size_t m = j.size();

@@ -58,6 +58,14 @@ using namespace examples::encode_json;
 namespace jsoncons
 {
     template <>
+    static T decode(std::istringstream& is,
+                    const json_serializing_options& options)
+    {
+        json j = json::parse(is, options);
+        return j. template as<T>();
+    }
+
+    template <>
     struct json_convert_traits<std::shared_ptr<Employee>>
     {
         static void encode(const std::shared_ptr<Employee>& val, json_content_handler& handler)
