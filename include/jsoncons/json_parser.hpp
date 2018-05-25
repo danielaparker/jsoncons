@@ -449,7 +449,7 @@ public:
         }
     }
 
-    void do_begin_object(std::error_code& ec)
+    void begin_object(std::error_code& ec)
     {
         if (++nesting_depth_ >= max_nesting_depth_)
         {
@@ -464,7 +464,7 @@ public:
         handler_.begin_object(*this);
     }
 
-    void do_end_object(std::error_code& ec)
+    void end_object(std::error_code& ec)
     {
         JSONCONS_ASSERT(nesting_depth_ >= 1);
         --nesting_depth_;
@@ -497,7 +497,7 @@ public:
         }
     }
 
-    void do_begin_array(std::error_code& ec)
+    void begin_array(std::error_code& ec)
     {
         if (++nesting_depth_ >= max_nesting_depth_)
         {
@@ -513,7 +513,7 @@ public:
         handler_.begin_array(*this);
     }
 
-    void do_end_array(std::error_code& ec)
+    void end_array(std::error_code& ec)
     {
         JSONCONS_ASSERT(nesting_depth_ >= 1);
         --nesting_depth_;
@@ -658,13 +658,13 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '{':
-                            do_begin_object(ec);
+                            begin_object(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
                             break;
                         case '[':
-                            do_begin_array(ec);
+                            begin_array(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
@@ -769,13 +769,13 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '}':
-                            do_end_object(ec);
+                            end_object(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
                             break;
                         case ']':
-                            do_end_array(ec);
+                            end_array(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
@@ -844,7 +844,7 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '}':
-                            do_end_object(ec);
+                            end_object(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
@@ -922,7 +922,7 @@ public:
                                 ec = json_parser_errc::extra_comma;
                                 return;
                             }
-                            do_end_object(ec);  // Recover
+                            end_object(ec);  // Recover
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
@@ -1035,13 +1035,13 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '{':
-                            do_begin_object(ec);
+                            begin_object(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
                             break;
                         case '[':
-                            do_begin_array(ec);
+                            begin_array(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
@@ -1103,7 +1103,7 @@ public:
                                     ec = json_parser_errc::extra_comma;
                                     return;
                                 }
-                                do_end_array(ec);  // Recover
+                                end_array(ec);  // Recover
                                 if (ec) return;
                             }
                             else
@@ -1173,19 +1173,19 @@ public:
                             state_ = parse_state::slash;
                             break;
                         case '{':
-                            do_begin_object(ec);
+                            begin_object(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
                             break;
                         case '[':
-                            do_begin_array(ec);
+                            begin_array(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
                             break;
                         case ']':
-                            do_end_array(ec);
+                            end_array(ec);
                             if (ec) return;
                             ++input_ptr_;
                             ++column_;
@@ -1735,7 +1735,7 @@ zero:
             case '}':
                 end_integer_value(ec);
                 if (ec) return;
-                do_end_object(ec);
+                end_object(ec);
                 ++input_ptr_;
                 ++column_;
                 if (ec) return;
@@ -1743,7 +1743,7 @@ zero:
             case ']':
                 end_integer_value(ec);
                 if (ec) return;
-                do_end_array(ec);
+                end_array(ec);
                 ++input_ptr_;
                 ++column_;
                 if (ec) return;
@@ -1820,7 +1820,7 @@ integer:
             case '}':
                 end_integer_value(ec);
                 if (ec) return;
-                do_end_object(ec);
+                end_object(ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -1828,7 +1828,7 @@ integer:
             case ']':
                 end_integer_value(ec);
                 if (ec) return;
-                do_end_array(ec);
+                end_array(ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -1927,7 +1927,7 @@ fraction2:
             case '}':
                 end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
-                do_end_object(ec);
+                end_object(ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -1935,7 +1935,7 @@ fraction2:
             case ']':
                 end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
-                do_end_array(ec);
+                end_array(ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -2054,7 +2054,7 @@ exp3:
             case '}':
                 end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
-                do_end_object(ec);
+                end_object(ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -2062,7 +2062,7 @@ exp3:
             case ']':
                 end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
-                do_end_array(ec);
+                end_array(ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
