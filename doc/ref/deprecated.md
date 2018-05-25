@@ -53,9 +53,9 @@ json member constants|null||Use static member function `json::null()`
 &#160;|an_object||Use the default constructor `json()` instead.
 &#160;|an_array||Use assignment to `json::array()` or `json::make_array()` instead.
 json_decoder|json& root()|<em>&#x2713;</em>|json get_result()
-serialization|`output_format`|<em>&#x2713;</em>|Use `serialization_options`
-json_reader|max_depth() const|<em>&#x2713;</em>|Use max_nesting_depth() const
-&#160;|max_depth(depth)|<em>&#x2713;</em>|Use max_nesting_depth() const
+serialization|`output_format`|<em>&#x2713;</em>|Use `json_serializing_options`
+json_reader|max_depth(),max_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
+&#160;|max_nesting_depth(),max_nesting_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
 &#160;|json_input_handler& parent()|<em>&#x2713;</em>|Use json_input_handler& input_handler()
 json_input_handler class|do_longlong_value(long long value, const parsing_context& context)||Override do_integer_value(int64_t value, const parsing_context& context)
 &#160;|do_ulonglong_value(unsigned long long value, const parsing_context& context)||Removed, override do_uinteger_value(uint64_t value, const parsing_context& context)

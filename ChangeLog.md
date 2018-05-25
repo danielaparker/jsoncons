@@ -1,5 +1,5 @@
-master
-------
+v0.105.0
+--------
 
 Enhancements
 
@@ -47,7 +47,6 @@ Other Changes
 
 - The name `csv_parameters` has been deprecated (still works) and renamed to 
   `csv_serializing_options`. Rationale: naming consistency.
-
 
 v0.104.0
 --------
