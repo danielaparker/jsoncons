@@ -42,6 +42,9 @@ Other Changes
 - The name `serialization_options` has been deprecated (still works) and renamed to 
   `json_serializing_options`. Rationale: naming consistency.
 
+- The `json_reader` `max_nesting_depth` getter and setter functions have been deprecated.
+  Use the `json_serializing_options` `max_nesting_depth` getter and setter functions instead.
+
 - The name `csv_parameters` has been deprecated (still works) and renamed to 
   `csv_serializing_options`. Rationale: naming consistency.
 
