@@ -196,7 +196,6 @@ Output:
 ]
 ```
 
-
 #### Is it possible to merge two json objects?
 
 [json::merge](doc/ref/json/merge.md) inserts another json object's key-value pairs into a json object,
@@ -237,7 +236,7 @@ Output:
 
 ### Modify
 
-#### How can I change object member names?
+#### How can I rename object member keys?
 
 You can rename object members with the built in filter [rename_object_member_filter](doc/ref/rename_object_member_filter.md)
 
