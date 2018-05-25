@@ -1,6 +1,6 @@
 ## FAQ
 
-### Deserialize JSON
+### Deserialize
 
 #### How can I parse JSON from a string?
 
@@ -93,7 +93,7 @@ Output:
 (2) Illegal comment at line 3 and column 10
 ```
 
-### Serialize JSON
+### Serialize 
 
 #### How can I serialize a json value to a string?
 
