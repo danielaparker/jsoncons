@@ -93,6 +93,22 @@ Output:
 (2) Illegal comment at line 3 and column 10
 ```
 
+#### Can I set a maximum nesting depth?
+
+Yes, like this,
+```
+try
+{
+    std::ifstream is("myfile.json");    
+    json_serializing_options options;
+    options.max_nesting_depth(20);
+    json::parse(is, options);
+}
+catch (const parse_error& e)
+{
+     std::cout e.what() << std::endl;
+}
+```
 ### Serialize 
 
 #### How can I serialize a json value to a string?
