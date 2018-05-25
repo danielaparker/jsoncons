@@ -54,6 +54,7 @@ json member constants|null||Use static member function `json::null()`
 &#160;|an_array||Use assignment to `json::array()` or `json::make_array()` instead.
 json_decoder|json& root()|<em>&#x2713;</em>|json get_result()
 serialization|`output_format`|<em>&#x2713;</em>|Use `json_serializing_options`
+|`serialization_options`|<em>&#x2713;</em>|Use `json_serializing_options`
 json_reader|max_depth(),max_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
 &#160;|max_nesting_depth(),max_nesting_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
 &#160;|json_input_handler& parent()|<em>&#x2713;</em>|Use json_input_handler& input_handler()
@@ -68,7 +69,8 @@ json_output_handler class|do_longlong_value(long long value)||Removed, override 
 basic_parsing_context|last_char()|<em>&#x2713;</em>|Use current_char()
 json_filter|parent()|<em>&#x2713;</em>|Use downstream_handler()
 &#160;|input_handler()|<em>&#x2713;</em>|Use downstream_handler()
-csv_parameters|`header(std::string value)`||Use `column_names(const std::string& value)`
+csv|`csv_parameters`||Use `csv_serializing_options`
+|`csv_parameters::header(std::string value)`||Use `csv_serializing_options::column_names(const std::string& value)`
 &#160;|`column_names(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_names(const std::string& value)`
 &#160;|`data_types(std::string value)`||Use `column_types(const std::string& value)`
 &#160;|`column_types(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_types(const std::string& value)`
