@@ -273,15 +273,14 @@ int main()
     rename_object_member_filter filter2("fifth", "fourth", serializer);
     rename_object_member_filter filter1("fourth", "third", filter2);
 
-    // A filter can be passed to any function that takes
-    // a json_content_handler ...
+    // A filter can be passed to any function that takes a json_content_handler ...
     std::cout << "(1) ";
     std::istringstream is(s);
     json_reader reader(is, filter1);
     reader.read();
     std::cout << std::endl;
 
-    // or a json_content_handler    
+    // or 
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);
