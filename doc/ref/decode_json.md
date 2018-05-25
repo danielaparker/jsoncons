@@ -11,7 +11,18 @@ work for all C++ classes that have `json_type_traits` defined.
 #include <jsoncons/json.hpp>
 
 template <class T, class CharT>
-T decode_json(const std::basic_string<CharT>& s);
+T decode_json(const std::basic_string<CharT>& s);  // (1)
+
+template <class T, class CharT>
+T decode_json(const std::basic_string<CharT>& s,
+              const basic_json_serializing_options<CharT>& options); // (2)
+
+template <class T, class CharT>
+T decode_json(std::basic_istringstream<CharT>& is); // (3)
+
+template <class T, class CharT>
+T decode_json(std::basic_istringstream<CharT>& is,
+              const basic_json_serializing_options<CharT>& options); // (4)
 ```
 
 ### Examples
@@ -23,8 +34,6 @@ T decode_json(const std::basic_string<CharT>& s);
 #include <map>
 #include <tuple>
 #include <jsoncons/json.hpp>
-
-using namespace jsoncons;
 
 int main()
 {
