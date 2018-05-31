@@ -38,16 +38,6 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
-### What's new on master
-
-- The CSV extension now supports multi-valued fields separated by subfield delimiters
-
-- New functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) convert JSON 
-  formatted strings to C++ objects and back. These functions attempts to 
-  perform the conversion by streaming using `json_convert_traits`, and if
-  streaming is not supported, fall back to using `json_type_traits`. `decode_json` 
-  and `encode_json` will work for all C++ classes that have `json_type_traits` defined.
-
 ### Extensions
 
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
