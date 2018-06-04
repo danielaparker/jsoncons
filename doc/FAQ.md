@@ -250,9 +250,9 @@ Output:
 }
 ```
 
-### Modify
+### Search and Replace
 
-#### How can I rename all object member keys in a JSON document?
+#### Is there a way to search for and repace an object member key?
 
 You can rename object members with the built in filter [rename_object_member_filter](doc/ref/rename_object_member_filter.md)
 
@@ -292,3 +292,45 @@ Output:
 (1) {"first":1,"second":2,"third":3,"fourth":4}
 (2) {"first":1,"second":2,"third":3,"fourth":4}
 ```
+
+#### Is there a way to search for and replace a value?
+
+You can use [json_replace](doc/ref/jsonpath/json_replace.md) in the `jsonpath` extension
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    json j = json::parse(R"(
+        { "store": {
+            "book": [ 
+              { "category": "reference",
+                "author": "Nigel Rees",
+                "title": "Sayings of the Century",
+                "price": 8.95
+              },
+              { "category": "fiction",
+                "author": "Evelyn Waugh",
+                "title": "Sword of Honour",
+                "price": 12.99
+              },
+              { "category": "fiction",
+                "author": "Herman Melville",
+                "title": "Moby Dick",
+                "isbn": "0-553-21311-3",
+                "price": 8.99
+              }
+            ]
+          }
+        }
+    )");
+
+    // Change the price of "Moby Dick" from $8.99 to $10
+    jsonpath::json_replace(j,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
+    std::cout << pretty_print(booklist) << std::endl;
+}
+
