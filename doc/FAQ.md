@@ -214,10 +214,10 @@ Output:
 
 #### Is it possible to merge two json objects?
 
-[json::merge](doc/ref/json/merge.md) inserts another json object's key-value pairs into a json object,
+[json::merge](ref/json/merge.md) inserts another json object's key-value pairs into a json object,
 unless they already exist with an equivalent key.
 
-[json::merge_or_update](doc/ref/json/merge_or_update.md) inserts another json object's key-value pairs 
+[json::merge_or_update](ref/json/merge_or_update.md) inserts another json object's key-value pairs 
 into a json object, or assigns them if they already exist.
 
 The `merge` and `merge_or_update` functions perform only a one-level-deep shallow merge,
@@ -254,7 +254,7 @@ Output:
 
 #### Is there a way to search for and repace an object member key?
 
-You can rename object members with the built in filter [rename_object_member_filter](doc/ref/rename_object_member_filter.md)
+You can rename object members with the built in filter [rename_object_member_filter](ref/rename_object_member_filter.md)
 
 ```c++
 #include <sstream>
@@ -295,7 +295,7 @@ Output:
 
 #### Is there a way to search for and replace a value?
 
-You can use [json_replace](doc/ref/jsonpath/json_replace.md) in the `jsonpath` extension
+You can use [json_replace](ref/jsonpath/json_replace.md) in the `jsonpath` extension
 
 ```c++
 #include <jsoncons/json.hpp>
