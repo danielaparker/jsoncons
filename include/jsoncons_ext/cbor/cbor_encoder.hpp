@@ -82,7 +82,7 @@ private:
         writer_.flush();
     }
 
-    void do_begin_object() override
+    void do_begin_object(const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -100,7 +100,42 @@ private:
         writer_.put('{');
     }
 
-    void do_end_object() override
+    void do_begin_object(size_t length, const serializing_context& context) override
+    {
+        if (!stack_.empty() && !stack_.back().is_object())
+        {
+            if (!stack_.empty())
+            {
+                if (stack_.back().count_ > 0)
+                {
+                    writer_. put(',');
+                }
+            }
+        }
+
+        stack_.push_back(stack_item(true));
+
+        writer_.put('{');
+    }
+
+    void do_end_object(const serializing_context& context) override
+    {
+        JSONCONS_ASSERT(!stack_.empty());
+        if (indenting_)
+        {
+            unindent();
+            if (stack_.back().unindent_at_end())
+            {
+                write_indent();
+            }
+        }
+        stack_.pop_back();
+        writer_.put('}');
+
+        end_value();
+    }
+
+    void do_end_object(size_t length, const serializing_context& context) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -118,7 +153,7 @@ private:
     }
 
 
-    void do_begin_array() override
+    void do_begin_array(const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -134,7 +169,7 @@ private:
         writer_.put('[');
     }
 
-    void do_end_array() override
+    void do_end_array(const serializing_context& context) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -142,7 +177,7 @@ private:
         end_value();
     }
 
-    void do_name(const string_view_type& name) override
+    void do_name(const string_view_type& name, const serializing_context& context) override
     {
         if (!stack_.empty())
         {
@@ -158,7 +193,7 @@ private:
         writer_.put(':');
     }
 
-    void do_null_value() override
+    void do_null_value(const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -171,7 +206,7 @@ private:
         end_value();
     }
 
-    void do_string_value(const string_view_type& value) override
+    void do_string_value(const string_view_type& value, const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -185,14 +220,14 @@ private:
         end_value();
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length) override
+    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
         std::basic_string<CharT> s;
         encode_base64url(data,data+length,s);
         do_string_value(s);
     }
 
-    void do_double_value(double value, const number_format& fmt) override
+    void do_double_value(double value, const number_format& fmt, const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -204,7 +239,7 @@ private:
         end_value();
     }
 
-    void do_integer_value(int64_t value) override
+    void do_integer_value(int64_t value, const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -214,7 +249,7 @@ private:
         end_value();
     }
 
-    void do_uinteger_value(uint64_t value) override
+    void do_uinteger_value(uint64_t value, const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {
@@ -224,7 +259,7 @@ private:
         end_value();
     }
 
-    void do_bool_value(bool value) override
+    void do_bool_value(bool value, const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {

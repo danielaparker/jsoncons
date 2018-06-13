@@ -64,7 +64,8 @@ void json_replace_example2()
 {"category": "reference",
 "author": "Margaret Weis",
 "title": "Dragonlance Series",
-"price": 31.96}, {"category": "reference",
+"price": 31.96}, 
+{"category": "reference",
 "author": "Brent Weeks",
 "title": "Night Angel Trilogy",
 "price": 14.70
