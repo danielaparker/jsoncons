@@ -18,7 +18,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/detail/number_printers.hpp>
+#include <jsoncons/detail/print_number.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons_ext/csv/csv_serializing_options.hpp>
 #include <jsoncons/detail/writer.hpp>

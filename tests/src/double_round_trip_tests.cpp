@@ -81,6 +81,9 @@ BOOST_AUTO_TEST_CASE(test_round_trip)
 
     input = "13.449999999999999";
     BOOST_CHECK_EQUAL(input,json::parse(input).as<std::string>());
+
+    input = "0.000071";
+    BOOST_CHECK_EQUAL(input,json::parse(input).as<std::string>());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

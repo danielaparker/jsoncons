@@ -21,7 +21,7 @@
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/writer.hpp>
-#include <jsoncons/detail/number_printers.hpp>
+#include <jsoncons/detail/print_number.hpp>
 
 namespace jsoncons {
 

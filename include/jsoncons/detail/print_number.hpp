@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_NUMBERPRINTERS_HPP
-#define JSONCONS_DETAIL_NUMBERPRINTERS_HPP
+#ifndef JSONCONS_DETAIL_PRINTNUMBER_HPP
+#define JSONCONS_DETAIL_PRINTNUMBER_HPP
 
 #include <stdexcept>
 #include <string>
@@ -99,6 +99,16 @@ public:
     {
         typedef typename Writer::char_type char_type;
 
+        chars_format format;
+        if (override_.format() != chars_format::hex)
+        {
+            format = override_.format();
+        }
+        else 
+        {
+            format = fmt.format();
+        }
+
         int precision;
         if (override_.precision() != 0)
         {
@@ -127,10 +137,10 @@ public:
             decimal_places = 6;
         }             
 
-        char number_buffer[100]; 
+        char number_buffer[200]; 
 
         int length = 0;
-        switch (fmt.format())
+        switch (format)
         {
         case chars_format::fixed:
             {
