@@ -104,7 +104,7 @@ private:
         downstream_handler_.byte_string_value(data, length, context);
     }
 
-    void do_double_value(double value, const number_format& fmt,
+    void do_double_value(double value, const floating_point_options& fmt,
                          const serializing_context& context) override
     {
         downstream_handler_.double_value(value, fmt, context);

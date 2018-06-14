@@ -2793,11 +2793,11 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                handler_.double_value(d, number_format(format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
+                handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
             }
             else
             {
-                handler_.double_value(d, number_format(format,static_cast<uint8_t>(precision_), decimal_places_), *this);
+                handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), *this);
             }
         }
         catch (...)

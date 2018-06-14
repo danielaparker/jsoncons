@@ -84,8 +84,8 @@ line and column information is provided in the [context](serializing_context.md)
 Sends a floating point value with specified precision. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 
-    void double_value(double value, const number_format& fmt) 
-    void double_value(double value, const number_format& fmt, const serializing_context& context)
+    void double_value(double value, const floating_point_options& fmt) 
+    void double_value(double value, const floating_point_options& fmt, const serializing_context& context)
 Sends a floating point value with specified precision. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 
@@ -146,7 +146,7 @@ line and column information is provided in the [context](serializing_context.md)
 Receives a non-negative integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 
-    virtual void do_double_value(double value, const number_format& fmt, const serializing_context& context) = 0;
+    virtual void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
 Receives a floating point value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 

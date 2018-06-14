@@ -21,11 +21,11 @@ BOOST_AUTO_TEST_SUITE(double_to_string_tests)
 template<class CharT>
 std::basic_string<CharT> float_to_string(double val, uint8_t precision)
 {
-    detail::print_double print(precision);
+    detail::print_double print(floating_point_options(chars_format::general,precision,0));
 
     std::basic_string<CharT> s;
     jsoncons::detail::string_writer<CharT> writer(s);
-    print(val, precision, writer);
+    print(val, floating_point_options(chars_format::general,precision,0), writer);
     writer.flush();
     return s;
 }

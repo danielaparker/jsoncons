@@ -62,7 +62,10 @@ namespace jsoncons
 
 #if defined(ANDROID) || defined(__ANDROID__)
 #define JSONCONS_HAS_STRTOLD_L
+#if __ANDROID_API__ >= 21
+#else
 #define JSONCONS_NO_LOCALECONV
+#endif
 #endif
 
 #if defined (__clang__)

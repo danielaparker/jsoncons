@@ -150,30 +150,30 @@ public:
 
     void double_value(double value)
     {
-        do_double_value(value, number_format(), null_serializing_context());
+        do_double_value(value, floating_point_options(), null_serializing_context());
     }
 
     void double_value(double value, uint8_t precision)
     {
-        do_double_value(value, number_format(precision, 0), null_serializing_context());
+        do_double_value(value, floating_point_options(precision, 0), null_serializing_context());
     }
 
-    void double_value(double value, const number_format& fmt)
+    void double_value(double value, const floating_point_options& fmt)
     {
         do_double_value(value, fmt, null_serializing_context());
     }
 
     void double_value(double value, const serializing_context& context)
     {
-        do_double_value(value, number_format(), context);
+        do_double_value(value, floating_point_options(), context);
     }
 
     void double_value(double value, uint8_t precision, const serializing_context& context)
     {
-        do_double_value(value, number_format(precision, 0), context);
+        do_double_value(value, floating_point_options(precision, 0), context);
     }
 
-    void double_value(double value, const number_format& fmt, const serializing_context& context)
+    void double_value(double value, const floating_point_options& fmt, const serializing_context& context)
     {
         do_double_value(value, fmt, context);
     }
@@ -252,12 +252,12 @@ public:
 
     void value(float value, uint8_t precision, const serializing_context& context)
     {
-        do_double_value(value, number_format(precision, 0), context);
+        do_double_value(value, floating_point_options(precision, 0), context);
     }
 
     void value(double value, uint8_t precision, const serializing_context& context)
     {
-        do_double_value(value, number_format(precision, 0), context);
+        do_double_value(value, floating_point_options(precision, 0), context);
     }
 
     void value(bool value, const serializing_context& context) 
@@ -302,7 +302,7 @@ private:
 
     virtual void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
-    virtual void do_double_value(double value, const number_format& fmt, const serializing_context& context) = 0;
+    virtual void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
 
     virtual void do_integer_value(int64_t value, const serializing_context& context) = 0;
 
@@ -357,7 +357,7 @@ private:
     {
     }
 
-    void do_double_value(double, const number_format& fmt, const serializing_context&) override
+    void do_double_value(double, const floating_point_options& fmt, const serializing_context&) override
     {
     }
 

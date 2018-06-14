@@ -1276,7 +1276,7 @@ private:
         case numeric_check_state::exp:
             {
                 double d = to_double_(buffer.data(), buffer.length());
-                handler.double_value(d, number_format(format, precision, decimal_places), *this);
+                handler.double_value(d, floating_point_options(format, precision, decimal_places), *this);
                 break;
             }
         default:

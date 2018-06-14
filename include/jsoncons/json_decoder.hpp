@@ -268,7 +268,7 @@ private:
         }
     }
 
-    void do_double_value(double value, const number_format& fmt, const serializing_context&) override
+    void do_double_value(double value, const floating_point_options& fmt, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {

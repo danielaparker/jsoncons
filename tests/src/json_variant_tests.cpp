@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
     BOOST_CHECK(var4.uinteger_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
-    json::variant var5(val5,number_format());
+    json::variant var5(val5,floating_point_options());
     json::variant var6(var5);
     BOOST_CHECK(json_type_tag::double_t == var5.type_id());
     BOOST_CHECK(json_type_tag::double_t == var6.type_id());

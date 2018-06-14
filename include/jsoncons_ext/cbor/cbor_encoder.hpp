@@ -227,7 +227,7 @@ private:
         do_string_value(s);
     }
 
-    void do_double_value(double value, const number_format& fmt, const serializing_context& context) override
+    void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) override
     {
         if (!stack_.empty() && !stack_.back().is_object())
         {

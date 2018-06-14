@@ -65,7 +65,9 @@ public:
 
     basic_json_serializing_options()
         : indent_(default_indent),
+          floating_point_format_(chars_format::hex),
           precision_(0),
+          decimal_places_(0),
           can_read_nan_replacement_(false),
           can_read_pos_inf_replacement_(false),
           can_read_neg_inf_replacement_(false),

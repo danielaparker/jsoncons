@@ -72,7 +72,9 @@ public:
        writer_(os),
        options_(),
        stack_(),
-       fp_(options_.precision()),
+       fp_(floating_point_options(options_.floating_point_format(), 
+                                  options_.precision(),
+                                  options_.decimal_places())),
        column_names_(parameters_.column_names())
     {
     }
@@ -84,7 +86,9 @@ public:
        parameters_(options),
        options_(),
        stack_(),
-       fp_(options_.precision()),
+       fp_(floating_point_options(options.floating_point_format(), 
+                                  options.precision(),
+                                  options.decimal_places())),
        column_names_(parameters_.column_names())
     {
     }
@@ -281,7 +285,7 @@ private:
 
     }
 
-    void do_double_value(double val, const number_format&, const serializing_context&) override
+    void do_double_value(double val, const floating_point_options& fmt, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -292,7 +296,7 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::detail::string_writer<CharT> bo(s);
-                    value(val,bo);
+                    value(val, fmt, bo);
                     bo.flush();
                     it->second = s;
                 }
@@ -382,7 +386,7 @@ private:
     }
 
     template <class AnyWriter>
-    void value(double val, AnyWriter& writer)
+    void value(double val, const floating_point_options& fmt, AnyWriter& writer)
     {
         begin_value(writer);
 
@@ -400,7 +404,7 @@ private:
         }
         else
         {
-            fp_(val,options_.precision(),writer);
+            fp_(val, fmt ,writer);
         }
 
         end_value();

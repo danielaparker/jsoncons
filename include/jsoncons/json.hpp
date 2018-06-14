@@ -256,14 +256,15 @@ public:
         public:
             double_data(double val)
                 : data_base(json_type_tag::double_t), 
+                  format_(chars_format::general),
                   precision_(0), 
                   decimal_places_(0), 
                   val_(val)
             {
             }
-            double_data(double val, const number_format& fmt)
+            double_data(double val, const floating_point_options& fmt)
                 : data_base(json_type_tag::double_t), 
-                  format_(fmt.floating_point_format()), 
+                  format_(fmt.format()), 
                   precision_(fmt.precision()), 
                   decimal_places_(fmt.decimal_places()), 
                   val_(val)
@@ -272,8 +273,9 @@ public:
 
             double_data(const double_data& val)
                 : data_base(json_type_tag::double_t),
-                  precision_(val.precision_), 
-                  decimal_places_(val.decimal_places_), 
+                  format_(val.format()),
+                  precision_(val.precision()), 
+                  decimal_places_(val.decimal_places()), 
                   val_(val.val_)
             {
             }
@@ -283,6 +285,11 @@ public:
                 return val_;
             }
 
+            chars_format format() const
+            {
+                return format_;
+            }
+
             uint8_t precision() const
             {
                 return precision_;
@@ -290,7 +297,7 @@ public:
 
             uint8_t decimal_places() const
             {
-                return precision_;
+                return decimal_places_;
             }
         };
 
@@ -711,7 +718,7 @@ public:
         {
             new(reinterpret_cast<void*>(&data_))double_data(val);
         }
-        variant(double val, const number_format& fmt)
+        variant(double val, const floating_point_options& fmt)
         {
             new(reinterpret_cast<void*>(&data_))double_data(val, fmt);
         }
@@ -2995,11 +3002,11 @@ public:
     }
 
     basic_json(double val, uint8_t precision)
-        : var_(val, number_format(precision, 0))
+        : var_(val, floating_point_options(precision, 0))
     {
     }
 
-    basic_json(double val, const number_format& fmt)
+    basic_json(double val, const floating_point_options& fmt)
         : var_(val, fmt)
     {
     }
@@ -3176,7 +3183,10 @@ public:
             handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
             break;
         case json_type_tag::double_t:
-            handler.double_value(var_.double_data_cast()->value(), number_format(var_.double_data_cast()->precision(), var_.double_data_cast()->decimal_places()));
+            handler.double_value(var_.double_data_cast()->value(), 
+                                 floating_point_options(var_.double_data_cast()->format(),
+                                                        var_.double_data_cast()->precision(), 
+                                                        var_.double_data_cast()->decimal_places()));
             break;
         case json_type_tag::integer_t:
             handler.integer_value(var_.integer_data_cast()->value());

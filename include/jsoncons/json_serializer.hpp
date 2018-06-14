@@ -120,7 +120,9 @@ public:
     basic_json_serializer(output_type& os)
        : indent_(0), 
          indenting_(false),
-         fp_(options_.precision()),
+         fp_(floating_point_options(options_.floating_point_format(), 
+                                    options_.precision(),
+                                    options_.decimal_places())),
          writer_(os)
     {
     }
@@ -128,7 +130,9 @@ public:
     basic_json_serializer(output_type& os, indenting line_indent)
        : indent_(0), 
          indenting_(line_indent == indenting::indent),
-         fp_(options_.precision()),
+        fp_(floating_point_options(options_.floating_point_format(), 
+                                   options_.precision(),
+                                   options_.decimal_places())),
          writer_(os)
     {
     }
@@ -137,7 +141,9 @@ public:
        : options_(options), 
          indent_(0), 
          indenting_(false),  
-         fp_(options_.precision()),
+         fp_(floating_point_options(options.floating_point_format(), 
+                                    options.precision(),
+                                    options.decimal_places())),
          writer_(os)
     {
     }
@@ -148,7 +154,9 @@ public:
        : options_(options), 
          indent_(0), 
          indenting_(line_indent == indenting::indent),  
-         fp_(options_.precision()),
+         fp_(floating_point_options(options.floating_point_format(), 
+                                    options.precision(),
+                                    options.decimal_places())),
          writer_(os)
     {
     }
@@ -498,7 +506,7 @@ private:
         do_string_value(s, context);
     }
 
-    void do_double_value(double value, const number_format& fmt, const serializing_context&) override
+    void do_double_value(double value, const floating_point_options& fmt, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -540,7 +548,7 @@ private:
         }
         else
         {
-            fp_(value, fmt.precision(), writer_);
+            fp_(value, fmt, writer_);
         }
 
         end_value();

@@ -552,38 +552,38 @@ using chars_format = std::chars_format;
 enum class chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixed|scientific};
 #endif
 
-// number_format
+// floating_point_options
 
-class number_format
+class floating_point_options
 {
     chars_format format_;
     uint8_t precision_;
     uint8_t decimal_places_;
 public:
-    number_format()
+    floating_point_options()
         : format_(chars_format::general), precision_(0), decimal_places_(0)
     {
     }
 
-    number_format(uint8_t precision, uint8_t decimal_places)
+    floating_point_options(uint8_t precision, uint8_t decimal_places)
         : format_(chars_format::general), precision_(precision), decimal_places_(decimal_places)
     {
     }
 
-    number_format(chars_format format, uint8_t precision, uint8_t decimal_places)
+    floating_point_options(chars_format format, uint8_t precision, uint8_t decimal_places)
         : format_(format), precision_(precision), decimal_places_(decimal_places)
     {
     }
 
-    number_format(chars_format format)
+    explicit floating_point_options(chars_format format)
         : format_(format), precision_(0), decimal_places_(0)
     {
     }
 
-    number_format(const number_format&) = default;
-    number_format(number_format&&) = default;
-    number_format& operator=(const number_format& e) = default;
-    number_format& operator=(number_format&& e) = default;
+    floating_point_options(const floating_point_options&) = default;
+    floating_point_options(floating_point_options&&) = default;
+    floating_point_options& operator=(const floating_point_options& e) = default;
+    floating_point_options& operator=(floating_point_options&& e) = default;
 
     uint8_t precision() const
     {
@@ -595,7 +595,7 @@ public:
         return decimal_places_;
     }
 
-    chars_format floating_point_format() const
+    chars_format format() const
     {
         return format_;
     }
