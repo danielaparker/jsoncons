@@ -40,6 +40,7 @@ public:
     typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
 private:
     int indent_;
+    chars_format floating_point_format_;
     uint8_t precision_;
     uint8_t decimal_places_;
     bool can_read_nan_replacement_;
@@ -56,7 +57,6 @@ private:
     line_split_kind array_array_split_lines_;
     line_split_kind array_object_split_lines_;
 
-    chars_format floating_point_format_;
     size_t max_nesting_depth_;
 public:
     static const size_t default_indent = 4;

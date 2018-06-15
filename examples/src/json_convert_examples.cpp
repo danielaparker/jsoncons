@@ -57,7 +57,7 @@ using namespace examples::encode_json;
 
 namespace jsoncons
 {
-    template <>
+    template <class T>
     static T decode(std::istringstream& is,
                     const json_serializing_options& options)
     {
