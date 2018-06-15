@@ -23,6 +23,7 @@
 #include <exception>
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
+#include <jsoncons/detail/number_parsers.hpp>
 
 namespace jsoncons { namespace detail {
 
@@ -110,6 +111,7 @@ public:
         }
 
         int precision;
+        int precision2 = 0;
         if (override_.precision() != 0)
         {
             precision = override_.precision();
@@ -121,6 +123,7 @@ public:
         else
         {
             precision = std::numeric_limits<double>::digits10;
+            precision2 = std::numeric_limits<double>::max_digits10;
         }             
 
         int decimal_places;
@@ -134,7 +137,7 @@ public:
         }
         else
         {
-            decimal_places = 6;
+            format = chars_format::general;
         }             
 
         char number_buffer[200]; 
@@ -166,6 +169,18 @@ public:
                 if (length < 0)
                 {
                     JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                }
+                if (precision2 > 0)
+                {
+                    string_to_double to_double;
+                    if (to_double(number_buffer,sizeof(number_buffer)) != val)
+                    {
+                        length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision2, val);
+                        if (length < 0)
+                        {
+                            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                        }
+                    }
                 }
             }
             break;
