@@ -75,6 +75,9 @@ class basic_csv_serializing_options
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
 
+    chars_format floating_point_format_;
+    uint8_t precision_;
+    uint8_t decimal_places_;
     bool assume_header_;
     bool ignore_empty_values_;
     bool ignore_empty_lines_;
@@ -106,6 +109,9 @@ public:
 
     basic_csv_serializing_options()
         :
+        floating_point_format_(chars_format::hex),
+        precision_(0),
+        decimal_places_(0),
         assume_header_(false),
         ignore_empty_values_(false),
         ignore_empty_lines_(true),
@@ -130,6 +136,39 @@ public:
     }
 
 //  Properties
+
+    chars_format floating_point_format() const
+    {
+        return floating_point_format_;
+    }
+
+    basic_csv_serializing_options<CharT>& floating_point_format(chars_format value)
+    {
+        floating_point_format_ = value;
+        return *this;
+    }
+
+    uint8_t precision() const
+    {
+        return precision_;
+    }
+
+    basic_csv_serializing_options<CharT>& precision(uint8_t value)
+    {
+        precision_ = value;
+        return *this;
+    }
+
+    uint8_t decimal_places() const
+    {
+        return decimal_places_;
+    }
+
+    basic_csv_serializing_options<CharT>& decimal_places(uint8_t value)
+    {
+        decimal_places_ = value;
+        return *this;
+    }
 
     size_t header_lines() const
     {

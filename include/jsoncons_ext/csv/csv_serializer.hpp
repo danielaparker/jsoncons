@@ -72,7 +72,7 @@ public:
        writer_(os),
        options_(),
        stack_(),
-       fp_(floating_point_options(options_.format(), 
+       fp_(floating_point_options(options_.floating_point_format(), 
                                   options_.precision(),
                                   options_.decimal_places())),
        column_names_(parameters_.column_names())
@@ -86,7 +86,7 @@ public:
        parameters_(options),
        options_(),
        stack_(),
-       fp_(floating_point_options(options.format(), 
+       fp_(floating_point_options(options.floating_point_format(), 
                                   options.precision(),
                                   options.decimal_places())),
        column_names_(parameters_.column_names())
@@ -303,7 +303,7 @@ private:
             }
             else
             {
-                value(val,writer_);
+                value(val, fmt, writer_);
             }
         }
     }
