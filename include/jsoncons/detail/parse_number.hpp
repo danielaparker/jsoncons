@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_NUMBERPARSERS_HPP
-#define JSONCONS_DETAIL_NUMBERPARSERS_HPP
+#ifndef JSONCONS_DETAIL_PARSENUMBER_HPP
+#define JSONCONS_DETAIL_PARSENUMBER_HPP
 
 #include <stdexcept>
 #include <string>

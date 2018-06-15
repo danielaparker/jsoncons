@@ -23,7 +23,7 @@
 #include <exception>
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
-#include <jsoncons/detail/number_parsers.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 
 namespace jsoncons { namespace detail {
 
@@ -76,6 +76,7 @@ void print_uinteger(uint64_t value, Writer& os)
 class print_double
 {
 private:
+    string_to_double to_double_;
     floating_point_options override_;
     char decimal_point_;
 public:
@@ -172,8 +173,7 @@ public:
                 }
                 if (precision2 > 0)
                 {
-                    string_to_double to_double;
-                    if (to_double(number_buffer,sizeof(number_buffer)) != val)
+                    if (to_double_(number_buffer,sizeof(number_buffer)) != val)
                     {
                         length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision2, val);
                         if (length < 0)

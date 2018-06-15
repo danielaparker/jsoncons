@@ -22,7 +22,7 @@
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons/detail/number_parsers.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/csv/csv_error_category.hpp>
 #include <jsoncons_ext/csv/csv_serializing_options.hpp>
 

@@ -21,7 +21,7 @@
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error_category.hpp>
-#include <jsoncons/detail/number_parsers.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 
 #define JSONCONS_ILLEGAL_CONTROL_CHARACTER \
         case 0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x0b: \
