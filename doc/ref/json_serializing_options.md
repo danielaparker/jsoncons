@@ -5,9 +5,9 @@ typedef basic_json_serializing_options<char> json_serializing_options
 ```
 Specifies options for serializing and deserializing JSON text. The `json_serializing_options` class is an instantiation of the `basic_json_serializing_options` class template that uses `char` as the character type.
 
-The default floating point formatting produces digits in decimal format if possible, if not, it produces digits in exponential format. Trailing zeros are removed, except the one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.  A `precision` gives the maximum number of significant digits, the default precision is `15`. On most modern machines, 17 digits is usually enough to capture a floating-point number's value exactly, however, if you change precision to 17, conversion to text becomes an issue for floating point numbers that do not have an exact representation, e.g. 1.1 read may become 1.1000000000000001 when written. 
+The default floating point formatting for a floating point value that was previously decoded from json text is to preserve the original format and precision. This ensures round-trip for both format and precision, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 
-When parsing text, the precision of the fractional number is retained, and used for subsequent serialization, to allow round-trip.
+The default floating point formatting for a floating point value that was directly inserted into a json value is `chars_format::general` with shortest representation. Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
 #### Header
 ```c++
@@ -31,11 +31,15 @@ The level of indenting, the default is 4.
 
     chars_format::hex floating_point_format() const 
     json_serializing_options& floating_point_format(uint8_t value)
-Overrides floating point precision when decoding json. The default, for encoded numbers with fraction parts, is to preserve the original format, and when inserting or assigning double values, to decode with `chars_format::general`. 
+Overrides floating point precision when decoding json.
+The default, for a floating point value that was previously decoded from json text, is to preserve the original format when serializing.
+The default, for a floating point value that was directly inserted into a json value, to serialize with `chars_format::general`. 
 
     uint8_t precision() const 
     json_serializing_options& precision(uint8_t value)
-Overrides floating point precision when decoding json. The default, for encoded numbers with fraction parts, is to preserve the original precision, and when inserting or assigning double values, to decode with shortest representation. 
+Overrides floating point precision when decoding json. 
+The default, for a floating point value that was previously decoded from json text, is to preserve the original precision. 
+The fefault, for a floating point value that was directly inserted into a json value, to decode with shortest representation. 
 
     bool escape_all_non_ascii() const
     json_serializing_options& escape_all_non_ascii(bool value)
