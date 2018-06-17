@@ -39,7 +39,7 @@ The default, for a floating point value that was directly inserted into a json v
     json_serializing_options& precision(uint8_t value)
 Overrides floating point precision when serializing json. 
 The default, for a floating point value that was previously decoded from json text, is to preserve the original precision. 
-The fefault, for a floating point value that was directly inserted into a json value, to decode with shortest representation. 
+The fefault, for a floating point value that was directly inserted into a json value, to serialize with shortest representation. 
 
     bool escape_all_non_ascii() const
     json_serializing_options& escape_all_non_ascii(bool value)
