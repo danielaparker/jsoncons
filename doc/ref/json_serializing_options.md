@@ -23,49 +23,43 @@ The default indent is 4
     json_serializing_options()
 Constructs an `json_serializing_options` with default values. 
 
-#### Accessors
+#### Properties
 
     int indent() const
-Returns the level of indenting, the default is 4
+    json_serializing_options& indent(int value)
+The level of indenting, the default is 4.
+
+    chars_format::hex floating_point_format() const 
+    json_serializing_options& floating_point_format(uint8_t value)
+Overrides floating point precision when decoding json. The default, for encoded numbers with fraction parts, is to preserve the original format, and when inserting or assigning double values, to decode with `chars_format::general`. 
 
     uint8_t precision() const 
-If set, returns an override for the number of significant digits, otherwise zero.
+    json_serializing_options& precision(uint8_t value)
+Overrides floating point precision when decoding json. The default, for encoded numbers with fraction parts, is to preserve the original precision, and when inserting or assigning double values, to decode with shortest representation. 
 
     bool escape_all_non_ascii() const
-The default is false
+    json_serializing_options& escape_all_non_ascii(bool value)
+Escape all non-ascii characters. The default is `false`.
 
     bool escape_solidus() const
-The default is false
+    json_serializing_options& escape_solidus(bool value)
+Escape the solidus ('/') character. The default is `false`.
 
     std::string nan_replacement() const 
-The default is "null"
+    json_serializing_options& nan_replacement(const std::string& replacement)
+NaN replacement. The default is `"null"`. 
 
     std::string pos_inf_replacement() const 
-The default is "null"
+    json_serializing_options& pos_inf_replacement(const std::string& replacement)
+Positive infinity replacement. The default is `"null"`
 
     std::string neg_inf_replacement() const 
-The default is "null"
+    json_serializing_options& neg_inf_replacement(const std::string& replacement)
+Negative infinity replacement. The default is `"null"`
 
     size_t max_nesting_depth() const
-By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
-
-#### Modifiers
-
-    json_serializing_options& indent(int value)
-
-    json_serializing_options& escape_all_non_ascii(bool value)
-
-    json_serializing_options& escape_solidus(bool value)
-
-    json_serializing_options& nan_replacement(const std::string& replacement)
-
-    json_serializing_options& pos_inf_replacement(const std::string& replacement)
-
-    json_serializing_options& neg_inf_replacement(const std::string& replacement)
-Sets replacement text for negative infinity.
-
-    json_serializing_options& precision(uint8_t prec)
-Overrides floating point precision
+    void max_nesting_depth(size_t depth)
+The maximum nesting depth allowed when deserializing. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
     json_serializing_options& object_object_split_lines(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
@@ -79,8 +73,6 @@ For an array whose parent is an object, set whether that array is split on a new
     json_serializing_options& array_array_split_lines(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind).
 
-    void max_nesting_depth(size_t depth)
-Sets the maximum nesting depth allowed when deserializing.
 
 ### Examples
 
