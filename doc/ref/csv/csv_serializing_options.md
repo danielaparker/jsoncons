@@ -19,8 +19,8 @@ Constructs an `csv_serializing_options` with default values.
 
 Parameter          | Description        | Default       
 -------------      | -------------  | ------------- 
-floating_point_format|Overrides floating point precision when serializing csv from json.|For a floating point value that was previously decoded from json text, is to preserve the original format when serializing.For a floating point value that was directly inserted into a json value, to serialize with `chars_format::general`.
-precision|Overrides floating point precision when serializing csv from json. |The default, For a floating point value that was previously decoded from json text, is to preserve the original precision. The fefault, For a floating point value that was directly inserted into a json value, to decode with shortest representation.
+floating_point_format|Overrides floating point precision when serializing csv from json.|For a floating point value that was previously decoded from json text, preserves the original format when serializing.For a floating point value that was directly inserted into a json value, serializes with `chars_format::general`.
+precision|Overrides floating point precision when serializing csv from json. |The default, For a floating point value that was previously decoded from json text, preserves the original precision. The fefault, For a floating point value that was directly inserted into a json value, serializes with shortest representation.
 assume_header      | Assume first row in file is header, use field names to construct objects | false         
 infer_types      | Infer null, true, false, integers and floating point values in the CSV source | true         
 header_lines      | Number of header lines in the CSV text | 1 if assume_header is true, otherwise 0         
