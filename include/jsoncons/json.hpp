@@ -3002,7 +3002,7 @@ public:
     }
 
     basic_json(double val, uint8_t precision)
-        : var_(val, floating_point_options(precision, 0))
+        : var_(val, floating_point_options(chars_format::general, precision, 0))
     {
     }
 

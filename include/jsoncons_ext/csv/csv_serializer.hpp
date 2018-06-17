@@ -74,7 +74,7 @@ public:
        stack_(),
        fp_(floating_point_options(options_.floating_point_format(), 
                                   options_.precision(),
-                                  options_.decimal_places())),
+                                  0)),
        column_names_(parameters_.column_names())
     {
     }
@@ -88,7 +88,7 @@ public:
        stack_(),
        fp_(floating_point_options(options.floating_point_format(), 
                                   options.precision(),
-                                  options.decimal_places())),
+                                  0)),
        column_names_(parameters_.column_names())
     {
     }

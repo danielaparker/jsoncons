@@ -1,3 +1,14 @@
+master
+--------
+
+Changes
+
+- If a fractional number is read in in fixed format, serialization now preserves
+  that fixed format, e.g. if 0.000071 is read in, serialization gives 0.000071
+  and not 7.1e-05. In previous versions, the floating point format, whether
+  fixed or scientific, was determined by the behavior of snprintf using the g
+  conversion specifier.
+
 v0.105.0
 --------
 

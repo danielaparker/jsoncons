@@ -122,7 +122,7 @@ public:
          indenting_(false),
          fp_(floating_point_options(options_.floating_point_format(), 
                                     options_.precision(),
-                                    options_.decimal_places())),
+                                    0)),
          writer_(os)
     {
     }
@@ -132,7 +132,7 @@ public:
          indenting_(line_indent == indenting::indent),
          fp_(floating_point_options(options_.floating_point_format(), 
                                     options_.precision(),
-                                    options_.decimal_places())),
+                                    0)),
          writer_(os)
     {
     }
@@ -143,7 +143,7 @@ public:
          indenting_(false),  
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
-                                    options.decimal_places())),
+                                    0)),
          writer_(os)
     {
     }
@@ -156,7 +156,7 @@ public:
          indenting_(line_indent == indenting::indent),  
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
-                                    options.decimal_places())),
+                                    0)),
          writer_(os)
     {
     }

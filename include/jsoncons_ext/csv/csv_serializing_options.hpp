@@ -77,7 +77,6 @@ class basic_csv_serializing_options
 
     chars_format floating_point_format_;
     uint8_t precision_;
-    uint8_t decimal_places_;
     bool assume_header_;
     bool ignore_empty_values_;
     bool ignore_empty_lines_;
@@ -111,7 +110,6 @@ public:
         :
         floating_point_format_(chars_format::hex),
         precision_(0),
-        decimal_places_(0),
         assume_header_(false),
         ignore_empty_values_(false),
         ignore_empty_lines_(true),
@@ -156,17 +154,6 @@ public:
     basic_csv_serializing_options<CharT>& precision(uint8_t value)
     {
         precision_ = value;
-        return *this;
-    }
-
-    uint8_t decimal_places() const
-    {
-        return decimal_places_;
-    }
-
-    basic_csv_serializing_options<CharT>& decimal_places(uint8_t value)
-    {
-        decimal_places_ = value;
         return *this;
     }
 

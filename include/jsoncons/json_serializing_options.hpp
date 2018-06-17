@@ -42,7 +42,6 @@ private:
     int indent_;
     chars_format floating_point_format_;
     uint8_t precision_;
-    uint8_t decimal_places_;
     bool can_read_nan_replacement_;
     bool can_read_pos_inf_replacement_;
     bool can_read_neg_inf_replacement_;
@@ -67,7 +66,6 @@ public:
         : indent_(default_indent),
           floating_point_format_(chars_format::hex),
           precision_(0),
-          decimal_places_(0),
           can_read_nan_replacement_(false),
           can_read_pos_inf_replacement_(false),
           can_read_neg_inf_replacement_(false),
@@ -168,17 +166,6 @@ public:
     basic_json_serializing_options<CharT>& precision(uint8_t value)
     {
         precision_ = value;
-        return *this;
-    }
-
-    uint8_t decimal_places() const
-    {
-        return decimal_places_;
-    }
-
-    basic_json_serializing_options<CharT>& decimal_places(uint8_t value)
-    {
-        decimal_places_ = value;
         return *this;
     }
 
