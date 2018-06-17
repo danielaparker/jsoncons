@@ -29,15 +29,15 @@ Constructs an `json_serializing_options` with default values.
     json_serializing_options& indent(int value)
 The level of indenting, the default is 4.
 
-    chars_format::hex floating_point_format() const 
-    json_serializing_options& floating_point_format(uint8_t value)
-Overrides floating point precision when decoding json.
+    chars_format floating_point_format() const 
+    json_serializing_options& floating_point_format(chars_format value)
+Overrides floating point precision when serializing json.
 The default, for a floating point value that was previously decoded from json text, is to preserve the original format when serializing.
 The default, for a floating point value that was directly inserted into a json value, to serialize with `chars_format::general`. 
 
     uint8_t precision() const 
     json_serializing_options& precision(uint8_t value)
-Overrides floating point precision when decoding json. 
+Overrides floating point precision when serializing json. 
 The default, for a floating point value that was previously decoded from json text, is to preserve the original precision. 
 The fefault, for a floating point value that was directly inserted into a json value, to decode with shortest representation. 
 
