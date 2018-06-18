@@ -75,7 +75,6 @@ The examples below use the JSON text from [Stefan Goessner's JsonPath](http://go
 
 #### Return values
 
-Our first example returns all authors whose books are cheaper than $10. 
 ```c++    
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
@@ -88,14 +87,28 @@ int main()
     std::ifstream is("./input/booklist.json");
     json booklist = json::parse(is);
 
+    // all authors whose books are cheaper than $10
     json result = json_query(booklist,"$.store.book[?(@.price < 10)].author");
+    std::cout  << "(1)\n" << pretty_print(result) << std::endl;
 
-    std::cout << pretty_print(result) << std::endl;
+    // All books whose author's name starts with Evelyn
+    json result1 = json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
+    std::cout << "(2)\n" << pretty_print(result1) << std::endl;
 }
 ```
 Output:
-```json
+```
+(1)
 ["Nigel Rees","Herman Melville"]
+(2)
+[
+    {
+        "author": "Evelyn Waugh",
+        "category": "fiction",
+        "price": 12.99,
+        "title": "Sword of Honour"
+    }
+]
 ```
 
 #### Return normalized path expressions

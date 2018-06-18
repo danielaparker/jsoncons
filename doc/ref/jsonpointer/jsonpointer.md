@@ -29,3 +29,64 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
   </tr>
 </table>
 
+#### Examples
+
+Example. Select author from second book
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    json doc = json::parse(R"(
+    [
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      }
+    ]
+    )");
+
+    // Using exceptions to report errors
+    try
+    {
+        json result = jsonpointer::get(doc, "/1/author");
+        std::cout << "(1) " << result << std::endl;
+    }
+    catch (const jsonpointer::jsonpointer_error& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    // Using error codes to report errors
+    std::error_code ec;
+    json result = jsonpointer::get(doc, "/0/title", ec);
+
+    if (ec)
+    {
+        std::cout << ec.message() << std::endl;
+    }
+    else
+    {
+        std::cout << "(2) " << result << std::endl;
+    }
+}
+```
+Output:
+```json
+(1) "Evelyn Waugh"
+(2) "Sayings of the Century"
+```
+
+[jsonpointer::get](doc/ref/jsonpointer/get.md) may also be used to query the nested data items of a packed CBOR value.
+
+
