@@ -119,7 +119,7 @@ Maximum JSON depth exceeded at line 1 and column 21
 Yes. Use `ojson` instead of `json` (or `wojson` instead of `wjson`) to retain the original insertion order. 
 
 ```c++
-ojson o = ojson::parse(R"(
+ojson j = ojson::parse(R"(
 {
     "street_number" : "100",
     "street_name" : "Queen St W",
@@ -127,16 +127,16 @@ ojson o = ojson::parse(R"(
     "country" : "Canada"
 }
 )");
-std::cout << "(1)\n" << pretty_print(o) << std::endl;
+std::cout << "(1)\n" << pretty_print(j) << std::endl;
 
 // Insert "postal_code" at end
 o.set("postal_code", "M5H 2N2");
-std::cout << "(2)\n" << pretty_print(o) << std::endl;
+std::cout << "(2)\n" << pretty_print(j) << std::endl;
 
 // Insert "province" before "country"
 auto it = o.find("country");
 o.set(it,"province","Ontario");
-std::cout << "(3)\n" << pretty_print(o) << std::endl;
+std::cout << "(3)\n" << pretty_print(j) << std::endl;
 ```
 Output:
 ```
