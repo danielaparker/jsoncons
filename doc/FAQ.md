@@ -1,6 +1,6 @@
 ## FAQ
 
-### Deserialize
+### Deserializing
 
 #### How can I parse JSON from a string?
 
@@ -113,7 +113,60 @@ Output:
 ```
 Maximum JSON depth exceeded at line 1 and column 21
 ```
-### Serialize 
+
+#### Is there any way to prevent the alphabetic sort of the outputted JSON? Is there a way of retaining the original insertion order?
+
+Yes. Use `ojson` instead of `json` (or `wojson` instead of `wjson`) to retain the original insertion order. 
+
+```c++
+ojson o = ojson::parse(R"(
+{
+    "street_number" : "100",
+    "street_name" : "Queen St W",
+    "city" : "Toronto",
+    "country" : "Canada"
+}
+)");
+std::cout << "(1)\n" << pretty_print(o) << std::endl;
+
+// Insert "postal_code" at end
+o.set("postal_code", "M5H 2N2");
+std::cout << "(2)\n" << pretty_print(o) << std::endl;
+
+// Insert "province" before "country"
+auto it = o.find("country");
+o.set(it,"province","Ontario");
+std::cout << "(3)\n" << pretty_print(o) << std::endl;
+```
+Output:
+```
+(1)
+{
+    "street_number": "100",
+    "street_name": "Queen St W",
+    "city": "Toronto",
+    "country": "Canada"
+}
+(2)
+{
+    "street_number": "100",
+    "street_name": "Queen St W",
+    "city": "Toronto",
+    "country": "Canada",
+    "postal_code": "M5H 2N2"
+}
+(3)
+{
+    "street_number": "100",
+    "street_name": "Queen St W",
+    "city": "Toronto",
+    "province": "Ontario",
+    "country": "Canada",
+    "postal_code": "M5H 2N2"
+}
+```
+
+### Serializing
 
 #### How can I serialize a json value to a string?
 
