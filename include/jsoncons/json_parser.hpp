@@ -451,7 +451,7 @@ public:
 
     void begin_object(std::error_code& ec)
     {
-        if (++nesting_depth_ >= max_nesting_depth_)
+        if (++nesting_depth_ > max_nesting_depth_)
         {
             if (err_handler_.error(json_parser_errc::max_depth_exceeded, *this))
             {
@@ -499,7 +499,7 @@ public:
 
     void begin_array(std::error_code& ec)
     {
-        if (++nesting_depth_ >= max_nesting_depth_)
+        if (++nesting_depth_ > max_nesting_depth_)
         {
             if (err_handler_.error(json_parser_errc::max_depth_exceeded, *this))
             {

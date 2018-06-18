@@ -354,7 +354,7 @@ BOOST_AUTO_TEST_CASE(test_fail18)
     try
     {
         json_serializing_options options;
-        options.max_nesting_depth(20);
+        options.max_nesting_depth(19);
         json::parse(is, options);
     }
     catch (const parse_error& e)

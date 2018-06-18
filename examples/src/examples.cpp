@@ -421,6 +421,21 @@ void validation_example()
     }
 }
 
+void max_nesting_path_example()
+{
+    std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
+    try
+    {
+        json_serializing_options options;
+        options.max_nesting_depth(20);
+        json::parse(s, options);
+    }
+    catch (const parse_error& e)
+    {
+         std::cout << e.what() << std::endl;
+    }
+}
+
 int main()
 {
     try
@@ -484,6 +499,8 @@ int main()
         csv_examples();
 
         json_convert_examples();
+
+        max_nesting_path_example();
     }
     catch (const std::exception& e)
     {
