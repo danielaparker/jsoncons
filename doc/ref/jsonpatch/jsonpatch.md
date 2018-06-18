@@ -16,7 +16,7 @@ The jsonpatch extension implements the IETF standard [JavaScript Object Notation
 The JSON Patch IETF standard requires that the JSON Patch method is atomic, so that if any JSON Patch operation results in an error, the target document is unchanged.
 The patch function implements this requirement by generating the inverse commands and building an undo stack, which is executed if any part of the patch fails.
 
-#### Examples
+### Examples
 
 ```c++
 #include <jsoncons/json.hpp>

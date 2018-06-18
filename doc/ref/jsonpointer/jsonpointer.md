@@ -29,7 +29,7 @@ The jsonpointer extension implements the IETF standard [JavaScript Object Notati
   </tr>
 </table>
 
-#### Examples
+### Examples
 
 Example. Select author from second book
 
