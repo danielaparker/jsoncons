@@ -7,7 +7,7 @@ Specifies options for serializing and deserializing JSON text. The `json_seriali
 
 The default floating point formatting for a floating point value that was previously decoded from json text is to preserve the original format and precision. This ensures round-trip for both format and precision, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 
-The default floating point formatting for a floating point value that was directly inserted into a json value is `chars_format::general` with shortest representation. Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
+The default floating point formatting for a floating point value that was directly inserted into a json value is [chars_format::general](chars_format.md) with shortest representation. Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
 #### Header
 ```c++
@@ -31,9 +31,9 @@ The level of indenting, the default is 4.
 
     chars_format floating_point_format() const 
     json_serializing_options& floating_point_format(chars_format value)
-Overrides floating point precision when serializing json.
+Overrides [floating point format](chars_format.md) when serializing json.
 The default, for a floating point value that was previously decoded from json text, is to preserve the original format when serializing.
-The default, for a floating point value that was directly inserted into a json value, to serialize with `chars_format::general`. 
+The default, for a floating point value that was directly inserted into a json value, to serialize with [chars_format::general](chars_format.md). 
 
     uint8_t precision() const 
     json_serializing_options& precision(uint8_t value)
