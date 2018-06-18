@@ -192,7 +192,7 @@ std::cout << j << std::endl; // compressed
 std::cout << pretty_print(j) << std::endl; // pretty print
 ```
 
-### Access
+### Iterating
 
 #### How can I iterate over a json array?
 
@@ -221,7 +221,7 @@ for (const auto& member : j.object_range())
 }
 ```
 
-### Construct
+### Constructing
 
 #### How do I create arrays of arrays of arrays of ...
 
