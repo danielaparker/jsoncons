@@ -1,5 +1,12 @@
 ## FAQ
 
+[Deserializing](#A1)
+[Serializing](#A2)
+[Constructing](#A3)
+[Iterating](#A4)
+[Search and Replace](#A5)
+
+<div id="A1"/>
 ### Deserializing
 
 #### How can I parse JSON from a string?
@@ -166,6 +173,7 @@ Output:
 }
 ```
 
+<div id="A2"/>
 ### Serializing
 
 #### How can I serialize a json value to a string?
@@ -192,35 +200,7 @@ std::cout << j << std::endl; // compressed
 std::cout << pretty_print(j) << std::endl; // pretty print
 ```
 
-### Iterating
-
-#### How can I iterate over a json array?
-
-```c++
-json j = json::array{1,2,3,4};
-
-for (auto val : j.array_range())
-{
-    std::cout << val << std::endl;
-}
-```
-
-#### How can I iterate over a json object?
-
-```c++
-json j = json::object{
-    {"author", "Haruki Murakami"},
-    {"title", "Kafka on the Shore"},
-    {"price", 25.17}
-};
-
-for (const auto& member : j.object_range())
-{
-    std::cout << member.key() << "=" 
-              << member.value() << std::endl;
-}
-```
-
+<div id="A3"/>
 ### Constructing
 
 #### How do I create arrays of arrays of arrays of ...
@@ -307,6 +287,37 @@ Output:
 }
 ```
 
+<div id="A4"/>
+### Iterating
+
+#### How can I iterate over a json array?
+
+```c++
+json j = json::array{1,2,3,4};
+
+for (auto val : j.array_range())
+{
+    std::cout << val << std::endl;
+}
+```
+
+#### How can I iterate over a json object?
+
+```c++
+json j = json::object{
+    {"author", "Haruki Murakami"},
+    {"title", "Kafka on the Shore"},
+    {"price", 25.17}
+};
+
+for (const auto& member : j.object_range())
+{
+    std::cout << member.key() << "=" 
+              << member.value() << std::endl;
+}
+```
+
+<div id="A5"/>
 ### Search and Replace
 
 #### Is there a way to search for and repace an object member key?
