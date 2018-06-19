@@ -179,6 +179,7 @@ Output:
 ```
 
 <div id="A2"/>
+
 ### Serializing
 
 #### How can I serialize a json value to a string?
@@ -206,6 +207,7 @@ std::cout << pretty_print(j) << std::endl; // pretty print
 ```
 
 <div id="A3"/>
+
 ### Constructing
 
 #### How do I create arrays of arrays of arrays of ...
@@ -293,6 +295,7 @@ Output:
 ```
 
 <div id="A4"/>
+
 ### Iterating
 
 #### How can I iterate over a json array?
@@ -323,6 +326,7 @@ for (const auto& member : j.object_range())
 ```
 
 <div id="A5"/>
+
 ### Search and Replace
 
 #### Is there a way to search for and repace an object member key?
