@@ -36,6 +36,8 @@
 #pragma GCC diagnostic ignored "-Wswitch"
 #endif
 
+namespace jsoncons {
+
 struct sorted_policy
 {
     static const bool preserve_order = false;
