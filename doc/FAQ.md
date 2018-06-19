@@ -233,7 +233,7 @@ json file_settings = json::object{
     {"Limit File Size To", 10000}
 ```
 
-How do I construct a json array?
+#### How do I construct a json array?
 
 Insert values into a json array,
 
@@ -248,7 +248,6 @@ or use an array initializer-list,
 ```c++
 json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 ```
-
 
 #### How do I create arrays of arrays of arrays of ...
 
