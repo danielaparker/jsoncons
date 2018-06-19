@@ -2383,12 +2383,13 @@ public:
         template <class T>
         T get_with_default(const string_view_type& name, const T& default_val) const
         {
-            return evaluate().get_with_default(name,default_val);
+            return evaluate().get_with_default<T>(name,default_val);
         }
 
-        string_proxy<CharT> get_with_default(const string_view_type& name, const CharT* default_val) const
+        template <class T = std::basic_string<CharT>>
+        T get_with_default(const string_view_type& name, const CharT* default_val) const
         {
-            return evaluate().get_with_default(name,default_val);
+            return evaluate().get_with_default<T>(name,default_val);
         }
 
         void shrink_to_fit()
@@ -3854,6 +3855,7 @@ public:
         }
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     const char_type* as_cstring() const
     {
         switch (var_.type_id())
@@ -3867,7 +3869,6 @@ public:
         }
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
 
     size_t double_precision() const
     {
@@ -4071,13 +4072,14 @@ public:
         }
     }
 
-    string_proxy<CharT> get_with_default(const string_view_type& name, const CharT* default_val) const
+    template<class T = std::basic_string<CharT>>
+    T get_with_default(const string_view_type& name, const CharT* default_val) const
     {
         switch (var_.type_id())
         {
         case json_type_tag::empty_object_t:
             {
-                return string_proxy<CharT>(default_val);
+                return T(default_val);
             }
         case json_type_tag::object_t:
             {
@@ -4087,16 +4089,20 @@ public:
                     switch (it->value().type_id())
                     {
                     case json_type_tag::small_string_t:
-                        return string_proxy<CharT>(it->value().as_string_view().data(),it->value().as_string_view().length());
+                        return T(it->value().as_string_view().data(),it->value().as_string_view().length());
                     case json_type_tag::string_t:
-                        return string_proxy<CharT>(it->value().as_string_view().data(),it->value().as_string_view().length());
+                        return T(it->value().as_string_view().data(),it->value().as_string_view().length());
                     default:
-                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
+                        {
+                            T s;
+                            it->value().dump(s);
+                            return s;
+                        }
                     }
                 }
                 else
                 {
-                    return string_proxy<CharT>(default_val);
+                    return T(default_val);
                 }
             }
         default:

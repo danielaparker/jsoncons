@@ -299,6 +299,33 @@ BOOST_AUTO_TEST_CASE(test_proxy_get)
     BOOST_CHECK_EQUAL(std::string("null"),s2);
 }
 
+BOOST_AUTO_TEST_CASE(test_proxy_get_with_default)
+{
+    json a;
+
+    a["object1"] = json();
+    a["object1"]["field1"] = "3.7";
+    a["object1"]["field2"] = 1.5;
+
+    std::string s1 = a["object1"].get_with_default("field1","default");
+    std::string s2 = a["object1"].get_with_default("field2","1.0");
+    std::string s3 = a["object1"].get_with_default("field3","1.0");
+    std::string s4 = a["object1"].get_with_default<std::string>("field2","1.0");
+    std::string s5 = a["object1"].get_with_default<std::string>("field3","1.0");
+    double d1 = a["object1"].get_with_default("field1",1.0);
+    double d2 = a["object1"].get_with_default("field2",1.0);
+    double d3 = a["object1"].get_with_default("field3",1.0);
+
+    BOOST_CHECK_EQUAL(std::string("3.7"),s1);
+    BOOST_CHECK_EQUAL(std::string("1.5"),s2);
+    BOOST_CHECK_EQUAL(std::string("1.0"),s3);
+    BOOST_CHECK_EQUAL(std::string("1.5"),s4);
+    BOOST_CHECK_EQUAL(std::string("1.0"),s5);
+    BOOST_CHECK_EQUAL(3.7,d1);
+    BOOST_CHECK_EQUAL(1.5,d2);
+    BOOST_CHECK_EQUAL(1,d3);
+}
+
 BOOST_AUTO_TEST_CASE(test_set_and_proxy_set)
 {
     json a;
