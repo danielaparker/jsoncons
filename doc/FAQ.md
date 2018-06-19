@@ -1,9 +1,13 @@
 ## FAQ
 
 [Deserializing](#A1)
+
 [Serializing](#A2)
+
 [Constructing](#A3)
+
 [Iterating](#A4)
+
 [Search and Replace](#A5)
 
 <div id="A1"/>
