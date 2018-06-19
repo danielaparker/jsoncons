@@ -20,7 +20,7 @@ using namespace jsoncons;
 using namespace jsoncons::csv;
 
 BOOST_AUTO_TEST_SUITE(csv_tests)
-
+#if 0
 BOOST_AUTO_TEST_CASE(n_objects_test)
 {
     const std::string bond_yields = R"(Date,1Y,2Y,3Y,5Y
@@ -790,7 +790,7 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
     BOOST_CHECK_EQUAL(std::string("00000003"),employees[2]["employee-no"].as<std::string>());
     BOOST_CHECK_EQUAL(std::string("00000004"),employees[3]["employee-no"].as<std::string>());
 }
-
+#endif
 BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
 {
     std::string in_file = "./input/employees.json";
@@ -830,7 +830,7 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
         BOOST_CHECK_EQUAL(employees1[i].get_with_default("note",""), employees2[i].get_with_default("note",""));
     }
 }
-
+#if 0
 BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped1)
 {
     std::string text = "1,2,3\n4,5,6\n7,8,9";
@@ -1109,6 +1109,6 @@ BOOST_AUTO_TEST_CASE(test_type_inference)
     //BOOST_REQUIRE(j2.size() == 3);
     //BOOST_CHECK("2017-01-09" == j2[0]["Date"].as<std::string>());
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()
 

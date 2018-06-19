@@ -37,6 +37,116 @@
 #endif
 
 namespace jsoncons {
+template <class CharT, class Traits = std::char_traits<CharT>>
+class string_proxy
+{
+private:
+    const CharT* data_;
+    size_t length_;
+public:
+    string_proxy(const CharT* data, size_t length)
+        : data_(data), length_(length)
+    {
+    }
+    explicit string_proxy(const CharT* data)
+        : data_(data), length_(Traits::length(data))
+    {
+    }
+    string_proxy(const string_proxy& other) = default;
+
+    template <class Allocator>
+    string_proxy(const std::basic_string<CharT,Traits,Allocator>& s)
+        : data_(s.data()), length_(s.length())
+    {
+    }
+    int compare(string_proxy s) const 
+    {
+        const int rc = Traits::compare(data_, s.data_, (std::min)(length_, s.length_));
+        return rc != 0 ? rc : (length_ == s.length_ ? 0 : length_ < s.length_ ? -1 : 1);
+    }
+
+    int compare(const CharT* data) const 
+    {
+        const size_t length = Traits::length(data);
+        const int rc = Traits::compare(data_, data, (std::min)(length_, length));
+        return rc != 0 ? rc : (length_ == length? 0 : length_ < length? -1 : 1);
+    }
+
+    template <class Allocator>
+    operator std::basic_string<CharT,Traits,Allocator>() const
+    { 
+        return std::basic_string<CharT,Traits,Allocator>(data_,length_); 
+    }
+
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const string_proxy& sv)
+    {
+        os.write(sv.data_,sv.length_);
+        return os;
+    }
+
+    template<class CharT,class OtherTraits>
+    friend bool operator==(const string_proxy<CharT,OtherTraits>& lhs, 
+                    const string_proxy<CharT,OtherTraits>& rhs)
+    {
+        return lhs.compare(rhs) == 0;
+    }
+    template<class CharT,class OtherTraits,class Allocator>
+    friend bool operator==(const string_proxy<CharT,OtherTraits>& lhs, 
+                    const std::basic_string<CharT,OtherTraits,Allocator>& rhs)
+    {
+        return lhs.compare(rhs) == 0;
+    }
+    template<class CharT,class OtherTraits,class Allocator>
+    friend bool operator==(const std::basic_string<CharT,OtherTraits,Allocator>& lhs, 
+                    const string_proxy<CharT,OtherTraits>& rhs)
+    {
+        return rhs.compare(lhs) == 0;
+    }
+    template<class CharT,class OtherTraits>
+    friend bool operator==(const string_proxy<CharT,OtherTraits>& lhs, 
+                    const CharT* rhs)
+    {
+        return lhs.compare(rhs) == 0;
+    }
+    template<class CharT,class OtherTraits>
+    friend bool operator==(const CharT* lhs, 
+                    const string_proxy<CharT,OtherTraits>& rhs)
+    {
+        return rhs.compare(lhs) == 0;
+    }
+
+    // !=
+    template<class CharT,class OtherTraits>
+    friend bool operator!=(const string_proxy<CharT,OtherTraits>& lhs, 
+                    const string_proxy<CharT,OtherTraits>& rhs)
+    {
+        return lhs.compare(rhs) != 0;
+    }
+    template<class CharT,class OtherTraits,class Allocator>
+    friend bool operator!=(const string_proxy<CharT,OtherTraits>& lhs, 
+                    const std::basic_string<CharT,OtherTraits,Allocator>& rhs)
+    {
+        return lhs.compare(rhs) != 0;
+    }
+    template<class CharT,class OtherTraits,class Allocator>
+    friend bool operator!=(const std::basic_string<CharT,OtherTraits,Allocator>& lhs, 
+                           const string_proxy<CharT,OtherTraits>& rhs)
+    {
+        return rhs.compare(lhs) != 0;
+    }
+    template<class CharT,class OtherTraits>
+    friend bool operator!=(const string_proxy<CharT,OtherTraits>& lhs, 
+                           const CharT* rhs)
+    {
+        return lhs.compare(rhs) != 0;
+    }
+    template<class CharT,class OtherTraits>
+    friend bool operator!=(const CharT* lhs, 
+                           const string_proxy<CharT,OtherTraits>& rhs)
+    {
+        return rhs.compare(lhs) != 0;
+    }
+};
 
 struct sorted_policy
 {
@@ -2276,7 +2386,7 @@ public:
             return evaluate().get_with_default(name,default_val);
         }
 
-        const CharT* get_with_default(const string_view_type& name, const CharT* default_val) const
+        string_proxy<CharT> get_with_default(const string_view_type& name, const CharT* default_val) const
         {
             return evaluate().get_with_default(name,default_val);
         }
@@ -3961,24 +4071,32 @@ public:
         }
     }
 
-    const CharT* get_with_default(const string_view_type& name, const CharT* default_val) const
+    string_proxy<CharT> get_with_default(const string_view_type& name, const CharT* default_val) const
     {
         switch (var_.type_id())
         {
         case json_type_tag::empty_object_t:
             {
-                return default_val;
+                return string_proxy<CharT>(default_val);
             }
         case json_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
-                    return it->value().as_cstring();
+                    switch (it->value().type_id())
+                    {
+                    case json_type_tag::small_string_t:
+                        return string_proxy<CharT>(it->value().as_string_view().data(),it->value().as_string_view().length());
+                    case json_type_tag::string_t:
+                        return string_proxy<CharT>(it->value().as_string_view().data(),it->value().as_string_view().length());
+                    default:
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
+                    }
                 }
                 else
                 {
-                    return default_val;
+                    return string_proxy<CharT>(default_val);
                 }
             }
         default:
