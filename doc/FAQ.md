@@ -8,7 +8,9 @@
 
 [Iterating](#A4)
 
-[Search and Replace](#A5)
+[Getters](#A5)
+
+[Search and Replace](#A6)
 
 <div id="A1"/> 
 
@@ -206,6 +208,23 @@ std::cout << j << std::endl; // compressed
 std::cout << pretty_print(j) << std::endl; // pretty print
 ```
 
+#### How can I escape all non-ascii characters?
+
+```
+json_serializing_options options;
+options.escape_all_non_ascii(true);
+
+j.dump(std::cout, options); // compressed
+
+j.dump(std::cout, options, indenting::indent); // pretty print
+```
+or
+```
+std::cout << print(j, options) << std::endl; // compressed
+
+std::cout << pretty_print(j, options) << std::endl; // pretty print
+```
+
 <div id="A3"/>
 
 ### Constructing
@@ -365,6 +384,32 @@ for (const auto& member : j.object_range())
 ```
 
 <div id="A5"/>
+
+### Getters
+
+#### I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double. 
+
+```c++
+json j = json::object{
+    {"price", "25.17"}
+};
+
+double price = j["price"].as<double>();
+```
+
+#### I want to lookup a key, if found, return the value converted to type T, otherwise, return a default value of type T.
+ 
+```c++
+json j = json::object{
+    {"price", "25.17"}
+};
+
+double price = j.get_with_default("price", 25.00); // returns 25.17
+
+double sale_price = j.get_with_default("sale_price", 22.0); // returns 22.0
+```
+ 
+<div id="A6"/>
 
 ### Search and Replace
 
