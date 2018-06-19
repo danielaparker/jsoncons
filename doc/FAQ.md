@@ -210,6 +210,46 @@ std::cout << pretty_print(j) << std::endl; // pretty print
 
 ### Constructing
 
+#### How do I construct a json object?
+
+Start with an empty json object and insert some name-value pairs,
+
+```c++
+json image_sizing;
+image_sizing.insert_or_assign("Resize To Fit",true);  // a boolean 
+image_sizing.insert_or_assign("Resize Unit", "pixels");  // a string
+image_sizing.insert_or_assign("Resize What", "long_edge");  // a string
+image_sizing.insert_or_assign("Dimension 1",9.84);  // a double
+image_sizing.insert_or_assign("Dimension 2",json::null());  // a null value
+```
+
+or use an object initializer-list,
+
+```c++
+json file_settings = json::object{
+    {"Image Format", "JPEG"},
+    {"Color Space", "sRGB"},
+    {"Limit File Size", true},
+    {"Limit File Size To", 10000}
+```
+
+How do I construct a json array?
+
+Insert values into a json array,
+
+```c++
+json color_spaces = json::array();
+color_spaces.push_back("sRGB");
+color_spaces.push_back("AdobeRGB");
+color_spaces.push_back("ProPhoto RGB");
+```
+
+or use an array initializer-list,
+```c++
+json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+```
+
+
 #### How do I create arrays of arrays of arrays of ...
 
 Like this:
