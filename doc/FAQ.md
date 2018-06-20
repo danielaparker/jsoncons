@@ -258,7 +258,7 @@ json file_settings = json::object{
 Insert values into a json array,
 
 ```c++
-json color_spaces = json::array();
+json color_spaces = json::array(); // an empty array
 color_spaces.push_back("sRGB");
 color_spaces.push_back("AdobeRGB");
 color_spaces.push_back("ProPhoto RGB");
@@ -267,6 +267,22 @@ color_spaces.push_back("ProPhoto RGB");
 or use an array initializer-list,
 ```c++
 json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
+```
+
+#### How do I insert a new value in an array at a specific position?
+
+```c++
+json cities = json::array(); // an empty array
+cities.push_back("Toronto");  
+cities.push_back("Vancouver");
+// Insert "Montreal" at beginning of array
+cities.insert(cities.array_range().begin(),"Montreal");  
+
+std::cout << cities << std::endl;
+```
+Output:
+```
+["Montreal","Toronto","Vancouver"]
 ```
 
 #### How do I create arrays of arrays of arrays of ...
