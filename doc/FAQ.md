@@ -398,7 +398,7 @@ json j = json::object{
 double price = j["price"].as<double>();
 ```
 
-#### I want to lookup a key, if found, return the value converted to type T, otherwise, return a default value of type T.
+#### I want to look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.
  
 ```c++
 json j = json::object{
