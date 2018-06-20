@@ -250,6 +250,7 @@ json file_settings = json::object{
     {"Color Space", "sRGB"},
     {"Limit File Size", true},
     {"Limit File Size To", 10000}
+};
 ```
 
 #### How do I construct a json array?
