@@ -44,7 +44,7 @@ JSONPath|       Description
 `$`|    The root object or array
 `@`|    the current object
 `.` or `[]`|    Child operator
-`..`    |Recursive descent. JSONPath borrows this syntax from E4X.
+`..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
 `[]`    |Subscript operator. In JSON it is the native array operator.
 `[,]`   |JSONPath allows alternate names or array indices as a set.
