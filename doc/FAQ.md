@@ -144,12 +144,12 @@ ojson j = ojson::parse(R"(
 std::cout << "(1)\n" << pretty_print(j) << std::endl;
 
 // Insert "postal_code" at end
-o.insert_or_assign("postal_code", "M5H 2N2");
+j.insert_or_assign("postal_code", "M5H 2N2");
 std::cout << "(2)\n" << pretty_print(j) << std::endl;
 
 // Insert "province" before "country"
-auto it = o.find("country");
-o.insert_or_assign(it,"province","Ontario");
+auto it = j.find("country");
+j.insert_or_assign(it,"province","Ontario");
 std::cout << "(3)\n" << pretty_print(j) << std::endl;
 ```
 Output:
