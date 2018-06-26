@@ -150,6 +150,40 @@ public:
     }
 };
 
+template <class CharT>
+class byte_string_writer 
+{
+public:
+    typedef CharT char_type;
+    typedef std::vector<CharT> output_type;
+private:
+    output_type& s_;
+
+    // Noncopyable and nonmoveable
+    byte_string_writer(const byte_string_writer&) = delete;
+    byte_string_writer& operator=(const byte_string_writer&) = delete;
+public:
+
+    byte_string_writer(output_type& s)
+        : s_(s)
+    {
+    }
+
+    void flush()
+    {
+    }
+
+    void write(const CharT* s, size_t length)
+    {
+        s_.append(s,length);
+    }
+
+    void put(CharT ch)
+    {
+        s_.push_back(ch);
+    }
+};
+
 }}
 
 #endif

@@ -20,9 +20,59 @@ using namespace jsoncons::cbor;
 
 BOOST_AUTO_TEST_SUITE(cbor_encoder_tests)
 
-BOOST_AUTO_TEST_CASE(cbor_encoder)
+BOOST_AUTO_TEST_CASE(test_array)
 {
-    cbor_encoder encoder;
+    std::vector<uint8_t> v;
+    cbor_byte_string_encoder encoder(v);
+    encoder.begin_json();
+    //encoder.begin_object(1);
+    encoder.begin_array(3);
+    encoder.bool_value(true);
+    encoder.bool_value(false);
+    encoder.null_value();
+    encoder.end_array();
+    //encoder.end_object();
+    encoder.end_json();
+
+    for (auto c: v)
+    {
+        std::cout << std::hex << (int)c << std::endl;
+    }
+
+    try
+    {
+        json result = decode_cbor<json>(v);
+        std::cout << result << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
+{
+    std::vector<uint8_t> v;
+    cbor_byte_string_encoder encoder(v);
+    encoder.begin_json();
+    encoder.begin_array();
+    encoder.end_array();
+    encoder.end_json();
+
+    for (auto c: v)
+    {
+        std::cout << std::hex << (int)c << std::endl;
+    }
+
+    try
+    {
+        json result = decode_cbor<json>(v);
+        std::cout << result << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 } 
 
 BOOST_AUTO_TEST_SUITE_END()

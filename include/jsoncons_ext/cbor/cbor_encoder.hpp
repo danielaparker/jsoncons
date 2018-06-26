@@ -23,7 +23,7 @@
 
 namespace jsoncons { namespace cbor {
 
-enum class cbor_structure_type {object, array};
+enum class cbor_structure_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Writer=jsoncons::detail::ostream_buffered_writer<CharT>>
 class basic_cbor_encoder final : public basic_json_content_handler<CharT>
@@ -53,7 +53,12 @@ private:
 
         bool is_object() const
         {
-            return is_object_ == cbor_structure_type::object;
+            return type_ == cbor_structure_type::object || type_ == cbor_structure_type::indefinite_length_object;
+        }
+
+        bool is_indefinite_length() const
+        {
+            return type_ == cbor_structure_type::indefinite_length_array || type_ == cbor_structure_type::indefinite_length_object;
         }
 
     };
@@ -87,9 +92,9 @@ private:
 
     void do_begin_object(const serializing_context& context) override
     {
-        stack_.push_back(stack_item(cbor_structure_type::object));
+        stack_.push_back(stack_item(cbor_structure_type::indefinite_length_object));
         
-        writer_.put('{');
+        writer_.put(0xbf);
     }
 
     void do_begin_object(size_t length, const serializing_context& context) override
@@ -117,30 +122,29 @@ private:
             binary::to_big_endian(static_cast<uint8_t>(0xbb), v);
             binary::to_big_endian(static_cast<uint64_t>(length),v);
         }
+
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
     }
 
     void do_end_object(const serializing_context& context) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        if (stack_.back().is_indefinite_length())
+        {
+            writer_.put(0xff);
+        }
         stack_.pop_back();
-        writer_.put('}');
-
-        end_value();
-    }
-
-    void do_end_object(size_t length, const serializing_context& context) override
-    {
-        JSONCONS_ASSERT(!stack_.empty());
-        stack_.pop_back();
-        writer_.put('}');
 
         end_value();
     }
 
     void do_begin_array(const serializing_context& context) override
     {
-        stack_.push_back(stack_item(cbor_structure_type::array));
-        writer_.put('[');
+        stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
+        writer_.put(0x9f);
     }
 
     void do_begin_array(size_t length, const serializing_context& context) override
@@ -171,53 +175,98 @@ private:
             binary::to_big_endian(static_cast<uint8_t>(0x9b), v);
             binary::to_big_endian(static_cast<uint64_t>(length),v);
         }
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
     }
 
     void do_end_array(const serializing_context& context) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        if (stack_.back().is_indefinite_length())
+        {
+            writer_.put(0xff);
+        }
         stack_.pop_back();
-        writer_.put(']');
         end_value();
     }
 
     void do_name(const string_view_type& name, const serializing_context& context) override
     {
-
-        writer_.put('\"');
-        // write string
-        writer_.put('\"');
-        writer_.put(':');
+        do_string_value(name,context);
     }
 
     void do_null_value(const serializing_context& context) override
     {
-
-        auto buf = detail::null_literal<CharT>();
-        writer_.write(buf, 4);
+        writer_.put(0xf6);
 
         end_value();
     }
 
     void do_string_value(const string_view_type& value, const serializing_context& context) override
     {
+        std::vector<uint8_t> v;
+        auto result = unicons::convert(
+            value.begin(), value.end(), std::back_inserter(v), 
+            unicons::conv_flags::strict);
+        if (result.ec != unicons::conv_errc())
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+        }
 
-        writer_. put('\"');
-        // write string
-        writer_. put('\"');
+        const size_t length = v.size();
+        if (length <= 0x17)
+        {
+            // fixstr stores a byte array whose length is upto 31 bytes
+            binary::to_big_endian(static_cast<uint8_t>(0x60 + length), v);
+        }
+        else if (length <= 0xff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x78), v);
+            binary::to_big_endian(static_cast<uint8_t>(length), v);
+        }
+        else if (length <= 0xffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x79), v);
+            binary::to_big_endian(static_cast<uint16_t>(length), v);
+        }
+        else if (length <= 0xffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x7a), v);
+            binary::to_big_endian(static_cast<uint32_t>(length), v);
+        }
+        else if (length <= 0xffffffffffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x7b), v);
+            binary::to_big_endian(static_cast<uint64_t>(length),v);
+        }
+
+        for (size_t i = 0; i < length; ++i)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(v.data()[i]), v);
+        }
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
 
         end_value();
     }
 
     void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
-        std::basic_string<CharT> s;
-        encode_base64url(data,data+length,s);
-        do_string_value(s);
     }
 
     void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) override
     {
+        std::vector<uint8_t> v;
+        binary::to_big_endian(static_cast<uint8_t>(0xfb), v);
+        binary::to_big_endian(value,v);
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
 
         // write double
 
@@ -226,13 +275,95 @@ private:
 
     void do_integer_value(int64_t value, const serializing_context& context) override
     {
-        detail::print_integer(value, writer_);
+        std::vector<uint8_t> v;
+        if (value >= 0)
+        {
+            if (value <= 0x17)
+            {
+                binary::to_big_endian(static_cast<uint8_t>(value), v);
+            } 
+            else if (value <= (std::numeric_limits<uint8_t>::max)())
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x18), v);
+                binary::to_big_endian(static_cast<uint8_t>(value), v);
+            } 
+            else if (value <= (std::numeric_limits<uint16_t>::max)())
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x19), v);
+                binary::to_big_endian(static_cast<uint16_t>(value), v);
+            } 
+            else if (value <= (std::numeric_limits<uint32_t>::max)())
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x1a), v);
+                binary::to_big_endian(static_cast<uint32_t>(value), v);
+            } 
+            else if (value <= (std::numeric_limits<int64_t>::max)())
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x1b), v);
+                binary::to_big_endian(static_cast<int64_t>(value), v);
+            }
+        } else
+        {
+            const auto posnum = -1 - value;
+            if (value >= -24)
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x20 + posnum), v);
+            } 
+            else if (posnum <= (std::numeric_limits<uint8_t>::max)())
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x38), v);
+                binary::to_big_endian(static_cast<uint8_t>(posnum), v);
+            } 
+            else if (posnum <= (std::numeric_limits<uint16_t>::max)())
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x39), v);
+                binary::to_big_endian(static_cast<uint16_t>(posnum), v);
+            } 
+            else if (posnum <= (std::numeric_limits<uint32_t>::max)())
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x3a), v);
+                binary::to_big_endian(static_cast<uint32_t>(posnum), v);
+            } 
+            else if (posnum <= (std::numeric_limits<int64_t>::max)())
+            {
+                binary::to_big_endian(static_cast<uint8_t>(0x3b), v);
+                binary::to_big_endian(static_cast<int64_t>(posnum), v);
+            }
+        }
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
         end_value();
     }
 
     void do_uinteger_value(uint64_t value, const serializing_context& context) override
     {
-        detail::print_uinteger(value, writer_);
+        std::vector<uint8_t> v;
+        if (value <= 0x17)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(value),v);
+        } else if (value <=(std::numeric_limits<uint8_t>::max)())
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x18), v);
+            binary::to_big_endian(static_cast<uint8_t>(value),v);
+        } else if (value <=(std::numeric_limits<uint16_t>::max)())
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x19), v);
+            binary::to_big_endian(static_cast<uint16_t>(value),v);
+        } else if (value <=(std::numeric_limits<uint32_t>::max)())
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x1a), v);
+            binary::to_big_endian(static_cast<uint32_t>(value),v);
+        } else if (value <=(std::numeric_limits<uint64_t>::max)())
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x1b), v);
+            binary::to_big_endian(static_cast<uint64_t>(value),v);
+        }
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
         end_value();
     }
 
@@ -241,13 +372,11 @@ private:
 
         if (value)
         {
-            auto buf = detail::true_literal<CharT>();
-            writer_.write(buf,4);
+            writer_.put(0xf5);
         }
         else
         {
-            auto buf = detail::false_literal<CharT>();
-            writer_.write(buf,5);
+            writer_.put(0xf4);
         }
 
         end_value();
@@ -263,7 +392,8 @@ private:
 };
 
 typedef basic_cbor_encoder<char,jsoncons::detail::ostream_buffered_writer<char>> cbor_encoder;
-typedef basic_cbor_encoder<wchar_t, jsoncons::detail::ostream_buffered_writer<wchar_t>> wcbor_encoder;
+
+typedef basic_cbor_encoder<char,jsoncons::detail::byte_string_writer<uint8_t>> cbor_byte_string_encoder;
 
 }}
 #endif
