@@ -9,6 +9,15 @@ Changes
   fixed or scientific, was determined by the behavior of snprintf using the g
   conversion specifier.
 
+Bug fix:
+
+- Fixed issue with parsing cbor indefinite length arrays and maps
+
+Warning fix:
+
+- Use memcpy in place of reinterpret_cast in binary data format utility 
+  `from_big_endian`
+
 v0.105.0
 --------
 
