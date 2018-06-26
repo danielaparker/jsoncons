@@ -22,6 +22,7 @@ BOOST_AUTO_TEST_SUITE(cbor_encoder_tests)
 
 BOOST_AUTO_TEST_CASE(cbor_encoder)
 {
+    cbor_encoder encoder;
 } 
 
 BOOST_AUTO_TEST_SUITE_END()

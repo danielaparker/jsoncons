@@ -613,24 +613,6 @@ private:
         }
     }
 
-    void begin_value()
-    {
-        if (!stack_.empty())
-        {
-            if (stack_.back().count() > 0)
-            {
-                writer_. put(',');
-            }
-            if (indenting_)
-            {
-                if (!stack_.back().is_same_line())
-                {
-                    write_indent();
-                }
-            }
-        }
-    }
-
     void end_value()
     {
         if (!stack_.empty())

@@ -23,7 +23,9 @@
 
 namespace jsoncons { namespace cbor {
 
-template<class CharT,class Writer=detail::ostream_buffered_writer<CharT>>
+enum class cbor_structure_type {object, array};
+
+template<class CharT,class Writer=jsoncons::detail::ostream_buffered_writer<CharT>>
 class basic_cbor_encoder final : public basic_json_content_handler<CharT>
 {
 public:
@@ -33,11 +35,13 @@ public:
 
 private:
     static const size_t default_buffer_length = 16384;
+    cbor_structure_type type_;
+    size_t count_;
 
     struct stack_item
     {
-        stack_item(bool is_object)
-           : is_object_(is_object), count_(0)
+        stack_item(cbor_structure_type type)
+           : type_(type), count_(0)
         {
         }
 
@@ -48,11 +52,9 @@ private:
 
         bool is_object() const
         {
-            return is_object_;
+            return is_object_ == cbor_structure_type::object;
         }
 
-        bool is_object_;
-        size_t count_;
     };
     std::vector<stack_item> stack_;
     Writer writer_;
@@ -84,51 +86,41 @@ private:
 
     void do_begin_object(const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            if (!stack_.empty())
-            {
-                if (stack_.back().count_ > 0)
-                {
-                    writer_. put(',');
-                }
-            }
-        }
-        
-        stack_.push_back(stack_item(true));
+        stack_.push_back(stack_item(cbor_structure_type::object));
         
         writer_.put('{');
     }
 
     void do_begin_object(size_t length, const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
+        stack_.push_back(stack_item(cbor_structure_type::object));
+
+        std::vector<uint8_t> v;
+        if (length <= 0x17)
         {
-            if (!stack_.empty())
-            {
-                if (stack_.back().count_ > 0)
-                {
-                    writer_. put(',');
-                }
-            }
+            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(0xa0 + length)), v);
+        } else if (length <= 0xff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0xb8), v);
+            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
+        } else if (length <= 0xffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0xb9), v);
+            binary::to_big_endian(static_cast<uint16_t>(length),v);
+        } else if (length <= 0xffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0xba), v);
+            binary::to_big_endian(static_cast<uint32_t>(length),v);
+        } else if (length <= 0xffffffffffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0xbb), v);
+            binary::to_big_endian(static_cast<uint64_t>(length),v);
         }
-
-        stack_.push_back(stack_item(true));
-
-        writer_.put('{');
     }
 
     void do_end_object(const serializing_context& context) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        if (indenting_)
-        {
-            unindent();
-            if (stack_.back().unindent_at_end())
-            {
-                write_indent();
-            }
-        }
         stack_.pop_back();
         writer_.put('}');
 
@@ -138,35 +130,46 @@ private:
     void do_end_object(size_t length, const serializing_context& context) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        if (indenting_)
-        {
-            unindent();
-            if (stack_.back().unindent_at_end())
-            {
-                write_indent();
-            }
-        }
         stack_.pop_back();
         writer_.put('}');
 
         end_value();
     }
 
-
     void do_begin_array(const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            if (!stack_.empty())
-            {
-                if (stack_.back().count_ > 0)
-                {
-                    writer_. put(',');
-                }
-            }
-        }
-        stack_.push_back(stack_item(false));
+        stack_.push_back(stack_item(cbor_structure_type::array));
         writer_.put('[');
+    }
+
+    void do_begin_array(size_t length, const serializing_context& context) override
+    {
+        std::vector<uint8_t> v;
+        stack_.push_back(stack_item(cbor_structure_type::array));
+        if (length <= 0x17)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(0x80 + length)), v);
+        } 
+        else if (length <= 0xff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x98), v);
+            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
+        } 
+        else if (length <= 0xffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x99), v);
+            binary::to_big_endian(static_cast<uint16_t>(length),v);
+        } 
+        else if (length <= 0xffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x9a), v);
+            binary::to_big_endian(static_cast<uint32_t>(length),v);
+        } 
+        else if (length <= 0xffffffffffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x9b), v);
+            binary::to_big_endian(static_cast<uint64_t>(length),v);
+        }
     }
 
     void do_end_array(const serializing_context& context) override
@@ -179,13 +182,6 @@ private:
 
     void do_name(const string_view_type& name, const serializing_context& context) override
     {
-        if (!stack_.empty())
-        {
-            if (stack_.back().count_ > 0)
-            {
-                writer_. put(',');
-            }
-        }
 
         writer_.put('\"');
         // write string
@@ -195,10 +191,6 @@ private:
 
     void do_null_value(const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            begin_scalar_value();
-        }
 
         auto buf = detail::null_literal<CharT>();
         writer_.write(buf, 4);
@@ -208,10 +200,6 @@ private:
 
     void do_string_value(const string_view_type& value, const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            begin_scalar_value();
-        }
 
         writer_. put('\"');
         // write string
@@ -229,10 +217,6 @@ private:
 
     void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            begin_scalar_value();
-        }
 
         // write double
 
@@ -241,30 +225,18 @@ private:
 
     void do_integer_value(int64_t value, const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            begin_scalar_value();
-        }
         detail::print_integer(value, writer_);
         end_value();
     }
 
     void do_uinteger_value(uint64_t value, const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            begin_scalar_value();
-        }
         detail::print_uinteger(value, writer_);
         end_value();
     }
 
     void do_bool_value(bool value, const serializing_context& context) override
     {
-        if (!stack_.empty() && !stack_.back().is_object())
-        {
-            begin_scalar_value();
-        }
 
         if (value)
         {
@@ -278,28 +250,6 @@ private:
         }
 
         end_value();
-    }
-
-    void begin_scalar_value()
-    {
-        if (!stack_.empty())
-        {
-            if (stack_.back().count_ > 0)
-            {
-                writer_. put(',');
-            }
-        }
-    }
-
-    void begin_value()
-    {
-        if (!stack_.empty())
-        {
-            if (stack_.back().count_ > 0)
-            {
-                writer_. put(',');
-            }
-        }
     }
 
     void end_value()
