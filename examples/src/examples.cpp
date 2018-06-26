@@ -143,7 +143,7 @@ void first_example_c()
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             std::string price;
-            book.get_with_default<json>("price", json("N/A")).dump(price,options);
+            book.get_with_default<json>("price", "N/A").dump(price,options);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
         catch (const parse_error& e)

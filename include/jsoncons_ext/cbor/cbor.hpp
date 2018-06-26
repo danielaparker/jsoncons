@@ -2123,28 +2123,28 @@ protected:
     }    
 };
 
-class packed_cbor : public cbor_view
+class cbor_value : public cbor_view
 {
     std::vector<uint8_t> data_;
 public:
 
-    packed_cbor() = default;
-    packed_cbor(const packed_cbor& val)
+    cbor_value() = default;
+    cbor_value(const cbor_value& val)
         : data_(val.data_)
     {
         this->set_data(data_.data(),data_.size());
     }
-    packed_cbor(packed_cbor&& val)
+    cbor_value(cbor_value&& val)
         : data_(std::move(val.data_))
     {
         this->set_data(data_.data(),data_.size());
     }
-    packed_cbor(const std::vector<uint8_t>& val)
+    cbor_value(const std::vector<uint8_t>& val)
         : data_(val)
     {
         this->set_data(data_.data(),data_.size());
     }
-    packed_cbor(std::vector<uint8_t>&& val)
+    cbor_value(std::vector<uint8_t>&& val)
         : data_(val)
     {
         this->set_data(data_.data(),data_.size());

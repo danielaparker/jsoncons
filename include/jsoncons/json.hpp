@@ -3976,19 +3976,7 @@ public:
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
-                    switch (it->value().type_id())
-                    {
-                    case json_type_tag::small_string_t:
-                        return T(it->value().as_string_view().data(),it->value().as_string_view().length());
-                    case json_type_tag::string_t:
-                        return T(it->value().as_string_view().data(),it->value().as_string_view().length());
-                    default:
-                        {
-                            T s;
-                            it->value().dump(s);
-                            return s;
-                        }
-                    }
+                    return it->value().template as<T>();
                 }
                 else
                 {
