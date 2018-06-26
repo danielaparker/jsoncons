@@ -21,7 +21,7 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/writer.hpp>
 
-namespace jsoncons { cbor {
+namespace jsoncons { namespace cbor {
 
 template<class CharT,class Writer=detail::ostream_buffered_writer<CharT>>
 class basic_cbor_encoder final : public basic_json_content_handler<CharT>
@@ -311,8 +311,8 @@ private:
     }
 };
 
-typedef basic_cbor_encoder<char,detail::ostream_buffered_writer<char>> cbor_encoder;
-typedef basic_cbor_encoder<wchar_t, detail::ostream_buffered_writer<wchar_t>> wcbor_encoder;
+typedef basic_cbor_encoder<char,jsoncons::detail::ostream_buffered_writer<char>> cbor_encoder;
+typedef basic_cbor_encoder<wchar_t, jsoncons::detail::ostream_buffered_writer<wchar_t>> wcbor_encoder;
 
 }}
 #endif
