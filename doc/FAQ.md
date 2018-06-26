@@ -426,6 +426,51 @@ double price = j.get_with_default("price", 25.00); // returns 25.17
 double sale_price = j.get_with_default("sale_price", 22.0); // returns 22.0
 ```
  
+#### How do I query a value in a hierarchy of JSON objects?
+
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+
+int main()
+{
+    json j = json::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+       {
+           "rater": "HikingAsylum.example.com",
+           "assertion": "is-good",
+           "rated": "sk",
+           "rating": 0.90
+         }
+       ]
+    }
+    )");
+
+    // Using index or `at` accessors
+    std::string result1 = j["reputons"][0]["rated"].as<std::string>();
+    std::cout << "(1) " << result1 << std::endl;
+    std::string result2 = j.at("reputons").at(0).at("rated").as<std::string>();
+    std::cout << "(2) " << result2 << std::endl;
+
+    // Using JSON Pointer
+    std::string result3 = jsonpointer::get(j, "/reputons/0/rated").as<std::string>();
+    std::cout << "(3) " << result3 << std::endl;
+
+    // Using JsonPath
+    json result4 = jsonpath::json_query(j, "$.reputons.0.rated");
+    if (result4.size() > 0)
+    {
+        std::cout << "(4) " << result4[0].as<std::string>() << std::endl;
+    }
+    json result5 = jsonpath::json_query(j, "$..0.rated");
+    if (result5.size() > 0)
+    {
+        std::cout << "(5) " << result5[0].as<std::string>() << std::endl;
+    }
+}
+ 
 <div id="A6"/>
 
 ### Search and Replace

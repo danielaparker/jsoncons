@@ -6,6 +6,8 @@
 #include <vector>
 #include <map>
 #include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 
 using namespace jsoncons;
 
@@ -141,7 +143,7 @@ void first_example_c()
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             std::string price;
-            book.get_with_default<json>("price", "N/A").dump(price,options);
+            book.get_with_default<json>("price", json("N/A")).dump(price,options);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
         catch (const parse_error& e)
@@ -436,6 +438,45 @@ void max_nesting_path_example()
     }
 }
 
+void get_example()
+{
+    json j = json::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+       {
+           "rater": "HikingAsylum.example.com",
+           "assertion": "is-good",
+           "rated": "sk",
+           "rating": 0.90
+         }
+       ]
+    }
+    )");
+
+    // Using index or `at` accessors
+    std::string result1 = j["reputons"][0]["rated"].as<std::string>();
+    std::cout << "(1) " << result1 << std::endl;
+    std::string result2 = j.at("reputons").at(0).at("rated").as<std::string>();
+    std::cout << "(2) " << result2 << std::endl;
+
+    // Using JSON Pointer
+    std::string result3 = jsonpointer::get(j, "/reputons/0/rated").as<std::string>();
+    std::cout << "(3) " << result3 << std::endl;
+
+    // Using JsonPath
+    json result4 = jsonpath::json_query(j, "$.reputons.0.rated");
+    if (result4.size() > 0)
+    {
+        std::cout << "(4) " << result4[0].as<std::string>() << std::endl;
+    }
+    json result5 = jsonpath::json_query(j, "$..0.rated");
+    if (result5.size() > 0)
+    {
+        std::cout << "(5) " << result5[0].as<std::string>() << std::endl;
+    }
+}
+
 int main()
 {
     try
@@ -501,6 +542,8 @@ int main()
         json_convert_examples();
 
         max_nesting_path_example();
+
+        get_example();
     }
     catch (const std::exception& e)
     {
