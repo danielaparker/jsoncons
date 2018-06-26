@@ -56,6 +56,12 @@ BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
     cbor_byte_string_encoder encoder(v);
     encoder.begin_json();
     encoder.begin_array();
+    encoder.begin_array(4);
+    encoder.bool_value(true);
+    encoder.bool_value(false);
+    encoder.null_value();
+    encoder.string_value("Hello");
+    encoder.end_array();
     encoder.end_array();
     encoder.end_json();
 

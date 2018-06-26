@@ -204,27 +204,28 @@ private:
         end_value();
     }
 
-    void do_string_value(const string_view_type& value, const serializing_context& context) override
+    void do_string_value(const string_view_type& sv, const serializing_context& context) override
     {
         std::vector<uint8_t> v;
+        std::basic_string<uint8_t> target;
         auto result = unicons::convert(
-            value.begin(), value.end(), std::back_inserter(v), 
+            sv.begin(), sv.end(), std::back_inserter(target), 
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
 
-        const size_t length = v.size();
+        const size_t length = target.length();
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x60 + length), v);
+            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(0x60 + length)), v);
         }
         else if (length <= 0xff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0x78), v);
-            binary::to_big_endian(static_cast<uint8_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
         }
         else if (length <= 0xffff)
         {
@@ -244,7 +245,7 @@ private:
 
         for (size_t i = 0; i < length; ++i)
         {
-            binary::to_big_endian(static_cast<uint8_t>(v.data()[i]), v);
+            binary::to_big_endian(static_cast<uint8_t>(target.data()[i]), v);
         }
         for (auto c : v)
         {

@@ -143,5 +143,13 @@ BOOST_AUTO_TEST_CASE(cbor_arrays_and_maps)
     check_decode({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }
 
+BOOST_AUTO_TEST_CASE(cbor_arrays_and_maps_indefinite_length)
+{
+    check_decode({0x9f,0xff},json::array());
+    check_decode({0x9f,0x9f,0xff,0xff},json::parse("[[]]"));
+    check_decode({0xbf,0xff},json::object());
+    check_decode({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
