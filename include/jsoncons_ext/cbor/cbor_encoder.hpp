@@ -35,11 +35,12 @@ public:
 
 private:
     static const size_t default_buffer_length = 16384;
-    cbor_structure_type type_;
-    size_t count_;
 
     struct stack_item
     {
+        cbor_structure_type type_;
+        size_t count_;
+
         stack_item(cbor_structure_type type)
            : type_(type), count_(0)
         {
