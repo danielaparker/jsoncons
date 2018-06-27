@@ -341,7 +341,9 @@ sizeof(T) == sizeof(uint32_t),T>::type
 from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     uint32_t data = from_big_endian<uint32_t>(first,last,endp);
-    return *reinterpret_cast<T*>(&data);
+    T val;
+    std::memcpy(&val,&data,sizeof(T));
+    return val;
 }
 
 template<class T>
@@ -350,7 +352,9 @@ sizeof(T) == sizeof(uint64_t),T>::type
 from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     uint64_t data = from_big_endian<uint64_t>(first,last,endp);
-    return *reinterpret_cast<T*>(&data);
+    T val;
+    std::memcpy(&val,&data,sizeof(T));
+    return val;
 }
 
 }}
