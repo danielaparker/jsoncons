@@ -155,7 +155,7 @@ public:
 
     void double_value(double value, uint8_t precision)
     {
-        do_double_value(value, floating_point_options(precision, 0), null_serializing_context());
+        do_double_value(value, floating_point_options(chars_format::general, precision), null_serializing_context());
     }
 
     void double_value(double value, const floating_point_options& fmt)
@@ -170,7 +170,7 @@ public:
 
     void double_value(double value, uint8_t precision, const serializing_context& context)
     {
-        do_double_value(value, floating_point_options(precision, 0), context);
+        do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
     void double_value(double value, const floating_point_options& fmt, const serializing_context& context)
@@ -252,12 +252,12 @@ public:
 
     void value(float value, uint8_t precision, const serializing_context& context)
     {
-        do_double_value(value, floating_point_options(precision, 0), context);
+        do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
     void value(double value, uint8_t precision, const serializing_context& context)
     {
-        do_double_value(value, floating_point_options(precision, 0), context);
+        do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
     void value(bool value, const serializing_context& context) 

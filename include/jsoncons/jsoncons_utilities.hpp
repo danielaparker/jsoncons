@@ -565,7 +565,7 @@ public:
     {
     }
 
-    floating_point_options(chars_format format, uint8_t precision, uint8_t decimal_places)
+    floating_point_options(chars_format format, uint8_t precision, uint8_t decimal_places = 0)
         : format_(format), precision_(precision), decimal_places_(decimal_places)
     {
     }
