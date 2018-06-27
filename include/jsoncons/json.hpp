@@ -2273,13 +2273,13 @@ public:
         template <class T>
         T get_with_default(const string_view_type& name, const T& default_val) const
         {
-            return evaluate().get_with_default<T>(name,default_val);
+            return evaluate().template get_with_default<T>(name,default_val);
         }
 
         template <class T = std::basic_string<CharT>>
         T get_with_default(const string_view_type& name, const CharT* default_val) const
         {
-            return evaluate().get_with_default<T>(name,default_val);
+            return evaluate().template get_with_default<T>(name,default_val);
         }
 
         void shrink_to_fit()
