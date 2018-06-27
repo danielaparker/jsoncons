@@ -139,7 +139,7 @@ public:
 };
 
 template <class CharT>
-class byte_string_writer 
+class bytes_writer 
 {
 public:
     typedef CharT char_type;
@@ -148,11 +148,11 @@ private:
     output_type& s_;
 
     // Noncopyable and nonmoveable
-    byte_string_writer(const byte_string_writer&) = delete;
-    byte_string_writer& operator=(const byte_string_writer&) = delete;
+    bytes_writer(const bytes_writer&) = delete;
+    bytes_writer& operator=(const bytes_writer&) = delete;
 public:
 
-    byte_string_writer(output_type& s)
+    bytes_writer(output_type& s)
         : s_(s)
     {
     }

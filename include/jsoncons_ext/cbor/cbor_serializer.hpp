@@ -26,7 +26,7 @@ namespace jsoncons { namespace cbor {
 enum class cbor_structure_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Writer=jsoncons::detail::ostream_buffered_writer<CharT>>
-class basic_cbor_encoder final : public basic_json_content_handler<CharT>
+class basic_cbor_serializer final : public basic_json_content_handler<CharT>
 {
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
@@ -64,15 +64,15 @@ private:
     Writer writer_;
 
     // Noncopyable and nonmoveable
-    basic_cbor_encoder(const basic_cbor_encoder&) = delete;
-    basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
+    basic_cbor_serializer(const basic_cbor_serializer&) = delete;
+    basic_cbor_serializer& operator=(const basic_cbor_serializer&) = delete;
 public:
-    basic_cbor_encoder(output_type& os)
+    basic_cbor_serializer(output_type& os)
        : writer_(os)
     {
     }
 
-    ~basic_cbor_encoder()
+    ~basic_cbor_serializer()
     {
     }
 
@@ -92,7 +92,7 @@ private:
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_object));
         
-        writer_.put(0xbf);
+        writer_.put((CharT)0xbf);
     }
 
     void do_begin_object(size_t length, const serializing_context& context) override
@@ -132,7 +132,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
-            writer_.put(0xff);
+            writer_.put((CharT)0xff);
         }
         stack_.pop_back();
 
@@ -142,7 +142,7 @@ private:
     void do_begin_array(const serializing_context& context) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
-        writer_.put(0x9f);
+        writer_.put((CharT)0x9f);
     }
 
     void do_begin_array(size_t length, const serializing_context& context) override
@@ -184,7 +184,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
-            writer_.put(0xff);
+            writer_.put((CharT)0xff);
         }
         stack_.pop_back();
         end_value();
@@ -197,7 +197,7 @@ private:
 
     void do_null_value(const serializing_context& context) override
     {
-        writer_.put(0xf6);
+        writer_.put((CharT)0xf6);
 
         end_value();
     }
@@ -409,11 +409,11 @@ private:
 
         if (value)
         {
-            writer_.put(0xf5);
+            writer_.put((CharT)0xf5);
         }
         else
         {
-            writer_.put(0xf4);
+            writer_.put((CharT)0xf4);
         }
 
         end_value();
@@ -428,9 +428,9 @@ private:
     }
 };
 
-typedef basic_cbor_encoder<char,jsoncons::detail::ostream_buffered_writer<char>> cbor_encoder;
+typedef basic_cbor_serializer<char,jsoncons::detail::ostream_buffered_writer<char>> cbor_serializer;
 
-typedef basic_cbor_encoder<char,jsoncons::detail::byte_string_writer<uint8_t>> cbor_bytes_encoder;
+typedef basic_cbor_serializer<char,jsoncons::detail::bytes_writer<uint8_t>> cbor_bytes_serializer;
 
 }}
 #endif
