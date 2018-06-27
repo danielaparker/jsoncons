@@ -7,8 +7,15 @@ Encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class Json>
-void encode_cbor(const Json& jval, std::vector<uint8_t>& buffer)
+void encode_cbor(const Json& jval, std::vector<uint8_t>& buffer); // (1)
+
+template<class Json>
+void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os); // (2)
 ```
+
+(1) Writes json value in CBOR data format to buffer
+
+(2) Writes json value in CBOR data format to binary output stream
 
 #### See also
 
