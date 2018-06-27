@@ -25,11 +25,8 @@ BOOST_AUTO_TEST_CASE(cbor_test_floating_point)
     j1["max double"] = (std::numeric_limits<double>::max)();
     j1["max float"] = (std::numeric_limits<float>::max)();
 
-    size_t calculated_size = cbor_Encoder_<json>::calculate_size(j1);
     std::vector<uint8_t> v;
     encode_cbor(j1, v);
-    BOOST_CHECK(calculated_size == v.size());
-    BOOST_CHECK(calculated_size == v.capacity());
 
     json j2 = decode_cbor<json>(v);
 
@@ -92,11 +89,8 @@ BOOST_AUTO_TEST_CASE(cbor_test)
 
     j1["An array"] = ja;
 
-    size_t calculated_size = cbor_Encoder_<json>::calculate_size(j1);
     std::vector<uint8_t> v;
     encode_cbor(j1, v);
-    BOOST_CHECK(calculated_size == v.size());
-    //BOOST_CHECK(calculated_size == v.capacity());
 
     json j2 = decode_cbor<json>(v);
 
@@ -161,11 +155,8 @@ BOOST_AUTO_TEST_CASE(cbor_test2)
 
     j1[L"An array"] = ja;
 
-    size_t calculated_size = cbor_Encoder_<wjson>::calculate_size(j1);
     std::vector<uint8_t> v;
     encode_cbor(j1, v);
-    BOOST_CHECK(calculated_size == v.size());
-    //BOOST_CHECK(calculated_size == v.capacity());
 
     wjson j2 = decode_cbor<wjson>(v);
 

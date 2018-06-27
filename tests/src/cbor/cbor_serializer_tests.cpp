@@ -20,14 +20,6 @@ using namespace jsoncons::cbor;
 
 BOOST_AUTO_TEST_SUITE(cbor_serializer_tests)
 
-template<class Json>
-void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os)
-{
-    typedef typename Json::char_type char_type;
-    basic_cbor_serializer<char_type> serializer(os);
-    j.dump(serializer);
-}
-
 BOOST_AUTO_TEST_CASE(test_serialize_to_stream)
 {
     json j = json::parse(R"(
