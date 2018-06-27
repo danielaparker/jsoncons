@@ -34,8 +34,6 @@ public:
     typedef typename Writer::output_type output_type;
 
 private:
-    static const size_t default_buffer_length = 16384;
-
     enum class structure_type {object, array};
 
     class line_split_context
@@ -479,8 +477,8 @@ private:
             begin_scalar_value();
         }
 
-        auto buf = detail::null_literal<CharT>();
-        writer_.write(buf, 4);
+        writer_.write(detail::null_literal<CharT>().data(), 
+                      detail::null_literal<CharT>().size());
 
         end_value();
     }
@@ -517,33 +515,39 @@ private:
         {
             if (options_.can_write_nan_replacement())
             {
-                writer_.write(options_.nan_replacement());
+                writer_.write(options_.nan_replacement().data(),
+                              options_.nan_replacement().length());
             }
             else
             {
-                writer_.write(detail::null_literal<CharT>());
+                writer_.write(detail::null_literal<CharT>().data(),
+                              detail::null_literal<CharT>().length());
             }
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
             if (options_.can_write_pos_inf_replacement())
             {
-                writer_.write(options_.pos_inf_replacement());
+                writer_.write(options_.pos_inf_replacement().data(),
+                              options_.pos_inf_replacement().length());
             }
             else
             {
-                writer_.write(detail::null_literal<CharT>());
+                writer_.write(detail::null_literal<CharT>().data(),
+                              detail::null_literal<CharT>().length());
             }
         }
         else if (!(std::isfinite)(value))
         {
             if (options_.can_write_neg_inf_replacement())
             {
-                writer_.write(options_.neg_inf_replacement());
+                writer_.write(options_.neg_inf_replacement().data(),
+                              options_.neg_inf_replacement().length());
             }
             else
             {
-                writer_.write(detail::null_literal<CharT>());
+                writer_.write(detail::null_literal<CharT>().data(),
+                              detail::null_literal<CharT>().length());
             }
         }
         else
@@ -583,13 +587,13 @@ private:
 
         if (value)
         {
-            auto buf = detail::true_literal<CharT>();
-            writer_.write(buf,4);
+            writer_.write(detail::true_literal<CharT>().data(),
+                          detail::true_literal<CharT>().length());
         }
         else
         {
-            auto buf = detail::false_literal<CharT>();
-            writer_.write(buf,5);
+            writer_.write(detail::false_literal<CharT>().data(),
+                          detail::false_literal<CharT>().length());
         }
 
         end_value();

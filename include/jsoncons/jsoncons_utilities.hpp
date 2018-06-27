@@ -539,11 +539,11 @@ bool operator>(const std::basic_string<CharT,Traits,Allocator>& lhs,
 
 #if !defined(JSONCONS_HAS_STRING_VIEW)
 template <class CharT, class Traits = std::char_traits<CharT>>
-using basic_string_view_ext = Basic_string_view_<CharT, Traits>;
+using basic_string_view = Basic_string_view_<CharT, Traits>;
 #else
 #include <string_view>
 template <class CharT, class Traits = std::char_traits<CharT>>
-using basic_string_view_ext = std::basic_string_view<CharT, Traits>;
+using basic_string_view = std::basic_string_view<CharT, Traits>;
 #endif
 
 #if !defined(JSONCONS_NO_TO_CHARS)
@@ -942,6 +942,33 @@ std::string decode_base64(const std::string& base64_string)
     }
 
     return result;
+}
+
+// json_literals
+
+namespace detail {
+
+template <class CharT>
+basic_string_view<CharT> null_literal()
+{
+    static const CharT chars[] = {'n','u','l', 'l'};
+    return basic_string_view<CharT>(chars,sizeof(chars));
+}
+
+template <class CharT>
+basic_string_view<CharT> true_literal()
+{
+    static const CharT chars[] = {'t','r','u', 'e'};
+    return basic_string_view<CharT>(chars,sizeof(chars));
+}
+
+template <class CharT>
+basic_string_view<CharT> false_literal()
+{
+    static const CharT chars[] = {'f','a','l', 's', 'e'};
+    return basic_string_view<CharT>(chars,sizeof(chars));
+}
+
 }
 
 }

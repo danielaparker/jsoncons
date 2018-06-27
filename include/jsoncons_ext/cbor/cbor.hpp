@@ -1743,7 +1743,7 @@ public:
     typedef std::string string_type;
     typedef char char_type;
     typedef std::char_traits<char_type> char_traits_type;
-    typedef basic_string_view_ext<char_type> string_view_type;
+    typedef basic_string_view<char_type> string_view_type;
     typedef detail::const_object_iterator<cbor_view> object_iterator;
     typedef detail::const_object_iterator<cbor_view> const_object_iterator;
     typedef detail::const_array_iterator<cbor_view> array_iterator;

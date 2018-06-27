@@ -93,14 +93,6 @@ struct type_wrapper<const T&>
     typedef const T& const_reference;
 };
 
-// json_literals
-
-namespace detail {
-JSONCONS_DEFINE_LITERAL(null_literal,"null")
-JSONCONS_DEFINE_LITERAL(true_literal,"true")
-JSONCONS_DEFINE_LITERAL(false_literal,"false")
-}
-
 inline
 unsigned char to_hex_character(unsigned char c)
 {

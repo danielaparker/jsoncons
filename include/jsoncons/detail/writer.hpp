@@ -31,7 +31,6 @@ template <class CharT>
 class ostream_buffered_writer
 {
 public:
-    typedef basic_string_view_ext<CharT> string_view_type;
     typedef CharT char_type;
     typedef std::basic_ostream<CharT> output_type;
 private:
@@ -84,11 +83,6 @@ public:
         }
     }
 
-    void write(const string_view_type& s)
-    {
-        write(s.data(),s.length());
-    }
-
     void put(CharT ch)
     {
         if (p_ < end_buffer_)
@@ -114,7 +108,6 @@ template <class CharT>
 class string_writer 
 {
 public:
-    typedef basic_string_view_ext<CharT> string_view_type;
     typedef CharT char_type;
     typedef std::basic_string<CharT> output_type;
 private:
@@ -137,11 +130,6 @@ public:
     void write(const CharT* s, size_t length)
     {
         s_.append(s,length);
-    }
-
-    void write(const string_view_type& s)
-    {
-        s_.append(s.data(),s.length());
     }
 
     void put(CharT ch)

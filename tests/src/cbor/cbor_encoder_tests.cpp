@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE(cbor_encoder_tests)
 BOOST_AUTO_TEST_CASE(test_array)
 {
     std::vector<uint8_t> v;
-    cbor_byte_string_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_json();
     //encoder.begin_object(1);
     encoder.begin_array(3);
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_array)
 BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
 {
     std::vector<uint8_t> v;
-    cbor_byte_string_encoder encoder(v);
+    cbor_bytes_encoder encoder(v);
     encoder.begin_json();
     encoder.begin_array();
     encoder.begin_array(4);

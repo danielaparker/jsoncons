@@ -144,9 +144,11 @@ private:
                     {
                         writer_.put(parameters_.field_delimiter());
                     }
-                    writer_.write(column_names_[i]);
+                    writer_.write(column_names_[i].data(),
+                                  column_names_[i].length());
                 }
-                writer_.write(parameters_.line_delimiter());
+                writer_.write(parameters_.line_delimiter().data(),
+                              parameters_.line_delimiter().length());
             }
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
@@ -157,11 +159,11 @@ private:
                 auto it = buffered_line_.find(column_names_[i]);
                 if (it != buffered_line_.end())
                 {
-                    writer_.write(it->second);
+                    writer_.write(it->second.data(),it->second.length());
                     it->second.clear();
                 }
             }
-            writer_.write(parameters_.line_delimiter());
+            writer_.write(parameters_.line_delimiter().data(), parameters_.line_delimiter().length());
         }
         stack_.pop_back();
 
@@ -181,11 +183,12 @@ private:
                     {
                         writer_.put(parameters_.field_delimiter());
                     }
-                    writer_.write(column_names_[i]);
+                    writer_.write(column_names_[i].data(),column_names_[i].length());
                 }
                 if (column_names_.size() > 0)
                 {
-                    writer_.write(parameters_.line_delimiter());
+                    writer_.write(parameters_.line_delimiter().data(),
+                                  parameters_.line_delimiter().length());
                 }
             }
         }
@@ -195,7 +198,8 @@ private:
     {
         if (stack_.size() == 2)
         {
-            writer_.write(parameters_.line_delimiter());
+            writer_.write(parameters_.line_delimiter().data(),
+                          parameters_.line_delimiter().length());
         }
         stack_.pop_back();
 
@@ -392,15 +396,18 @@ private:
 
         if ((std::isnan)(val))
         {
-            writer.write(options_.nan_replacement());
+            writer.write(options_.nan_replacement().data(),
+                         options_.nan_replacement().length());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            writer.write(options_.pos_inf_replacement());
+            writer.write(options_.pos_inf_replacement().data(),
+                         options_.pos_inf_replacement().length());
         }
         else if (!(std::isfinite)(val))
         {
-            writer.write(options_.neg_inf_replacement());
+            writer.write(options_.neg_inf_replacement().data(),
+                         options_.neg_inf_replacement().length());
         }
         else
         {
@@ -418,7 +425,7 @@ private:
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        writer.write(ss.str());
+        writer.write(ss.str().data(),ss.str().length());
 
         end_value();
     }
@@ -430,7 +437,7 @@ private:
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        writer.write(ss.str());
+        writer.write(ss.str().data(),ss.str().length());
 
         end_value();
     }
@@ -442,13 +449,13 @@ private:
 
         if (val)
         {
-            auto buf = jsoncons::detail::true_literal<CharT>();
-            writer.write(buf,4);
+            writer.write(jsoncons::detail::true_literal<CharT>().data(),
+                         jsoncons::detail::true_literal<CharT>().length());
         }
         else
         {
-            auto buf = jsoncons::detail::false_literal<CharT>();
-            writer.write(buf,5);
+            writer.write(jsoncons::detail::false_literal<CharT>().data(),
+                         jsoncons::detail::false_literal<CharT>().length());
         }
 
         end_value();
@@ -458,8 +465,8 @@ private:
     void do_null_value(AnyWriter& writer) 
     {
         begin_value(writer);
-        auto buf = jsoncons::detail::null_literal<CharT>();
-        writer.write(buf,4);
+        writer.write(jsoncons::detail::null_literal<CharT>().data(), 
+                     jsoncons::detail::null_literal<CharT>().length());
         end_value();
 
     }

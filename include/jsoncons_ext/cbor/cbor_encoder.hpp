@@ -34,8 +34,6 @@ public:
     typedef typename Writer::output_type output_type;
 
 private:
-    static const size_t default_buffer_length = 16384;
-
     struct stack_item
     {
         cbor_structure_type type_;
@@ -104,11 +102,11 @@ private:
         std::vector<uint8_t> v;
         if (length <= 0x17)
         {
-            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(0xa0 + length)), v);
+            binary::to_big_endian(static_cast<uint8_t>(0xa0 + length), v);
         } else if (length <= 0xff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0xb8), v);
-            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
+            binary::to_big_endian(static_cast<uint8_t>(length), v);
         } else if (length <= 0xffff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0xb9), v);
@@ -153,12 +151,12 @@ private:
         stack_.push_back(stack_item(cbor_structure_type::array));
         if (length <= 0x17)
         {
-            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(0x80 + length)), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x80 + length), v);
         } 
         else if (length <= 0xff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0x98), v);
-            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
+            binary::to_big_endian(static_cast<uint8_t>(length), v);
         } 
         else if (length <= 0xffff)
         {
@@ -220,12 +218,12 @@ private:
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(0x60 + length)), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x60 + length), v);
         }
         else if (length <= 0xff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0x78), v);
-            binary::to_big_endian(static_cast<uint8_t>(static_cast<uint8_t>(length)), v);
+            binary::to_big_endian(static_cast<uint8_t>(length), v);
         }
         else if (length <= 0xffff)
         {
@@ -257,6 +255,44 @@ private:
 
     void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
+        std::vector<uint8_t> v;
+
+        if (length <= 0x17)
+        {
+            // fixstr stores a byte array whose length is upto 31 bytes
+            binary::to_big_endian(static_cast<uint8_t>(0x40 + length), v);
+        }
+        else if (length <= 0xff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x58), v);
+            binary::to_big_endian(static_cast<uint8_t>(length), v);
+        }
+        else if (length <= 0xffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x59), v);
+            binary::to_big_endian(static_cast<uint16_t>(length), v);
+        }
+        else if (length <= 0xffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x5a), v);
+            binary::to_big_endian(static_cast<uint32_t>(length), v);
+        }
+        else if (length <= 0xffffffffffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x5b), v);
+            binary::to_big_endian(static_cast<uint64_t>(length),v);
+        }
+
+        for (size_t i = 0; i < length; ++i)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
+        }
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
+
+        end_value();
     }
 
     void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) override
@@ -394,7 +430,7 @@ private:
 
 typedef basic_cbor_encoder<char,jsoncons::detail::ostream_buffered_writer<char>> cbor_encoder;
 
-typedef basic_cbor_encoder<char,jsoncons::detail::byte_string_writer<uint8_t>> cbor_byte_string_encoder;
+typedef basic_cbor_encoder<char,jsoncons::detail::byte_string_writer<uint8_t>> cbor_bytes_encoder;
 
 }}
 #endif
