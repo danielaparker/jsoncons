@@ -26,7 +26,7 @@ addon_shortcuts:
   gcc6: &gcc6
     apt:
       sources:
-        - ubuntu-toolchain-r
+        - ubuntu-toolchain-r-test
       packages:
         - g++-6
         - libboost-all-dev
@@ -34,7 +34,7 @@ addon_shortcuts:
   gcc7: &gcc7
     apt:
       sources:
-        - ubuntu-toolchain-r
+        - ubuntu-toolchain-r-test
       packages:
         - g++-7
         - libboost-all-dev
