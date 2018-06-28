@@ -22,15 +22,15 @@ before_install:
   - chmod +x tests/build/cmake/run_tests.sh
 
 env:
-  #- CC=gcc-6 CXX=g++-6
-  #- CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES
+  - CC=gcc-6 CXX=g++-6
+  - CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES
   - CC=clang-3.8 CXX=clang++-3.8
 
 matrix:
   include:
-      - {env: CC=gcc-6 CXX=g++-6}
-      - {env: CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES}
-      - {env: CC=clang-3.8 CXX=clang++-3.8}
+      - env: CC=gcc-6 CXX=g++-6
+      - env: CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES
+      - env: CC=clang-3.8 CXX=clang++-3.8
 
   allow_failures:
     - env: CC=clang-3.8 CXX=clang++-3.8
