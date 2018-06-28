@@ -10,6 +10,7 @@ addon_shortcuts:
       packages:
         - clang-5.0
         - libc++-dev
+        - libboost-all-dev
 
   clang38: &clang38
     apt:
@@ -18,6 +19,7 @@ addon_shortcuts:
       packages:
         - clang-3.8
         - libc++-dev
+        - libboost-all-dev
 
 addons:
   apt:
@@ -30,20 +32,24 @@ addons:
       #- libc++-dev
       - cmake
       - libboost-all-dev
+
 before_install:
   - curl -L http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
   - echo 'deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.8 main' | sudo tee /etc/apt/sources.list
   - chmod +x tests/build/cmake/run_tests.sh
+
 env:
   - CC=gcc-6 CXX=g++-6
   - CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES
-  - STD=11 CC=clang-3.8 CXX=clang++-3.8
+  #- STD=11 CC=clang-3.8 CXX=clang++-3.8
+
 matrix:
   include:
     - { env: 'STD=11 CC=clang-3.8 CXX=clang++-3.8', addons: *clang38 }
 
   allow_failures:
-    - env: STD=11 CC=clang-3.8 CXX=clang++-3.8
+    - { env: 'STD=11 CC=clang-3.8 CXX=clang++-3.8', addons: *clang38 }
+
 script:
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
