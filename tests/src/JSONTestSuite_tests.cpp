@@ -15,18 +15,19 @@
 #include <utility>
 #include <ctime>
 #include <new>
-#include <codecvt>
 #include <sstream>
 #include <jsoncons/json.hpp>
 #include <fstream>
 #include <iostream>
 #include <locale>
+#if defined(_MSC_VER)
 #include <codecvt>
-
+#endif
 using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(JSONTestSuite_tests)
 
+#if defined(_MSC_VER)
 BOOST_AUTO_TEST_CASE(test_json)
 {
     boost::filesystem::path p("./input/JSONTestSuite");
@@ -97,6 +98,7 @@ BOOST_AUTO_TEST_CASE(test_json)
         }
     }
 }
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
 

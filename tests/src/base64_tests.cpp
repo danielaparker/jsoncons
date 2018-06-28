@@ -15,7 +15,6 @@
 #include <utility>
 #include <ctime>
 #include <new>
-#include <codecvt>
 #include <jsoncons/json.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 
