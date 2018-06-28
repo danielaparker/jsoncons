@@ -2,6 +2,23 @@ dist: trusty
 
 sudo: required
 
+addon_shortcuts:
+  clang50: &clang50
+    apt:
+      sources:
+        - llvm-toolchain-trusty-5.0
+      packages:
+        - clang-5.0
+        - libc++-dev
+
+  clang38: &clang38
+    apt:
+      sources:
+        - llvm-toolchain-trusty-3.8
+      packages:
+        - clang-3.8
+        - libc++-dev
+
 addons:
   apt:
     update: true
@@ -22,6 +39,9 @@ env:
   - CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES
   - CC=clang-3.8 CXX=clang++-3.8
 matrix:
+  include:
+    - { env: 'STD=11 CC=clang-3.8 CXX=clang++-3.8', compiler: clang-3.8, addons: *clang38 }
+
   allow_failures:
     - env: CC=clang-3.8 CXX=clang++-3.8
 script:
