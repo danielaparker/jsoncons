@@ -2491,6 +2491,21 @@ Json decode_cbor(const cbor_view& v)
     Decode_cbor_<Json> decoder(v.buffer(),v.buffer()+v.buflen());
     return decoder.decode();
 }
+
+template<class Json>
+Json decode_cbor(std::basic_istream<typename Json::char_type>& is)
+{
+    typedef typename Json::char_type char_type;
+
+    std::vector<uint8_t> v;
+    is.seekg(0, std::ios::end);   
+    v.resize(is.tellg());
+    is.seekg(0, std::ios::beg);    
+    is.read((char_type*)&v[0],v.size());
+
+    Decode_cbor_<Json> decoder(v.data(),v.data()+v.size());
+    return decoder.decode();
+}
   
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Json>

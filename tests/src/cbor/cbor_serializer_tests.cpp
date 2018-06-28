@@ -22,33 +22,31 @@ BOOST_AUTO_TEST_SUITE(cbor_serializer_tests)
 
 BOOST_AUTO_TEST_CASE(test_serialize_to_stream)
 {
-    json j = json::parse(R"(
-{ "store": {
-    "book": [ 
-          { "author": "Nigel Rees"
-          },
-          { "author": "Evelyn Waugh"
-          },
-          { "author": "Herman Melville"
-          }
-        ]
-    }  
+json j = json::parse(R"(
+{
+   "application": "hiking",
+   "reputons": [
+   {
+       "rater": "HikingAsylum.example.com",
+       "assertion": "is-good",
+       "rated": "sk",
+       "rating": 0.90
+     }
+   ]
 }
-    )");
+)");
 
-    std::ofstream outfile;
-    outfile.open("./output/store.cbor", std::ios::binary | std::ios::out);
-    encode_cbor(j,outfile);
+    std::ofstream os;
+    os.open("./output/store.cbor", std::ios::binary | std::ios::out);
+    encode_cbor(j,os);
 
     std::vector<uint8_t> v;
-    std::ifstream infile;
-    infile.open("./output/store.cbor", std::ios::binary | std::ios::in);
-    infile.seekg(0, std::ios::end);   
-    v.resize(infile.tellg());
-    infile.seekg(0, std::ios::beg);    
-    infile.read((char*)&v[0],v.size());
+    std::ifstream is;
+    is.open("./output/store.cbor", std::ios::binary | std::ios::in);
 
-    json j2 = decode_cbor<json>(v);
+    json j2 = decode_cbor<json>(is);
+
+    std::cout << pretty_print(j2) << std::endl; 
 
     BOOST_CHECK(j == j2);
 }
