@@ -26,8 +26,8 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-6
-      - clang-3.8
-      - libc++-dev
+      #- clang-3.8
+      #- libc++-dev
       - cmake
       - libboost-all-dev
 before_install:
@@ -37,10 +37,10 @@ before_install:
 env:
   - CC=gcc-6 CXX=g++-6
   - CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES
-  - CC=clang-3.8 CXX=clang++-3.8
+  - CC=STD=11 clang-3.8 CXX=clang++-3.8
 matrix:
   include:
-    - { env: 'STD=11 CC=clang-3.8 CXX=clang++-3.8', compiler: clang-3.8, addons: *clang38 }
+    - { env: 'STD=11 CC=clang-3.8 CXX=clang++-3.8', addons: *clang38 }
 
   allow_failures:
     - env: CC=clang-3.8 CXX=clang++-3.8
