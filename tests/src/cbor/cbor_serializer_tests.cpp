@@ -65,11 +65,6 @@ BOOST_AUTO_TEST_CASE(test_array)
     //serializer.end_object();
     serializer.end_json();
 
-    for (auto c: v)
-    {
-        std::cout << std::hex << (int)c << std::endl;
-    }
-
     try
     {
         json result = decode_cbor<json>(v);
@@ -95,11 +90,6 @@ BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
     serializer.end_array();
     serializer.end_array();
     serializer.end_json();
-
-    for (auto c: v)
-    {
-        std::cout << std::hex << (int)c << std::endl;
-    }
 
     try
     {
