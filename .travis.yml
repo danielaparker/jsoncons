@@ -29,6 +29,14 @@ addon_shortcuts:
         - g++-6
         - libboost-all-dev
 
+  gcc7: &gcc7
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-7
+        - libboost-all-dev
+
 addons:
   apt:
     update: true
@@ -54,6 +62,8 @@ matrix:
   include:
     - { env: 'STD=11 CC=gcc-6 CXX=g++-6', addons: *gcc6 }
     - { env: 'STD=11 CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
+    - { env: 'STD=11 CC=gcc-7 CXX=g++-7', addons: *gcc7 }
+    - { env: 'STD=11 CC=gcc-7 CXX=g++-7 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc7 }
     - { env: 'STD=11 CC=clang-3.8 CXX=clang++-3.8', addons: *clang38 }
     - { env: 'STD=11 CC=clang-5.0 CXX=clang++-5.0', addons: *clang50 }
 
