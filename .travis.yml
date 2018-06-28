@@ -5,6 +5,14 @@ dist: trusty
 sudo: required
 
 addon_shortcuts:
+  clang50: &clang50
+    apt:
+      sources:
+        - llvm-toolchain-trusty-5.0
+      packages:
+        - clang-5.0
+        - libc++-dev
+
   clang38: &clang38
     apt:
       sources:
@@ -37,8 +45,8 @@ before_install:
 
 matrix:
 
-    include:
-    - { env: 'STD=11 JOB=test/x3 TOOLSET=clang-3.8', compiler: clang-3.8, addons: *clang38 }
+  allowed_failures:
+    - { env: 'STD=11 JOB=test/x3 TOOLSET=clang-5.0', compiler: clang-5.0, addons: *clang50 }
   #allow_failures:
     #- env: CC=clang-3.8 CXX=clang++-3.8
 
