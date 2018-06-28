@@ -35,11 +35,11 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-6
+      #- g++-6
       #- clang-3.8
       #- libc++-dev
       - cmake
-      - libboost-all-dev
+      #- libboost-all-dev
 
 before_install:
   - curl -L http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
