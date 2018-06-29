@@ -169,8 +169,10 @@ public:
     basic_json_serializer(output_type& os, bool pprint)
        : indent_(0), 
          indenting_(pprint),
-         fp_(options_.precision()),
-         writer_(os)
+         fp_(floating_point_options(chars_format::general,
+             options.precision(),
+             options_.precision())),
+        writer_(os)
     {
     }
 
@@ -178,7 +180,9 @@ public:
        : options_(options), 
          indent_(0), 
          indenting_(pprint),  
-         fp_(options_.precision()),
+         fp_(floating_point_options(options.floating_point_format(),
+             options.precision(),
+             options_.precision())),
          writer_(os)
     {
     }
