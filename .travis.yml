@@ -32,6 +32,7 @@ addon_shortcuts:
       packages:
         - g++-6
         - libboost-all-dev
+        - libubsan0-dbg
 
   gcc7: &gcc7
     apt:
@@ -40,6 +41,7 @@ addon_shortcuts:
       packages:
         - g++-7
         - libboost-all-dev
+        - libubsan0
 
 addons:
   apt:
