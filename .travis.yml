@@ -54,7 +54,7 @@ before_install:
 
 matrix:
   include:
-    - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc6 }
+    - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS="-fsanitize=undefined -fuse-ld=gold" CPPFLAGS="-fsanitize=undefined -fuse-ld=gold"', addons: *gcc6 }
     - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
     - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc7 }
     #- { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc7 }
