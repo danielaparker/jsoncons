@@ -3,15 +3,9 @@ dist: trusty
 sudo: required
 
 addon_shortcuts:
-  clang50: &clang50
+  xcode64: &xcode64
     apt:
-      sources:
-        - llvm-toolchain-trusty-5.0
-        - ubuntu-toolchain-r-test
-        - llvm-toolchain-precise
       packages:
-        - clang-5.0
-        - libc++-dev
         - libboost-all-dev
 
   clang38: &clang38
@@ -22,6 +16,17 @@ addon_shortcuts:
         - llvm-toolchain-precise
       packages:
         - clang-3.8
+        - libc++-dev
+        - libboost-all-dev
+
+  clang50: &clang50
+    apt:
+      sources:
+        - llvm-toolchain-trusty-5.0
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-precise
+      packages:
+        - clang-5.0
         - libc++-dev
         - libboost-all-dev
 
@@ -41,6 +46,14 @@ addon_shortcuts:
         - g++-7
         - libboost-all-dev
 
+  gcc8: &gcc8
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-8
+        - libboost-all-dev
+
 addons:
   apt:
     update: true
@@ -54,12 +67,15 @@ before_install:
 
 matrix:
   include:
-    - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS="-fsanitize=undefined -fuse-ld=gold" CPPFLAGS="-fsanitize=undefined -fuse-ld=gold"', addons: *gcc6 }
-    - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
-    - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc7 }
+    #- { env: 'STD=11 CXX=g++-6 CMAKEFLAGS="-fsanitize=undefined -fuse-ld=gold" CPPFLAGS="-fsanitize=undefined -fuse-ld=gold"', addons: *gcc6 }
+    #- { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
+    #- { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc7 }
     #- { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc7 }
-    #- { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=undefined -lubsan"', addons: *clang38 }
+    #- { env: 'STD=11 CXX=g++-8 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc8 }
+    #- { env: 'STD=11 CXX=g++-8 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc8 }
+    #- { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=undefined"', addons: *clang38 }
     #- { env: 'STD=11 CXX=clang++-5.0', addons: *clang50 }
+    - { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
 
   allow_failures:
     #- { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS=-fsanitize=undefined', addons: *clang38 }
