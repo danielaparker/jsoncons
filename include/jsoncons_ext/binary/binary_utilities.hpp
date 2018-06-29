@@ -313,6 +313,7 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     else
     {
         *endp = first + sizeof(T);
+        std::cout << "JSONCONS_BINARY_TO_BE32" << std::endl;
         return JSONCONS_BINARY_TO_BE32(*reinterpret_cast<const uint32_t*>(first));        
         //T val;
         //std::memcpy(&val,first,sizeof(T));
@@ -332,9 +333,11 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     else
     {
         *endp = first + sizeof(T);
-        T val;
-        std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_BINARY_TO_BE64(val);
+        std::cout << "JSONCONS_BINARY_TO_BE64" << std::endl;
+        return JSONCONS_BINARY_TO_BE64(*reinterpret_cast<const uint64_t*>(first));        
+        //T val;
+        //std::memcpy(&val,first,sizeof(T));
+        //return JSONCONS_BINARY_TO_BE64(val);
     }
 }
 
