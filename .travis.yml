@@ -58,11 +58,11 @@ before_install:
 
 matrix:
   include:
-    - { env: 'STD=11 CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc6 }
+    - { env: 'STD=11 CC=gcc-6 CXX=g++-6 CMAKEFLAGS="-fsanitize=undefined -lubsan"', addons: *gcc6 }
     #- { env: 'STD=11 CC=gcc-6 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
     - { env: 'STD=11 CC=gcc-7 CXX=g++-7 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc7 }
     #- { env: 'STD=11 CC=gcc-7 CXX=g++-7 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc7 }
-    #- { env: 'STD=11 CC=clang-3.8 CXX=clang++-3.8 CMAKEFLAGS=-fsanitize=undefined', addons: *clang38 }
+    #- { env: 'STD=11 CC=clang-3.8 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=undefined -lubsan"', addons: *clang38 }
     #- { env: 'STD=11 CC=clang-5.0 CXX=clang++-5.0', addons: *clang50 }
 
   allow_failures:
