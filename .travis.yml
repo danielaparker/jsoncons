@@ -3,10 +3,10 @@ dist: trusty
 sudo: required
 
 addon_shortcuts:
-  #xcode64: &xcode64
-  #  apt:
-  #    packages:
-  #      - libboost-all-dev
+  xcode64: &xcode64
+    apt:
+      packages:
+        - libboost-all-dev
 
   clang38: &clang38
     apt:
@@ -30,16 +30,16 @@ addon_shortcuts:
         - libc++-dev
         - libboost-all-dev
 
-  #clang60: &clang60
-  #  apt:
-  #    sources:
-  #      - llvm-toolchain-trusty-6.0
-  #      - ubuntu-toolchain-r-test
-  #      - llvm-toolchain-precise
-  #    packages:
-  #      - clang-6.0
-  #      - libc++-dev
-  #      - libboost-all-dev
+  clang60: &clang60
+    apt:
+      sources:
+        - llvm-toolchain-trusty-6.0
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-precise
+      packages:
+        - clang-6.0
+        - libc++-dev
+        - libboost-all-dev
 
   gcc6: &gcc6
     apt:
@@ -87,13 +87,13 @@ matrix:
     - { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=undefined"', addons: *clang38 }
     - { env: 'STD=11 CXX=clang++-5.0', addons: *clang50 }
     - { env: 'STD=11 CXX=clang++-6.0', addons: *clang60 }
-    #- { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
+    - { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
 
   allow_failures:
     - { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=undefined"', addons: *clang38 }
     - { env: 'STD=11 CXX=clang++-5.0', addons: *clang50 }
-    #- { env: 'STD=11 CXX=clang++-6.0', addons: *clang60 }
-    #- { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
+    - { env: 'STD=11 CXX=clang++-6.0', addons: *clang60 }
+    - { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
 
 script:
   - cd tests/build/cmake
