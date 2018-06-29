@@ -32,7 +32,6 @@ addon_shortcuts:
       packages:
         - g++-6
         - libboost-all-dev
-        - libubsan0-dbg
 
   gcc7: &gcc7
     apt:
@@ -41,7 +40,6 @@ addon_shortcuts:
       packages:
         - g++-7
         - libboost-all-dev
-        - libubsan0
 
 addons:
   apt:
@@ -56,9 +54,9 @@ before_install:
 
 matrix:
   include:
-    - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS="-fsanitize=address,memory,leak,undefined"', addons: *gcc6 }
+    - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc6 }
     - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
-    - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-fsanitize=address,memory,leak,undefined', addons: *gcc7 }
+    - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-fsanitize=undefined', addons: *gcc7 }
     #- { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc7 }
     #- { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=undefined -lubsan"', addons: *clang38 }
     #- { env: 'STD=11 CXX=clang++-5.0', addons: *clang50 }
