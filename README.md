@@ -28,6 +28,8 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - [FAQ](doc/FAQ.md)
 - [Reference](doc/Home.md)
 
+As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
+
 ## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
@@ -37,8 +39,6 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
 
 - [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
-
-As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
 ## Extensions
 
