@@ -2700,25 +2700,7 @@ private:
         if (!overflow)
         {
             handler_.integer_value(n, *this);
-
-            switch (parent())
-            {
-            case parse_state::array:
-            case parse_state::object:
-                state_ = parse_state::expect_comma_or_end;
-                break;
-            case parse_state::root:
-                state_ = parse_state::done;
-                handler_.end_json();
-                break;
-            default:
-                if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
-                {
-                    ec = json_parser_errc::invalid_json_text;
-                    return;
-                }
-                break;
-            }
+            after_value(ec);
         }
         else
         {
@@ -2757,25 +2739,7 @@ private:
         if (!overflow)
         {
             handler_.uinteger_value(n, *this);
-
-            switch (parent())
-            {
-            case parse_state::array:
-            case parse_state::object:
-                state_ = parse_state::expect_comma_or_end;
-                break;
-            case parse_state::root:
-                state_ = parse_state::done;
-                handler_.end_json();
-                break;
-            default:
-                if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
-                {
-                    ec = json_parser_errc::invalid_json_text;
-                    return;
-                }
-                break;
-            }
+            after_value(ec);
         }
         else
         {
@@ -2810,24 +2774,7 @@ private:
             handler_.null_value(*this); // recovery
         }
 
-        switch (parent())
-        {
-        case parse_state::array:
-        case parse_state::object:
-            state_ = parse_state::expect_comma_or_end;
-            break;
-        case parse_state::root:
-            state_ = parse_state::done;
-            handler_.end_json();
-            break;
-        default:
-            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
-            {
-                ec = json_parser_errc::invalid_json_text;
-                return;
-            }
-            break;
-        }
+        after_value(ec);
     }
 
     void append_codepoint(int c, std::error_code& ec)
@@ -2911,6 +2858,28 @@ private:
             state_ = parse_state::expect_value;
             break;
         case parse_state::root:
+            break;
+        default:
+            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            {
+                ec = json_parser_errc::invalid_json_text;
+                return;
+            }
+            break;
+        }
+    }
+
+    void after_value(std::error_code& ec) 
+    {
+        switch (parent())
+        {
+        case parse_state::array:
+        case parse_state::object:
+            state_ = parse_state::expect_comma_or_end;
+            break;
+        case parse_state::root:
+            state_ = parse_state::done;
+            handler_.end_json();
             break;
         default:
             if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
