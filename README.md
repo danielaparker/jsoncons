@@ -24,9 +24,9 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 
 ## How to use it
 
-- [Quick guide](http://danielaparker.github.io/jsoncons). 
-- [FAQ](doc/FAQ.md).
-- [Reference](doc/Home.md). 
+- [Quick guide](http://danielaparker.github.io/jsoncons)
+- [FAQ](doc/FAQ.md)
+- [Reference](doc/Home.md)
 
 ## Benchmarks
 
