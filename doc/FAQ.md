@@ -439,6 +439,7 @@ double sale_price = j.get_with_default("sale_price", 22.0); // returns 22.0
  
 #### How do I query a value in a hierarchy of JSON objects?
 
+```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
@@ -481,6 +482,7 @@ int main()
         std::cout << "(5) " << result5[0].as<std::string>() << std::endl;
     }
 }
+```
  
 <div id="A6"/>
 
