@@ -1,3 +1,5 @@
+# JSONCONS
+
 jsoncons is a C++, header-only library for constructing [JSON](http://www.json.org) and JSON-like
 data formats (e.g. CBOR). It supports 
 
@@ -14,7 +16,19 @@ It is distributed under the [Boost Software License](http://www.boost.org/users/
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
 
-### Benchmarks
+## Get jsoncons
+
+Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
+
+Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
+
+## How to use it
+
+- [Quick guide](http://danielaparker.github.io/jsoncons). 
+- [FAQ](doc/FAQ.md).
+- [Reference](doc/Home.md). 
+
+## Benchmarks
 
 [json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
 
@@ -24,21 +38,9 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 
 - [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
 
-### Get jsoncons
-
-Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
-
-Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
-
-### How to use it
-
-- For a quick guide, see [jsoncons: a C++ library for json construction](http://danielaparker.github.io/jsoncons). 
-- For answers to basic questions, see the [FAQ](doc/FAQ.md).
-- For the details, see the [documentation](doc/Home.md). 
-
 As the `jsoncons` library has evolved, names have sometimes changed. To ease transition, jsoncons deprecates the old names but continues to support many of them. See the [deprecated list](doc/ref/deprecated.md) for the status of old names. The deprecated names can be suppressed by defining macro `JSONCONS_NO_DEPRECATED`, which is recommended for new code.
 
-### Extensions
+## Extensions
 
 - [jsonpointer](doc/ref/jsonpointer/jsonpointer.md) implements the IETF standard [JavaScript Object Notation (JSON) Pointer](https://tools.ietf.org/html/rfc6901)
 - [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
@@ -49,7 +51,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
-### A simple program using jsoncons
+## A simple program using jsoncons
 
 ```c++
 #include <iostream>
@@ -120,7 +122,7 @@ Output:
 (3) Dimension 2 = 0.0
 ```
 
-### About jsoncons::basic_json
+## About jsoncons::basic_json
 
 The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different 
 character types, different policies for ordering name-value pairs, etc. A `basic_json` provides an unpacked representation 
@@ -141,7 +143,7 @@ The library includes four instantiations of `basic_json`:
 
 - [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
 
-#### Convert unpacked json values to standard library types and back
+### Convert unpacked json values to standard library types and back
 
 ```c++
 std::vector<int> v{1, 2, 3, 4};
@@ -163,7 +165,7 @@ Output:
 
 See [json_type_traits](doc/ref/json_type_traits.md)
 
-#### Convert unpacked `json` values to user defined types and back (also standard library containers of user defined types)
+### Convert unpacked `json` values to user defined types and back (also standard library containers of user defined types)
 
 ```c++
     struct book
@@ -194,7 +196,7 @@ See [json_type_traits](doc/ref/json_type_traits.md)
 
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
-#### Convert JSON formatted text to C++ objects, and back
+### Convert JSON formatted text to C++ objects, and back
 
 The functions `decode_json` and `encode_json` convert JSON 
 formatted strings to C++ objects and back. These functions attempt to 
@@ -250,7 +252,7 @@ John Smith: Software Engineer
 
 See [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
 
-#### Dump json fragments into a larger document
+### Dump json fragments into a larger document
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -330,7 +332,7 @@ Output:
 ]
 ```
 
-### Building the test suite and examples with CMake
+## Building the test suite and examples with CMake
 
 [CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
 ```
@@ -345,7 +347,7 @@ Instructions for building the examples with CMake may be found in
 
     jsoncons/examples/build/cmake/README.txt
 
-### Acknowledgements
+## Acknowledgements
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
 
