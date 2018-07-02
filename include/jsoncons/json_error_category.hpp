@@ -97,7 +97,7 @@ public:
         case json_parser_errc::invalid_number:
             return "Invalid number";
         case json_parser_errc::expected_comma_or_right_brace:
-            return "Expected comma or right brace ']'";
+            return "Expected comma or right brace '}'";
         case json_parser_errc::expected_comma_or_right_bracket:
             return "Expected comma or right bracket ']'";
         case json_parser_errc::unexpected_right_brace:
