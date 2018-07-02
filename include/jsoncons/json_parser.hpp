@@ -150,7 +150,6 @@ class basic_json_parser : private serializing_context
     std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
     std::basic_string<char,std::char_traits<char>,numeral_allocator_type> number_buffer_;
 
-    bool is_negative_;
     uint8_t precision_;
     uint8_t decimal_places_;
 
@@ -180,7 +179,6 @@ public:
          err_handler_(default_err_handler_),
          cp_(0),
          cp2_(0),
-         is_negative_(false),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
@@ -205,7 +203,6 @@ public:
          err_handler_(err_handler),
          cp_(0),
          cp2_(0),
-         is_negative_(false),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
@@ -230,7 +227,6 @@ public:
          err_handler_(default_err_handler_),
          cp_(0),
          cp2_(0),
-         is_negative_(false),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
@@ -256,7 +252,6 @@ public:
          err_handler_(err_handler),
          cp_(0),
          cp2_(0),
-         is_negative_(false),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
@@ -281,7 +276,6 @@ public:
          err_handler_(default_err_handler_),
          cp_(0),
          cp2_(0),
-         is_negative_(false),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
@@ -307,7 +301,6 @@ public:
          err_handler_(err_handler),
          cp_(0),
          cp2_(0),
-         is_negative_(false),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
@@ -334,7 +327,6 @@ public:
          err_handler_(default_err_handler_),
          cp_(0),
          cp2_(0),
-         is_negative_(false),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
@@ -362,7 +354,6 @@ public:
          err_handler_(err_handler),
          cp_(0),
          cp2_(0),
-         is_negative_(false),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
@@ -676,7 +667,7 @@ public:
                             break;
                         case '-':
                             number_buffer_.clear();
-                            is_negative_ = true;
+                            number_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
                             ++column_;
@@ -686,7 +677,6 @@ public:
                             break;
                         case '0': 
                             number_buffer_.clear();
-                            is_negative_ = false;
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             state_ = parse_state::zero;
@@ -697,7 +687,6 @@ public:
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             number_buffer_.clear();
-                            is_negative_ = false;
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1053,7 +1042,7 @@ public:
                             break;
                         case '-':
                             number_buffer_.clear();
-                            is_negative_ = true;
+                            number_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
                             ++column_;
@@ -1063,7 +1052,6 @@ public:
                             break;
                         case '0': 
                             number_buffer_.clear();
-                            is_negative_ = false;
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1074,7 +1062,6 @@ public:
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             number_buffer_.clear();
-                            is_negative_ = false;
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1197,7 +1184,7 @@ public:
                             break;
                         case '-':
                             number_buffer_.clear();
-                            is_negative_ = true;
+                            number_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
                             ++column_;
@@ -1207,7 +1194,6 @@ public:
                             break;
                         case '0': 
                             number_buffer_.clear();
-                            is_negative_ = false;
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1218,7 +1204,6 @@ public:
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             number_buffer_.clear();
-                            is_negative_ = false;
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1750,13 +1735,11 @@ zero:
                 return;
             case '.':
                 decimal_places_ = 0; 
-                JSONCONS_ASSERT(precision_ == number_buffer_.length());
                 number_buffer_.push_back(to_double_.get_decimal_point());
                 ++input_ptr_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
-                JSONCONS_ASSERT(precision_ == number_buffer_.length());
                 number_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
@@ -1841,13 +1824,11 @@ integer:
                 goto integer;
             case '.':
                 decimal_places_ = 0; 
-                JSONCONS_ASSERT(precision_ == number_buffer_.length());
                 number_buffer_.push_back(to_double_.get_decimal_point());
                 ++input_ptr_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
-                JSONCONS_ASSERT(precision_ == number_buffer_.length());
                 number_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
@@ -2659,7 +2640,7 @@ private:
 
     void end_integer_value(std::error_code& ec)
     {
-        if (is_negative_)
+        if (number_buffer_[0] == '-')
         {
             end_negative_value(ec);
         }
@@ -2671,35 +2652,10 @@ private:
 
     void end_negative_value(std::error_code& ec)
     {
-        static const int64_t min_value = (std::numeric_limits<int64_t>::min)();
-        static const int64_t min_value_div_10 = min_value / 10;
-
-        const char* s = number_buffer_.data();
-        size_t length = number_buffer_.length();
-        int64_t n = 0;
-        bool overflow = false;
-        const char* end = s + length; 
-        for (; s < end; ++s)
+        jsoncons::detail::to_integer_result result = jsoncons::detail::to_integer(number_buffer_.data(), number_buffer_.length());
+        if (!result.overflow)
         {
-            int64_t x = *s - '0';
-            if (n < min_value_div_10)
-            {
-                overflow = true;
-                break;
-            }
-            n = n * 10;
-            if (n < min_value + x)
-            {
-                overflow = true;
-                break;
-            }
-
-            n -= x;
-        }        
-
-        if (!overflow)
-        {
-            handler_.integer_value(n, *this);
+            handler_.integer_value(result.value, *this);
             after_value(ec);
         }
         else
@@ -2710,35 +2666,10 @@ private:
 
     void end_positive_value(std::error_code& ec)
     {
-        static const uint64_t max_value = (std::numeric_limits<uint64_t>::max)();
-        static const uint64_t max_value_div_10 = max_value / 10;
-        uint64_t n = 0;
-        bool overflow = false;
-        const char* s = number_buffer_.data();
-        size_t length = number_buffer_.length();
-
-        const char* end = s + length; 
-        for (; s < end; ++s)
+        jsoncons::detail::to_uinteger_result result = jsoncons::detail::to_uinteger(number_buffer_.data(), number_buffer_.length());
+        if (!result.overflow)
         {
-            uint64_t x = *s - '0';
-            if (n > max_value_div_10)
-            {
-                overflow = true;
-                break;
-            }
-            n = n * 10;
-            if (n > max_value - x)
-            {
-                overflow = true;
-                break;
-            }
-
-            n += x;
-        }
-
-        if (!overflow)
-        {
-            handler_.uinteger_value(n, *this);
+            handler_.uinteger_value(result.value, *this);
             after_value(ec);
         }
         else
@@ -2752,8 +2683,6 @@ private:
         try
         {
             double d = to_double_(number_buffer_.c_str(), number_buffer_.length());
-            if (is_negative_)
-                d = -d;
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
