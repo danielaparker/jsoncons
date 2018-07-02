@@ -116,7 +116,7 @@ try
 {
     json_serializing_options options;
     options.max_nesting_depth(20);
-    json::parse(s, options);
+    json j = json::parse(s, options);
 }
 catch (const parse_error& e)
 {
