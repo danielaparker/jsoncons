@@ -8,8 +8,8 @@ It provides functions for search and "search and replace" using JsonPath express
 
 [json_replace](json_replace.md)
 
-The [Jayway JsonPath Evaluator](https://jsonpath.herokuapp.com/)
-is a good online evaluator for checking JsonPath expressions.
+The [Jayway JsonPath Evaluator](https://jsonpath.herokuapp.com/) and [JSONPATH Expression Tester](https://jsonpath.curiousconcept.com/)
+are good online evaluators for checking JsonPath expressions.
     
 ### Stefan Goessner's JsonPath
 
