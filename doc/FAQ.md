@@ -28,14 +28,14 @@
 [How can I iterate over a json array?](#D1)  
 [How can I iterate over a json object?](#D2)  
 
-[Getters](#E1)
+### Getters
 
 [Is there a way to use `string_view` to access the actual memory that's being used to hold a string?](#E1)  
 [I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double.](#E2)  
 [I want to look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E3)  
 [How do I retrieve a value in a hierarchy of JSON objects?](#E4)  
 
-[Search and Replace](#F1)
+### Search and Replace
 
 [Is there a way to search for and repace an object member key?](#F1)  
 [Is there a way to search for and replace a value?](#F2)  
