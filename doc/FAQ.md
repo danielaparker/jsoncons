@@ -412,8 +412,9 @@ Use `as_string_view()`, e.g.
 json j = json::parse("\"Hello World\"");
 auto sv = j.as_string_view();
 ```
-`sv` supports the member functions of `std::string_view`, including `data()` and `size()`. If your compiler supports
-`std::string_view` and `JSONCONS_HAS_STRING_VIEW` is defined, `sv` is a `std::string_view`.
+`sv` supports the member functions of `std::string_view`, including `data()` and `size()`. 
+If your compiler supports `std::string_view` and `JSONCONS_HAS_STRING_VIEW` is defined, 
+`sv` is a `std::string_view`.
 ```
 
 #### I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double. 
