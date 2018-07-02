@@ -1,20 +1,27 @@
 ## FAQ
 
-[Deserializing](#A1)
+### Deserializing
 
-[Serializing](#A2)
+[How can I parse JSON from a string?](A1)
+[How can I parse JSON from a file?](A2)
+[How can I validate JSON without incurring parse exceptions?](A3)
+[What if I want to allow comments? What if I don't?](A4)
+[Can I set a maximum nesting depth?](A5)
+[Is there any way to prevent the alphabetic sort of the outputted JSON? Is there a way of retaining the original insertion order?](A6)
 
-[Constructing](#A3)
+[Serializing](#B1)
 
-[Iterating](#A4)
+[Constructing](#C1)
 
-[Getters](#A5)
+[Iterating](#D1)
 
-[Search and Replace](#A6)
+[Getters](#E1)
 
-<div id="A1"/> 
+[Search and Replace](#F1)
 
 ### Deserializing
+
+<div id="A1"/> 
 
 #### How can I parse JSON from a string?
 
@@ -37,6 +44,8 @@ json j = R"(
 )"_json;
 ```
 
+<div id="A2"/> 
+
 #### How can I parse JSON from a file?
 
 ```
@@ -44,6 +53,8 @@ std::ifstream is("myfile.json");
 
 json j = json::parse(is);
 ```
+
+<div id="A3"/> 
 
 #### How can I validate JSON without incurring parse exceptions?
 ```c++
@@ -71,6 +82,8 @@ Output:
 ```
 Expected name separator ':' on line 4 and column 20
 ```
+
+<div id="A4"/> 
 
 #### What if I want to allow comments? What if I don't?
 
@@ -107,6 +120,8 @@ Output:
 (2) Illegal comment at line 3 and column 10
 ```
 
+<div id="A5"/> 
+
 #### Can I set a maximum nesting depth?
 
 Yes, like this,
@@ -127,6 +142,8 @@ Output:
 ```
 Maximum JSON depth exceeded at line 1 and column 21
 ```
+
+<div id="A6"/> 
 
 #### Is there any way to prevent the alphabetic sort of the outputted JSON? Is there a way of retaining the original insertion order?
 
@@ -180,7 +197,7 @@ Output:
 }
 ```
 
-<div id="A2"/>
+<div id="B1"/>
 
 ### Serializing
 
@@ -225,7 +242,7 @@ std::cout << print(j, options) << std::endl; // compressed
 std::cout << pretty_print(j, options) << std::endl; // pretty print
 ```
 
-<div id="A3"/>
+<div id="C1"/>
 
 ### Constructing
 
@@ -369,7 +386,7 @@ Output:
 }
 ```
 
-<div id="A4"/>
+<div id="D1"/>
 
 ### Iterating
 
@@ -400,7 +417,7 @@ for (const auto& member : j.object_range())
 }
 ```
 
-<div id="A5"/>
+<div id="E1"/>
 
 ### Getters
 
@@ -484,7 +501,7 @@ int main()
 }
 ```
  
-<div id="A6"/>
+<div id="F1"/>
 
 ### Search and Replace
 
