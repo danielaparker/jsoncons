@@ -1,19 +1,19 @@
 ### jsonpath extension
 
-The jsonpath extension implements [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/).  
+The jsonpath extension implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).  
 
-It provides functions for search and "search and replace" using JsonPath expressions:
+It provides functions for search and "search and replace" using JSONPath expressions:
 
 [json_query](json_query.md)
 
 [json_replace](json_replace.md)
 
-The [Jayway JsonPath Evaluator](https://jsonpath.herokuapp.com/) and [JSONPATH Expression Tester](https://jsonpath.curiousconcept.com/)
-are good online evaluators for checking JsonPath expressions.
+The [Jayway JSONPath Evaluator](https://jsonpath.herokuapp.com/) and [JSONPATH Expression Tester](https://jsonpath.curiousconcept.com/)
+are good online evaluators for checking JSONPath expressions.
     
-### Stefan Goessner's JsonPath
+### Stefan Goessner's JSONPath
 
-[JsonPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
+[JSONPath](http://goessner.net/articles/JsonPath/) is a creation of Stefan Goessner. JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
 
 Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
 
@@ -54,7 +54,7 @@ JSONPath|       Description
 
 ### jsoncons filter expressions
 
-[Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
+[Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
 
 Operator|       Description
 --------|--------------------------------
@@ -103,7 +103,7 @@ max()|Provides the maximum value of an array of numbers|double|$.store.book[?(@.
 
 ### Examples
 
-The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (booklist.json).
+The examples below use the JSON text from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) (booklist.json).
 
 ```json
 { "store": {

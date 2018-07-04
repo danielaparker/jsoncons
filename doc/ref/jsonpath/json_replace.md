@@ -1,6 +1,6 @@
 ### jsoncons::jsonpath::json_replace
 
-Searches for all values that match a JsonPath expression and replaces them with the specified value
+Searches for all values that match a JSONPath expression and replaces them with the specified value
 
 #### Header
 ```c++

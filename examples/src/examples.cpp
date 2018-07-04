@@ -464,7 +464,7 @@ void get_example()
     std::string result3 = jsonpointer::get(j, "/reputons/0/rated").as<std::string>();
     std::cout << "(3) " << result3 << std::endl;
 
-    // Using JsonPath
+    // Using JSONPath
     json result4 = jsonpath::json_query(j, "$.reputons.0.rated");
     if (result4.size() > 0)
     {

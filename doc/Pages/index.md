@@ -14,7 +14,7 @@
 
 [Filters](#A7)
 
-[JsonPath](#A8)
+[JSONPath](#A8)
 
 [About jsoncons::json](#A9)
 
@@ -524,9 +524,9 @@ Output:
 ```
 Or define and use your own filters. See [json_filter](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_filter.md) for details.
 <div id="A8"/>
-### JsonPath
+### JSONPath
 
-[Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
+[Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
 
 Example JSON file (booklist.json):
 ```json
@@ -558,7 +558,7 @@ Example JSON file (booklist.json):
   }
 }
 ```
-JsonPath examples:
+JSONPath examples:
 ```c++    
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 

@@ -138,7 +138,7 @@ void basics_json_example2()
     json booklist;
     is >> booklist;
 
-    // Use a JsonPath expression to find 
+    // Use a JSONPath expression to find 
       
     // (1) The authors of books that cost less than $12
     json result = json_query(booklist, "$[*][?(@.price < 12)].author");
@@ -291,7 +291,7 @@ void basics_wjson_example2()
     wjson booklist;
     is >> booklist;
 
-    // Use a JsonPath expression to find 
+    // Use a JSONPath expression to find 
     //  
     // (1) The authors of books that cost less than $12
     wjson result = json_query(booklist, L"$[*][?(@.price < 12)].author");

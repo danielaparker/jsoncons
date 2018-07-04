@@ -37,7 +37,7 @@ Returns an empty array if there is no match.
 
 ### Store examples
 
-The examples below use the JSON text from [Stefan Goessner's JsonPath](http://goessner.net/articles/JsonPath/) (booklist.json).
+The examples below use the JSON text from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) (booklist.json).
 
 ```json
 { "store": {
