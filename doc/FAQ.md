@@ -272,6 +272,8 @@ std::cout << pretty_print(j, options) << std::endl; // pretty print
 
 #### How can I replace the representation of NaN, Inf and -Inf when serializing? And when reading in again?
 
+Set the serializing options for `nan_replacement`, `pos_inf_replacement` and `neg_inf_replacement` to distinct string values.
+
 ```c++
 json j;
 j["field1"] = std::sqrt(-1.0);
