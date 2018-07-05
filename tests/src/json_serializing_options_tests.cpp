@@ -35,37 +35,39 @@ BOOST_AUTO_TEST_CASE(test_default_nan_replacement)
 
 BOOST_AUTO_TEST_CASE(test_write_nan_replacement)
 {
-    json obj;
-    obj["field1"] = std::sqrt(-1.0);
-    obj["field2"] = 1.79e308 * 1000;
-    obj["field3"] = -1.79e308 * 1000;
+    json j;
+    j["field1"] = std::sqrt(-1.0);
+    j["field2"] = 1.79e308 * 1000;
+    j["field3"] = -1.79e308 * 1000;
 
     json_serializing_options options;
-    options.nan_replacement("null");
-    options.pos_inf_replacement("1e9999");
-    options.neg_inf_replacement("-1e9999");
+    options.nan_replacement("null")
+           .pos_inf_replacement("1e9999")
+           .neg_inf_replacement("-1e9999");
 
     std::ostringstream os;
-    os << print(obj, options);
+    os << print(j, options);
     std::string expected = R"({"field1":null,"field2":1e9999,"field3":-1e9999})";
 
     BOOST_CHECK_EQUAL(expected,os.str());
 }
 
-BOOST_AUTO_TEST_CASE(test_read_nan_replacement)
+BOOST_AUTO_TEST_CASE(test_read_write_read_nan_replacement)
 {
-    std::string s = R"({"field1":"NaN","field2":"PositiveInfinity","field3":"NegativeInfinity"})";
+    json j;
+    j["field1"] = std::sqrt(-1.0);
+    j["field2"] = 1.79e308 * 1000;
+    j["field3"] = -1.79e308 * 1000;
 
     json_serializing_options options;
-    options.nan_replacement("\"NaN\"");
-    options.pos_inf_replacement("\"PositiveInfinity\"");
-    options.neg_inf_replacement("\"NegativeInfinity\"");
+    options.nan_replacement("\"NaN\"")
+           .pos_inf_replacement("\"Inf\"")
+           .neg_inf_replacement("\"-Inf\"");
 
-    json j = json::parse(s,options);
+    std::ostringstream os;
+    os << pretty_print(j, options);
 
-    std::cout << "\n(1)\n" << pretty_print(j) << std::endl;
-
-    std::cout << "\n(2)\n" << pretty_print(j,options) << std::endl;
+    json j2 = json::parse(os.str(),options);
 
     json expected;
     expected["field1"] = std::nan("");

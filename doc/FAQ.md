@@ -14,6 +14,7 @@
 [How can I serialize a json value to a string?](#B1)  
 [How can I serialize a json value to a stream?](#B2)  
 [How can I escape all non-ascii characters?](#B3)  
+[How can I replace the representation of NaN, Inf and -Inf when serializing? And when reading in again?](#B4)
 
 ### Constructing
 
@@ -265,6 +266,56 @@ or
 std::cout << print(j, options) << std::endl; // compressed
 
 std::cout << pretty_print(j, options) << std::endl; // pretty print
+```
+
+<div id="B4"/>
+
+#### How can I replace the representation of NaN, Inf and -Inf when serializing? And when reading in again?
+
+```c++
+json j;
+j["field1"] = std::sqrt(-1.0);
+j["field2"] = 1.79e308 * 1000;
+j["field3"] = -1.79e308 * 1000;
+
+json_serializing_options options;
+options.nan_replacement("\"NaN\"")
+       .pos_inf_replacement("\"Inf\"")
+       .neg_inf_replacement("\"-Inf\""); // defaults are null
+
+std::ostringstream os;
+os << pretty_print(j, options);
+
+std::cout << "(1)\n" << os.str() << std::endl;
+
+json j2 = json::parse(os.str(),options);
+
+std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
+std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
+std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
+
+std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
+```
+
+Output:
+```json
+(1)
+{
+    "field1": "NaN",
+    "field2": "Inf",
+    "field3": "-Inf"
+}
+
+(2) nan
+(3) inf
+(4) -inf
+
+(5)
+{
+    "field1": "NaN",
+    "field2": "Inf",
+    "field3": "-Inf"
+}
 ```
 
 ### Constructing

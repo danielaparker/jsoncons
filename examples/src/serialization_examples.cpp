@@ -311,6 +311,32 @@ void dump_json_fragments()
     serializer.end_json();
 }
 
+void nan_inf_replacement()
+{
+    json j;
+    j["field1"] = std::sqrt(-1.0);
+    j["field2"] = 1.79e308 * 1000;
+    j["field3"] = -1.79e308 * 1000;
+
+    json_serializing_options options;
+    options.nan_replacement("\"NaN\"")
+           .pos_inf_replacement("\"Inf\"")
+           .neg_inf_replacement("\"-Inf\"");
+
+    std::ostringstream os;
+    os << pretty_print(j, options);
+
+    std::cout << "(1)\n" << os.str() << std::endl;
+
+    json j2 = json::parse(os.str(),options);
+
+    std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
+    std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
+    std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
+
+    std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
+}
+
 void serialization_examples()
 {
     std::cout << "\nSerialization examples\n\n";
@@ -319,6 +345,7 @@ void serialization_examples()
     serialization_example3();
     serialization_example4();
     dump_json_fragments();
+    nan_inf_replacement();
     std::cout << std::endl;
 }
 
