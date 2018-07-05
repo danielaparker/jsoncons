@@ -32,7 +32,7 @@ NY,LON,TOR;LON
 )";
     csv_serializing_options options;
     options.assume_header(true)
-          .subfield_delimiter(';');
+           .subfield_delimiter(';');
 
     json expected = R"(
 [
@@ -81,7 +81,7 @@ NY,LON,TOR;LON
 )";
     csv_serializing_options options;
     options.mapping(mapping_type::n_rows)
-          .subfield_delimiter(';');
+           .subfield_delimiter(';');
 
     json expected = R"(
 [
@@ -123,8 +123,8 @@ NY,LON,TOR;LON
 )";
     csv_serializing_options options;
     options.assume_header(true)
-          .mapping(mapping_type::m_columns)
-          .subfield_delimiter(';');
+           .mapping(mapping_type::m_columns)
+           .subfield_delimiter(';');
 
     json expected = R"(
 {

@@ -57,7 +57,7 @@ void serialization_example1()
     json_serializing_options options;
 
     options.array_array_split_lines(line_split_kind::new_line)
-          .array_object_split_lines(line_split_kind::new_line);
+           .array_object_split_lines(line_split_kind::new_line);
     std::cout << pretty_print(val,options) << std::endl;
 }
 

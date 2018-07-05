@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(m_columns_test)
     json_decoder<ojson> decoder;
     csv_serializing_options options;
     options.assume_header(true)
-          .mapping(mapping_type::m_columns);
+           .mapping(mapping_type::m_columns);
 
     std::istringstream is(bond_yields);
     csv_reader reader(is, decoder, options);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values)
 
     csv_serializing_options options;
     options.assume_header(true)
-          .column_types("boolean,integer,float,string");
+           .column_types("boolean,integer,float,string");
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -140,8 +140,8 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_defaults)
 
     csv_serializing_options options;
     options.assume_header(true) 
-          .column_types("boolean,integer,float,string")
-          .column_defaults("false,0,0.0,\"\"");
+           .column_types("boolean,integer,float,string")
+           .column_defaults("false,0,0.0,\"\"");
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -190,8 +190,8 @@ BOOST_AUTO_TEST_CASE(csv_test_empty_values_with_empty_defaults)
 
     csv_serializing_options options;
     options.assume_header(true)
-          .column_types("boolean,integer,float,string")
-          .column_defaults(",,,");
+           .column_types("boolean,integer,float,string")
+           .column_defaults(",,,");
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -297,8 +297,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_1col_b)
     json_decoder<json> decoder;
 
     csv_serializing_options options;
-    options.assume_header(false);
-    options.infer_types(false);
+    options.assume_header(false)
+           .infer_types(false);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_leading)
 
     csv_serializing_options options;
     options.assume_header(false)
-          .trim_leading(true);
+           .trim_leading(true);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim_trailing)
 
     csv_serializing_options options;
     options.assume_header(false)
-          .trim_trailing(true);
+           .trim_trailing(true);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -408,8 +408,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_trim)
 
     csv_serializing_options options;
     options.assume_header(false)
-          .trim(true)
-          .unquoted_empty_value_is_null(true);
+           .trim(true)
+           .unquoted_empty_value_is_null(true);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_header)
 
     csv_serializing_options options;
     options.column_names("x,y,z")
-          .header_lines(1);
+           .header_lines(1);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -536,8 +536,8 @@ BOOST_AUTO_TEST_CASE(csv_test1_object_3cols_bool)
 
     csv_serializing_options options;
     options.column_names("x,y,z")
-          .column_types("boolean,boolean,boolean")
-          .header_lines(1);
+           .column_types("boolean,boolean,boolean")
+           .header_lines(1);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -730,7 +730,7 @@ BOOST_AUTO_TEST_CASE(read_comma_delimited_file_header)
 
     csv_serializing_options options;
     options.column_names("Country Code,Name")
-          .header_lines(1);
+           .header_lines(1);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -779,7 +779,7 @@ BOOST_AUTO_TEST_CASE(test_tab_delimited_file)
     json_decoder<json> decoder;
     csv_serializing_options options;
     options.field_delimiter('\t')
-          .assume_header(true);
+           .assume_header(true);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -799,9 +799,9 @@ BOOST_AUTO_TEST_CASE(serialize_tab_delimited_file)
     json_decoder<ojson> decoder;
     csv_serializing_options options;
     options.assume_header(false)
-          .header_lines(1)
-          .column_names("dept,employee-name,employee-no,note,comment,salary")
-          .field_delimiter('\t');
+           .header_lines(1)
+           .column_names("dept,employee-name,employee-no,note,comment,salary")
+           .field_delimiter('\t');
 
     json_reader reader(is,decoder);
     reader.read_next();
@@ -840,7 +840,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped1)
 
     csv_serializing_options options;
     options.assume_header(false)
-          .column_types("integer,[integer]*");
+           .column_types("integer,[integer]*");
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -872,7 +872,7 @@ BOOST_AUTO_TEST_CASE(csv_test1_array_3cols_grouped2)
 
     csv_serializing_options options;
     options.assume_header(false)
-          .column_types("integer,[integer,integer]*");
+           .column_types("integer,[integer,integer]*");
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -988,7 +988,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 
     csv_serializing_options options;
     options.assume_header(true)
-          .ignore_empty_lines(false);
+           .ignore_empty_lines(false);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -1039,7 +1039,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 
     csv_serializing_options options;
     options.assume_header(true)
-          .trim(true);
+           .trim(true);
 
     csv_reader reader(is,decoder,options);
     reader.read();
@@ -1092,9 +1092,9 @@ BOOST_AUTO_TEST_CASE(test_type_inference)
     json_decoder<ojson> decoder;
 
     csv_serializing_options options;
-    options.assume_header(true);
+    options.assume_header(true)
+           .mapping(mapping_type::n_rows);
 
-    options.mapping(mapping_type::n_rows);
     ojson j1 = decode_csv<ojson>(input,options);
     std::cout << "\n(1)\n"<< pretty_print(j1) << "\n";
     //BOOST_CHECK(j1.size() == 4);

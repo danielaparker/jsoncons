@@ -82,9 +82,9 @@ Extra comma at line 1 and column 10
 std::string s = R"({"field1":"NaN","field2":"PositiveInfinity","field3":"NegativeInfinity"})";
 
 json_serializing_options options;
-options.nan_replacement("\"NaN\"");
-options.pos_inf_replacement("\"PositiveInfinity\"");
-options.neg_inf_replacement("\"NegativeInfinity\"");
+options.nan_replacement("\"NaN\"")
+       .pos_inf_replacement("\"PositiveInfinity\"")
+       .neg_inf_replacement("\"NegativeInfinity\"");
 
 json j = json::parse(s,options);
 
