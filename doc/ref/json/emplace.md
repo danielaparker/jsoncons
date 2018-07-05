@@ -5,7 +5,7 @@ template <class... Args>
 array_iterator emplace(Args&&... args);
 
 template <class... Args>
-object_iterator emplace(const_array_iterator pos, Args&&... args);
+array_iterator emplace(const_array_iterator pos, Args&&... args);
 ```
 
 Constructs a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.
