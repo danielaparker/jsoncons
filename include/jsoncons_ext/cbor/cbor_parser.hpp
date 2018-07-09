@@ -1884,13 +1884,21 @@ public:
                 handler_.string_value(basic_string_view<char>(s.data(),s.length()), *this);
             }
             break;
-#if 0
 
             // array (0x00..0x17 data items follow)
         case JSONCONS_CBOR_0x80_0x97:
             {
-                return get_fixed_length_array(*pos & 0x1f);
+                size_t len = (*pos & 0x1f);
+                ++nesting_depth_;
+                handler_.begin_array(len, *this);
+                for (size_t i = 0; i < len; ++i)
+                {
+                    parse_some(ec);
+                }
+                handler_.end_array(*this);
+                --nesting_depth_;
             }
+            break;
 
             // array (one-byte uint8_t for n follows)
         case 0x98:
@@ -1905,8 +1913,16 @@ public:
                 {
                     input_ptr_ = endp;
                 }
-                return get_fixed_length_array(len);
+                ++nesting_depth_;
+                handler_.begin_array(len, *this);
+                for (size_t i = 0; i < len; ++i)
+                {
+                    parse_some(ec);
+                }
+                handler_.end_array(*this);
+                --nesting_depth_;
             }
+            break;
 
             // array (two-byte uint16_t for n follow)
         case 0x99:
@@ -1921,14 +1937,22 @@ public:
                 {
                     input_ptr_ = endp;
                 }
-                return get_fixed_length_array(len);
+                ++nesting_depth_;
+                handler_.begin_array(len, *this);
+                for (size_t i = 0; i < len; ++i)
+                {
+                    parse_some(ec);
+                }
+                handler_.end_array(*this);
+                --nesting_depth_;
             }
+            break;
 
             // array (four-byte uint32_t for n follow)
         case 0x9a:
             {
                 const uint8_t* endp;
-                const auto len = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
                     JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
@@ -1937,14 +1961,22 @@ public:
                 {
                     input_ptr_ = endp;
                 }
-                return get_fixed_length_array(len);
+                ++nesting_depth_;
+                handler_.begin_array(len, *this);
+                for (size_t i = 0; i < len; ++i)
+                {
+                    parse_some(ec);
+                }
+                handler_.end_array(*this);
+                --nesting_depth_;
             }
+            break;
 
             // array (eight-byte uint64_t for n follow)
         case 0x9b:
             {
                 const uint8_t* endp;
-                const auto len = binary::from_big_endian<int64_t>(input_ptr_,end_input_,&endp);
+                const auto len = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
                     JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
@@ -1953,8 +1985,17 @@ public:
                 {
                     input_ptr_ = endp;
                 }
-                return get_fixed_length_array(len);
+                ++nesting_depth_;
+                handler_.begin_array(len, *this);
+                for (size_t i = 0; i < len; ++i)
+                {
+                    parse_some(ec);
+                }
+                handler_.end_array(*this);
+                --nesting_depth_;
             }
+            break;
+#if 0
 
             // array (indefinite length)
         case 0x9f:

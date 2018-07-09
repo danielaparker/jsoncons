@@ -42,7 +42,7 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_scalar)
+BOOST_AUTO_TEST_CASE(test_cbor_parsing)
 {
     // unsigned integer
     check_parsing({0x00},json(0U));
@@ -131,6 +131,14 @@ BOOST_AUTO_TEST_CASE(test_scalar)
     check_parsing({0x7f,0x63,'H','e','l',0x62,'l','o',0xff}, json("Hello"));
     check_parsing({0x7f,0x61,'H',0x61,'e',0x61,'l',0x61,'l',0x61,'o',0xff}, json("Hello"));
     check_parsing({0x7f,0x61,'H',0x61,'e',0x61,'l',0x60,0x61,'l',0x61,'o',0xff}, json("Hello"));
+
+    // arrays
+    check_parsing({0x80},json::array());
+    check_parsing({0x81,'\0'},json::parse("[0]"));
+    check_parsing({0x82,'\0','\0'},json::array({0,0}));
+    check_parsing({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
+    check_parsing({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()
