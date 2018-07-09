@@ -28,7 +28,6 @@ void check_decode(const std::vector<uint8_t>& v, const json& expected)
     {
         json result = decode_cbor<json>(v);
         BOOST_REQUIRE_MESSAGE(expected == result, expected.to_string());
-        BOOST_REQUIRE_MESSAGE(expected == result, expected.to_string());
     }
     catch (const std::exception& e)
     {

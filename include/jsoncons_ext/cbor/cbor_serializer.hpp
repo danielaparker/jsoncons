@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBORENCODER_HPP
-#define JSONCONS_CBOR_CBORENCODER_HPP
+#ifndef JSONCONS_CBOR_CBORSERIALIZER_HPP
+#define JSONCONS_CBOR_CBORSERIALIZER_HPP
 
 #include <string>
 #include <sstream>
