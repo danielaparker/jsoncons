@@ -168,21 +168,33 @@ public:
 
     void resize(size_t n, const Json& val) {elements_.resize(n,val);}
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     void remove_range(size_t from_index, size_t to_index) 
     {
         JSONCONS_ASSERT(from_index <= to_index);
         JSONCONS_ASSERT(to_index <= elements_.size());
         elements_.erase(elements_.cbegin()+from_index,elements_.cbegin()+to_index);
     }
-
+#endif
     void erase(const_iterator pos) 
     {
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+        iterator it = elements_.begin() + (pos - elements_.begin());
+        elements_.erase(it);
+#else
         elements_.erase(pos);
+#endif
     }
 
     void erase(const_iterator first, const_iterator last) 
     {
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+        iterator it1 = elements_.begin() + (first - elements_.begin());
+        iterator it2 = elements_.begin() + (last - elements_.begin());
+        elements_.erase(it1,it2);
+#else
         elements_.erase(first,last);
+#endif
     }
 
     Json& operator[](size_t i) {return elements_[i];}
