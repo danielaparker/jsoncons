@@ -41,6 +41,14 @@ addon_shortcuts:
         - libc++-dev
         - libboost-all-dev
 
+  gcc48: &gcc48
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-4.8
+        - libboost-all-dev
+
   gcc6: &gcc6
     apt:
       sources:
@@ -78,6 +86,7 @@ before_install:
 
 matrix:
   include:
+    - { env: 'STD=11 CXX=g++-4.8 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc48 }
     - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc6 }
     - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
     - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-fsanitize=address,memory,undefined,thread,leak', addons: *gcc7 }
