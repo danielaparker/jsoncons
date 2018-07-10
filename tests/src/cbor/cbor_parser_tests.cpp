@@ -139,6 +139,19 @@ BOOST_AUTO_TEST_CASE(test_cbor_parsing)
     check_parsing({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
     check_parsing({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
+    // indefinite length arrays
+    check_parsing({0x9f,0xff},json::array());
+    check_parsing({0x9f,0x9f,0xff,0xff},json::parse("[[]]"));
+
+    // maps
+    check_parsing({0xa0},json::object());
+    check_parsing({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
+    check_parsing({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
+
+    // indefinite length maps
+    check_parsing({0xbf,0xff},json::object());
+    check_parsing({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

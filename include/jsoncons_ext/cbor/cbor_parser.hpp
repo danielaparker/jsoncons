@@ -1728,7 +1728,7 @@ public:
 
 } // namespace detail
 
-class cbor_parser : private serializing_context
+class cbor_parser : public serializing_context
 {
     const uint8_t* begin_input_;
     const uint8_t* end_input_;
@@ -1782,7 +1782,8 @@ public:
                 uint64_t val = detail::get_uinteger(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    JSONCONS_THROW(cbor_decode_error(endp-begin_input_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
                 input_ptr_ = endp;
                 handler_.uinteger_value(val, *this);
@@ -1802,7 +1803,8 @@ public:
                 int64_t val = detail::get_integer(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    JSONCONS_THROW(cbor_decode_error(endp-begin_input_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
                 input_ptr_ = endp;
                 handler_.integer_value(val, *this);
@@ -1834,7 +1836,8 @@ public:
                 double val = detail::get_double(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    JSONCONS_THROW(cbor_decode_error(endp-begin_input_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
                 input_ptr_ = endp;
                 handler_.double_value(val, *this);
@@ -1852,12 +1855,10 @@ public:
                 std::vector<uint8_t> v = detail::get_byte_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-pos));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
-                {
-                    input_ptr_ = endp;
-                }
+                input_ptr_ = endp;
 
                 handler_.byte_string_value(v.data(), v.size(), *this);
             }
@@ -1875,12 +1876,10 @@ public:
                 std::string s = detail::get_text_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-pos));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
-                {
-                    input_ptr_ = endp;
-                }
+                input_ptr_ = endp;
                 handler_.string_value(basic_string_view<char>(s.data(),s.length()), *this);
             }
             break;
@@ -1889,14 +1888,11 @@ public:
         case JSONCONS_CBOR_0x80_0x97:
             {
                 size_t len = (*pos & 0x1f);
-                ++nesting_depth_;
-                handler_.begin_array(len, *this);
-                for (size_t i = 0; i < len; ++i)
+                parse_array(len, ec);
+                if (ec)
                 {
-                    parse_some(ec);
+                    return;
                 }
-                handler_.end_array(*this);
-                --nesting_depth_;
             }
             break;
 
@@ -1907,20 +1903,15 @@ public:
                 const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
+                input_ptr_ = endp;
+                parse_array(len, ec);
+                if (ec)
                 {
-                    input_ptr_ = endp;
+                    return;
                 }
-                ++nesting_depth_;
-                handler_.begin_array(len, *this);
-                for (size_t i = 0; i < len; ++i)
-                {
-                    parse_some(ec);
-                }
-                handler_.end_array(*this);
-                --nesting_depth_;
             }
             break;
 
@@ -1931,20 +1922,15 @@ public:
                 const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
+                input_ptr_ = endp;
+                parse_array(len, ec);
+                if (ec)
                 {
-                    input_ptr_ = endp;
+                    return;
                 }
-                ++nesting_depth_;
-                handler_.begin_array(len, *this);
-                for (size_t i = 0; i < len; ++i)
-                {
-                    parse_some(ec);
-                }
-                handler_.end_array(*this);
-                --nesting_depth_;
             }
             break;
 
@@ -1955,20 +1941,15 @@ public:
                 const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
+                input_ptr_ = endp;
+                parse_array(len, ec);
+                if (ec)
                 {
-                    input_ptr_ = endp;
+                    return;
                 }
-                ++nesting_depth_;
-                handler_.begin_array(len, *this);
-                for (size_t i = 0; i < len; ++i)
-                {
-                    parse_some(ec);
-                }
-                handler_.end_array(*this);
-                --nesting_depth_;
             }
             break;
 
@@ -1979,41 +1960,48 @@ public:
                 const auto len = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
+                input_ptr_ = endp;
+                parse_array(len, ec);
+                if (ec)
                 {
-                    input_ptr_ = endp;
+                    return;
                 }
+            }
+            break;
+
+            // array (indefinite length)
+        case 0x9f:
+            {
                 ++nesting_depth_;
-                handler_.begin_array(len, *this);
-                for (size_t i = 0; i < len; ++i)
+                handler_.begin_array(*this);
+                while (*input_ptr_ != 0xff)
                 {
                     parse_some(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    pos = input_ptr_;
                 }
                 handler_.end_array(*this);
                 --nesting_depth_;
             }
             break;
-#if 0
-
-            // array (indefinite length)
-        case 0x9f:
-            {
-                Json result = typename Json::array();
-                while (*input_ptr_ != 0xff)
-                {
-                    result.push_back(decode());
-                    pos = input_ptr_;
-                }
-                return result;
-            }
 
             // map (0x00..0x17 pairs of data items follow)
         case JSONCONS_CBOR_0xa0_0xb7:
             {
-                return get_fixed_length_map(*pos & 0x1f);
+                size_t len = (*pos & 0x1f);
+                parse_object(len, ec);
+                if (ec)
+                {
+                    return;
+                }
             }
+            break;
 
             // map (one-byte uint8_t for n follows)
         case 0xb8:
@@ -2022,14 +2010,17 @@ public:
                 const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
+                input_ptr_ = endp;
+                parse_object(len, ec);
+                if (ec)
                 {
-                    input_ptr_ = endp;
+                    return;
                 }
-                return get_fixed_length_map(len);
             }
+            break;
 
             // map (two-byte uint16_t for n follow)
         case 0xb9:
@@ -2038,14 +2029,17 @@ public:
                 const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
+                input_ptr_ = endp;
+                parse_object(len, ec);
+                if (ec)
                 {
-                    input_ptr_ = endp;
+                    return;
                 }
-                return get_fixed_length_map(len);
             }
+            break;
 
             // map (four-byte uint32_t for n follow)
         case 0xba:
@@ -2054,14 +2048,17 @@ public:
                 const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
+                input_ptr_ = endp;
+                parse_object(len, ec);
+                if (ec)
                 {
-                    input_ptr_ = endp;
+                    return;
                 }
-                return get_fixed_length_map(len);
             }
+            break;
 
             // map (eight-byte uint64_t for n follow)
         case 0xbb:
@@ -2070,33 +2067,46 @@ public:
                 const auto len = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(end_input_-input_ptr_));
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
                 }
-                else
+                input_ptr_ = endp;
+                parse_object(len, ec);
+                if (ec)
                 {
-                    input_ptr_ = endp;
+                    return;
                 }
-                return get_fixed_length_map(len);
             }
+            break;
 
             // map (indefinite length)
         case 0xbf:
             {
-                Json result = typename Json::object();
+                ++nesting_depth_;
+                handler_.begin_object(*this);
                 while (*input_ptr_ != 0xff)
                 {
-                    auto j = decode();
-                    result.set(j.as_string_view(),decode());
+                    parse_name(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    parse_some(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     pos = input_ptr_;
                 }
-                return result;
+                handler_.end_object(*this);
+                --nesting_depth_;
             }
+            break;
 
-
-#endif
         default:
             {
                 ec = cbor_parser_errc::source_error;
+                return;
             }
         }
         if (nesting_depth_ == 0)
@@ -2105,6 +2115,73 @@ public:
         }
     }
 private:
+    void parse_name(std::error_code& ec)
+    {
+        const uint8_t* pos = input_ptr_++;
+        switch (*pos)
+        {
+            // UTF-8 string (0x00..0x17 bytes follow)
+        case JSONCONS_CBOR_0x60_0x77:
+        case 0x78:
+        case 0x79:
+        case 0x7a:
+        case 0x7b:
+        case 0x7f:
+            {
+                const uint8_t* endp;
+                std::string s = detail::get_text_string(pos,end_input_,&endp);
+                if (endp == pos)
+                {
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
+                }
+                input_ptr_ = endp;
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+            }
+            break;
+        default:
+            ec = cbor_parser_errc::source_error;
+            return;
+        }
+    }
+
+    void parse_array(size_t len, std::error_code& ec)
+    {
+        ++nesting_depth_;
+        handler_.begin_array(len, *this);
+        for (size_t i = 0; i < len; ++i)
+        {
+            parse_some(ec);
+            if (ec)
+            {
+                return;
+            }
+        }
+        handler_.end_array(*this);
+        --nesting_depth_;
+    }
+
+    void parse_object(size_t len, std::error_code& ec)
+    {
+        ++nesting_depth_;
+        handler_.begin_object(len, *this);
+        for (size_t i = 0; i < len; ++i)
+        {
+            parse_name(ec);
+            if (ec)
+            {
+                return;
+            }
+            parse_some(ec);
+            if (ec)
+            {
+                return;
+            }
+        }
+        handler_.end_object(*this);
+        --nesting_depth_;
+    }
+
     size_t do_line_number() const override
     {
         return 1;
