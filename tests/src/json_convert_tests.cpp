@@ -129,6 +129,7 @@ BOOST_AUTO_TEST_CASE(convert_array_test)
     }
 }
 
+#if !defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
 BOOST_AUTO_TEST_CASE(convert_tuple_test)
 {
     typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
@@ -151,6 +152,7 @@ BOOST_AUTO_TEST_CASE(convert_tuple_test)
         std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
     }
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(test_boost_matrix)
 {
