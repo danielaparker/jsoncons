@@ -14,7 +14,7 @@ data formats (e.g. CBOR). It supports
 
 It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. Note that `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
+jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. 
 
 ## Get jsoncons
 
@@ -348,6 +348,18 @@ Instructions for building the test suite with CMake may be found in
 Instructions for building the examples with CMake may be found in
 
     jsoncons/examples/build/cmake/README.txt
+
+## Supported compilers
+
+| Compiler        | Operating System             |Notes
+|-----------------|------------------------------|----------------
+| VS 2015      | Windows 10       |
+| g++-4.8      | Ubuntu           | `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
+| g++-6        | Ubuntu           |
+| g++-7        | Ubuntu           |
+| g++-8        | Ubuntu           |
+| clang-5.0    |
+| clang-6.0    |
 
 ## Acknowledgements
 
