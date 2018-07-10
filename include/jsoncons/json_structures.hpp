@@ -702,12 +702,23 @@ public:
 
     void erase(const_iterator pos) 
     {
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+        iterator it = this->members_.begin() + (pos - this->members_.begin());
+        this->members_.erase(it);
+#else
         this->members_.erase(pos);
+#endif
     }
 
     void erase(const_iterator first, const_iterator last) 
     {
+#if defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+        iterator it1 = this->members_.begin() + (first - this->members_.begin());
+        iterator it2 = this->members_.begin() + (last - this->members_.begin());
+        this->members_.erase(it1,it2);
+#else
         this->members_.erase(first,last);
+#endif
     }
 
     void erase(const string_view_type& name) 
