@@ -7,7 +7,7 @@
 [How can I validate JSON without incurring parse exceptions?](#A3)  
 [What if I want to allow comments? What if I don't?](#A4)  
 [Can I set a maximum nesting depth?](#A5)  
-[Is there any way to prevent the alphabetic sort of the outputted JSON? Is there a way of retaining the original insertion order?](#A6)  
+[Is there any way to prevent the alphabetic sort of the outputted JSON? Retaining the original insertion order?](#A6)  
 
 ### Serializing
 
@@ -167,7 +167,7 @@ Maximum JSON depth exceeded at line 1 and column 21
 
 <div id="A6"/> 
 
-#### Is there any way to prevent the alphabetic sort of the outputted JSON? Is there a way of retaining the original insertion order?
+#### Is there any way to prevent the alphabetic sort of the outputted JSON? Retaining the original insertion order?
 
 Yes. Use `ojson` instead of `json` (or `wojson` instead of `wjson`) to retain the original insertion order. 
 
