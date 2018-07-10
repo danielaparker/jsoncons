@@ -1,4 +1,4 @@
-master
+v0.106.0
 --------
 
 Changes
