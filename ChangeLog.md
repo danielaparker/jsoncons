@@ -18,6 +18,10 @@ Warning fix:
 - Use memcpy in place of reinterpret_cast in binary data format utility 
   `from_big_endian`
 
+Compiler fix:
+
+- Fixed issues with g++ 4.8
+
 v0.105.0
 --------
 

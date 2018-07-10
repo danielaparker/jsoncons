@@ -48,3 +48,5 @@ in string_view code.
 Vojtech Fried for contributing patches to JSONCONS_DEFINE_LITERAL 
 and to json::as_string to remove warnings
 
+Joshua Pritikin, for reporting gcc ubsan runtime warnings about 
+load of misaligned addresses, and verifying fix
