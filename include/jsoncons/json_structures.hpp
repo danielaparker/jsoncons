@@ -249,7 +249,7 @@ public:
     // work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54577
         iterator it = elements_.begin() + (pos - elements_.begin());
         elements_.insert(it, first, last);
-        return first == last ? pos : pos + 1;
+        return first == last ? it : it + 1;
 #else
         return elements_.insert(pos, first, last);
 #endif
