@@ -2703,7 +2703,7 @@ public:
             handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
             break;
         case json_type_tag::bignum_t:
-            handler.bignum_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+            handler.bignum_value(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
             break;
         case json_type_tag::double_t:
             handler.double_value(var_.double_data_cast()->value(), 

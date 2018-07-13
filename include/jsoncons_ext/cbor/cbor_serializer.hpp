@@ -295,7 +295,7 @@ private:
         end_value();
     }
 
-    void do_bignum_value(const uint8_t* data, size_t length, const serializing_context& context) override
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
     {
         std::vector<uint8_t> v;
 

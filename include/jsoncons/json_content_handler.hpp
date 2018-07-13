@@ -123,9 +123,9 @@ public:
         do_byte_string_value(data, length, null_serializing_context());
     }
 
-    void bignum_value(const uint8_t* data, size_t length) 
+    void bignum_value(int signum, const uint8_t* data, size_t length) 
     {
-        do_bignum_value(data, length, null_serializing_context());
+        do_bignum_value(signum, data, length, null_serializing_context());
     }
 
     void byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
@@ -133,9 +133,9 @@ public:
         do_byte_string_value(data, length, context);
     }
 
-    void bignum_value(const uint8_t* data, size_t length, const serializing_context& context) 
+    void bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
     {
-        do_bignum_value(data, length, context);
+        do_bignum_value(signum, data, length, context);
     }
 
     void integer_value(int64_t value)
@@ -312,7 +312,7 @@ private:
 
     virtual void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
-    virtual void do_bignum_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
     virtual void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
 
@@ -369,7 +369,7 @@ private:
     {
     }
 
-    void do_bignum_value(const uint8_t* data, size_t length, const serializing_context&) override
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
     {
     }
 
