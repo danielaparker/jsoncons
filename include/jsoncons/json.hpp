@@ -1195,6 +1195,9 @@ public:
             case json_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
                 break;
+            case json_type_tag::bignum_t:
+                new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
+                break;
             case json_type_tag::array_t:
                 new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(*array_data_cast()));
                 break;
@@ -1211,6 +1214,9 @@ public:
                 new(reinterpret_cast<void*>(&data_))string_data(std::move(*temp.string_data_cast()));
                 break;
             case json_type_tag::byte_string_t:
+                new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
+                break;
+            case json_type_tag::bignum_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
                 break;
             case json_type_tag::array_t:
