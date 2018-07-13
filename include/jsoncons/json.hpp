@@ -737,18 +737,6 @@ public:
             }
         }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-        variant(const uint8_t* s, size_t length)
-        {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, s, length, byte_allocator_type());
-        }
-
-        variant(const uint8_t* s, size_t length, const Allocator& alloc)
-        {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, s, length, alloc);
-        }
-#endif
-
         variant(const byte_string_view& bs)
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, bs.data(), bs.length(), byte_allocator_type());
@@ -2545,16 +2533,6 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-
-    basic_json(const uint8_t* s, size_t length)
-        : var_(s, length)
-    {
-    }
-
-    basic_json(const uint8_t* s, size_t length, const Allocator& allocator)
-        : var_(s, length, allocator)
-    {
-    }
 
     template<class InputIterator>
     basic_json(InputIterator first, InputIterator last, const Allocator& allocator = Allocator())

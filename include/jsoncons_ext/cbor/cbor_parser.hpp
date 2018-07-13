@@ -1811,6 +1811,36 @@ public:
             }
             break;
 
+        case 0xC2:
+            {
+                const uint8_t* endp;
+                std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
+                if (endp == pos)
+                {
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
+                }
+                input_ptr_ = endp;
+
+                handler_.bignum_value(1, v.data(), v.size(), *this);
+            }
+            break;
+
+        case 0xC3:
+            {
+                const uint8_t* endp;
+                std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
+                if (endp == pos)
+                {
+                    ec = cbor_parser_errc::unexpected_eof;
+                    return;
+                }
+                input_ptr_ = endp;
+
+                handler_.bignum_value(-1, v.data(), v.size(), *this);
+            }
+            break;
+
             // False
         case 0xf4:
             handler_.bool_value(false, *this);
