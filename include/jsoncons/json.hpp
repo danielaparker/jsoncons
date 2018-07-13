@@ -96,7 +96,8 @@ enum class json_type_tag : uint8_t
     string_t,
     byte_string_t,
     array_t,
-    object_t
+    object_t,
+    bignum_t
 };
                         
 template <class CharT, class ImplementationPolicy, class Allocator>
@@ -812,6 +813,9 @@ public:
             case json_type_tag::byte_string_t:
                 reinterpret_cast<byte_string_data*>(&data_)->~byte_string_data();
                 break;
+            case json_type_tag::bignum_t:
+                reinterpret_cast<byte_string_data*>(&data_)->~byte_string_data();
+                break;
             case json_type_tag::object_t:
                 reinterpret_cast<object_data*>(&data_)->~object_data();
                 break;
@@ -855,6 +859,9 @@ public:
                     new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
                     break;
                 case json_type_tag::byte_string_t:
+                    new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
+                    break;
+                case json_type_tag::bignum_t:
                     new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
                     break;
                 case json_type_tag::array_t:
@@ -979,6 +986,8 @@ public:
             {
             case json_type_tag::byte_string_t:
                 return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length());
+            case json_type_tag::bignum_t:
+                return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length());
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a byte string"));
             }
@@ -1082,6 +1091,17 @@ public:
                     return false;
                 }
                 break;
+            case json_type_tag::bignum_t:
+                switch (rhs.type_id())
+                {
+                case json_type_tag::bignum_t:
+                    {
+                        return as_byte_string_view() == rhs.as_byte_string_view();
+                    }
+                default:
+                    return false;
+                }
+                break;
             case json_type_tag::string_t:
                 switch (rhs.type_id())
                 {
@@ -1164,6 +1184,13 @@ public:
                             new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
                         }
                         break;
+                    case json_type_tag::bignum_t:
+                        {
+                            byte_string_data temp(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&(other.data_)))null_data();
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
+                        }
+                        break;
                     case json_type_tag::array_t:
                         {
                             array_data temp(std::move(*other.array_data_cast()));
@@ -1202,6 +1229,13 @@ public:
                             new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
                         }
                         break;
+                    case json_type_tag::bignum_t:
+                        {
+                            byte_string_data temp(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&(other.data_)))empty_object_data();
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
+                        }
+                        break;
                     case json_type_tag::array_t:
                         {
                             array_data temp(std::move(*other.array_data_cast()));
@@ -1233,7 +1267,7 @@ public:
                             new(reinterpret_cast<void*>(&data_))string_data(std::move(temp));
                         }
                         break;
-                    case json_type_tag::byte_string_t:
+                    case json_type_tag::bignum_t:
                         {
                             byte_string_data temp(std::move(*other.byte_string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
@@ -1278,6 +1312,13 @@ public:
                             new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
                         }
                         break;
+                    case json_type_tag::bignum_t:
+                        {
+                            byte_string_data temp(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&(other.data_)))integer_data(*integer_data_cast());
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
+                        }
+                        break;
                     case json_type_tag::array_t:
                         {
                             array_data temp(std::move(*other.array_data_cast()));
@@ -1310,6 +1351,13 @@ public:
                         }
                         break;
                     case json_type_tag::byte_string_t:
+                        {
+                            byte_string_data temp(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&(other.data_)))uinteger_data(*uinteger_data_cast());
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::bignum_t:
                         {
                             byte_string_data temp(std::move(*other.byte_string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))uinteger_data(*uinteger_data_cast());
@@ -1354,6 +1402,13 @@ public:
                             new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
                         }
                         break;
+                    case json_type_tag::bignum_t:
+                        {
+                            byte_string_data temp(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
+                        }
+                        break;
                     case json_type_tag::array_t:
                         {
                             array_data temp(std::move(*other.array_data_cast()));
@@ -1386,6 +1441,13 @@ public:
                         }
                         break;
                     case json_type_tag::byte_string_t:
+                        {
+                            byte_string_data temp(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::bignum_t:
                         {
                             byte_string_data temp(std::move(*other.byte_string_data_cast()));
                             new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
@@ -1471,6 +1533,13 @@ public:
                         }
                         break;
                     case json_type_tag::byte_string_t:
+                        {
+                            string_data temp(std::move(*string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::bignum_t:
                         {
                             string_data temp(std::move(*string_data_cast()));
                             new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*other.byte_string_data_cast()));
@@ -1582,6 +1651,96 @@ public:
                     }
                 }
                 break;
+            case json_type_tag::bignum_t:
+                {
+                    switch (other.type_id())
+                    {
+                    case json_type_tag::null_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))null_data();
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::empty_object_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))empty_object_data();
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::bool_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))bool_data(*(other.bool_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::integer_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))integer_data(*(other.integer_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::uinteger_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))uinteger_data(*(other.uinteger_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::double_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))double_data(*(other.double_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::small_string_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))small_string_data(*(other.small_string_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::string_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))string_data(*(other.string_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::byte_string_t:
+                        {
+                            byte_string_data_cast()->swap(*other.byte_string_data_cast());
+                        }
+                        break;
+                    case json_type_tag::bignum_t:
+                        {
+                            byte_string_data_cast()->swap(*other.byte_string_data_cast());
+                        }
+                        break;
+                    case json_type_tag::array_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))array_data(std::move(*other.array_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::object_t:
+                        {
+                            byte_string_data temp(std::move(*byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))object_data(std::move(*other.object_data_cast()));
+                            new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(temp));
+                        }
+                        break;
+                    default:
+                        JSONCONS_UNREACHABLE();
+                        break;
+                    }
+                }
+                break;
             case json_type_tag::array_t:
                 {
                     switch (other.type_id())
@@ -1643,6 +1802,13 @@ public:
                         }
                         break;
                     case json_type_tag::byte_string_t:
+                        {
+                            array_data temp(std::move(*array_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(temp));
+                        }
+                        break;
+                    case json_type_tag::bignum_t:
                         {
                             array_data temp(std::move(*array_data_cast()));
                             new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*other.byte_string_data_cast()));
@@ -1734,6 +1900,13 @@ public:
                             new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
                         }
                         break;
+                    case json_type_tag::bignum_t:
+                        {
+                            object_data temp(std::move(*object_data_cast()));
+                            new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*other.byte_string_data_cast()));
+                            new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(temp));
+                        }
+                        break;
                     case json_type_tag::array_t:
                         {
                             object_data temp(std::move(*object_data_cast()));
@@ -1790,6 +1963,9 @@ public:
             case json_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
                 break;
+            case json_type_tag::bignum_t:
+                new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
+                break;
             case json_type_tag::object_t:
                 new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
                 break;
@@ -1818,6 +1994,9 @@ public:
                 new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
                 break;
             case json_type_tag::byte_string_t:
+                new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()),a);
+                break;
+            case json_type_tag::bignum_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()),a);
                 break;
             case json_type_tag::array_t:
@@ -1851,6 +2030,12 @@ public:
                 }
                 break;
             case json_type_tag::byte_string_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*val.byte_string_data_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_data();
+                }
+                break;
+            case json_type_tag::bignum_t:
                 {
                     new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*val.byte_string_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
@@ -1905,6 +2090,18 @@ public:
                 }
                 break;
             case json_type_tag::byte_string_t:
+                {
+                    if (a == val.byte_string_data_cast()->get_allocator())
+                    {
+                        Init_rv_(std::forward<variant>(val), a, std::true_type());
+                    }
+                    else
+                    {
+                        Init_(val,a);
+                    }
+                }
+                break;
+            case json_type_tag::bignum_t:
                 {
                     if (a == val.byte_string_data_cast()->get_allocator())
                     {
@@ -3183,6 +3380,9 @@ public:
         case json_type_tag::byte_string_t:
             handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
             break;
+        case json_type_tag::bignum_t:
+            handler.bignum_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+            break;
         case json_type_tag::double_t:
             handler.double_value(var_.double_data_cast()->value(), 
                                  floating_point_options(var_.double_data_cast()->format(),
@@ -3402,6 +3602,11 @@ public:
     bool is_byte_string() const JSONCONS_NOEXCEPT
     {
         return (var_.type_id() == json_type_tag::byte_string_t);
+    }
+
+    bool is_bignum() const JSONCONS_NOEXCEPT
+    {
+        return (var_.type_id() == json_type_tag::bignum_t);
     }
 
     bool is_bool() const JSONCONS_NOEXCEPT

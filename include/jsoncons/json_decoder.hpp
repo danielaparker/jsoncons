@@ -244,6 +244,18 @@ private:
         }
     }
 
+    void do_bignum_value(const uint8_t* data, size_t length, const serializing_context&) override
+    {
+        if (stack_offsets_.back().is_object_)
+        {
+            stack_.back().value_ = Json(data,length,string_allocator_);
+        }
+        else
+        {
+            stack_.push_back(Json(data,length,string_allocator_));
+        }
+    }
+
     void do_integer_value(int64_t value, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
