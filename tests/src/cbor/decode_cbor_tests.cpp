@@ -90,16 +90,16 @@ BOOST_AUTO_TEST_CASE(cbor_decode_test)
 
     // byte string
     std::vector<uint8_t> v;
-    check_decode({0x40},json(v.data(),v.size()));
+    check_decode({0x40},json(byte_string_view(v.data(),v.size())));
     v = {' '};
-    check_decode({0x41,' '},json(v.data(),v.size()));
+    check_decode({0x41,' '},json(byte_string_view(v.data(),v.size())));
     v = {0};
-    check_decode({0x41,0},json(v.data(),v.size()));
+    check_decode({0x41,0},json(byte_string_view(v.data(),v.size())));
     v = {'H','e','l','l','o'};
-    check_decode({0x45,'H','e','l','l','o'},json(v.data(),v.size()));
+    check_decode({0x45,'H','e','l','l','o'},json(byte_string_view(v.data(),v.size())));
     v = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'};
     check_decode({0x58,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
-                 json(v.data(),v.size()));
+                 json(byte_string_view(v.data(),v.size())));
 
     // string
     check_decode({0x60},json(""));
