@@ -240,7 +240,7 @@ private:
         }
         else
         {
-            stack_.push_back(Json(data,length,string_allocator_));
+            stack_.push_back(Json(byte_string_view(data,length),string_allocator_));
         }
     }
 
