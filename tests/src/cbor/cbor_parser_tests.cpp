@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(test_cbor_parsing)
     check_parsing({0x45,'H','e','l','l','o'},json(byte_string_view(v.data(),v.size())));
     v = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'};
     check_parsing({0x58,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
-                 json(v.data(),v.size()));
+                 json(byte_string_view(v.data(),v.size())));
 
     // string
     check_parsing({0x60},json(""));
