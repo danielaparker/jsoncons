@@ -1164,6 +1164,11 @@ public:
             {
                 return;
             }
+
+            variant temp(other);
+            other = std::move(*this);
+            *this = std::move(temp);
+#if 0
             switch (type_id())
             {
             case json_type_tag::null_t:
@@ -1929,6 +1934,7 @@ public:
                 JSONCONS_UNREACHABLE();
                 break;
             }
+#endif
         }
     private:
 
