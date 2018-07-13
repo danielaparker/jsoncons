@@ -883,7 +883,7 @@ public:
     
     static Json to_json(const basic_byte_string<Allocator>& val)
     {
-        return Json(val.data(),val.length());
+        return Json(byte_string_view(val.data(),val.length()));
     }
 };
 
