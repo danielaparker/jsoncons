@@ -1125,7 +1125,7 @@ public:
         }
 
         template <class Alloc = allocator_type>
-        typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
+        typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
         swap(variant& other) JSONCONS_NOEXCEPT
         {
             if (this ==&other)
@@ -1137,13 +1137,73 @@ public:
         }
 
         template <class Alloc = allocator_type>
-        typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
+        typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
         swap(variant& other) JSONCONS_NOEXCEPT
         {
             if (this ==&other)
             {
                 return;
             }
+
+            variant temp(other);
+            switch (type_id())
+            {
+            case json_type_tag::null_t:
+                new(reinterpret_cast<void*>(&(other.data_)))null_data();
+                break;
+            case json_type_tag::empty_object_t:
+                new(reinterpret_cast<void*>(&(other.data_)))empty_object_data();
+                break;
+            case json_type_tag::bool_t:
+                new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
+                break;
+            case json_type_tag::integer_t:
+                new(reinterpret_cast<void*>(&(other.data_)))integer_data(*integer_data_cast());
+                break;
+            case json_type_tag::uinteger_t:
+                new(reinterpret_cast<void*>(&(other.data_)))uinteger_data(*uinteger_data_cast());
+                break;
+            case json_type_tag::double_t:
+                new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
+                break;
+            case json_type_tag::small_string_t:
+                new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
+                break;
+            case json_type_tag::string_t:
+                new(reinterpret_cast<void*>(&other.data_))string_data(std::move(*string_data_cast()));
+                break;
+            case json_type_tag::byte_string_t:
+                new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
+                break;
+            case json_type_tag::array_t:
+                new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(*array_data_cast()));
+                break;
+            case json_type_tag::object_t:
+                new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(*object_data_cast()));
+                break;
+            default:
+                JSONCONS_UNREACHABLE();
+                break;
+            }
+            switch (temp.type_id())
+            {
+            case json_type_tag::string_t:
+                new(reinterpret_cast<void*>(&data_))string_data(std::move(*temp.string_data_cast()));
+                break;
+            case json_type_tag::byte_string_t:
+                new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
+                break;
+            case json_type_tag::array_t:
+                new(reinterpret_cast<void*>(&(data_)))array_data(std::move(*temp.array_data_cast()));
+                break;
+            case json_type_tag::object_t:
+                new(reinterpret_cast<void*>(&(data_)))object_data(std::move(*temp.object_data_cast()));
+                break;
+            default:
+                std::swap(data_,temp.data_);
+                break;
+            }
+#if 0
             switch (type_id())
             {
             case json_type_tag::null_t:
@@ -1756,6 +1816,7 @@ public:
                 JSONCONS_UNREACHABLE();
                 break;
             }
+#endif
         }
     private:
 
