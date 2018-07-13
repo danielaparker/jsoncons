@@ -35,7 +35,7 @@ json(const char* val); // (15)
 
 json(const char* val, const allocator_type& allocator); // (16)
 
-json(const byte_string_view& bsv); // (17)
+json(const byte_string_view& bs); // (17)
 
 json(const uint8_t* s, size_t length, const allocator_type& allocator); // (18)
 ```

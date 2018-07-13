@@ -167,6 +167,8 @@ public:
             data_base(json_type_tag id)
                 : type_id_(id)
             {}
+
+            json_type_tag type_id() const {return type_id_;}
         };
 
         class null_data final : public data_base
@@ -431,25 +433,25 @@ public:
             }
         public:
             byte_string_data(const byte_string_data& val)
-                : data_base(json_type_tag::byte_string_t)
+                : data_base(val.type_id())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_data(byte_string_data&& val)
-                : data_base(json_type_tag::byte_string_t), ptr_(nullptr)
+                : data_base(val.type_id()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
-            byte_string_data(const byte_string_data& val, const Allocator& a)
-                : data_base(json_type_tag::byte_string_t)
+            byte_string_data(json_type_tag type, const byte_string_data& val, const Allocator& a)
+                : data_base(type)
             {
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
 
-            byte_string_data(const uint8_t* data, size_t length, const Allocator& a)
-                : data_base(json_type_tag::byte_string_t)
+            byte_string_data(json_type_tag type, const uint8_t* data, size_t length, const Allocator& a)
+                : data_base(type)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
@@ -734,14 +736,27 @@ public:
                 new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator_type());
             }
         }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
         variant(const uint8_t* s, size_t length)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(s, length, byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, s, length, byte_allocator_type());
         }
 
         variant(const uint8_t* s, size_t length, const Allocator& alloc)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(s, length, alloc);
+            new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, s, length, alloc);
+        }
+#endif
+
+        variant(const byte_string_view& bs)
+        {
+            new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, bs.data(), bs.length(), byte_allocator_type());
+        }
+
+        variant(const byte_string_view& bs, const Allocator& allocator)
+        {
+            new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, bs.data(), bs.length(), allocator);
         }
 
         variant(const char_type* s)
@@ -2519,13 +2534,20 @@ public:
     {
     }
 
-    basic_json(const uint8_t* s, size_t length)
-        : var_(s, length)
+    explicit basic_json(const byte_string_view& bs)
+        : var_(bs)
     {
     }
 
-    explicit basic_json(const byte_string_view& s)
-        : var_(s.data(), s.length())
+    basic_json(const byte_string_view& bs, const Allocator& allocator)
+        : var_(bs, allocator)
+    {
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    basic_json(const uint8_t* s, size_t length)
+        : var_(s, length)
     {
     }
 
@@ -2533,7 +2555,7 @@ public:
         : var_(s, length, allocator)
     {
     }
-#if !defined(JSONCONS_NO_DEPRECATED)
+
     template<class InputIterator>
     basic_json(InputIterator first, InputIterator last, const Allocator& allocator = Allocator())
         : var_(first,last,allocator)
