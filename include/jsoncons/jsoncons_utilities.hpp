@@ -826,6 +826,11 @@ public:
     {
     }
 
+    basic_bignum(int signum, const byte_string_view& bytes)
+        : signum_(signum), bytes_(bytes)
+    {
+    }
+
     basic_bignum(int signum, const basic_byte_string<Allocator>& bytes)
         : signum_(signum), bytes_(bytes)
     {
