@@ -808,7 +808,82 @@ public:
     }
 };
 
+// basic_bignum
+template <class Allocator = std::allocator<uint8_t>>
+class basic_bignum
+{
+    int signum_;
+    basic_byte_string<Allocator> bytes_;
+public:
+
+    basic_bignum() 
+        : signum_(0)
+    {
+    }
+
+    explicit basic_bignum(const Allocator& alloc)
+        : signum_(0), bytes_(alloc)
+    {
+    }
+
+    basic_bignum(int signum, const basic_byte_string<Allocator>& bytes)
+        : signum_(signum), bytes_(bytes)
+    {
+    }
+
+    basic_bignum(int signum, basic_byte_string<Allocator>&& bytes)
+        : signum_(signum), bytes_(std::move(bytes))
+    {
+    }
+
+    basic_bignum(int signum, const byte_string_view& bytes, const Allocator& alloc)
+        : signum_(signum), bytes_(bytes,alloc)
+    {
+    }
+
+    basic_bignum(const basic_bignum& s) = default; 
+
+    basic_bignum(basic_bignum&& s) = default; 
+
+    basic_bignum& operator=(const basic_bignum& s) = default;
+
+    basic_bignum& operator=(basic_bignum&& s) = default;
+
+    int signum() const
+    {
+        return signum_;
+    }
+
+    const basic_byte_string<Allocator>& bytes() const JSONCONS_NOEXCEPT
+    {
+        return bytes_;
+    }
+    
+    friend bool operator==(const basic_bignum& lhs, const basic_bignum& rhs)
+    {
+        return lhs.signum() == rhs.signum() && lhs.bytes() == rhs.bytes();
+    }
+
+    friend bool operator!=(const basic_bignum& lhs, const basic_bignum& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    template <class CharT>
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bignum& o)
+    {
+        if (o.signum() == -1)
+        {
+            os << "~";
+        }
+        os << byte_string_view(o.bytes());
+        return os;
+    }
+};
+
 typedef basic_byte_string<std::allocator<uint8_t>> byte_string;
+
+typedef basic_bignum<std::allocator<uint8_t>> bignum;
 
 static const std::string base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "abcdefghijklmnopqrstuvwxyz"
