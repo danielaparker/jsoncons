@@ -748,13 +748,13 @@ public:
             new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, bs.data(), bs.length(), allocator);
         }
 
-        variant(const basic_bignum<Allocator>& bs)
+        variant(const basic_bignum<byte_allocator_type>& bs)
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(bs.signum() > 0 ? json_type_tag::positive_bignum_t : json_type_tag::negative_bignum_t, 
                                                                  bs.bytes().data(), bs.bytes().length(), byte_allocator_type());
         }
 
-        variant(const basic_bignum<Allocator>& bs, const Allocator& allocator)
+        variant(const basic_bignum<byte_allocator_type>& bs, const Allocator& allocator)
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(bs.signum() > 0 ? json_type_tag::positive_bignum_t : json_type_tag::negative_bignum_t, 
                                                                  bs.bytes().data(), bs.bytes().length(), byte_allocator_type(allocator));
@@ -1679,7 +1679,7 @@ public:
             return evaluate().as_byte_string_view();
         }
 
-        basic_bignum<Allocator> as_bignum() const 
+        basic_bignum<byte_allocator_type> as_bignum() const 
         {
             return evaluate().as_bignum();
         }
@@ -2579,13 +2579,13 @@ public:
     {
     }
 
-    explicit basic_json(const basic_bignum<Allocator>& bs)
+    explicit basic_json(const basic_bignum<byte_allocator_type>& bs)
         : var_(bs)
     {
     }
 
-    explicit basic_json(const basic_bignum<Allocator>& bs, const Allocator& allocator)
-    : var_(bs, allocator)
+    explicit basic_json(const basic_bignum<byte_allocator_type>& bs, const Allocator& allocator)
+    : var_(bs, byte_allocator_type(allocator))
     {
     }
 
@@ -3259,7 +3259,7 @@ public:
         return var_.as_byte_string_view();
     }
 
-    basic_bignum<Allocator> as_bignum() const
+    basic_bignum<byte_allocator_type> as_bignum() const
     {
         return var_.as_bignum();
     }
