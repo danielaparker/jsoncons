@@ -757,7 +757,7 @@ public:
         variant(const basic_bignum<Allocator>& bs, const Allocator& allocator)
         {
             new(reinterpret_cast<void*>(&data_))byte_string_data(bs.signum() > 0 ? json_type_tag::positive_bignum_t : json_type_tag::negative_bignum_t, 
-                                                                 bs.bytes().data(), bs.bytes().length(), allocator);
+                                                                 bs.bytes().data(), bs.bytes().length(), byte_allocator_type(allocator));
         }
 
         variant(const char_type* s)
@@ -1011,7 +1011,7 @@ public:
             }
         }
 
-        basic_bignum<Allocator> as_bignum() const
+        basic_bignum<byte_allocator_type> as_bignum() const
         {
             switch (type_id())
             {
