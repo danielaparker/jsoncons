@@ -79,26 +79,14 @@ public:
         initialize( v );
     }
 
-    bignum(int i)
+    bignum(int32_t i)
     {
         neg_ = i < 0;
-        unsigned long u = neg_ ? -i : i;
+        uint32_t u = neg_ ? -i : i;
         initialize( u );
     }
 
-    bignum(unsigned u)
-    {
-        initialize( (unsigned long) u );
-    }
-
-    bignum(long i)
-    {
-        neg_ = i < 0;
-        unsigned long u = neg_ ? -i : i;
-        initialize( u );
-    }
-
-    bignum(unsigned long u)
+    bignum(uint32_t u)
     {
         initialize( u );
     }
@@ -866,7 +854,7 @@ private:
         return (i/word_length + 1) * word_length;
     }
 
-    void initialize( unsigned long u )
+    void initialize(uint32_t u)
     {
         data_ = values_;
         dynamic_ = false;
@@ -875,7 +863,7 @@ private:
         data_ [0] = u;
     }
 
-    void initialize( uint64_t u )
+    void initialize(uint64_t u)
     {
         data_ = values_;
         dynamic_ = false;
