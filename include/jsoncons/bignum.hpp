@@ -862,7 +862,7 @@ private:
 
         data_ [0] = u;
     }
-
+ 
     void initialize(uint64_t u)
     {
         data_ = values_;
