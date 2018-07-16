@@ -19,8 +19,7 @@ BOOST_AUTO_TEST_SUITE(bignum_tests)
 
 BOOST_AUTO_TEST_CASE(test_bignum)
 {
-    bignum val{};
-}
+    bignum val;
 
 BOOST_AUTO_TEST_SUITE_END()
 
