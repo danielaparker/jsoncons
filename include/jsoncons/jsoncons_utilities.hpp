@@ -899,6 +899,59 @@ static const std::string base64url_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                               "0123456789-_"
                                               "\0";
 
+template <class InputIt,class CharT>
+void encode_base16(InputIt first, InputIt last, const std::string& alphabet, std::basic_string<CharT>& result)
+{
+    unsigned char a3[3];
+    unsigned char a4[4];
+    unsigned char fill = alphabet.back();
+    int i = 0;
+    int j = 0;
+
+    while (first != last)
+    {
+        a3[i++] = *first++;
+        if (i == 3)
+        {
+            a4[0] = (a3[0] & 0xfc) >> 2;
+            a4[1] = ((a3[0] & 0x03) << 4) + ((a3[1] & 0xf0) >> 4);
+            a4[2] = ((a3[1] & 0x0f) << 2) + ((a3[2] & 0xc0) >> 6);
+            a4[3] = a3[2] & 0x3f;
+
+            for (i = 0; i < 4; i++) 
+            {
+                result.push_back(alphabet[a4[i]]);
+            }
+            i = 0;
+        }
+    }
+
+    if (i > 0)
+    {
+        for (j = i; j < 3; ++j) 
+        {
+            a3[j] = 0;
+        }
+
+        a4[0] = (a3[0] & 0xfc) >> 2;
+        a4[1] = ((a3[0] & 0x03) << 4) + ((a3[1] & 0xf0) >> 4);
+        a4[2] = ((a3[1] & 0x0f) << 2) + ((a3[2] & 0xc0) >> 6);
+
+        for (j = 0; j < i + 1; ++j) 
+        {
+            result.push_back(alphabet[a4[j]]);
+        }
+
+        if (fill != 0)
+        {
+            while (i++ < 3) 
+            {
+                result.push_back(fill);
+            }
+        }
+    }
+}
+
 inline 
 static bool is_base64(uint8_t c) 
 {
@@ -1024,6 +1077,49 @@ std::string decode_base64(const std::string& base64_string)
     return result;
 }
 
+inline
+std::string string_to_hex(const std::string& input)
+{
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i)
+    {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
+}
+
+#include <algorithm>
+#include <stdexcept>
+
+inline
+std::string hex_to_string(const byte_string& input)
+{
+    static const char lut[] = {0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F'};
+    size_t len = input.length();
+    if (len & 1) throw std::invalid_argument("odd length");
+
+    std::string output;
+    output.reserve(len / 2);
+    for (size_t i = 0; i < len; i += 2)
+    {
+        char a = input[i];
+        const char* p = std::lower_bound(lut, lut + 16, a);
+        if (*p != a) throw std::invalid_argument("not a hex digit");
+
+        char b = input[i + 1];
+        const char* q = std::lower_bound(lut, lut + 16, b);
+        if (*q != b) throw std::invalid_argument("not a hex digit");
+
+        output.push_back(((p - lut) << 4) | (q - lut));
+    }
+    return output;
+}
 // json_literals
 
 namespace detail {

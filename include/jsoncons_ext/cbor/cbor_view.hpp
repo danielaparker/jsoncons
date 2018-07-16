@@ -17,7 +17,7 @@
 #include <cassert>
 #include <iterator>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/binary/binary_utilities.hpp>
+#include <jsoncons/binary/binary_utilities.hpp>
 #include <jsoncons_ext/cbor/cbor_parser.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 
