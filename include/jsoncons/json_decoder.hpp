@@ -250,11 +250,11 @@ private:
     {
         if (stack_offsets_.back().is_object_)
         {
-            stack_.back().value_ = Json(basic_bignum<json_byte_allocator_type>(signum,byte_string_view(data,length),byte_allocator_));
+            stack_.back().value_ = Json(basic_bignum<json_byte_allocator_type>(signum,data,length));
         }
         else
         {
-            stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(signum,byte_string_view(data,length),byte_allocator_)));
+            stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(signum,data,length)));
         }
     }
 

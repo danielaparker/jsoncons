@@ -21,8 +21,9 @@
 #include <jsoncons/version.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_structures.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/bignum.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_decoder.hpp>
@@ -748,10 +749,26 @@ public:
             new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, bs.data(), bs.length(), allocator);
         }
 
-        variant(const basic_bignum<byte_allocator_type>& bs)
+        variant(const basic_bignum<byte_allocator_type>& n)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(bs.signum() > 0 ? json_type_tag::positive_bignum_t : json_type_tag::negative_bignum_t, 
-                                                                 bs.bytes().data(), bs.bytes().length(), byte_allocator_type());
+            bool neg = n < 0 ? true : false;
+            basic_bignum<byte_allocator_type> v = neg ? -n : n;
+            basic_bignum<byte_allocator_type> base(16);
+            basic_bignum<byte_allocator_type> r;
+
+            std::vector<uint8_t> data;
+
+            do
+            {
+                v.divide( base, v, r, true );
+                data.push_back((int)r);
+            } 
+            while (v.length() > 0);
+
+            std::reverse(data.begin(),data.end());
+
+            new(reinterpret_cast<void*>(&data_))byte_string_data(neg ? json_type_tag::negative_bignum_t : json_type_tag::positive_bignum_t, 
+                                                                 data.data(), data.size(), byte_allocator_type());
         }
 
         variant(const basic_bignum<byte_allocator_type>& bs, const Allocator& allocator)
