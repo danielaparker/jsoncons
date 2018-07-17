@@ -87,6 +87,24 @@ public:
         initialize( v );
     }
 
+    basic_bignum(int signum, std::initializer_list<uint8_t> l)
+    {
+        bool neg = signum == -1 ? true : false;
+
+        basic_bignum<Allocator> v = 0;
+        for (auto c: l)
+        {
+            v = (v * 16) + (int)(c);
+        }
+
+        if ( neg )
+        {
+            v.neg_ = true;
+        }
+
+        initialize( v );
+    }
+
     basic_bignum(int signum, const uint8_t* str, size_t n)
     {
         bool neg = signum == -1 ? true : false;
