@@ -948,7 +948,7 @@ public:
     template <class Alloc>
     friend basic_bignum<Alloc> power( basic_bignum<Alloc> x, unsigned n )
     {
-        basic_bignum<Alloc><Alloc> y = 1;
+        basic_bignum<Alloc> y = 1;
 
         while ( n )
         {
@@ -966,9 +966,9 @@ public:
     template <class Alloc>
     friend basic_bignum<Alloc> sqrt( const basic_bignum<Alloc>& a )
     {
-        basic_bignum<Alloc><Alloc> x = a;
-        basic_bignum<Alloc><Alloc> b = a;
-        basic_bignum<Alloc><Alloc> q;
+        basic_bignum<Alloc> x = a;
+        basic_bignum<Alloc> b = a;
+        basic_bignum<Alloc> q;
 
         b <<= 1;
         while ( b >>= 2, b > 0 )
