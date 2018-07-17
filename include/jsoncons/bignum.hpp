@@ -25,11 +25,36 @@ Chichester: John Wiley.
 
 */
 
-template <class Allocator = std::allocator<uint8_t>>
-class basic_bignum 
+template <class Allocator>
+class basic_bignum_base
 {
 public:
     typedef uint32_t basic_type;
+    typedef typename Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<basic_type> byte_allocator_type;
+
+private:
+    byte_allocator_type byte_allocator_;
+
+public:
+    basic_bignum_base()
+        : byte_allocator_()
+    {
+    }
+    basic_bignum_base(const allocator_type& allocator)
+        : byte_allocator_(byte_allocator_type(allocator))
+    {
+    }
+
+    byte_allocator_type allocator() const
+    {
+        return byte_allocator_;
+    }
+};
+
+template <class Allocator = std::allocator<uint8_t>>
+class basic_bignum : protected basic_bignum_base<Allocator>
+{
 private:
     static const basic_type max_basic_type = std::numeric_limits<basic_type>::max();
     static const unsigned basic_type_bits = sizeof(basic_type) * 8;  // Number of bits
@@ -158,7 +183,7 @@ public:
         else
         {
             capacity_ = n.capacity_;
-            data_ = new basic_type [capacity_];
+            data_ = allocator().allocate(capacity_);
             dynamic_ = true;
             memcpy( data_, n.data_, n.length_*sizeof(basic_type) );
         }
@@ -1269,7 +1294,7 @@ public:
                delete[] data_;
            }
            capacity_ = round_up(length_);
-           data_ = new basic_type[capacity_];
+           data_ = allocator().allocate(capacity_);
            dynamic_ = true;
        }
     }
@@ -1314,7 +1339,7 @@ public:
         else
         {
             capacity_ = round_up( length_ );
-            data_ = new basic_type[capacity_];
+            data_ = allocator().allocate(capacity_);
             dynamic_ = true;
             if ( length_ > 0 )
             {
@@ -1354,7 +1379,7 @@ public:
 
             basic_type* data_old = data_;
 
-            data_ = new basic_type[capacity_new];
+            data_ = allocator().allocate(capacity_new);
 
             if ( len_old > 0 )
             {
@@ -1362,7 +1387,7 @@ public:
             }
             if ( dynamic_ )
             {
-                delete [] data_old;
+                allocator().deallocate(data_old,capacity_);
             }
             capacity_ = capacity_new;
             dynamic_ = true;
