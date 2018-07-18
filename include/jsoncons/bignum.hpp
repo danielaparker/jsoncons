@@ -61,10 +61,10 @@ private:
     using basic_bignum_base<Allocator>::allocator;
 
     static const basic_type max_basic_type = std::numeric_limits<basic_type>::max();
-    static const unsigned basic_type_bits = sizeof(basic_type) * 8;  // Number of bits
-    static const unsigned basic_type_halfBits = basic_type_bits/2;
+    static const uint32_t basic_type_bits = sizeof(basic_type) * 8;  // Number of bits
+    static const uint32_t basic_type_halfBits = basic_type_bits/2;
 
-    static const unsigned word_length = 2; // Use multiples of word_length words
+    static const uint32_t word_length = 2; // Use multiples of word_length words
     static const basic_type r_mask = (1 << basic_type_halfBits) - 1;
     static const basic_type l_mask = max_basic_type - r_mask;
     static const basic_type l_bit = max_basic_type - (max_basic_type >> 1);
@@ -106,7 +106,7 @@ public:
         basic_bignum<Allocator> v = 0;
         for (size_t i = 0; i < n; i++)
         {
-            v = (v * 10) + (int)(str[i] - '0');
+            v = (v * 10) + (uint32_t)(str[i] - '0');
         }
 
         if ( neg )
@@ -123,7 +123,7 @@ public:
         basic_bignum<Allocator> v = 0;
         for (auto c: l)
         {
-            v = (v * 16) + (int)(c);
+            v = (v * 16) + (uint32_t)(c);
         }
 
         if ( neg )
@@ -141,7 +141,7 @@ public:
         basic_bignum<Allocator> v = 0;
         for (size_t i = 0; i < n; i++)
         {
-            v = (v * 16) + (int)(str[i]);
+            v = (v * 16) + (uint32_t)(str[i]);
         }
 
         if ( neg )
@@ -608,10 +608,7 @@ public:
        return length() != 0 ? true : false;
     }
 
-    template <typename T>
-    explicit operator typename std::enable_if<std::is_integral<T>::value && 
-                                              std::is_signed<T>::value && 
-                                              sizeof(T) == sizeof(uint32_t),T>::type () const
+    explicit operator int32_t() const
     {
        T x = 0;
        if ( length() > 0 )
@@ -622,10 +619,7 @@ public:
        return neg_ ? -x : x;
     }
 
-    template <typename T>
-    explicit operator typename std::enable_if<std::is_integral<T>::value && 
-                                              !std::is_signed<T>::value && 
-                                              sizeof(T) == sizeof(uint32_t),T>::type () const
+    explicit operator uint32_t() const
     {
        T u = 0;
        if ( length() > 0 )
@@ -636,20 +630,14 @@ public:
        return u;
     }
 
-    template <typename T>
-    explicit operator typename std::enable_if<std::is_integral<T>::value && 
-                                              std::is_signed<T>::value && 
-                                              sizeof(T) == sizeof(uint64_t),T>::type () const
+    explicit operator int64_t() const
     {
         uint64_t u = (uint64_t) *this;
         T i = (T)u;
         return neg_ ? -i : i;
     }
 
-    template <typename T>
-    explicit operator typename std::enable_if<std::is_integral<T>::value && 
-                                              !std::is_signed<T>::value && 
-                                              sizeof(T) == sizeof(uint64_t),T>::type () const
+    explicit operator uint64_t() const
     {
         T u = 0;
 
