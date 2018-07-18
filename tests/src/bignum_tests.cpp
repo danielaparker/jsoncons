@@ -35,5 +35,36 @@ BOOST_AUTO_TEST_CASE(test_bignum2)
     std::cout << val << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_logical_operations)
+{
+    bignum x( "888888888888888888" );
+    bignum y( "888888888888888888" );
+
+    bignum z = x & y;
+    BOOST_CHECK( z == x );
+}
+
+BOOST_AUTO_TEST_CASE(test_addition)
+{
+    bignum x( "4444444444444444444444444444444" );
+    bignum y( "4444444444444444444444444444444" );
+    bignum a( "8888888888888888888888888888888" );
+
+    bignum z = x + y;
+    BOOST_CHECK( z == a );
+}
+
+BOOST_AUTO_TEST_CASE(test_multiplication)
+{
+    bignum x( "4444444444444444444444444444444" );
+    bignum a( "8888888888888888888888888888888" );
+
+    bignum z = 2*x;
+    BOOST_CHECK( z == a );
+
+    z = x*2;
+    BOOST_CHECK( z == a );
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

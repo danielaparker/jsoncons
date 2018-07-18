@@ -15,11 +15,7 @@
 namespace jsoncons {
 
 /*
-Description:  Multi-precision integer arithmetic.
-
-Remarks:
-
-This program text is based on Chapter 2 and Appendix A of
+This implementation is based on Chapter 2 and Appendix A of
 Ammeraal, L. (1996) Algorithms and Data Structures in C++,
 Chichester: John Wiley.
 
@@ -696,7 +692,7 @@ public:
         basic_bignum<Allocator> v(*this);
         std::string data;
 
-        int len = int(long(v.length()) * basic_bignum<Allocator>::basic_type_bits / 3) + 2;
+        int len = int(uint32_t(v.length()) * basic_bignum<Allocator>::basic_type_bits / 3) + 2;
         data.resize(len);
 
         int n = len;
