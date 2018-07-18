@@ -610,7 +610,7 @@ public:
 
     explicit operator int32_t() const
     {
-       T x = 0;
+       int32_t x = 0;
        if ( length() > 0 )
        {
            x = data_ [0];
@@ -621,7 +621,7 @@ public:
 
     explicit operator uint32_t() const
     {
-       T u = 0;
+       uint32_t u = 0;
        if ( length() > 0 )
        {
            u = data_ [0];
@@ -633,13 +633,13 @@ public:
     explicit operator int64_t() const
     {
         uint64_t u = (uint64_t) *this;
-        T i = (T)u;
+        int64_t i = (int64_t)u;
         return neg_ ? -i : i;
     }
 
     explicit operator uint64_t() const
     {
-        T u = 0;
+        uint64_t u = 0;
 
         if ( length() >= 1 )
         {
@@ -1049,7 +1049,7 @@ public:
     }
 
     void DDproduct( basic_type A, basic_type B,
-                                  basic_type& Hi, basic_type& Lo ) const
+                    basic_type& Hi, basic_type& Lo ) const
     // Multiplying two digits: (Hi, Lo) = A * B
     {
         basic_type hiA = A >> basic_type_halfBits, loA = A & r_mask,
