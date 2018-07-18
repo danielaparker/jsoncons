@@ -56,14 +56,14 @@ private:
     using typename basic_bignum_base<Allocator>::byte_allocator_type;
     using basic_bignum_base<Allocator>::allocator;
 
-    static const basic_type max_basic_type;
+    static const uint64_t max_basic_type;
     static const uint64_t basic_type_bits;  // Number of bits
     static const uint64_t basic_type_halfBits;
 
     static const uint16_t word_length; // Use multiples of word_length words
-    static const basic_type r_mask;
-    static const basic_type l_mask;
-    static const basic_type l_bit;
+    static const uint64_t r_mask;
+    static const uint64_t l_mask;
+    static const uint64_t l_bit;
 
     union
     {
