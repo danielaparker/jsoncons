@@ -56,14 +56,14 @@ private:
     using typename basic_bignum_base<Allocator>::byte_allocator_type;
     using basic_bignum_base<Allocator>::allocator;
 
-    static const basic_type max_basic_type = std::numeric_limits<basic_type>::max();
-    static const uint64_t basic_type_bits = sizeof(basic_type) * 8;  // Number of bits
-    static const uint64_t basic_type_halfBits = basic_type_bits/2;
+    static const basic_type max_basic_type;
+    static const uint64_t basic_type_bits;  // Number of bits
+    static const uint64_t basic_type_halfBits;
 
-    static const uint64_t word_length = 2; // Use multiples of word_length words
-    static const basic_type r_mask = (uint64_t(1) << basic_type_halfBits) - 1;
-    static const basic_type l_mask = max_basic_type - r_mask;
-    static const basic_type l_bit = max_basic_type - (max_basic_type >> 1);
+    static const uint16_t word_length; // Use multiples of word_length words
+    static const basic_type r_mask;
+    static const basic_type l_mask;
+    static const basic_type l_bit;
 
     union
     {
@@ -435,9 +435,9 @@ public:
         return *this;
     }
 
-    basic_bignum& operator<<=( unsigned k )
+    basic_bignum& operator<<=( uint64_t k )
     {
-        int q = k / basic_type_bits;
+        uint64_t q = k / basic_type_bits;
         if ( q ) // Increase length_ by q:
         {
             incr_length( length() + q );
@@ -447,7 +447,7 @@ public:
         }
         if ( k )  // 0 < k < basic_type_bits:
         {
-            int k1 = basic_type_bits - k;
+            uint64_t k1 = basic_type_bits - k;
             basic_type mask = (1 << k) - 1;
             incr_length( length() + 1 );
             for ( int i = length() - 1; i >= 0; i-- )
@@ -482,7 +482,7 @@ public:
         }
 
         int n = length() - 1;
-        int k1 = basic_type_bits - k;
+        int64_t k1 = basic_type_bits - k;
         basic_type mask = (1 << k) - 1;
         for ( int i = 0; i <= n; i++ )
         {
@@ -1329,6 +1329,21 @@ public:
         }
     }
 };
+
+template <class Allocator>
+const uint64_t basic_bignum<Allocator>::max_basic_type = std::numeric_limits<uint64_t>::max();
+template <class Allocator>
+const uint64_t basic_bignum<Allocator>::basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
+template <class Allocator>
+const uint64_t basic_bignum<Allocator>::basic_type_halfBits = basic_bignum<Allocator>::basic_type_bits/2;
+template <class Allocator>
+const uint16_t basic_bignum<Allocator>::word_length = 2; // Use multiples of word_length words
+template <class Allocator>
+const uint64_t basic_bignum<Allocator>::r_mask = (uint64_t(1) << basic_bignum<Allocator>::basic_type_halfBits) - 1;
+template <class Allocator>
+const uint64_t basic_bignum<Allocator>::l_mask = basic_bignum<Allocator>::max_basic_type - basic_bignum<Allocator>::r_mask;
+template <class Allocator>
+const uint64_t basic_bignum<Allocator>::l_bit = basic_bignum<Allocator>::max_basic_type - (basic_bignum<Allocator>::max_basic_type >> 1);
 
 typedef basic_bignum<std::allocator<uint8_t>> bignum;
 
