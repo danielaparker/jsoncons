@@ -608,9 +608,13 @@ public:
        return length() != 0 ? true : false;
     }
 
-    explicit operator int32_t() const
+    template<
+        typename T,
+        typename = typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value && sizeof(T) == sizeof(uint32_t)>::type
+    >
+    explicit operator T() const
     {
-       int x = 0;
+       T x = 0;
        if ( length() > 0 )
        {
            x = data_ [0];
@@ -619,9 +623,13 @@ public:
        return neg_ ? -x : x;
     }
 
-    explicit operator uint32_t() const
+    template<
+        typename T,
+        typename = typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value && sizeof(T) == sizeof(uint32_t)>::type
+    >
+    explicit operator T() const
     {
-       unsigned u = 0;
+       T u = 0;
        if ( length() > 0 )
        {
            u = data_ [0];
@@ -630,16 +638,24 @@ public:
        return u;
     }
 
-    explicit operator int64_t() const
+    template<
+        typename T,
+        typename = typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value && sizeof(T) == sizeof(uint64_t)>::type
+    >
+    explicit operator T() const
     {
         uint64_t u = (uint64_t) *this;
-        int64_t i = u;
+        T i = (T)u;
         return neg_ ? -i : i;
     }
 
-    explicit operator uint64_t() const
+    template<
+        typename T,
+        typename = typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value && sizeof(T) == sizeof(uint64_t)>::type
+    >
+    explicit operator T() const
     {
-        uint64_t u = 0;
+        T u = 0;
 
         if ( length() >= 1 )
         {
