@@ -25,7 +25,7 @@ template <class Allocator>
 class basic_bignum_base
 {
 public:
-    typedef uint32_t basic_type;
+    typedef uint64_t basic_type;
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<basic_type> byte_allocator_type;
 
@@ -57,11 +57,11 @@ private:
     using basic_bignum_base<Allocator>::allocator;
 
     static const basic_type max_basic_type = std::numeric_limits<basic_type>::max();
-    static const uint32_t basic_type_bits = sizeof(basic_type) * 8;  // Number of bits
-    static const uint32_t basic_type_halfBits = basic_type_bits/2;
+    static const uint64_t basic_type_bits = sizeof(basic_type) * 8;  // Number of bits
+    static const uint64_t basic_type_halfBits = basic_type_bits/2;
 
-    static const uint32_t word_length = 2; // Use multiples of word_length words
-    static const basic_type r_mask = (1 << basic_type_halfBits) - 1;
+    static const uint64_t word_length = 2; // Use multiples of word_length words
+    static const basic_type r_mask = (uint64_t(1) << basic_type_halfBits) - 1;
     static const basic_type l_mask = max_basic_type - r_mask;
     static const basic_type l_bit = max_basic_type - (max_basic_type >> 1);
 
@@ -99,10 +99,10 @@ public:
         }
 
         size_t n = strlen( str );
-        basic_bignum<Allocator> v = 0;
+        basic_bignum<Allocator> v = uint64_t(0);
         for (size_t i = 0; i < n; i++)
         {
-            v = (v * 10) + (uint32_t)(str[i] - '0');
+            v = (v * 10) + (uint64_t)(str[i] - '0');
         }
 
         if ( neg )
@@ -119,7 +119,7 @@ public:
         basic_bignum<Allocator> v = 0;
         for (auto c: l)
         {
-            v = (v * 16) + (uint32_t)(c);
+            v = (v * 16) + (uint64_t)(c);
         }
 
         if ( neg )
@@ -134,10 +134,10 @@ public:
     {
         bool neg = signum == -1 ? true : false;
 
-        basic_bignum<Allocator> v = 0;
+        basic_bignum<Allocator> v = uint64_t(0);
         for (size_t i = 0; i < n; i++)
         {
-            v = (v * 16) + (uint32_t)(str[i]);
+            v = (v * 16) + (uint64_t)(str[i]);
         }
 
         if ( neg )
@@ -146,18 +146,6 @@ public:
         }
 
         initialize( v );
-    }
-
-    basic_bignum(int32_t i)
-    {
-        neg_ = i < 0;
-        uint32_t u = neg_ ? -i : i;
-        initialize( u );
-    }
-
-    basic_bignum(uint32_t u)
-    {
-        initialize( u );
     }
 
     basic_bignum(const int64_t& i)
@@ -339,7 +327,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator*=( int y )
+    basic_bignum& operator*=( int64_t y )
     {
         *this *= basic_type(y < 0 ? -y : y);
         if ( y < 0 )
@@ -347,7 +335,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator*=( unsigned y )
+    basic_bignum& operator*=( uint64_t y )
     {
         int len0 = length();
         basic_type Hi;
@@ -604,9 +592,9 @@ public:
        return length() != 0 ? true : false;
     }
 
-    explicit operator int32_t() const
+    explicit operator int64_t() const
     {
-       int32_t x = 0;
+       int64_t x = 0;
        if ( length() > 0 )
        {
            x = data_ [0];
@@ -615,40 +603,15 @@ public:
        return neg_ ? -x : x;
     }
 
-    explicit operator uint32_t() const
+    explicit operator uint64_t() const
     {
-       uint32_t u = 0;
+       uint64_t u = 0;
        if ( length() > 0 )
        {
            u = data_ [0];
        }
 
        return u;
-    }
-
-    explicit operator int64_t() const
-    {
-        uint64_t u = (uint64_t) *this;
-        int64_t i = (int64_t)u;
-        return neg_ ? -i : i;
-    }
-
-    explicit operator uint64_t() const
-    {
-        uint64_t u = 0;
-
-        if ( length() >= 1 )
-        {
-            u = data_ [0];
-        }
-        if ( length() >= 2 )
-        {
-            uint64_t y = data_ [1];
-            y <<= basic_type_bits;
-            u += y;
-        }
-
-        return u;
     }
 
     explicit operator double() const
@@ -698,8 +661,8 @@ public:
         int n = len;
         int i = 0;
                                       // 1/3 > ln(2)/ln(10)
-        static unsigned p10 = 1;
-        static unsigned ip10 = 0;
+        static uint64_t p10 = 1;
+        static uint64_t ip10 = 0;
 
         if ( v.length() == 0 )
         {
@@ -708,7 +671,7 @@ public:
         }
         else
         {
-            unsigned r;
+            uint64_t r;
             if ( p10 == 1 )
             {
                 while ( p10 <= UINT_MAX/10 )
@@ -777,7 +740,7 @@ public:
     }
 
     template <class Alloc>
-    friend bool operator<( const basic_bignum<Alloc>& x, int y )
+    friend bool operator<( const basic_bignum<Alloc>& x, int64_t y )
     {
        return x.compare(y) < 0 ? true : false;
     }
@@ -825,7 +788,7 @@ public:
     }
 
     template <class Alloc>
-    friend basic_bignum<Alloc> operator+( basic_bignum<Alloc> x, int y )
+    friend basic_bignum<Alloc> operator+( basic_bignum<Alloc> x, int64_t y )
     {
         return x += y;
     }
@@ -837,13 +800,13 @@ public:
     }
 
     template <class Alloc>
-    friend basic_bignum<Alloc> operator-( basic_bignum<Alloc> x, int y )
+    friend basic_bignum<Alloc> operator-( basic_bignum<Alloc> x, int64_t y )
     {
         return x -= y;
     }
 
     template <class Alloc>
-    friend basic_bignum<Alloc> operator*( int x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Alloc> operator*( int64_t x, const basic_bignum<Alloc>& y )
     {
         return basic_bignum<Alloc>(y) *= x;
     }
@@ -855,7 +818,7 @@ public:
     }
 
     template <class Alloc>
-    friend basic_bignum<Alloc> operator*( basic_bignum<Alloc> x, int y )
+    friend basic_bignum<Alloc> operator*( basic_bignum<Alloc> x, int64_t y )
     {
         return x *= y;
     }
@@ -1191,7 +1154,7 @@ public:
         num.neg_ = denom.neg_ = false;
         if ( num < denom )
         {
-            quot = 0;
+            quot = uint64_t(0);
             rem = num;
             rem.neg_ = RemNeg;
             return;
@@ -1282,7 +1245,7 @@ public:
         return (i/word_length + 1) * word_length;
     }
 
-    void initialize(uint32_t u)
+    void initialize(uint64_t u)
     {
         data_ = values_;
         dynamic_ = false;
@@ -1291,17 +1254,6 @@ public:
         data_ [0] = u;
     }
  
-    void initialize(uint64_t u)
-    {
-        data_ = values_;
-        dynamic_ = false;
-        length_ = u != 0 ? 2 : 0;
-
-        data_[0] = basic_type(u & max_basic_type);
-        u >>= basic_type_bits;
-        data_[1] = basic_type(u & max_basic_type);
-    }
-
     void initialize( const basic_bignum<Allocator>& n )
     {
         neg_ = n.neg_;

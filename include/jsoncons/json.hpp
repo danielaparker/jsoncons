@@ -753,7 +753,7 @@ public:
         {
             bool neg = n < 0 ? true : false;
             basic_bignum<byte_allocator_type> v = neg ? -n : n;
-            basic_bignum<byte_allocator_type> base(16);
+            basic_bignum<byte_allocator_type> base(uint64_t(16));
             basic_bignum<byte_allocator_type> r;
 
             std::vector<uint8_t> data;
@@ -761,7 +761,7 @@ public:
             do
             {
                 v.divide( base, v, r, true );
-                data.push_back((int)r);
+                data.push_back((uint8_t)(int64_t)r);
             } 
             while (v.length() > 0);
 
