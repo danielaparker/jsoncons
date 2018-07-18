@@ -1033,9 +1033,9 @@ public:
             switch (type_id())
             {
             case json_type_tag::positive_bignum_t:
-                return bignum(1,byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length()));
+                return bignum(1, byte_string_data_cast()->data(),byte_string_data_cast()->length());
             case json_type_tag::negative_bignum_t:
-                return bignum(-1,byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length()));
+                return bignum(-1,byte_string_data_cast()->data(),byte_string_data_cast()->length());
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
             }

@@ -321,7 +321,7 @@ public:
     {
         if ( neg_ != y.neg_ )
             return *this += -y;
-        if ( !neg_ && y > *this || neg_ && y < *this )
+        if ( (!neg_ && y > *this) || (neg_ && y < *this) )
             return *this = -(y - *this);
         int borrow = 0;
         basic_type d;
