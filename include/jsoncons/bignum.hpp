@@ -116,7 +116,7 @@ public:
     {
         bool neg = signum == -1 ? true : false;
 
-        basic_bignum<Allocator> v = 0;
+        basic_bignum<Allocator> v = uint64_t(0);
         for (auto c: l)
         {
             v = (v * 16) + (uint64_t)(c);
