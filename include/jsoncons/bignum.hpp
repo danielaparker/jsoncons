@@ -58,6 +58,7 @@ class basic_bignum : protected basic_bignum_base<Allocator>
 private:
     using typename basic_bignum_base<Allocator>::basic_type;
     using typename basic_bignum_base<Allocator>::byte_allocator_type;
+    using basic_bignum_base<Allocator>::allocator;
 
     static const basic_type max_basic_type = std::numeric_limits<basic_type>::max();
     static const unsigned basic_type_bits = sizeof(basic_type) * 8;  // Number of bits
