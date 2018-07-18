@@ -30,7 +30,7 @@ class basic_bignum_base
 {
 public:
     typedef uint32_t basic_type;
-    typedef typename Allocator allocator_type;
+    typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<basic_type> byte_allocator_type;
 
 private:
