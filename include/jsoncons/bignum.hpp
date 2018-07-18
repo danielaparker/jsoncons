@@ -608,29 +608,7 @@ public:
        return length() != 0 ? true : false;
     }
 
-    explicit operator long() const
-    {
-       long x = 0;
-       if ( length() > 0 )
-       {
-           x = data_ [0];
-       }
-
-       return neg_ ? -x : x;
-    }
-
-    explicit operator unsigned long() const
-    {
-       unsigned long u = 0;
-       if ( length() > 0 )
-       {
-           u = data_ [0];
-       }
-
-       return u;
-    }
-
-    explicit operator int() const
+    explicit operator int32_t() const
     {
        int x = 0;
        if ( length() > 0 )
@@ -641,7 +619,7 @@ public:
        return neg_ ? -x : x;
     }
 
-    explicit operator unsigned() const
+    explicit operator uint32_t() const
     {
        unsigned u = 0;
        if ( length() > 0 )
@@ -650,42 +628,6 @@ public:
        }
 
        return u;
-    }
-
-    explicit operator long double() const
-    {
-        long double x = 0.0;
-        long double factor = 1.0;
-        long double values = (long double)max_basic_type + 1.0;
-
-        const basic_type* p = begin();
-        const basic_type* pEnd = end();
-        while ( p < pEnd )
-        {
-            x += *p*factor;
-            factor *= values;
-            ++p;
-        }
-
-       return neg_ ? -x : x;
-    }
-
-    explicit operator double() const
-    {
-        double x = 0.0;
-        double factor = 1.0;
-        double values = (double)max_basic_type + 1.0;
-
-        const basic_type* p = begin();
-        const basic_type* pEnd = end();
-        while ( p < pEnd )
-        {
-            x += *p*factor;
-            factor *= values;
-            ++p;
-        }
-
-       return neg_ ? -x : x;
     }
 
     explicit operator int64_t() const
@@ -711,6 +653,42 @@ public:
         }
 
         return u;
+    }
+
+    explicit operator double() const
+    {
+        double x = 0.0;
+        double factor = 1.0;
+        double values = (double)max_basic_type + 1.0;
+
+        const basic_type* p = begin();
+        const basic_type* pEnd = end();
+        while ( p < pEnd )
+        {
+            x += *p*factor;
+            factor *= values;
+            ++p;
+        }
+
+       return neg_ ? -x : x;
+    }
+
+    explicit operator long double() const
+    {
+        long double x = 0.0;
+        long double factor = 1.0;
+        long double values = (long double)max_basic_type + 1.0;
+
+        const basic_type* p = begin();
+        const basic_type* pEnd = end();
+        while ( p < pEnd )
+        {
+            x += *p*factor;
+            factor *= values;
+            ++p;
+        }
+
+       return neg_ ? -x : x;
     }
 
     std::string to_string() const
