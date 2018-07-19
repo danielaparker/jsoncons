@@ -148,14 +148,22 @@ public:
         initialize( v );
     }
 
-    basic_bignum(const int64_t& i)
+    template<typename T,
+             typename  = typename std::enable_if<std::is_integral<T>::value && 
+                                                 std::is_signed<T>::value &&
+                                                 sizeof(T) <= sizeof(int64_t)>::type>
+    basic_bignum(T i)
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
         initialize( u );
     }
 
-    basic_bignum(const uint64_t& u)
+    template<typename T,
+             typename  = typename std::enable_if<std::is_integral<T>::value && 
+                                                 !std::is_signed<T>::value &&
+                                                 sizeof(T) <= sizeof(uint64_t)>::type>
+    basic_bignum(T u)
     {
         initialize( u );
     }
