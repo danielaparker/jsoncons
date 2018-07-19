@@ -27,6 +27,15 @@ BOOST_AUTO_TEST_CASE(test_bignum)
     //std::cout << val.to_string(16) << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(test_longlong)
+{
+    long long n = 100;
+    bignum val = n;
+
+    std::cout << "long long " << val << std::endl;
+    //std::cout << val.to_string(16) << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE(test_bignum2)
 {
     std::string v = "10000000000000000";

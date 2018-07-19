@@ -152,48 +152,48 @@ public:
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
-        initialize1( u );
+        initialize_from_integer( u );
     }
 
     basic_bignum(unsigned short u)
     {
-        initialize1( u );
+        initialize_from_integer( u );
     }
 
     basic_bignum(int i)
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
-        initialize1( u );
+        initialize_from_integer( u );
     }
 
     basic_bignum(unsigned int u)
     {
-        initialize1( u );
+        initialize_from_integer( u );
     }
 
     basic_bignum(long i)
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
-        initialize1( u );
+        initialize_from_integer( u );
     }
 
     basic_bignum(unsigned long u)
     {
-        initialize1( u );
+        initialize_from_integer( u );
     }
 
     basic_bignum(long long i)
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
-        initialize1( u );
+        initialize_from_integer( u );
     }
 
     basic_bignum(unsigned long long u)
     {
-        initialize1( u );
+        initialize_from_integer( u );
     }
 
     basic_bignum(const basic_bignum<Allocator>& n)
@@ -343,7 +343,7 @@ public:
             return *this += -y;
         if ( (!neg_ && y > *this) || (neg_ && y < *this) )
             return *this = -(y - *this);
-        int borrow = 0;
+        uint64_t borrow = 0;
         basic_type d;
         for (size_t i = 0; i < length(); i++ )
         {
@@ -357,7 +357,8 @@ public:
                 if ( data_[i] > d )
                     borrow = 1;
             }
-            else data_[i] = d;
+            else 
+                data_[i] = d;
         }
         reduce();
         return *this;
@@ -373,7 +374,7 @@ public:
 
     basic_bignum& operator*=( uint64_t y )
     {
-        int len0 = length();
+        size_t len0 = length();
         basic_type Hi;
         basic_type Lo;
         basic_type dig = data_[0];
@@ -381,8 +382,8 @@ public:
 
         incr_length( length() + 1 );
 
-        int i = 0;
-        for ( i = 0; i < len0; i++ )
+        size_t i = 0;
+        for (i = 0; i < len0; i++ )
         {
             DDproduct( dig, y, Hi, Lo );
             data_[i] = Lo + carry;
@@ -418,18 +419,18 @@ public:
             *this *= digit;
         }
         else
+        {
             if ( y.length() == 1 )
                 *this *= y.data_[0];
             else
             {
-                int lenProd = length() + y.length(), jA, jB;
+                size_t lenProd = length() + y.length(), jA, jB;
                 basic_type sumHi = 0, sumLo, Hi, Lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bignum<Allocator> x = *this;
                 set_length( lenProd ); // Give *this length lenProd
 
-                int i = 0;
-                for ( i = 0; i < lenProd; i++ )
+                for (size_t i = 0; i < lenProd; i++ )
                 {
                     sumLo = sumHi;
                     sumHi = carry;
@@ -449,9 +450,10 @@ public:
                             carry += (sumHi < sumHi_old);
                         }
                     }
-                data_[i] = sumLo;
+                    data_[i] = sumLo;
+                }
             }
-       }
+        }
        reduce();
        neg_ = difSigns;
        return *this;
@@ -476,8 +478,8 @@ public:
         uint64_t q = k / basic_type_bits;
         if ( q ) // Increase length_ by q:
         {
-            incr_length( length() + q );
-            for (int i = length() - 1; i >= 0; i-- )
+            incr_length( (uint16_t)(length() + q) );
+            for (size_t i = length(); i-- > 0; )
                 data_[i] = ( i < q ? 0 : data_[i - q]);
             k %= basic_type_bits;
         }
@@ -486,7 +488,7 @@ public:
             uint64_t k1 = basic_type_bits - k;
             basic_type mask = (1 << k) - 1;
             incr_length( length() + 1 );
-            for ( int i = length() - 1; i >= 0; i-- )
+            for (size_t i = length(); i-- > 0; )
             {
                 data_[i] <<= k;
                 if ( i > 0 )
@@ -497,18 +499,18 @@ public:
         return *this;
     }
 
-    basic_bignum& operator>>=( unsigned k )
+    basic_bignum& operator>>=(uint64_t k)
     {
-        int q = k / basic_type_bits;
+        uint64_t q = (k / basic_type_bits);
         if ( q >= length() )
         {
             set_length( 0 );
             return *this;
         }
-        if ( q )
+        if (q > 0)
         {
             memmove( data_, data_+q, (length() - q)*sizeof(basic_type) );
-            set_length( length() - q );
+            set_length( length() - (uint16_t)q );
             k %= basic_type_bits;
             if ( k == 0 )
             {
@@ -520,7 +522,7 @@ public:
         int n = length() - 1;
         int64_t k1 = basic_type_bits - k;
         basic_type mask = (1 << k) - 1;
-        for ( int i = 0; i <= n; i++ )
+        for (size_t i = 0; i <= n; i++)
         {
             data_[i] >>= k;
             if ( i < n )
@@ -600,7 +602,7 @@ public:
 
     basic_bignum& operator&=( const basic_bignum<Allocator>& a )
     {
-        int old_length = length();
+        uint16_t old_length = length();
 
         set_length( std::min( length(), a.length() ) );
 
@@ -1026,7 +1028,7 @@ public:
             code = +1;
         else
         {
-            for ( int i = length() - 1; i >= 0; i-- )
+            for (size_t i = length(); i-- > 0; )
             {
                 if (data_[i] > y.data_[i])
                 {
@@ -1184,7 +1186,7 @@ public:
         }
         bool QuotNeg = neg_ ^ denom.neg_;
         bool RemNeg = neg_;
-        int    i, r, secondDone, x = 0, n;
+        int r, secondDone, x = 0, n;
         basic_type q, d;
         basic_bignum<Allocator> num = *this;
         num.neg_ = denom.neg_ = false;
@@ -1209,7 +1211,7 @@ public:
             basic_type divisor = denom.data_[0], dHi = 0,
                      q1, r, q2, dividend;
             quot.set_length(length());
-            for ( int i=length()-1; i >= 0; i-- )
+            for (size_t i=length(); i-- > 0; )
             {
                 dividend = (dHi << basic_type_halfBits) | (data_[i] >> basic_type_halfBits);
                 q1 = dividend/divisor;
@@ -1230,7 +1232,7 @@ public:
         r = denom.length() - 1;
         n = num.length() - 1;
         quot.set_length(n - r);
-        for ( i=quot.length()-1; i >= 0; i-- )
+        for (size_t i=quot.length(); i-- > 0; )
             quot.data_[i] = 0;
         rem = num;
         if ( rem.data_[n] >= denom.data_[r] )
@@ -1255,13 +1257,13 @@ public:
         }
     }
 
-    int length() const { return length_; }
+    uint16_t length() const { return length_; }
     basic_type* begin() { return data_; }
     const basic_type* begin() const { return data_; }
     basic_type* end() { return data_ + length_; }
     const basic_type* end() const { return data_ + length_; }
 
-    void set_length(int n)
+    void set_length(uint16_t n)
     {
        length_ = n;
        if ( length_ > capacity() )
@@ -1285,7 +1287,7 @@ public:
     typename std::enable_if<std::is_integral<T>::value && 
                             !std::is_signed<T>::value &&
                             sizeof(T) <= sizeof(int64_t),void>::type
-    initialize1(T u)
+    initialize_from_integer(T u)
     {
         data_ = values_;
         dynamic_ = false;
@@ -1294,6 +1296,22 @@ public:
         data_ [0] = u;
     }
  
+    template <typename T>
+    typename std::enable_if<std::is_integral<T>::value &&
+                           !std::is_signed<T>::value &&
+                           sizeof(int64_t) < sizeof(T) &&
+                           sizeof(T) < sizeof(int64_t)*2, void>::type
+        initialize_from_integer(T u)
+    {
+        data_ = values_;
+        dynamic_ = false;
+        length_ = u != 0 ? 2 : 0;
+
+        data_[0] = basic_type(u & max_basic_type);
+        u >>= basic_type_bits;
+        data_[1] = basic_type(u & max_basic_type);
+    }
+
     void initialize( const basic_bignum<Allocator>& n )
     {
         neg_ = n.neg_;
@@ -1377,7 +1395,7 @@ const uint64_t basic_bignum<Allocator>::basic_type_bits = sizeof(uint64_t) * 8; 
 template <class Allocator>
 const uint64_t basic_bignum<Allocator>::basic_type_halfBits = basic_bignum<Allocator>::basic_type_bits/2;
 template <class Allocator>
-const uint16_t basic_bignum<Allocator>::word_length = 2; // Use multiples of word_length words
+const uint16_t basic_bignum<Allocator>::word_length = 4; // Use multiples of word_length words
 template <class Allocator>
 const uint64_t basic_bignum<Allocator>::r_mask = (uint64_t(1) << basic_bignum<Allocator>::basic_type_halfBits) - 1;
 template <class Allocator>
