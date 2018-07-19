@@ -83,7 +83,7 @@ public:
         values_[1] = 0;
     }
 
-    basic_bignum(const char* str)
+    explicit basic_bignum(const char* str)
     {
         bool neg = false;
 
@@ -99,7 +99,7 @@ public:
         }
 
         size_t n = strlen( str );
-        basic_bignum<Allocator> v = uint64_t(0);
+        basic_bignum<Allocator> v = 0;
         for (size_t i = 0; i < n; i++)
         {
             v = (v * 10) + (uint64_t)(str[i] - '0');
@@ -116,7 +116,7 @@ public:
     {
         bool neg = signum == -1 ? true : false;
 
-        basic_bignum<Allocator> v = uint64_t(0);
+        basic_bignum<Allocator> v = 0;
         for (auto c: l)
         {
             v = (v * 16) + (uint64_t)(c);
@@ -134,7 +134,7 @@ public:
     {
         bool neg = signum == -1 ? true : false;
 
-        basic_bignum<Allocator> v = uint64_t(0);
+        basic_bignum<Allocator> v(uint64_t(0));
         for (size_t i = 0; i < n; i++)
         {
             v = (v * 16) + (uint64_t)(str[i]);
@@ -148,24 +148,52 @@ public:
         initialize( v );
     }
 
-    template<typename T,
-             typename  = typename std::enable_if<std::is_integral<T>::value && 
-                                                 std::is_signed<T>::value &&
-                                                 sizeof(T) <= sizeof(int64_t)>::type>
-    basic_bignum(T i)
+    basic_bignum(short i)
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
-        initialize( u );
+        initialize1( u );
     }
 
-    template<typename T,
-             typename  = typename std::enable_if<std::is_integral<T>::value && 
-                                                 !std::is_signed<T>::value &&
-                                                 sizeof(T) <= sizeof(uint64_t)>::type>
-    basic_bignum(T u)
+    basic_bignum(unsigned short u)
     {
-        initialize( u );
+        initialize1( u );
+    }
+
+    basic_bignum(int i)
+    {
+        neg_ = i < 0;
+        uint64_t u = neg_ ? -i : i;
+        initialize1( u );
+    }
+
+    basic_bignum(unsigned int u)
+    {
+        initialize1( u );
+    }
+
+    basic_bignum(long i)
+    {
+        neg_ = i < 0;
+        uint64_t u = neg_ ? -i : i;
+        initialize1( u );
+    }
+
+    basic_bignum(unsigned long u)
+    {
+        initialize1( u );
+    }
+
+    basic_bignum(long long i)
+    {
+        neg_ = i < 0;
+        uint64_t u = neg_ ? -i : i;
+        initialize1( u );
+    }
+
+    basic_bignum(unsigned long long u)
+    {
+        initialize1( u );
     }
 
     basic_bignum(const basic_bignum<Allocator>& n)
@@ -185,7 +213,7 @@ public:
         }
     }
 
-    basic_bignum( double x )
+    explicit basic_bignum( double x )
     {
         bool neg = false;
 
@@ -214,7 +242,7 @@ public:
         initialize( v );
     }
 
-    basic_bignum(long double x)
+    explicit basic_bignum(long double x)
     {
         bool neg = false;
 
@@ -1253,7 +1281,11 @@ public:
         return (i/word_length + 1) * word_length;
     }
 
-    void initialize(uint64_t u)
+    template <typename T>
+    typename std::enable_if<std::is_integral<T>::value && 
+                            !std::is_signed<T>::value &&
+                            sizeof(T) <= sizeof(int64_t),void>::type
+    initialize1(T u)
     {
         data_ = values_;
         dynamic_ = false;
