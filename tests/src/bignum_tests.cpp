@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(test_bignum)
 
 BOOST_AUTO_TEST_CASE(test_longlong)
 {
-    long long n = 100;
+    long long n = std::numeric_limits<long long>::max();
     bignum val = n;
 
     std::cout << "long long " << val << std::endl;

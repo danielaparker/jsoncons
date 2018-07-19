@@ -316,7 +316,7 @@ public:
         basic_type d;
         basic_type carry = 0;
 
-        incr_length( std::max(y.length(), length()) + 1 );
+        incr_length( (std::max)(y.length(), length()) + 1 );
 
         for (size_t i = 0; i < length(); i++ )
         {
@@ -604,7 +604,7 @@ public:
     {
         uint16_t old_length = length();
 
-        set_length( std::min( length(), a.length() ) );
+        set_length( (std::min)( length(), a.length() ) );
 
         const basic_type* pBegin = begin();
         basic_type* p = end() - 1;
