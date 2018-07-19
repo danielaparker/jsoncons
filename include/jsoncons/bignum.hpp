@@ -1300,7 +1300,7 @@ public:
     typename std::enable_if<std::is_integral<T>::value &&
                            !std::is_signed<T>::value &&
                            sizeof(int64_t) < sizeof(T) &&
-                           sizeof(T) < sizeof(int64_t)*2, void>::type
+                           sizeof(T) <= sizeof(int64_t)*2, void>::type
         initialize_from_integer(T u)
     {
         data_ = values_;
