@@ -753,7 +753,7 @@ public:
         {
             bool neg = n < 0 ? true : false;
             basic_bignum<byte_allocator_type> v = neg ? -n : n;
-            basic_bignum<byte_allocator_type> base(uint64_t(16));
+            basic_bignum<byte_allocator_type> base(16);
             basic_bignum<byte_allocator_type> r;
 
             std::vector<uint8_t> data;
@@ -1140,13 +1140,22 @@ public:
                 }
                 break;
             case json_type_tag::positive_bignum_t:
-                // FALLTHRU
-            case json_type_tag::negative_bignum_t:
                 switch (rhs.type_id())
                 {
                 case json_type_tag::positive_bignum_t:
                     {
-                        return as_byte_string_view() == rhs.as_byte_string_view();
+                        return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length()) == byte_string_view(rhs.byte_string_data_cast()->data(),rhs.byte_string_data_cast()->length());
+                    }
+                default:
+                    return false;
+                }
+                break;
+            case json_type_tag::negative_bignum_t:
+                switch (rhs.type_id())
+                {
+                case json_type_tag::negative_bignum_t:
+                    {
+                        return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length()) == byte_string_view(rhs.byte_string_data_cast()->data(),rhs.byte_string_data_cast()->length());
                     }
                 default:
                     return false;
