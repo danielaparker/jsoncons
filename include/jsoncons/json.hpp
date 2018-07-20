@@ -447,8 +447,8 @@ public:
             }
 
             byte_string_data(const byte_string_data& val, const Allocator& a)
-                : data_base(val.type_id())
-            {
+                : data_base(val.type())
+            { 
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
 
@@ -1277,14 +1277,11 @@ public:
             case json_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
                 break;
-<<<<<<< HEAD
-=======
             case json_type_tag::positive_bignum_t:
                 // FALLTHRU
             case json_type_tag::negative_bignum_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
                 break;
->>>>>>> cb2037e47da118aacf97fe5d9bb40130e090cce8
             case json_type_tag::array_t:
                 new(reinterpret_cast<void*>(&(data_)))array_data(std::move(*temp.array_data_cast()));
                 break;
