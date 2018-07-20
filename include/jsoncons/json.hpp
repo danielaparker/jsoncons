@@ -1662,6 +1662,11 @@ public:
             return evaluate().is_byte_string();
         }
 
+        bool is_bignum() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_bignum();
+        }
+
         bool is_number() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_number();

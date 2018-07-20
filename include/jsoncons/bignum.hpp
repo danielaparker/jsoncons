@@ -745,218 +745,182 @@ public:
 
 //  Global Operators
 
-    template <class Alloc>
-    friend bool operator==( const basic_bignum<Alloc>& x, const basic_bignum<Alloc>& y )
+    friend bool operator==( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
     {
         return x.compare(y) == 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator==( const basic_bignum<Alloc>& x, int y )
+    friend bool operator==( const basic_bignum<Allocator>& x, int y )
     {
         return x.compare(y) == 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator!=( const basic_bignum<Alloc>& x, const basic_bignum<Alloc>& y )
+    friend bool operator!=( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
     {
         return x.compare(y) != 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator!=( const basic_bignum<Alloc>& x, int y )
+    friend bool operator!=( const basic_bignum<Allocator>& x, int y )
     {
-        return x.compare(basic_bignum<Alloc>(y)) != 0 ? true : false;
+        return x.compare(basic_bignum<Allocator>(y)) != 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator<( const basic_bignum<Alloc>& x, const basic_bignum<Alloc>& y )
+    friend bool operator<( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
     {
        return x.compare(y) < 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator<( const basic_bignum<Alloc>& x, int64_t y )
+    friend bool operator<( const basic_bignum<Allocator>& x, int64_t y )
     {
        return x.compare(y) < 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator>( const basic_bignum<Alloc>& x, const basic_bignum<Alloc>& y )
+    friend bool operator>( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
     {
         return x.compare(y) > 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator>( const basic_bignum<Alloc>& x, int y )
+    friend bool operator>( const basic_bignum<Allocator>& x, int y )
     {
-        return x.compare(basic_bignum<Alloc>(y)) > 0 ? true : false;
+        return x.compare(basic_bignum<Allocator>(y)) > 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator<=( const basic_bignum<Alloc>& x, const basic_bignum<Alloc>& y )
+    friend bool operator<=( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
     {
         return x.compare(y) <= 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator<=( const basic_bignum<Alloc>& x, int y )
+    friend bool operator<=( const basic_bignum<Allocator>& x, int y )
     {
         return x.compare(y) <= 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator>=( const basic_bignum<Alloc>& x, const basic_bignum<Alloc>& y )
+    friend bool operator>=( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
     {
         return x.compare(y) >= 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend bool operator>=( const basic_bignum<Alloc>& x, int y )
+    friend bool operator>=( const basic_bignum<Allocator>& x, int y )
     {
         return x.compare(y) >= 0 ? true : false;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator+( basic_bignum<Alloc> x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator+( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
     {
         return x += y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator+( basic_bignum<Alloc> x, int64_t y )
+    friend basic_bignum<Allocator> operator+( basic_bignum<Allocator> x, int64_t y )
     {
         return x += y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator-( basic_bignum<Alloc> x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator-( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
     {
         return x -= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator-( basic_bignum<Alloc> x, int64_t y )
+    friend basic_bignum<Allocator> operator-( basic_bignum<Allocator> x, int64_t y )
     {
         return x -= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator*( int64_t x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator*( int64_t x, const basic_bignum<Allocator>& y )
     {
-        return basic_bignum<Alloc>(y) *= x;
+        return basic_bignum<Allocator>(y) *= x;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator*( basic_bignum<Alloc> x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator*( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
     {
         return x *= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator*( basic_bignum<Alloc> x, int64_t y )
+    friend basic_bignum<Allocator> operator*( basic_bignum<Allocator> x, int64_t y )
     {
         return x *= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator/( basic_bignum<Alloc> x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator/( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
     {
         return x /= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator/( basic_bignum<Alloc> x, int y )
+    friend basic_bignum<Allocator> operator/( basic_bignum<Allocator> x, int y )
     {
         return x /= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator%( basic_bignum<Alloc> x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator%( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
     {
         return x %= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator<<( basic_bignum<Alloc> u, unsigned k )
+    friend basic_bignum<Allocator> operator<<( basic_bignum<Allocator> u, unsigned k )
     {
         return u <<= k;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator<<( basic_bignum<Alloc> u, int k )
+    friend basic_bignum<Allocator> operator<<( basic_bignum<Allocator> u, int k )
     {
         return u <<= k;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator>>( basic_bignum<Alloc> u, unsigned k )
+    friend basic_bignum<Allocator> operator>>( basic_bignum<Allocator> u, unsigned k )
     {
         return u >>= k;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator>>( basic_bignum<Alloc> u, int k )
+    friend basic_bignum<Allocator> operator>>( basic_bignum<Allocator> u, int k )
     {
         return u >>= k;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator|( basic_bignum<Alloc> x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator|( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
     {
         return x |= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator|( basic_bignum<Alloc> x, int y )
+    friend basic_bignum<Allocator> operator|( basic_bignum<Allocator> x, int y )
     {
         return x |= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator|( basic_bignum<Alloc> x, unsigned y )
+    friend basic_bignum<Allocator> operator|( basic_bignum<Allocator> x, unsigned y )
     {
         return x |= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator^( basic_bignum<Alloc> x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator^( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
     {
         return x ^= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator^( basic_bignum<Alloc> x, int y )
+    friend basic_bignum<Allocator> operator^( basic_bignum<Allocator> x, int y )
     {
         return x ^= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator^( basic_bignum<Alloc> x, unsigned y )
+    friend basic_bignum<Allocator> operator^( basic_bignum<Allocator> x, unsigned y )
     {
         return x ^= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator&( basic_bignum<Alloc> x, const basic_bignum<Alloc>& y )
+    friend basic_bignum<Allocator> operator&( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
     {
         return x &= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator&( basic_bignum<Alloc> x, int y )
+    friend basic_bignum<Allocator> operator&( basic_bignum<Allocator> x, int y )
     {
         return x &= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> operator&( basic_bignum<Alloc> x, unsigned y )
+    friend basic_bignum<Allocator> operator&( basic_bignum<Allocator> x, unsigned y )
     {
         return x &= y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> abs( const basic_bignum<Alloc>& a )
+    friend basic_bignum<Allocator> abs( const basic_bignum<Allocator>& a )
     {
         if ( a.neg_ )
         {
@@ -965,10 +929,9 @@ public:
         return a;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> power( basic_bignum<Alloc> x, unsigned n )
+    friend basic_bignum<Allocator> power( basic_bignum<Allocator> x, unsigned n )
     {
-        basic_bignum<Alloc> y = 1;
+        basic_bignum<Allocator> y = 1;
 
         while ( n )
         {
@@ -983,12 +946,11 @@ public:
         return y;
     }
 
-    template <class Alloc>
-    friend basic_bignum<Alloc> sqrt( const basic_bignum<Alloc>& a )
+    friend basic_bignum<Allocator> sqrt( const basic_bignum<Allocator>& a )
     {
-        basic_bignum<Alloc> x = a;
-        basic_bignum<Alloc> b = a;
-        basic_bignum<Alloc> q;
+        basic_bignum<Allocator> x = a;
+        basic_bignum<Allocator> b = a;
+        basic_bignum<Allocator> q;
 
         b <<= 1;
         while ( b >>= 2, b > 0 )
@@ -1003,8 +965,7 @@ public:
         return x < q ? x : q;
     }
 
-    template <class Alloc>
-    friend std::ostream& operator<<( std::ostream& os, const basic_bignum<Alloc>& v )
+    friend std::ostream& operator<<( std::ostream& os, const basic_bignum<Allocator>& v )
     {
         std::string s; 
         v.dump(s);
