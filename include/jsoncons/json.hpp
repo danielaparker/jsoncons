@@ -448,7 +448,7 @@ public:
 
             byte_string_data(const byte_string_data& val, const Allocator& a)
                 : data_base(val.type_id())
-            {
+            { 
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
 
