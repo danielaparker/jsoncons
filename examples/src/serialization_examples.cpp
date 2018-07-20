@@ -337,9 +337,30 @@ void nan_inf_replacement()
     std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
 }
 
-void bignum_serialization_examples()
+void bignum_serialization_examples1()
 {
-    json j(bignum("-18446744073709551617"));
+    json j(bignum("[-18446744073709551617]"));
+
+    std::cout << "(1)\n";
+    j.dump(std::cout);
+    std::cout << "\n\n";
+
+    std::cout << "(2)\n";
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::integer);
+    j.dump(std::cout, options2);
+    std::cout << "\n\n";
+
+    std::cout << "(3)\n";
+    json_serializing_options options3;
+    options3.bignum_format(bignum_chars_format::base64url);
+    j.dump(std::cout, options3);
+    std::cout << "\n\n";
+}
+
+void bignum_serialization_examples2()
+{
+    json j = json::parse("[-18446744073709551617]");
 
     std::cout << "(1)\n";
     j.dump(std::cout);
@@ -367,7 +388,8 @@ void serialization_examples()
     serialization_example4();
     dump_json_fragments();
     nan_inf_replacement();
-    bignum_serialization_examples();
+    bignum_serialization_examples1();
+    bignum_serialization_examples2();
     std::cout << std::endl;
 }
 
