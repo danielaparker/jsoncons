@@ -28,6 +28,7 @@
 #include <initializer_list>
 #include <jsoncons/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp>
+#include <jsoncons/bignum.hpp>
 #include <jsoncons/json_exception.hpp>
 #if !defined(JSONCONS_NO_TO_CHARS)
 #include <charconv>
