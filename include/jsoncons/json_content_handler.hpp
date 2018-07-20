@@ -11,6 +11,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/serializing_context.hpp>
+#include <jsoncons/json_serializing_options.hpp>
 #if !defined(JSONCONS_NO_DEPRECATED)
 #include <jsoncons/json_type_traits.hpp> // for null_type
 #endif
