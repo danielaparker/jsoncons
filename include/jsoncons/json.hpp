@@ -753,7 +753,7 @@ public:
         {
             bool neg = n < 0 ? true : false;
             basic_bignum<byte_allocator_type> v = neg ? -n : n;
-            basic_bignum<byte_allocator_type> base(16);
+            basic_bignum<byte_allocator_type> base(256);
             basic_bignum<byte_allocator_type> r;
 
             std::vector<uint8_t> data;
@@ -3297,6 +3297,20 @@ public:
         case json_type_tag::small_string_t:
         case json_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length());
+        case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s;
+                n.dump(s);
+                return s;
+            }
+        case json_type_tag::negative_bignum_t:
+            {
+                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s;
+                n.dump(s);
+                return s;
+            }
         default:
             return to_string();
         }
@@ -3310,6 +3324,20 @@ public:
         case json_type_tag::small_string_t:
         case json_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length(),allocator);
+        case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
+        case json_type_tag::negative_bignum_t:
+            {
+                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
         default:
             return to_string(allocator);
         }
@@ -3322,6 +3350,20 @@ public:
         case json_type_tag::small_string_t:
         case json_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length());
+        case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s;
+                n.dump(s);
+                return s;
+            }
+        case json_type_tag::negative_bignum_t:
+            {
+                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s;
+                n.dump(s);
+                return s;
+            }
         default:
             return to_string(options);
         }
@@ -3336,6 +3378,20 @@ public:
         case json_type_tag::small_string_t:
         case json_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length(),allocator);
+        case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
+        case json_type_tag::negative_bignum_t:
+            {
+                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
         default:
             return to_string(options,allocator);
         }

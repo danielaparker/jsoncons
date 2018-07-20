@@ -299,6 +299,15 @@ private:
     {
         std::vector<uint8_t> v;
 
+        if (signum == -1)
+        {
+            v.push_back(0xc3);
+        }
+        else
+        {
+            v.push_back(0xc2);
+        }
+
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
@@ -327,8 +336,10 @@ private:
 
         for (size_t i = 0; i < length; ++i)
         {
-            binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
+            v.push_back(data[i]);
+            //binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
         }
+
         for (auto c : v)
         {
             writer_.put(c);

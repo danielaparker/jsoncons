@@ -171,8 +171,8 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                 size_t length = *first & 0x1f;
                 *endp = p + length;
                 v = std::vector<uint8_t>(p, *endp);
-                break;
             }
+            break;
         case 0x58: // byte string (one-byte uint8_t for n follows)
             {
                 const auto length = binary::from_big_endian<uint8_t>(p,last,endp);
@@ -186,8 +186,8 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                     *endp = p + length;
                     v = std::vector<uint8_t>(p, *endp);
                 }
-                break;
             }
+            break;
         case 0x59: // byte string (two-byte uint16_t for n follow)
             {
                 const auto length = binary::from_big_endian<uint16_t>(p,last,endp);
@@ -201,8 +201,8 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                     *endp = p + length;
                     v = std::vector<uint8_t>(p, *endp);
                 }
-                break;
             }
+            break;
         case 0x5a: // byte string (four-byte uint32_t for n follow)
             {
                 const auto length = binary::from_big_endian<uint32_t>(p,last,endp);
@@ -216,8 +216,8 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                     *endp = p + length;
                     v = std::vector<uint8_t>(p, *endp);
                 }
-                break;
             }
+            break;
         case 0x5b: // byte string (eight-byte uint64_t for n follow)
             {
                 const auto length = binary::from_big_endian<uint64_t>(p,last,endp);
@@ -231,8 +231,8 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                     *endp = p + length;
                     v = std::vector<uint8_t>(p, *endp);
                 }
-                break;
             }
+            break;
         case 0x5f: // byte string, byte strings follow, terminated by "break"
             {
                 while (*p != 0xff)
@@ -249,8 +249,8 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                         v.insert(v.end(),ss.begin(),ss.end());
                     }
                 }
-                break;
             }
+            break;
         default: 
             {
                 *endp = first;
@@ -1815,7 +1815,7 @@ public:
             {
                 const uint8_t* endp;
                 std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
-                if (endp == pos)
+                if (endp == input_ptr_)
                 {
                     ec = cbor_parser_errc::unexpected_eof;
                     return;
@@ -1830,7 +1830,7 @@ public:
             {
                 const uint8_t* endp;
                 std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
-                if (endp == pos)
+                if (endp == input_ptr_)
                 {
                     ec = cbor_parser_errc::unexpected_eof;
                     return;

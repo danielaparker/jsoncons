@@ -498,16 +498,75 @@ private:
 
     void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
+        if (!stack_.empty() && stack_.back().is_array())
+        {
+            begin_scalar_value();
+        }
+
         std::basic_string<CharT> s;
         encode_base64url(data,data+length,s);
-        do_string_value(s, context);
+        writer_. put('\"');
+        writer_.write(s.data(),s.size());
+        writer_. put('\"');
+
+        end_value();
     }
 
     void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
     {
-        std::basic_string<CharT> s;
-        encode_base64url(data,data+length,s);
-        do_string_value(s, context);
+        if (!stack_.empty() && stack_.back().is_array())
+        {
+            begin_scalar_value();
+        }
+
+        switch (options_.bignum_format())
+        {
+        case bignum_chars_format::integer:
+            {
+                bignum n = bignum(1,data,length);
+                bignum base(256);
+                bignum r;
+                std::vector<CharT> data;
+                do
+                {
+                    n.divide( base, n, r, true );
+                    data.push_back((uint8_t)(int64_t)r);
+                } 
+                while (n.length() > 0);
+                if (signum == -1)
+                {
+                    data.push_back(-1);
+                }
+                std::reverse(data.begin(),data.end());
+                writer_.write(data.data(),data.size());
+            }
+            break;
+        case bignum_chars_format::base64url:
+            {
+                std::basic_string<CharT> s;
+                encode_base64url(data, data + length, s);
+                if (signum == -1)
+                {
+                    s.insert(s.begin(), '~');
+                }
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+            }
+            break;
+        default:
+            {
+                bignum n = bignum(signum, data, length);
+                std::basic_string<CharT> s;
+                n.dump(s);
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+            }
+            break;
+        }
+
+        end_value();
     }
 
     void do_double_value(double value, const floating_point_options& fmt, const serializing_context&) override

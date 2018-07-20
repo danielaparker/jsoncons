@@ -119,7 +119,7 @@ public:
         basic_bignum<Allocator> v = 0;
         for (auto c: l)
         {
-            v = (v * 16) + (uint64_t)(c);
+            v = (v * 256) + (uint64_t)(c);
         }
 
         if ( neg )
@@ -137,7 +137,7 @@ public:
         basic_bignum<Allocator> v(uint64_t(0));
         for (size_t i = 0; i < n; i++)
         {
-            v = (v * 16) + (uint64_t)(str[i]);
+            v = (v * 256) + (uint64_t)(str[i]);
         }
 
         if ( neg )
@@ -688,10 +688,10 @@ public:
        return neg_ ? -x : x;
     }
 
-    std::string to_string() const
+    template <typename Ch, typename Traits, typename Alloc>
+    void dump(std::basic_string<Ch,Traits,Alloc>& data) const
     {
         basic_bignum<Allocator> v(*this);
-        std::string data;
 
         int len = int(uint32_t(v.length()) * basic_bignum<Allocator>::basic_type_bits / 3) + 2;
         data.resize(len);
@@ -741,8 +741,6 @@ public:
                 data[i++] = data[n++];
         }
         data.resize(i);
-
-        return data;
     }
 
 //  Global Operators
@@ -1008,7 +1006,8 @@ public:
     template <class Alloc>
     friend std::ostream& operator<<( std::ostream& os, const basic_bignum<Alloc>& v )
     {
-        std::string s = v.to_string();
+        std::string s; 
+        v.dump(s);
 
         os << s;
 
