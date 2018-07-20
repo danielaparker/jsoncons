@@ -21,13 +21,65 @@
 
 namespace jsoncons {
 
-enum class indenting {no_indent = 0, indent = 1};
+#if !defined(JSONCONS_NO_TO_CHARS)
+using chars_format = std::chars_format;
+#else
+enum class chars_format : uint8_t {fixed=1,scientific=2,hex=4,general=fixed|scientific};
+#endif
+
+// floating_point_options
+
+class floating_point_options
+{
+    chars_format format_;
+    uint8_t precision_;
+    uint8_t decimal_places_;
+public:
+    floating_point_options()
+        : format_(chars_format::general), precision_(0), decimal_places_(0)
+    {
+    }
+
+    floating_point_options(chars_format format, uint8_t precision, uint8_t decimal_places = 0)
+        : format_(format), precision_(precision), decimal_places_(decimal_places)
+    {
+    }
+
+    explicit floating_point_options(chars_format format)
+        : format_(format), precision_(0), decimal_places_(0)
+    {
+    }
+
+    floating_point_options(const floating_point_options&) = default;
+    floating_point_options(floating_point_options&&) = default;
+    floating_point_options& operator=(const floating_point_options& e) = default;
+    floating_point_options& operator=(floating_point_options&& e) = default;
+
+    uint8_t precision() const
+    {
+        return precision_;
+    }
+
+    uint8_t decimal_places() const
+    {
+        return decimal_places_;
+    }
+
+    chars_format format() const
+    {
+        return format_;
+    }
+};
+
+enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 enum class block_options {next_line,same_line};
 #endif
 
-enum class line_split_kind{same_line,new_line,multi_line};
+enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
+
+enum class bignum_chars_format : uint8_t {integer,string,base64url};
 
 template <class CharT,class Allocator=std::allocator<CharT>>
 class basic_json_serializing_options
@@ -50,6 +102,7 @@ private:
     string_type neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
+    bignum_chars_format bignum_format_;
 
     line_split_kind object_object_split_lines_;
     line_split_kind object_array_split_lines_;
@@ -71,6 +124,7 @@ public:
           can_read_neg_inf_replacement_(false),
           escape_all_non_ascii_(false),
           escape_solidus_(false),
+          bignum_format_(bignum_chars_format::string),
           object_object_split_lines_(line_split_kind::multi_line),
           object_array_split_lines_(line_split_kind::same_line),
           array_array_split_lines_(line_split_kind::new_line),
@@ -79,15 +133,20 @@ public:
     {
     }
 
-//  Accessors
-    line_split_kind object_object_split_lines() const {return object_object_split_lines_;}
-    line_split_kind array_object_split_lines() const {return array_object_split_lines_;}
-    line_split_kind object_array_split_lines() const {return object_array_split_lines_;}
-    line_split_kind array_array_split_lines() const {return array_array_split_lines_;}
+//  Properties
+    bignum_chars_format bignum_format() const {return bignum_format_;}
+    basic_json_serializing_options<CharT>&  bignum_format(bignum_chars_format value) {bignum_format_ = value; return *this;}
 
+    line_split_kind object_object_split_lines() const {return object_object_split_lines_;}
     basic_json_serializing_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_split_lines_ = value; return *this;}
+
+    line_split_kind array_object_split_lines() const {return array_object_split_lines_;}
     basic_json_serializing_options<CharT>& array_object_split_lines(line_split_kind value) {array_object_split_lines_ = value; return *this;}
+
+    line_split_kind object_array_split_lines() const {return object_array_split_lines_;}
     basic_json_serializing_options<CharT>& object_array_split_lines(line_split_kind value) {object_array_split_lines_ = value; return *this;}
+
+    line_split_kind array_array_split_lines() const {return array_array_split_lines_;}
     basic_json_serializing_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
 
 #if !defined(JSONCONS_NO_DEPRECATED)

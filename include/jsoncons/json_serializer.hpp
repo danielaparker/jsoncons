@@ -18,6 +18,8 @@
 #include <memory>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/byte_string.hpp>
+#include <jsoncons/bignum.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/writer.hpp>
@@ -498,9 +500,63 @@ private:
 
     void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
+        if (!stack_.empty() && stack_.back().is_array())
+        {
+            begin_scalar_value();
+        }
+
         std::basic_string<CharT> s;
         encode_base64url(data,data+length,s);
-        do_string_value(s, context);
+        writer_. put('\"');
+        writer_.write(s.data(),s.size());
+        writer_. put('\"');
+
+        end_value();
+    }
+
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
+    {
+        if (!stack_.empty() && stack_.back().is_array())
+        {
+            begin_scalar_value();
+        }
+
+        switch (options_.bignum_format())
+        {
+        case bignum_chars_format::integer:
+            {
+                bignum n = bignum(signum, data, length);
+                std::basic_string<CharT> s;
+                n.dump(s);
+                writer_.write(s.data(),s.size());
+            }
+            break;
+        case bignum_chars_format::base64url:
+            {
+                std::basic_string<CharT> s;
+                encode_base64url(data, data + length, s);
+                if (signum == -1)
+                {
+                    s.insert(s.begin(), '~');
+                }
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+            }
+            break;
+        default:
+            {
+                bignum n = bignum(signum, data, length);
+                std::basic_string<CharT> s;
+                n.dump(s);
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+            }
+            break;
+        }
+
+        end_value();
     }
 
     void do_double_value(double value, const floating_point_options& fmt, const serializing_context&) override

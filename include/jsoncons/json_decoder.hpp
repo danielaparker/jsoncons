@@ -34,10 +34,12 @@ public:
     typedef typename string_type::allocator_type json_string_allocator;
     typedef typename array::allocator_type json_array_allocator;
     typedef typename object::allocator_type json_object_allocator;
+    typedef typename std::allocator_traits<json_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
 
     json_string_allocator string_allocator_;
     json_object_allocator object_allocator_;
     json_array_allocator array_allocator_;
+    json_byte_allocator_type byte_allocator_;
 
     Json result_;
 
@@ -236,11 +238,23 @@ private:
     {
         if (stack_offsets_.back().is_object_)
         {
-            stack_.back().value_ = Json(data,length,string_allocator_);
+            stack_.back().value_ = Json(byte_string_view(data,length),string_allocator_);
         }
         else
         {
-            stack_.push_back(Json(data,length,string_allocator_));
+            stack_.push_back(Json(byte_string_view(data,length),string_allocator_));
+        }
+    }
+
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    {
+        if (stack_offsets_.back().is_object_)
+        {
+            stack_.back().value_ = Json(basic_bignum<json_byte_allocator_type>(signum,data,length));
+        }
+        else
+        {
+            stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(signum,data,length)));
         }
     }
 

@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_SUITE(json_serializer_tests)
 BOOST_AUTO_TEST_CASE(test_byte_string_serialization)
 {
     const uint8_t bs[] = {'H','e','l','l','o'};
-    json j(bs,sizeof(bs));
+    json j(byte_string_view(bs,sizeof(bs)));
 
     std::ostringstream os;
     os << j;

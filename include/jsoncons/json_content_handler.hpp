@@ -11,6 +11,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/serializing_context.hpp>
+#include <jsoncons/json_serializing_options.hpp>
 #if !defined(JSONCONS_NO_DEPRECATED)
 #include <jsoncons/json_type_traits.hpp> // for null_type
 #endif
@@ -123,9 +124,19 @@ public:
         do_byte_string_value(data, length, null_serializing_context());
     }
 
+    void bignum_value(int signum, const uint8_t* data, size_t length) 
+    {
+        do_bignum_value(signum, data, length, null_serializing_context());
+    }
+
     void byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
     {
         do_byte_string_value(data, length, context);
+    }
+
+    void bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
+    {
+        do_bignum_value(signum, data, length, context);
     }
 
     void integer_value(int64_t value)
@@ -302,6 +313,8 @@ private:
 
     virtual void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
+    virtual void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
+
     virtual void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
 
     virtual void do_integer_value(int64_t value, const serializing_context& context) = 0;
@@ -354,6 +367,10 @@ private:
     }
 
     void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
+    {
+    }
+
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
     {
     }
 

@@ -2660,7 +2660,16 @@ private:
         }
         else
         {
-            end_fraction_value(chars_format::general,ec);
+            if (number_buffer_[0] == '-')
+            {
+                handler_.bignum_value(-1, (const uint8_t*)(number_buffer_.data()+1), number_buffer_.length()-1, *this);
+                after_value(ec);
+            }
+            else
+            {
+                handler_.bignum_value(1, (const uint8_t*)(number_buffer_.data()), number_buffer_.length(), *this);
+                after_value(ec);
+            }
         }
     }
 
@@ -2674,7 +2683,8 @@ private:
         }
         else
         {
-            end_fraction_value(chars_format::general,ec);
+            handler_.bignum_value(1, (const uint8_t*)(number_buffer_.data()), number_buffer_.length(), *this);
+            after_value(ec);
         }
     }
 

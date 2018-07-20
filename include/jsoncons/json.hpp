@@ -21,8 +21,9 @@
 #include <jsoncons/version.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_structures.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/bignum.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_decoder.hpp>
@@ -96,7 +97,9 @@ enum class json_type_tag : uint8_t
     string_t,
     byte_string_t,
     array_t,
-    object_t
+    object_t,
+    positive_bignum_t,
+    negative_bignum_t
 };
                         
 template <class CharT, class ImplementationPolicy, class Allocator>
@@ -166,6 +169,8 @@ public:
             data_base(json_type_tag id)
                 : type_id_(id)
             {}
+
+            json_type_tag type_id() const {return type_id_;}
         };
 
         class null_data final : public data_base
@@ -430,25 +435,25 @@ public:
             }
         public:
             byte_string_data(const byte_string_data& val)
-                : data_base(json_type_tag::byte_string_t)
+                : data_base(val.type_id())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_data(byte_string_data&& val)
-                : data_base(json_type_tag::byte_string_t), ptr_(nullptr)
+                : data_base(val.type_id()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
-            byte_string_data(const byte_string_data& val, const Allocator& a)
-                : data_base(json_type_tag::byte_string_t)
+            byte_string_data(json_type_tag type, const byte_string_data& val, const Allocator& a)
+                : data_base(type)
             {
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
 
-            byte_string_data(const uint8_t* data, size_t length, const Allocator& a)
-                : data_base(json_type_tag::byte_string_t)
+            byte_string_data(json_type_tag type, const uint8_t* data, size_t length, const Allocator& a)
+                : data_base(type)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
@@ -733,14 +738,43 @@ public:
                 new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator_type());
             }
         }
-        variant(const uint8_t* s, size_t length)
+
+        variant(const byte_string_view& bs)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(s, length, byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, bs.data(), bs.length(), byte_allocator_type());
         }
 
-        variant(const uint8_t* s, size_t length, const Allocator& alloc)
+        variant(const byte_string_view& bs, const Allocator& allocator)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(s, length, alloc);
+            new(reinterpret_cast<void*>(&data_))byte_string_data(json_type_tag::byte_string_t, bs.data(), bs.length(), allocator);
+        }
+
+        variant(const basic_bignum<byte_allocator_type>& n)
+        {
+            bool neg = n < 0 ? true : false;
+            basic_bignum<byte_allocator_type> v = neg ? -n : n;
+            basic_bignum<byte_allocator_type> base(256);
+            basic_bignum<byte_allocator_type> r;
+
+            std::vector<uint8_t> data;
+
+            do
+            {
+                v.divide( base, v, r, true );
+                data.push_back((uint8_t)(int64_t)r);
+            } 
+            while (v.length() > 0);
+
+            std::reverse(data.begin(),data.end());
+
+            new(reinterpret_cast<void*>(&data_))byte_string_data(neg ? json_type_tag::negative_bignum_t : json_type_tag::positive_bignum_t, 
+                                                                 data.data(), data.size(), byte_allocator_type());
+        }
+
+        variant(const basic_bignum<byte_allocator_type>& bs, const Allocator& allocator)
+        {
+            new(reinterpret_cast<void*>(&data_))byte_string_data(bs.signum() > 0 ? json_type_tag::positive_bignum_t : json_type_tag::negative_bignum_t, 
+                                                                 bs.bytes().data(), bs.bytes().length(), byte_allocator_type(allocator));
         }
 
         variant(const char_type* s)
@@ -812,6 +846,11 @@ public:
             case json_type_tag::byte_string_t:
                 reinterpret_cast<byte_string_data*>(&data_)->~byte_string_data();
                 break;
+            case json_type_tag::positive_bignum_t:
+                // FALLTHRU
+            case json_type_tag::negative_bignum_t:
+                reinterpret_cast<byte_string_data*>(&data_)->~byte_string_data();
+                break;
             case json_type_tag::object_t:
                 reinterpret_cast<object_data*>(&data_)->~object_data();
                 break;
@@ -855,6 +894,11 @@ public:
                     new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
                     break;
                 case json_type_tag::byte_string_t:
+                    new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
+                    break;
+                case json_type_tag::positive_bignum_t:
+                    // FALLTHRU
+                case json_type_tag::negative_bignum_t:
                     new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
                     break;
                 case json_type_tag::array_t:
@@ -984,6 +1028,19 @@ public:
             }
         }
 
+        basic_bignum<byte_allocator_type> as_bignum() const
+        {
+            switch (type_id())
+            {
+            case json_type_tag::positive_bignum_t:
+                return bignum(1, byte_string_data_cast()->data(),byte_string_data_cast()->length());
+            case json_type_tag::negative_bignum_t:
+                return bignum(-1,byte_string_data_cast()->data(),byte_string_data_cast()->length());
+            default:
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+            }
+        }
+
         bool operator==(const variant& rhs) const
         {
             if (this ==&rhs)
@@ -1082,6 +1139,28 @@ public:
                     return false;
                 }
                 break;
+            case json_type_tag::positive_bignum_t:
+                switch (rhs.type_id())
+                {
+                case json_type_tag::positive_bignum_t:
+                    {
+                        return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length()) == byte_string_view(rhs.byte_string_data_cast()->data(),rhs.byte_string_data_cast()->length());
+                    }
+                default:
+                    return false;
+                }
+                break;
+            case json_type_tag::negative_bignum_t:
+                switch (rhs.type_id())
+                {
+                case json_type_tag::negative_bignum_t:
+                    {
+                        return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length()) == byte_string_view(rhs.byte_string_data_cast()->data(),rhs.byte_string_data_cast()->length());
+                    }
+                default:
+                    return false;
+                }
+                break;
             case json_type_tag::string_t:
                 switch (rhs.type_id())
                 {
@@ -1174,6 +1253,14 @@ public:
                 break;
             case json_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
+<<<<<<< HEAD
+=======
+                break;
+            case json_type_tag::positive_bignum_t:
+                // FALLTHRU
+            case json_type_tag::negative_bignum_t:
+                new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
+>>>>>>> cb2037e47da118aacf97fe5d9bb40130e090cce8
                 break;
             case json_type_tag::array_t:
                 new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(*array_data_cast()));
@@ -1193,6 +1280,14 @@ public:
             case json_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
                 break;
+<<<<<<< HEAD
+=======
+            case json_type_tag::positive_bignum_t:
+                // FALLTHRU
+            case json_type_tag::negative_bignum_t:
+                new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
+                break;
+>>>>>>> cb2037e47da118aacf97fe5d9bb40130e090cce8
             case json_type_tag::array_t:
                 new(reinterpret_cast<void*>(&(data_)))array_data(std::move(*temp.array_data_cast()));
                 break;
@@ -1237,6 +1332,11 @@ public:
             case json_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
                 break;
+            case json_type_tag::positive_bignum_t:
+                // FALLTHRU
+            case json_type_tag::negative_bignum_t:
+                new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
+                break;
             case json_type_tag::object_t:
                 new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
                 break;
@@ -1265,6 +1365,11 @@ public:
                 new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
                 break;
             case json_type_tag::byte_string_t:
+                new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()),a);
+                break;
+            case json_type_tag::positive_bignum_t:
+                // FALLTHRU
+            case json_type_tag::negative_bignum_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()),a);
                 break;
             case json_type_tag::array_t:
@@ -1298,6 +1403,14 @@ public:
                 }
                 break;
             case json_type_tag::byte_string_t:
+                {
+                    new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*val.byte_string_data_cast()));
+                    new(reinterpret_cast<void*>(&val.data_))null_data();
+                }
+                break;
+            case json_type_tag::positive_bignum_t:
+                // FALLTHRU
+            case json_type_tag::negative_bignum_t:
                 {
                     new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*val.byte_string_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
@@ -1352,6 +1465,20 @@ public:
                 }
                 break;
             case json_type_tag::byte_string_t:
+                {
+                    if (a == val.byte_string_data_cast()->get_allocator())
+                    {
+                        Init_rv_(std::forward<variant>(val), a, std::true_type());
+                    }
+                    else
+                    {
+                        Init_(val,a);
+                    }
+                }
+                break;
+            case json_type_tag::positive_bignum_t:
+                // FALLTHRU
+            case json_type_tag::negative_bignum_t:
                 {
                     if (a == val.byte_string_data_cast()->get_allocator())
                     {
@@ -1541,6 +1668,11 @@ public:
             return evaluate().is_byte_string();
         }
 
+        bool is_bignum() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_bignum();
+        }
+
         bool is_number() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_number();
@@ -1582,6 +1714,11 @@ public:
         byte_string_view as_byte_string_view() const 
         {
             return evaluate().as_byte_string_view();
+        }
+
+        basic_bignum<byte_allocator_type> as_bignum() const 
+        {
+            return evaluate().as_bignum();
         }
 
         string_type as_string() const
@@ -2469,21 +2606,28 @@ public:
     {
     }
 
-    basic_json(const uint8_t* s, size_t length)
-        : var_(s, length)
+    explicit basic_json(const byte_string_view& bs)
+        : var_(bs)
     {
     }
 
-    explicit basic_json(const byte_string_view& s)
-        : var_(s.data(), s.length())
+    basic_json(const byte_string_view& bs, const Allocator& allocator)
+        : var_(bs, allocator)
     {
     }
 
-    basic_json(const uint8_t* s, size_t length, const Allocator& allocator)
-        : var_(s, length, allocator)
+    explicit basic_json(const basic_bignum<byte_allocator_type>& bs)
+        : var_(bs)
     {
     }
+
+    explicit basic_json(const basic_bignum<byte_allocator_type>& bs, const Allocator& allocator)
+    : var_(bs, byte_allocator_type(allocator))
+    {
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
+
     template<class InputIterator>
     basic_json(InputIterator first, InputIterator last, const Allocator& allocator = Allocator())
         : var_(first,last,allocator)
@@ -2629,6 +2773,12 @@ public:
             break;
         case json_type_tag::byte_string_t:
             handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+            break;
+        case json_type_tag::positive_bignum_t:
+            handler.bignum_value(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+            break;
+        case json_type_tag::negative_bignum_t:
+            handler.bignum_value(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
             break;
         case json_type_tag::double_t:
             handler.double_value(var_.double_data_cast()->value(), 
@@ -2849,6 +2999,11 @@ public:
     bool is_byte_string() const JSONCONS_NOEXCEPT
     {
         return (var_.type_id() == json_type_tag::byte_string_t);
+    }
+
+    bool is_bignum() const JSONCONS_NOEXCEPT
+    {
+        return (var_.type_id() == json_type_tag::positive_bignum_t) || (var_.type_id() == json_type_tag::negative_bignum_t);
     }
 
     bool is_bool() const JSONCONS_NOEXCEPT
@@ -3141,6 +3296,11 @@ public:
         return var_.as_byte_string_view();
     }
 
+    basic_bignum<byte_allocator_type> as_bignum() const
+    {
+        return var_.as_bignum();
+    }
+
     string_type as_string() const
     {
         switch (var_.type_id())
@@ -3148,6 +3308,20 @@ public:
         case json_type_tag::small_string_t:
         case json_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length());
+        case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s;
+                n.dump(s);
+                return s;
+            }
+        case json_type_tag::negative_bignum_t:
+            {
+                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s;
+                n.dump(s);
+                return s;
+            }
         default:
             return to_string();
         }
@@ -3161,6 +3335,20 @@ public:
         case json_type_tag::small_string_t:
         case json_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length(),allocator);
+        case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
+        case json_type_tag::negative_bignum_t:
+            {
+                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
         default:
             return to_string(allocator);
         }
@@ -3173,6 +3361,20 @@ public:
         case json_type_tag::small_string_t:
         case json_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length());
+        case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s;
+                n.dump(s);
+                return s;
+            }
+        case json_type_tag::negative_bignum_t:
+            {
+                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s;
+                n.dump(s);
+                return s;
+            }
         default:
             return to_string(options);
         }
@@ -3187,6 +3389,20 @@ public:
         case json_type_tag::small_string_t:
         case json_type_tag::string_t:
             return string_type(as_string_view().data(),as_string_view().length(),allocator);
+        case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
+        case json_type_tag::negative_bignum_t:
+            {
+                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
         default:
             return to_string(options,allocator);
         }

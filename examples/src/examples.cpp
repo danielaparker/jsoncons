@@ -258,8 +258,8 @@ void json_constructor_examples()
     json j8("Hello"); // A text string
     std::cout << "(8) " << j8 << std::endl;
 
-    const uint8_t bs[] = {'H','e','l','l','o'};
-    json j9(bs, sizeof(bs)); // A byte string
+    byte_string bs = {'H','e','l','l','o'};
+    json j9(bs); // A byte string
     std::cout << "(9) " << j9 << std::endl;
 
     std::vector<int> v = {10,20,30};
@@ -519,8 +519,6 @@ int main()
 
         validation_example();
 
-        serialization_examples();
-
         comment_example();
 
         json_constructor_examples();
@@ -544,6 +542,8 @@ int main()
         max_nesting_path_example();
 
         get_example();
+
+        serialization_examples();
     }
     catch (const std::exception& e)
     {

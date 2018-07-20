@@ -289,6 +289,11 @@ private:
 
     }
 
+    void do_bignum_value(int signum, const uint8_t*, size_t, const serializing_context&) override
+    {
+
+    }
+
     void do_double_value(double val, const floating_point_options& fmt, const serializing_context&) override
     {
         if (stack_.size() == 2)

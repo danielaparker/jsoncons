@@ -295,6 +295,59 @@ private:
         end_value();
     }
 
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
+    {
+        std::vector<uint8_t> v;
+
+        if (signum == -1)
+        {
+            v.push_back(0xc3);
+        }
+        else
+        {
+            v.push_back(0xc2);
+        }
+
+        if (length <= 0x17)
+        {
+            // fixstr stores a byte array whose length is upto 31 bytes
+            binary::to_big_endian(static_cast<uint8_t>(0x40 + length), v);
+        }
+        else if (length <= 0xff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x58), v);
+            binary::to_big_endian(static_cast<uint8_t>(length), v);
+        }
+        else if (length <= 0xffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x59), v);
+            binary::to_big_endian(static_cast<uint16_t>(length), v);
+        }
+        else if (length <= 0xffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x5a), v);
+            binary::to_big_endian(static_cast<uint32_t>(length), v);
+        }
+        else if (length <= 0xffffffffffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x5b), v);
+            binary::to_big_endian(static_cast<uint64_t>(length),v);
+        }
+
+        for (size_t i = 0; i < length; ++i)
+        {
+            v.push_back(data[i]);
+            //binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
+        }
+
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
+
+        end_value();
+    }
+
     void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) override
     {
         std::vector<uint8_t> v;

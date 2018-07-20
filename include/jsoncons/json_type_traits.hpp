@@ -20,6 +20,7 @@
 #include <limits>
 #include <type_traits>
 #include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/bignum.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
 
 #if defined(__GNUC__)
@@ -633,16 +634,7 @@ struct json_type_traits<Json, T,
 
     static T as(const Json& j)
     {
-        if (j.is_string())
-        {
-			return j.as_string(string_allocator_type());
-        }
-        else
-        {
-            T s;
-            j.dump(s);
-            return s;
-        }
+   	    return j.as_string(string_allocator_type());
     }
 
     static Json to_json(const T& val)
@@ -883,7 +875,29 @@ public:
     
     static Json to_json(const basic_byte_string<Allocator>& val)
     {
-        return Json(val.data(),val.length());
+        return Json(byte_string_view(val.data(),val.length()));
+    }
+};
+
+// basic_bignum
+
+template<class Json, class Allocator>
+struct json_type_traits<Json, basic_bignum<Allocator>>
+{
+public:
+    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    {
+        return j.is_bignum();
+    }
+    
+    static basic_bignum<Allocator> as(const Json& j)
+    {
+        return j.as_bignum();
+    }
+    
+    static Json to_json(const basic_bignum<Allocator>& val)
+    {
+        return Json(val);
     }
 };
 

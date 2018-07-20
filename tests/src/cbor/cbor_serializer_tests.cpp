@@ -46,7 +46,7 @@ json j = json::parse(R"(
 
     json j2 = decode_cbor<json>(is);
 
-    std::cout << pretty_print(j2) << std::endl; 
+    //std::cout << pretty_print(j2) << std::endl; 
 
     BOOST_CHECK(j == j2);
 }
@@ -95,6 +95,107 @@ BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
     {
         json result = decode_cbor<json>(v);
         std::cout << result << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_bignum)
+{
+    std::vector<uint8_t> v;
+    cbor_bytes_serializer serializer(v);
+    serializer.begin_json();
+    serializer.begin_array();
+
+    std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    serializer.bignum_value(1, bytes.data(), bytes.size());
+    serializer.end_array();
+    serializer.end_json();
+
+    try
+    {
+        json result = decode_cbor<json>(v);
+        BOOST_CHECK_EQUAL(std::string("18446744073709551616"),result[0].as<std::string>());
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_negative_bignum1)
+{
+    std::vector<uint8_t> v;
+    cbor_bytes_serializer serializer(v);
+    serializer.begin_json();
+    serializer.begin_array();
+
+    std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    serializer.end_array();
+    serializer.end_json();
+
+    try
+    {
+        json result = decode_cbor<json>(v);
+        BOOST_CHECK_EQUAL(std::string("-18446744073709551616"),result[0].as<std::string>());
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_negative_bignum2)
+{
+    std::vector<uint8_t> v;
+    cbor_bytes_serializer serializer(v);
+    serializer.begin_json();
+    serializer.begin_array();
+
+    std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    serializer.end_array();
+    serializer.end_json();
+
+    try
+    {
+        json result = decode_cbor<json>(v);
+        json_serializing_options options;
+        options.bignum_format(bignum_chars_format::integer);
+        std::string s;
+        result.dump(s,options);
+        BOOST_CHECK_EQUAL(std::string("[-18446744073709551616]"),s);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+} 
+
+BOOST_AUTO_TEST_CASE(test_negative_bignum3)
+{
+    std::vector<uint8_t> v;
+    cbor_bytes_serializer serializer(v);
+    serializer.begin_json();
+    serializer.begin_array();
+
+    std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
+    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    serializer.end_array();
+    serializer.end_json();
+
+    try
+    {
+        json result = decode_cbor<json>(v);
+        json_serializing_options options;
+        options.bignum_format(bignum_chars_format::base64url);
+        std::string s;
+        result.dump(s,options);
+        BOOST_CHECK_EQUAL(std::string("[\"~AQAAAAAAAAAA\"]"),s);
     }
     catch (const std::exception& e)
     {

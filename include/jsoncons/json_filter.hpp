@@ -102,6 +102,12 @@ private:
         downstream_handler_.byte_string_value(data, length, context);
     }
 
+    void do_bignum_value(int signum, const uint8_t* data, size_t length,
+                         const serializing_context& context) override
+    {
+        downstream_handler_.bignum_value(signum, data, length, context);
+    }
+
     void do_double_value(double value, const floating_point_options& fmt,
                          const serializing_context& context) override
     {
@@ -278,6 +284,12 @@ private:
                               const serializing_context& context) override
     {
         downstream_handler_.byte_string_value(data, length, context);
+    }
+
+    void do_bignum_value(int signum, const uint8_t* data, size_t length,
+                         const serializing_context& context) override
+    {
+        downstream_handler_.bignum_value(signum, data, length, context);
     }
 
     void do_double_value(double value, const floating_point_options& fmt,

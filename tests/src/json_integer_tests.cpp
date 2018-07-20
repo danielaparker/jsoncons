@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
 
         os << "{\"int overflow\":-" << (std::numeric_limits<int64_t>::max)() << "0}";
         json val = json::parse(os.str());
-        BOOST_REQUIRE(val["int overflow"].is_double());
+        BOOST_REQUIRE(val["int overflow"].is_bignum());
     }
     {
         std::ostringstream os;
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_integer_limits)
 
         os << "{\"uint overflow\":" << (std::numeric_limits<uint64_t>::max)() << "0}";
         json val = json::parse(os.str());
-        BOOST_REQUIRE(val["uint overflow"].is_double());
+        BOOST_REQUIRE(val["uint overflow"].is_bignum());
     }
 }
 

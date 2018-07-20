@@ -1,3 +1,14 @@
+master
+--------
+
+Enhancements
+
+- bignum support
+
+Changes
+
+- If the json parser encounters an integer overflow, the value is now handled as a bignum rather than a double value.
+
 v0.106.0
 --------
 
