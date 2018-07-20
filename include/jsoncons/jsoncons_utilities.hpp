@@ -625,6 +625,10 @@ void encode_base64(InputIt first, InputIt last, const std::string& alphabet, std
     int i = 0;
     int j = 0;
 
+    // 4 bytes for every 3 in the input 
+    size_t untruncated_len = ((last-first) + 5) / 3 * 4;
+    result.reserve(untruncated_len);
+
     while (first != last)
     {
         a3[i++] = *first++;
@@ -679,6 +683,12 @@ template <class InputIt,class CharT>
 void encode_base64(InputIt first, InputIt last, std::basic_string<CharT>& result)
 {
     encode_base64(first,last,base64_alphabet,result);
+}
+
+template <class CharT>
+void encode_base64(const uint8_t* data, size_t length, std::basic_string<CharT>& result)
+{
+    encode_base64(data, data+length, base64_alphabet, result);
 }
 
 inline

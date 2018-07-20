@@ -525,22 +525,10 @@ private:
         {
         case bignum_chars_format::integer:
             {
-                bignum n = bignum(1,data,length);
-                bignum base(256);
-                bignum r;
-                std::vector<CharT> data;
-                do
-                {
-                    n.divide( base, n, r, true );
-                    data.push_back((uint8_t)(int64_t)r);
-                } 
-                while (n.length() > 0);
-                if (signum == -1)
-                {
-                    data.push_back(-1);
-                }
-                std::reverse(data.begin(),data.end());
-                writer_.write(data.data(),data.size());
+                bignum n = bignum(signum, data, length);
+                std::basic_string<CharT> s;
+                n.dump(s);
+                writer_.write(s.data(),s.size());
             }
             break;
         case bignum_chars_format::base64url:

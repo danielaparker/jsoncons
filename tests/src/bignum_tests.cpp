@@ -122,5 +122,20 @@ BOOST_AUTO_TEST_CASE(test_traits2)
     BOOST_CHECK(s == "18446744073709551616");
 }
 
+BOOST_AUTO_TEST_CASE(test_traits3)
+{
+    bignum x(-1, {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
+
+    json j(x);
+
+    bignum y = j.as<bignum>();
+    BOOST_CHECK(x == y);
+
+    std::string s;
+    y.dump(s);
+
+    BOOST_CHECK(s == "-18446744073709551616");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
