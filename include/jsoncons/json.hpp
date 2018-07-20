@@ -1253,14 +1253,11 @@ public:
                 break;
             case json_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
-<<<<<<< HEAD
-=======
                 break;
             case json_type_tag::positive_bignum_t:
                 // FALLTHRU
             case json_type_tag::negative_bignum_t:
                 new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
->>>>>>> cb2037e47da118aacf97fe5d9bb40130e090cce8
                 break;
             case json_type_tag::array_t:
                 new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(*array_data_cast()));
