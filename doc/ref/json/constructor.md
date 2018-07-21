@@ -37,7 +37,11 @@ json(const char* val, const allocator_type& allocator); // (16)
 
 json(const byte_string_view& bs); // (17)
 
-json(const uint8_t* s, size_t length, const allocator_type& allocator); // (18)
+json(const byte_string_view& bs, const allocator_type& allocator); // (18)
+
+json(const bignum& n); // (19)
+
+json(const bignum& n, const allocator_type& allocator); // (20)
 ```
 
 (1) Constructs a `json` value that holds an empty json object. 
@@ -72,9 +76,13 @@ json(const uint8_t* s, size_t length, const allocator_type& allocator); // (18)
 
 (16) Constructs a `json` value for a text string with supplied allocator.
 
-(17) Constructs a `json` value for a byte string, serializable as `base64url`.
+(17) Constructs a `json` value for a [byte_string](../byte_string.md).
 
-(18) Constructs a `json` value for a byte string with supplied allocator, serializable as `base64url`.
+(18) Constructs a `json` value for a [byte_string](../byte_string.md) with supplied allocator.
+
+(19) Constructs a `json` value for a [bignum](../bignum.md).
+
+(20) Constructs a `json` value for a [bignum](../bignum.md) with supplied allocator.
 
 ### Examples
 

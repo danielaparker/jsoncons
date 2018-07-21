@@ -38,7 +38,7 @@ public:
         : byte_allocator_()
     {
     }
-    basic_bignum_base(const allocator_type& allocator)
+    explicit basic_bignum_base(const allocator_type& allocator)
         : byte_allocator_(byte_allocator_type(allocator))
     {
     }

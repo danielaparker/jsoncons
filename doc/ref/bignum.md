@@ -1,0 +1,136 @@
+### jsoncons::bignum
+
+```c++
+typedef basic_bignum<Allocator = std::allocator<uint8_t>> bignum;
+```
+The `bignum` class is an instantiation of the `basic_bignum` class template that uses `std::allocator<uint8_t>` as the allocator type.
+
+#### Header
+```c++
+#include <jsoncons/bignum.hpp>
+```
+
+#### Constructor
+
+    bignum();
+
+    explicit bignum(const Allocator& alloc);
+
+    explicit basic_bignum(const char* str);
+
+    explicit basic_bignum(const char* str, const Allocator& alloc);
+
+    bignum(int signum, std::initializer_list<uint8_t> init);
+
+    bignum(int signum, std::initializer_list<uint8_t> init, const Allocator& alloc);
+
+    bignum(const bignum& s); 
+
+    bignum(bignum&& s); 
+
+#### Assignment
+
+    bignum& operator=(const bignum& s);
+
+    bignum& operator=(bignum&& s);
+
+#### Non-member functions
+
+    bool operator==(const bignum& lhs, const bignum& rhs);
+
+    bool operator!=(const bignum& lhs, const bignum& rhs);
+
+    template <class CharT>
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const bignum& o);
+
+### Examples
+
+
+### Examples
+
+#### Initializing with bignum
+
+```c++
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::string s = "-18446744073709551617";
+
+    json j(bignum(s.c_str()));
+
+    std::cout << "(1) " << j.as<bignum>() << "\n\n";
+
+    std::cout << "(2) " << j.as<std::string>() << "\n\n";
+
+    std::cout << "(3) ";
+    j.dump(std::cout);
+    std::cout << "\n\n";
+
+    std::cout << "(4) ";
+    json_serializing_options options1;
+    options1.bignum_format(bignum_chars_format::integer);
+    j.dump(std::cout, options1);
+    std::cout << "\n\n";
+
+    std::cout << "(5) ";
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::base64url);
+    j.dump(std::cout, options2);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1) -18446744073709551617
+
+(2) -18446744073709551617
+
+(3) "-18446744073709551617"
+
+(4) -18446744073709551617
+
+(5) "~AQAAAAAAAAAB"
+```
+
+#### Integer overflow during parsing
+
+```c++
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::string s = "-18446744073709551617";
+
+    json j = json::parse(s);
+
+    std::cout << "(1) ";
+    j.dump(std::cout);
+    std::cout << "\n\n";
+
+    std::cout << "(2) ";
+    json_serializing_options options1;
+    options1.bignum_format(bignum_chars_format::integer);
+    j.dump(std::cout, options1);
+    std::cout << "\n\n";
+
+    std::cout << "(3) ";
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::base64url);
+    j.dump(std::cout, options2);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1) "-18446744073709551617"
+
+(2) -18446744073709551617
+
+(3) "~AQAAAAAAAAAB"
+```
+

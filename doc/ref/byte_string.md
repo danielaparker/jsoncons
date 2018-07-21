@@ -7,7 +7,7 @@ The `byte_string` class is an instantiation of the `basic_byte_string` class tem
 
 #### Header
 ```c++
-#include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/byte_string.hpp>
 ```
 
 #### Member types
