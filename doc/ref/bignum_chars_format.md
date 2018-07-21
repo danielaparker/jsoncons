@@ -13,7 +13,7 @@ Specifies `bignum` formatting.
 
 ### Examples
 
-#### Example 1
+#### Initializing with bignum
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -60,7 +60,7 @@ Output:
 (5) "~AQAAAAAAAAAB"
 ```
 
-#### Example 2
+#### Integer overflow during parsing
 
 ```c++
 #include <jsoncons/json.hpp>
