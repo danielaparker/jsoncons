@@ -146,9 +146,11 @@ class basic_json_parser : private serializing_context
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char> numeral_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
 
     std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
     std::basic_string<char,std::char_traits<char>,numeral_allocator_type> number_buffer_;
+    std::vector<uint8_t,byte_allocator_type> byte_buffer_;
 
     uint8_t precision_;
     uint8_t decimal_places_;
@@ -2660,16 +2662,26 @@ private:
         }
         else
         {
-            if (number_buffer_[0] == '-')
+            bignum n(number_buffer_.c_str());
+            n = -n;
+            bignum divisor(256);
+
+            byte_buffer_.clear();
+            while (n >= 256)
             {
-                handler_.bignum_value(-1, (const uint8_t*)(number_buffer_.data()+1), number_buffer_.length()-1, *this);
-                after_value(ec);
+                bignum q;
+                bignum r;
+                n.divide(divisor, q, r, true);
+                n = q;
+                byte_buffer_.push_back((uint8_t)(uint64_t)r);
             }
-            else
+            if (n >= 0)
             {
-                handler_.bignum_value(1, (const uint8_t*)(number_buffer_.data()), number_buffer_.length(), *this);
-                after_value(ec);
+                byte_buffer_.push_back((uint8_t)(uint64_t)n);
             }
+            std::reverse(byte_buffer_.begin(),byte_buffer_.end());
+            handler_.bignum_value(-1, byte_buffer_.data(), byte_buffer_.size(), *this);
+            after_value(ec);
         }
     }
 
@@ -2683,7 +2695,24 @@ private:
         }
         else
         {
-            handler_.bignum_value(1, (const uint8_t*)(number_buffer_.data()), number_buffer_.length(), *this);
+            bignum n(number_buffer_.c_str());
+            bignum divisor(256);
+
+            byte_buffer_.clear();
+            while (n >= 256)
+            {
+                bignum q;
+                bignum r;
+                n.divide(divisor, q, r, true);
+                n = q;
+                byte_buffer_.push_back((uint8_t)(uint64_t)r);
+            }
+            if (n >= 0)
+            {
+                byte_buffer_.push_back((uint8_t)(uint64_t)n);
+            }
+            std::reverse(byte_buffer_.begin(),byte_buffer_.end());
+            handler_.bignum_value(1, byte_buffer_.data(), byte_buffer_.size(), *this);
             after_value(ec);
         }
     }

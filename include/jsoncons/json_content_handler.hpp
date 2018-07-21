@@ -124,14 +124,14 @@ public:
         do_byte_string_value(data, length, null_serializing_context());
     }
 
-    void bignum_value(int signum, const uint8_t* data, size_t length) 
-    {
-        do_bignum_value(signum, data, length, null_serializing_context());
-    }
-
     void byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
     {
         do_byte_string_value(data, length, context);
+    }
+
+    void bignum_value(int signum, const uint8_t* data, size_t length) 
+    {
+        do_bignum_value(signum, data, length, null_serializing_context());
     }
 
     void bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 

@@ -18,14 +18,48 @@ using namespace jsoncons;
 
 BOOST_AUTO_TEST_SUITE(bignum_tests)
 
-BOOST_AUTO_TEST_CASE(test_bignum)
+BOOST_AUTO_TEST_CASE(test_positive_bignum)
 {
-    // 18446744073709551616
-    std::vector<uint8_t> v = {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    bignum val(1,v.data(),v.size());
+    std::string expected = "18446744073709551616";
+    std::vector<uint8_t> v = {1,0,0,0,0,0,0,0,0};
+    bignum x(1,v.data(),v.size());
 
-    std::cout << val << std::endl;
-    //std::cout << val.to_string(16) << std::endl;
+    std::string sx;
+    x.dump(sx);
+    BOOST_CHECK_EQUAL(expected,sx);
+
+    bignum y(x);
+    std::string sy;
+    y.dump(sy);
+    BOOST_CHECK_EQUAL(expected,sy);
+
+    bignum z;
+    z = x;
+    std::string sz;
+    y.dump(sz);
+    BOOST_CHECK_EQUAL(expected,sz);
+}
+
+BOOST_AUTO_TEST_CASE(test_negative_bignum)
+{
+    std::string expected = "-18446744073709551616";
+    std::vector<uint8_t> v = {1,0,0,0,0,0,0,0,0};
+    bignum x(-1,v.data(),v.size());
+
+    std::string sx;
+    x.dump(sx);
+    BOOST_CHECK_EQUAL(expected,sx);
+
+    bignum y(x);
+    std::string sy;
+    y.dump(sy);
+    BOOST_CHECK_EQUAL(expected,sy);
+
+    bignum z;
+    z = x;
+    std::string sz;
+    y.dump(sz);
+    BOOST_CHECK_EQUAL(expected,sz);
 }
 
 BOOST_AUTO_TEST_CASE(test_longlong)

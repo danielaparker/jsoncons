@@ -339,7 +339,9 @@ void nan_inf_replacement()
 
 void bignum_serialization_examples1()
 {
-    json j(bignum("[-18446744073709551617]"));
+    std::string s = "-18446744073709551617";
+
+    json j(bignum(s.c_str()));
 
     std::cout << "(1)\n";
     j.dump(std::cout);
@@ -360,7 +362,9 @@ void bignum_serialization_examples1()
 
 void bignum_serialization_examples2()
 {
-    json j = json::parse("[-18446744073709551617]");
+    std::string s = "-18446744073709551617";
+
+    json j = json::parse(s);
 
     std::cout << "(1)\n";
     j.dump(std::cout);
