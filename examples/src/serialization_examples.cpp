@@ -343,20 +343,24 @@ void bignum_serialization_examples1()
 
     json j(bignum(s.c_str()));
 
-    std::cout << "(1)\n";
+    std::cout << "(1) " << j.as<bignum>() << "\n\n";
+
+    std::cout << "(2) " << j.as<std::string>() << "\n\n";
+
+    std::cout << "(3) ";
     j.dump(std::cout);
     std::cout << "\n\n";
 
-    std::cout << "(2)\n";
-    json_serializing_options options2;
-    options2.bignum_format(bignum_chars_format::integer);
-    j.dump(std::cout, options2);
+    std::cout << "(4) ";
+    json_serializing_options options1;
+    options1.bignum_format(bignum_chars_format::integer);
+    j.dump(std::cout, options1);
     std::cout << "\n\n";
 
-    std::cout << "(3)\n";
-    json_serializing_options options3;
-    options3.bignum_format(bignum_chars_format::base64url);
-    j.dump(std::cout, options3);
+    std::cout << "(5) ";
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::base64url);
+    j.dump(std::cout, options2);
     std::cout << "\n\n";
 }
 
@@ -366,20 +370,20 @@ void bignum_serialization_examples2()
 
     json j = json::parse(s);
 
-    std::cout << "(1)\n";
+    std::cout << "(1) ";
     j.dump(std::cout);
     std::cout << "\n\n";
 
-    std::cout << "(2)\n";
-    json_serializing_options options2;
-    options2.bignum_format(bignum_chars_format::integer);
-    j.dump(std::cout, options2);
+    std::cout << "(2) ";
+    json_serializing_options options1;
+    options1.bignum_format(bignum_chars_format::integer);
+    j.dump(std::cout, options1);
     std::cout << "\n\n";
 
-    std::cout << "(3)\n";
-    json_serializing_options options3;
-    options3.bignum_format(bignum_chars_format::base64url);
-    j.dump(std::cout, options3);
+    std::cout << "(3) ";
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::base64url);
+    j.dump(std::cout, options2);
     std::cout << "\n\n";
 }
 

@@ -13,6 +13,8 @@ Specifies `bignum` formatting.
 
 ### Examples
 
+#### Example 1
+
 ```c++
 #include <jsoncons/json.hpp>
 
@@ -20,34 +22,80 @@ using namespace jsoncons;
 
 int main()
 {
-    json j(bignum("-18446744073709551617"));
+    std::string s = "-18446744073709551617";
 
-    std::cout << "(1)\n";
+    json j(bignum(s.c_str()));
+
+    std::cout << "(1) " << j.as<bignum>() << "\n\n";
+
+    std::cout << "(2) " << j.as<std::string>() << "\n\n";
+
+    std::cout << "(3) ";
     j.dump(std::cout);
     std::cout << "\n\n";
 
-    std::cout << "(2)\n";
-    json_serializing_options options2;
-    options2.bignum_format(bignum_chars_format::integer);
-    j.dump(std::cout, options2);
+    std::cout << "(4) ";
+    json_serializing_options options1;
+    options1.bignum_format(bignum_chars_format::integer);
+    j.dump(std::cout, options1);
     std::cout << "\n\n";
 
-    std::cout << "(3)\n";
-    json_serializing_options options3;
-    options3.bignum_format(bignum_chars_format::base64url);
-    j.dump(std::cout, options3);
+    std::cout << "(5) ";
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::base64url);
+    j.dump(std::cout, options2);
     std::cout << "\n\n";
 }
 ```
 Output:
 ```
-(1)
-"-18446744073709551617"
+(1) -18446744073709551617
 
-(2)
--18446744073709551617
+(2) -18446744073709551617
 
-(3)
-"~AQAAAAAAAAAB"
+(3) "-18446744073709551617"
+
+(4) -18446744073709551617
+
+(5) "~AQAAAAAAAAAB"
+```
+
+#### Example 2
+
+```c++
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::string s = "-18446744073709551617";
+
+    json j = json::parse(s);
+
+    std::cout << "(1) ";
+    j.dump(std::cout);
+    std::cout << "\n\n";
+
+    std::cout << "(2) ";
+    json_serializing_options options1;
+    options1.bignum_format(bignum_chars_format::integer);
+    j.dump(std::cout, options1);
+    std::cout << "\n\n";
+
+    std::cout << "(3) ";
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::base64url);
+    j.dump(std::cout, options2);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1) "-18446744073709551617"
+
+(2) -18446744073709551617
+
+(3) "~AQAAAAAAAAAB"
 ```
 
