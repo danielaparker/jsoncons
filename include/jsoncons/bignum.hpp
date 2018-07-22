@@ -721,7 +721,7 @@ public:
     template <typename Alloc>
     void dump(int& signum, std::vector<uint8_t,Alloc>& data) const
     {
-        bignum n(*this);
+        basic_bignum<Allocator> n(*this);
         if (neg_)
         {
             signum = -1;
