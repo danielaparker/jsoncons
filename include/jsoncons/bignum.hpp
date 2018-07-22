@@ -735,8 +735,8 @@ public:
 
         while (n >= 256)
         {
-            bignum q;
-            bignum r;
+            basic_bignum<Allocator> q;
+            basic_bignum<Allocator> r;
             n.divide(divisor, q, r, true);
             n = q;
             data.push_back((uint8_t)(uint64_t)r);
