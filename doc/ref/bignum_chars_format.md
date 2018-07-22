@@ -26,21 +26,17 @@ int main()
 
     json j(bignum(s.c_str()));
 
-    std::cout << "(1) " << j.as<bignum>() << "\n\n";
-
-    std::cout << "(2) " << j.as<std::string>() << "\n\n";
-
-    std::cout << "(3) ";
+    std::cout << "(1) ";
     j.dump(std::cout);
     std::cout << "\n\n";
 
-    std::cout << "(4) ";
+    std::cout << "(2) ";
     json_serializing_options options1;
     options1.bignum_format(bignum_chars_format::integer);
     j.dump(std::cout, options1);
     std::cout << "\n\n";
 
-    std::cout << "(5) ";
+    std::cout << "(3) ";
     json_serializing_options options2;
     options2.bignum_format(bignum_chars_format::base64url);
     j.dump(std::cout, options2);
@@ -49,15 +45,11 @@ int main()
 ```
 Output:
 ```
-(1) -18446744073709551617
+(1) "-18446744073709551617"
 
 (2) -18446744073709551617
 
-(3) "-18446744073709551617"
-
-(4) -18446744073709551617
-
-(5) "~AQAAAAAAAAAB"
+(3) "~AQAAAAAAAAAB"
 ```
 
 #### Integer overflow during parsing
