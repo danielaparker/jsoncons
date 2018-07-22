@@ -117,6 +117,7 @@ public:
             dynamic_ = true;
 
             n.data_ = n.values_;
+            n.dynamic_ = false;
             n.length_ = 0;
             n.neg_ = false;
         }
