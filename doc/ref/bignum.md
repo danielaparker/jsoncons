@@ -39,6 +39,9 @@ The `bignum` class is an instantiation of the `basic_bignum` class template that
     template <typename Ch, typename Traits, typename Alloc>
     void dump(std::basic_string<Ch,Traits,Alloc>& data) const
 
+    template <typename Alloc>
+    void dump(int& signum, std::vector<uint8_t,Alloc>& data) const
+
 #### Arithmetic operators
 
     explicit operator bool() const

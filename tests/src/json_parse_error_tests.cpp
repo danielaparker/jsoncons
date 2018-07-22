@@ -205,6 +205,7 @@ BOOST_AUTO_TEST_CASE(test_uinteger_overflow)
     json j2 =  json::parse(s2);
     BOOST_CHECK(!j2.is_uinteger());
     BOOST_CHECK(j2.is_bignum());
+    BOOST_CHECK_EQUAL(s2,j2.as<std::string>());
 }
 
 BOOST_AUTO_TEST_CASE(test_negative_integer_overflow)
@@ -220,6 +221,7 @@ BOOST_AUTO_TEST_CASE(test_negative_integer_overflow)
     json j2 =  json::parse(s2);
     BOOST_CHECK(!j2.is_integer());
     BOOST_CHECK(j2.is_bignum());
+    BOOST_CHECK_EQUAL(s2,j2.as<std::string>());
 }
 
 BOOST_AUTO_TEST_CASE(test_positive_integer_overflow)
@@ -235,6 +237,7 @@ BOOST_AUTO_TEST_CASE(test_positive_integer_overflow)
     json j2 =  json::parse(s2);
     BOOST_CHECK(!j2.is_integer());
     BOOST_CHECK(j2.is_bignum());
+    BOOST_CHECK_EQUAL(s2,j2.as<std::string>());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
