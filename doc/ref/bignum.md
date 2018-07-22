@@ -16,9 +16,9 @@ The `bignum` class is an instantiation of the `basic_bignum` class template that
 
     explicit bignum(const Allocator& alloc);
 
-    explicit basic_bignum(const char* str);
+    explicit bignum(const char* str);
 
-    explicit basic_bignum(const char* str, const Allocator& alloc);
+    explicit bignum(const char* str, const Allocator& alloc);
 
     bignum(int signum, std::initializer_list<uint8_t> init);
 
@@ -34,6 +34,57 @@ The `bignum` class is an instantiation of the `basic_bignum` class template that
 
     bignum& operator=(bignum&& s);
 
+#### Accessors
+
+    template <typename Ch, typename Traits, typename Alloc>
+    void dump(std::basic_string<Ch,Traits,Alloc>& data) const
+
+#### Arithmetic operators
+
+    explicit operator bool() const
+
+    explicit operator int64_t() const
+
+    explicit operator uint64_t() const
+
+    explicit operator double() const
+
+    explicit operator long double() const
+
+    bignum operator-() const
+
+    bignum& operator+=( const bignum& y )
+
+    bignum& operator-=( const bignum& y )
+
+    bignum& operator*=( int64_t y )
+
+    bignum& operator*=( uint64_t y )
+
+    bignum& operator*=( bignum y )
+
+    bignum& operator/=( const bignum& divisor )
+
+    bignum& operator%=( const bignum& divisor )
+
+    bignum& operator<<=( uint64_t k )
+
+    bignum& operator>>=(uint64_t k)
+
+    bignum& operator++()
+
+    bignum operator++(int)
+
+    bignum& operator--()
+
+    bignum operator--(int)
+
+    bignum& operator|=( const bignum& a )
+
+    bignum& operator^=( const bignum& a )
+
+    bignum& operator&=( const bignum& a )
+
 #### Non-member functions
 
     bool operator==(const bignum& lhs, const bignum& rhs);
@@ -42,6 +93,84 @@ The `bignum` class is an instantiation of the `basic_bignum` class template that
 
     template <class CharT>
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const bignum& o);
+
+#### Global arithmetic operators
+
+    bool operator==( const bignum& x, const bignum& y )
+
+    bool operator==( const bignum& x, int y )
+
+    bool operator!=( const bignum& x, const bignum& y )
+
+    bool operator!=( const bignum& x, int y )
+
+    bool operator<( const bignum& x, const bignum& y )
+
+    bool operator<( const bignum& x, int64_t y )
+
+    bool operator>( const bignum& x, const bignum& y )
+
+    bool operator>( const bignum& x, int y )
+
+    bool operator<=( const bignum& x, const bignum& y )
+
+    bool operator<=( const bignum& x, int y )
+
+    bool operator>=( const bignum& x, const bignum& y )
+
+    bool operator>=( const bignum& x, int y )
+
+    bignum operator+( bignum x, const bignum& y )
+
+    bignum operator+( bignum x, int64_t y )
+
+    bignum operator-( bignum x, const bignum& y )
+
+    bignum operator-( bignum x, int64_t y )
+
+    bignum operator*( int64_t x, const bignum& y )
+
+    bignum operator*( bignum x, const bignum& y )
+
+    bignum operator*( bignum x, int64_t y )
+
+    bignum operator/( bignum x, const bignum& y )
+
+    bignum operator/( bignum x, int y )
+
+    bignum operator%( bignum x, const bignum& y )
+
+    bignum operator<<( bignum u, unsigned k )
+
+    bignum operator<<( bignum u, int k )
+
+    bignum operator>>( bignum u, unsigned k )
+
+    bignum operator>>( bignum u, int k )
+
+    bignum operator|( bignum x, const bignum& y )
+
+    bignum operator|( bignum x, int y )
+
+    bignum operator|( bignum x, unsigned y )
+
+    bignum operator^( bignum x, const bignum& y )
+
+    bignum operator^( bignum x, int y )
+
+    bignum operator^( bignum x, unsigned y )
+
+    bignum operator&( bignum x, const bignum& y )
+
+    bignum operator&( bignum x, int y )
+
+    bignum operator&( bignum x, unsigned y )
+
+    bignum abs( const bignum& a )
+
+    bignum power( bignum x, unsigned n )
+
+    bignum sqrt( const bignum& a )
 
 ### Examples
 
