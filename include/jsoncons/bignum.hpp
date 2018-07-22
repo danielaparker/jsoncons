@@ -114,8 +114,6 @@ public:
         if (n.dynamic_)
         {
             data_ = n.data_;
-            length_ = n.length_;
-            neg_ = n.neg_;
             dynamic_ = true;
 
             n.data_ = n.values_;
@@ -126,9 +124,7 @@ public:
         {
             values_[0] = n.data_[0];
             values_[1] = n.data_[1];
-            neg_ = n.neg_;
             data_ = values_;
-            length_ = n.length_;
             dynamic_ = false;
         }
     }
