@@ -731,7 +731,7 @@ public:
         {
             signum = 1;
         }
-        bignum divisor(256);
+        basic_bignum<Allocator> divisor(256);
 
         while (n >= 256)
         {
