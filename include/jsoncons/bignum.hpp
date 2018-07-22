@@ -92,7 +92,7 @@ public:
     }
 
     basic_bignum(const basic_bignum<Allocator>& n)
-        : data_(values_), dynamic_(false), length_(n.length_), neg_(n.neg_)
+        : basic_bignum_base<Allocator>(n.allocator()), data_(values_), dynamic_(false), length_(n.length_), neg_(n.neg_)
     {
         if ( length_ <= 2 )
         {
