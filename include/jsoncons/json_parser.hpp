@@ -2662,25 +2662,12 @@ private:
         }
         else
         {
-            bignum n(number_buffer_.c_str());
-            n = -n;
-            bignum divisor(256);
-
             byte_buffer_.clear();
-            while (n >= 256)
-            {
-                bignum q;
-                bignum r;
-                n.divide(divisor, q, r, true);
-                n = q;
-                byte_buffer_.push_back((uint8_t)(uint64_t)r);
-            }
-            if (n >= 0)
-            {
-                byte_buffer_.push_back((uint8_t)(uint64_t)n);
-            }
-            std::reverse(byte_buffer_.begin(),byte_buffer_.end());
-            handler_.bignum_value(-1, byte_buffer_.data(), byte_buffer_.size(), *this);
+
+            int signum = 0;
+            bignum n(number_buffer_.c_str());
+            n.dump(signum, byte_buffer_);
+            handler_.bignum_value(signum, byte_buffer_.data(), byte_buffer_.size(), *this);
             after_value(ec);
         }
     }
@@ -2695,23 +2682,11 @@ private:
         }
         else
         {
-            bignum n(number_buffer_.c_str());
-            bignum divisor(256);
-
             byte_buffer_.clear();
-            while (n >= 256)
-            {
-                bignum q;
-                bignum r;
-                n.divide(divisor, q, r, true);
-                n = q;
-                byte_buffer_.push_back((uint8_t)(uint64_t)r);
-            }
-            if (n >= 0)
-            {
-                byte_buffer_.push_back((uint8_t)(uint64_t)n);
-            }
-            std::reverse(byte_buffer_.begin(),byte_buffer_.end());
+
+            int signum = 0;
+            bignum n(number_buffer_.c_str());
+            n.dump(signum, byte_buffer_);
             handler_.bignum_value(1, byte_buffer_.data(), byte_buffer_.size(), *this);
             after_value(ec);
         }

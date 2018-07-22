@@ -718,6 +718,36 @@ public:
        return neg_ ? -x : x;
     }
 
+    template <typename Alloc>
+    void dump(int& signum, std::vector<uint8_t,Alloc>& data) const
+    {
+        bignum n(*this);
+        if (neg_)
+        {
+            signum = -1;
+            n = -n;
+        }
+        else
+        {
+            signum = 1;
+        }
+        bignum divisor(256);
+
+        while (n >= 256)
+        {
+            bignum q;
+            bignum r;
+            n.divide(divisor, q, r, true);
+            n = q;
+            data.push_back((uint8_t)(uint64_t)r);
+        }
+        if (n >= 0)
+        {
+            data.push_back((uint8_t)(uint64_t)n);
+        }
+        std::reverse(data.begin(),data.end());
+    }
+
     template <typename Ch, typename Traits, typename Alloc>
     void dump(std::basic_string<Ch,Traits,Alloc>& data) const
     {
