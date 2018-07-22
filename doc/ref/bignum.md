@@ -5,6 +5,8 @@ typedef basic_bignum<Allocator = std::allocator<uint8_t>> bignum;
 ```
 The `bignum` class is an instantiation of the `basic_bignum` class template that uses `std::allocator<uint8_t>` as the allocator type.
 
+An arbitrary-precision integer.
+
 #### Header
 ```c++
 #include <jsoncons/bignum.hpp>
@@ -17,10 +19,12 @@ The `bignum` class is an instantiation of the `basic_bignum` class template that
     explicit bignum(const Allocator& alloc);
 
     explicit bignum(const char* str);
+Constructs a bignum from the decimal string representation of a bignum. 
 
     explicit bignum(const char* str, const Allocator& alloc);
 
     bignum(int signum, std::initializer_list<uint8_t> init);
+Constructs a bignum from the sign-magnitude representation. The integer signum value is -1 for negative or 1 for positive. The initializer list `init` of bytes is in big-endian byte-order. An empty list means a zero value.
 
     bignum(int signum, std::initializer_list<uint8_t> init, const Allocator& alloc);
 
