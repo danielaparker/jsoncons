@@ -84,6 +84,55 @@ public:
         values_[1] = 0;
     }
 
+    basic_bignum(const Allocator& allocator)
+        : basic_bignum_base<Allocator>(allocator), data_(values_), neg_(false), dynamic_(false), length_(0)
+    {
+        values_[0] = 0;
+        values_[1] = 0;
+    }
+
+    basic_bignum(const basic_bignum<Allocator>& n)
+        : data_(values_), dynamic_(false), length_(n.length_), neg_(n.neg_)
+    {
+        if ( length_ <= 2 )
+        {
+            values_ [0] = n.data_ [0];
+            values_ [1] = n.data_ [1];
+        }
+        else
+        {
+            capacity_ = n.capacity_;
+            data_ = allocator().allocate(capacity_);
+            dynamic_ = true;
+            memcpy( data_, n.data_, n.length_*sizeof(basic_type) );
+        }
+    }
+
+    basic_bignum(basic_bignum<Allocator>&& n)
+        : data_(values_), dynamic_(false), length_(n.length_), neg_(n.neg_)
+    {
+        if (n.dynamic_)
+        {
+            data_ = n.data_;
+            length_ = n.length_;
+            neg_ = n.neg_;
+            dynamic_ = true;
+
+            n.data_ = n.values_;
+            n.length_ = 0;
+            n.neg_ = false;
+        }
+        else
+        {
+            values_[0] = n.data_[0];
+            values_[1] = n.data_[1];
+            neg_ = n.neg_;
+            data_ = values_;
+            length_ = n.length_;
+            dynamic_ = false;
+        }
+    }
+
     explicit basic_bignum(const char* str)
     {
         bool neg = false;
@@ -195,23 +244,6 @@ public:
     basic_bignum(unsigned long long u)
     {
         initialize_from_integer( u );
-    }
-
-    basic_bignum(const basic_bignum<Allocator>& n)
-        : data_(values_), dynamic_(false), length_(n.length_), neg_(n.neg_)
-    {
-        if ( length_ <= 2 )
-        {
-            values_ [0] = n.data_ [0];
-            values_ [1] = n.data_ [1];
-        }
-        else
-        {
-            capacity_ = n.capacity_;
-            data_ = allocator().allocate(capacity_);
-            dynamic_ = true;
-            memcpy( data_, n.data_, n.length_*sizeof(basic_type) );
-        }
     }
 
     explicit basic_bignum( double x )
