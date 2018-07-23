@@ -29,14 +29,14 @@ public:
 
     virtual ~basic_json_content_handler() {}
 
-    void begin_json()
+    void begin_document()
     {
-        do_begin_json();
+        do_begin_document();
     }
 
-    void end_json()
+    void end_document()
     {
-        do_end_json();
+        do_end_document();
     }
 
     void begin_object()
@@ -129,6 +129,16 @@ public:
         do_byte_string_value(data, length, context);
     }
 
+    void byte_string_value(const std::vector<uint8_t>& v) 
+    {
+        do_byte_string_value(v.data(), v.size(), null_serializing_context());
+    }
+
+    void byte_string_value(const std::vector<uint8_t>& v, const serializing_context& context) 
+    {
+        do_byte_string_value(v.data(), v.size(), context);
+    }
+
     void bignum_value(int signum, const uint8_t* data, size_t length) 
     {
         do_bignum_value(signum, data, length, null_serializing_context());
@@ -211,6 +221,16 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+    void begin_json()
+    {
+        do_begin_document();
+    }
+
+    void end_json()
+    {
+        do_end_document();
+    }
+
     void name(const CharT* p, size_t length, const serializing_context& context) 
     {
         do_name(string_view_type(p, length), context);
@@ -283,9 +303,9 @@ public:
 #endif
 
 private:
-    virtual void do_begin_json() = 0;
+    virtual void do_begin_document() = 0;
 
-    virtual void do_end_json() = 0;
+    virtual void do_end_document() = 0;
 
     virtual void do_begin_object(const serializing_context& context) = 0;
 
@@ -330,11 +350,11 @@ class basic_null_json_content_handler final : public basic_json_content_handler<
 public:
     using typename basic_json_content_handler<CharT>::string_view_type                                 ;
 private:
-    void do_begin_json() override
+    void do_begin_document() override
     {
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
     }
 

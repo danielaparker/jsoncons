@@ -81,6 +81,8 @@ enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
 
 enum class bignum_chars_format : uint8_t {integer,string,base64url};
 
+enum class byte_string_chars_format : uint8_t {base64,base64url};
+
 template <class CharT,class Allocator=std::allocator<CharT>>
 class basic_json_serializing_options
 {
@@ -102,6 +104,7 @@ private:
     string_type neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
+    byte_string_chars_format byte_string_format_;
     bignum_chars_format bignum_format_;
 
     line_split_kind object_object_split_lines_;
@@ -124,6 +127,7 @@ public:
           can_read_neg_inf_replacement_(false),
           escape_all_non_ascii_(false),
           escape_solidus_(false),
+          byte_string_format_(byte_string_chars_format::base64url),
           bignum_format_(bignum_chars_format::string),
           object_object_split_lines_(line_split_kind::multi_line),
           object_array_split_lines_(line_split_kind::same_line),
@@ -134,6 +138,9 @@ public:
     }
 
 //  Properties
+    byte_string_chars_format byte_string_format() const {return byte_string_format_;}
+    basic_json_serializing_options<CharT>&  byte_string_format(byte_string_chars_format value) {byte_string_format_ = value; return *this;}
+
     bignum_chars_format bignum_format() const {return bignum_format_;}
     basic_json_serializing_options<CharT>&  bignum_format(bignum_chars_format value) {bignum_format_ = value; return *this;}
 

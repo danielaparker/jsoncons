@@ -118,11 +118,11 @@ private:
         }
     }
 
-    void do_begin_json() override
+    void do_begin_document() override
     {
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
         writer_.flush();
     }

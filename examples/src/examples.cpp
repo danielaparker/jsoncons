@@ -11,6 +11,7 @@
 
 using namespace jsoncons;
 
+void readme_examples();
 void basics_examples();
 void json_filter_examples();
 void array_examples();
@@ -544,6 +545,8 @@ int main()
         get_example();
 
         serialization_examples();
+
+        readme_examples();
     }
     catch (const std::exception& e)
     {

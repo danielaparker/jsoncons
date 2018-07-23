@@ -47,7 +47,7 @@
         0xa0:case 0xa1:case 0xa2:case 0xa3:case 0xa4:case 0xa5:case 0xa6:case 0xa7:case 0xa8:case 0xa9:case 0xaa:case 0xab:case 0xac:case 0xad:case 0xae:case 0xaf:case 0xb0:case 0xb1:case 0xb2:case 0xb3:case 0xb4:case 0xb5:case 0xb6:case 0xb7
 
 namespace jsoncons { namespace cbor {
-  
+
 class cbor_decode_error : public std::invalid_argument, public virtual json_exception
 {
 public:
@@ -1761,7 +1761,7 @@ public:
     {
         if (nesting_depth_ == 0)
         {
-            handler_.begin_json();
+            handler_.begin_document();
         }
 
         const uint8_t* pos = input_ptr_++;
@@ -2141,7 +2141,7 @@ public:
         }
         if (nesting_depth_ == 0)
         {
-            handler_.end_json();
+            handler_.end_document();
         }
     }
 private:

@@ -482,7 +482,7 @@ public:
         if (parent() == parse_state::root)
         {
             state_ = parse_state::done;
-            handler_.end_json();
+            handler_.end_document();
         }
         else
         {
@@ -530,7 +530,7 @@ public:
         if (parent() == parse_state::root)
         {
             state_ = parse_state::done;
-            handler_.end_json();
+            handler_.end_document();
         }
         else
         {
@@ -619,7 +619,7 @@ public:
                 break;
             case parse_state::start: 
                 {
-                    handler_.begin_json();
+                    handler_.begin_document();
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -1309,7 +1309,7 @@ public:
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
-                        handler_.end_json();
+                        handler_.end_document();
                     }
                     else
                     {
@@ -1374,7 +1374,7 @@ public:
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
-                        handler_.end_json();
+                        handler_.end_document();
                     }
                     else
                     {
@@ -1425,7 +1425,7 @@ public:
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
-                        handler_.end_json();
+                        handler_.end_document();
                     }
                     else
                     {
@@ -1541,7 +1541,7 @@ public:
                 column_ += 4;
                 if (parent() == parse_state::root)
                 {
-                    handler_.end_json();
+                    handler_.end_document();
                     state_ = parse_state::done;
                 }
                 else
@@ -1575,7 +1575,7 @@ public:
                 column_ += 4;
                 if (parent() == parse_state::root)
                 {
-                    handler_.end_json();
+                    handler_.end_document();
                     state_ = parse_state::done;
                 }
                 else
@@ -1609,7 +1609,7 @@ public:
                 column_ += 5;
                 if (parent() == parse_state::root)
                 {
-                    handler_.end_json();
+                    handler_.end_document();
                     state_ = parse_state::done;
                 }
                 else
@@ -2778,7 +2778,7 @@ private:
         case parse_state::root:
             handler_.string_value(string_view_type(s, length), *this);
             state_ = parse_state::done;
-            handler_.end_json();
+            handler_.end_document();
             break;
         default:
             if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
@@ -2822,7 +2822,7 @@ private:
             break;
         case parse_state::root:
             state_ = parse_state::done;
-            handler_.end_json();
+            handler_.end_document();
             break;
         default:
             if (err_handler_.error(json_parser_errc::invalid_json_text, *this))

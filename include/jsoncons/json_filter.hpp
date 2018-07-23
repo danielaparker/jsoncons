@@ -44,14 +44,14 @@ public:
     }
 
 private:
-    void do_begin_json() override
+    void do_begin_document() override
     {
-        downstream_handler_.begin_json();
+        downstream_handler_.begin_document();
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
-        downstream_handler_.end_json();
+        downstream_handler_.end_document();
     }
 
     void do_begin_object(const serializing_context& context) override
@@ -139,7 +139,7 @@ private:
 
 };
 
-// Filters out begin_json and end_json events
+// Filters out begin_document and end_document events
 template <class CharT>
 class basic_json_fragment_filter : public basic_json_filter<CharT>
 {
@@ -151,11 +151,11 @@ public:
     {
     }
 private:
-    void do_begin_json() override
+    void do_begin_document() override
     {
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
     }
 };
@@ -216,14 +216,14 @@ public:
     }
 
 private:
-    void do_begin_json() override
+    void do_begin_document() override
     {
-        downstream_handler_.begin_json();
+        downstream_handler_.begin_document();
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
-        downstream_handler_.end_json();
+        downstream_handler_.end_document();
     }
 
     void do_begin_object(const serializing_context& context) override

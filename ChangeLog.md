@@ -9,6 +9,17 @@ Changes
 
 - If the json parser encounters an integer overflow, the value is now handled as a bignum rather than a double value.
 
+- The `json_content_handler` names `begin_json` and `end_json` have been 
+  deprecated and replaced with `begin_document` and `end_document`, and the 
+  names `do_begin_json` and `do_end_json` have been removed and replaced with 
+  `do_begin_document`, and `do_end_document`. 
+  Rationale: meaningfullness across JSON and other data formats including
+  CBOR.
+
+Bug fix:
+
+- Fixed bug in base64url encoding of CBOR byte strings
+
 v0.106.0
 --------
 

@@ -18,10 +18,10 @@ Member type                         |Definition
 
 #### Public interface methods
 
-    void begin_json()
+    void begin_document()
 Sends a notification of the beginning of a sequence of JSON events. 
 
-    void end_json()
+    void end_document()
 Sends a notification of the end of a sequence of JSON events. 
 
     void begin_object()
@@ -101,10 +101,10 @@ line and column information is provided in the [context](serializing_context.md)
 
 #### Private virtual implementation methods
 
-    virtual void do_begin_json() = 0;
+    virtual void do_begin_document() = 0;
 Receives a notification of the beginning of a sequence of JSON events.
 
-    virtual void do_end_json() = 0;
+    virtual void do_end_document() = 0;
 Receives a notification of the end of a sequence of JSON events.
 
     virtual void do_begin_object(const serializing_context& context) = 0;

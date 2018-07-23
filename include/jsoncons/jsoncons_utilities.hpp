@@ -548,11 +548,11 @@ template <class CharT, class Traits = std::char_traits<CharT>>
 using basic_string_view = std::basic_string_view<CharT, Traits>;
 #endif
 
-static const std::string base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+static const char base64_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "abcdefghijklmnopqrstuvwxyz"
                                            "0123456789+/"
                                            "=";
-static const std::string base64url_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+static const char base64url_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                               "abcdefghijklmnopqrstuvwxyz"
                                               "0123456789-_"
                                               "\0";
@@ -562,7 +562,7 @@ void encode_base16(InputIt first, InputIt last, const std::string& alphabet, std
 {
     unsigned char a3[3];
     unsigned char a4[4];
-    unsigned char fill = alphabet.back();
+    unsigned char fill = alphabet[64];
     int i = 0;
     int j = 0;
 
@@ -621,9 +621,11 @@ void encode_base64(InputIt first, InputIt last, const std::string& alphabet, std
 {
     unsigned char a3[3];
     unsigned char a4[4];
-    unsigned char fill = alphabet.back();
+    unsigned char fill = alphabet[64];
     int i = 0;
     int j = 0;
+
+    std::cout << "fill: " << fill << std::endl;
 
     // 4 bytes for every 3 in the input 
     size_t untruncated_len = ((last-first) + 5) / 3 * 4;
@@ -711,7 +713,11 @@ std::string decode_base64(const std::string& base64_string)
         {
             for (i = 0; i < 4; ++i) 
             {
-                a4[i] = static_cast<uint8_t>(base64_alphabet.find(a4[i]));
+                auto p = std::find(base64_alphabet, base64_alphabet + 64, a4[i]);
+                if (p != base64_alphabet + 64)
+                {
+                    a4[i] = *p;
+                }
             }
 
             a3[0] = (a4[0] << 2) + ((a4[1] & 0x30) >> 4);
@@ -730,7 +736,11 @@ std::string decode_base64(const std::string& base64_string)
     {
         for (j = 0; j < i; ++j) 
         {
-            a4[j] = static_cast<uint8_t>(base64_alphabet.find(a4[j]));
+            auto p = std::find(base64_alphabet, base64_alphabet + 64,a4[j]);
+            if (p != base64_alphabet + 64)
+            {
+                a4[i] = *p;
+            }
         }
 
         a3[0] = (a4[0] << 2) + ((a4[1] & 0x30) >> 4);

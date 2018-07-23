@@ -287,11 +287,11 @@ private:
         }
     }
     // Implementing methods
-    void do_begin_json() override
+    void do_begin_document() override
     {
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
         writer_.flush();
     }
@@ -504,12 +504,27 @@ private:
         {
             begin_scalar_value();
         }
-
-        std::basic_string<CharT> s;
-        encode_base64url(data,data+length,s);
-        writer_. put('\"');
-        writer_.write(s.data(),s.size());
-        writer_. put('\"');
+        switch (options_.byte_string_format())
+        {
+            case byte_string_chars_format::base64url:
+            {
+                std::basic_string<CharT> s;
+                encode_base64url(data,data+length,s);
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+                break;
+            }
+            default:
+            {
+                std::basic_string<CharT> s;
+                encode_base64(data, data + length, s);
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+                break;
+            }
+        }
 
         end_value();
     }
@@ -523,15 +538,15 @@ private:
 
         switch (options_.bignum_format())
         {
-        case bignum_chars_format::integer:
+            case bignum_chars_format::integer:
             {
                 bignum n = bignum(signum, data, length);
                 std::basic_string<CharT> s;
                 n.dump(s);
                 writer_.write(s.data(),s.size());
+                break;
             }
-            break;
-        case bignum_chars_format::base64url:
+            case bignum_chars_format::base64url:
             {
                 std::basic_string<CharT> s;
                 encode_base64url(data, data + length, s);
@@ -542,9 +557,9 @@ private:
                 writer_. put('\"');
                 writer_.write(s.data(),s.size());
                 writer_. put('\"');
+                break;
             }
-            break;
-        default:
+            default:
             {
                 bignum n = bignum(signum, data, length);
                 std::basic_string<CharT> s;
@@ -552,8 +567,8 @@ private:
                 writer_. put('\"');
                 writer_.write(s.data(),s.size());
                 writer_. put('\"');
+                break;
             }
-            break;
         }
 
         end_value();

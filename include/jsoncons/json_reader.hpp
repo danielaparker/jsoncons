@@ -54,14 +54,14 @@ public:
 
 private:
 
-    void do_begin_json() override
+    void do_begin_document() override
     {
-        other_handler_.begin_json();
+        other_handler_.begin_document();
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
-        other_handler_.end_json();
+        other_handler_.end_document();
     }
 
     void do_begin_object(const serializing_context& context) override

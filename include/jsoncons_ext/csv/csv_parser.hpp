@@ -314,7 +314,7 @@ public:
                 for (const auto& name : column_names_)
                 {
                     decoders_.push_back(json_decoder<json_type>());
-                    decoders_.back().begin_json();
+                    decoders_.back().begin_document();
                     decoders_.back().begin_array(*this);
                 }
                 break;
@@ -342,7 +342,7 @@ public:
     void reset()
     {
         push_mode(csv_mode_type::initial);
-        handler_.begin_json();
+        handler_.begin_document();
 
         for (auto name : parameters_.column_names())
         {
@@ -669,7 +669,7 @@ all_csv_states:
             {
                 handler_.name(column_names_[i],*this);
                 decoders_[i].end_array(*this);
-                decoders_[i].end_json();
+                decoders_[i].end_document();
                 decoders_[i].get_result().dump_fragment(fragment_filter);
             }
             handler_.end_object(*this);
@@ -684,7 +684,7 @@ all_csv_states:
             ec = csv_parser_errc::unexpected_eof;
             return;
         }
-        handler_.end_json();
+        handler_.end_document();
     }
 
     csv_state_type state() const

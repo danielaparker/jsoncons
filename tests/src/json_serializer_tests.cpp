@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     std::ostringstream os1;
 
     json_serializer os(os1, options, jsoncons::indenting::indent); // pretty printing
-    os.begin_json();
+    os.begin_document();
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)
     {
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
         os.end_array();
     }
     os.end_array();
-    os.end_json();
+    os.end_document();
 
     std::string expected1 = R"([
     [1.0,2.0],

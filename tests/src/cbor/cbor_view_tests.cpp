@@ -108,44 +108,42 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
 
 }
 
-const json store = json::parse(R"(
+BOOST_AUTO_TEST_CASE(as_string_test)
 {
-    "store": {
-        "book": [
-            {
-                "category": "reference",
-                "author": "Nigel Rees",
-                "title": "Sayings of the Century",
-                "price": 8.95
-            },
-            {
-                "category": "fiction",
-                "author": "Evelyn Waugh",
-                "title": "Sword of Honour",
-                "price": 12.99
-            },
-            {
-                "category": "fiction",
-                "author": "Herman Melville",
-                "title": "Moby Dick",
-                "isbn": "0-553-21311-3",
-                "price": 8.99
-            },
-            {
-                "category": "fiction",
-                "author": "J. R. R. Tolkien",
-                "title": "The Lord of the Rings",
-                "isbn": "0-395-19395-8",
-                "price": 22.99
-            }
-        ],
-        "bicycle": {
-            "color": "red",
-            "price": 19.95
-        }
-    }
+    std::vector<uint8_t> b;
+    jsoncons::cbor::cbor_bytes_serializer serializer(b);
+    serializer.begin_document();
+    serializer.begin_array(5);
+    serializer.bool_value(true);
+    serializer.bool_value(false);
+    serializer.null_value();
+    serializer.string_value("Toronto");
+    serializer.byte_string_value({'H','e','l','l','o'});
+    serializer.end_array();
+    serializer.end_document();
+
+    jsoncons::cbor::cbor_view bv = b;
+
+    std::string s0;
+    bv.at(0).dump(s0);
+    BOOST_CHECK_EQUAL(std::string("true"), s0);
+
+    std::string s1;
+    bv.at(1).dump(s1);
+    BOOST_CHECK_EQUAL(std::string("false"), s1);
+
+    std::string s2;
+    bv.at(2).dump(s2);
+    BOOST_CHECK_EQUAL(std::string("null"), s2);
+
+    std::string s3;
+    bv.at(3).dump(s3);
+    BOOST_CHECK_EQUAL(std::string("\"Toronto\""), s3);
+
+    std::string s4;
+    bv.at(4).dump(s4);
+    BOOST_CHECK_EQUAL(std::string("\"SGVsbG8\""), s4);
 }
-)");
 
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -19,6 +19,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/binary/binary_utilities.hpp>
 #include <jsoncons/detail/writer.hpp>
 
 namespace jsoncons { namespace cbor {
@@ -79,11 +80,11 @@ public:
 private:
     // Implementing methods
 
-    void do_begin_json() override
+    void do_begin_document() override
     {
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
         writer_.flush();
     }

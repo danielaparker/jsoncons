@@ -2825,9 +2825,9 @@ public:
     }
     void dump(basic_json_content_handler<char_type>& handler) const
     {
-        handler.begin_json();
+        handler.begin_document();
         dump_fragment(handler);
-        handler.end_json();
+        handler.end_document();
     }
 
     void dump(std::basic_ostream<char_type>& os) const
@@ -2911,9 +2911,9 @@ public:
 
     void to_stream(basic_json_content_handler<char_type>& handler) const
     {
-        handler.begin_json();
+        handler.begin_document();
         dump_fragment(handler);
-        handler.end_json();
+        handler.end_document();
     }
 
     void to_stream(std::basic_ostream<char_type>& os) const

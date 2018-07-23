@@ -46,9 +46,9 @@ void dump_fragment(json_content_handler& handler) const; // (10)
 
 (8) Dumps json value to stream using the specified [json_serializing_options](../json_serializing_options.md) and [indenting](../indenting.md). 
 
-(9) Calls `begin_json()` on [json_content_handler](../json_content_handler.md), emits json value to the [json_content_handler](../json_content_handler.md), and calls `end_json()` on [json_content_handler](../json_content_handler.md). 
+(9) Calls `begin_document()` on [json_content_handler](../json_content_handler.md), emits json value to the [json_content_handler](../json_content_handler.md), and calls `end_document()` on [json_content_handler](../json_content_handler.md). 
 
-(10) Emits json value to the [json_content_handler](../json_content_handler.md) (does not call `begin_json()` or `end_json()`.)
+(10) Emits json value to the [json_content_handler](../json_content_handler.md) (does not call `begin_document()` or `end_document()`.)
 
 ### Examples
 

@@ -32,9 +32,9 @@ void encode_json(const T& val,
                  std::basic_ostream<CharT>& os, indenting line_indent); // (6)
 ```
 
-(1) Calls `begin_json()` on `handler`, applies `json_convert_traits` to serialize `val` to JSON output stream, and calls `end_json()` on `handler`.
+(1) Calls `begin_document()` on `handler`, applies `json_convert_traits` to serialize `val` to JSON output stream, and calls `end_document()` on `handler`.
 
-(2) Applies `json_convert_traits` to serialize `val` to JSON output stream, but does not call begin_json() and `end_json()`.
+(2) Applies `json_convert_traits` to serialize `val` to JSON output stream, but does not call begin_document() and `end_document()`.
 
 #### Parameters
 

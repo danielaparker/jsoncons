@@ -149,7 +149,7 @@ private:
         stack_offsets_.pop_back();
     }
 
-    void do_begin_json() override
+    void do_begin_document() override
     {
         stack_offsets_.clear();
         stack_.clear();
@@ -157,7 +157,7 @@ private:
         is_valid_ = false;
     }
 
-    void do_end_json() override
+    void do_end_document() override
     {
         if (stack_.size() == 1)
         {

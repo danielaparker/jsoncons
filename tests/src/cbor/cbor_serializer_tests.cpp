@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(test_array)
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
-    serializer.begin_json();
+    serializer.begin_document();
     //serializer.begin_object(1);
     serializer.begin_array(3);
     serializer.bool_value(true);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_array)
     serializer.null_value();
     serializer.end_array();
     //serializer.end_object();
-    serializer.end_json();
+    serializer.end_document();
 
     try
     {
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
-    serializer.begin_json();
+    serializer.begin_document();
     serializer.begin_array();
     serializer.begin_array(4);
     serializer.bool_value(true);
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
     serializer.string_value("Hello");
     serializer.end_array();
     serializer.end_array();
-    serializer.end_json();
+    serializer.end_document();
 
     try
     {
@@ -106,13 +106,13 @@ BOOST_AUTO_TEST_CASE(test_bignum)
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
-    serializer.begin_json();
+    serializer.begin_document();
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     serializer.bignum_value(1, bytes.data(), bytes.size());
     serializer.end_array();
-    serializer.end_json();
+    serializer.end_document();
 
     try
     {
@@ -129,13 +129,13 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum1)
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
-    serializer.begin_json();
+    serializer.begin_document();
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     serializer.bignum_value(-1, bytes.data(), bytes.size());
     serializer.end_array();
-    serializer.end_json();
+    serializer.end_document();
 
     try
     {
@@ -152,13 +152,13 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum2)
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
-    serializer.begin_json();
+    serializer.begin_document();
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     serializer.bignum_value(-1, bytes.data(), bytes.size());
     serializer.end_array();
-    serializer.end_json();
+    serializer.end_document();
 
     try
     {
@@ -179,14 +179,14 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum3)
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
-    serializer.begin_json();
+    serializer.begin_document();
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
     serializer.bignum_value(-1, bytes.data(), bytes.size());
     serializer.end_array();
-    serializer.end_json();
+    serializer.end_document();
 
     try
     {

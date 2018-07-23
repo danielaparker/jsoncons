@@ -23,6 +23,40 @@
 
 namespace jsoncons { namespace cbor {
 
+enum class cbor_major_type : uint8_t
+{
+    unsigned_integer = 0x00,
+    negative_integer = 0x01,
+    byte_string = 0x02,
+    text_string = 0x03,
+    array = 0x04,
+    map = 0x05,   
+    semantic_tagging = 0x06,
+    simple = 0x7
+};
+
+const uint8_t major_type_shift = 0x05;
+const uint8_t major_type_mask = (~0x00 << major_type_shift);
+const uint8_t indefinite_length = 0x1f;
+const uint8_t additional_information_mask = (1U << 5) - 1;
+
+namespace additional_information
+{
+    const uint8_t indefinite_length = 0x1f;
+}
+
+cbor_major_type get_major_type(uint8_t type)
+{
+    uint8_t value = type >> major_type_shift;
+    return static_cast<cbor_major_type>(value);
+}
+
+uint8_t get_additional_information_value(uint8_t type)
+{
+    uint8_t value = type & additional_information_mask;
+    return value;
+}
+
 class cbor_view 
 {
     const uint8_t* first_;
@@ -145,6 +179,16 @@ public:
         return last_ - first_;
     }
 
+    uint8_t type() const
+    {
+        return first_[0];
+    }
+
+    cbor_major_type major_type() const
+    {
+        return get_major_type(type());
+    }
+
     bool is_null() const
     {
         JSONCONS_ASSERT(buflen() > 0);
@@ -193,34 +237,13 @@ public:
     bool is_string() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_string(first_[0]);
+        return get_major_type(first_[0]) == cbor_major_type::text_string;
     }
 
     bool is_byte_string() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-
-        bool result;
-        switch (first_[0])
-        {
-        case JSONCONS_CBOR_0x40_0x57: // byte string (0x00..0x17 bytes follow)
-            // FALLTHRU
-        case 0x58: // byte string (one-byte uint8_t for n follows)
-            // FALLTHRU
-        case 0x59: // byte string (two-byte uint16_t for n follow)
-            // FALLTHRU
-        case 0x5a: // byte string (four-byte uint32_t for n follow)
-            // FALLTHRU
-        case 0x5b: // byte string (eight-byte uint64_t for n follow)
-            // FALLTHRU
-        case 0x5f: // byte string, byte strings follow, terminated by "break"
-            result = true;
-            break;
-        default: 
-            result = false;
-            break;
-        }
-        return result;
+        return get_major_type(first_[0]) == cbor_major_type::byte_string;
     }
 
     bool is_bool() const
@@ -412,13 +435,90 @@ public:
         }
         return val;
     }
-protected:
 
-    void set_data(const uint8_t* data, size_t length)
+    void dump(std::string& s) const
     {
-        first_ = data;
-        last_ = data + length;
-    }    
+        basic_json_serializer<char,jsoncons::detail::string_writer<char_type>> serializer(s);
+        dump(serializer);
+    }
+
+    void dump(std::string& s, indenting line_indent) const
+    {
+        basic_json_serializer<char,jsoncons::detail::string_writer<char_type>> serializer(s, line_indent);
+        dump(serializer);
+    }
+
+    void dump(std::string& s,
+              const json_serializing_options& options) const
+    {
+        basic_json_serializer<char,jsoncons::detail::string_writer<char_type>> serializer(s, options);
+        dump(serializer);
+    }
+
+    void dump(std::string& s,
+              const json_serializing_options& options,
+              indenting line_indent) const
+    {
+        basic_json_serializer<char,jsoncons::detail::string_writer<char_type>> serializer(s, options, line_indent);
+        dump(serializer);
+    }
+
+    void dump(json_content_handler& handler) const
+    {
+        handler.begin_document();
+        dump_fragment(handler);
+        handler.end_document();
+    }
+
+    void dump_fragment(json_content_handler& handler) const
+    {
+        // If it's a non indefinite length string, dump view
+        // If it's an indefinite length string, dump view
+        switch (major_type())
+        {
+            case cbor_major_type::text_string:
+            {
+                const uint8_t* endp;
+                std::string s = detail::get_text_string(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(0));
+                }
+                handler.string_value(s);
+                break;
+            }
+            case cbor_major_type::byte_string:
+            {
+                const uint8_t* endp;
+                std::vector<uint8_t> s = detail::get_byte_string(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(0));
+                }
+                handler.byte_string_value(s.data(), s.size());
+                break;
+            }
+            case cbor_major_type::simple:
+            {
+                switch (type())
+                {
+                    case 0xf5:
+                        handler.bool_value(true);
+                        break;
+                    case 0xf4:
+                        handler.bool_value(false);
+                        break;
+                    case 0xf6:
+                        handler.null_value();
+                        break;
+                }
+                break;
+            }
+        }
+    }
+
+private:
+
 };
 
 }}
