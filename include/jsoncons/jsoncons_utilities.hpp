@@ -625,8 +625,6 @@ void encode_base64(InputIt first, InputIt last, const std::string& alphabet, std
     int i = 0;
     int j = 0;
 
-    std::cout << "fill: " << fill << std::endl;
-
     // 4 bytes for every 3 in the input 
     size_t untruncated_len = ((last-first) + 5) / 3 * 4;
     result.reserve(untruncated_len);
