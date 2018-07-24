@@ -3288,25 +3288,33 @@ public:
     {
         switch (var_.type_id())
         {
-        case json_type_tag::small_string_t:
-        case json_type_tag::string_t:
-            return string_type(as_string_view().data(),as_string_view().length());
-        case json_type_tag::positive_bignum_t:
+            case json_type_tag::small_string_t:
+            case json_type_tag::string_t:
+                return string_type(as_string_view().data(),as_string_view().length());
+            case json_type_tag::byte_string_t:
             {
                 bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                 string_type s;
                 n.dump(s);
                 return s;
             }
-        case json_type_tag::negative_bignum_t:
+            case json_type_tag::positive_bignum_t:
+            {
+                string_type s;
+                encode_base64url(var_.byte_string_data_cast()->data(), 
+                                 var_.byte_string_data_cast()->data()+var_.byte_string_data_cast()->length(),
+                                 s);
+                return s;
+            }
+            case json_type_tag::negative_bignum_t:
             {
                 bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                 string_type s;
                 n.dump(s);
                 return s;
             }
-        default:
-            return to_string();
+            default:
+                return to_string();
         }
     }
 

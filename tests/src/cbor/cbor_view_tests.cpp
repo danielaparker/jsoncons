@@ -133,53 +133,63 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     serializer.end_array();
     serializer.end_document();
 
-    for (auto u : b)
-    {
-        std::cout << std::hex << (int)u;
-    }
-    std::cout << "\n\n";
+    //for (auto u : b)
+    //{
+    //    std::cout << std::hex << (int)u;
+    //}
+    //std::cout << "\n\n";
 
     jsoncons::cbor::cbor_view bv = b;
 
     std::string s0;
     bv[0].dump(s0);
     BOOST_CHECK_EQUAL(std::string("true"), s0);
+    BOOST_CHECK_EQUAL(std::string("true"), bv[0].as_string());
 
     std::string s1;
     bv[1].dump(s1);
     BOOST_CHECK_EQUAL(std::string("false"), s1);
+    BOOST_CHECK_EQUAL(std::string("false"), bv[1].as_string());
 
     std::string s2;
     bv[2].dump(s2);
     BOOST_CHECK_EQUAL(std::string("null"), s2);
+    BOOST_CHECK_EQUAL(std::string("null"), bv[2].as_string());
 
     std::string s3;
     bv[3].dump(s3);
     BOOST_CHECK_EQUAL(std::string("\"Toronto\""), s3);
+    BOOST_CHECK_EQUAL(std::string("Toronto"), bv[3].as_string());
 
     std::string s4;
     bv[4].dump(s4);
     BOOST_CHECK_EQUAL(std::string("\"SGVsbG8\""), s4);
+    BOOST_CHECK_EQUAL(std::string("SGVsbG8"), bv[4].as_string());
 
     std::string s5;
     bv[5].dump(s5);
     BOOST_CHECK_EQUAL(std::string("-100"), s5);
+    BOOST_CHECK_EQUAL(std::string("-100"), bv[5].as_string());
 
     std::string s6;
     bv[6].dump(s6);
     BOOST_CHECK_EQUAL(std::string("100"), s6);
+    BOOST_CHECK_EQUAL(std::string("100"), bv[6].as_string());
 
     std::string s7;
     bv[7].dump(s7);
     BOOST_CHECK_EQUAL(std::string("\"18446744073709551616\""), s7);
+    BOOST_CHECK_EQUAL(std::string("18446744073709551616"), bv[7].as_string());
 
     std::string s8;
     bv[8].dump(s8);
     BOOST_CHECK_EQUAL(std::string("10.5"), s8);
+    BOOST_CHECK_EQUAL(std::string("10.5"), bv[8].as_string());
 
     std::string s9;
     bv[9].dump(s9);
     BOOST_CHECK_EQUAL(std::string("\"-18446744073709551617\""), s9);
+    BOOST_CHECK_EQUAL(std::string("-18446744073709551617"), bv[9].as_string());
 }
 
 BOOST_AUTO_TEST_CASE(test_dump_to_string)

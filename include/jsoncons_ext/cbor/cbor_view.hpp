@@ -449,13 +449,70 @@ public:
 
     std::string as_string() const
     {
-        const uint8_t* endp;
-        std::string val = detail::get_text_string(first_,last_,&endp);
-        if (endp == first_)
+        switch (major_type())
         {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
+            case cbor_major_type::text_string:
+            {
+                const uint8_t* endp;
+                std::string s = detail::get_text_string(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
+                }
+                return s;
+            }
+            case cbor_major_type::byte_string:
+            {
+                const uint8_t* endp;
+                std::vector<uint8_t> v = detail::get_byte_string(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(0));
+                }
+                std::string s;
+                encode_base64url(v.begin(),v.end(),s);
+                return s;
+            }
+            case cbor_major_type::semantic_tag:
+            {
+                uint8_t tag = get_additional_information_value(type());
+                switch (tag)
+                {
+                    case 2:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_+1)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        bignum n = bignum(1, v.data(), v.size());
+                        std::string s;
+                        n.dump(s);
+                        return s;
+                    }
+                    case 3:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_+1)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        bignum n = bignum(-1, v.data(), v.size());
+                        std::string s;
+                        n.dump(s);
+                        return s;
+                    }
+                }
+            }
+            default:
+            {
+                std::string s;
+                dump(s);
+                return s;
+            }
         }
-        return val;
     }
 
     template <typename Traits,typename SAllocator>
