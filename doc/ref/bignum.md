@@ -23,10 +23,14 @@ Constructs a bignum from the decimal string representation of a bignum.
 
     explicit bignum(const char* str, const Allocator& alloc);
 
-    bignum(int signum, std::initializer_list<uint8_t> init);
-Constructs a bignum from the sign-magnitude representation. The integer signum value is -1 for negative or 1 for positive. The initializer list `init` of bytes is in big-endian byte-order. An empty list means a zero value.
+    bignum(int signum, std::initializer_list<uint8_t> magnitude);
+Constructs a bignum from the sign-magnitude representation. 
+The magnitude is an unsigned integer `n` encoded as a byte string data item in big-endian byte-order.
+If the value of signum is 1, the value of the bignum is `n`. 
+If the value of signum is -1, the value of the bignum is `-1 - n`. 
+An empty list means a zero value.
 
-    bignum(int signum, std::initializer_list<uint8_t> init, const Allocator& alloc);
+    bignum(int signum, std::initializer_list<uint8_t> magnitude, const Allocator& alloc);
 
     bignum(const bignum& s); 
 

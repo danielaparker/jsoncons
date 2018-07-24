@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum1)
     try
     {
         json result = decode_cbor<json>(v);
-        BOOST_CHECK_EQUAL(std::string("-18446744073709551616"),result[0].as<std::string>());
+        BOOST_CHECK_EQUAL(std::string("-18446744073709551617"),result[0].as<std::string>());
     }
     catch (const std::exception& e)
     {
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum2)
         options.bignum_format(bignum_chars_format::integer);
         std::string s;
         result.dump(s,options);
-        BOOST_CHECK_EQUAL(std::string("[-18446744073709551616]"),s);
+        BOOST_CHECK_EQUAL(std::string("[-18446744073709551617]"),s);
     }
     catch (const std::exception& e)
     {
