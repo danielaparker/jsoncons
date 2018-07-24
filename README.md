@@ -193,12 +193,14 @@ int main()
     std::cout << "(5)\n";
     std::cout << pretty_print(bv, options) << "\n\n";
 
+    // Unpack the CBOR bytes into a json value
     json j = cbor::decode_cbor<json>(bv);
     j.push_back(bignum("18446744073709551616"));
     j.insert(j.array_range().begin(),10.5);
     std::cout << "(6)\n";
     std::cout << pretty_print(j) << "\n\n";
 
+    // And repack
     std::vector<uint8_t> u;
     cbor::encode_cbor(j, u);
     std::cout << "(7)\n";
