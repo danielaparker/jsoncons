@@ -93,6 +93,12 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     std::vector<uint8_t> buffer;
     encode_cbor(j, buffer);
 
+    cbor_view bv = buffer;
+    std::string s;
+    bv.dump(s);
+    std::cout << "Object dump" << std::endl;
+    std::cout << s << std::endl;
+
     std::error_code ec;
     cbor_view application = jsonpointer::get(cbor_view(buffer), "/application", ec);
     BOOST_CHECK(!ec);
@@ -165,6 +171,14 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     std::string s7;
     bv.at(7).dump(s7);
     BOOST_CHECK_EQUAL(std::string("\"18446744073709551616\""), s7);
+
+    std::string s8;
+    bv.at(8).dump(s8);
+    BOOST_CHECK_EQUAL(std::string("10.5"), s8);
+
+    std::string s9;
+    bv.dump(s9);
+    std::cout << s9 << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -500,6 +500,17 @@ public:
                 handler.integer_value(value);
                 break;
             }
+            case cbor_major_type::byte_string:
+            {
+                const uint8_t* endp;
+                std::vector<uint8_t> s = detail::get_byte_string(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(0));
+                }
+                handler.byte_string_value(s.data(), s.size());
+                break;
+            }
             case cbor_major_type::text_string:
             {
                 const uint8_t* endp;
@@ -511,15 +522,51 @@ public:
                 handler.string_value(s);
                 break;
             }
-            case cbor_major_type::byte_string:
+            case cbor_major_type::array:
             {
-                const uint8_t* endp;
-                std::vector<uint8_t> s = detail::get_byte_string(first_,last_,&endp);
-                if (endp == first_)
+                const uint8_t* it;
+                size_t len = detail::get_size(first_,last_,&it);
+                handler.begin_array(len);
+                for (size_t i = 0; i < len; ++i)
                 {
-                    JSONCONS_THROW(cbor_decode_error(0));
+                    const uint8_t* endp;
+                    detail::walk(it, last_, &endp);
+                    if (endp == it)
+                    {
+                        JSONCONS_THROW(cbor_decode_error(0));
+                    }
+
+                    cbor_view(it,endp-it).dump(handler);
+                    it = endp;
                 }
-                handler.byte_string_value(s.data(), s.size());
+                handler.end_array();
+                break;
+            }
+            case cbor_major_type::map:
+            {
+                const uint8_t* it;
+                size_t len = detail::get_size(first_,last_,&it);
+                handler.begin_object(len);
+                for (size_t i = 0; i < len; ++i)
+                {
+                    const uint8_t* endp;
+                    std::string key = detail::get_text_string(it, last_, &endp);
+                    if (endp == it)
+                    {
+                        JSONCONS_THROW(cbor_decode_error(last_-it));
+                    }
+                    handler.name(key);
+                    it = endp;
+                    detail::walk(it, last_, &endp);
+                    if (endp == it)
+                    {
+                        JSONCONS_THROW(cbor_decode_error(0));
+                    }
+
+                    cbor_view(it,endp-it).dump(handler);
+                    it = endp;
+                }
+                handler.end_object();
                 break;
             }
             case cbor_major_type::semantic_tag:
@@ -560,6 +607,14 @@ public:
                     case 0xf6:
                         handler.null_value();
                         break;
+                    case 0xf9:
+                    case 0xfa:
+                    case 0xfb:
+                    {
+                        double value = as_double();
+                        handler.double_value(value);
+                        break;
+                    }
                     default:
                         break;
                 }
