@@ -149,6 +149,26 @@ public:
         do_bignum_value(signum, data, length, context);
     }
 
+    void bignum_value(const char* s) 
+    {
+        bignum n(s);
+        int signum;
+        std::vector<uint8_t> v;
+        n.dump(signum, v);
+
+        do_bignum_value(signum, v.data(), v.size(), null_serializing_context());
+    }
+
+    void bignum_value(const char* s, const serializing_context& context) 
+    {
+        bignum n(s);
+        int signum;
+        std::vector<uint8_t> v;
+        n.dump(signum, v);
+
+        do_bignum_value(signum, v.data(), v.size(), context);
+    }
+
     void integer_value(int64_t value)
     {
         do_integer_value(value,null_serializing_context());

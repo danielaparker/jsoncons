@@ -113,14 +113,24 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     std::vector<uint8_t> b;
     jsoncons::cbor::cbor_bytes_serializer serializer(b);
     serializer.begin_document();
-    serializer.begin_array(5);
+    serializer.begin_array(9);
     serializer.bool_value(true);
     serializer.bool_value(false);
     serializer.null_value();
     serializer.string_value("Toronto");
     serializer.byte_string_value({'H','e','l','l','o'});
+    serializer.integer_value(-100);
+    serializer.uinteger_value(100);
+    serializer.bignum_value("18446744073709551616");
+    serializer.double_value(10.5);
     serializer.end_array();
     serializer.end_document();
+
+    for (auto u : b)
+    {
+        std::cout << std::hex << (int)u;
+    }
+    std::cout << "\n\n";
 
     jsoncons::cbor::cbor_view bv = b;
 
@@ -143,6 +153,18 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     std::string s4;
     bv.at(4).dump(s4);
     BOOST_CHECK_EQUAL(std::string("\"SGVsbG8\""), s4);
+
+    std::string s5;
+    bv.at(5).dump(s5);
+    BOOST_CHECK_EQUAL(std::string("-100"), s5);
+
+    std::string s6;
+    bv.at(6).dump(s6);
+    BOOST_CHECK_EQUAL(std::string("100"), s6);
+
+    std::string s7;
+    bv.at(7).dump(s7);
+    BOOST_CHECK_EQUAL(std::string("\"18446744073709551616\""), s7);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

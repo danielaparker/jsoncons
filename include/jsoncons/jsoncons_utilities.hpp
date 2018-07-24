@@ -548,7 +548,7 @@ template <class CharT, class Traits = std::char_traits<CharT>>
 using basic_string_view = std::basic_string_view<CharT, Traits>;
 #endif
 
-static const char base64_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+static const char* base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "abcdefghijklmnopqrstuvwxyz"
                                            "0123456789+/"
                                            "=";
@@ -617,7 +617,7 @@ static bool is_base64(uint8_t c)
 }
 
 template <class InputIt,class CharT>
-void encode_base64(InputIt first, InputIt last, const std::string& alphabet, std::basic_string<CharT>& result)
+void encode_base64(InputIt first, InputIt last, const char* alphabet, std::basic_string<CharT>& result)
 {
     unsigned char a3[3];
     unsigned char a4[4];
@@ -691,9 +691,14 @@ void encode_base64(const uint8_t* data, size_t length, std::basic_string<CharT>&
     encode_base64(data, data+length, base64_alphabet, result);
 }
 
+static const std::string base64_alphabet2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                           "abcdefghijklmnopqrstuvwxyz"
+                                           "0123456789+/"
+                                           "=";
 inline
 std::string decode_base64(const std::string& base64_string)
 {
+    const char* alphabet_end = base64_alphabet + 65;
     std::string result;
     uint8_t a4[4], a3[3];
     uint8_t i = 0;
@@ -711,10 +716,14 @@ std::string decode_base64(const std::string& base64_string)
         {
             for (i = 0; i < 4; ++i) 
             {
-                auto p = std::find(base64_alphabet, base64_alphabet + 64, a4[i]);
-                if (p != base64_alphabet + 64)
+                auto p = std::find(base64_alphabet,alphabet_end,a4[i]);
+                if (p == alphabet_end)
                 {
-                    a4[i] = *p;
+                    a4[i] = static_cast<uint8_t>(std::string::npos);
+                }
+                else
+                {
+                    a4[i] = static_cast<uint8_t>(p - base64_alphabet);
                 }
             }
 
@@ -734,10 +743,14 @@ std::string decode_base64(const std::string& base64_string)
     {
         for (j = 0; j < i; ++j) 
         {
-            auto p = std::find(base64_alphabet, base64_alphabet + 64,a4[j]);
-            if (p != base64_alphabet + 64)
+            auto p = std::find(base64_alphabet,alphabet_end,a4[j]);
+            if (p == alphabet_end)
             {
-                a4[i] = *p;
+                a4[j] = static_cast<uint8_t>(std::string::npos);
+            }
+            else
+            {
+                a4[j] = static_cast<uint8_t>(p - base64_alphabet);
             }
         }
 

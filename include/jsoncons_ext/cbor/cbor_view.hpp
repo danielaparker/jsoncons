@@ -31,7 +31,7 @@ enum class cbor_major_type : uint8_t
     text_string = 0x03,
     array = 0x04,
     map = 0x05,   
-    semantic_tagging = 0x06,
+    semantic_tag = 0x06,
     simple = 0x7
 };
 
@@ -288,11 +288,21 @@ public:
 
         for (size_t i = 0; i < index; ++i)
         {
-            detail::walk(it, last_, &it);
+            const uint8_t* endp;
+            detail::walk(it, last_, &endp);
+            if (endp == it)
+            {
+                JSONCONS_THROW(cbor_decode_error(0));
+            }
+            it = endp;
         }
 
         const uint8_t* endp;
         detail::walk(it, last_, &endp);
+        if (endp == it)
+        {
+            JSONCONS_THROW(cbor_decode_error(0));
+        }
 
         return cbor_view(it,endp-it);
     }
@@ -478,6 +488,18 @@ public:
         // If it's an indefinite length string, dump view
         switch (major_type())
         {
+            case cbor_major_type::unsigned_integer:
+            {
+                uint64_t value = as_uinteger();
+                handler.uinteger_value(value);
+                break;
+            }
+            case cbor_major_type::negative_integer:
+            {
+                int64_t value = as_integer();
+                handler.integer_value(value);
+                break;
+            }
             case cbor_major_type::text_string:
             {
                 const uint8_t* endp;
@@ -500,6 +522,31 @@ public:
                 handler.byte_string_value(s.data(), s.size());
                 break;
             }
+            case cbor_major_type::semantic_tag:
+            {
+                uint8_t tag = get_additional_information_value(type());
+                if (tag == 2)
+                {
+                    const uint8_t* endp;
+                    std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                    if (endp == first_+1)
+                    {
+                        JSONCONS_THROW(cbor_decode_error(0));
+                    }
+                    handler.bignum_value(1, v.data(), v.size());
+                }
+                else if (tag == 3)
+                {
+                    const uint8_t* endp;
+                    std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                    if (endp == first_+1)
+                    {
+                        JSONCONS_THROW(cbor_decode_error(0));
+                    }
+                    handler.bignum_value(-1, v.data(), v.size());
+                }
+                break;
+            }
             case cbor_major_type::simple:
             {
                 switch (type())
@@ -512,6 +559,8 @@ public:
                         break;
                     case 0xf6:
                         handler.null_value();
+                        break;
+                    default:
                         break;
                 }
                 break;
