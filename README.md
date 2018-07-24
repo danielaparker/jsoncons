@@ -51,98 +51,6 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
-## A simple program using jsoncons
-
-```c++
-#include <iostream>
-#include <fstream>
-#include <jsoncons/json.hpp>
-
-// For convenience
-using jsoncons::json;
-
-int main()
-{
-    json color_spaces = json::array();
-    color_spaces.push_back("sRGB");
-    color_spaces.push_back("AdobeRGB");
-    color_spaces.push_back("ProPhoto RGB");
-
-    json image_sizing; // empty object
-    image_sizing["Resize To Fit"] = true; // a boolean 
-    image_sizing["Resize Unit"] = "pixels"; // a string
-    image_sizing["Resize What"] = "long_edge"; // a string
-    image_sizing["Dimension 1"] = 9.84; // a double
-    
-    json export_settings;
-
-    // create "File Format Options" as an object and put "Color Spaces" in it
-    export_settings["File Format Options"]["Color Spaces"] = std::move(color_spaces); 
-
-    export_settings["Image Sizing"] = std::move(image_sizing);
-
-    // Write to stream
-    std::ofstream os("export_settings.json");
-    os << export_settings;
-
-    // Read from stream
-    std::ifstream is("export_settings.json");
-    json j = json::parse(is);
-
-    // Pretty print
-    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
-
-    // Get reference to object member
-    const json& val = j["Image Sizing"];
-
-    // Access member as double
-    std::cout << "(2) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
-
-    // Try access member with default
-    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n";
-}
-```
-Output:
-```json
-(1)
-{
-    "File Format Options": {
-        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"]
-    },
-    "Image Sizing": {
-        "Dimension 1": 9.84,
-        "Resize To Fit": true,
-        "Resize Unit": "pixels",
-        "Resize What": "long_edge"
-    }
-}
-
-(2) Dimension 1 = 9.84
-
-(3) Dimension 2 = 0.0
-```
-
-## About jsoncons::basic_json
-
-The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different 
-character types, different policies for ordering name-value pairs, etc. A `basic_json` provides an unpacked representation 
-of JSON-like string or binary data formats, and defines an interface for accessing and modifying that data.
-
-```c++
-typedef basic_json<char,
-                   ImplementationPolicy = sorted_policy,
-                   Allocator = std::allocator<char>> json;
-```
-The library includes four instantiations of `basic_json`:
-
-- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
-
-- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
-
-- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
-
-- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
-
 ## Playing around
 
 ```c++
@@ -253,7 +161,99 @@ SGVsbG8
 ]
 ```
 
+## About jsoncons::basic_json
+
+The jsoncons library provides a `basic_json` class template, which is the generalization of a `json` value for different 
+character types, different policies for ordering name-value pairs, etc. A `basic_json` provides an unpacked representation 
+of JSON-like string or binary data formats, and defines an interface for accessing and modifying that data.
+
+```c++
+typedef basic_json<char,
+                   ImplementationPolicy = sorted_policy,
+                   Allocator = std::allocator<char>> json;
+```
+The library includes four instantiations of `basic_json`:
+
+- [json](doc/ref/json.md) constructs a utf8 character json value that sorts name-value members alphabetically
+
+- [ojson](doc/ref/ojson.md) constructs a utf8 character json value that preserves the original name-value insertion order
+
+- [wjson](doc/ref/wjson.md) constructs a wide character json value that sorts name-value members alphabetically
+
+- [wojson](doc/ref/wojson.md) constructs a wide character json value that preserves the original name-value insertion order
+
 ## More examples
+
+### Constructing json
+
+```c++
+#include <iostream>
+#include <fstream>
+#include <jsoncons/json.hpp>
+
+// For convenience
+using jsoncons::json;
+
+int main()
+{
+    json color_spaces = json::array();
+    color_spaces.push_back("sRGB");
+    color_spaces.push_back("AdobeRGB");
+    color_spaces.push_back("ProPhoto RGB");
+
+    json image_sizing; // empty object
+    image_sizing["Resize To Fit"] = true; // a boolean 
+    image_sizing["Resize Unit"] = "pixels"; // a string
+    image_sizing["Resize What"] = "long_edge"; // a string
+    image_sizing["Dimension 1"] = 9.84; // a double
+    
+    json export_settings;
+
+    // create "File Format Options" as an object and put "Color Spaces" in it
+    export_settings["File Format Options"]["Color Spaces"] = std::move(color_spaces); 
+
+    export_settings["Image Sizing"] = std::move(image_sizing);
+
+    // Write to stream
+    std::ofstream os("export_settings.json");
+    os << export_settings;
+
+    // Read from stream
+    std::ifstream is("export_settings.json");
+    json j = json::parse(is);
+
+    // Pretty print
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+
+    // Get reference to object member
+    const json& val = j["Image Sizing"];
+
+    // Access member as double
+    std::cout << "(2) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
+
+    // Try access member with default
+    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n";
+}
+```
+Output:
+```json
+(1)
+{
+    "File Format Options": {
+        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"]
+    },
+    "Image Sizing": {
+        "Dimension 1": 9.84,
+        "Resize To Fit": true,
+        "Resize Unit": "pixels",
+        "Resize What": "long_edge"
+    }
+}
+
+(2) Dimension 1 = 9.84
+
+(3) Dimension 2 = 0.0
+```
 
 ### Convert unpacked json values to standard library types and back
 
