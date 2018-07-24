@@ -96,6 +96,14 @@ cbor_view(const cbor_view& other); // (4)
     <td>Attempts to convert a CBOR packed value to a value of a type.</td> 
   </tr>
   <tr>
+    <td><code>cbor_view operator[](size_t pos) const</code></td>
+    <td>Returns a view of the CBOR array element at specified index <code>pos</code>.</td> 
+  </tr>
+  <tr>
+    <td><code>cbor_view operator[](const string_view_type& key) const</code></td>
+    <td>Returns a view of the CBOR object member value with key equivalent to <code>key</code>.</td> 
+  </tr>
+  <tr>
     <td><code>cbor_view at(size_t pos) const</code></td>
     <td>Returns a view of the CBOR array element at specified index <code>pos</code>.</td> 
   </tr>

@@ -279,6 +279,16 @@ public:
         return len;
     }
 
+    cbor_view operator[](size_t i) const
+    {
+        return at(i);
+    }
+
+    cbor_view operator[](const string_view_type& name) const
+    {
+        return at(name);
+    }
+
     cbor_view at(size_t index) const
     {
         JSONCONS_ASSERT(is_array());

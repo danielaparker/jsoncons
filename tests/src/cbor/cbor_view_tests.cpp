@@ -142,44 +142,44 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     jsoncons::cbor::cbor_view bv = b;
 
     std::string s0;
-    bv.at(0).dump(s0);
+    bv[0].dump(s0);
     BOOST_CHECK_EQUAL(std::string("true"), s0);
 
     std::string s1;
-    bv.at(1).dump(s1);
+    bv[1].dump(s1);
     BOOST_CHECK_EQUAL(std::string("false"), s1);
 
     std::string s2;
-    bv.at(2).dump(s2);
+    bv[2].dump(s2);
     BOOST_CHECK_EQUAL(std::string("null"), s2);
 
     std::string s3;
-    bv.at(3).dump(s3);
+    bv[3].dump(s3);
     BOOST_CHECK_EQUAL(std::string("\"Toronto\""), s3);
 
     std::string s4;
-    bv.at(4).dump(s4);
+    bv[4].dump(s4);
     BOOST_CHECK_EQUAL(std::string("\"SGVsbG8\""), s4);
 
     std::string s5;
-    bv.at(5).dump(s5);
+    bv[5].dump(s5);
     BOOST_CHECK_EQUAL(std::string("-100"), s5);
 
     std::string s6;
-    bv.at(6).dump(s6);
+    bv[6].dump(s6);
     BOOST_CHECK_EQUAL(std::string("100"), s6);
 
     std::string s7;
-    bv.at(7).dump(s7);
+    bv[7].dump(s7);
     BOOST_CHECK_EQUAL(std::string("\"18446744073709551616\""), s7);
 
     std::string s8;
-    bv.at(8).dump(s8);
+    bv[8].dump(s8);
     BOOST_CHECK_EQUAL(std::string("10.5"), s8);
 
     std::string s9;
-    bv.dump(s9);
-    std::cout << s9 << std::endl;
+    bv[9].dump(s9);
+    BOOST_CHECK_EQUAL(std::string("\"-18446744073709551617\""), s9);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
