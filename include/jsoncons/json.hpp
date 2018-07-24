@@ -751,23 +751,12 @@ public:
 
         variant(const basic_bignum<byte_allocator_type>& n)
         {
-            bool neg = n < 0 ? true : false;
-            basic_bignum<byte_allocator_type> v = neg ? -n : n;
-            basic_bignum<byte_allocator_type> base(256);
-            basic_bignum<byte_allocator_type> r;
-
+            int signum;
             std::vector<uint8_t> data;
 
-            do
-            {
-                v.divide( base, v, r, true );
-                data.push_back((uint8_t)(int64_t)r);
-            } 
-            while (v.length() > 0);
+            n.dump(signum, data);
 
-            std::reverse(data.begin(),data.end());
-
-            new(reinterpret_cast<void*>(&data_))byte_string_data(neg ? json_type_tag::negative_bignum_t : json_type_tag::positive_bignum_t, 
+            new(reinterpret_cast<void*>(&data_))byte_string_data(signum == -1 ? json_type_tag::negative_bignum_t : json_type_tag::positive_bignum_t, 
                                                                  data.data(), data.size(), byte_allocator_type());
         }
 

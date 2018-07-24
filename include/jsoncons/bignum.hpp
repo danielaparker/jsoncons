@@ -161,38 +161,50 @@ public:
 
     basic_bignum(int signum, std::initializer_list<uint8_t> l)
     {
-        bool neg = signum == -1 ? true : false;
-
-        basic_bignum<Allocator> v = 0;
-        for (auto c: l)
+        if (l.size() > 0)
         {
-            v = (v * 256) + (uint64_t)(c);
-        }
+            basic_bignum<Allocator> v = 0;
+            for (auto c: l)
+            {
+                v = (v * 256) + (uint64_t)(c);
+            }
 
-        if ( neg )
+            if (signum == -1)
+            {
+                v = -1 - v;
+            }
+
+            initialize(v);
+        }
+        else
         {
-            v.neg_ = true;
+            neg_ = false;
+            initialize_from_integer(0u);
         }
-
-        initialize( v );
     }
 
     basic_bignum(int signum, const uint8_t* str, size_t n)
     {
-        bool neg = signum == -1 ? true : false;
-
-        basic_bignum<Allocator> v(uint64_t(0));
-        for (size_t i = 0; i < n; i++)
+        if (n > 0)
         {
-            v = (v * 256) + (uint64_t)(str[i]);
-        }
+            basic_bignum<Allocator> v = 0;
+            for (size_t i = 0; i < n; i++)
+            {
+                v = (v * 256) + (uint64_t)(str[i]);
+            }
 
-        if ( neg )
+            if (signum == -1)
+            {
+                v = -1 - v;
+            }
+
+            initialize(v);
+        }
+        else
         {
-            v.neg_ = true;
+            neg_ = false;
+            initialize_from_integer(0u);
         }
-
-        initialize( v );
     }
 
     basic_bignum(short i)
@@ -725,7 +737,7 @@ public:
         if (neg_)
         {
             signum = -1;
-            n = -n;
+            n = - n -1;
         }
         else
         {

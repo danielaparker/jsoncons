@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     std::vector<uint8_t> b;
     jsoncons::cbor::cbor_bytes_serializer serializer(b);
     serializer.begin_document();
-    serializer.begin_array(9);
+    serializer.begin_array(10);
     serializer.bool_value(true);
     serializer.bool_value(false);
     serializer.null_value();
@@ -129,6 +129,7 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     serializer.uinteger_value(100);
     serializer.bignum_value("18446744073709551616");
     serializer.double_value(10.5);
+    serializer.bignum_value("-18446744073709551617");
     serializer.end_array();
     serializer.end_document();
 
