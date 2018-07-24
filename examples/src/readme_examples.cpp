@@ -2,10 +2,8 @@
 // Distributed under Boost license
 
 #include <string>
+#include <vector>
 #include <jsoncons/json.hpp>
-#include <deque>
-#include <map>
-#include <unordered_map>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 #include <jsoncons_ext/cbor/cbor_view.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
