@@ -1389,6 +1389,7 @@ size_t get_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
             p = *endp;
         }
         *endp = p;
+
         return len;
     }
 
@@ -1430,9 +1431,8 @@ size_t get_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         size_t len = 0;
         while (*p != 0xff)
         {
-            size_t sz = get_size(p,last,&p);
-            len += sz;
             walk(p, last, &p);
+            ++len;
         }
         *endp = first + 1;
         return len;
@@ -1517,6 +1517,7 @@ size_t get_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         {
             walk(p, last, &p);
             walk(p, last, &p);
+            ++len;
         }
         *endp = first + 1;
         return len;

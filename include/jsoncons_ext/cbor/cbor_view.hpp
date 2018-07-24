@@ -458,30 +458,58 @@ public:
         return val;
     }
 
-    void dump(std::string& s) const
+    template <typename Traits,typename SAllocator>
+    void dump(std::basic_string<char,Traits,SAllocator>& s) const
     {
         basic_json_serializer<char,jsoncons::detail::string_writer<char_type>> serializer(s);
         dump(serializer);
     }
 
-    void dump(std::string& s, indenting line_indent) const
+    template <typename Traits,typename SAllocator>
+    void dump(std::basic_string<char,Traits,SAllocator>& s, indenting line_indent) const
     {
         basic_json_serializer<char,jsoncons::detail::string_writer<char_type>> serializer(s, line_indent);
         dump(serializer);
     }
 
-    void dump(std::string& s,
+    template <typename Traits,typename SAllocator>
+    void dump(std::basic_string<char,Traits,SAllocator>& s,
               const json_serializing_options& options) const
     {
         basic_json_serializer<char,jsoncons::detail::string_writer<char_type>> serializer(s, options);
         dump(serializer);
     }
 
-    void dump(std::string& s,
+    template <typename Traits,typename SAllocator>
+    void dump(std::basic_string<char,Traits,SAllocator>& s,
               const json_serializing_options& options,
               indenting line_indent) const
     {
         basic_json_serializer<char,jsoncons::detail::string_writer<char_type>> serializer(s, options, line_indent);
+        dump(serializer);
+    }
+
+    void dump(std::ostream& os) const
+    {
+        json_serializer serializer(os);
+        dump(serializer);
+    }
+
+    void dump(std::ostream& os, indenting line_indent) const
+    {
+        json_serializer serializer(os, line_indent);
+        dump(serializer);
+    }
+
+    void dump(std::ostream& os, const json_serializing_options& options) const
+    {
+        json_serializer serializer(os, options);
+        dump(serializer);
+    }
+
+    void dump(std::ostream& os, const json_serializing_options& options, indenting line_indent) const
+    {
+        json_serializer serializer(os, options, line_indent);
         dump(serializer);
     }
 

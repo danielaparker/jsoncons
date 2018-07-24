@@ -3,7 +3,9 @@ master
 
 Enhancements
 
-- bignum support
+- Support for CBOR bignums
+- Added json serializing options for formatting CBOR bignums as integer, string, or base64url encoded byte string
+- Added json serializing options for formatting CBOR bytes strings as base64 or base64url
 
 Changes
 
@@ -16,9 +18,10 @@ Changes
   Rationale: meaningfullness across JSON and other data formats including
   CBOR.
 
-Bug fix:
+Bug fixes:
 
 - Fixed bug in base64url encoding of CBOR byte strings
+- Fixed bug in parsing indefinite length CBOR arrays and maps
 
 v0.106.0
 --------

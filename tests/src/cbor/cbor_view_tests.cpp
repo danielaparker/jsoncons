@@ -182,5 +182,85 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     BOOST_CHECK_EQUAL(std::string("\"-18446744073709551617\""), s9);
 }
 
+BOOST_AUTO_TEST_CASE(test_dump_to_string)
+{
+    std::vector<uint8_t> b;
+    cbor_bytes_serializer serializer(b);
+    serializer.begin_document();
+    serializer.begin_array();
+    std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    serializer.end_array();
+    serializer.end_document();
+
+    cbor_view bv = b;
+
+    std::string s0;
+    bv.dump(s0);
+    BOOST_CHECK_EQUAL("[\"-18446744073709551617\"]",s0.c_str());
+    //std::cout << s0 << std::endl;
+
+    std::string s1;
+    json_serializing_options options1;
+    options1.bignum_format(bignum_chars_format::integer);
+    bv.dump(s1,options1);
+    BOOST_CHECK_EQUAL("[-18446744073709551617]",s1.c_str());
+    //std::cout << s1 << std::endl;
+
+    std::string s2;
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::string);
+    bv.dump(s2,options2);
+    BOOST_CHECK_EQUAL("[\"-18446744073709551617\"]",s2.c_str());
+    //std::cout << s2 << std::endl;
+
+    std::string s3;
+    json_serializing_options options3;
+    options3.bignum_format(bignum_chars_format::base64url);
+    bv.dump(s3,options3);
+    BOOST_CHECK_EQUAL("[\"~AQAAAAAAAAAA\"]",s3.c_str());
+    //std::cout << s3 << std::endl;
+} 
+
+BOOST_AUTO_TEST_CASE(test_dump_to_stream)
+{
+    std::vector<uint8_t> b;
+    cbor_bytes_serializer serializer(b);
+    serializer.begin_document();
+    serializer.begin_array();
+    std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    serializer.end_array();
+    serializer.end_document();
+
+    cbor_view bv = b;
+
+    std::ostringstream os0;
+    bv.dump(os0);
+    BOOST_CHECK_EQUAL("[\"-18446744073709551617\"]",os0.str().c_str());
+    //std::cout << os0.str() << std::endl;
+
+    std::ostringstream os1;
+    json_serializing_options options1;
+    options1.bignum_format(bignum_chars_format::integer);
+    bv.dump(os1,options1);
+    BOOST_CHECK_EQUAL("[-18446744073709551617]",os1.str().c_str());
+    //std::cout << os1.str() << std::endl;
+
+    std::ostringstream os2;
+    json_serializing_options options2;
+    options2.bignum_format(bignum_chars_format::string);
+    bv.dump(os2,options2);
+    BOOST_CHECK_EQUAL("[\"-18446744073709551617\"]",os2.str().c_str());
+    //std::cout << os2.str() << std::endl;
+
+    std::ostringstream os3;
+    json_serializing_options options3;
+    options3.bignum_format(bignum_chars_format::base64url);
+    bv.dump(os3,options3);
+    BOOST_CHECK_EQUAL("[\"~AQAAAAAAAAAA\"]",os3.str().c_str());
+    //std::cout << os3.str() << std::endl;
+} 
+
 BOOST_AUTO_TEST_SUITE_END()
 
