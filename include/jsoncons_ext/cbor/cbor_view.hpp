@@ -63,6 +63,7 @@ class cbor_view
 {
     const uint8_t* first_;
     const uint8_t* last_; 
+    const uint8_t* base_relative_; 
 public:
     typedef std::ptrdiff_t difference_type;
     typedef cbor_view value_type;
@@ -81,6 +82,7 @@ public:
     typedef detail::key_value_pair_view<cbor_view> key_value_pair_type;
 
     friend class detail::const_array_iterator<cbor_view>;
+    friend class detail::const_object_iterator<cbor_view>;
 
     range<const_object_iterator> object_range() const
     {
@@ -108,7 +110,7 @@ public:
         }
         detail::walk_object(first_,last_,&endp);
 
-        return range<const_object_iterator>(const_object_iterator(begin,endp), const_object_iterator(endp, endp));
+        return range<const_object_iterator>(const_object_iterator(begin,endp,base_relative_), const_object_iterator(endp, endp, base_relative_));
     }
 
     range<const_array_iterator> array_range() const
@@ -136,26 +138,31 @@ public:
             break;
         }
         detail::walk_array(first_,last_,&endp);
-        return range<const_array_iterator>(const_array_iterator(begin,endp), const_array_iterator(endp, endp));
+        return range<const_array_iterator>(const_array_iterator(begin,endp,base_relative_), const_array_iterator(endp, endp,base_relative_));
     }
 
     cbor_view()
-        : first_(nullptr), last_(nullptr)
+        : first_(nullptr), last_(nullptr), base_relative_(nullptr)
     {
     }
 
-    cbor_view(const uint8_t* buffer, size_t buflen)
-        : first_(buffer), last_(buffer+buflen)
+    cbor_view(const uint8_t* data, size_t length)
+        : first_(data), last_(data+length), base_relative_(data)
+    {
+    }
+
+    cbor_view(const uint8_t* data, size_t length, const uint8_t* base_relative)
+        : first_(data), last_(data+length), base_relative_(base_relative)
     {
     }
 
     cbor_view(const std::vector<uint8_t>& v)
-        : first_(v.data()), last_(v.data()+v.size())
+        : first_(v.data()), last_(v.data()+v.size()), base_relative_(v.data())
     {
     }
 
     cbor_view(const cbor_view& other)
-        : first_(other.first_), last_(other.last_)
+        : first_(other.first_), last_(other.last_), base_relative_(other.base_relative_)
     {
     }
 
@@ -194,7 +201,7 @@ public:
     bool is_null() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return first_[0] == 0xf6;
+        return type() == 0xf6;
     }
 
     bool empty() const
@@ -227,37 +234,44 @@ public:
     bool is_array() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_array(first_[0]);
+        return detail::is_array(type());
     }
 
     bool is_object() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_object(first_[0]);
+        return detail::is_object(type());
     }
 
     bool is_string() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return get_major_type(first_[0]) == cbor_major_type::text_string;
+        return get_major_type(type()) == cbor_major_type::text_string;
     }
 
     bool is_byte_string() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return get_major_type(first_[0]) == cbor_major_type::byte_string;
+        return get_major_type(type()) == cbor_major_type::byte_string;
+    }
+
+    bool is_bignum() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        uint8_t info = get_additional_information_value(type());
+        return get_major_type(type()) == cbor_major_type::semantic_tag && (info == 2 || info == 3);
     }
 
     bool is_bool() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_bool(first_[0]);
+        return detail::is_bool(type());
     }
 
     bool is_double() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_double(first_[0]);
+        return detail::is_double(type());
     }
 
     bool is_integer() const
@@ -269,7 +283,7 @@ public:
     bool is_uinteger() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_uinteger(first_[0]);
+        return detail::is_uinteger(type());
     }
 
     size_t size() const
@@ -314,7 +328,7 @@ public:
             JSONCONS_THROW(cbor_decode_error(0));
         }
 
-        return cbor_view(it,endp-it);
+        return cbor_view(it, endp-it, base_relative_);
     }
 
     cbor_view at(const string_view_type& key) const
@@ -341,7 +355,7 @@ public:
                 const uint8_t* last;
                 detail::walk(it, last_, &last);
                 JSONCONS_ASSERT(last >= it);
-                return cbor_view(it,last-it);
+                return cbor_view(it, last-it, base_relative_);
             }
             const uint8_t* last;
             detail::walk(it, last_, &last);
@@ -511,6 +525,69 @@ public:
                 std::string s;
                 dump(s);
                 return s;
+            }
+        }
+    }
+
+    byte_string as_byte_string() const
+    {
+        switch (major_type())
+        {
+            case cbor_major_type::byte_string:
+            {
+                const uint8_t* endp;
+                std::vector<uint8_t> v = detail::get_byte_string(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(cbor_decode_error(0));
+                }
+                return byte_string(v.data(),v.size());
+            }
+            default:
+            {
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a byte string"));
+                break;
+            }
+        }
+    }
+
+    bignum as_bignum() const
+    {
+        switch (major_type())
+        {
+            case cbor_major_type::semantic_tag:
+            {
+                uint8_t tag = get_additional_information_value(type());
+                switch (tag)
+                {
+                    case 2:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_+1)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        bignum n = bignum(1, v.data(), v.size());
+                        return n;
+                    }
+                    case 3:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_+1)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        bignum n = bignum(-1, v.data(), v.size());
+                        return n;
+                    }
+                }
+            }
+            default:
+            {
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+                break;
             }
         }
     }
@@ -717,8 +794,6 @@ public:
             }
         }
     }
-
-private:
 
 };
 
