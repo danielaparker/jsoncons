@@ -36,7 +36,7 @@ enum class cbor_major_type : uint8_t
 };
 
 const uint8_t major_type_shift = 0x05;
-const uint8_t major_type_mask = (~0x00 << major_type_shift);
+const unsigned major_type_mask = (~0U << major_type_shift);
 const uint8_t indefinite_length = 0x1f;
 const uint8_t additional_information_mask = (1U << 5) - 1;
 
