@@ -59,6 +59,9 @@ Planned new features are listed on the [roadmap](doc/Roadmap.md)
 #include <jsoncons_ext/cbor/cbor_view.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
+// For convenience
+using namespace jsoncons;    
+
 int main()
 {
     // Construct some CBOR using the streaming API
