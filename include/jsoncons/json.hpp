@@ -1007,6 +1007,17 @@ public:
             }
         }
 
+        basic_byte_string<byte_allocator_type> as_byte_string() const
+        {
+            switch (type_id())
+            {
+            case json_type_tag::byte_string_t:
+                return basic_byte_string<byte_allocator_type>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
+            default:
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a byte string"));
+            }
+        }
+
         byte_string_view as_byte_string_view() const
         {
             switch (type_id())
@@ -3324,25 +3335,32 @@ public:
     {
         switch (var_.type_id())
         {
-        case json_type_tag::small_string_t:
-        case json_type_tag::string_t:
-            return string_type(as_string_view().data(),as_string_view().length(),allocator);
-        case json_type_tag::positive_bignum_t:
+            case json_type_tag::small_string_t:
+            case json_type_tag::string_t:
+                return string_type(as_string_view().data(),as_string_view().length(),allocator);
+            case json_type_tag::byte_string_t:
             {
                 bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                 string_type s(allocator);
                 n.dump(s);
                 return s;
             }
-        case json_type_tag::negative_bignum_t:
+            case json_type_tag::positive_bignum_t:
+            {
+                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                string_type s(allocator);
+                n.dump(s);
+                return s;
+            }
+            case json_type_tag::negative_bignum_t:
             {
                 bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                 string_type s(allocator);
                 n.dump(s);
                 return s;
             }
-        default:
-            return to_string(allocator);
+            default:
+                return to_string(allocator);
         }
     }
 

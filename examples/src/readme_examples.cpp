@@ -35,15 +35,15 @@ namespace readme
         cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
 
         std::cout << "(2)\n";
-        for (auto element : bv.array_range())
+        for (cbor::cbor_view element : bv.array_range())
         {
-            std::cout << element.as_string() << "\n";
+            std::cout << element.as<std::string>() << "\n";
         }
         std::cout << "\n";
 
         // Get element at position 1 using jsonpointer
         cbor::cbor_view element1 = jsonpointer::get(bv, "/1");
-        std::cout << "(3) " << element1.as_string() << "\n\n";
+        std::cout << "(3) " << element1.as<std::string>() << "\n\n";
 
         std::cout << "(4)\n";
         std::cout << pretty_print(bv) << "\n\n";

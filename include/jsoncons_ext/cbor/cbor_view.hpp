@@ -68,6 +68,8 @@ class cbor_view
     const uint8_t* last_; 
     const uint8_t* base_relative_; 
 public:
+    typedef cbor_view array;
+    typedef std::allocator<char> allocator_type;
     typedef std::ptrdiff_t difference_type;
     typedef cbor_view value_type;
     typedef cbor_view& reference;
@@ -396,6 +398,18 @@ public:
             detail::walk(it, last_, &it);
         }
         return false;
+    }
+
+    template<class T, class... Args>
+    bool is(Args&&... args) const
+    {
+        return json_type_traits<cbor_view,T>::is(*this,std::forward<Args>(args)...);
+    }
+
+    template<class T, class... Args>
+    T as(Args&&... args) const
+    {
+        return json_type_traits<cbor_view,T>::as(*this,std::forward<Args>(args)...);
     }
 
     int64_t as_integer() const

@@ -623,7 +623,6 @@ template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<detail::is_compatible_string_type<Json,T>::value>::type>
 {
-    typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
     typedef typename Json::allocator_type allocator_type;
 	typedef typename T::allocator_type string_allocator_type;
 
@@ -634,7 +633,7 @@ struct json_type_traits<Json, T,
 
     static T as(const Json& j)
     {
-   	    return j.as_string(string_allocator_type());
+   	    return j.as_string();
     }
 
     static Json to_json(const T& val)
@@ -870,7 +869,7 @@ public:
     
     static basic_byte_string<Allocator> as(const Json& j)
     {
-        return basic_byte_string<Allocator>(j.as_byte_string_view());
+        return j.as_byte_string();
     }
     
     static Json to_json(const basic_byte_string<Allocator>& val)
