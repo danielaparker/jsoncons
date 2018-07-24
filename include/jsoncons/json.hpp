@@ -20,6 +20,7 @@
 #include <jsoncons/json_fwd.hpp>
 #include <jsoncons/version.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/pretty_print.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_structures.hpp>
@@ -4602,68 +4603,6 @@ std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<type
     }
     o = handler.get_result();
     return is;
-}
-
-template<class Json>
-class json_printable
-{
-public:
-    typedef typename Json::char_type char_type;
-
-    json_printable(const Json& o, indenting line_indent)
-       : o_(&o), indenting_(line_indent)
-    {
-    }
-
-    json_printable(const Json& o,
-                   const basic_json_serializing_options<char_type>& options,
-                   indenting line_indent)
-       : o_(&o), options_(options), indenting_(line_indent)
-    {
-    }
-
-    void dump(std::basic_ostream<char_type>& os) const
-    {
-        o_->dump(os, options_, indenting_);
-    }
-
-    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json>& o)
-    {
-        o.dump(os);
-        return os;
-    }
-
-    const Json *o_;
-    basic_json_serializing_options<char_type> options_;
-    indenting indenting_;
-private:
-    json_printable();
-};
-
-template<class Json>
-json_printable<Json> print(const Json& val)
-{
-    return json_printable<Json>(val, indenting::no_indent);
-}
-
-template<class Json>
-json_printable<Json> print(const Json& val,
-                           const basic_json_serializing_options<typename Json::char_type>& options)
-{
-    return json_printable<Json>(val, options, indenting::no_indent);
-}
-
-template<class Json>
-json_printable<Json> pretty_print(const Json& val)
-{
-    return json_printable<Json>(val, indenting::indent);
-}
-
-template<class Json>
-json_printable<Json> pretty_print(const Json& val,
-                                  const basic_json_serializing_options<typename Json::char_type>& options)
-{
-    return json_printable<Json>(val, options, indenting::indent);
 }
 
 typedef basic_json<char,sorted_policy,std::allocator<char>> json;
