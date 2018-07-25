@@ -1,4 +1,4 @@
-master
+v0.107.0
 --------
 
 Enhancements

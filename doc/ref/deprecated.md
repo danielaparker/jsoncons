@@ -53,6 +53,10 @@ json member constants|null||Use static member function `json::null()`
 &#160;|an_object||Use the default constructor `json()` instead.
 &#160;|an_array||Use assignment to `json::array()` or `json::make_array()` instead.
 json_decoder|json& root()|<em>&#x2713;</em>|json get_result()
+json_content_handler|begin_json|<em>&#x2713;</em>|`begin_document`
+                    |end_json|<em>&#x2713;</em>|`end_document`
+                    |do_begin_json||`do_begin_document`
+                    |do_end_json||`do_end_document`
 serialization|`output_format`|<em>&#x2713;</em>|Use `json_serializing_options`
 |`serialization_options`|<em>&#x2713;</em>|Use `json_serializing_options`
 json_reader|max_depth(),max_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
