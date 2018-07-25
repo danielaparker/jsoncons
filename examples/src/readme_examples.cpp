@@ -28,6 +28,7 @@ namespace readme
         bserializer.end_array();
         bserializer.end_document();
 
+        // Print bytes
         std::cout << "(1)\n";
         for (auto x : b)
         {
@@ -37,6 +38,7 @@ namespace readme
 
         cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
 
+        // Loop over the outer array elements
         std::cout << "(2)\n";
         for (cbor::cbor_view row : bv.array_range())
         {
@@ -45,30 +47,35 @@ namespace readme
         std::cout << "\n";
 
         // Get element at position /0/1 using jsonpointer
-        cbor::cbor_view element1 = jsonpointer::get(bv, "/0/1");
-        std::cout << "(3) " << element1.as<std::string>() << "\n\n";
+        cbor::cbor_view item = jsonpointer::get(bv, "/0/1");
+        std::cout << "(3) " << item.as<std::string>() << "\n\n";
 
+        // Print JSON representation with default options
         std::cout << "(4)\n";
         std::cout << pretty_print(bv) << "\n\n";
 
+        // Print JSON representation with different options
         json_serializing_options options;
         options.byte_string_format(byte_string_chars_format::base64)
                .bignum_format(bignum_chars_format::base64url);
         std::cout << "(5)\n";
         std::cout << pretty_print(bv, options) << "\n\n";
 
+        // Unpack bytes into a json value, and add some more elements
         json j = cbor::decode_cbor<json>(bv);
         j[0].push_back(bignum("18446744073709551616"));
         j[0].insert(j[0].array_range().begin(),10.5);
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
+        // Repack bytes
         std::vector<uint8_t> b2;
         cbor::encode_cbor(j, b2);
         std::cout << "(7)\n";
         cbor::cbor_view b2v = b2;
         std::cout << pretty_print(b2v) << "\n\n";
 
+        // Serialize to CSV
         csv::csv_serializing_options csv_options;
         csv_options.column_names("A,B,C,D,E");
 
