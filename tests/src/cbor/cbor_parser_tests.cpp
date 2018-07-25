@@ -44,7 +44,6 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 
 BOOST_AUTO_TEST_CASE(test_cbor_parsing)
 {
-    #if 0
     // unsigned integer
     check_parsing({0x00},json(0U));
     check_parsing({0x01},json(1U));
@@ -152,7 +151,7 @@ BOOST_AUTO_TEST_CASE(test_cbor_parsing)
     // indefinite length maps
     check_parsing({0xbf,0xff},json::object());
     check_parsing({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
-#endif
+
     // bignum
 
     check_parsing({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},

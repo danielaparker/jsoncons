@@ -58,6 +58,7 @@ Planned new features are listed on the [roadmap](doc/Roadmap.md)
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 #include <jsoncons_ext/cbor/cbor_view.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+#include <jsoncons_ext/csv/csv_serializer.hpp>
 
 // For convenience
 using namespace jsoncons;    
@@ -112,63 +113,65 @@ int main()
     std::cout << "(6)\n";
     std::cout << pretty_print(j) << "\n\n";
 
-    std::vector<uint8_t> u;
-    cbor::encode_cbor(j, u);
+    std::vector<uint8_t> b2;
+    cbor::encode_cbor(j, b2);
     std::cout << "(7)\n";
-    std::cout << pretty_print(cbor::cbor_view(u)) << "\n\n";
+    cbor::cbor_view b2v = b2;
+    std::cout << pretty_print(b2v) << "\n\n";
 
     csv::csv_serializing_options csv_options;
     csv_options.column_names("A,B,C,D,E");
-    std::string csv;
-    csv::encode_csv(j, csv, csv_options);
+
+    std::string json_csv;
+    csv::encode_csv(j, json_csv, csv_options);
     std::cout << "(8)\n";
-    std::cout << csv << "\n\n";
+    std::cout << json_csv << "\n\n";
+
+    std::string cbor_csv;
+    csv::encode_csv(b2v, cbor_csv, csv_options);
+    std::cout << "(9)\n";
+    std::cout << cbor_csv << "\n\n";
 }
 
 ```
 Output:
 ```
 (1)
-0x830x670x540x6f0x720x6f0x6e0x740x6f0x450x480x650x6c0x6c0x6f0xc30x490x100000000
+0x9f0x830x670x540x6f0x720x6f0x6e0x740x6f0x450x480x650x6c0x6c0x6f0xc30x490x1000000000xff
 
 (2)
-Toronto
-SGVsbG8
--18446744073709551617
+["Toronto","SGVsbG8","-18446744073709551617"]
 
 (3) SGVsbG8
 
 (4)
 [
-    "Toronto",
-    "SGVsbG8",
-    "-18446744073709551617"
+    ["Toronto","SGVsbG8","-18446744073709551617"]
 ]
 
 (5)
 [
-    "Toronto",
-    "SGVsbG8=",
-    "~AQAAAAAAAAAA"
+    ["Toronto","SGVsbG8=","~AQAAAAAAAAAA"]
 ]
 
 (6)
 [
-    10.5,
-    "Toronto",
-    "SGVsbG8",
-    "-18446744073709551617",
-    "18446744073709551616"
+    [10.5,"Toronto","SGVsbG8","-18446744073709551617","18446744073709551616"]
 ]
 
 (7)
 [
-    10.5,
-    "Toronto",
-    "SGVsbG8",
-    "-18446744073709551617",
-    "18446744073709551616"
+    [10.5,"Toronto","SGVsbG8","-18446744073709551617","18446744073709551616"]
 ]
+
+(8)
+A,B,C,D,E
+10.5,Toronto,SGVsbG8,-18446744073709551617,18446744073709551616
+
+
+(9)
+A,B,C,D,E
+10.5,Toronto,SGVsbG8,-18446744073709551617,18446744073709551616
 ```
 
 ## About jsoncons::basic_json

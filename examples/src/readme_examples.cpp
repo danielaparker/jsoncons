@@ -63,17 +63,24 @@ namespace readme
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
-        std::vector<uint8_t> u;
-        cbor::encode_cbor(j, u);
+        std::vector<uint8_t> b2;
+        cbor::encode_cbor(j, b2);
         std::cout << "(7)\n";
-        std::cout << pretty_print(cbor::cbor_view(u)) << "\n\n";
+        cbor::cbor_view b2v = b2;
+        std::cout << pretty_print(b2v) << "\n\n";
 
         csv::csv_serializing_options csv_options;
         csv_options.column_names("A,B,C,D,E");
-        std::string csv;
-        csv::encode_csv(j, csv, csv_options);
+
+        std::string json_csv;
+        csv::encode_csv(j, json_csv, csv_options);
         std::cout << "(8)\n";
-        std::cout << csv << "\n\n";
+        std::cout << json_csv << "\n\n";
+
+        std::string cbor_csv;
+        csv::encode_csv(b2v, cbor_csv, csv_options);
+        std::cout << "(9)\n";
+        std::cout << cbor_csv << "\n\n";
     }
 }
 

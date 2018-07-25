@@ -1,3 +1,14 @@
+v0.107.1
+--------
+
+Bug fixes:
+
+- Fixed issue with cbor_view iterators over indefinite length arrays and maps 
+
+Enhancements:
+
+- csv_serializer recognizes `byte_string`s and `bignums`.
+
 v0.107.0
 --------
 
