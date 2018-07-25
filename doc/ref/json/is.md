@@ -18,9 +18,13 @@ bool is_number() const noexcept; // (7)
 
 bool is_bool() const noexcept; // (8)
 
-bool is_array() const noexcept; // (9)
+bool is_byte_string() const; // (9)
 
-bool is_object() const noexcept; // (10)
+bool is_bignum() const; // (10)
+
+bool is_array() const noexcept; // (11)
+
+bool is_object() const noexcept; // (12)
 ```
 
 (1) Generic `is` equivalent to type `T`. Returns `true` if the json value is the same as type `T` according to [json_type_traits](../json_type_traits.md), `false` otherwise.  
@@ -50,10 +54,10 @@ Returns `true` if the json value is floating point and within the range of `doub
 (8) Same as `is<bool>()`.  
 Returns `true` if the json value is of boolean type, `false` otherwise.  
 
-(9) Same as `is<json::array>()`.  
+(11) Same as `is<json::array>()`.  
 Returns `true` if the json value is an array, `false` otherwise.  
 
-(10) Same as `is<json::object>()`.  
+(12) Same as `is<json::object>()`.  
 Returns `true` if the json value is an object, `false` otherwise.  
 
 ### Examples

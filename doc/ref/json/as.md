@@ -13,6 +13,12 @@ uint64_t as_uinteger() const; // (4)
 double as_double() const; // (5)
 
 string_view_type as_string_view() const; // (6)
+
+std::string as_string() const; // (7)
+
+byte_string as_byte_string() const; // (8)
+
+bignum as_bignum() const; // (9)
 ```
 
 (1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../json_type_traits.md).
