@@ -113,6 +113,20 @@ cbor_view(const cbor_view& other); // (4)
   </tr>
 </table>
 
+#### Serialization
+
+<table border="0">
+  <tr>
+    <td><a href="json/dump.md"</a>dump, dump_fragment</td>
+    <td>Serializes json value to a string, stream, or output handler.</td> 
+  </tr>
+</table>
+
+#### Non member functions
+
+    std::ostream& operator<< (std::ostream& os, const cbor_view& val)
+Inserts CBOR value into stream.
+
 #### Select values from `cbor_view` object
 
 A `cbor_view` satisfies the requirements for [jsonpointer::get](../jsonpointer/get.md).

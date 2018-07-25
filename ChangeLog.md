@@ -6,6 +6,7 @@ Enhancements
 - Support for CBOR bignums
 - Added json serializing options for formatting CBOR bignums as integer, string, or base64url encoded byte string
 - Added json serializing options for formatting CBOR bytes strings as base64 or base64url
+- Enhanced interface for `cbor_view` including `dump`, `is<T>`, and `as<t>` functions 
 
 Changes
 
