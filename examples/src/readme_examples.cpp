@@ -79,15 +79,15 @@ namespace readme
         csv::csv_serializing_options csv_options;
         csv_options.column_names("A,B,C,D,E");
 
-        std::string json_csv;
-        csv::encode_csv(j, json_csv, csv_options);
+        std::string from_unpacked;
+        csv::encode_csv(j, from_unpacked, csv_options);
         std::cout << "(8)\n";
-        std::cout << json_csv << "\n\n";
+        std::cout << from_unpacked << "\n\n";
 
-        std::string cbor_csv;
-        csv::encode_csv(b2v, cbor_csv, csv_options);
+        std::string from_packed;
+        csv::encode_csv(b2v, from_packed, csv_options);
         std::cout << "(9)\n";
-        std::cout << cbor_csv << "\n\n";
+        std::cout << from_packed << "\n\n";
     }
 }
 
