@@ -149,9 +149,9 @@ public:
         do_bignum_value(signum, data, length, context);
     }
 
-    void bignum_value(const char* s) 
+    void bignum_value(const string_view_type& s) 
     {
-        bignum n(s);
+        bignum n(s.data(),s.size());
         int signum;
         std::vector<uint8_t> v;
         n.dump(signum, v);
@@ -159,9 +159,9 @@ public:
         do_bignum_value(signum, v.data(), v.size(), null_serializing_context());
     }
 
-    void bignum_value(const char* s, const serializing_context& context) 
+    void bignum_value(const string_view_type& s, const serializing_context& context) 
     {
-        bignum n(s);
+        bignum n(s.data(),s.size());
         int signum;
         std::vector<uint8_t> v;
         n.dump(signum, v);

@@ -21,6 +21,9 @@ An arbitrary-precision integer.
     explicit bignum(const char* str);
 Constructs a bignum from the decimal string representation of a bignum. 
 
+    explicit bignum(const char* data, size_t length);
+Constructs a bignum from the decimal string representation of a bignum. 
+
     explicit bignum(const char* str, const Allocator& alloc);
 
     bignum(int signum, std::initializer_list<uint8_t> magnitude);

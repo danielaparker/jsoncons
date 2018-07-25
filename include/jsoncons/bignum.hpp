@@ -132,24 +132,36 @@ public:
 
     explicit basic_bignum(const char* str)
     {
+        initialize(str, strlen(str));
+    }
+
+    basic_bignum(const char* data, size_t length)
+    {
+        initialize(data, length);
+    }
+
+    void initialize(const char* data, size_t length)
+    {
         bool neg = false;
 
-        while ( isspace(*str) )
+        const char* end = data+length;
+        while (data != end && isspace(*data))
         {
-            ++str;
+            ++data;
+            --length;
         }
 
-        if ( *str == '-' )
+        if ( *data == '-' )
         {
             neg = true;
-            str++;
+            data++;
+            --length;
         }
 
-        size_t n = strlen( str );
         basic_bignum<Allocator> v = 0;
-        for (size_t i = 0; i < n; i++)
+        for (size_t i = 0; i < length; i++)
         {
-            v = (v * 10) + (uint64_t)(str[i] - '0');
+            v = (v * 10) + (uint64_t)(data[i] - '0');
         }
 
         if ( neg )
