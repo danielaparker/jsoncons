@@ -46,10 +46,23 @@ public:
     typedef const uint8_t* iterator;
     typedef std::size_t size_type;
 
+    byte_string_view()
+        : data_(nullptr), length_(0)
+    {
+    }
+
     byte_string_view(const uint8_t* data, size_t length)
         : data_(data), length_(length)
     {
     }
+
+    byte_string_view(const byte_string_view&) = default;
+
+    byte_string_view(byte_string_view&&) = default;
+
+    byte_string_view& operator=(const byte_string_view&) = default;
+
+    byte_string_view& operator=(byte_string_view&&) = default;
 
     const uint8_t* data() const
     {
@@ -148,6 +161,16 @@ public:
     {
     }
 
+    basic_byte_string(const basic_byte_string<Allocator>& v)
+        : data_(v.data_)
+    {
+    }
+
+    basic_byte_string(basic_byte_string<Allocator>&& v)
+    {
+        data_.swap(v.data_);
+    }
+
     basic_byte_string(const byte_string_view& v, const Allocator& alloc)
         : data_(v.begin(),v.end(),alloc)
     {
@@ -165,10 +188,6 @@ public:
         : data_(data, data+length)
     {
     }
-
-    basic_byte_string(const basic_byte_string& s) = default; 
-
-    basic_byte_string(basic_byte_string&& s) = default; 
 
     basic_byte_string& operator=(const basic_byte_string& s) = default;
 

@@ -1007,12 +1007,13 @@ public:
             }
         }
 
-        basic_byte_string<byte_allocator_type> as_byte_string() const
+        template <typename BAllocator=std::allocator<char>>
+        basic_byte_string<BAllocator> as_byte_string() const
         {
             switch (type_id())
             {
             case json_type_tag::byte_string_t:
-                return basic_byte_string<byte_allocator_type>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
+                return basic_byte_string<BAllocator>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a byte string"));
             }
@@ -1725,6 +1726,12 @@ public:
         string_type as_string(const SAllocator& allocator) const 
         {
             return evaluate().as_string(allocator);
+        }
+
+        template <typename BAllocator=std::allocator<char>>
+        basic_byte_string<BAllocator> as_byte_string() const
+        {
+            return evaluate().as_byte_string<BAllocator>();
         }
 
         string_type as_string(const basic_json_serializing_options<char_type>& options) const
@@ -3289,6 +3296,12 @@ public:
     byte_string_view as_byte_string_view() const
     {
         return var_.as_byte_string_view();
+    }
+
+    template <typename BAllocator=std::allocator<char>>
+    basic_byte_string<BAllocator> as_byte_string() const
+    {
+        return var_.as_byte_string<BAllocator>();
     }
 
     basic_bignum<byte_allocator_type> as_bignum() const

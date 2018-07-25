@@ -869,7 +869,7 @@ public:
     
     static basic_byte_string<Allocator> as(const Json& j)
     {
-        return j.as_byte_string();
+        return j.as_byte_string<Allocator>();
     }
     
     static Json to_json(const basic_byte_string<Allocator>& val)

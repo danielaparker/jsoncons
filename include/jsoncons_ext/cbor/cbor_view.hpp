@@ -546,7 +546,8 @@ public:
         }
     }
 
-    byte_string as_byte_string() const
+    template <typename BAllocator=std::allocator<char>>
+    basic_byte_string<BAllocator> as_byte_string() const
     {
         switch (major_type())
         {
@@ -558,7 +559,7 @@ public:
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
                 }
-                return byte_string(v.data(),v.size());
+                return basic_byte_string<BAllocator>(v.data(),v.size());
             }
             default:
             {
