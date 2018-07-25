@@ -22,6 +22,42 @@
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 #include <jsoncons_ext/cbor/cbor_error_category.hpp>
 
+enum class cbor_major_type : uint8_t
+{
+    unsigned_integer = 0x00,
+    negative_integer = 0x01,
+    byte_string = 0x02,
+    text_string = 0x03,
+    array = 0x04,
+    map = 0x05,   
+    semantic_tag = 0x06,
+    simple = 0x7
+};
+
+const uint8_t major_type_shift = 0x05;
+const unsigned major_type_mask = (~0U << major_type_shift);
+const uint8_t indefinite_length = 0x1f;
+const uint8_t additional_information_mask = (1U << 5) - 1;
+
+namespace additional_information
+{
+    const uint8_t indefinite_length = 0x1f;
+}
+
+inline
+cbor_major_type get_major_type(uint8_t type)
+{
+    uint8_t value = type >> major_type_shift;
+    return static_cast<cbor_major_type>(value);
+}
+
+inline
+uint8_t get_additional_information_value(uint8_t type)
+{
+    uint8_t value = type & additional_information_mask;
+    return value;
+}
+
 // Positive integer 0x00..0x17 (0..23)
 #define JSONCONS_CBOR_0x00_0x17 \
         0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x09:case 0x0a:case 0x0b:case 0x0c:case 0x0d:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:case 0x17
@@ -548,13 +584,9 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
                 *endp = p;
                 while (*p != 0xff)
                 {
-                    walk_object(p, last, endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                        break;
-                    }
+                    walk_object(p, last, &p);
                 }
+                *endp = p;
                 break;
             }
         default:
@@ -579,7 +611,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         const uint8_t* p = first+1;
         switch (*first)
         {
-        case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
+            case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
             {
                 size = *first & 0x1f;
                 *endp = p;
@@ -590,7 +622,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
                 break;
             }
 
-        case 0x98: // array (one-byte uint8_t for n follows)
+            case 0x98: // array (one-byte uint8_t for n follows)
             {
                 size = binary::from_big_endian<uint8_t>(p,last,endp);
                 if (*endp == p)
@@ -607,7 +639,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
                 break;
             }
 
-        case 0x99: // array (two-byte uint16_t for n follow)
+            case 0x99: // array (two-byte uint16_t for n follow)
             {
                 size = binary::from_big_endian<uint16_t>(p,last,endp);
                 if (*endp == p)
@@ -624,7 +656,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
                 break;
             }
 
-        case 0x9a: // array (four-byte uint32_t for n follow)
+            case 0x9a: // array (four-byte uint32_t for n follow)
             {
                 size = binary::from_big_endian<uint32_t>(p,last,endp);
                 if (*endp == p)
@@ -641,7 +673,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
                 break;
             }
 
-        case 0x9b: // array (eight-byte uint64_t for n follow)
+            case 0x9b: // array (eight-byte uint64_t for n follow)
             {
                 size = binary::from_big_endian<uint64_t>(p,last,endp);
                 if (*endp == p)
@@ -657,21 +689,22 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
                 }
                 break;
             }
-        case 0x9f: // array (indefinite length)
+
+            case 0x9f: // array (indefinite length)
             {
-                *endp = p;
                 while (*p != 0xff)
                 {
-                    walk_array(p, last, endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                        break;
-                    }
+                    walk_array(p, last, &p);
+                    //if (*endp == p)
+                    //{
+                    //    *endp = first;
+                    //    break;
+                    //}
                 }
+                *endp = p;
                 break;
             }
-        default:
+            default:
             {
                 *endp = first; 
             }

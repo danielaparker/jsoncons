@@ -26,42 +26,6 @@ namespace jsoncons { namespace cbor {
 
 using jsoncons::pretty_print;
 
-enum class cbor_major_type : uint8_t
-{
-    unsigned_integer = 0x00,
-    negative_integer = 0x01,
-    byte_string = 0x02,
-    text_string = 0x03,
-    array = 0x04,
-    map = 0x05,   
-    semantic_tag = 0x06,
-    simple = 0x7
-};
-
-const uint8_t major_type_shift = 0x05;
-const unsigned major_type_mask = (~0U << major_type_shift);
-const uint8_t indefinite_length = 0x1f;
-const uint8_t additional_information_mask = (1U << 5) - 1;
-
-namespace additional_information
-{
-    const uint8_t indefinite_length = 0x1f;
-}
-
-inline
-cbor_major_type get_major_type(uint8_t type)
-{
-    uint8_t value = type >> major_type_shift;
-    return static_cast<cbor_major_type>(value);
-}
-
-inline
-uint8_t get_additional_information_value(uint8_t type)
-{
-    uint8_t value = type & additional_information_mask;
-    return value;
-}
-
 class cbor_view 
 {
     const uint8_t* first_;
@@ -94,24 +58,17 @@ public:
         const uint8_t* endp;
         const uint8_t* begin;
 
-        switch (*first_)
+        if (major_type() == cbor_major_type::map)
         {
-        case JSONCONS_CBOR_0xa0_0xb7: // map (0x00..0x17 pairs of data items follow)
-            // FALLTHRU
-        case 0xb8: // map (one-byte uint8_t for n follows)
-            // FALLTHRU
-        case 0xb9: // map (two-byte uint16_t for n follow)
-            // FALLTHRU
-        case 0xba: // map (four-byte uint32_t for n follow)
-            // FALLTHRU
-        case 0xbb: // map (eight-byte uint64_t for n follow)
-            // FALLTHRU
-        case 0xbf:
             detail::get_size(first_,last_,&begin);
-            break;
-        default:
+            if (begin == first_)
+            {
+                JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Failed finding size"));
+            }
+        }
+        else
+        {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an object"));
-            break;
         }
         detail::walk_object(first_,last_,&endp);
 
@@ -123,27 +80,26 @@ public:
         const uint8_t* endp;
         const uint8_t* begin;
 
-        switch (*first_)
+        if (major_type() == cbor_major_type::array)
         {
-        case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
-            // FALLTHRU
-        case 0x98: // array (one-byte uint8_t for n follows)
-            // FALLTHRU
-        case 0x99: // array (two-byte uint16_t for n follow)
-            // FALLTHRU
-        case 0x9a: // array (four-byte uint32_t for n follow)
-            // FALLTHRU
-        case 0x9b: // array (eight-byte uint64_t for n follow)
-            // FALLTHRU
-        case 0x9f: // array (indefinite length)
-            detail::get_size(first_,last_,&begin);
-            break;
-        default:
-            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an array"));
-            break;
+            size_t n = detail::get_size(first_,last_,&begin);
+            if (begin == first_)
+            {
+                JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
+            }
         }
+        else
+        {
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an array"));
+        }
+        
+
         detail::walk_array(first_,last_,&endp);
-        return range<const_array_iterator>(const_array_iterator(begin,endp,base_relative_), const_array_iterator(endp, endp,base_relative_));
+        if (endp == first_)
+        {
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
+        }
+        return range<const_array_iterator>(const_array_iterator(begin,endp,base_relative_), const_array_iterator(endp, endp, base_relative_));
     }
 
     cbor_view()
@@ -425,11 +381,11 @@ public:
 
     bool as_bool() const
     {
-        if (*first_ == 0xf5)
+        if (type() == 0xf5)
         {
             return true;
         }
-        else if (*first_ == 0xf4)
+        else if (type() == 0xf4)
         {
             return false;
         }

@@ -284,14 +284,19 @@ private:
         }
     }
 
-    void do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
+    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
-
+        std::basic_string<CharT> s;
+        encode_base64url(data,data+length,s);
+        do_string_value(s,context);
     }
 
-    void do_bignum_value(int signum, const uint8_t*, size_t, const serializing_context&) override
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
     {
-
+        bignum n = bignum(signum, data, length);
+        std::basic_string<CharT> s;
+        n.dump(s);
+        do_string_value(s,context);
     }
 
     void do_double_value(double val, const floating_point_options& fmt, const serializing_context&) override
@@ -505,6 +510,14 @@ void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os)
     j.dump(serializer);
 }
 
+template <class Json>
+void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s)
+{
+    typedef typename Json::char_type char_type;
+    basic_csv_serializer<char_type,jsoncons::detail::string_writer<char>> serializer(s);
+    j.dump(serializer);
+}
+
 template <class Json,class Allocator>
 void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
 {
@@ -513,7 +526,16 @@ void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os,
     j.dump(serializer);
 }
 
+template <class Json,class Allocator>
+void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
+{
+    typedef typename Json::char_type char_type;
+    basic_csv_serializer<char_type,jsoncons::detail::string_writer<char>,Allocator> serializer(s,options);
+    j.dump(serializer);
+}
+
 typedef basic_csv_serializer<char> csv_serializer;
+typedef basic_json_serializer<char,jsoncons::detail::string_writer<char>> csv_string_serializer;
 
 }}
 
