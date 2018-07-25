@@ -51,7 +51,7 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
-## Playing around
+## Playing around with CBOR, JSON, and CSV
 
 ```c++
 #include <jsoncons/json.hpp>
