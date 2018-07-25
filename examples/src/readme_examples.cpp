@@ -26,9 +26,9 @@ namespace readme
         serializer.end_document();
 
         std::cout << "(1)\n";
-        for (auto b : b)
+        for (auto x : b)
         {
-            std::cout << std::hex << (int)b;
+            std::cout << std::hex << (int)x;
         }
         std::cout << "\n\n";
 
@@ -64,7 +64,6 @@ namespace readme
         cbor::encode_cbor(j, u);
         std::cout << "(7)\n";
         std::cout << pretty_print(cbor::cbor_view(u)) << "\n\n";
-
     }
 }
 
