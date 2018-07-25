@@ -1731,7 +1731,7 @@ public:
         template <typename BAllocator=std::allocator<char>>
         basic_byte_string<BAllocator> as_byte_string() const
         {
-            return evaluate().as_byte_string<BAllocator>();
+            return evaluate().template as_byte_string<BAllocator>();
         }
 
         string_type as_string(const basic_json_serializing_options<char_type>& options) const
@@ -3301,7 +3301,7 @@ public:
     template <typename BAllocator=std::allocator<char>>
     basic_byte_string<BAllocator> as_byte_string() const
     {
-        return var_.as_byte_string<BAllocator>();
+        return var_.template as_byte_string<BAllocator>();
     }
 
     basic_bignum<byte_allocator_type> as_bignum() const
