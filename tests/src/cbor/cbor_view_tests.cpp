@@ -19,7 +19,7 @@ using namespace jsoncons;
 using namespace jsoncons::cbor;
 
 BOOST_AUTO_TEST_SUITE(cbor_view_tests)
-#if 0
+
 BOOST_AUTO_TEST_CASE(cbor_view_test)
 {
     ojson j1 = ojson::parse(R"(
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     std::cout << pretty_print(j3) << std::endl;
 
 }
-#endif
+
 BOOST_AUTO_TEST_CASE(as_string_test)
 {
     std::vector<uint8_t> b;
@@ -197,8 +197,6 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     BOOST_CHECK_EQUAL(std::string("-18446744073709551617"), bv[9].as_string());
 }
 
-#if 0
-
 BOOST_AUTO_TEST_CASE(test_dump_to_string)
 {
     std::vector<uint8_t> b;
@@ -278,6 +276,64 @@ BOOST_AUTO_TEST_CASE(test_dump_to_stream)
     BOOST_CHECK_EQUAL("[\"~AQAAAAAAAAAA\"]",os3.str().c_str());
     //std::cout << os3.str() << std::endl;
 } 
-#endif
+
+BOOST_AUTO_TEST_CASE(test_indefinite_length_object_iterator)
+{
+    std::vector<uint8_t> b1;
+    cbor::cbor_bytes_serializer serializer1(b1);
+    serializer1.begin_document();
+    serializer1.begin_object(); // indefinite length object
+    serializer1.end_object(); 
+    serializer1.end_document();
+    cbor_view bv1 = b1;
+    BOOST_CHECK(bv1.object_range().begin() == bv1.object_range().end());
+
+    std::vector<uint8_t> b2;
+    cbor::cbor_bytes_serializer serializer2(b2);
+    serializer2.begin_document();
+    serializer2.begin_object(); // indefinite length object
+    serializer2.name("City");
+    serializer2.string_value("Toronto");
+    serializer2.name("Province");
+    serializer2.string_value("Ontario");
+    serializer2.end_object(); 
+    serializer2.end_document();
+    cbor_view bv2 = b2;
+
+    auto it2 = bv2.object_range().begin();
+    BOOST_CHECK(it2 != bv2.object_range().end());
+    BOOST_CHECK(++it2 != bv2.object_range().end());
+    BOOST_CHECK(++it2 == bv2.object_range().end());
+}
+
+BOOST_AUTO_TEST_CASE(test_indefinite_length_array_iterator)
+{
+    std::vector<uint8_t> b1;
+    cbor::cbor_bytes_serializer serializer1(b1);
+    serializer1.begin_document();
+    serializer1.begin_array(); // indefinite length array
+    serializer1.end_array(); 
+    serializer1.end_document();
+    cbor_view bv1 = b1;
+    BOOST_CHECK(bv1.array_range().begin() == bv1.array_range().end());
+
+    std::vector<uint8_t> b2;
+    cbor::cbor_bytes_serializer serializer2(b2);
+    serializer2.begin_document();
+    serializer2.begin_array(); // indefinite length array
+    serializer2.string_value("Toronto");
+    serializer2.string_value("Ontario");
+    serializer2.end_array(); 
+    serializer2.end_document();
+    cbor_view bv2 = b2;
+
+    BOOST_CHECK(bv2.size() == 2);
+
+    auto it2 = bv2.array_range().begin();
+    BOOST_CHECK(it2 != bv2.array_range().end());
+    BOOST_CHECK(++it2 != bv2.array_range().end());
+    BOOST_CHECK(++it2 == bv2.array_range().end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

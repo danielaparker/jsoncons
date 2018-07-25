@@ -581,10 +581,28 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
             }
         case 0xbf:
             {
-                *endp = p;
                 while (*p != 0xff)
                 {
-                    walk_object(p, last, &p);
+                    walk(p, last, endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                        break;
+                    }
+                    else
+                    {
+                        p = *endp;
+                    }
+                    walk(p, last, endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                        break;
+                    }
+                    else
+                    {
+                        p = *endp;
+                    }
                 }
                 *endp = p;
                 break;
@@ -694,12 +712,16 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
             {
                 while (*p != 0xff)
                 {
-                    walk_array(p, last, &p);
-                    //if (*endp == p)
-                    //{
-                    //    *endp = first;
-                    //    break;
-                    //}
+                    walk(p, last, endp);
+                    if (*endp == p)
+                    {
+                        *endp = first;
+                        break;
+                    }
+                    else
+                    {
+                        p = *endp;
+                    }
                 }
                 *endp = p;
                 break;

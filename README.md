@@ -66,14 +66,16 @@ int main()
 {
     // Construct some CBOR using the streaming API
     std::vector<uint8_t> b;
-    cbor::cbor_bytes_serializer serializer(b);
-    serializer.begin_document();
-    serializer.begin_array(3); // omit size for indefinite length array
-    serializer.string_value("Toronto");
-    serializer.byte_string_value({'H','e','l','l','o'});
-    serializer.bignum_value("-18446744073709551617");
-    serializer.end_array();
-    serializer.end_document();
+    cbor::cbor_bytes_serializer bserializer(b);
+    bserializer.begin_document();
+    bserializer.begin_array(); // indefinite length array
+    bserializer.begin_array(3); // fixed length array
+    bserializer.string_value("Toronto");
+    bserializer.byte_string_value({'H','e','l','l','o'});
+    bserializer.bignum_value("-18446744073709551617");
+    bserializer.end_array();
+    bserializer.end_array();
+    bserializer.end_document();
 
     std::cout << "(1)\n";
     for (auto x : b)
@@ -85,14 +87,14 @@ int main()
     cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
 
     std::cout << "(2)\n";
-    for (cbor::cbor_view element : bv.array_range())
+    for (cbor::cbor_view row : bv.array_range())
     {
-        std::cout << element.as<std::string>() << "\n";
+        std::cout << row << "\n";
     }
     std::cout << "\n";
 
-    // Get element at position 1 using jsonpointer
-    cbor::cbor_view element1 = jsonpointer::get(bv, "/1");
+    // Get element at position /0/1 using jsonpointer
+    cbor::cbor_view element1 = jsonpointer::get(bv, "/0/1");
     std::cout << "(3) " << element1.as<std::string>() << "\n\n";
 
     std::cout << "(4)\n";
@@ -105,8 +107,8 @@ int main()
     std::cout << pretty_print(bv, options) << "\n\n";
 
     json j = cbor::decode_cbor<json>(bv);
-    j.push_back(bignum("18446744073709551616"));
-    j.insert(j.array_range().begin(),10.5);
+    j[0].push_back(bignum("18446744073709551616"));
+    j[0].insert(j[0].array_range().begin(),10.5);
     std::cout << "(6)\n";
     std::cout << pretty_print(j) << "\n\n";
 
@@ -114,6 +116,13 @@ int main()
     cbor::encode_cbor(j, u);
     std::cout << "(7)\n";
     std::cout << pretty_print(cbor::cbor_view(u)) << "\n\n";
+
+    csv::csv_serializing_options csv_options;
+    csv_options.column_names("A,B,C,D,E");
+    std::string csv;
+    csv::encode_csv(j, csv, csv_options);
+    std::cout << "(8)\n";
+    std::cout << csv << "\n\n";
 }
 
 ```
