@@ -7,7 +7,7 @@ Bug fixes:
 
 Enhancements:
 
-- csv_serializer recognizes `byte_string`s and `bignums`.
+- csv_serializer recognizes byte strings and bignums.
 
 v0.107.0
 --------
