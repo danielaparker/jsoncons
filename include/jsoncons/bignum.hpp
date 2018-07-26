@@ -797,7 +797,7 @@ public:
             uint64_t r;
             if ( p10 == 1 )
             {
-                while ( p10 <= UINT_MAX/10 )
+                while ( p10 <= (std::numeric_limits<uint64_t>::max)()/10 )
                 {
                     p10 *= 10;
                     ip10++;
@@ -814,7 +814,7 @@ public:
             {
                 v.divide( LP10, v, R, true );
                 r = (R.length() ? R.data_[0] : 0);
-                for ( unsigned j=0; j < ip10; j++ )
+                for ( size_t j=0; j < ip10; j++ )
                 {
                     data[--n] = char(r % 10 + '0');
                     r /= 10;
