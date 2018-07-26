@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <climits>
 #include <limits>
 #include <algorithm>
 #include <string>
@@ -411,7 +412,7 @@ public:
                 if ( data_[i] > d )
                     borrow = 1;
             }
-            else 
+            else
                 data_[i] = d;
         }
         reduce();
@@ -1051,7 +1052,7 @@ public:
 
     friend std::ostream& operator<<( std::ostream& os, const basic_bignum<Allocator>& v )
     {
-        std::string s; 
+        std::string s;
         v.dump(s);
 
         os << s;
@@ -1328,7 +1329,7 @@ public:
     }
 
     template <typename T>
-    typename std::enable_if<std::is_integral<T>::value && 
+    typename std::enable_if<std::is_integral<T>::value &&
                             !std::is_signed<T>::value &&
                             sizeof(T) <= sizeof(int64_t),void>::type
     initialize_from_integer(T u)
@@ -1339,7 +1340,7 @@ public:
 
         data_ [0] = u;
     }
- 
+
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value &&
                            !std::is_signed<T>::value &&
