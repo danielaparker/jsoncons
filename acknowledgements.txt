@@ -50,3 +50,8 @@ and to json::as_string to remove warnings
 
 Joshua Pritikin, for reporting gcc ubsan runtime warnings about 
 load of misaligned addresses, and verifying fix
+
+Tobias Hermann, for reporting issue with `UINT_MAX` not declared 
+in `bignum.hpp`, and proposing fix.
+
+
