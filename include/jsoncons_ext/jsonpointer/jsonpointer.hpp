@@ -53,18 +53,18 @@ private:
     std::string buffer_;
     std::error_code error_code_;
 };
-template <class Json,class JsonReference,class Enable = void>
+template <class J,class JReference,class Enable = void>
 class item_handle
 {
 };
 
-template <class Json,class JsonReference>
-class item_handle<Json,JsonReference,typename std::enable_if<std::is_reference<decltype(std::declval<Json>().at(typename Json::string_view_type()))>::value>::type>
+template <class J,class JReference>
+class item_handle<J,JReference,typename std::enable_if<std::is_reference<decltype(std::declval<J>().at(typename J::string_view_type()))>::value>::type>
 {
 public:
-    using reference = JsonReference;
-    using handle_type = JsonReference;
-    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+    using reference = JReference;
+    using handle_type = JReference;
+    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
 
     item_handle(reference ref) JSONCONS_NOEXCEPT
         : ptr_(std::addressof(ref))
@@ -83,11 +83,11 @@ private:
     pointer ptr_;
 };
 
-template <class Json,class JsonReference>
-class item_handle<Json,JsonReference,typename std::enable_if<!std::is_reference<decltype(std::declval<Json>().at(typename Json::string_view_type()))>::value>::type>
+template <class J,class JReference>
+class item_handle<J,JReference,typename std::enable_if<!std::is_reference<decltype(std::declval<J>().at(typename J::string_view_type()))>::value>::type>
 {
 public:
-    using value_type = typename Json::value_type;
+    using value_type = typename J::value_type;
     using handle_type = value_type;
 
     item_handle(const value_type& val) JSONCONS_NOEXCEPT
@@ -128,12 +128,12 @@ enum class pointer_state
     escaped
 };
 
-template<class Json,class JsonReference>
+template<class J,class JReference>
 struct path_resolver
 {
-    typedef typename Json::string_view_type string_view_type;
+    typedef typename J::string_view_type string_view_type;
 
-    jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
+    jsonpointer_errc operator()(std::vector<item_handle<J,JReference>>& current,
                                 size_t index) const
     {
         if (index >= current.back().get().size())
@@ -144,7 +144,7 @@ struct path_resolver
         return jsonpointer_errc();
     }
 
-    jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
+    jsonpointer_errc operator()(std::vector<item_handle<J,JReference>>& current,
                                 const string_view_type& name) const
     {
         if (!current.back().get().has_key(name))
@@ -156,12 +156,12 @@ struct path_resolver
     }
 };
 
-template<class Json, class JsonReference>
+template<class J, class JReference>
 struct path_setter
 {
-    typedef typename Json::string_view_type string_view_type;
+    typedef typename J::string_view_type string_view_type;
 
-    jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
+    jsonpointer_errc operator()(std::vector<item_handle<J,JReference>>& current,
                                 size_t index) const
     {
         if (index >= current.back().get().size())
@@ -172,7 +172,7 @@ struct path_setter
         return jsonpointer_errc();
     }
 
-    jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
+    jsonpointer_errc operator()(std::vector<item_handle<J,JReference>>& current,
                                 const string_view_type& name) const
     {
         jsonpointer_errc ec = jsonpointer_errc();
@@ -185,15 +185,15 @@ struct path_setter
     }
 };
 
-template<class Json,class JsonReference>
+template<class J,class JReference>
 class jsonpointer_evaluator : private serializing_context
 {
-    typedef typename item_handle<Json,JsonReference>::handle_type handle_type;
-    typedef typename Json::string_type string_type;
+    typedef typename item_handle<J,JReference>::handle_type handle_type;
+    typedef typename J::string_type string_type;
     typedef typename string_type::value_type char_type;
-    typedef typename Json::string_view_type string_view_type;
-    using reference = JsonReference;
-    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+    typedef typename J::string_view_type string_view_type;
+    using reference = JReference;
+    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
 
     jsonpointer::detail::pointer_state state_;
     size_t line_;
@@ -203,7 +203,7 @@ class jsonpointer_evaluator : private serializing_context
     const char_type* p_;
     string_type buffer_;
     size_t index_;
-    std::vector<item_handle<Json,JsonReference>> current_;
+    std::vector<item_handle<J,JReference>> current_;
 public:
     handle_type get_result() 
     {
@@ -222,7 +222,7 @@ public:
 
     jsonpointer_errc get(reference root, const string_view_type& path)
     {
-        path_resolver<Json,reference> op;
+        path_resolver<J,reference> op;
         jsonpointer_errc ec = evaluate(root,op,path);
         if (ec != jsonpointer_errc())
         {
@@ -248,7 +248,7 @@ public:
 
     string_type normalized_path(reference root, const string_view_type& path)
     {
-        jsonpointer_errc ec = evaluate(root,path_setter<Json,reference>(),path);
+        jsonpointer_errc ec = evaluate(root,path_setter<J,reference>(),path);
         if (ec != jsonpointer_errc())
         {
             return string_type(path);
@@ -269,9 +269,9 @@ public:
         }
     }
 
-    jsonpointer_errc insert_or_assign(reference root, const string_view_type& path, const Json& value)
+    jsonpointer_errc insert_or_assign(reference root, const string_view_type& path, const J& value)
     {
-        jsonpointer_errc ec = evaluate(root,path_setter<Json,reference>(),path);
+        jsonpointer_errc ec = evaluate(root,path_setter<J,reference>(),path);
         if (ec != jsonpointer_errc())
         {
             return ec;
@@ -308,9 +308,9 @@ public:
         return ec;
     }
 
-    jsonpointer_errc insert(reference root, const string_view_type& path, const Json& value)
+    jsonpointer_errc insert(reference root, const string_view_type& path, const J& value)
     {
-        jsonpointer_errc ec = evaluate(root,path_setter<Json,reference>(),path);
+        jsonpointer_errc ec = evaluate(root,path_setter<J,reference>(),path);
         if (ec != jsonpointer_errc())
         {
             return ec;
@@ -356,7 +356,7 @@ public:
 
     jsonpointer_errc remove(reference root, const string_view_type& path)
     {
-        jsonpointer_errc ec = evaluate(root,path_resolver<Json,reference>(),path);
+        jsonpointer_errc ec = evaluate(root,path_resolver<J,reference>(),path);
         if (ec != jsonpointer_errc())
         {
             return ec;
@@ -389,9 +389,9 @@ public:
         return ec;
     }
 
-    jsonpointer_errc replace(reference root, const string_view_type& path, const Json& value)
+    jsonpointer_errc replace(reference root, const string_view_type& path, const J& value)
     {
-        jsonpointer_errc ec = evaluate(root,path_resolver<Json,reference>(),path);
+        jsonpointer_errc ec = evaluate(root,path_resolver<J,reference>(),path);
         if (ec != jsonpointer_errc())
         {
             return ec;
@@ -668,17 +668,17 @@ private:
 
 }
 
-template<class Json>
-typename Json::string_type normalized_path(const Json& root, const typename Json::string_view_type& path)
+template<class J>
+typename J::string_type normalized_path(const J& root, const typename J::string_view_type& path)
 {
-    detail::jsonpointer_evaluator<Json,const Json&> evaluator;
+    detail::jsonpointer_evaluator<J,const J&> evaluator;
     return evaluator.normalized_path(root,path);
 }
 
-template<class Json>
-typename item_handle<Json,const Json&>::handle_type get(const Json& root, const typename Json::string_view_type& path)
+template<class J>
+typename item_handle<J,const J&>::handle_type get(const J& root, const typename J::string_view_type& path)
 {
-    detail::jsonpointer_evaluator<Json,const Json&> evaluator;
+    detail::jsonpointer_evaluator<J,const J&> evaluator;
     jsonpointer_errc ec = evaluator.get(root,path);
     if (ec != jsonpointer_errc())
     {
@@ -687,26 +687,26 @@ typename item_handle<Json,const Json&>::handle_type get(const Json& root, const 
     return evaluator.get_result();
 }
 
-template<class Json>
-typename item_handle<Json,const Json&>::handle_type get(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+template<class J>
+typename item_handle<J,const J&>::handle_type get(const J& root, const typename J::string_view_type& path, std::error_code& ec)
 {
-    detail::jsonpointer_evaluator<Json,const Json&> evaluator;
+    detail::jsonpointer_evaluator<J,const J&> evaluator;
     ec = evaluator.get(root,path);
     return evaluator.get_result();
 }
 
-template<class Json>
-bool contains(const Json& root, const typename Json::string_view_type& path)
+template<class J>
+bool contains(const J& root, const typename J::string_view_type& path)
 {
-    detail::jsonpointer_evaluator<Json,const Json&> evaluator;
+    detail::jsonpointer_evaluator<J,const J&> evaluator;
     jsonpointer_errc ec = evaluator.get(root,path);
     return ec == jsonpointer_errc() ? true : false;
 }
 
-template<class Json>
-void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value)
+template<class J>
+void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value)
 {
-    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+    detail::jsonpointer_evaluator<J,J&> evaluator;
 
     jsonpointer_errc ec = evaluator.insert_or_assign(root,path,value);
     if (ec != jsonpointer_errc())
@@ -715,18 +715,18 @@ void insert_or_assign(Json& root, const typename Json::string_view_type& path, c
     }
 }
 
-template<class Json>
-void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
+template<class J>
+void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
 {
-    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+    detail::jsonpointer_evaluator<J,J&> evaluator;
 
     ec = evaluator.insert_or_assign(root,path,value);
 }
 
-template<class Json>
-void insert(Json& root, const typename Json::string_view_type& path, const Json& value)
+template<class J>
+void insert(J& root, const typename J::string_view_type& path, const J& value)
 {
-    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+    detail::jsonpointer_evaluator<J,J&> evaluator;
 
     jsonpointer_errc ec = evaluator.insert(root,path,value);
     if (ec != jsonpointer_errc())
@@ -735,18 +735,18 @@ void insert(Json& root, const typename Json::string_view_type& path, const Json&
     }
 }
 
-template<class Json>
-void insert(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
+template<class J>
+void insert(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
 {
-    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+    detail::jsonpointer_evaluator<J,J&> evaluator;
 
     ec = evaluator.insert(root,path,value);
 }
 
-template<class Json>
-void remove(Json& root, const typename Json::string_view_type& path)
+template<class J>
+void remove(J& root, const typename J::string_view_type& path)
 {
-    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+    detail::jsonpointer_evaluator<J,J&> evaluator;
 
     jsonpointer_errc ec = evaluator.remove(root,path);
     if (ec != jsonpointer_errc())
@@ -755,18 +755,18 @@ void remove(Json& root, const typename Json::string_view_type& path)
     }
 }
 
-template<class Json>
-void remove(Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+template<class J>
+void remove(J& root, const typename J::string_view_type& path, std::error_code& ec)
 {
-    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+    detail::jsonpointer_evaluator<J,J&> evaluator;
 
     ec = evaluator.remove(root,path);
 }
 
-template<class Json>
-void replace(Json& root, const typename Json::string_view_type& path, const Json& value)
+template<class J>
+void replace(J& root, const typename J::string_view_type& path, const J& value)
 {
-    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+    detail::jsonpointer_evaluator<J,J&> evaluator;
 
     jsonpointer_errc ec = evaluator.replace(root,path,value);
     if (ec != jsonpointer_errc())
@@ -775,10 +775,10 @@ void replace(Json& root, const typename Json::string_view_type& path, const Json
     }
 }
 
-template<class Json>
-void replace(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
+template<class J>
+void replace(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
 {
-    detail::jsonpointer_evaluator<Json,Json&> evaluator;
+    detail::jsonpointer_evaluator<J,J&> evaluator;
 
     ec = evaluator.replace(root,path,value);
 }
