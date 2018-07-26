@@ -53,19 +53,6 @@ private:
     std::string buffer_;
     std::error_code error_code_;
 };
-
-namespace detail {
-
-enum class pointer_state 
-{
-    start,
-    array_reference_token,
-    zero_array_reference_token,
-    nonzero_array_reference_token,
-    after_last_array_reference_token,
-    object_reference_token,
-    escaped
-};
 template <class Json,class JsonReference,class Enable = void>
 class item_handle
 {
@@ -128,6 +115,19 @@ private:
     value_type val_;
 };
 
+namespace detail {
+
+enum class pointer_state 
+{
+    start,
+    array_reference_token,
+    zero_array_reference_token,
+    nonzero_array_reference_token,
+    after_last_array_reference_token,
+    object_reference_token,
+    escaped
+};
+
 template<class Json,class JsonReference>
 struct path_resolver
 {
@@ -159,10 +159,7 @@ struct path_resolver
 template<class Json, class JsonReference>
 struct path_setter
 {
-    typedef typename Json::string_type string_type;
     typedef typename Json::string_view_type string_view_type;
-    using reference = JsonReference;
-    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
     jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
                                 size_t index) const
@@ -679,7 +676,7 @@ typename Json::string_type normalized_path(const Json& root, const typename Json
 }
 
 template<class Json>
-Json get(const Json& root, const typename Json::string_view_type& path)
+typename item_handle<Json,const Json&>::handle_type get(const Json& root, const typename Json::string_view_type& path)
 {
     detail::jsonpointer_evaluator<Json,const Json&> evaluator;
     jsonpointer_errc ec = evaluator.get(root,path);
@@ -691,7 +688,7 @@ Json get(const Json& root, const typename Json::string_view_type& path)
 }
 
 template<class Json>
-Json get(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+typename item_handle<Json,const Json&>::handle_type get(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
 {
     detail::jsonpointer_evaluator<Json,const Json&> evaluator;
     ec = evaluator.get(root,path);

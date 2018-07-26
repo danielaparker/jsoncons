@@ -42,7 +42,7 @@ void check_get(const std::string& pointer, const json& expected)
 {
 
     std::error_code ec;
-    json result = jsonpointer::get(example,pointer,ec);
+    const json& result = jsonpointer::get(example,pointer,ec);
     BOOST_CHECK(!ec);
     BOOST_CHECK_EQUAL(expected,result);
 }
