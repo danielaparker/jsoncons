@@ -87,6 +87,6 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-[jsonpointer::get](doc/ref/jsonpointer/get.md) may also be used to query the nested data items of a packed CBOR value.
+[jsonpointer::get](get.md) may also be used to query the nested data items of a packed CBOR value.
 
 
