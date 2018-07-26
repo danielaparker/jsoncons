@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <climits>
 #include <limits>
 #include <algorithm>
 #include <string>
