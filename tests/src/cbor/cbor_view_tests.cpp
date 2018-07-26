@@ -20,6 +20,7 @@ using namespace jsoncons::cbor;
 
 BOOST_AUTO_TEST_SUITE(cbor_view_tests)
 
+#if 0
 BOOST_AUTO_TEST_CASE(cbor_view_test)
 {
     ojson j1 = ojson::parse(R"(
@@ -73,6 +74,7 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
     }
     std::cout << std::endl;
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(jsonpointer_test)
 {
@@ -102,7 +104,7 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     std::error_code ec;
     cbor_view application = jsonpointer::get(cbor_view(buffer), "/application", ec);
     BOOST_CHECK(!ec);
-
+/*
     json j2 = decode_cbor<json>(application);
     std::cout << pretty_print(j2) << std::endl;
 
@@ -111,9 +113,9 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
 
     json j3 = decode_cbor<json>(reputons_0_rated);
     std::cout << pretty_print(j3) << std::endl;
-
+*/
 }
-
+#if 0
 BOOST_AUTO_TEST_CASE(as_string_test)
 {
     std::vector<uint8_t> b;
@@ -334,6 +336,6 @@ BOOST_AUTO_TEST_CASE(test_indefinite_length_array_iterator)
     BOOST_CHECK(++it2 != bv2.array_range().end());
     BOOST_CHECK(++it2 == bv2.array_range().end());
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END()
 

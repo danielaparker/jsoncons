@@ -28,7 +28,7 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 
         jsoncons::json_decoder<json> decoder;
         cbor_parser parser(decoder);
-        parser.set_source(v.data(),v.size());
+        parser.update(v.data(),v.size());
         parser.parse_some(ec);
 
         json result = decoder.get_result();

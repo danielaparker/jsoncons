@@ -66,28 +66,29 @@ enum class pointer_state
     object_reference_token,
     escaped
 };
-template <class Json,class JsonReference, class Enable = void>
-class json_wrapper
+template <class Json,class JsonReference,class Enable = void>
+class item_handle
 {
 };
 
 template <class Json,class JsonReference>
-class json_wrapper<Json,JsonReference,typename std::enable_if<std::is_reference<decltype(std::declval<Json>().at(typename Json::string_view_type()))>::value>::type>
+class item_handle<Json,JsonReference,typename std::enable_if<std::is_reference<decltype(std::declval<Json>().at(typename Json::string_view_type()))>::value>::type>
 {
 public:
     using reference = JsonReference;
+    using handle_type = JsonReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
-    json_wrapper(reference ref) JSONCONS_NOEXCEPT
+    item_handle(reference ref) JSONCONS_NOEXCEPT
         : ptr_(std::addressof(ref))
     {
     }
 
-    json_wrapper(const json_wrapper&) JSONCONS_NOEXCEPT = default;
+    item_handle(const item_handle&) JSONCONS_NOEXCEPT = default;
 
-    json_wrapper& operator=(const json_wrapper&) JSONCONS_NOEXCEPT = default;
+    item_handle& operator=(const item_handle&) JSONCONS_NOEXCEPT = default;
 
-    reference get() const JSONCONS_NOEXCEPT
+    handle_type get() const JSONCONS_NOEXCEPT
     {
         return *ptr_;
     }
@@ -96,26 +97,30 @@ private:
 };
 
 template <class Json,class JsonReference>
-class json_wrapper<Json,JsonReference,typename std::enable_if<!std::is_reference<decltype(std::declval<Json>().at(typename Json::string_view_type()))>::value>::type>
+class item_handle<Json,JsonReference,typename std::enable_if<!std::is_reference<decltype(std::declval<Json>().at(typename Json::string_view_type()))>::value>::type>
 {
 public:
     using value_type = typename Json::value_type;
-    using reference = JsonReference;
-    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+    using handle_type = value_type;
 
-    json_wrapper(reference ref) JSONCONS_NOEXCEPT
-        : val_(ref)
+    item_handle(const value_type& val) JSONCONS_NOEXCEPT
+        : val_(val)
     {
     }
 
-    json_wrapper(const json_wrapper& w) JSONCONS_NOEXCEPT
+    item_handle(value_type&& val) JSONCONS_NOEXCEPT
+        : val_(std::move(val))
+    {
+    }
+
+    item_handle(const item_handle& w) JSONCONS_NOEXCEPT
         : val_(w.val_)
     {
     }
 
-    json_wrapper& operator=(const json_wrapper&) JSONCONS_NOEXCEPT = default;
+    item_handle& operator=(const item_handle&) JSONCONS_NOEXCEPT = default;
 
-    value_type get() const JSONCONS_NOEXCEPT
+    handle_type get() const JSONCONS_NOEXCEPT
     {
         return val_;
     }
@@ -126,12 +131,9 @@ private:
 template<class Json,class JsonReference>
 struct path_resolver
 {
-    typedef typename Json::string_type string_type;
     typedef typename Json::string_view_type string_view_type;
-    using reference = JsonReference;
-    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
-    jsonpointer_errc operator()(std::vector<json_wrapper<Json,JsonReference>>& current,
+    jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
                                 size_t index) const
     {
         if (index >= current.back().get().size())
@@ -142,7 +144,7 @@ struct path_resolver
         return jsonpointer_errc();
     }
 
-    jsonpointer_errc operator()(std::vector<json_wrapper<Json,JsonReference>>& current,
+    jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
                                 const string_view_type& name) const
     {
         if (!current.back().get().has_key(name))
@@ -162,7 +164,7 @@ struct path_setter
     using reference = JsonReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
-    jsonpointer_errc operator()(std::vector<json_wrapper<Json,JsonReference>>& current,
+    jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
                                 size_t index) const
     {
         if (index >= current.back().get().size())
@@ -173,7 +175,7 @@ struct path_setter
         return jsonpointer_errc();
     }
 
-    jsonpointer_errc operator()(std::vector<json_wrapper<Json,JsonReference>>& current,
+    jsonpointer_errc operator()(std::vector<item_handle<Json,JsonReference>>& current,
                                 const string_view_type& name) const
     {
         jsonpointer_errc ec = jsonpointer_errc();
@@ -189,6 +191,7 @@ struct path_setter
 template<class Json,class JsonReference>
 class jsonpointer_evaluator : private serializing_context
 {
+    typedef typename item_handle<Json,JsonReference>::handle_type handle_type;
     typedef typename Json::string_type string_type;
     typedef typename string_type::value_type char_type;
     typedef typename Json::string_view_type string_view_type;
@@ -203,11 +206,11 @@ class jsonpointer_evaluator : private serializing_context
     const char_type* p_;
     string_type buffer_;
     size_t index_;
-    std::vector<json_wrapper<Json,JsonReference>> current_;
+    std::vector<item_handle<Json,JsonReference>> current_;
 public:
-    Json get_result() 
+    handle_type get_result() 
     {
-        return std::move(current_.back().get());
+        return current_.back().get();
     }
 
     size_t line_number() const

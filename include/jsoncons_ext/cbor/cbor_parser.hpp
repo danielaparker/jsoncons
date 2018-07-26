@@ -1788,7 +1788,7 @@ public:
     {
     }
 
-    void set_source(const uint8_t* input, size_t length)
+    void update(const uint8_t* input, size_t length)
     {
         begin_input_ = input;
         end_input_ = input + length;

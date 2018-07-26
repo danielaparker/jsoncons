@@ -273,55 +273,6 @@ public:
         push_state(parse_state::root);
     }
 
-    basic_json_parser(const basic_json_serializing_options<CharT>& options)
-       : handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_(default_content_handler_,options) : default_content_handler_),
-         err_handler_(default_err_handler_),
-         cp_(0),
-         cp2_(0),
-         precision_(0), 
-         decimal_places_(0), 
-         line_(1),
-         column_(1),
-         nesting_depth_(0), 
-         initial_stack_capacity_(default_initial_stack_capacity_),
-         begin_input_(nullptr),
-         input_end_(nullptr),
-         input_ptr_(nullptr),
-         state_(parse_state::start)
-    {
-        string_buffer_.reserve(initial_string_buffer_capacity_);
-        number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_nesting_depth_ = options.max_nesting_depth();
-
-        state_stack_.reserve(initial_stack_capacity_);
-        push_state(parse_state::root);
-    }
-
-    basic_json_parser(const basic_json_serializing_options<CharT>& options, 
-                      parse_error_handler& err_handler)
-       : handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_(default_content_handler_,options) : default_content_handler_),
-         err_handler_(err_handler),
-         cp_(0),
-         cp2_(0),
-         precision_(0), 
-         decimal_places_(0), 
-         line_(1),
-         column_(1),
-         nesting_depth_(0), 
-         initial_stack_capacity_(default_initial_stack_capacity_),
-         begin_input_(nullptr),
-         input_end_(nullptr),
-         input_ptr_(nullptr),
-         state_(parse_state::start)
-    {
-        string_buffer_.reserve(initial_string_buffer_capacity_);
-        number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_nesting_depth_ = options.max_nesting_depth();
-
-        state_stack_.reserve(initial_stack_capacity_);
-        push_state(parse_state::root);
-    }
-
     basic_json_parser(basic_json_content_handler<CharT>& handler,
                       const basic_json_serializing_options<CharT>& options)
        : replacement_filter_(handler,options),
@@ -2632,7 +2583,7 @@ escape_u9:
         return state_;
     }
 
-    void set_source(const CharT* input, size_t length)
+    void update(const CharT* input, size_t length)
     {
         begin_input_ = input;
         input_end_ = input + length;

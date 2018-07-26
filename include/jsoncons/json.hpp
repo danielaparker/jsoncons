@@ -2371,7 +2371,7 @@ public:
             throw parse_error(result.ec,1,1);
         }
         size_t offset = result.it - s.begin();
-        parser.set_source(s.data()+offset,s.size()-offset);
+        parser.update(s.data()+offset,s.size()-offset);
         parser.parse_some();
         parser.end_parse();
         parser.check_done();
@@ -2418,7 +2418,7 @@ public:
             throw parse_error(result.ec,1,1);
         }
         size_t offset = result.it - s.begin();
-        parser.set_source(s.data()+offset,s.size()-offset);
+        parser.update(s.data()+offset,s.size()-offset);
         parser.parse_some();
         parser.end_parse();
         parser.check_done();
