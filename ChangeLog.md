@@ -1,3 +1,10 @@
+v0.107.2
+--------
+
+Bug fixes:
+
+- Fixed issue with `UINT_MAX` not declared in `bignum.hpp`
+
 v0.107.1
 --------
 

@@ -157,8 +157,16 @@ Receives a string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 
     virtual void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
+Receives a byte string value. Contextual information including
+line and column information is provided in the [context](serializing_context.md) parameter. 
 
     virtual void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
+Receives a bignum using the sign-magnitude representation. 
+The magnitude is an unsigned integer `n` encoded as a byte string data item in big-endian byte-order.
+If the value of signum is 1, the value of the bignum is `n`. 
+If the value of signum is -1, the value of the bignum is `-1 - n`. 
+An empty list means a zero value. Contextual information including
+line and column information is provided in the [context](serializing_context.md) parameter. 
 
     virtual void do_integer_value(int64_t value, const serializing_context& context) = 0;
 Receives a signed integer value. Contextual information including
