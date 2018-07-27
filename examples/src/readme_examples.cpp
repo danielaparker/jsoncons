@@ -69,8 +69,8 @@ namespace readme
         std::cout << pretty_print(j) << "\n\n";
 
         // Get element at position /0/0 using jsonpointer (by reference)
-        json& lref = jsonpointer::get(j, "/0/0");
-        std::cout << "(7) " << lref.as<double>() << "\n\n";
+        json& ref = jsonpointer::get(j, "/0/0");
+        std::cout << "(7) " << ref.as<double>() << "\n\n";
 
         // Repack bytes
         std::vector<uint8_t> b2;
