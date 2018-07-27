@@ -71,8 +71,16 @@ get(const J& root, const typename J::string_view_type& path, std::error_code& ec
 ### Exceptions
 
 (1) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
+
+(2) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
+
+(3) Throws a [jsonpointer_error](jsonpointer_error.md) if get fails.
  
-(2) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
+(4) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
+ 
+(5) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
+ 
+(6) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if get fails. 
 
 #### Requirements
 
