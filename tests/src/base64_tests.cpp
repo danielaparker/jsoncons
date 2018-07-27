@@ -24,33 +24,33 @@ BOOST_AUTO_TEST_SUITE(base64_tests)
 
 // https://tools.ietf.org/html/rfc4648#section-4 test vectors
 
-void check_encode_base64(const std::string& input, const std::string& expected)
+void check_encode_base64(const std::vector<uint8_t>& input, const std::string& expected)
 {
     std::string result;
-    encode_base64(input.begin(),input.end(),result);
-    BOOST_CHECK_EQUAL(result, expected);
+    encode_base64(input.data(),input.size(),result);
+    BOOST_REQUIRE(result.size() == expected.size());
+    for (size_t i = 0; i < result.size(); ++i)
+    {
+        BOOST_CHECK(result[i] == expected[i]);
+    }
+
+    std::vector<uint8_t> output = decode_base64(result);
+    BOOST_REQUIRE(output.size() == input.size());
+    for (size_t i = 0; i < output.size(); ++i)
+    {
+        BOOST_CHECK(output[i] == input[i]);
+    }
 }
 
-BOOST_AUTO_TEST_CASE(test_encode_base64)
+BOOST_AUTO_TEST_CASE(test_base64_conversion)
 {
-    check_encode_base64("", "");
-    check_encode_base64("f", "Zg==");
-    check_encode_base64("fo", "Zm8=");
-    check_encode_base64("foo", "Zm9v");
-    check_encode_base64("foob", "Zm9vYg==");
-    check_encode_base64("fooba", "Zm9vYmE=");
-    check_encode_base64("foobar", "Zm9vYmFy");
-}
-
-BOOST_AUTO_TEST_CASE(test_decode_base64)
-{
-    BOOST_CHECK_EQUAL("", decode_base64(""));
-    BOOST_CHECK_EQUAL("f", decode_base64("Zg=="));
-    BOOST_CHECK_EQUAL("fo", decode_base64("Zm8="));
-    BOOST_CHECK_EQUAL("foo", decode_base64("Zm9v"));
-    BOOST_CHECK_EQUAL("foob", decode_base64("Zm9vYg=="));
-    BOOST_CHECK_EQUAL("fooba", decode_base64("Zm9vYmE="));
-    BOOST_CHECK_EQUAL("foobar", decode_base64("Zm9vYmFy"));
+    check_encode_base64({}, "");
+    check_encode_base64({'f'}, "Zg==");
+    check_encode_base64({'f','o'}, "Zm8=");
+    check_encode_base64({'f','o','o'}, "Zm9v");
+    check_encode_base64({'f','o','o','b'}, "Zm9vYg==");
+    check_encode_base64({'f','o','o','b','a'}, "Zm9vYmE=");
+    check_encode_base64({'f','o','o','b','a','r'}, "Zm9vYmFy");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -496,7 +496,7 @@ private:
             default:
             {
                 std::basic_string<CharT> s;
-                encode_base64(data, data + length, s);
+                encode_base64(data, length, s);
                 writer_. put('\"');
                 writer_.write(s.data(),s.size());
                 writer_. put('\"');
