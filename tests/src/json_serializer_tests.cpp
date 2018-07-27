@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(test_byte_string_serialization)
 
     std::string expected; 
     expected.push_back('\"');
-    encode_base64url(bs,bs+sizeof(bs),expected);
+    encode_base64url(bs,sizeof(bs),expected);
     expected.push_back('\"');
 
     //std::cout << expected << " " << os.str() << std::endl;
