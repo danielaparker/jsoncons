@@ -34,7 +34,7 @@ get(const J& root, const typename J::string_view_type& path, std::error_code& ec
 #### Return value
 
 (1) On success, returns the selected item by reference.  
-    Example: 
+Example: 
     json j = json::array{"baz","foo"};
     json& item = jsonpointer::get(j,"/0");
 
