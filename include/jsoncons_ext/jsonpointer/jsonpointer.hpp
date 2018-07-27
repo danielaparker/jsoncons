@@ -54,68 +54,18 @@ private:
     std::error_code error_code_;
 };
 
-template <class J,class JReference,class Enable = void>
-class return_type
-{
-};
+// find_by_reference
 
-template <class J,class JReference>
-class return_type<J,JReference,
-                  typename std::enable_if<std::is_reference<decltype(std::declval<J>().at(typename J::string_view_type()))>::value>::type>
-{
-public:
-    using reference = JReference;
-    using type = reference;
-    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
+template <class J, class Enable=void>
+struct is_accessible_by_reference : std::false_type {};
 
-    return_type(reference ref) JSONCONS_NOEXCEPT
-        : ptr_(std::addressof(ref))
-    {
-    }
+template <class J>
+struct is_accessible_by_reference<J, 
+                            typename std::enable_if<std::is_reference<decltype(std::declval<J>().at(typename J::string_view_type()))>::value
+                                                    && std::is_reference<decltype(std::declval<J>().at(0))>::value>::type> 
+: std::true_type {};
 
-    return_type(const return_type&) JSONCONS_NOEXCEPT = default;
 
-    return_type& operator=(const return_type&) JSONCONS_NOEXCEPT = default;
-
-    type get() const JSONCONS_NOEXCEPT
-    {
-        return *ptr_;
-    }
-private:
-    pointer ptr_;
-};
-
-template <class J,class JReference>
-class return_type<J,JReference,typename std::enable_if<!std::is_reference<decltype(std::declval<J>().at(typename J::string_view_type()))>::value>::type>
-{
-public:
-    using value_type = typename J::value_type;
-    using type = value_type;
-
-    return_type(const value_type& val) JSONCONS_NOEXCEPT
-        : val_(val)
-    {
-    }
-
-    return_type(value_type&& val) JSONCONS_NOEXCEPT
-        : val_(std::move(val))
-    {
-    }
-
-    return_type(const return_type& w) JSONCONS_NOEXCEPT
-        : val_(w.val_)
-    {
-    }
-
-    return_type& operator=(const return_type&) JSONCONS_NOEXCEPT = default;
-
-    type get() const JSONCONS_NOEXCEPT
-    {
-        return val_;
-    }
-private:
-    value_type val_;
-};
 
 namespace detail {
 
@@ -129,13 +79,70 @@ enum class pointer_state
     object_reference_token,
     escaped
 };
+template <class J,class JReference,class Enable = void>
+class handle_type
+{
+public:
+    using value_type = typename J::value_type;
+    using type = value_type;
+
+    handle_type(const value_type& val) JSONCONS_NOEXCEPT
+        : val_(val)
+    {
+    }
+
+    handle_type(value_type&& val) JSONCONS_NOEXCEPT
+        : val_(std::move(val))
+    {
+    }
+
+    handle_type(const handle_type& w) JSONCONS_NOEXCEPT
+        : val_(w.val_)
+    {
+    }
+
+    handle_type& operator=(const handle_type&) JSONCONS_NOEXCEPT = default;
+
+    type get() const JSONCONS_NOEXCEPT
+    {
+        return val_;
+    }
+private:
+    value_type val_;
+};
+
+template <class J,class JReference>
+class handle_type<J,JReference,
+                  typename std::enable_if<is_accessible_by_reference<J>::value>::type>
+{
+public:
+    using reference = JReference;
+    using type = reference;
+    using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
+
+    handle_type(reference ref) JSONCONS_NOEXCEPT
+        : ptr_(std::addressof(ref))
+    {
+    }
+
+    handle_type(const handle_type&) JSONCONS_NOEXCEPT = default;
+
+    handle_type& operator=(const handle_type&) JSONCONS_NOEXCEPT = default;
+
+    type get() const JSONCONS_NOEXCEPT
+    {
+        return *ptr_;
+    }
+private:
+    pointer ptr_;
+};
 
 template<class J,class JReference>
 struct path_resolver
 {
     typedef typename J::string_view_type string_view_type;
 
-    jsonpointer_errc operator()(std::vector<return_type<J,JReference>>& current,
+    jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
                                 size_t index) const
     {
         if (index >= current.back().get().size())
@@ -146,7 +153,7 @@ struct path_resolver
         return jsonpointer_errc();
     }
 
-    jsonpointer_errc operator()(std::vector<return_type<J,JReference>>& current,
+    jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
                                 const string_view_type& name) const
     {
         if (!current.back().get().has_key(name))
@@ -163,7 +170,7 @@ struct path_setter
 {
     typedef typename J::string_view_type string_view_type;
 
-    jsonpointer_errc operator()(std::vector<return_type<J,JReference>>& current,
+    jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
                                 size_t index) const
     {
         if (index >= current.back().get().size())
@@ -174,7 +181,7 @@ struct path_setter
         return jsonpointer_errc();
     }
 
-    jsonpointer_errc operator()(std::vector<return_type<J,JReference>>& current,
+    jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
                                 const string_view_type& name) const
     {
         jsonpointer_errc ec = jsonpointer_errc();
@@ -190,7 +197,7 @@ struct path_setter
 template<class J,class JReference>
 class jsonpointer_evaluator : private serializing_context
 {
-    typedef typename return_type<J,JReference>::type type;
+    typedef typename handle_type<J,JReference>::type type;
     typedef typename J::string_type string_type;
     typedef typename string_type::value_type char_type;
     typedef typename J::string_view_type string_view_type;
@@ -205,7 +212,7 @@ class jsonpointer_evaluator : private serializing_context
     const char_type* p_;
     string_type buffer_;
     size_t index_;
-    std::vector<return_type<J,JReference>> current_;
+    std::vector<handle_type<J,JReference>> current_;
 public:
     type get_result() 
     {
@@ -678,19 +685,8 @@ typename J::string_type normalized_path(const J& root, const typename J::string_
 }
 
 template<class J>
-typename return_type<J,const J&>::type get(const J& root, const typename J::string_view_type& path)
-{
-    detail::jsonpointer_evaluator<J,const J&> evaluator;
-    jsonpointer_errc ec = evaluator.get(root,path);
-    if (ec != jsonpointer_errc())
-    {
-        JSONCONS_THROW(jsonpointer_error(ec));
-    }
-    return evaluator.get_result();
-}
-
-template<class J>
-typename return_type<J,J&>::type get(J& root, const typename J::string_view_type& path)
+typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
+get(J& root, const typename J::string_view_type& path)
 {
     detail::jsonpointer_evaluator<J,J&> evaluator;
     jsonpointer_errc ec = evaluator.get(root,path);
@@ -702,7 +698,43 @@ typename return_type<J,J&>::type get(J& root, const typename J::string_view_type
 }
 
 template<class J>
-typename return_type<J,const J&>::type get(const J& root, const typename J::string_view_type& path, std::error_code& ec)
+typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
+get(const J& root, const typename J::string_view_type& path)
+{
+    detail::jsonpointer_evaluator<J,const J&> evaluator;
+    jsonpointer_errc ec = evaluator.get(root,path);
+    if (ec != jsonpointer_errc())
+    {
+        JSONCONS_THROW(jsonpointer_error(ec));
+    }
+    return evaluator.get_result();
+}
+
+template<class J>
+typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
+get(const J& root, const typename J::string_view_type& path)
+{
+    detail::jsonpointer_evaluator<J,const J&> evaluator;
+    jsonpointer_errc ec = evaluator.get(root,path);
+    if (ec != jsonpointer_errc())
+    {
+        JSONCONS_THROW(jsonpointer_error(ec));
+    }
+    return evaluator.get_result();
+}
+
+template<class J>
+typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
+get(J& root, const typename J::string_view_type& path, std::error_code& ec)
+{
+    detail::jsonpointer_evaluator<J,J&> evaluator;
+    ec = evaluator.get(root,path);
+    return evaluator.get_result();
+}
+
+template<class J>
+typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
+get(const J& root, const typename J::string_view_type& path, std::error_code& ec)
 {
     detail::jsonpointer_evaluator<J,const J&> evaluator;
     ec = evaluator.get(root,path);
@@ -710,9 +742,10 @@ typename return_type<J,const J&>::type get(const J& root, const typename J::stri
 }
 
 template<class J>
-typename return_type<J,J&>::type get(J& root, const typename J::string_view_type& path, std::error_code& ec)
+typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
+get(const J& root, const typename J::string_view_type& path, std::error_code& ec)
 {
-    detail::jsonpointer_evaluator<J,J&> evaluator;
+    detail::jsonpointer_evaluator<J,const J&> evaluator;
     ec = evaluator.get(root,path);
     return evaluator.get_result();
 }

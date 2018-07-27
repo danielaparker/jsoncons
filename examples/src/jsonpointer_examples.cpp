@@ -354,12 +354,64 @@ void jsonpointer_error_example()
         std::cout << "succeeded?" << std::endl;
         std::cout << result << std::endl;
     }
-    catch (const std::runtime_error& e)
+    catch (const jsonpointer::jsonpointer_error& e)
     {
         std::cout << "Caught jsonpointer_error with category " << e.code().category().name() 
                   << ", code " << e.code().value() 
                   << " and message \"" << e.what() << "\"" << std::endl;
     }
+}
+
+void jsonpointer_get_examples()
+{
+    {
+        json j = json::array{"baz","foo"};
+        json& item = jsonpointer::get(j,"/0");
+        std::cout << "(1) " << item << std::endl;
+
+        std::vector<uint8_t> u;
+        cbor::encode_cbor(j,u);
+        for (auto c : u)
+        {
+            std::cout << "0x" << std::hex << (int)c << ",";
+        }
+        std::cout << std::endl;
+    }
+    {
+        const json j = json::array{"baz","foo"};
+        const json& item = jsonpointer::get(j,"/1");
+        std::cout << "(2) " << item << std::endl;
+    }
+    {
+        std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f};
+        
+        cbor::cbor_view bv = b;
+        cbor::cbor_view item = jsonpointer::get(bv,"/0");
+        std::cout << "(3) " << item << std::endl;
+    }
+    {
+        json j = json::array{"baz","foo"};
+
+        std::error_code ec;
+        json& item = jsonpointer::get(j,"/1",ec);
+        std::cout << "(4) " << item << std::endl;
+    }
+    {
+        const json j = json::array{"baz","foo"};
+
+        std::error_code ec;
+        const json& item = jsonpointer::get(j,"/0",ec);
+        std::cout << "(5) " << item << std::endl;
+    }
+    {
+        std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f};
+        cbor::cbor_view bv = b;
+
+        std::error_code ec;
+        cbor::cbor_view item = jsonpointer::get(bv,"/1",ec);
+        std::cout << "(6) " << item << std::endl;
+    }
+
 }
 
 void jsonpointer_examples()
@@ -381,6 +433,7 @@ void jsonpointer_examples()
     jsonpointer_insert_name_exists();
     jsonpointer_insert_or_assign_name_exists();
     jsonpointer_cbor();
+    jsonpointer_get_examples();
     std::cout << std::endl;
 }
 

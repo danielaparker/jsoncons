@@ -7,32 +7,60 @@ Selects a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class J>
-typename return_type<J,J&>::type get(J& root, const typename J::string_view_type& path); // (1)
+typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
+get(J& root, const typename J::string_view_type& path); // (1)
 
 template<class J>
-typename return_type<J,const J&>::type get(const J& root, const typename J::string_view_type& path); // (2)
+typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
+get(const J& root, const typename J::string_view_type& path); // (2)
 
 template<class J>
-typename return_type<J,J&>::type get(J& root, const typename J::string_view_type& path, std::error_code& ec); // (3)
+typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
+get(const J& root, const typename J::string_view_type& path); // (3)
 
 template<class J>
-typename return_type<J,const J&>::type get(const J& root, const typename J::string_view_type& path, std::error_code& ec); // (4)
+typename std::enable_if<is_accessible_by_reference<J>::value,J&>::type
+get(J& root, const typename J::string_view_type& path, std::error_code& ec); // (4)
 
+template<class J>
+typename std::enable_if<is_accessible_by_reference<J>::value,const J&>::type
+get(const J& root, const typename J::string_view_type& path, std::error_code& ec); // (5)
+
+template<class J>
+typename std::enable_if<!is_accessible_by_reference<J>::value,J>::type
+get(const J& root, const typename J::string_view_type& path, std::error_code& ec); // (6)
 ```
 
 #### Return value
 
-(1) On success, returns the selected item. `return_type<J,J&>::type` resolves to `J&` if `J`'s `at` functions return references,
-    and `J` if `J`'s `at` functions return values.
+(1) On success, returns the selected item by reference.
+    Example: ```json j = json::array{"baz","foo"};
+             json& item = jsonpointer::get(j,"/0");```
 
-(2) On success, returns the selected item, otherwise an undefined item. `return_type<J,const J&>::type` resolves to `const J&` if `J`'s `at` functions return references,
-    and `J` if `J`'s `at` functions return values.
+(2) On success, returns the selected item by const reference.
+    Example: ```const json j = json::array{"baz","foo"};
+             const json& item = jsonpointer::get(j,"/1");```
 
-(3) On success, returns the selected item. `return_type<J,J&>::type` resolves to `J&` if `J`'s `at` functions return references,
-    and `J` if `J`'s `at` functions return values.
+(3) On success, returns the selected item by value.
+    Example: ```std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f}; // in CBOR
+             cbor::cbor_view bv = b;
+             cbor::cbor_view item = jsonpointer::get(bv,"/0");```
 
-(4) On success, returns the selected item, otherwise an undefined item. `return_type<J,const J&>::type` resolves to `const J&` if `J`'s `at` functions return references,
-    and `J` if `J`'s `at` functions return values.
+(4) On success, returns the selected item by reference, otherwise an undefined item by reference.
+    Example: ```json j = json::array{"baz","foo"};
+             std::error_code ec;
+             json& item = jsonpointer::get(j,"/1",ec);```
+
+(5) On success, returns the selected item by const reference, otherwise an undefined item by const reference.
+    Example: ```const json j = json::array{"baz","foo"};
+             std::error_code ec;
+             const json& item = jsonpointer::get(j,"/0",ec);```
+
+(6) On success, returns the selected item by value, otherwise an undefined item by value.
+    Example: ```std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f}; // in CBOR
+             cbor::cbor_view bv = b;
+             std::error_code ec;
+             cbor::cbor_view item = jsonpointer::get(bv,"/1",ec);```
 
 ### Exceptions
 
