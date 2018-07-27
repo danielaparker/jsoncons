@@ -13,18 +13,36 @@ typedef basic_json_parser<char> json_parser
 ```
 #### Constructors
 
-    json_parser(std::istream& is,
-                json_content_handler& handler,
-                parse_error_handler& err_handler)
-Constructs a `json_parser` that is associated with an input stream `is` of JSON text, a [json_content_handler](json_content_handler.md) that receives JSON events, and the specified [parse_error_handler](parse_error_handler.md).
-You must ensure that the input stream, input handler, and error handler exist as long as does `json_parser`, as `json_parser` holds pointers to but does not own these objects.
+    json_parser(); // (1)
 
-    json_parser(std::istream& is,
-                json_content_handler& handler)
-Constructs a `json_parser` that is associated with an input stream `is` of JSON text, a [json_content_handler](json_content_handler.md) that receives JSON events, and a [default_parse_error_handler](default_parse_error_handler.md).
+    json_parser(parse_error_handler& err_handler); // (2)
+
+    json_parser(json_content_handler& handler); // (3)
+
+    json_parser(json_content_handler& handler,
+                parse_error_handler& err_handler); // (4)
+
+    json_parser(const json_serializing_options& options); // (5)
+
+    json_parser(const json_serializing_options& options, 
+                parse_error_handler& err_handler); // (6)
+
+    json_parser(json_content_handler& handler,
+                const json_serializing_options& options); // (7)
+
+    json_parser(json_content_handler& handler, 
+                const json_serializing_options& options,
+                parse_error_handler& err_handler); // (8)
+
+(4) Constructs a `json_parser` that is associated with a [json_content_handler](json_content_handler.md) that receives JSON events and a [default_parse_error_handler](default_parse_error_handler.md).
 You must ensure that the input stream and input handler exist as long as does `json_parser`, as `json_parser` holds pointers to does not own these objects.
 
+(6) Constructs a `json_parser` that is associated with a [json_content_handler](json_content_handler.md) that receives JSON events and the specified [parse_error_handler](parse_error_handler.md).
+You must ensure that the input stream, input handler, and error handler exist as long as does `json_parser`, as `json_parser` holds pointers to but does not own these objects.
+
 #### Member functions
+
+    void update(const char* data, size_t length)
 
     bool done() const
 Returns `true` when the parser has consumed a complete json text, `false` otherwise
@@ -32,11 +50,11 @@ Returns `true` when the parser has consumed a complete json text, `false` otherw
     bool source_exhausted() const
 Returns `true` if the input in the source buffer has been exhausted, `false` otherwise
 
-    void parse()
+    void parse_some()
 Parses the source until a complete json text has been consumed or the source has been exhausted.
 Throws [parse_error](parse_error.md) if parsing fails.
 
-    void parse(std::error_code& ec)
+    void parse_some(std::error_code& ec)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
 Sets a `std::error_code` if parsing fails.
 

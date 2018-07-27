@@ -2496,10 +2496,10 @@ escape_u9:
         return state_;
     }
 
-    void update(const CharT* input, size_t length)
+    void update(const CharT* data, size_t length)
     {
-        begin_input_ = input;
-        input_end_ = input + length;
+        begin_input_ = data;
+        input_end_ = data + length;
         input_ptr_ = begin_input_;
     }
 private:
