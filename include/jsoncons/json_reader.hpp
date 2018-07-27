@@ -187,7 +187,7 @@ public:
 
     basic_json_reader(std::basic_istream<CharT>& is, 
                       const basic_json_serializing_options<CharT>& options)
-        : basic_json_reader(is,handler,options,default_err_handler_)
+        : basic_json_reader(is,default_content_handler_,options,default_err_handler_)
     {
     }
 
