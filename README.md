@@ -96,9 +96,9 @@ int main()
     }
     std::cout << "\n";
 
-    // Get element at position /0/1 using jsonpointer
-    cbor::cbor_view item = jsonpointer::get(bv, "/0/1");
-    std::cout << "(3) " << item.as<std::string>() << "\n\n";
+    // Get element at position /0/1 using jsonpointer (must be by value)
+    cbor::cbor_view val = jsonpointer::get(bv, "/0/1");
+    std::cout << "(3) " << val.as<std::string>() << "\n\n";
 
     // Print JSON representation with default options
     std::cout << "(4)\n";
@@ -118,10 +118,14 @@ int main()
     std::cout << "(6)\n";
     std::cout << pretty_print(j) << "\n\n";
 
+    // Get element at position /0/0 using jsonpointer (by reference)
+    json& lref = jsonpointer::get(j, "/0/0");
+    std::cout << "(7) " << lref.as<double>() << "\n\n";
+
     // Repack bytes
     std::vector<uint8_t> b2;
     cbor::encode_cbor(j, b2);
-    std::cout << "(7)\n";
+    std::cout << "(8)\n";
     cbor::cbor_view b2v = b2;
     std::cout << pretty_print(b2v) << "\n\n";
 
@@ -131,12 +135,12 @@ int main()
 
     std::string from_unpacked;
     csv::encode_csv(j, from_unpacked, csv_options);
-    std::cout << "(8)\n";
+    std::cout << "(9)\n";
     std::cout << from_unpacked << "\n\n";
 
     std::string from_packed;
     csv::encode_csv(b2v, from_packed, csv_options);
-    std::cout << "(9)\n";
+    std::cout << "(10)\n";
     std::cout << from_packed << "\n\n";
 }
 
@@ -144,7 +148,7 @@ int main()
 Output:
 ```
 (1)
-0x9f0x830x670x540x6f0x720x6f0x6e0x740x6f0x450x480x650x6c0x6c0x6f0xc30x490x1000000000xff
+9f8367546f726f6e746f4548656c6c6fc349100000000ff
 
 (2)
 ["Toronto","SGVsbG8","-18446744073709551617"]
@@ -166,17 +170,19 @@ Output:
     [10.5,"Toronto","SGVsbG8","-18446744073709551617","18446744073709551616"]
 ]
 
-(7)
+(7) 10.5
+
+(8)
 [
     [10.5,"Toronto","SGVsbG8","-18446744073709551617","18446744073709551616"]
 ]
 
-(8)
+(9)
 A,B,C,D,E
 10.5,Toronto,SGVsbG8,-18446744073709551617,18446744073709551616
 
 
-(9)
+(10)
 A,B,C,D,E
 10.5,Toronto,SGVsbG8,-18446744073709551617,18446744073709551616
 ```

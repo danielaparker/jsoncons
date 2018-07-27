@@ -369,13 +369,13 @@ void jsonpointer_get_examples()
         json& item = jsonpointer::get(j,"/0");
         std::cout << "(1) " << item << std::endl;
 
-        std::vector<uint8_t> u;
-        cbor::encode_cbor(j,u);
-        for (auto c : u)
-        {
-            std::cout << "0x" << std::hex << (int)c << ",";
-        }
-        std::cout << std::endl;
+        //std::vector<uint8_t> u;
+        //cbor::encode_cbor(j,u);
+        //for (auto c : u)
+        //{
+        //    std::cout << "0x" << std::hex << (int)c << ",";
+        //}
+        //std::cout << std::endl;
     }
     {
         const json j = json::array{"baz","foo"};

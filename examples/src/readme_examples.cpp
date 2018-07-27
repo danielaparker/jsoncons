@@ -46,9 +46,9 @@ namespace readme
         }
         std::cout << "\n";
 
-        // Get element at position /0/1 using jsonpointer
-        cbor::cbor_view item = jsonpointer::get(bv, "/0/1");
-        std::cout << "(3) " << item.as<std::string>() << "\n\n";
+        // Get element at position /0/1 using jsonpointer (must be by value)
+        cbor::cbor_view val = jsonpointer::get(bv, "/0/1");
+        std::cout << "(3) " << val.as<std::string>() << "\n\n";
 
         // Print JSON representation with default options
         std::cout << "(4)\n";
@@ -68,10 +68,14 @@ namespace readme
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
+        // Get element at position /0/0 using jsonpointer (by reference)
+        json& lref = jsonpointer::get(j, "/0/0");
+        std::cout << "(7) " << lref.as<double>() << "\n\n";
+
         // Repack bytes
         std::vector<uint8_t> b2;
         cbor::encode_cbor(j, b2);
-        std::cout << "(7)\n";
+        std::cout << "(8)\n";
         cbor::cbor_view b2v = b2;
         std::cout << pretty_print(b2v) << "\n\n";
 
@@ -81,12 +85,12 @@ namespace readme
 
         std::string from_unpacked;
         csv::encode_csv(j, from_unpacked, csv_options);
-        std::cout << "(8)\n";
+        std::cout << "(9)\n";
         std::cout << from_unpacked << "\n\n";
 
         std::string from_packed;
         csv::encode_csv(b2v, from_packed, csv_options);
-        std::cout << "(9)\n";
+        std::cout << "(10)\n";
         std::cout << from_packed << "\n\n";
     }
 }

@@ -544,9 +544,9 @@ int main()
 
         serialization_examples();
 
-        readme_examples();
-#endif
         jsonpointer_examples();
+#endif
+        readme_examples();
     }
     catch (const std::exception& e)
     {
