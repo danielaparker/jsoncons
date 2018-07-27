@@ -7,18 +7,32 @@ Selects a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class J>
-J get(const J& root, typename J::string_view_type path); // (1)
+typename return_type<J,J&>::type get(J& root, const typename J::string_view_type& path); // (1)
 
 template<class J>
-J get(const J& root, typename J::string_view_type path, std::error_code& ec); // (2)
+typename return_type<J,const J&>::type get(const J& root, const typename J::string_view_type& path); // (2)
+
+template<class J>
+typename return_type<J,J&>::type get(J& root, const typename J::string_view_type& path, std::error_code& ec); // (3)
+
+template<class J>
+typename return_type<J,const J&>::type get(const J& root, const typename J::string_view_type& path, std::error_code& ec); // (4)
 
 ```
 
 #### Return value
 
-(1) On success, returns the selected J value
+(1) On success, returns the selected item. `return_type<J,J&>::type` resolves to `J&` if `J`'s `at` functions return references,
+    and `J` if `J`'s `at` functions return values.
 
-(2) Returns the selected J value if found.
+(2) On success, returns the selected item, otherwise an undefined item. `return_type<J,const J&>::type` resolves to `const J&` if `J`'s `at` functions return references,
+    and `J` if `J`'s `at` functions return values.
+
+(3) On success, returns the selected item. `return_type<J,J&>::type` resolves to `J&` if `J`'s `at` functions return references,
+    and `J` if `J`'s `at` functions return values.
+
+(4) On success, returns the selected item, otherwise an undefined item. `return_type<J,const J&>::type` resolves to `const J&` if `J`'s `at` functions return references,
+    and `J` if `J`'s `at` functions return values.
 
 ### Exceptions
 
@@ -69,7 +83,7 @@ using namespace jsoncons;
 
 int main()
 {
-    json example = json::parse(R"(
+    const json example = json::parse(R"(
         {
           "foo": ["bar", "baz"],
           "": 0,
@@ -86,32 +100,32 @@ int main()
    
     try
     {
-        json result1 = jsonpointer::get(example, "");
+        const json& result1 = jsonpointer::get(example, "");
         std::cout << "(1) " << result1 << std::endl;
-        json result2 = jsonpointer::get(example, "/foo");
+        const json& result2 = jsonpointer::get(example, "/foo");
         std::cout << "(2) " << result2 << std::endl;
-        json result3 = jsonpointer::get(example, "/foo/0");
+        const json& result3 = jsonpointer::get(example, "/foo/0");
         std::cout << "(3) " << result3 << std::endl;
-        json result4 = jsonpointer::get(example, "/");
+        const json& result4 = jsonpointer::get(example, "/");
         std::cout << "(4) " << result4 << std::endl;
-        json result5 = jsonpointer::get(example, "/a~1b");
+        const json& result5 = jsonpointer::get(example, "/a~1b");
         std::cout << "(5) " << result5 << std::endl;
-        json result6 = jsonpointer::get(example, "/c%d");
+        const json& result6 = jsonpointer::get(example, "/c%d");
         std::cout << "(6) " << result6 << std::endl;
-        json result7 = jsonpointer::get(example, "/e^f");
+        const json& result7 = jsonpointer::get(example, "/e^f");
         std::cout << "(7) " << result7 << std::endl;
-        json result8 = jsonpointer::get(example, "/g|h");
+        const json& result8 = jsonpointer::get(example, "/g|h");
         std::cout << "(8) " << result8 << std::endl;
-        json result9 = jsonpointer::get(example, "/i\\j");
+        const json& result9 = jsonpointer::get(example, "/i\\j");
         std::cout << "(9) " << result9 << std::endl;
-        json result10 = jsonpointer::get(example, "/k\"l");
+        const json& result10 = jsonpointer::get(example, "/k\"l");
         std::cout << "(10) " << result10 << std::endl;
-        json result11 = jsonpointer::get(example, "/ ");
+        const json& result11 = jsonpointer::get(example, "/ ");
         std::cout << "(11) " << result11 << std::endl;
-        json result12 = jsonpointer::get(example, "/m~0n");
+        const json& result12 = jsonpointer::get(example, "/m~0n");
         std::cout << "(12) " << result12 << std::endl;
     }
-    catch (const jsonpointer::jsonpointer_error& e)
+    catch (const std::runtime_error& e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -171,7 +185,7 @@ int main()
 
     // Using error codes to report errors
     std::error_code ec;
-    json result = jsonpointer::get(doc, "/0/title", ec);
+    const json& result = jsonpointer::get(doc, "/0/title", ec);
 
     if (ec)
     {
