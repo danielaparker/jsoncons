@@ -96,7 +96,7 @@ int main()
     }
     std::cout << "\n";
 
-    // Get element at position /0/1 using jsonpointer::get (returns value)
+    // Get element at position /0/1 using jsonpointer::get on cbor_view (returns value)
     cbor::cbor_view val = jsonpointer::get(bv, "/0/1");
     std::cout << "(3) " << val.as<std::string>() << "\n\n";
 
@@ -118,7 +118,7 @@ int main()
     std::cout << "(6)\n";
     std::cout << pretty_print(j) << "\n\n";
 
-    // Get element at position /0/0 using jsonpointer::get (returns reference)
+    // Get element at position /0/0 using jsonpointer::get on json (returns reference)
     json& ref = jsonpointer::get(j, "/0/0");
     std::cout << "(7) " << ref.as<double>() << "\n\n";
 
