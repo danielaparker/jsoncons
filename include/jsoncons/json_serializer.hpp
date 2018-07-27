@@ -118,33 +118,17 @@ private:
     basic_json_serializer& operator=(const basic_json_serializer&) = delete;
 public:
     basic_json_serializer(output_type& os)
-       : indent_(0), 
-         indenting_(false),
-         fp_(floating_point_options(options_.floating_point_format(), 
-                                    options_.precision(),
-                                    0)),
-         writer_(os)
+        : basic_json_serializer(os, indenting::no_indent)
     {
     }
 
     basic_json_serializer(output_type& os, indenting line_indent)
-       : indent_(0), 
-         indenting_(line_indent == indenting::indent),
-         fp_(floating_point_options(options_.floating_point_format(), 
-                                    options_.precision(),
-                                    0)),
-         writer_(os)
+        : basic_json_serializer(os, basic_json_serializing_options<CharT>(), line_indent)
     {
     }
 
     basic_json_serializer(output_type& os, const basic_json_serializing_options<CharT>& options)
-       : options_(options), 
-         indent_(0), 
-         indenting_(false),  
-         fp_(floating_point_options(options.floating_point_format(), 
-                                    options.precision(),
-                                    0)),
-         writer_(os)
+       : basic_json_serializer(os, options, indenting::no_indent)
     {
     }
 
@@ -169,18 +153,12 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     basic_json_serializer(output_type& os, bool pprint)
-       : indent_(0), 
-         indenting_(pprint),
-         writer_(os)
+       : basic_json_serializer(os, basic_json_serializing_options<CharT>(), (pprint ? indenting::indent : indenting::no_indent))
     {
     }
 
     basic_json_serializer(output_type& os, const basic_json_serializing_options<CharT>& options, bool pprint)
-       : options_(options), 
-         indent_(0), 
-         indenting_(pprint),  
-         fp_(options_.precision()),
-         writer_(os)
+        : basic_json_serializer(os, basic_json_serializing_options<CharT>(), (pprint ? indenting::indent : indenting::no_indent))
     {
     }
 #endif
