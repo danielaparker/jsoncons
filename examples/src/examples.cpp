@@ -542,11 +542,11 @@ int main()
 
         get_example();
 
-        serialization_examples();
-
         jsonpointer_examples();
 
         readme_examples();
+
+        serialization_examples();
     }
     catch (const std::exception& e)
     {

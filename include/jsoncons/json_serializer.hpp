@@ -524,6 +524,19 @@ private:
                 writer_.write(s.data(),s.size());
                 break;
             }
+            case bignum_chars_format::base64:
+            {
+                std::basic_string<CharT> s;
+                encode_base64(data, length, s);
+                if (signum == -1)
+                {
+                    s.insert(s.begin(), '~');
+                }
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+                break;
+            }
             case bignum_chars_format::base64url:
             {
                 std::basic_string<CharT> s;

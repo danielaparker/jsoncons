@@ -287,7 +287,7 @@ private:
     void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
         std::basic_string<CharT> s;
-        encode_base64url(data,data+length,s);
+        encode_base64url(data,length,s);
         do_string_value(s,context);
     }
 

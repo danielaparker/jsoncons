@@ -79,7 +79,7 @@ enum class block_options {next_line,same_line};
 
 enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
 
-enum class bignum_chars_format : uint8_t {integer,base10,base64url
+enum class bignum_chars_format : uint8_t {integer, base10, base64, base64url
 #if !defined(JSONCONS_NO_DEPRECATED)
 ,string
 #endif

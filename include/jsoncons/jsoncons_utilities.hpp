@@ -561,7 +561,7 @@ static const char base64url_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 template <class CharT>
 void encode_base16(const uint8_t* data, size_t length, std::basic_string<CharT>& result)
 {
-    static const CharT* const lut = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+    static const char* lut = "0123456789ABCDEF";
 
     result.reserve(2 * length);
     for (size_t i = 0; i < length; ++i)
