@@ -3319,7 +3319,7 @@ public:
             {
                 string_type s;
                 encode_base64url(var_.byte_string_data_cast()->data(), 
-                                 var_.byte_string_data_cast()->data()+var_.byte_string_data_cast()->length(),
+                                 var_.byte_string_data_cast()->length(),
                                  s);
                 return s;
             }

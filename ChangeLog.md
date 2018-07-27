@@ -1,8 +1,12 @@
 master
 ------
 
+Changes (non-breaking)
+
 - Previously, jsonpointer::get returned values (copies)
   Now, jsonpointer::get returns references if applied to `basic_json`, and values if applied to `cbor_view`
+
+- `bignum_chars_format::string` has been deprecated (still works) and replaced with `bignum_chars_format::string`
 
 v0.107.2
 --------

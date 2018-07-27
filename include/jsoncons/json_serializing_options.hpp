@@ -79,7 +79,11 @@ enum class block_options {next_line,same_line};
 
 enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
 
-enum class bignum_chars_format : uint8_t {integer,string,base64url};
+enum class bignum_chars_format : uint8_t {integer,base10,base64url
+#if !defined(JSONCONS_NO_DEPRECATED)
+,string
+#endif
+};
 
 enum class byte_string_chars_format : uint8_t {base64,base64url};
 
@@ -128,7 +132,7 @@ public:
           escape_all_non_ascii_(false),
           escape_solidus_(false),
           byte_string_format_(byte_string_chars_format::base64url),
-          bignum_format_(bignum_chars_format::string),
+          bignum_format_(bignum_chars_format::base10),
           object_object_split_lines_(line_split_kind::multi_line),
           object_array_split_lines_(line_split_kind::same_line),
           array_array_split_lines_(line_split_kind::new_line),

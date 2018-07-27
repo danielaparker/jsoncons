@@ -672,7 +672,7 @@ std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string
                 auto p = std::find(base64_alphabet,alphabet_end,a4[i]);
                 if (p == alphabet_end)
                 {
-                    a4[i] = static_cast<uint8_t>(std::string::npos);
+                    a4[i] = 0xff;
                 }
                 else
                 {
@@ -699,7 +699,7 @@ std::vector<uint8_t> decode_base64(const std::basic_string<CharT>& base64_string
             auto p = std::find(base64_alphabet,alphabet_end,a4[j]);
             if (p == alphabet_end)
             {
-                a4[j] = static_cast<uint8_t>(std::string::npos);
+                a4[j] = 0xff;
             }
             else
             {

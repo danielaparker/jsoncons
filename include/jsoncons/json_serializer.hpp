@@ -487,7 +487,7 @@ private:
             case byte_string_chars_format::base64url:
             {
                 std::basic_string<CharT> s;
-                encode_base64url(data,data+length,s);
+                encode_base64url(data,length,s);
                 writer_. put('\"');
                 writer_.write(s.data(),s.size());
                 writer_. put('\"');
@@ -527,7 +527,7 @@ private:
             case bignum_chars_format::base64url:
             {
                 std::basic_string<CharT> s;
-                encode_base64url(data, data + length, s);
+                encode_base64url(data, length, s);
                 if (signum == -1)
                 {
                     s.insert(s.begin(), '~');

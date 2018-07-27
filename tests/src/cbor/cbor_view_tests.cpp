@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(test_dump_to_string)
 
     std::string s2;
     json_serializing_options options2;
-    options2.bignum_format(bignum_chars_format::string);
+    options2.bignum_format(bignum_chars_format::base10);
     bv.dump(s2,options2);
     BOOST_CHECK_EQUAL("[\"-18446744073709551617\"]",s2.c_str());
     //std::cout << s2 << std::endl;
@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE(test_dump_to_stream)
 
     std::ostringstream os2;
     json_serializing_options options2;
-    options2.bignum_format(bignum_chars_format::string);
+    options2.bignum_format(bignum_chars_format::base10);
     bv.dump(os2,options2);
     BOOST_CHECK_EQUAL("[\"-18446744073709551617\"]",os2.str().c_str());
     //std::cout << os2.str() << std::endl;

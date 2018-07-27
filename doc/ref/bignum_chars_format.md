@@ -1,7 +1,7 @@
 ### jsoncons::bignum_chars_format
 
 ```c++
-enum class bignum_chars_format : uint8_t {integer, string, base64url};
+enum class bignum_chars_format : uint8_t {integer, base10, base64url};
 ```
 
 #### Header

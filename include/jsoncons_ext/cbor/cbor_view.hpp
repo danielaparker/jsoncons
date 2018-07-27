@@ -457,7 +457,7 @@ public:
                     JSONCONS_THROW(cbor_decode_error(0));
                 }
                 std::string s;
-                encode_base64url(v.begin(),v.end(),s);
+                encode_base64url(v.data(),v.size(),s);
                 return s;
             }
             case cbor_major_type::semantic_tag:
