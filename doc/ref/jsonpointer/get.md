@@ -33,36 +33,40 @@ get(const J& root, const typename J::string_view_type& path, std::error_code& ec
 
 #### Return value
 
-(1) On success, returns the selected item by reference.  
-Example:
+(1) On success, returns the selected item by reference. 
 
     json j = json::array{"baz","foo"};
     json& item = jsonpointer::get(j,"/0");
 
 (2) On success, returns the selected item by const reference.  
-Example: ```const json j = json::array{"baz","foo"};```  
-```         const json& item = jsonpointer::get(j,"/1");```
 
-(3) On success, returns the selected item by value.  
-Example: ```std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f}; // in CBOR```  
-```         cbor::cbor_view bv = b;```  
-```         cbor::cbor_view item = jsonpointer::get(bv,"/0");```
+    const json j = json::array{"baz","foo"};
+    const json& item = jsonpointer::get(j,"/1");
+
+(3) On success, returns the selected item by value.
+  
+    std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f}; // in CBOR
+    cbor::cbor_view bv = b;
+    cbor::cbor_view item = jsonpointer::get(bv,"/0");
 
 (4) On success, returns the selected item by reference, otherwise an undefined item by reference.  
-Example: ```json j = json::array{"baz","foo"};```  
-             ```std::error_code ec;```  
-             ```json& item = jsonpointer::get(j,"/1",ec);```
+
+    json j = json::array{"baz","foo"};
+    std::error_code ec;
+    json& item = jsonpointer::get(j,"/1",ec);
 
 (5) On success, returns the selected item by const reference, otherwise an undefined item by const reference.  
-    Example: ```const json j = json::array{"baz","foo"};```  
-             ```std::error_code ec;```  
-             ```const json& item = jsonpointer::get(j,"/0",ec);```
+
+    const json j = json::array{"baz","foo"};
+    std::error_code ec;
+    const json& item = jsonpointer::get(j,"/0",ec);
 
 (6) On success, returns the selected item by value, otherwise an undefined item by value.  
-    Example: ```std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f}; // in CBOR```  
-             ```cbor::cbor_view bv = b;```  
-             ```std::error_code ec;```  
-             ```cbor::cbor_view item = jsonpointer::get(bv,"/1",ec);```  
+
+    std::vector<uint8_t> b = {0x82,0x63,0x62,0x61,0x7a,0x63,0x66,0x6f,0x6f}; // in CBOR
+    cbor::cbor_view bv = b;
+    std::error_code ec; 
+    cbor::cbor_view item = jsonpointer::get(bv,"/1",ec);
 
 ### Exceptions
 
