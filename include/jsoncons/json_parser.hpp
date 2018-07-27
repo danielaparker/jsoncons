@@ -69,7 +69,6 @@ public:
             this->downstream_handler().string_value(s, context);
         }
     }
-
 };
 
 }
