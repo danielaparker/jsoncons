@@ -1,3 +1,9 @@
+master
+------
+
+- Previously, jsonpointer::get returned values (copies)
+  Now, jsonpointer::get returns references if applied to `basic_json`, and values if applied to `cbor_view`
+
 v0.107.2
 --------
 
