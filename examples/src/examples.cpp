@@ -30,6 +30,7 @@ void jsonpointer_examples();
 void jsonpatch_examples();
 void cbor_examples();
 void json_convert_examples();
+void json_parser_examples();
 
 void comment_example()
 {
@@ -547,6 +548,8 @@ int main()
         readme_examples();
 
         serialization_examples();
+
+        json_parser_examples();
     }
     catch (const std::exception& e)
     {

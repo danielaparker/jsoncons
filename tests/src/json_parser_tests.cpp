@@ -254,6 +254,28 @@ BOOST_AUTO_TEST_CASE(test_array_string)
     json j = decoder.get_result();
 }
 
+BOOST_AUTO_TEST_CASE(test_incremental_parsing)
+{
+    jsoncons::json_decoder<json> decoder;
+    json_parser parser(decoder);
+
+    parser.reset();
+
+    parser.update("[fal",4);
+    parser.parse_some();
+    BOOST_CHECK(!parser.done());
+    BOOST_CHECK(parser.source_exhausted());
+    parser.update("se]",3);
+    parser.parse_some();
+
+    parser.end_parse();
+    BOOST_CHECK(parser.done());
+
+    json j = decoder.get_result();
+    BOOST_REQUIRE(j.is_array());
+    BOOST_CHECK(!j[0].as<bool>());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 

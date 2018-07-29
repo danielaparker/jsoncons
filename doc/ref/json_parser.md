@@ -3,7 +3,7 @@
 ```c++
 typedef basic_json_parser<char> json_parser
 ```
-`json_parser` is an incremental json parser.
+`json_parser` is an incremental json parser. It can be fed its input in chunks.
 
 `json_parser` is noncopyable and nonmoveable.
 
@@ -15,16 +15,16 @@ typedef basic_json_parser<char> json_parser
 
     json_parser(); // (1)
 
-    json_parser(parse_error_handler& err_handler); // (2)
+    json_parser(const json_serializing_options& options); // (2)
 
-    json_parser(json_content_handler& handler); // (3)
-
-    json_parser(json_content_handler& handler,
-                parse_error_handler& err_handler); // (4)
-
-    json_parser(const json_serializing_options& options); // (5)
+    json_parser(parse_error_handler& err_handler); // (3)
 
     json_parser(const json_serializing_options& options, 
+                parse_error_handler& err_handler); // (4)
+
+    json_parser(json_content_handler& handler); // (5)
+
+    json_parser(json_content_handler& handler,
                 parse_error_handler& err_handler); // (6)
 
     json_parser(json_content_handler& handler,
@@ -43,6 +43,7 @@ You must ensure that the input stream, input handler, and error handler exist as
 #### Member functions
 
     void update(const char* data, size_t length)
+Update the parser with a chunk of JSON
 
     bool done() const
 Returns `true` when the parser has consumed a complete json text, `false` otherwise
@@ -58,6 +59,14 @@ Throws [parse_error](parse_error.md) if parsing fails.
 Parses the source until a complete json text has been consumed or the source has been exhausted.
 Sets a `std::error_code` if parsing fails.
 
+    void end_parse()
+Called after there is no more input
+Throws [parse_error](parse_error.md) if parsing fails.
+
+    void end_parse(std::error_code& ec)
+Called after there is no more input
+Sets a `std::error_code` if parsing fails.
+
     void skip_bom()
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Throws [parse_error](parse_error.md) if parsing fails.
@@ -66,46 +75,61 @@ Throws [parse_error](parse_error.md) if parsing fails.
 Throws if there are any unconsumed non-whitespace characters in the input.
 Throws [parse_error](parse_error.md) if parsing fails.
 
-    size_t max_nesting_depth() const
-By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
+    void check_done(std::error_code& ec)
+Sets a `std::error_code` if there are any unconsumed non-whitespace characters in the input.
 
-    void max_nesting_depth(size_t depth)
+    size_t reset() const
+Resets the state of the parser to it's initial state
 
 ### Examples
 
+#### Incremental parsing 
 
-#### Reading a sequence of JSON texts from a stream
-
-`jsoncons` supports reading a sequence of JSON texts, such as shown below (`json-texts.json`):
-```json
-{"a":1,"b":2,"c":3}
-{"a":4,"b":5,"c":6}
-{"a":7,"b":8,"c":9}
-```
-This is the code that reads them: 
 ```c++
-std::ifstream is("json-texts.json");
-if (!is.is_open())
-{
-    throw std::runtime_error("Cannot open file");
-}
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_parser.hpp>
 
-json_decoder<json> decoder;
-json_parser reader(is,decoder);
+using namespace jsoncons;
 
-while (!reader.eof())
+int main()
 {
-    reader.read_next();
-    if (!reader.eof())
+    jsoncons::json_decoder<json> decoder;
+    json_parser parser(decoder);
+    try
     {
-        json val = decoder.get_result();
-        std::cout << val << std::endl;
+        parser.update("[fal",4);
+        parser.parse_some();
+
+        std::cout << "(1) done: " << std::boolalpha << parser.done() << "\n";
+        std::cout << "(2) source_exhausted: " << std::boolalpha << parser.source_exhausted() << "\n\n";
+
+        parser.update("se]",3);
+
+        parser.parse_some();
+
+        std::cout << "(3) done: " << std::boolalpha << parser.done() << "\n";
+        std::cout << "(4) source_exhausted: " << std::boolalpha << parser.source_exhausted() << "\n\n";
+
+        parser.end_parse();
+
+        json j = decoder.get_result();
+        std::cout << "(5) " << j << "\n";
+    }
+    catch (const parse_error& e)
+    {
+        std::cout << e.what() << std::endl;
     }
 }
 ```
+
 Output:
-```json
-{"a":1,"b":2,"c":3}
-{"a":4,"b":5,"c":6}
-{"a":7,"b":8,"c":9}
+
+```
+(1) done: false
+(2) source_exhausted: true
+
+(3) done: true
+(4) source_exhausted: true
+
+(5) [false]
 ```
