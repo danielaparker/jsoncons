@@ -86,34 +86,25 @@ Resets the state of the parser to it's initial state
 #### Incremental parsing 
 
 ```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons/json_parser.hpp>
-
-using namespace jsoncons;
-
 int main()
 {
     jsoncons::json_decoder<json> decoder;
     json_parser parser(decoder);
     try
     {
-        parser.update("[fal",4);
+        parser.update("10",2);
         parser.parse_some();
+        std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        std::cout << "(1) done: " << std::boolalpha << parser.done() << "\n";
-        std::cout << "(2) source_exhausted: " << std::boolalpha << parser.source_exhausted() << "\n\n";
-
-        parser.update("se]",3);
-
+        parser.update(".5",2);
         parser.parse_some();
-
-        std::cout << "(3) done: " << std::boolalpha << parser.done() << "\n";
-        std::cout << "(4) source_exhausted: " << std::boolalpha << parser.source_exhausted() << "\n\n";
+        std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.end_parse();
+        std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         json j = decoder.get_result();
-        std::cout << "(5) " << j << "\n";
+        std::cout << "(4) " << j << "\n";
     }
     catch (const parse_error& e)
     {
@@ -125,11 +116,11 @@ int main()
 Output:
 
 ```
-(1) done: false
-(2) source_exhausted: true
+(1) done: false, source_exhausted: true
 
-(3) done: true
-(4) source_exhausted: true
+(2) done: false, source_exhausted: true
 
-(5) [false]
+(3) done: true, source_exhausted: true
+
+(4) 10.5
 ```
