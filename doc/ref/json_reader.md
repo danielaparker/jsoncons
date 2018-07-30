@@ -16,39 +16,44 @@ A `json_reader` can read a sequence of JSON texts from a stream.
     json_reader(std::istream& is); // (1)
 
     json_reader(std::istream& is, 
-                parse_error_handler& err_handler); // (2)
+                const json_read_options& options); // (2)
 
     json_reader(std::istream& is, 
-                basic_json_content_handler<CharT>& handler); // (3)
-
-    json_reader(std::istream& is,
-                json_content_handler& handler,
-                parse_error_handler& err_handler); // (4)
-
-    json_reader(std::istream& is, 
-                const json_read_options& options); // (5)
+                parse_error_handler& err_handler); // (3)
 
     json_reader(std::istream& is, 
                 const json_read_options& options,
-                parse_error_handler& err_handler); // (6)
+                parse_error_handler& err_handler); // (4)
+
+    json_reader(std::istream& is, 
+                basic_json_content_handler<CharT>& handler); // (5)
 
     json_reader(std::istream& is, 
                 json_content_handler& handler,
-                const json_read_options& options); // (7)
+                const json_read_options& options); // (6)
+
+    json_reader(std::istream& is,
+                json_content_handler& handler,
+                parse_error_handler& err_handler); // (7)
 
     json_reader(std::istream& is,
                 json_content_handler& handler, 
                 const json_read_options& options,
                 parse_error_handler& err_handler); // (8)
 
+
+Constructors (1)-(4) use a default [json_content_handler](json_content_handler.md) that discards the JSON parse events, and are for validation only.
+
 (1) Constructs a `json_reader` that reads from an input stream `is` of JSON text.
 
-(2) Constructs a `json_reader` that reads from an input stream `is` of JSON text and handles errors with the specified [parse_error_handler](parse_error_handler.md).
+(3) Constructs a `json_reader` that reads from an input stream `is` of JSON text and handles errors with the specified [parse_error_handler](parse_error_handler.md).
 
-(3) Constructs a `json_reader` that reads from an input stream `is` of JSON text, writes to a [json_content_handler](json_content_handler.md), default deserializing options, and a [default_parse_error_handler](default_parse_error_handler.md).
+Constructors (5)-(8) take a user supplied [json_content_handler](json_content_handler.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
+
+(5) Constructs a `json_reader` that reads from an input stream `is` of JSON text, writes to a [json_content_handler](json_content_handler.md), default deserializing options, and a [default_parse_error_handler](default_parse_error_handler.md).
 You must ensure that the input stream and input handler exist as long as does `json_reader`, as `json_reader` holds pointers to does not own these objects.
 
-(4) Constructs a `json_reader` that reads from an input stream `is` of JSON text, writes to a [json_content_handler](json_content_handler.md), and handles errors wth the specified [parse_error_handler](parse_error_handler.md).
+(6) Constructs a `json_reader` that reads from an input stream `is` of JSON text, writes to a [json_content_handler](json_content_handler.md), and handles errors wth the specified [parse_error_handler](parse_error_handler.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `json_reader`, as `json_reader` holds pointers to but does not own these objects.
 
 #### Member functions
