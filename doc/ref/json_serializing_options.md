@@ -9,9 +9,13 @@ The default floating point formatting for a floating point value that was previo
 
 The default floating point formatting for a floating point value that was directly inserted into a json value is [chars_format::general](chars_format.md) with shortest representation. Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
-<svg width="400" height="110">
-  <rect width="300" height="100" style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)" />
-</svg>
+<div class="t-inheritance-diagram">
+<div class="center"><div class="noresize" style="height: 99px; width: 686px; "><map name="ImageMap_1_966068046"><area href="/w/cpp/io/ios_base" shape="rect" coords="5,33,107,66" alt="cpp/io/ios base" title="cpp/io/ios base"/><area href="/w/cpp/io/basic_ios" shape="rect" coords="135,31,252,69" alt="cpp/io/basic ios" title="cpp/io/basic ios"/><area href="/w/cpp/io/basic_istream" shape="rect" coords="278,4,395,42" alt="cpp/io/basic istream" title="cpp/io/basic istream"/><area href="/w/cpp/io/basic_ostream" shape="rect" coords="278,58,395,96" alt="cpp/io/basic ostream" title="cpp/io/basic ostream"/><area href="/w/cpp/io/basic_iostream" shape="rect" coords="422,31,539,69" alt="cpp/io/basic iostream" title="cpp/io/basic iostream"/></map><img alt="std-basic fstream-inheritance.svg" src="http://upload.cppreference.com/mwiki/images/f/f1/std-basic_fstream-inheritance.svg" width="686" height="99" usemap="#ImageMap_1_966068046"/><div style="margin-left: 666px; margin-top: -20px; text-align: left;"><a href="/w/File:std-basic_fstream-inheritance.svg" title="About this image"><img alt="About this image" src="/mwiki/extensions/ImageMap/desc-20.png" style="border: none;"/></a></div></div></div>
+<div style="text-align:center;">
+<p><span style="font-size:0.7em; line-height:130%">Inheritance diagram</span>
+</p>
+</div>
+</div>
 
 #### Header
 ```c++
