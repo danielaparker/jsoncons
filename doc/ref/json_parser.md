@@ -50,21 +50,23 @@ and a specified [parse_error_handler](parse_error_handler.md).
 
 Constructors (5)-(8) take a user supplied [json_content_handler](json_content_handler.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
 
-(5) Constructs a `json_parser` that feeds JSON parse events to the specified 
+(5) Constructs a `json_parser` that emits JSON parse events to the specified 
 [json_content_handler](json_content_handler.md), and uses default [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(6) Constructs a `json_parser` that feeds JSON parse events to the specified [json_content_handler](json_content_handler.md) 
+(6) Constructs a `json_parser` that emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
 and uses the specified [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(7) Constructs a `json_parser` that feeds JSON parse events to the specified [json_content_handler](json_content_handler.md) 
+(7) Constructs a `json_parser` that emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
 and uses default [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(8) Constructs a `json_parser` that feeds JSON parse events to the specified [json_content_handler](json_content_handler.md) and
+(8) Constructs a `json_parser` that emits JSON parse events to the specified [json_content_handler](json_content_handler.md) and
 uses the specified [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
+
+Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any content handler and error handler passed in the constuctor.
 
 #### Member functions
 
