@@ -1,6 +1,6 @@
-### jsoncons::json_parser_errc
+### jsoncons::json_parse_errc
 
-The constant integer values scoped by `jsoncons::json_parser_errc` define the values for json text error codes.
+The constant integer values scoped by `jsoncons::json_parse_errc` define the values for json text error codes.
 
 #### Header
 

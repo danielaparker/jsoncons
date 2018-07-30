@@ -26,7 +26,7 @@ private:
     bool do_error(std::error_code ec,
                   const serializing_context&) JSONCONS_NOEXCEPT override
     {
-        if (ec == jsoncons::json_parser_errc::extra_comma)
+        if (ec == jsoncons::json_parse_errc::extra_comma)
         {
             return false;
         }

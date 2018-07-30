@@ -1826,7 +1826,7 @@ public:
                 uint64_t val = detail::get_uinteger(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -1847,7 +1847,7 @@ public:
                 int64_t val = detail::get_integer(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -1861,7 +1861,7 @@ public:
                 std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -1876,7 +1876,7 @@ public:
                 std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -1910,7 +1910,7 @@ public:
                 double val = detail::get_double(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -1929,7 +1929,7 @@ public:
                 std::vector<uint8_t> v = detail::get_byte_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -1950,7 +1950,7 @@ public:
                 std::string s = detail::get_text_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -1977,7 +1977,7 @@ public:
                 const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -1996,7 +1996,7 @@ public:
                 const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -2015,7 +2015,7 @@ public:
                 const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -2034,7 +2034,7 @@ public:
                 const auto len = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -2084,7 +2084,7 @@ public:
                 const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -2103,7 +2103,7 @@ public:
                 const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -2122,7 +2122,7 @@ public:
                 const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -2141,7 +2141,7 @@ public:
                 const auto len = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -2179,7 +2179,7 @@ public:
 
         default:
             {
-                ec = cbor_parser_errc::source_error;
+                ec = cbor_parse_errc::source_error;
                 return;
             }
         }
@@ -2206,7 +2206,7 @@ private:
                 std::string s = detail::get_text_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parser_errc::unexpected_eof;
+                    ec = cbor_parse_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -2214,7 +2214,7 @@ private:
             }
             break;
         default:
-            ec = cbor_parser_errc::source_error;
+            ec = cbor_parse_errc::source_error;
             return;
         }
     }

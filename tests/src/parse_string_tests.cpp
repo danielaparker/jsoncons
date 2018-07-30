@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string2)
     //{
         std::istringstream is(input);
         json_decoder<json> decoder;
-        lenient_error_handler err_handler(json_parser_errc::illegal_character_in_string);
+        lenient_error_handler err_handler(json_parse_errc::illegal_character_in_string);
         try
         {
             json_reader reader(is, decoder, err_handler);

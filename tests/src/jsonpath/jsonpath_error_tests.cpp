@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(test_dot_star_name)
 BOOST_AUTO_TEST_CASE(test_filter_error)
 {
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$..book[?(.price<10)]", json_parser_errc::invalid_json_text,1,17);
+    test_error_code(root, "$..book[?(.price<10)]", json_parse_errc::invalid_json_text,1,17);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

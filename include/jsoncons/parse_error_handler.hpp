@@ -121,7 +121,7 @@ private:
     bool do_error(std::error_code code,
                   const serializing_context&) JSONCONS_NOEXCEPT override
     {
-        static const std::error_code illegal_comment = make_error_code(json_parser_errc::illegal_comment);
+        static const std::error_code illegal_comment = make_error_code(json_parse_errc::illegal_comment);
 
         if (code == illegal_comment)
         {

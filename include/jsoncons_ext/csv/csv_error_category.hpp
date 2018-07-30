@@ -12,7 +12,7 @@
 
 namespace jsoncons { namespace csv {
 
-    enum class csv_parser_errc : int
+    enum class csv_parse_errc : int
     {
         ok = 0,
         unexpected_eof = 1,
@@ -20,6 +20,10 @@ namespace jsoncons { namespace csv {
         invalid_csv_text = 3,
         invalid_state = 4
     };
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef csv_parse_errc csv_parser_errc;
+#endif
 
 class csv_error_category_impl
    : public std::error_category
@@ -31,13 +35,13 @@ public:
     }
     virtual std::string message(int ev) const
     {
-        switch (static_cast<csv_parser_errc>(ev))
+        switch (static_cast<csv_parse_errc>(ev))
         {
-        case csv_parser_errc::unexpected_eof:
+        case csv_parse_errc::unexpected_eof:
             return "Unexpected end of file";
-        case csv_parser_errc::expected_quote:
+        case csv_parse_errc::expected_quote:
             return "Expected quote character";
-        case csv_parser_errc::invalid_csv_text:
+        case csv_parse_errc::invalid_csv_text:
             return "Invalid CSV text";
         default:
             return "Unknown JSON parser error";
@@ -53,7 +57,7 @@ const std::error_category& csv_error_category()
 }
 
 inline 
-std::error_code make_error_code(csv_parser_errc result)
+std::error_code make_error_code(csv_parse_errc result)
 {
     return std::error_code(static_cast<int>(result),csv_error_category());
 }
@@ -62,7 +66,7 @@ std::error_code make_error_code(csv_parser_errc result)
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::csv::csv_parser_errc> : public true_type
+    struct is_error_code_enum<jsoncons::csv::csv_parse_errc> : public true_type
     {
     };
 }

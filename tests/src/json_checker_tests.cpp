@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_fail2)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::unexpected_eof);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::unexpected_eof);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail3)
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_fail3)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_name);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_name);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail4)
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(test_fail4)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::extra_comma);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_comma);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail5)
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(test_fail5)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail6)
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_fail6)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail7)
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(test_fail7)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::extra_character);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_character);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail8)
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(test_fail8)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::extra_character);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_character);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail9)
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(test_fail9)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::extra_comma);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_comma);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail10)
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(test_fail10)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::extra_character);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_character);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail11)
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(test_fail11)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_comma_or_right_brace);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_brace);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail12)
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(test_fail12)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail13)
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(test_fail13)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::leading_zero);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::leading_zero);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail14)
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE(test_fail14)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::invalid_number);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::invalid_number);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail15)
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE(test_fail15)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::illegal_escaped_character);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail16)
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(test_fail16)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail17)
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE(test_fail17)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::illegal_escaped_character);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail18)
@@ -362,7 +362,7 @@ BOOST_AUTO_TEST_CASE(test_fail18)
          err = e.code();
          //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::max_depth_exceeded);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::max_depth_exceeded);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail19)
@@ -382,7 +382,7 @@ BOOST_AUTO_TEST_CASE(test_fail19)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_colon);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_colon);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail20)
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(test_fail20)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail21)
@@ -422,7 +422,7 @@ BOOST_AUTO_TEST_CASE(test_fail21)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_colon);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_colon);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail22)
@@ -442,7 +442,7 @@ BOOST_AUTO_TEST_CASE(test_fail22)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_comma_or_right_bracket);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_bracket);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail23)
@@ -462,7 +462,7 @@ BOOST_AUTO_TEST_CASE(test_fail23)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::invalid_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::invalid_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail24)
@@ -483,7 +483,7 @@ BOOST_AUTO_TEST_CASE(test_fail24)
         //std::cout << in_file << " " << e.what() << std::endl;
     }
     // Single quote
-    BOOST_CHECK(err == jsoncons::json_parser_errc::single_quote);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::single_quote);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail25)
@@ -503,7 +503,7 @@ BOOST_AUTO_TEST_CASE(test_fail25)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::illegal_character_in_string);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_character_in_string);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail26)
@@ -523,7 +523,7 @@ BOOST_AUTO_TEST_CASE(test_fail26)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::illegal_escaped_character);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail27)
@@ -543,7 +543,7 @@ BOOST_AUTO_TEST_CASE(test_fail27)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::illegal_character_in_string);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_character_in_string);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail28)
@@ -563,7 +563,7 @@ BOOST_AUTO_TEST_CASE(test_fail28)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::illegal_escaped_character);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail29)
@@ -583,7 +583,7 @@ BOOST_AUTO_TEST_CASE(test_fail29)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail30)
@@ -603,7 +603,7 @@ BOOST_AUTO_TEST_CASE(test_fail30)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail31)
@@ -623,7 +623,7 @@ BOOST_AUTO_TEST_CASE(test_fail31)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_value);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail32)
@@ -643,7 +643,7 @@ BOOST_AUTO_TEST_CASE(test_fail32)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::unexpected_eof);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::unexpected_eof);
 }
 
 BOOST_AUTO_TEST_CASE(test_fail33)
@@ -663,7 +663,7 @@ BOOST_AUTO_TEST_CASE(test_fail33)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parser_errc::expected_comma_or_right_bracket);
+    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_bracket);
 }
 
 BOOST_AUTO_TEST_CASE(test_pass1)

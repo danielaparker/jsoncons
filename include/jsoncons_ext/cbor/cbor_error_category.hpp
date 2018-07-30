@@ -12,12 +12,16 @@
 
 namespace jsoncons { namespace cbor {
 
-    enum class cbor_parser_errc
+    enum class cbor_parse_errc
     {
         ok = 0,
         unexpected_eof = 1,
         source_error
     };
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef cbor_parse_errc cbor_parser_errc;
+#endif
 
 class cbor_error_category_impl
    : public std::error_category
@@ -29,11 +33,11 @@ public:
     }
     virtual std::string message(int ev) const
     {
-        switch (static_cast<cbor_parser_errc>(ev))
+        switch (static_cast<cbor_parse_errc>(ev))
         {
-        case cbor_parser_errc::unexpected_eof:
+        case cbor_parse_errc::unexpected_eof:
             return "Unexpected end of file";
-        case cbor_parser_errc::source_error:
+        case cbor_parse_errc::source_error:
             return "Source error";
        default:
             return "Unknown CBOR parser error";
@@ -49,7 +53,7 @@ const std::error_category& cbor_error_category()
 }
 
 inline 
-std::error_code make_error_code(cbor_parser_errc result)
+std::error_code make_error_code(cbor_parse_errc result)
 {
     return std::error_code(static_cast<int>(result),cbor_error_category());
 }
@@ -59,7 +63,7 @@ std::error_code make_error_code(cbor_parser_errc result)
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::cbor::cbor_parser_errc> : public true_type
+    struct is_error_code_enum<jsoncons::cbor::cbor_parse_errc> : public true_type
     {
     };
 }

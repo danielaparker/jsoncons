@@ -12,7 +12,7 @@
 
 namespace jsoncons {
 
-    enum class json_parser_errc
+    enum class json_parse_errc
     {
         ok = 0,
         unexpected_eof = 1,
@@ -46,6 +46,10 @@ namespace jsoncons {
         unpaired_high_surrogate
     };
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef json_parse_errc json_parser_errc;
+#endif
+
 class json_error_category_impl
    : public std::error_category
 {
@@ -56,65 +60,65 @@ public:
     }
     virtual std::string message(int ev) const
     {
-        switch (static_cast<json_parser_errc>(ev))
+        switch (static_cast<json_parse_errc>(ev))
         {
-        case json_parser_errc::unexpected_eof:
+        case json_parse_errc::unexpected_eof:
             return "Unexpected end of file";
-        case json_parser_errc::source_error:
+        case json_parse_errc::source_error:
             return "Source error";
-        case json_parser_errc::invalid_json_text:
+        case json_parse_errc::invalid_json_text:
             return "Invalid JSON text";
-        case json_parser_errc::extra_character:
+        case json_parse_errc::extra_character:
             return "Unexpected non-whitespace character after JSON text";
-        case json_parser_errc::max_depth_exceeded:
+        case json_parse_errc::max_depth_exceeded:
             return "Maximum JSON depth exceeded";
-        case json_parser_errc::single_quote:
+        case json_parse_errc::single_quote:
             return "JSON strings cannot be quoted with single quotes";
-        case json_parser_errc::illegal_character_in_string:
+        case json_parse_errc::illegal_character_in_string:
             return "Illegal character in string";
-        case json_parser_errc::extra_comma:
+        case json_parse_errc::extra_comma:
             return "Extra comma";
-        case json_parser_errc::expected_name:
+        case json_parse_errc::expected_name:
             return "Expected object member name";
-        case json_parser_errc::expected_value:
+        case json_parse_errc::expected_value:
             return "Expected value";
-        case json_parser_errc::invalid_value:
+        case json_parse_errc::invalid_value:
             return "Invalid value";
-        case json_parser_errc::expected_colon:
+        case json_parse_errc::expected_colon:
             return "Expected name separator ':'";
-        case json_parser_errc::illegal_control_character:
+        case json_parse_errc::illegal_control_character:
             return "Illegal control character in string";
-        case json_parser_errc::illegal_escaped_character:
+        case json_parse_errc::illegal_escaped_character:
             return "Illegal escaped character in string";
-        case json_parser_errc::expected_codepoint_surrogate_pair:
+        case json_parse_errc::expected_codepoint_surrogate_pair:
             return "Invalid codepoint, expected another \\u token to begin the second half of a codepoint surrogate pair.";
-        case json_parser_errc::invalid_hex_escape_sequence:
+        case json_parse_errc::invalid_hex_escape_sequence:
             return "Invalid codepoint, expected hexadecimal digit.";
-        case json_parser_errc::invalid_unicode_escape_sequence:
+        case json_parse_errc::invalid_unicode_escape_sequence:
             return "Invalid codepoint, expected four hexadecimal digits.";
-        case json_parser_errc::leading_zero:
+        case json_parse_errc::leading_zero:
             return "A number cannot have a leading zero";
-        case json_parser_errc::invalid_number:
+        case json_parse_errc::invalid_number:
             return "Invalid number";
-        case json_parser_errc::expected_comma_or_right_brace:
+        case json_parse_errc::expected_comma_or_right_brace:
             return "Expected comma or right brace '}'";
-        case json_parser_errc::expected_comma_or_right_bracket:
+        case json_parse_errc::expected_comma_or_right_bracket:
             return "Expected comma or right bracket ']'";
-        case json_parser_errc::unexpected_right_brace:
+        case json_parse_errc::unexpected_right_brace:
             return "Unexpected right brace '}'";
-        case json_parser_errc::unexpected_right_bracket:
+        case json_parse_errc::unexpected_right_bracket:
             return "Unexpected right bracket ']'";
-        case json_parser_errc::illegal_comment:
+        case json_parse_errc::illegal_comment:
             return "Illegal comment";
-        case json_parser_errc::expected_continuation_byte:
+        case json_parse_errc::expected_continuation_byte:
             return "Expected continuation byte";
-        case json_parser_errc::over_long_utf8_sequence:
+        case json_parse_errc::over_long_utf8_sequence:
             return "Over long UTF-8 sequence";
-        case json_parser_errc::illegal_codepoint:
+        case json_parse_errc::illegal_codepoint:
             return "Illegal codepoint (>= 0xd800 && <= 0xdfff)";
-        case json_parser_errc::illegal_surrogate_value:
+        case json_parse_errc::illegal_surrogate_value:
             return "UTF-16 surrogate values are illegal in UTF-32";
-        case json_parser_errc::unpaired_high_surrogate:
+        case json_parse_errc::unpaired_high_surrogate:
             return "Expected low surrogate following the high surrogate";
        default:
             return "Unknown JSON parser error";
@@ -130,7 +134,7 @@ const std::error_category& json_error_category()
 }
 
 inline 
-std::error_code make_error_code(json_parser_errc result)
+std::error_code make_error_code(json_parse_errc result)
 {
     return std::error_code(static_cast<int>(result),json_error_category());
 }
@@ -140,7 +144,7 @@ std::error_code make_error_code(json_parser_errc result)
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::json_parser_errc> : public true_type
+    struct is_error_code_enum<jsoncons::json_parse_errc> : public true_type
     {
     };
 }

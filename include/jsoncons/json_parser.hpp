@@ -321,9 +321,9 @@ public:
     {
         if (++nesting_depth_ > max_nesting_depth_)
         {
-            if (err_handler_.error(json_parser_errc::max_depth_exceeded, *this))
+            if (err_handler_.error(json_parse_errc::max_depth_exceeded, *this))
             {
-                ec = json_parser_errc::max_depth_exceeded;
+                ec = json_parse_errc::max_depth_exceeded;
                 return;
             }
         } 
@@ -343,14 +343,14 @@ public:
         }
         else if (state_ == parse_state::array)
         {
-            err_handler_.fatal_error(json_parser_errc::expected_comma_or_right_bracket, *this);
-            ec = json_parser_errc::expected_comma_or_right_bracket;
+            err_handler_.fatal_error(json_parse_errc::expected_comma_or_right_bracket, *this);
+            ec = json_parse_errc::expected_comma_or_right_bracket;
             return;
         }
         else
         {
-            err_handler_.fatal_error(json_parser_errc::unexpected_right_brace, *this);
-            ec = json_parser_errc::unexpected_right_brace;
+            err_handler_.fatal_error(json_parse_errc::unexpected_right_brace, *this);
+            ec = json_parse_errc::unexpected_right_brace;
             return;
         }
 
@@ -369,9 +369,9 @@ public:
     {
         if (++nesting_depth_ > max_nesting_depth_)
         {
-            if (err_handler_.error(json_parser_errc::max_depth_exceeded, *this))
+            if (err_handler_.error(json_parse_errc::max_depth_exceeded, *this))
             {
-                ec = json_parser_errc::max_depth_exceeded;
+                ec = json_parse_errc::max_depth_exceeded;
                 return;
             }
 
@@ -392,14 +392,14 @@ public:
         }
         else if (state_ == parse_state::object)
         {
-            err_handler_.fatal_error(json_parser_errc::expected_comma_or_right_brace, *this);
-            ec = json_parser_errc::expected_comma_or_right_brace;
+            err_handler_.fatal_error(json_parse_errc::expected_comma_or_right_brace, *this);
+            ec = json_parse_errc::expected_comma_or_right_brace;
             return;
         }
         else
         {
-            err_handler_.fatal_error(json_parser_errc::unexpected_right_bracket, *this);
-            ec = json_parser_errc::unexpected_right_bracket;
+            err_handler_.fatal_error(json_parse_errc::unexpected_right_bracket, *this);
+            ec = json_parse_errc::unexpected_right_bracket;
             return;
         }
         if (parent() == parse_state::root)
@@ -438,9 +438,9 @@ public:
     {
         if (state_ != parse_state::done)
         {
-            if (err_handler_.error(json_parser_errc::unexpected_eof, *this))
+            if (err_handler_.error(json_parse_errc::unexpected_eof, *this))
             {
-                ec = json_parser_errc::unexpected_eof;
+                ec = json_parse_errc::unexpected_eof;
                 return;
             }
         }
@@ -455,9 +455,9 @@ public:
             case ' ':
                 break;
             default:
-                if (err_handler_.error(json_parser_errc::extra_character, *this))
+                if (err_handler_.error(json_parse_errc::extra_character, *this))
                 {
-                    ec = json_parser_errc::extra_character;
+                    ec = json_parse_errc::extra_character;
                     return;
                 }
                 break;
@@ -498,9 +498,9 @@ public:
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                            if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                            if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                             {
-                                ec = json_parser_errc::illegal_control_character;
+                                ec = json_parse_errc::illegal_control_character;
                                 return;
                             }
                             break;
@@ -585,16 +585,16 @@ public:
                             if (ec) {return;}
                             break;
                         case '}':
-                            err_handler_.fatal_error(json_parser_errc::unexpected_right_brace, *this);
-                            ec = json_parser_errc::unexpected_right_brace;
+                            err_handler_.fatal_error(json_parse_errc::unexpected_right_brace, *this);
+                            ec = json_parse_errc::unexpected_right_brace;
                             return;
                         case ']':
-                            err_handler_.fatal_error(json_parser_errc::unexpected_right_bracket, *this);
-                            ec = json_parser_errc::unexpected_right_bracket;
+                            err_handler_.fatal_error(json_parse_errc::unexpected_right_bracket, *this);
+                            ec = json_parse_errc::unexpected_right_bracket;
                             return;
                         default:
-                            err_handler_.fatal_error(json_parser_errc::invalid_json_text, *this);
-                            ec = json_parser_errc::invalid_json_text;
+                            err_handler_.fatal_error(json_parse_errc::invalid_json_text, *this);
+                            ec = json_parse_errc::invalid_json_text;
                             return;
                     }
                 }
@@ -605,9 +605,9 @@ public:
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                            if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                            if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                             {
-                                ec = json_parser_errc::illegal_control_character;
+                                ec = json_parse_errc::illegal_control_character;
                                 return;
                             }
                             ++input_ptr_;
@@ -655,17 +655,17 @@ public:
                         default:
                             if (parent() == parse_state::array)
                             {
-                                if (err_handler_.error(json_parser_errc::expected_comma_or_right_bracket, *this))
+                                if (err_handler_.error(json_parse_errc::expected_comma_or_right_bracket, *this))
                                 {
-                                    ec = json_parser_errc::expected_comma_or_right_bracket;
+                                    ec = json_parse_errc::expected_comma_or_right_bracket;
                                     return;
                                 }
                             }
                             else if (parent() == parse_state::object)
                             {
-                                if (err_handler_.error(json_parser_errc::expected_comma_or_right_brace, *this))
+                                if (err_handler_.error(json_parse_errc::expected_comma_or_right_brace, *this))
                                 {
-                                    ec = json_parser_errc::expected_comma_or_right_brace;
+                                    ec = json_parse_errc::expected_comma_or_right_brace;
                                     return;
                                 }
                             }
@@ -680,9 +680,9 @@ public:
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                            if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                            if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                             {
-                                ec = json_parser_errc::illegal_control_character;
+                                ec = json_parse_errc::illegal_control_character;
                                 return;
                             }
                             ++input_ptr_;
@@ -722,18 +722,18 @@ public:
                             state_ = parse_state::string_u1;
                             break;
                         case '\'':
-                            if (err_handler_.error(json_parser_errc::single_quote, *this))
+                            if (err_handler_.error(json_parse_errc::single_quote, *this))
                             {
-                                ec = json_parser_errc::single_quote;
+                                ec = json_parse_errc::single_quote;
                                 return;
                             }
                             ++input_ptr_;
                             ++column_;
                             break;
                         default:
-                            if (err_handler_.error(json_parser_errc::expected_name, *this))
+                            if (err_handler_.error(json_parse_errc::expected_name, *this))
                             {
-                                ec = json_parser_errc::expected_name;
+                                ec = json_parse_errc::expected_name;
                                 return;
                             }
                             ++input_ptr_;
@@ -747,9 +747,9 @@ public:
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                            if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                            if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                             {
-                                ec = json_parser_errc::illegal_control_character;
+                                ec = json_parse_errc::illegal_control_character;
                                 return;
                             }
                             ++input_ptr_;
@@ -783,9 +783,9 @@ public:
                             state_ = parse_state::string_u1;
                             break;
                         case '}':
-                            if (err_handler_.error(json_parser_errc::extra_comma, *this))
+                            if (err_handler_.error(json_parse_errc::extra_comma, *this))
                             {
-                                ec = json_parser_errc::extra_comma;
+                                ec = json_parse_errc::extra_comma;
                                 return;
                             }
                             end_object(ec);  // Recover
@@ -794,18 +794,18 @@ public:
                             ++column_;
                             break;
                         case '\'':
-                            if (err_handler_.error(json_parser_errc::single_quote, *this))
+                            if (err_handler_.error(json_parse_errc::single_quote, *this))
                             {
-                                ec = json_parser_errc::single_quote;
+                                ec = json_parse_errc::single_quote;
                                 return;
                             }
                             ++input_ptr_;
                             ++column_;
                             break;
                         default:
-                            if (err_handler_.error(json_parser_errc::expected_name, *this))
+                            if (err_handler_.error(json_parse_errc::expected_name, *this))
                             {
-                                ec = json_parser_errc::expected_name;
+                                ec = json_parse_errc::expected_name;
                                 return;
                             }
                             ++input_ptr_;
@@ -819,9 +819,9 @@ public:
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                            if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                            if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                             {
-                                ec = json_parser_errc::illegal_control_character;
+                                ec = json_parse_errc::illegal_control_character;
                                 return;
                             }
                             ++input_ptr_;
@@ -854,9 +854,9 @@ public:
                             ++column_;
                             break;
                         default:
-                            if (err_handler_.error(json_parser_errc::expected_colon, *this))
+                            if (err_handler_.error(json_parse_errc::expected_colon, *this))
                             {
-                                ec = json_parser_errc::expected_colon;
+                                ec = json_parse_errc::expected_colon;
                                 return;
                             }
                             ++input_ptr_;
@@ -871,9 +871,9 @@ public:
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                            if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                            if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                             {
-                                ec = json_parser_errc::illegal_control_character;
+                                ec = json_parse_errc::illegal_control_character;
                                 return;
                             }
                             ++input_ptr_;
@@ -962,9 +962,9 @@ public:
                         case ']':
                             if (parent() == parse_state::array)
                             {
-                                if (err_handler_.error(json_parser_errc::extra_comma, *this))
+                                if (err_handler_.error(json_parse_errc::extra_comma, *this))
                                 {
-                                    ec = json_parser_errc::extra_comma;
+                                    ec = json_parse_errc::extra_comma;
                                     return;
                                 }
                                 end_array(ec);  // Recover
@@ -972,9 +972,9 @@ public:
                             }
                             else
                             {
-                                if (err_handler_.error(json_parser_errc::expected_value, *this))
+                                if (err_handler_.error(json_parse_errc::expected_value, *this))
                                 {
-                                    ec = json_parser_errc::expected_value;
+                                    ec = json_parse_errc::expected_value;
                                     return;
                                 }
                             }
@@ -982,18 +982,18 @@ public:
                             ++column_;
                             break;
                         case '\'':
-                            if (err_handler_.error(json_parser_errc::single_quote, *this))
+                            if (err_handler_.error(json_parse_errc::single_quote, *this))
                             {
-                                ec = json_parser_errc::single_quote;
+                                ec = json_parse_errc::single_quote;
                                 return;
                             }
                             ++input_ptr_;
                             ++column_;
                             break;
                         default:
-                            if (err_handler_.error(json_parser_errc::expected_value, *this))
+                            if (err_handler_.error(json_parse_errc::expected_value, *this))
                             {
-                                ec = json_parser_errc::expected_value;
+                                ec = json_parse_errc::expected_value;
                                 return;
                             }
                             ++input_ptr_;
@@ -1007,9 +1007,9 @@ public:
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                            if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                            if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                             {
-                                ec = json_parser_errc::illegal_control_character;
+                                ec = json_parse_errc::illegal_control_character;
                                 return;
                             }
                             ++input_ptr_;
@@ -1102,18 +1102,18 @@ public:
                             if (ec) {return;}
                             break;
                         case '\'':
-                            if (err_handler_.error(json_parser_errc::single_quote, *this))
+                            if (err_handler_.error(json_parse_errc::single_quote, *this))
                             {
-                                ec = json_parser_errc::single_quote;
+                                ec = json_parse_errc::single_quote;
                                 return;
                             }
                             ++input_ptr_;
                             ++column_;
                             break;
                         default:
-                            if (err_handler_.error(json_parser_errc::expected_value, *this))
+                            if (err_handler_.error(json_parse_errc::expected_value, *this))
                             {
-                                ec = json_parser_errc::expected_value;
+                                ec = json_parse_errc::expected_value;
                                 return;
                             }
                             ++input_ptr_;
@@ -1157,8 +1157,8 @@ public:
                     state_ = parse_state::tr;
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 break;
@@ -1169,8 +1169,8 @@ public:
                     state_ = parse_state::tru;
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 ++input_ptr_;
@@ -1192,8 +1192,8 @@ public:
                     }
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 ++input_ptr_;
@@ -1208,8 +1208,8 @@ public:
                     state_ = parse_state::fa;
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 break;
@@ -1220,8 +1220,8 @@ public:
                     state_ = parse_state::fal;
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 ++input_ptr_;
@@ -1234,8 +1234,8 @@ public:
                     state_ = parse_state::fals;
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 ++input_ptr_;
@@ -1257,8 +1257,8 @@ public:
                     }
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 ++input_ptr_;
@@ -1273,8 +1273,8 @@ public:
                     state_ = parse_state::nu;
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 break;
@@ -1285,8 +1285,8 @@ public:
                     state_ = parse_state::nul;
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 ++input_ptr_;
@@ -1308,8 +1308,8 @@ public:
                     }
                     break;
                 default:
-                    err_handler_.error(json_parser_errc::invalid_value, *this);
-                    ec = json_parser_errc::invalid_value;
+                    err_handler_.error(json_parse_errc::invalid_value, *this);
+                    ec = json_parse_errc::invalid_value;
                     return;
                 }
                 ++input_ptr_;
@@ -1321,24 +1321,24 @@ public:
                     {
                     case '*':
                         state_ = parse_state::slash_star;
-                        if (err_handler_.error(json_parser_errc::illegal_comment, *this))
+                        if (err_handler_.error(json_parse_errc::illegal_comment, *this))
                         {
-                            ec = json_parser_errc::illegal_comment;
+                            ec = json_parse_errc::illegal_comment;
                             return;
                         }
                         break;
                     case '/':
                         state_ = parse_state::slash_slash;
-                        if (err_handler_.error(json_parser_errc::illegal_comment, *this))
+                        if (err_handler_.error(json_parse_errc::illegal_comment, *this))
                         {
-                            ec = json_parser_errc::illegal_comment;
+                            ec = json_parse_errc::illegal_comment;
                             return;
                         }
                         break;
                     default:    
-                        if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+                        if (err_handler_.error(json_parse_errc::invalid_json_text, *this))
                         {
-                            ec = json_parser_errc::invalid_json_text;
+                            ec = json_parse_errc::invalid_json_text;
                             return;
                         }
                         break;
@@ -1426,8 +1426,8 @@ public:
             }
             else
             {
-                err_handler_.error(json_parser_errc::invalid_value, *this);
-                ec = json_parser_errc::invalid_value;
+                err_handler_.error(json_parse_errc::invalid_value, *this);
+                ec = json_parse_errc::invalid_value;
                 return;
             }
         }
@@ -1460,8 +1460,8 @@ public:
             }
             else
             {
-                err_handler_.error(json_parser_errc::invalid_value, *this);
-                ec = json_parser_errc::invalid_value;
+                err_handler_.error(json_parse_errc::invalid_value, *this);
+                ec = json_parse_errc::invalid_value;
                 return;
             }
         }
@@ -1494,8 +1494,8 @@ public:
             }
             else
             {
-                err_handler_.error(json_parser_errc::invalid_value, *this);
-                ec = json_parser_errc::invalid_value;
+                err_handler_.error(json_parse_errc::invalid_value, *this);
+                ec = json_parse_errc::invalid_value;
                 return;
             }
         }
@@ -1553,8 +1553,8 @@ minus_sign:
                 ++column_;
                 goto integer;
             default:
-                err_handler_.error(json_parser_errc::expected_value, *this);
-                ec = json_parser_errc::expected_value;
+                err_handler_.error(json_parse_errc::expected_value, *this);
+                ec = json_parse_errc::expected_value;
                 return;
         }
 zero:
@@ -1630,13 +1630,13 @@ zero:
                 ++column_;
                 return;
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                err_handler_.error(json_parser_errc::leading_zero, *this);
-                ec = json_parser_errc::leading_zero;
+                err_handler_.error(json_parse_errc::leading_zero, *this);
+                ec = json_parse_errc::leading_zero;
                 state_ = parse_state::zero;
                 return;
             default:
-                err_handler_.error(json_parser_errc::invalid_number, *this);
-                ec = json_parser_errc::invalid_number;
+                err_handler_.error(json_parse_errc::invalid_number, *this);
+                ec = json_parse_errc::invalid_number;
                 state_ = parse_state::zero;
                 return;
         }
@@ -1719,8 +1719,8 @@ integer:
                 ++column_;
                 return;
             default:
-                err_handler_.error(json_parser_errc::invalid_number, *this);
-                ec = json_parser_errc::invalid_number;
+                err_handler_.error(json_parse_errc::invalid_number, *this);
+                ec = json_parse_errc::invalid_number;
                 state_ = parse_state::integer;
                 return;
         }
@@ -1740,8 +1740,8 @@ fraction1:
                 ++column_;
                 goto fraction2;
             default:
-                err_handler_.error(json_parser_errc::invalid_number, *this);
-                ec = json_parser_errc::invalid_number;
+                err_handler_.error(json_parse_errc::invalid_number, *this);
+                ec = json_parse_errc::invalid_number;
                 state_ = parse_state::fraction1;
                 return;
         }
@@ -1819,8 +1819,8 @@ fraction2:
                 ++column_;
                 goto exp1;
             default:
-                err_handler_.error(json_parser_errc::invalid_number, *this);
-                ec = json_parser_errc::invalid_number;
+                err_handler_.error(json_parse_errc::invalid_number, *this);
+                ec = json_parse_errc::invalid_number;
                 state_ = parse_state::fraction2;
                 return;
         }
@@ -1847,8 +1847,8 @@ exp1:
                 ++column_;
                 goto exp3;
             default:
-                err_handler_.error(json_parser_errc::expected_value, *this);
-                ec = json_parser_errc::expected_value;
+                err_handler_.error(json_parse_errc::expected_value, *this);
+                ec = json_parse_errc::expected_value;
                 state_ = parse_state::exp1;
                 return;
         }
@@ -1866,8 +1866,8 @@ exp2:
                 ++column_;
                 goto exp3;
             default:
-                err_handler_.error(json_parser_errc::expected_value, *this);
-                ec = json_parser_errc::expected_value;
+                err_handler_.error(json_parse_errc::expected_value, *this);
+                ec = json_parse_errc::expected_value;
                 state_ = parse_state::exp2;
                 return;
         }
@@ -1939,8 +1939,8 @@ exp3:
                 ++column_;
                 goto exp3;
             default:
-                err_handler_.error(json_parser_errc::invalid_number, *this);
-                ec = json_parser_errc::invalid_number;
+                err_handler_.error(json_parse_errc::invalid_number, *this);
+                ec = json_parse_errc::invalid_number;
                 state_ = parse_state::exp3;
                 return;
         }
@@ -1991,9 +1991,9 @@ string_u1:
                 JSONCONS_ILLEGAL_CONTROL_CHARACTER:
                 {
                     column_ += (input_ptr_ - sb + 1);
-                    if (err_handler_.error(json_parser_errc::illegal_control_character, *this))
+                    if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                     {
-                        ec = json_parser_errc::illegal_control_character;
+                        ec = json_parse_errc::illegal_control_character;
                         state_ = parse_state::string_u1;
                         return;
                     }
@@ -2013,9 +2013,9 @@ string_u1:
                 case '\r':
                 {
                     column_ += (input_ptr_ - sb + 1);
-                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    if (err_handler_.error(json_parse_errc::illegal_character_in_string, *this))
                     {
-                        ec = json_parser_errc::illegal_character_in_string;
+                        ec = json_parse_errc::illegal_character_in_string;
                         state_ = parse_state::string_u1;
                         return;
                     }
@@ -2036,9 +2036,9 @@ string_u1:
                 case '\n':
                 {
                     column_ += (input_ptr_ - sb + 1);
-                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    if (err_handler_.error(json_parse_errc::illegal_character_in_string, *this))
                     {
-                        ec = json_parser_errc::illegal_character_in_string;
+                        ec = json_parse_errc::illegal_character_in_string;
                         state_ = parse_state::string_u1;
                         return;
                     }
@@ -2059,9 +2059,9 @@ string_u1:
                 case '\t':
                 {
                     column_ += (input_ptr_ - sb + 1);
-                    if (err_handler_.error(json_parser_errc::illegal_character_in_string, *this))
+                    if (err_handler_.error(json_parse_errc::illegal_character_in_string, *this))
                     {
-                        ec = json_parser_errc::illegal_character_in_string;
+                        ec = json_parse_errc::illegal_character_in_string;
                         state_ = parse_state::string_u1;
                         return;
                     }
@@ -2192,8 +2192,8 @@ escape:
             ++column_;
             goto escape_u1;
         default:    
-            err_handler_.error(json_parser_errc::illegal_escaped_character, *this);
-            ec = json_parser_errc::illegal_escaped_character;
+            err_handler_.error(json_parse_errc::illegal_escaped_character, *this);
+            ec = json_parse_errc::illegal_escaped_character;
             state_ = parse_state::escape;
             return;
         }
@@ -2296,8 +2296,8 @@ escape_expect_surrogate_pair1:
                 ++column_;
                 goto escape_expect_surrogate_pair2;
             default:
-                err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
-                ec = json_parser_errc::expected_codepoint_surrogate_pair;
+                err_handler_.error(json_parse_errc::expected_codepoint_surrogate_pair, *this);
+                ec = json_parse_errc::expected_codepoint_surrogate_pair;
                 state_ = parse_state::escape_expect_surrogate_pair1;
                 return;
             }
@@ -2317,8 +2317,8 @@ escape_expect_surrogate_pair2:
                 ++column_;
                 goto escape_u6;
             default:
-                err_handler_.error(json_parser_errc::expected_codepoint_surrogate_pair, *this);
-                ec = json_parser_errc::expected_codepoint_surrogate_pair;
+                err_handler_.error(json_parse_errc::expected_codepoint_surrogate_pair, *this);
+                ec = json_parse_errc::expected_codepoint_surrogate_pair;
                 state_ = parse_state::escape_expect_surrogate_pair2;
                 return;
             }
@@ -2408,37 +2408,37 @@ escape_u9:
         case unicons::conv_errc():
             break;
         case unicons::conv_errc::over_long_utf8_sequence:
-            if (err_handler_.error(json_parser_errc::over_long_utf8_sequence, *this))
+            if (err_handler_.error(json_parse_errc::over_long_utf8_sequence, *this))
             {
-                ec = json_parser_errc::over_long_utf8_sequence;
+                ec = json_parse_errc::over_long_utf8_sequence;
                 return;
             }
             break;
         case unicons::conv_errc::unpaired_high_surrogate:
-            if (err_handler_.error(json_parser_errc::unpaired_high_surrogate, *this))
+            if (err_handler_.error(json_parse_errc::unpaired_high_surrogate, *this))
             {
-                ec = json_parser_errc::unpaired_high_surrogate;
+                ec = json_parse_errc::unpaired_high_surrogate;
                 return;
             }
             break;
         case unicons::conv_errc::expected_continuation_byte:
-            if (err_handler_.error(json_parser_errc::expected_continuation_byte, *this))
+            if (err_handler_.error(json_parse_errc::expected_continuation_byte, *this))
             {
-                ec = json_parser_errc::expected_continuation_byte;
+                ec = json_parse_errc::expected_continuation_byte;
                 return;
             }
             break;
         case unicons::conv_errc::illegal_surrogate_value:
-            if (err_handler_.error(json_parser_errc::illegal_surrogate_value, *this))
+            if (err_handler_.error(json_parse_errc::illegal_surrogate_value, *this))
             {
-                ec = json_parser_errc::illegal_surrogate_value;
+                ec = json_parse_errc::illegal_surrogate_value;
                 return;
             }
             break;
         default:
-            if (err_handler_.error(json_parser_errc::illegal_codepoint, *this))
+            if (err_handler_.error(json_parse_errc::illegal_codepoint, *this))
             {
-                ec = json_parser_errc::illegal_codepoint;
+                ec = json_parse_errc::illegal_codepoint;
                 return;
             }
             break;
@@ -2494,9 +2494,9 @@ escape_u9:
         }
         if (!(state_ == parse_state::done || state_ == parse_state::start))
         {
-            if (err_handler_.error(json_parser_errc::unexpected_eof, *this))
+            if (err_handler_.error(json_parse_errc::unexpected_eof, *this))
             {
-                ec = json_parser_errc::unexpected_eof;
+                ec = json_parse_errc::unexpected_eof;
                 return;
             }
         }
@@ -2589,9 +2589,9 @@ private:
         }
         catch (...)
         {
-            if (err_handler_.error(json_parser_errc::invalid_number, *this))
+            if (err_handler_.error(json_parse_errc::invalid_number, *this))
             {
-                ec = json_parser_errc::invalid_number;
+                ec = json_parse_errc::invalid_number;
                 return;
             }
             handler_.null_value(*this); // recovery
@@ -2611,9 +2611,9 @@ private:
             if (ec) return;
             break;
         default:
-            if (err_handler_.error(json_parser_errc::expected_value, *this))
+            if (err_handler_.error(json_parse_errc::expected_value, *this))
             {
-                ec = json_parser_errc::expected_value;
+                ec = json_parse_errc::expected_value;
                 return;
             }
             break;
@@ -2632,9 +2632,9 @@ private:
             if (ec) return;
             break;
         default:
-            if (err_handler_.error(json_parser_errc::expected_value, *this))
+            if (err_handler_.error(json_parse_errc::expected_value, *this))
             {
-                ec = json_parser_errc::expected_value;
+                ec = json_parse_errc::expected_value;
                 return;
             }
             break;
@@ -2661,9 +2661,9 @@ private:
             handler_.end_document();
             break;
         default:
-            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            if (err_handler_.error(json_parse_errc::invalid_json_text, *this))
             {
-                ec = json_parser_errc::invalid_json_text;
+                ec = json_parse_errc::invalid_json_text;
                 return;
             }
             break;
@@ -2683,9 +2683,9 @@ private:
         case parse_state::root:
             break;
         default:
-            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            if (err_handler_.error(json_parse_errc::invalid_json_text, *this))
             {
-                ec = json_parser_errc::invalid_json_text;
+                ec = json_parse_errc::invalid_json_text;
                 return;
             }
             break;
@@ -2705,9 +2705,9 @@ private:
             handler_.end_document();
             break;
         default:
-            if (err_handler_.error(json_parser_errc::invalid_json_text, *this))
+            if (err_handler_.error(json_parse_errc::invalid_json_text, *this))
             {
-                ec = json_parser_errc::invalid_json_text;
+                ec = json_parse_errc::invalid_json_text;
                 return;
             }
             break;
@@ -2744,9 +2744,9 @@ private:
         }
         else
         {
-            if (err_handler_.error(json_parser_errc::invalid_hex_escape_sequence, *this))
+            if (err_handler_.error(json_parse_errc::invalid_hex_escape_sequence, *this))
             {
-                ec = json_parser_errc::invalid_hex_escape_sequence;
+                ec = json_parse_errc::invalid_hex_escape_sequence;
                 return cp;
             }
         }

@@ -565,8 +565,8 @@ all_csv_states:
                 }
                 break;
             default:
-                err_handler_.fatal_error(csv_parser_errc::invalid_state, *this);
-                ec = csv_parser_errc::invalid_state;
+                err_handler_.fatal_error(csv_parse_errc::invalid_state, *this);
+                ec = csv_parse_errc::invalid_state;
                 return;
             }
             if (line_ > parameters_.max_lines())
@@ -680,8 +680,8 @@ all_csv_states:
         }
         if (!pop_mode(csv_mode_type::initial))
         {
-            err_handler_.fatal_error(csv_parser_errc::unexpected_eof, *this);
-            ec = csv_parser_errc::unexpected_eof;
+            err_handler_.fatal_error(csv_parse_errc::unexpected_eof, *this);
+            ec = csv_parse_errc::unexpected_eof;
             return;
         }
         handler_.end_document();
@@ -851,8 +851,8 @@ private:
             }
             break;
         default:
-            err_handler_.fatal_error(csv_parser_errc::invalid_csv_text, *this);
-            ec = csv_parser_errc::invalid_csv_text;
+            err_handler_.fatal_error(csv_parse_errc::invalid_csv_text, *this);
+            ec = csv_parse_errc::invalid_csv_text;
             return;
         }
         state_ = csv_state_type::expect_value;
