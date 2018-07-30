@@ -453,6 +453,12 @@ private:
 typedef basic_json_serializing_options<char> json_serializing_options;
 typedef basic_json_serializing_options<wchar_t> wjson_serializing_options;
 
+typedef basic_json_read_options<char> json_read_options;
+typedef basic_json_read_options<wchar_t> wjson_read_options;
+
+typedef basic_json_write_options<char> json_write_options;
+typedef basic_json_write_options<wchar_t> wjson_write_options;
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_json_serializing_options<char> output_format;
 typedef basic_json_serializing_options<wchar_t> woutput_format;
