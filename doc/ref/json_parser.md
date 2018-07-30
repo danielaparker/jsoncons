@@ -25,20 +25,46 @@ typedef basic_json_parser<char> json_parser
     json_parser(json_content_handler& handler); // (5)
 
     json_parser(json_content_handler& handler,
-                parse_error_handler& err_handler); // (6)
+                const json_read_options& options); // (6)
 
     json_parser(json_content_handler& handler,
-                const json_read_options& options); // (7)
+                parse_error_handler& err_handler); // (7)
 
     json_parser(json_content_handler& handler, 
                 const json_read_options& options,
                 parse_error_handler& err_handler); // (8)
 
-(5) Constructs a `json_parser` that is associated with a [json_content_handler](json_content_handler.md) that receives JSON events and a [default_parse_error_handler](default_parse_error_handler.md).
-You must ensure that the input stream and input handler exist as long as does `json_parser`, as `json_parser` holds pointers to does not own these objects.
+Constructors (1)-(4) use a default [json_content_handler](json_content_handler.md) that discards the JSON parse events, and are for validation only.
 
-(6) Constructs a `json_parser` that is associated with a [json_content_handler](json_content_handler.md) that receives JSON events and the specified [parse_error_handler](parse_error_handler.md).
-You must ensure that the input stream, input handler, and error handler exist as long as does `json_parser`, as `json_parser` holds pointers to but does not own these objects.
+(1) Constructs a `json_parser` that uses default [json_read_options](json_read_options)
+and a default [parse_error_handler](parse_error_handler.md).
+
+(2) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options)
+and a default [parse_error_handler](parse_error_handler.md).
+
+(3) Constructs a `json_parser` that uses default [json_read_options](json_read_options)
+and a specified [parse_error_handler](parse_error_handler.md).
+
+(4) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options)
+and a specified [parse_error_handler](parse_error_handler.md).
+
+Constructors (5)-(8) take a user supplied [json_content_handler](json_content_handler.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
+
+(5) Constructs a `json_parser` that feeds JSON parse events to the specified 
+[json_content_handler](json_content_handler.md), and uses default [json_read_options](json_read_options)
+and a default [parse_error_handler](parse_error_handler.md).
+
+(6) Constructs a `json_parser` that feeds JSON parse events to the specified [json_content_handler](json_content_handler.md) 
+and uses the specified [json_read_options](json_read_options)
+and a default [parse_error_handler](parse_error_handler.md).
+
+(7) Constructs a `json_parser` that feeds JSON parse events to the specified [json_content_handler](json_content_handler.md) 
+and uses default [json_read_options](json_read_options)
+and a specified [parse_error_handler](parse_error_handler.md).
+
+(8) Constructs a `json_parser` that feeds JSON parse events to the specified [json_content_handler](json_content_handler.md) and
+uses the specified [json_read_options](json_read_options)
+and a specified [parse_error_handler](parse_error_handler.md).
 
 #### Member functions
 
