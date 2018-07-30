@@ -70,6 +70,7 @@ Note: It is the programmer's responsibility to ensure that `json_reader` does no
 
 #### Member functions
 
+    void update(const string_view_type& sv)
     void update(const char* data, size_t length)
 Update the parser with a chunk of JSON
 
@@ -85,7 +86,7 @@ Throws [parse_error](parse_error.md) if parsing fails.
 
     void parse_some(std::error_code& ec)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
-Sets a `std::error_code` if parsing fails.
+Sets `ec` to a [json_parser_errc](jsoncons::json_parser_errc.md) if parsing fails.
 
     void end_parse()
 Called after there is no more input
@@ -93,7 +94,7 @@ Throws [parse_error](parse_error.md) if parsing fails.
 
     void end_parse(std::error_code& ec)
 Called after there is no more input
-Sets a `std::error_code` if parsing fails.
+Sets `ec` to a [json_parser_errc](jsoncons::json_parser_errc.md) if parsing fails.
 
     void skip_bom()
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
@@ -104,14 +105,14 @@ Throws if there are any unconsumed non-whitespace characters in the input.
 Throws [parse_error](parse_error.md) if parsing fails.
 
     void check_done(std::error_code& ec)
-Sets a `std::error_code` if there are any unconsumed non-whitespace characters in the input.
+Sets `ec` to a [json_parser_errc](jsoncons::json_parser_errc.md) if parsing fails.
 
     size_t reset() const
 Resets the state of the parser to it's initial state
 
 ### Examples
 
-#### Incremental parsing 
+#### Incremental parsing
 
 ```c++
 int main()
@@ -120,19 +121,23 @@ int main()
     json_parser parser(decoder);
     try
     {
-        parser.update("10",2);
+        parser.update("10");
         parser.parse_some();
         std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.update(".5",2);
-        parser.parse_some();
+        parser.update(".5");
+        parser.parse_some(); // This is the end, but the parser can't tell
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse();
+        parser.end_parse(); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
+        parser.check_done(); // Checks if there are any unconsumed 
+                             // non-whitespace characters in the input
+        std::cout << "(4) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
         json j = decoder.get_result();
-        std::cout << "(4) " << j << "\n";
+        std::cout << "(5) " << j << "\n";
     }
     catch (const parse_error& e)
     {
@@ -150,5 +155,50 @@ Output:
 
 (3) done: true, source_exhausted: true
 
-(4) 10.5
+(4) done: true, source_exhausted: true
+
+(5) 10.5
+```
+
+#### Incremental parsing with unconsumed non-whitespace characters
+
+```c++
+int main()
+{
+    jsoncons::json_decoder<json> decoder;
+    json_parser parser(decoder);
+    try
+    {
+        parser.update("[10");
+        parser.parse_some();
+        std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        parser.update(".5]{}");
+        parser.parse_some(); // The parser reaches the end at ']'
+        std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        parser.end_parse(); // Indicates that this is the end
+        std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
+
+        parser.check_done(); // Checks if there are any unconsumed 
+                             // non-whitespace characters in the input
+                             // (there are)
+    }
+    catch (const parse_error& e)
+    {
+        std::cout << "(4) " << e.what() << std::endl;
+    }
+}
+```
+
+Output:
+
+```
+(1) done: false, source_exhausted: true
+
+(2) done: true, source_exhausted: false
+
+(3) done: true, source_exhausted: false
+
+(4) Unexpected non-whitespace character after JSON text at line 1 and column 7
 ```

@@ -2507,6 +2507,11 @@ escape_u9:
         return state_;
     }
 
+    void update(const string_view_type sv)
+    {
+        update(sv.data(),sv.length());
+    }
+
     void update(const CharT* data, size_t length)
     {
         begin_input_ = data;
