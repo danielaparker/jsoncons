@@ -34,6 +34,7 @@ public:
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Writer writer_type;
     typedef typename Writer::output_type output_type;
+    typedef typename basic_json_serializing_options<CharT>::string_type string_type;
 
 private:
     enum class structure_type {object, array};
@@ -106,7 +107,23 @@ private:
         }
 
     };
-    basic_json_serializing_options<CharT> options_;
+
+    int indent_width_;
+    bool can_write_nan_replacement_;
+    bool can_write_pos_inf_replacement_;
+    bool can_write_neg_inf_replacement_;
+    string_type nan_replacement_;
+    string_type pos_inf_replacement_;
+    string_type neg_inf_replacement_;
+    bool escape_all_non_ascii_;
+    bool escape_solidus_;
+    byte_string_chars_format byte_string_format_;
+    bignum_chars_format bignum_format_;
+    line_split_kind object_object_split_lines_;
+    line_split_kind object_array_split_lines_;
+    line_split_kind array_array_split_lines_;
+    line_split_kind array_object_split_lines_;
+
     std::vector<line_split_context> stack_;
     int indent_;
     bool indenting_;
@@ -127,15 +144,29 @@ public:
     {
     }
 
-    basic_json_serializer(output_type& os, const basic_json_serializing_options<CharT>& options)
+    basic_json_serializer(output_type& os, const basic_json_write_options<CharT>& options)
        : basic_json_serializer(os, options, indenting::no_indent)
     {
     }
 
     basic_json_serializer(output_type& os, 
-                          const basic_json_serializing_options<CharT>& options, 
+                          const basic_json_write_options<CharT>& options, 
                           indenting line_indent)
-       : options_(options), 
+       : indent_width_(options.indent()),
+         can_write_nan_replacement_(options.can_write_nan_replacement()),
+         can_write_pos_inf_replacement_(options.can_write_pos_inf_replacement()),
+         can_write_neg_inf_replacement_(options.can_write_neg_inf_replacement()),
+         nan_replacement_(options.nan_replacement()),
+         pos_inf_replacement_(options.pos_inf_replacement()),
+         neg_inf_replacement_(options.neg_inf_replacement()),
+         escape_all_non_ascii_(options.escape_all_non_ascii()),
+         escape_solidus_(options.escape_solidus()),
+         byte_string_format_(options.byte_string_format()),
+         bignum_format_(options.bignum_format()),
+         object_object_split_lines_(options.object_object_split_lines()),
+         object_array_split_lines_(options.object_array_split_lines()),
+         array_array_split_lines_(options.array_array_split_lines()),
+         array_object_split_lines_(options.array_object_split_lines()),
          indent_(0), 
          indenting_(line_indent == indenting::indent),  
          fp_(floating_point_options(options.floating_point_format(), 
@@ -164,10 +195,7 @@ public:
 #endif
 
 private:
-    void escape_string(const CharT* s,
-                       size_t length,
-                       const basic_json_serializing_options<CharT>& options,
-                       writer_type& writer)
+    void escape_string(const CharT* s, size_t length)
     {
         const CharT* begin = s;
         const CharT* end = s + length;
@@ -177,40 +205,40 @@ private:
             switch (c)
             {
             case '\\':
-                writer.put('\\'); 
-                writer.put('\\');
+                writer_.put('\\'); 
+                writer_.put('\\');
                 break;
             case '"':
-                writer.put('\\'); 
-                writer.put('\"');
+                writer_.put('\\'); 
+                writer_.put('\"');
                 break;
             case '\b':
-                writer.put('\\'); 
-                writer.put('b');
+                writer_.put('\\'); 
+                writer_.put('b');
                 break;
             case '\f':
-                writer.put('\\');
-                writer.put('f');
+                writer_.put('\\');
+                writer_.put('f');
                 break;
             case '\n':
-                writer.put('\\');
-                writer.put('n');
+                writer_.put('\\');
+                writer_.put('n');
                 break;
             case '\r':
-                writer.put('\\');
-                writer.put('r');
+                writer_.put('\\');
+                writer_.put('r');
                 break;
             case '\t':
-                writer.put('\\');
-                writer.put('t');
+                writer_.put('\\');
+                writer_.put('t');
                 break;
             default:
-                if (options.escape_solidus() && c == '/')
+                if (escape_solidus_ && c == '/')
                 {
-                    writer.put('\\');
-                    writer.put('/');
+                    writer_.put('\\');
+                    writer_.put('/');
                 }
-                else if (is_control_character(c) || options.escape_all_non_ascii())
+                else if (is_control_character(c) || escape_all_non_ascii_)
                 {
                     // convert utf8 to codepoint
                     unicons::sequence_generator<const CharT*> g(it,end,unicons::conv_flags::strict);
@@ -228,37 +256,37 @@ private:
                             uint32_t first = (cp >> 10) + 0xD800;
                             uint32_t second = ((cp & 0x03FF) + 0xDC00);
 
-                            writer.put('\\');
-                            writer.put('u');
-                            writer.put(to_hex_character(first >> 12 & 0x000F));
-                            writer.put(to_hex_character(first >> 8  & 0x000F));
-                            writer.put(to_hex_character(first >> 4  & 0x000F));
-                            writer.put(to_hex_character(first     & 0x000F));
-                            writer.put('\\');
-                            writer.put('u');
-                            writer.put(to_hex_character(second >> 12 & 0x000F));
-                            writer.put(to_hex_character(second >> 8  & 0x000F));
-                            writer.put(to_hex_character(second >> 4  & 0x000F));
-                            writer.put(to_hex_character(second     & 0x000F));
+                            writer_.put('\\');
+                            writer_.put('u');
+                            writer_.put(to_hex_character(first >> 12 & 0x000F));
+                            writer_.put(to_hex_character(first >> 8  & 0x000F));
+                            writer_.put(to_hex_character(first >> 4  & 0x000F));
+                            writer_.put(to_hex_character(first     & 0x000F));
+                            writer_.put('\\');
+                            writer_.put('u');
+                            writer_.put(to_hex_character(second >> 12 & 0x000F));
+                            writer_.put(to_hex_character(second >> 8  & 0x000F));
+                            writer_.put(to_hex_character(second >> 4  & 0x000F));
+                            writer_.put(to_hex_character(second     & 0x000F));
                         }
                         else
                         {
-                            writer.put('\\');
-                            writer.put('u');
-                            writer.put(to_hex_character(cp >> 12 & 0x000F));
-                            writer.put(to_hex_character(cp >> 8  & 0x000F));
-                            writer.put(to_hex_character(cp >> 4  & 0x000F));
-                            writer.put(to_hex_character(cp     & 0x000F));
+                            writer_.put('\\');
+                            writer_.put('u');
+                            writer_.put(to_hex_character(cp >> 12 & 0x000F));
+                            writer_.put(to_hex_character(cp >> 8  & 0x000F));
+                            writer_.put(to_hex_character(cp >> 4  & 0x000F));
+                            writer_.put(to_hex_character(cp     & 0x000F));
                         }
                     }
                     else
                     {
-                        writer.put(c);
+                        writer_.put(c);
                     }
                 }
                 else
                 {
-                    writer.put(c);
+                    writer_.put(c);
                 }
                 break;
             }
@@ -291,19 +319,19 @@ private:
         {
             if (!stack_.empty() && stack_.back().is_object())
             {
-                stack_.push_back(line_split_context(structure_type::object,options_.object_object_split_lines(), false));
+                stack_.push_back(line_split_context(structure_type::object,object_object_split_lines_, false));
             }
             else if (!stack_.empty())
             {
-                if (options_.array_object_split_lines() != line_split_kind::same_line)
+                if (array_object_split_lines_ != line_split_kind::same_line)
                 {
                     stack_.back().unindent_after(true);
-                    stack_.push_back(line_split_context(structure_type::object,options_.array_object_split_lines(), false));
+                    stack_.push_back(line_split_context(structure_type::object,array_object_split_lines_, false));
                     write_indent1();
                 }
                 else
                 {
-                    stack_.push_back(line_split_context(structure_type::object,options_.array_object_split_lines(), false));
+                    stack_.push_back(line_split_context(structure_type::object,array_object_split_lines_, false));
                 }
             }
             else 
@@ -357,18 +385,18 @@ private:
                 {
                     writer_.put('[');
                     indent();
-                    if (options_.object_array_split_lines() != line_split_kind::same_line)
+                    if (object_array_split_lines_ != line_split_kind::same_line)
                     {
-                        stack_.push_back(line_split_context(structure_type::array,options_.object_array_split_lines(),true));
+                        stack_.push_back(line_split_context(structure_type::array,object_array_split_lines_,true));
                     }
                     else
                     {
-                        stack_.push_back(line_split_context(structure_type::array,options_.object_array_split_lines(),false));
+                        stack_.push_back(line_split_context(structure_type::array,object_array_split_lines_,false));
                     }
                 }
                 else // array
                 {
-                    if (options_.array_array_split_lines() == line_split_kind::same_line)
+                    if (array_array_split_lines_ == line_split_kind::same_line)
                     {
                         if (stack_.back().is_multi_line())
                         {
@@ -377,16 +405,16 @@ private:
                         stack_.push_back(line_split_context(structure_type::array,line_split_kind::same_line, false));
                         indent();
                     }
-                    else if (options_.array_array_split_lines() == line_split_kind::multi_line)
+                    else if (array_array_split_lines_ == line_split_kind::multi_line)
                     {
                         write_indent();
-                        stack_.push_back(line_split_context(structure_type::array,options_.array_array_split_lines(), false));
+                        stack_.push_back(line_split_context(structure_type::array,array_array_split_lines_, false));
                         indent();
                     }
                     else // new_line
                     {
                         write_indent();
-                        stack_.push_back(line_split_context(structure_type::array,options_.array_array_split_lines(), false));
+                        stack_.push_back(line_split_context(structure_type::array,array_array_split_lines_, false));
                         indent();
                     }
                     writer_.put('[');
@@ -440,7 +468,7 @@ private:
         }
 
         writer_.put('\"');
-        escape_string(name.data(), name.length(), options_, writer_);
+        escape_string(name.data(), name.length());
         writer_.put('\"');
         writer_.put(':');
         if (indenting_)
@@ -470,7 +498,7 @@ private:
         }
 
         writer_. put('\"');
-        escape_string(value.data(), value.length(), options_, writer_);
+        escape_string(value.data(), value.length());
         writer_. put('\"');
 
         end_value();
@@ -482,7 +510,7 @@ private:
         {
             begin_scalar_value();
         }
-        switch (options_.byte_string_format())
+        switch (byte_string_format_)
         {
             case byte_string_chars_format::base64url:
             {
@@ -514,7 +542,7 @@ private:
             begin_scalar_value();
         }
 
-        switch (options_.bignum_format())
+        switch (bignum_format_)
         {
             case bignum_chars_format::integer:
             {
@@ -574,10 +602,10 @@ private:
 
         if ((std::isnan)(value))
         {
-            if (options_.can_write_nan_replacement())
+            if (can_write_nan_replacement_)
             {
-                writer_.write(options_.nan_replacement().data(),
-                              options_.nan_replacement().length());
+                writer_.write(nan_replacement_.data(),
+                              nan_replacement_.length());
             }
             else
             {
@@ -587,10 +615,10 @@ private:
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            if (options_.can_write_pos_inf_replacement())
+            if (can_write_pos_inf_replacement_)
             {
-                writer_.write(options_.pos_inf_replacement().data(),
-                              options_.pos_inf_replacement().length());
+                writer_.write(pos_inf_replacement_.data(),
+                              pos_inf_replacement_.length());
             }
             else
             {
@@ -600,10 +628,10 @@ private:
         }
         else if (!(std::isfinite)(value))
         {
-            if (options_.can_write_neg_inf_replacement())
+            if (can_write_neg_inf_replacement_)
             {
-                writer_.write(options_.neg_inf_replacement().data(),
-                              options_.neg_inf_replacement().length());
+                writer_.write(neg_inf_replacement_.data(),
+                              neg_inf_replacement_.length());
             }
             else
             {
@@ -688,12 +716,12 @@ private:
 
     void indent()
     {
-        indent_ += static_cast<int>(options_.indent());
+        indent_ += static_cast<int>(indent_width_);
     }
 
     void unindent()
     {
-        indent_ -= static_cast<int>(options_.indent());
+        indent_ -= static_cast<int>(indent_width_);
     }
 
     void write_indent()

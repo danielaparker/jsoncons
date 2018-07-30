@@ -87,15 +87,82 @@ enum class bignum_chars_format : uint8_t {integer, base10, base64, base64url
 
 enum class byte_string_chars_format : uint8_t {base64,base64url};
 
-template <class CharT,class Allocator=std::allocator<CharT>>
-class basic_json_serializing_options
+template <class CharT>
+class basic_json_read_options
 {
 public:
     typedef basic_string_view<CharT> string_view_type;
+
+    virtual ~basic_json_read_options() = default;
+
+    virtual bool can_read_nan_replacement() const = 0;
+
+    virtual string_view_type nan_replacement() const = 0;
+
+    virtual bool can_read_pos_inf_replacement() const = 0;
+
+    virtual string_view_type pos_inf_replacement() const = 0;
+
+    virtual bool can_read_neg_inf_replacement() const = 0;
+
+    virtual string_view_type neg_inf_replacement() const = 0;
+
+    virtual size_t max_nesting_depth() const = 0;
+};
+
+template <class CharT>
+class basic_json_write_options
+{
+public:
+    typedef basic_string_view<CharT> string_view_type;
+
+    virtual ~basic_json_write_options() = default;
+
+    virtual bool can_write_nan_replacement() const = 0;
+
+    virtual string_view_type nan_replacement() const = 0;
+
+    virtual bool can_write_pos_inf_replacement() const = 0;
+
+    virtual string_view_type pos_inf_replacement() const = 0;
+
+    virtual bool can_write_neg_inf_replacement() const = 0;
+
+    virtual string_view_type neg_inf_replacement() const = 0;
+
+    virtual size_t max_nesting_depth() const = 0;
+
+    virtual byte_string_chars_format byte_string_format() const = 0; 
+
+    virtual bignum_chars_format bignum_format() const = 0; 
+
+    virtual line_split_kind object_object_split_lines() const = 0; 
+
+    virtual line_split_kind array_object_split_lines() const = 0; 
+
+    virtual line_split_kind object_array_split_lines() const = 0; 
+
+    virtual line_split_kind array_array_split_lines() const = 0; 
+
+    virtual int indent() const = 0;  
+
+    virtual chars_format floating_point_format() const = 0; 
+
+    virtual uint8_t precision() const = 0; 
+
+    virtual bool escape_all_non_ascii() const = 0; 
+
+    virtual bool escape_solidus() const = 0; 
+};
+
+template <class CharT>
+class basic_json_serializing_options : public virtual basic_json_read_options<CharT>, 
+                                       public virtual basic_json_write_options<CharT>
+{
+public:
     typedef CharT char_type;
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
+    typedef basic_string_view<CharT> string_view_type;
+    typedef std::basic_string<CharT> string_type;
 private:
     int indent_;
     chars_format floating_point_format_;
@@ -110,7 +177,6 @@ private:
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
     bignum_chars_format bignum_format_;
-
     line_split_kind object_object_split_lines_;
     line_split_kind object_array_split_lines_;
     line_split_kind array_array_split_lines_;
@@ -142,22 +208,22 @@ public:
     }
 
 //  Properties
-    byte_string_chars_format byte_string_format() const {return byte_string_format_;}
+    byte_string_chars_format byte_string_format() const override {return byte_string_format_;}
     basic_json_serializing_options<CharT>&  byte_string_format(byte_string_chars_format value) {byte_string_format_ = value; return *this;}
 
-    bignum_chars_format bignum_format() const {return bignum_format_;}
+    bignum_chars_format bignum_format() const override {return bignum_format_;}
     basic_json_serializing_options<CharT>&  bignum_format(bignum_chars_format value) {bignum_format_ = value; return *this;}
 
-    line_split_kind object_object_split_lines() const {return object_object_split_lines_;}
+    line_split_kind object_object_split_lines() const override {return object_object_split_lines_;}
     basic_json_serializing_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_split_lines_ = value; return *this;}
 
-    line_split_kind array_object_split_lines() const {return array_object_split_lines_;}
+    line_split_kind array_object_split_lines() const override {return array_object_split_lines_;}
     basic_json_serializing_options<CharT>& array_object_split_lines(line_split_kind value) {array_object_split_lines_ = value; return *this;}
 
-    line_split_kind object_array_split_lines() const {return object_array_split_lines_;}
+    line_split_kind object_array_split_lines() const override {return object_array_split_lines_;}
     basic_json_serializing_options<CharT>& object_array_split_lines(line_split_kind value) {object_array_split_lines_ = value; return *this;}
 
-    line_split_kind array_array_split_lines() const {return array_array_split_lines_;}
+    line_split_kind array_array_split_lines() const override {return array_array_split_lines_;}
     basic_json_serializing_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -261,11 +327,11 @@ public:
         return *this;
     }
 
-    bool can_read_nan_replacement() const {return can_read_nan_replacement_;}
+    bool can_read_nan_replacement() const override {return can_read_nan_replacement_;}
 
-    bool can_read_pos_inf_replacement() const {return can_read_pos_inf_replacement_;}
+    bool can_read_pos_inf_replacement() const override {return can_read_pos_inf_replacement_;}
 
-    bool can_read_neg_inf_replacement() const {return can_read_neg_inf_replacement_;}
+    bool can_read_neg_inf_replacement() const override {return can_read_neg_inf_replacement_;}
 
     bool can_write_nan_replacement() const {return !nan_replacement_.empty();}
 
@@ -292,45 +358,45 @@ public:
         return *this;
     }
 
-    const string_type& nan_replacement() const
+    string_view_type nan_replacement() const override
     {
         return nan_replacement_;
     }
 
-    basic_json_serializing_options<CharT>& nan_replacement(const string_type& replacement)
+    basic_json_serializing_options<CharT>& nan_replacement(const string_view_type& value)
     {
-        nan_replacement_ = replacement;
+        nan_replacement_ = string_type(value);
 
-        can_read_nan_replacement_ = is_string(replacement);
+        can_read_nan_replacement_ = is_string(value);
 
         return *this;
     }
 
-    const string_type& pos_inf_replacement() const
+    string_view_type pos_inf_replacement() const override
     {
         return pos_inf_replacement_;
     }
 
-    basic_json_serializing_options<CharT>& pos_inf_replacement(const string_type& replacement)
+    basic_json_serializing_options<CharT>& pos_inf_replacement(const string_view_type& value)
     {
-        pos_inf_replacement_ = replacement;
-        can_read_pos_inf_replacement_ = is_string(replacement);
+        pos_inf_replacement_ = string_type(value);
+        can_read_pos_inf_replacement_ = is_string(value);
         return *this;
     }
 
-    const string_type& neg_inf_replacement() const
+    string_view_type neg_inf_replacement() const override
     {
         return neg_inf_replacement_;
     }
 
-    basic_json_serializing_options<CharT>& neg_inf_replacement(const string_type& replacement)
+    basic_json_serializing_options<CharT>& neg_inf_replacement(const string_view_type& value)
     {
-        neg_inf_replacement_ = replacement;
-        can_read_neg_inf_replacement_ = is_string(replacement);
+        neg_inf_replacement_ = string_type(value);
+        can_read_neg_inf_replacement_ = is_string(value);
         return *this;
     }
 
-    size_t max_nesting_depth() const
+    size_t max_nesting_depth() const override
     {
         return max_nesting_depth_;
     }

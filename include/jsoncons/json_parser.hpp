@@ -17,8 +17,8 @@
 #include <system_error>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
-#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_serializing_options.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error_category.hpp>
 #include <jsoncons/detail/parse_number.hpp>
@@ -36,31 +36,42 @@ template <class CharT>
 class replacement_filter : public basic_json_filter<CharT>
 {
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
+    typedef typename basic_json_serializing_options<CharT>::string_type string_type;
 
     basic_null_json_content_handler<CharT> default_content_handler_;
-    basic_json_serializing_options<CharT> options_;
-public:
-    replacement_filter()
-        : basic_json_filter<CharT>(default_content_handler_)
-    {
-    }
 
-    replacement_filter(basic_json_content_handler<CharT>& handler, const basic_json_serializing_options<CharT>& options)
-        : basic_json_filter<CharT>(handler), options_(options)
+    bool can_read_nan_replacement_;
+    bool can_read_pos_inf_replacement_;
+    bool can_read_neg_inf_replacement_;
+    string_type nan_replacement_;
+    string_type pos_inf_replacement_;
+    string_type neg_inf_replacement_;
+
+public:
+    replacement_filter() = delete;
+
+    replacement_filter(basic_json_content_handler<CharT>& handler, const basic_json_read_options<CharT>& options)
+        : basic_json_filter<CharT>(handler), 
+          can_read_nan_replacement_(options.can_read_nan_replacement()),
+          can_read_pos_inf_replacement_(options.can_read_pos_inf_replacement()),
+          can_read_neg_inf_replacement_(options.can_read_neg_inf_replacement()),
+          nan_replacement_(options.nan_replacement()),
+          pos_inf_replacement_(options.pos_inf_replacement()),
+          neg_inf_replacement_(options.neg_inf_replacement())
     {
     }
 
     void do_string_value(const string_view_type& s, const serializing_context& context) override
     {
-        if (options_.can_read_nan_replacement() && s == options_.nan_replacement().substr(1,options_.nan_replacement().length()-2))
+        if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
         {
             this->downstream_handler().double_value(std::nan(""), context);
         }
-        else if (options_.can_read_pos_inf_replacement() && s == options_.pos_inf_replacement().substr(1,options_.pos_inf_replacement().length()-2))
+        else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
         {
             this->downstream_handler().double_value(std::numeric_limits<double>::infinity(), context);
         }
-        else if (options_.can_read_neg_inf_replacement() && s == options_.neg_inf_replacement().substr(1,options_.neg_inf_replacement().length()-2))
+        else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
         {
             this->downstream_handler().double_value(-std::numeric_limits<double>::infinity(), context);
         }
@@ -195,29 +206,30 @@ public:
     {
     }
 
-    basic_json_parser(const basic_json_serializing_options<CharT>& options)
+    basic_json_parser(const basic_json_read_options<CharT>& options)
         : basic_json_parser(default_content_handler_, options, default_err_handler_)
     {
     }
 
-    basic_json_parser(const basic_json_serializing_options<CharT>& options, 
+    basic_json_parser(const basic_json_read_options<CharT>& options, 
                       parse_error_handler& err_handler)
         : basic_json_parser(default_content_handler_, options, err_handler)
     {
     }
 
     basic_json_parser(basic_json_content_handler<CharT>& handler,
-                      const basic_json_serializing_options<CharT>& options)
+                      const basic_json_read_options<CharT>& options)
         : basic_json_parser(handler, options, default_err_handler_)
     {
     }
 
     basic_json_parser(basic_json_content_handler<CharT>& handler, 
-                      const basic_json_serializing_options<CharT>& options,
+                      const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
        : replacement_filter_(handler,options),
          handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_ : handler),
          err_handler_(err_handler),
+         max_nesting_depth_(options.max_nesting_depth()),
          cp_(0),
          cp2_(0),
          precision_(0), 
@@ -233,7 +245,6 @@ public:
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
-        max_nesting_depth_ = options.max_nesting_depth();
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);

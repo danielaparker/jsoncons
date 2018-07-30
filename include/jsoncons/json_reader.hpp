@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_READER_HPP
-#define JSONCONS_JSON_READER_HPP
+#ifndef JSONCONS_JSONREADER_HPP
+#define JSONCONS_JSONREADER_HPP
 
 #include <memory>
 #include <string>
@@ -186,13 +186,13 @@ public:
     }
 
     basic_json_reader(std::basic_istream<CharT>& is, 
-                      const basic_json_serializing_options<CharT>& options)
+                      const basic_json_read_options<CharT>& options)
         : basic_json_reader(is,default_content_handler_,options,default_err_handler_)
     {
     }
 
     basic_json_reader(std::basic_istream<CharT>& is, 
-                      const basic_json_serializing_options<CharT>& options,
+                      const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
         : basic_json_reader(is,default_content_handler_,options,err_handler)
     {
@@ -201,14 +201,14 @@ public:
 
     basic_json_reader(std::basic_istream<CharT>& is, 
                       basic_json_content_handler<CharT>& handler,
-                      const basic_json_serializing_options<CharT>& options)
+                      const basic_json_read_options<CharT>& options)
         : basic_json_reader(is,handler,options,default_err_handler_)
     {
     }
 
     basic_json_reader(std::basic_istream<CharT>& is,
                       basic_json_content_handler<CharT>& handler, 
-                      const basic_json_serializing_options<CharT>& options,
+                      const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
        : parser_(handler,options,err_handler),
          is_(is),
