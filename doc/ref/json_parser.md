@@ -15,11 +15,11 @@ typedef basic_json_parser<char> json_parser
 
     json_parser(); // (1)
 
-    json_parser(const json_serializing_options& options); // (2)
+    json_parser(const json_read_options& options); // (2)
 
     json_parser(parse_error_handler& err_handler); // (3)
 
-    json_parser(const json_serializing_options& options, 
+    json_parser(const json_read_options& options, 
                 parse_error_handler& err_handler); // (4)
 
     json_parser(json_content_handler& handler); // (5)
@@ -28,13 +28,13 @@ typedef basic_json_parser<char> json_parser
                 parse_error_handler& err_handler); // (6)
 
     json_parser(json_content_handler& handler,
-                const json_serializing_options& options); // (7)
+                const json_read_options& options); // (7)
 
     json_parser(json_content_handler& handler, 
-                const json_serializing_options& options,
+                const json_read_options& options,
                 parse_error_handler& err_handler); // (8)
 
-(4) Constructs a `json_parser` that is associated with a [json_content_handler](json_content_handler.md) that receives JSON events and a [default_parse_error_handler](default_parse_error_handler.md).
+(5) Constructs a `json_parser` that is associated with a [json_content_handler](json_content_handler.md) that receives JSON events and a [default_parse_error_handler](default_parse_error_handler.md).
 You must ensure that the input stream and input handler exist as long as does `json_parser`, as `json_parser` holds pointers to does not own these objects.
 
 (6) Constructs a `json_parser` that is associated with a [json_content_handler](json_content_handler.md) that receives JSON events and the specified [parse_error_handler](parse_error_handler.md).

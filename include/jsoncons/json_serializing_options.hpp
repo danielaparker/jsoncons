@@ -91,21 +91,21 @@ template <class CharT>
 class basic_json_read_options
 {
 public:
-    typedef basic_string_view<CharT> string_view_type;
+    typedef std::basic_string<CharT> string_type;
 
     virtual ~basic_json_read_options() = default;
 
     virtual bool can_read_nan_replacement() const = 0;
 
-    virtual string_view_type nan_replacement() const = 0;
+    virtual const string_type& nan_replacement() const = 0;
 
     virtual bool can_read_pos_inf_replacement() const = 0;
 
-    virtual string_view_type pos_inf_replacement() const = 0;
+    virtual const string_type& pos_inf_replacement() const = 0;
 
     virtual bool can_read_neg_inf_replacement() const = 0;
 
-    virtual string_view_type neg_inf_replacement() const = 0;
+    virtual const string_type& neg_inf_replacement() const = 0;
 
     virtual size_t max_nesting_depth() const = 0;
 };
@@ -114,21 +114,21 @@ template <class CharT>
 class basic_json_write_options
 {
 public:
-    typedef basic_string_view<CharT> string_view_type;
+    typedef std::basic_string<CharT> string_type;
 
     virtual ~basic_json_write_options() = default;
 
     virtual bool can_write_nan_replacement() const = 0;
 
-    virtual string_view_type nan_replacement() const = 0;
+    virtual const string_type& nan_replacement() const = 0;
 
     virtual bool can_write_pos_inf_replacement() const = 0;
 
-    virtual string_view_type pos_inf_replacement() const = 0;
+    virtual const string_type& pos_inf_replacement() const = 0;
 
     virtual bool can_write_neg_inf_replacement() const = 0;
 
-    virtual string_view_type neg_inf_replacement() const = 0;
+    virtual const string_type& neg_inf_replacement() const = 0;
 
     virtual size_t max_nesting_depth() const = 0;
 
@@ -358,7 +358,7 @@ public:
         return *this;
     }
 
-    string_view_type nan_replacement() const override
+    const string_type& nan_replacement() const override
     {
         return nan_replacement_;
     }
@@ -372,7 +372,7 @@ public:
         return *this;
     }
 
-    string_view_type pos_inf_replacement() const override
+    const string_type& pos_inf_replacement() const override
     {
         return pos_inf_replacement_;
     }
@@ -384,7 +384,7 @@ public:
         return *this;
     }
 
-    string_view_type neg_inf_replacement() const override
+    const string_type& neg_inf_replacement() const override
     {
         return neg_inf_replacement_;
     }

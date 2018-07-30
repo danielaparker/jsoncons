@@ -3,24 +3,23 @@
 ```c++
 typedef basic_json_serializing_options<char> json_serializing_options
 ```
+
 Specifies options for serializing and deserializing JSON text. The `json_serializing_options` class is an instantiation of the `basic_json_serializing_options` class template that uses `char` as the character type.
 
 The default floating point formatting for a floating point value that was previously decoded from json text is to preserve the original format and precision. This ensures round-trip for both format and precision, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 
 The default floating point formatting for a floating point value that was directly inserted into a json value is [chars_format::general](chars_format.md) with shortest representation. Trailing zeros are removed, except one immediately following the decimal point. The period character (‘.’) is always used as the decimal point, non English locales are ignored.
 
-<div class="t-inheritance-diagram">
-<div class="center"><div class="noresize" style="height: 99px; width: 686px; "><map name="ImageMap_1_966068046"><area href="/w/cpp/io/ios_base" shape="rect" coords="5,33,107,66" alt="cpp/io/ios base" title="cpp/io/ios base"/><area href="/w/cpp/io/basic_ios" shape="rect" coords="135,31,252,69" alt="cpp/io/basic ios" title="cpp/io/basic ios"/><area href="/w/cpp/io/basic_istream" shape="rect" coords="278,4,395,42" alt="cpp/io/basic istream" title="cpp/io/basic istream"/><area href="/w/cpp/io/basic_ostream" shape="rect" coords="278,58,395,96" alt="cpp/io/basic ostream" title="cpp/io/basic ostream"/><area href="/w/cpp/io/basic_iostream" shape="rect" coords="422,31,539,69" alt="cpp/io/basic iostream" title="cpp/io/basic iostream"/></map><img alt="std-basic fstream-inheritance.svg" src="http://upload.cppreference.com/mwiki/images/f/f1/std-basic_fstream-inheritance.svg" width="686" height="99" usemap="#ImageMap_1_966068046"/><div style="margin-left: 666px; margin-top: -20px; text-align: left;"><a href="/w/File:std-basic_fstream-inheritance.svg" title="About this image"><img alt="About this image" src="/mwiki/extensions/ImageMap/desc-20.png" style="border: none;"/></a></div></div></div>
-<div style="text-align:center;">
-<p><span style="font-size:0.7em; line-height:130%">Inheritance diagram</span>
-</p>
-</div>
-</div>
-
 #### Header
 ```c++
 #include <jsoncons/json_serializing_options.hpp>
 ```
+
+#### Abstract base classes
+
+[json_read_options](json_read_options)
+[json_write_options](json_write_options)
+
 #### Member constants
 
     default_indent
@@ -31,7 +30,7 @@ The default indent is 4
     json_serializing_options()
 Constructs an `json_serializing_options` with default values. 
 
-#### Properties
+#### Accessors and modifiers
 
     int indent() const
     json_serializing_options& indent(int value)
@@ -62,16 +61,16 @@ Escape all non-ascii characters. The default is `false`.
     json_serializing_options& escape_solidus(bool value)
 Escape the solidus ('/') character. The default is `false`.
 
-    std::string nan_replacement() const 
-    json_serializing_options& nan_replacement(const std::string& replacement)
+    const std::string& nan_replacement() const 
+    json_serializing_options& nan_replacement(const string_view_type& replacement)
 NaN replacement. The default is `"null"`. 
 
-    std::string pos_inf_replacement() const 
-    json_serializing_options& pos_inf_replacement(const std::string& replacement)
+    const std::string& pos_inf_replacement() const 
+    json_serializing_options& pos_inf_replacement(const string_view_type& replacement)
 Positive infinity replacement. The default is `"null"`
 
-    std::string neg_inf_replacement() const 
-    json_serializing_options& neg_inf_replacement(const std::string& replacement)
+    const std::string& neg_inf_replacement() const 
+    json_serializing_options& neg_inf_replacement(const string_view_type& replacement)
 Negative infinity replacement. The default is `"null"`
 
     size_t max_nesting_depth() const
@@ -89,6 +88,10 @@ For an array whose parent is an object, set whether that array is split on a new
 
     json_serializing_options& array_array_split_lines(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind).
+
+    size_t max_nesting_depth()
+    json_serializing_options& max_nesting_depth(size_t value)
+ Maximum nesting depth when parsing JSON.
 
 
 ### Examples

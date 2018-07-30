@@ -26,19 +26,19 @@ A `json_reader` can read a sequence of JSON texts from a stream.
                 parse_error_handler& err_handler); // (4)
 
     json_reader(std::istream& is, 
-                const json_serializing_options& options); // (5)
+                const json_read_options& options); // (5)
 
     json_reader(std::istream& is, 
-                const json_serializing_options& options,
+                const json_read_options& options,
                 parse_error_handler& err_handler); // (6)
 
     json_reader(std::istream& is, 
                 json_content_handler& handler,
-                const json_serializing_options& options); // (7)
+                const json_read_options& options); // (7)
 
     json_reader(std::istream& is,
                 json_content_handler& handler, 
-                const json_serializing_options& options,
+                const json_read_options& options,
                 parse_error_handler& err_handler); // (8)
 
 (1) Constructs a `json_reader` that reads from an input stream `is` of JSON text.

@@ -25,12 +25,12 @@ You must ensure that the output stream exists as long as does `json_serializer`,
 Constructs a new serializer that writes to the output stream `os` with the specified [indenting](indenting.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, const json_serializing_options& options)
-Constructs a new serializer that writes to the specified output stream using the specified [json_serializing_options](json_serializing_options.md).
+    json_serializer(std::ostream& os, const json_write_options& options)
+Constructs a new serializer that writes to the specified output stream using the specified [json_write_options](json_write_options.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
-    json_serializer(std::ostream& os, const json_serializing_options& options, indenting line_indent)
-Constructs a new serializer that writes to output stream `os` using the specified [json_serializing_options](json_serializing_options.md)
+    json_serializer(std::ostream& os, const json_write_options& options, indenting line_indent)
+Constructs a new serializer that writes to output stream `os` using the specified [json_write_options](json_write_options.md)
 and [indenting](indenting.md).
 You must ensure that the output stream exists as long as does `json_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
