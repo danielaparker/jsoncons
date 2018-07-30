@@ -272,7 +272,7 @@ public:
     }
 #endif
 
-    int indent() const
+    int indent() const override
     {
         return indent_;
     }
@@ -283,7 +283,7 @@ public:
         return *this;
     }
 
-    chars_format floating_point_format() const
+    chars_format floating_point_format() const override
     {
         return floating_point_format_;
     }
@@ -294,7 +294,7 @@ public:
         return *this;
     }
 
-    uint8_t precision() const
+    uint8_t precision() const override
     {
         return precision_;
     }
@@ -305,7 +305,7 @@ public:
         return *this;
     }
 
-    bool escape_all_non_ascii() const
+    bool escape_all_non_ascii() const override
     {
         return escape_all_non_ascii_;
     }
@@ -316,7 +316,7 @@ public:
         return *this;
     }
 
-    bool escape_solidus() const
+    bool escape_solidus() const override
     {
         return escape_solidus_;
     }
@@ -333,11 +333,11 @@ public:
 
     bool can_read_neg_inf_replacement() const override {return can_read_neg_inf_replacement_;}
 
-    bool can_write_nan_replacement() const {return !nan_replacement_.empty();}
+    bool can_write_nan_replacement() const override {return !nan_replacement_.empty();}
 
-    bool can_write_pos_inf_replacement() const {return !pos_inf_replacement_.empty();}
+    bool can_write_pos_inf_replacement() const override {return !pos_inf_replacement_.empty();}
 
-    bool can_write_neg_inf_replacement() const {return !neg_inf_replacement_.empty();}
+    bool can_write_neg_inf_replacement() const override {return !neg_inf_replacement_.empty();}
 
     basic_json_serializing_options<CharT>& replace_inf(bool replace)
     {
