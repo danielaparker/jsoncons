@@ -334,7 +334,7 @@ See [json_type_traits](doc/ref/json_type_traits.md)
 
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
-### Convert JSON formatted text to C++ objects, and back
+### Convert JSON text to C++ objects, and back
 
 The functions `decode_json` and `encode_json` convert JSON 
 formatted strings to C++ objects and back. These functions attempt to 
