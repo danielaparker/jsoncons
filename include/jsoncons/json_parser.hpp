@@ -2518,6 +2518,15 @@ escape_u9:
         input_end_ = data + length;
         input_ptr_ = begin_input_;
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    void set_source(const CharT* data, size_t length)
+    {
+        begin_input_ = data;
+        input_end_ = data + length;
+        input_ptr_ = begin_input_;
+    }
+#endif
 private:
 
     void end_integer_value(std::error_code& ec)
