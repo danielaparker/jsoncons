@@ -1,12 +1,21 @@
-master
-------
+v0.108.0
+--------
+
+Enhancements
+
+- `bignum_chars_format::base64` is supported
+
+- The incremental parser `json_parser` has been documented
 
 Changes (non-breaking)
 
 - Previously, jsonpointer::get returned values (copies)
   Now, jsonpointer::get returns references if applied to `basic_json`, and values if applied to `cbor_view`
 
-- `bignum_chars_format::string` has been deprecated (still works) and replaced with `bignum_chars_format::string`
+- `bignum_chars_format::string` has been deprecated (still works) and replaced with `bignum_chars_format::base10`
+
+- `json_parser_errc`, `cbor_parser_errc`, and `csv_parser_errc` have been deprecated (still work) and renamed to 
+  `json_parse_errc`, `cbor_parse_errc`, and `csv_parse_errc`
 
 v0.107.2
 --------

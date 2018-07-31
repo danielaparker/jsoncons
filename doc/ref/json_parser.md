@@ -202,3 +202,61 @@ Output:
 
 (4) Unexpected non-whitespace character after JSON text at line 1 and column 7
 ```
+
+#### nan, inf, and -inf substitition
+
+```c++
+int main()
+{
+    std::string s = R"(
+        {
+           "A" : "NaN",
+           "B" : "Infinity",
+           "C" : "-Infinity"
+        }
+    )";
+
+    json_serializing_options options; // Implements json_read_options
+    options.nan_replacement("\"NaN\"")
+           .pos_inf_replacement("\"Infinity\"")
+           .neg_inf_replacement("\"-Infinity\"");
+
+    jsoncons::json_decoder<json> decoder;
+    json_parser parser(decoder, options);
+    try
+    {
+        parser.update(s);
+        parser.parse_some();
+        parser.end_parse();
+        parser.check_done();
+    }
+    catch (const parse_error& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    json j = decoder.get_result(); // performs move
+    if (j["A"].is<double>())
+    {
+        std::cout << "A: " << j["A"].as<double>() << std::endl;
+    }
+    if (j["B"].is<double>())
+    {
+        std::cout << "B: " << j["B"].as<double>() << std::endl;
+    }
+    if (j["C"].is<double>())
+    {
+        std::cout << "C: " << j["C"].as<double>() << std::endl;
+    }
+}
+```
+
+Output:
+
+```
+A: nan
+B: inf
+C: -inf
+```
+
+

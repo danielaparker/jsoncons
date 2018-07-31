@@ -94,12 +94,57 @@ void incremental_parsing_example3()
     }
 }
 
+void parse_nan_replacement_example()
+{
+    std::string s = R"(
+        {
+           "A" : "NaN",
+           "B" : "Infinity",
+           "C" : "-Infinity"
+        }
+    )";
+
+    json_serializing_options options;
+    options.nan_replacement("\"NaN\"")
+           .pos_inf_replacement("\"Infinity\"")
+           .neg_inf_replacement("\"-Infinity\"");
+
+    jsoncons::json_decoder<json> decoder;
+    json_parser parser(decoder, options);
+    try
+    {
+        parser.update(s);
+        parser.parse_some();
+        parser.end_parse();
+        parser.check_done();
+    }
+    catch (const parse_error& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
+    json j = decoder.get_result(); // performs move
+    if (j["A"].is<double>())
+    {
+        std::cout << "A: " << j["A"].as<double>() << std::endl;
+    }
+    if (j["B"].is<double>())
+    {
+        std::cout << "B: " << j["B"].as<double>() << std::endl;
+    }
+    if (j["C"].is<double>())
+    {
+        std::cout << "C: " << j["C"].as<double>() << std::endl;
+    }
+}
+
 void json_parser_examples()
 {
     std::cout << "\njson_parser examples\n\n";
     incremental_parsing_example1();
     incremental_parsing_example2();
     incremental_parsing_example3();
+    parse_nan_replacement_example();
 
     std::cout << std::endl;
 }
