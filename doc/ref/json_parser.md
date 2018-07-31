@@ -10,7 +10,7 @@ typedef basic_json_parser<char> json_parser
  say after digesting the sequence 'f', 'a', 'l', member function `done()` will return `false`, 
  and `source_exhausted()` will return `true`. Additional text can then be supplied to the parser, 
  `parse_some` called again, and parsing will continue from where it left off. `end_done` should be called
- when there is no more text to feed to the parser. Once the parser has read a complete JSON text, 
+ when there is no more input to feed to the parser. Once the parser has read a complete JSON text, 
  `done()` will return `true`. `check_done` will check if the input has any unconsumed non-whitespace characters,
  which would normally be considered an error.  
 
