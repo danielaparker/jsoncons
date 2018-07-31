@@ -74,7 +74,7 @@ basic_parsing_context|last_char()|<em>&#x2713;</em>|Use current_char()
 json_filter|parent()|<em>&#x2713;</em>|Use downstream_handler()
 &#160;|input_handler()|<em>&#x2713;</em>|Use downstream_handler()
 csv|`csv_parameters`||Use `csv_serializing_options`
-|`csv_parameters::header(std::string value)`||Use `csv_serializing_options::column_names(const std::string& value)`
+&#160;|`csv_parameters::header(std::string value)`|&#160;|Use `csv_serializing_options::column_names(const std::string& value)`
 &#160;|`column_names(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_names(const std::string& value)`
 &#160;|`data_types(std::string value)`||Use `column_types(const std::string& value)`
 &#160;|`column_types(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_types(const std::string& value)`
