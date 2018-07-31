@@ -3,9 +3,20 @@
 ```c++
 typedef basic_json_parser<char> json_parser
 ```
-`json_parser` is an incremental json parser. It can be fed its input in chunks.
+`json_parser` is an incremental json parser. It can be fed its input in chunks.  
 
-`json_parser` is noncopyable and nonmoveable.
+ A buffer of text is supplied to the parser with a call to `update(buffer)`. 
+ If a subsequent call to `parse_some` reaches the end of the buffer in the middle of parsing, 
+ say after digesting the sequence 'f', 'a', 'l', member function `done()` will return `false`, 
+ and `source_exhausted()` will return `true`. Additional text can then be supplied to the parser, 
+ `parse_some` called again, and parsing will continue from where it left off. `end_done` should be called
+ when there is no more text to feed to the parser. Once the parser has read a complete JSON text, 
+ `done()` will return `true`. `check_done` will check if the input has any unconsumed non-whitespace characters,
+ which would normally be considered an error.  
+
+`json_parser` is used by [json_reader](json_reader.md) to read from a stream in chunks.
+
+ `json_parser` is noncopyable and nonmoveable.
 
 #### Header
 ```c++
