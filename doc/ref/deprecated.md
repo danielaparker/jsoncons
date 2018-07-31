@@ -58,7 +58,7 @@ json_content_handler|begin_json|<em>&#x2713;</em>|`begin_document`
 &#160;|do_begin_json||`do_begin_document`
 &#160;|do_end_json||`do_end_document`
 serialization|`output_format`|<em>&#x2713;</em>|Use `json_serializing_options`
-|`serialization_options`|<em>&#x2713;</em>|Use `json_serializing_options`
+&#160;|`serialization_options`|<em>&#x2713;</em>|Use `json_serializing_options`
 json_reader|max_depth(),max_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
 &#160;|max_nesting_depth(),max_nesting_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
 &#160;|json_input_handler& parent()|<em>&#x2713;</em>|Use json_input_handler& input_handler()
