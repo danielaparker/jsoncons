@@ -16,7 +16,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### C++/JSON Conversion
 
-[encode_json](ref/encode_json.md)
+[encode_json](ref/encode_json.md)  
 [decode_json](ref/decode_json.md)
 
 #### Streaming
