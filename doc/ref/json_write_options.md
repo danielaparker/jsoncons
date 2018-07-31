@@ -44,6 +44,12 @@ Escape all non-ascii characters. The default is `false`.
     virtual bool escape_solidus() const = 0;
 Escape the solidus ('/') character. The default is `false`.
 
+    virtual bool can_write_nan_replacement() const = 0;
+
+    virtual bool can_write_pos_inf_replacement() const = 0;
+
+    virtual bool can_write_neg_inf_replacement() const = 0;
+
     virtual const std::string& nan_replacement() const = 0; 
 NaN replacement. The default is `"null"`. 
 

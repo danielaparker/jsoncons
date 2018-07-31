@@ -21,6 +21,12 @@ An abstract class that defines accessors for JSON deserialization options. The `
 
 #### Accessors
 
+    virtual bool can_read_nan_replacement() const = 0;
+
+    virtual bool can_read_pos_inf_replacement() const = 0;
+
+    virtual bool can_read_neg_inf_replacement() const = 0;
+
     virtual const std::string& nan_replacement() const = 0;
 NaN replacement. Double NaN values are substituted for JSON string values, if specified
 
