@@ -89,11 +89,11 @@ Parses the source until a complete json text has been consumed or the source has
 Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
     void end_parse()
-Called after there is no more input
+Called after there is no more input.
 Throws [parse_error](parse_error.md) if parsing fails.
 
     void end_parse(std::error_code& ec)
-Called after there is no more input
+Called after there is no more input.
 Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
     void skip_bom()
