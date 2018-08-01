@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(test_for_each_value)
     ++it;
     BOOST_CHECK(it->value().is_string());
     ++it;
-    BOOST_CHECK(it->value().type_id() == jsoncons::json_type_tag::uinteger_t);
+    BOOST_CHECK(it->value().type_id() == jsoncons::json_major_type::uinteger_t);
     ++it;
     BOOST_CHECK(it == val.object_range().end());
 }
