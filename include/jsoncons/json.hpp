@@ -88,19 +88,19 @@ public:
 
 enum class json_type_tag : uint8_t 
 {
-    null_t = 0,
-    empty_object_t,
-    bool_t,
-    integer_t,
-    uinteger_t,
-    double_t,
-    small_string_t,
-    string_t,
-    byte_string_t,
-    array_t,
-    object_t,
-    positive_bignum_t,
-    negative_bignum_t
+    null_t = 0x01,
+    empty_object_t = 0x02,
+    bool_t = 0x03,
+    integer_t = 0x04,
+    uinteger_t = 0x05,
+    double_t = 0x06,
+    small_string_t = 0x07,
+    string_t = 0x08,
+    byte_string_t = 0x09,
+    array_t = 0x0a,
+    object_t = 0x0b,
+    positive_bignum_t = 0x0c,
+    negative_bignum_t = 0x0d
 };
                         
 template <class CharT, class ImplementationPolicy, class Allocator>
@@ -162,10 +162,10 @@ public:
 
     struct variant
     {
-        struct data_base
+        class data_base
         {
             json_type_tag type_id_;
-
+        public:
             data_base(json_type_tag id)
                 : type_id_(id)
             {}
@@ -915,7 +915,7 @@ public:
 
         json_type_tag type_id() const
         {
-            return reinterpret_cast<const data_base*>(&data_)->type_id_;
+            return reinterpret_cast<const data_base*>(&data_)->type_id();
         }
 
         const null_data* null_data_cast() const
