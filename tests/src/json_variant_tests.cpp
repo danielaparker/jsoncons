@@ -73,8 +73,8 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
     json::variant var10(std::move(var9));
     //BOOST_CHECK(json_major_type::null_t == var9.major_type());
     BOOST_CHECK(json_major_type::short_string_t == var10.major_type());
-    BOOST_CHECK(val9 == var10.small_string_data_cast()->data());
-    BOOST_CHECK(val9.length() == var10.small_string_data_cast()->length());
+    BOOST_CHECK(val9 == var10.short_string_data_cast()->data());
+    BOOST_CHECK(val9.length() == var10.short_string_data_cast()->length());
 
     bool val11 = true;
     json::variant var11(val11);
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
     json::variant var10(var9);
     BOOST_CHECK(json_major_type::short_string_t == var9.major_type());
     BOOST_CHECK(json_major_type::short_string_t == var10.major_type());
-    BOOST_CHECK(var10.small_string_data_cast()->data() == val9);
+    BOOST_CHECK(var10.short_string_data_cast()->data() == val9);
 
     bool val11 = true;
     json::variant var11(val11);

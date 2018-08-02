@@ -310,7 +310,7 @@ public:
             }
         };
 
-        class small_string_data final : public data_base
+        class short_string_data final : public data_base
         {
             static const size_t capacity = 14/sizeof(char_type);
             uint8_t length_;
@@ -318,7 +318,7 @@ public:
         public:
             static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
-            small_string_data(const char_type* p, uint8_t length)
+            short_string_data(const char_type* p, uint8_t length)
                 : data_base(json_major_type::short_string_t), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
@@ -326,7 +326,7 @@ public:
                 data_[length] = 0;
             }
 
-            small_string_data(const small_string_data& val)
+            short_string_data(const short_string_data& val)
                 : data_base(json_major_type::short_string_t), length_(val.length_)
             {
                 std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
@@ -678,8 +678,8 @@ public:
         };
 
     private:
-        static const size_t data_size = static_max<sizeof(uinteger_data),sizeof(double_data),sizeof(small_string_data), sizeof(string_data), sizeof(array_data), sizeof(object_data)>::value;
-        static const size_t data_align = static_max<JSONCONS_ALIGNOF(uinteger_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(small_string_data),JSONCONS_ALIGNOF(string_data),JSONCONS_ALIGNOF(array_data),JSONCONS_ALIGNOF(object_data)>::value;
+        static const size_t data_size = static_max<sizeof(uinteger_data),sizeof(double_data),sizeof(short_string_data), sizeof(string_data), sizeof(array_data), sizeof(object_data)>::value;
+        static const size_t data_align = static_max<JSONCONS_ALIGNOF(uinteger_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(short_string_data),JSONCONS_ALIGNOF(string_data),JSONCONS_ALIGNOF(array_data),JSONCONS_ALIGNOF(object_data)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
@@ -746,9 +746,9 @@ public:
         }
         variant(const char_type* s, size_t length)
         {
-            if (length <= small_string_data::max_length)
+            if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(s, static_cast<uint8_t>(length));
             }
             else
             {
@@ -813,9 +813,9 @@ public:
         variant(const char_type* s)
         {
             size_t length = char_traits_type::length(s);
-            if (length <= small_string_data::max_length)
+            if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(s, static_cast<uint8_t>(length));
             }
             else
             {
@@ -826,9 +826,9 @@ public:
         variant(const char_type* s, const Allocator& alloc)
         {
             size_t length = char_traits_type::length(s);
-            if (length <= small_string_data::max_length)
+            if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(s, static_cast<uint8_t>(length));
             }
             else
             {
@@ -838,9 +838,9 @@ public:
 
         variant(const char_type* s, size_t length, const Allocator& alloc)
         {
-            if (length <= small_string_data::max_length)
+            if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))small_string_data(s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(s, static_cast<uint8_t>(length));
             }
             else
             {
@@ -916,7 +916,7 @@ public:
                     new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                     break;
                 case json_major_type::short_string_t:
-                    new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
                     break;
                 case json_major_type::long_string_t:
                     new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
@@ -982,9 +982,9 @@ public:
             return reinterpret_cast<const double_data*>(&data_);
         }
 
-        const small_string_data* small_string_data_cast() const
+        const short_string_data* short_string_data_cast() const
         {
-            return reinterpret_cast<const small_string_data*>(&data_);
+            return reinterpret_cast<const short_string_data*>(&data_);
         }
 
         string_data* string_data_cast()
@@ -1032,7 +1032,7 @@ public:
             switch (major_type())
             {
             case json_major_type::short_string_t:
-                return string_view_type(small_string_data_cast()->data(),small_string_data_cast()->length());
+                return string_view_type(short_string_data_cast()->data(),short_string_data_cast()->length());
             case json_major_type::long_string_t:
                 return string_view_type(string_data_cast()->data(),string_data_cast()->length());
             default:
@@ -1268,7 +1268,7 @@ public:
                 new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
                 break;
             case json_major_type::short_string_t:
-                new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
+                new(reinterpret_cast<void*>(&(other.data_)))short_string_data(*short_string_data_cast());
                 break;
             case json_major_type::long_string_t:
                 new(reinterpret_cast<void*>(&other.data_))string_data(std::move(*string_data_cast()));
@@ -1330,7 +1330,7 @@ public:
                 new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                 break;
             case json_major_type::short_string_t:
-                new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
                 break;
             case json_major_type::long_string_t:
                 new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
@@ -3035,7 +3035,7 @@ public:
         switch (var_.major_type())
         {
         case json_major_type::short_string_t:
-            return var_.small_string_data_cast()->length() == 0;
+            return var_.short_string_data_cast()->length() == 0;
         case json_major_type::long_string_t:
             return var_.string_data_cast()->length() == 0;
         case json_major_type::array_t:
@@ -3352,7 +3352,12 @@ public:
                 }
             }
             default:
-                return to_string(options, allocator);
+            {
+                string_type s(allocator);
+                basic_json_serializer<char_type,detail::string_writer<char_type>> serializer(s,options);
+                dump_fragment(serializer);
+                return s;
+            }
         }
     }
 
@@ -3362,7 +3367,7 @@ public:
         switch (var_.major_type())
         {
         case json_major_type::short_string_t:
-            return var_.small_string_data_cast()->c_str();
+            return var_.short_string_data_cast()->c_str();
         case json_major_type::long_string_t:
             return var_.string_data_cast()->c_str();
         default:
