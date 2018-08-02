@@ -227,8 +227,8 @@ public:
                 break;
             }
 
-            case json_major_type::small_string_t:
-            case json_major_type::string_t:
+            case json_major_type::short_string_t:
+            case json_major_type::long_string_t:
             {
                 encode_string(jval.as_string_view(), action, v);
                 break;

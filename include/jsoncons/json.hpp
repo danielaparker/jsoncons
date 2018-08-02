@@ -94,8 +94,8 @@ enum class json_major_type : uint8_t
     integer_t = 0x04,
     uinteger_t = 0x05,
     double_t = 0x06,
-    small_string_t = 0x07,
-    string_t = 0x08,
+    short_string_t = 0x07,
+    long_string_t = 0x08,
     byte_string_t = 0x09,
     array_t = 0x0a,
     object_t = 0x0b
@@ -319,7 +319,7 @@ public:
             static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
             small_string_data(const char_type* p, uint8_t length)
-                : data_base(json_major_type::small_string_t), length_(length)
+                : data_base(json_major_type::short_string_t), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
@@ -327,7 +327,7 @@ public:
             }
 
             small_string_data(const small_string_data& val)
-                : data_base(json_major_type::small_string_t), length_(val.length_)
+                : data_base(json_major_type::short_string_t), length_(val.length_)
             {
                 std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
                 data_[length_] = 0;
@@ -357,25 +357,25 @@ public:
             pointer ptr_;
         public:
             string_data(const string_data& val)
-                : data_base(json_major_type::string_t)
+                : data_base(json_major_type::long_string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
             string_data(string_data&& val)
-                : data_base(json_major_type::string_t), ptr_(nullptr)
+                : data_base(json_major_type::long_string_t), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             string_data(const string_data& val, const Allocator& a)
-                : data_base(json_major_type::string_t)
+                : data_base(json_major_type::long_string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
             }
 
             string_data(const char_type* data, size_t length, const Allocator& a)
-                : data_base(json_major_type::string_t)
+                : data_base(json_major_type::long_string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
@@ -873,7 +873,7 @@ public:
         {
             switch (major_type())
             {
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 reinterpret_cast<string_data*>(&data_)->~string_data();
                 break;
             case json_major_type::byte_string_t:
@@ -915,10 +915,10 @@ public:
                 case json_major_type::double_t:
                     new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                     break;
-                case json_major_type::small_string_t:
+                case json_major_type::short_string_t:
                     new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
                     break;
-                case json_major_type::string_t:
+                case json_major_type::long_string_t:
                     new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
                     break;
                 case json_major_type::byte_string_t:
@@ -1031,9 +1031,9 @@ public:
         {
             switch (major_type())
             {
-            case json_major_type::small_string_t:
+            case json_major_type::short_string_t:
                 return string_view_type(small_string_data_cast()->data(),small_string_data_cast()->length());
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 return string_view_type(string_data_cast()->data(),string_data_cast()->length());
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
@@ -1070,11 +1070,11 @@ public:
                 case json_major_type::byte_string_t:
                     switch (byte_string_data_cast()->tag())
                     {
-                        case byte_string_tag::positive_bignum_t:
-                            return bignum(1, byte_string_data_cast()->data(),byte_string_data_cast()->length());
-                            break;
                         case byte_string_tag::negative_bignum_t:
                             return bignum(-1, byte_string_data_cast()->data(),byte_string_data_cast()->length());
+                            break;
+                        case byte_string_tag::positive_bignum_t:
+                            return bignum(1, byte_string_data_cast()->data(),byte_string_data_cast()->length());
                             break;
                         default:
                             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
@@ -1161,12 +1161,12 @@ public:
                     return false;
                 }
                 break;
-            case json_major_type::small_string_t:
+            case json_major_type::short_string_t:
                 switch (rhs.major_type())
                 {
-                case json_major_type::small_string_t:
+                case json_major_type::short_string_t:
                     return as_string_view() == rhs.as_string_view();
-                case json_major_type::string_t:
+                case json_major_type::long_string_t:
                     return as_string_view() == rhs.as_string_view();
                 default:
                     return false;
@@ -1183,12 +1183,12 @@ public:
                     return false;
                 }
                 break;
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 switch (rhs.major_type())
                 {
-                case json_major_type::small_string_t:
+                case json_major_type::short_string_t:
                     return as_string_view() == rhs.as_string_view();
-                case json_major_type::string_t:
+                case json_major_type::long_string_t:
                     return as_string_view() == rhs.as_string_view();
                 default:
                     return false;
@@ -1267,10 +1267,10 @@ public:
             case json_major_type::double_t:
                 new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
                 break;
-            case json_major_type::small_string_t:
+            case json_major_type::short_string_t:
                 new(reinterpret_cast<void*>(&(other.data_)))small_string_data(*small_string_data_cast());
                 break;
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 new(reinterpret_cast<void*>(&other.data_))string_data(std::move(*string_data_cast()));
                 break;
             case json_major_type::byte_string_t:
@@ -1288,7 +1288,7 @@ public:
             }
             switch (temp.major_type())
             {
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 new(reinterpret_cast<void*>(&data_))string_data(std::move(*temp.string_data_cast()));
                 break;
             case json_major_type::byte_string_t:
@@ -1329,10 +1329,10 @@ public:
             case json_major_type::double_t:
                 new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                 break;
-            case json_major_type::small_string_t:
+            case json_major_type::short_string_t:
                 new(reinterpret_cast<void*>(&data_))small_string_data(*(val.small_string_data_cast()));
                 break;
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
                 break;
             case json_major_type::byte_string_t:
@@ -1359,10 +1359,10 @@ public:
             case json_major_type::integer_t:
             case json_major_type::uinteger_t:
             case json_major_type::double_t:
-            case json_major_type::small_string_t:
+            case json_major_type::short_string_t:
                 Init_(val);
                 break;
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
                 break;
             case json_major_type::byte_string_t:
@@ -1389,10 +1389,10 @@ public:
             case json_major_type::integer_t:
             case json_major_type::uinteger_t:
             case json_major_type::bool_t:
-            case json_major_type::small_string_t:
+            case json_major_type::short_string_t:
                 Init_(val);
                 break;
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 {
                     new(reinterpret_cast<void*>(&data_))string_data(std::move(*val.string_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
@@ -1437,10 +1437,10 @@ public:
             case json_major_type::integer_t:
             case json_major_type::uinteger_t:
             case json_major_type::bool_t:
-            case json_major_type::small_string_t:
+            case json_major_type::short_string_t:
                 Init_(std::forward<variant>(val));
                 break;
-            case json_major_type::string_t:
+            case json_major_type::long_string_t:
                 {
                     if (a == val.string_data_cast()->get_allocator())
                     {
@@ -2749,18 +2749,18 @@ public:
     {
         switch (var_.major_type())
         {
-            case json_major_type::small_string_t:
-            case json_major_type::string_t:
+            case json_major_type::short_string_t:
+            case json_major_type::long_string_t:
                 handler.string_value(as_string_view());
                 break;
             case json_major_type::byte_string_t:
                 switch (var_.byte_string_data_cast()->tag())
                 {
-                    case byte_string_tag::positive_bignum_t:
-                        handler.bignum_value(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                        break;
                     case byte_string_tag::negative_bignum_t:
                         handler.bignum_value(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                        break;
+                    case byte_string_tag::positive_bignum_t:
+                        handler.bignum_value(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                         break;
                     default:
                         handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
@@ -2980,7 +2980,7 @@ public:
 
     bool is_string() const JSONCONS_NOEXCEPT
     {
-        return (var_.major_type() == json_major_type::string_t) || (var_.major_type() == json_major_type::small_string_t);
+        return (var_.major_type() == json_major_type::long_string_t) || (var_.major_type() == json_major_type::short_string_t);
     }
 
     bool is_byte_string() const JSONCONS_NOEXCEPT
@@ -3034,9 +3034,9 @@ public:
     {
         switch (var_.major_type())
         {
-        case json_major_type::small_string_t:
+        case json_major_type::short_string_t:
             return var_.small_string_data_cast()->length() == 0;
-        case json_major_type::string_t:
+        case json_major_type::long_string_t:
             return var_.string_data_cast()->length() == 0;
         case json_major_type::array_t:
             return array_value().size() == 0;
@@ -3141,8 +3141,8 @@ public:
     {
         switch (var_.major_type())
         {
-        case json_major_type::small_string_t:
-        case json_major_type::string_t:
+        case json_major_type::short_string_t:
+        case json_major_type::long_string_t:
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3170,8 +3170,8 @@ public:
     {
         switch (var_.major_type())
         {
-        case json_major_type::small_string_t:
-        case json_major_type::string_t:
+        case json_major_type::short_string_t:
+        case json_major_type::long_string_t:
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3199,8 +3199,8 @@ public:
     {
         switch (var_.major_type())
         {
-        case json_major_type::small_string_t:
-        case json_major_type::string_t:
+        case json_major_type::short_string_t:
+        case json_major_type::long_string_t:
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3250,8 +3250,8 @@ public:
     {
         switch (var_.major_type())
         {
-        case json_major_type::small_string_t:
-        case json_major_type::string_t:
+        case json_major_type::short_string_t:
+        case json_major_type::long_string_t:
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3320,23 +3320,23 @@ public:
     {
         switch (var_.major_type())
         {
-            case json_major_type::small_string_t:
-            case json_major_type::string_t:
+            case json_major_type::short_string_t:
+            case json_major_type::long_string_t:
                 return string_type(as_string_view().data(),as_string_view().length(),allocator);
             case json_major_type::byte_string_t:
             {
                 switch (var_.byte_string_data_cast()->tag())
                 {
-                    case byte_string_tag::positive_bignum_t:
+                    case byte_string_tag::negative_bignum_t:
                     {
-                        bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                        bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                         string_type s(allocator);
                         n.dump(s);
                         return s;
                     }
-                    case byte_string_tag::negative_bignum_t:
+                    case byte_string_tag::positive_bignum_t:
                     {
-                        bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                        bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                         string_type s(allocator);
                         n.dump(s);
                         return s;
@@ -3361,9 +3361,9 @@ public:
     {
         switch (var_.major_type())
         {
-        case json_major_type::small_string_t:
+        case json_major_type::short_string_t:
             return var_.small_string_data_cast()->c_str();
-        case json_major_type::string_t:
+        case json_major_type::long_string_t:
             return var_.string_data_cast()->c_str();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a cstring"));
