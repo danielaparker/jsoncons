@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
     BOOST_CHECK(v.is_object());
     BOOST_CHECK(!v.is_array());
 
-    json jv = decode_cbor<json>(v);
-    std::cout << pretty_print(jv) << std::endl;
+    ojson jv = decode_cbor<ojson>(v);
+    BOOST_CHECK(jv == j1);
 
     cbor_view reputons = v.at("reputons");
     BOOST_CHECK(reputons.is_array());
@@ -62,21 +62,21 @@ BOOST_AUTO_TEST_CASE(cbor_view_test)
         const auto& val = member.value();
         json jval = decode_cbor<json>(val);
 
-        std::cout << key << ": " << jval << std::endl;
+        //std::cout << key << ": " << jval << std::endl;
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
     for (auto element : reputons.array_range())
     {
         json j = decode_cbor<json>(element);
-        std::cout << j << std::endl;
+        //std::cout << j << std::endl;
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(jsonpointer_test)
 {
-    ojson j = ojson::parse(R"(
+    json j = json::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -96,21 +96,24 @@ BOOST_AUTO_TEST_CASE(jsonpointer_test)
     cbor_view bv = buffer;
     std::string s;
     bv.dump(s);
-    std::cout << "Object dump" << std::endl;
-    std::cout << s << std::endl;
+    json j1 = json::parse(s);
+    BOOST_CHECK(j1 == j);
 
     std::error_code ec;
     cbor_view application = jsonpointer::get(cbor_view(buffer), "/application", ec);
     BOOST_CHECK(!ec);
 
     json j2 = decode_cbor<json>(application);
-    std::cout << pretty_print(j2) << std::endl;
+    BOOST_CHECK(j2 == j["application"]);
 
     cbor_view reputons_0_rated = jsonpointer::get(cbor_view(buffer), "/reputons", ec);
     BOOST_CHECK(!ec);
 
     json j3 = decode_cbor<json>(reputons_0_rated);
-    std::cout << pretty_print(j3) << std::endl;
+    json j4 = j["reputons"];
+    BOOST_CHECK(j3 == j4);
+
+    //std::cout << pretty_print(j3) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(as_string_test)
@@ -131,12 +134,6 @@ BOOST_AUTO_TEST_CASE(as_string_test)
     serializer.bignum_value("-18446744073709551617");
     serializer.end_array();
     serializer.end_document();
-
-    //for (auto u : b)
-    //{
-    //    std::cout << std::hex << (int)u;
-    //}
-    //std::cout << "\n\n";
 
     jsoncons::cbor::cbor_view bv = b;
 
