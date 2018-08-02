@@ -420,7 +420,7 @@ public:
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> string_holder_allocator_type;
             typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
 
-            json_minor_type tag_;
+            json_minor_type minor_type_;
             pointer ptr_;
 
             template <typename... Args>
@@ -439,26 +439,26 @@ public:
                 }
             }
         public:
-            byte_string_data(json_minor_type tag, const uint8_t* data, size_t length, const Allocator& a)
-                : data_base(json_major_type::byte_string_t), tag_(tag)
+            byte_string_data(json_minor_type type, const uint8_t* data, size_t length, const Allocator& a)
+                : data_base(json_major_type::byte_string_t), minor_type_(type)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
 
             byte_string_data(const byte_string_data& val)
-                : data_base(val.major_type()), tag_(val.tag())
+                : data_base(val.major_type()), minor_type_(val.minor_type())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_data(byte_string_data&& val)
-                : data_base(val.major_type()), tag_(val.tag()), ptr_(nullptr)
+                : data_base(val.major_type()), minor_type_(val.minor_type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             byte_string_data(const byte_string_data& val, const Allocator& a)
-                : data_base(val.major_type()), tag_(val.tag())
+                : data_base(val.major_type()), minor_type_(val.minor_type())
             { 
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
@@ -473,9 +473,9 @@ public:
                 }
             }
 
-            json_minor_type tag() const
+            json_minor_type minor_type() const
             {
-                return tag_;
+                return minor_type_;
             }
 
             void swap(byte_string_data& val)
@@ -1057,7 +1057,7 @@ public:
             switch (major_type())
             {
                 case json_major_type::byte_string_t:
-                    switch (byte_string_data_cast()->tag())
+                    switch (byte_string_data_cast()->minor_type())
                     {
                         case json_minor_type::negative_bignum_t:
                             return bignum(-1, byte_string_data_cast()->data(),byte_string_data_cast()->length());
@@ -1166,7 +1166,7 @@ public:
                 {
                 case json_major_type::byte_string_t:
                     {
-                        return byte_string_data_cast()->tag() == rhs.byte_string_data_cast()->tag() && as_byte_string_view() == rhs.as_byte_string_view();
+                        return byte_string_data_cast()->minor_type() == rhs.byte_string_data_cast()->minor_type() && as_byte_string_view() == rhs.as_byte_string_view();
                     }
                 default:
                     return false;
@@ -2743,7 +2743,7 @@ public:
                 handler.string_value(as_string_view());
                 break;
             case json_major_type::byte_string_t:
-                switch (var_.byte_string_data_cast()->tag())
+                switch (var_.byte_string_data_cast()->minor_type())
                 {
                     case json_minor_type::negative_bignum_t:
                         handler.bignum_value(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
@@ -2975,13 +2975,13 @@ public:
     bool is_byte_string() const JSONCONS_NOEXCEPT
     {
         return (var_.major_type() == json_major_type::byte_string_t 
-               && var_.byte_string_data_cast()->tag() == json_minor_type());
+               && var_.byte_string_data_cast()->minor_type() == json_minor_type());
     }
 
     bool is_bignum() const JSONCONS_NOEXCEPT
     {
         return (var_.major_type() == json_major_type::byte_string_t 
-               && (var_.byte_string_data_cast()->tag() == json_minor_type::negative_bignum_t || var_.byte_string_data_cast()->tag() == json_minor_type::positive_bignum_t));
+               && (var_.byte_string_data_cast()->minor_type() == json_minor_type::negative_bignum_t || var_.byte_string_data_cast()->minor_type() == json_minor_type::positive_bignum_t));
     }
 
     bool is_bool() const JSONCONS_NOEXCEPT
@@ -3314,7 +3314,7 @@ public:
                 return string_type(as_string_view().data(),as_string_view().length(),allocator);
             case json_major_type::byte_string_t:
             {
-                switch (var_.byte_string_data_cast()->tag())
+                switch (var_.byte_string_data_cast()->minor_type())
                 {
                     case json_minor_type::negative_bignum_t:
                     {
