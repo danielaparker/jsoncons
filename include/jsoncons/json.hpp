@@ -788,7 +788,7 @@ public:
             }
         }
 
-        variant(const basic_bignum<byte_allocator_type>& bs, const Allocator& allocator)
+        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& allocator)
         {
             int signum;
             std::vector<uint8_t> data;
