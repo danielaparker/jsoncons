@@ -98,7 +98,7 @@ public:
     template <class Action, class Result>
     static void encode(const Json& jval, Action action, Result& v)
     {
-        switch (jval.type_id())
+        switch (jval.major_type())
         {
             case json_major_type::null_t:
             {

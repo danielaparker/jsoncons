@@ -174,7 +174,7 @@ public:
                 : type_id_(id)
             {}
 
-            json_major_type type_id() const {return type_id_;}
+            json_major_type major_type() const {return type_id_;}
         };
 
         class null_data final : public data_base
@@ -453,19 +453,19 @@ public:
             }
 
             byte_string_data(const byte_string_data& val)
-                : data_base(val.type_id()), tag_(val.tag())
+                : data_base(val.major_type()), tag_(val.tag())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_data(byte_string_data&& val)
-                : data_base(val.type_id()), tag_(val.tag()), ptr_(nullptr)
+                : data_base(val.major_type()), tag_(val.tag()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             byte_string_data(const byte_string_data& val, const Allocator& a)
-                : data_base(val.type_id()), tag_(val.tag())
+                : data_base(val.major_type()), tag_(val.tag())
             { 
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
             }
@@ -871,7 +871,7 @@ public:
 
         void Destroy_()
         {
-            switch (type_id())
+            switch (major_type())
             {
             case json_major_type::string_t:
                 reinterpret_cast<string_data*>(&data_)->~string_data();
@@ -895,7 +895,7 @@ public:
             if (this !=&val)
             {
                 Destroy_();
-                switch (val.type_id())
+                switch (val.major_type())
                 {
                 case json_major_type::null_t:
                     new(reinterpret_cast<void*>(&data_))null_data();
@@ -947,9 +947,9 @@ public:
             return *this;
         }
 
-        json_major_type type_id() const
+        json_major_type major_type() const
         {
-            return reinterpret_cast<const data_base*>(&data_)->type_id();
+            return reinterpret_cast<const data_base*>(&data_)->major_type();
         }
 
         const null_data* null_data_cast() const
@@ -1029,7 +1029,7 @@ public:
 
         string_view_type as_string_view() const
         {
-            switch (type_id())
+            switch (major_type())
             {
             case json_major_type::small_string_t:
                 return string_view_type(small_string_data_cast()->data(),small_string_data_cast()->length());
@@ -1043,7 +1043,7 @@ public:
         template <typename BAllocator=std::allocator<char>>
         basic_byte_string<BAllocator> as_byte_string() const
         {
-            switch (type_id())
+            switch (major_type())
             {
             case json_major_type::byte_string_t:
                 return basic_byte_string<BAllocator>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
@@ -1054,7 +1054,7 @@ public:
 
         byte_string_view as_byte_string_view() const
         {
-            switch (type_id())
+            switch (major_type())
             {
             case json_major_type::byte_string_t:
                 return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length());
@@ -1065,7 +1065,7 @@ public:
 
         basic_bignum<byte_allocator_type> as_bignum() const
         {
-            switch (type_id())
+            switch (major_type())
             {
                 case json_major_type::byte_string_t:
                     switch (byte_string_data_cast()->tag())
@@ -1091,10 +1091,10 @@ public:
             {
                 return true;
             }
-            switch (type_id())
+            switch (major_type())
             {
             case json_major_type::null_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::null_t:
                     return true;
@@ -1103,7 +1103,7 @@ public:
                 }
                 break;
             case json_major_type::empty_object_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::empty_object_t:
                     return true;
@@ -1114,7 +1114,7 @@ public:
                 }
                 break;
             case json_major_type::bool_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::bool_t:
                     return bool_data_cast()->value() == rhs.bool_data_cast()->value();
@@ -1123,7 +1123,7 @@ public:
                 }
                 break;
             case json_major_type::integer_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::integer_t:
                     return integer_data_cast()->value() == rhs.integer_data_cast()->value();
@@ -1136,7 +1136,7 @@ public:
                 }
                 break;
             case json_major_type::uinteger_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::integer_t:
                     return rhs.integer_data_cast()->value() >= 0 ? uinteger_data_cast()->value() == static_cast<uint64_t>(rhs.integer_data_cast()->value()) : false;
@@ -1149,7 +1149,7 @@ public:
                 }
                 break;
             case json_major_type::double_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::integer_t:
                     return double_data_cast()->value() == static_cast<double>(rhs.integer_data_cast()->value());
@@ -1162,7 +1162,7 @@ public:
                 }
                 break;
             case json_major_type::small_string_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::small_string_t:
                     return as_string_view() == rhs.as_string_view();
@@ -1173,7 +1173,7 @@ public:
                 }
                 break;
             case json_major_type::byte_string_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::byte_string_t:
                     {
@@ -1184,7 +1184,7 @@ public:
                 }
                 break;
             case json_major_type::string_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::small_string_t:
                     return as_string_view() == rhs.as_string_view();
@@ -1195,7 +1195,7 @@ public:
                 }
                 break;
             case json_major_type::array_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::array_t:
                     return array_data_cast()->value() == rhs.array_data_cast()->value();
@@ -1204,7 +1204,7 @@ public:
                 }
                 break;
             case json_major_type::object_t:
-                switch (rhs.type_id())
+                switch (rhs.major_type())
                 {
                 case json_major_type::empty_object_t:
                     return object_data_cast()->value().size() == 0;
@@ -1247,7 +1247,7 @@ public:
             }
 
             variant temp(other);
-            switch (type_id())
+            switch (major_type())
             {
             case json_major_type::null_t:
                 new(reinterpret_cast<void*>(&(other.data_)))null_data();
@@ -1286,7 +1286,7 @@ public:
                 JSONCONS_UNREACHABLE();
                 break;
             }
-            switch (temp.type_id())
+            switch (temp.major_type())
             {
             case json_major_type::string_t:
                 new(reinterpret_cast<void*>(&data_))string_data(std::move(*temp.string_data_cast()));
@@ -1309,7 +1309,7 @@ public:
 
         void Init_(const variant& val)
         {
-            switch (val.type_id())
+            switch (val.major_type())
             {
             case json_major_type::null_t:
                 new(reinterpret_cast<void*>(&data_))null_data();
@@ -1351,7 +1351,7 @@ public:
 
         void Init_(const variant& val, const Allocator& a)
         {
-            switch (val.type_id())
+            switch (val.major_type())
             {
             case json_major_type::null_t:
             case json_major_type::empty_object_t:
@@ -1381,7 +1381,7 @@ public:
 
         void Init_rv_(variant&& val) JSONCONS_NOEXCEPT
         {
-            switch (val.type_id())
+            switch (val.major_type())
             {
             case json_major_type::null_t:
             case json_major_type::empty_object_t:
@@ -1429,7 +1429,7 @@ public:
 
         void Init_rv_(variant&& val, const Allocator& a, std::false_type) JSONCONS_NOEXCEPT
         {
-            switch (val.type_id())
+            switch (val.major_type())
             {
             case json_major_type::null_t:
             case json_major_type::empty_object_t:
@@ -1580,9 +1580,9 @@ public:
             return evaluate().size();
         }
 
-        json_major_type type_id() const
+        json_major_type major_type() const
         {
-            return evaluate().type_id();
+            return evaluate().major_type();
         }
 
         size_t count(const string_view_type& name) const
@@ -2664,7 +2664,7 @@ public:
 
     size_t size() const JSONCONS_NOEXCEPT
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             return 0;
@@ -2689,7 +2689,7 @@ public:
 
     json_proxy<basic_json> operator[](const string_view_type& name)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t: 
             create_object_implicitly();
@@ -2747,7 +2747,7 @@ public:
 #endif
     void dump_fragment(basic_json_content_handler<char_type>& handler) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
             case json_major_type::small_string_t:
             case json_major_type::string_t:
@@ -2929,12 +2929,12 @@ public:
 #endif
     bool is_null() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::null_t;
+        return var_.major_type() == json_major_type::null_t;
     }
 
     bool has_key(const string_view_type& name) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::object_t:
             {
@@ -2949,7 +2949,7 @@ public:
 
     size_t count(const string_view_type& name) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::object_t:
             {
@@ -2980,59 +2980,59 @@ public:
 
     bool is_string() const JSONCONS_NOEXCEPT
     {
-        return (var_.type_id() == json_major_type::string_t) || (var_.type_id() == json_major_type::small_string_t);
+        return (var_.major_type() == json_major_type::string_t) || (var_.major_type() == json_major_type::small_string_t);
     }
 
     bool is_byte_string() const JSONCONS_NOEXCEPT
     {
-        return (var_.type_id() == json_major_type::byte_string_t 
+        return (var_.major_type() == json_major_type::byte_string_t 
                && var_.byte_string_data_cast()->tag() == byte_string_tag());
     }
 
     bool is_bignum() const JSONCONS_NOEXCEPT
     {
-        return (var_.type_id() == json_major_type::byte_string_t 
+        return (var_.major_type() == json_major_type::byte_string_t 
                && (var_.byte_string_data_cast()->tag() == byte_string_tag::negative_bignum_t || var_.byte_string_data_cast()->tag() == byte_string_tag::positive_bignum_t));
     }
 
     bool is_bool() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::bool_t;
+        return var_.major_type() == json_major_type::bool_t;
     }
 
     bool is_object() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::object_t || var_.type_id() == json_major_type::empty_object_t;
+        return var_.major_type() == json_major_type::object_t || var_.major_type() == json_major_type::empty_object_t;
     }
 
     bool is_array() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::array_t;
+        return var_.major_type() == json_major_type::array_t;
     }
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::integer_t || (var_.type_id() == json_major_type::uinteger_t&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
+        return var_.major_type() == json_major_type::integer_t || (var_.major_type() == json_major_type::uinteger_t&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::uinteger_t || (var_.type_id() == json_major_type::integer_t&& as_integer() >= 0);
+        return var_.major_type() == json_major_type::uinteger_t || (var_.major_type() == json_major_type::integer_t&& as_integer() >= 0);
     }
 
     bool is_double() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::double_t;
+        return var_.major_type() == json_major_type::double_t;
     }
 
     bool is_number() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::integer_t || var_.type_id() == json_major_type::uinteger_t || var_.type_id() == json_major_type::double_t;
+        return var_.major_type() == json_major_type::integer_t || var_.major_type() == json_major_type::uinteger_t || var_.major_type() == json_major_type::double_t;
     }
 
     bool empty() const JSONCONS_NOEXCEPT
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::small_string_t:
             return var_.small_string_data_cast()->length() == 0;
@@ -3051,7 +3051,7 @@ public:
 
     size_t capacity() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return array_value().capacity();
@@ -3078,7 +3078,7 @@ public:
 
     void reserve(size_t n)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().reserve(n);
@@ -3101,7 +3101,7 @@ public:
 
     void resize(size_t n)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().resize(n);
@@ -3114,7 +3114,7 @@ public:
     template <class T>
     void resize(size_t n, T val)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().resize(n, val);
@@ -3139,7 +3139,7 @@ public:
 
     bool as_bool() const 
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::small_string_t:
         case json_major_type::string_t:
@@ -3168,7 +3168,7 @@ public:
 
     int64_t as_integer() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::small_string_t:
         case json_major_type::string_t:
@@ -3197,7 +3197,7 @@ public:
 
     uint64_t as_uinteger() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::small_string_t:
         case json_major_type::string_t:
@@ -3226,7 +3226,7 @@ public:
 
     size_t precision() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::double_t:
             return var_.double_data_cast()->precision();
@@ -3237,7 +3237,7 @@ public:
 
     size_t decimal_places() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::double_t:
             return var_.double_data_cast()->decimal_places();
@@ -3248,7 +3248,7 @@ public:
 
     double as_double() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::small_string_t:
         case json_major_type::string_t:
@@ -3299,159 +3299,30 @@ public:
     template <class SAllocator=std::allocator<CharT>>
     string_type as_string() const 
     {
-        switch (var_.type_id())
-        {
-            case json_major_type::small_string_t:
-            case json_major_type::string_t:
-                return string_type(as_string_view().data(),as_string_view().length());
-            case json_major_type::byte_string_t:
-            {
-                switch (var_.byte_string_data_cast()->tag())
-                {
-                    case byte_string_tag::positive_bignum_t:
-                    {
-                        bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                        string_type s;
-                        n.dump(s);
-                        return s;
-                    }
-                    case byte_string_tag::negative_bignum_t:
-                    {
-                        bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                        string_type s;
-                        n.dump(s);
-                        return s;
-                    }
-                    default:
-                    {
-                        string_type s;
-                        encode_base64url(var_.byte_string_data_cast()->data(), 
-                                         var_.byte_string_data_cast()->length(),
-                                         s);
-                        return s;
-                    }
-                }
-            }
-            default:
-                return to_string();
-        }
+        return as_string(basic_json_serializing_options<char_type>(),SAllocator());
     }
 
     template <class SAllocator=std::allocator<CharT>>
     string_type as_string(const SAllocator& allocator) const 
     {
-        switch (var_.type_id())
-        {
-            case json_major_type::small_string_t:
-            case json_major_type::string_t:
-                return string_type(as_string_view().data(),as_string_view().length(),allocator);
-            case json_major_type::byte_string_t:
-            {
-                string_type s(allocator);
-                encode_base64url(var_.byte_string_data_cast()->data(), 
-                                 var_.byte_string_data_cast()->data()+var_.byte_string_data_cast()->length(),
-                                 s);
-                return s;
-            }
-            case json_major_type::byte_string_t:
-            {
-                switch (var_.byte_string_data_cast()->tag())
-                {
-                    case byte_string_tag::positive_bignum_t:
-                    {
-                        bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                        string_type s(allocator);
-                        n.dump(s);
-                        return s;
-                    }
-                    case byte_string_tag::negative_bignum_t:
-                    {
-                        bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                        string_type s(allocator);
-                        n.dump(s);
-                        return s;
-                    }
-                    default:
-                    {
-                        string_type s(allocator);
-                        encode_base64url(var_.byte_string_data_cast()->data(), 
-                                         var_.byte_string_data_cast()->length(),
-                                         s);
-                        return s;
-                    }
-                }
-            }
-            default:
-                return to_string(allocator);
-        }
+        return as_string(basic_json_serializing_options<char_type>(),allocator);
     }
 
     template <class SAllocator=std::allocator<CharT>>
     string_type as_string(const basic_json_serializing_options<char_type>& options) const 
     {
-        switch (var_.type_id())
-        {
-            case json_major_type::small_string_t:
-            case json_major_type::string_t:
-                return string_type(as_string_view().data(),as_string_view().length());
-            case json_major_type::byte_string_t:
-            {
-                string_type s;
-                encode_base64url(var_.byte_string_data_cast()->data(), 
-                                 var_.byte_string_data_cast()->data()+var_.byte_string_data_cast()->length(),
-                                 s);
-                return s;
-            }
-            case json_major_type::byte_string_t:
-            {
-                switch (var_.byte_string_data_cast()->tag())
-                {
-                    case byte_string_tag::positive_bignum_t:
-                    {
-                        bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                        string_type s;
-                        n.dump(s);
-                        return s;
-                    }
-                    case byte_string_tag::negative_bignum_t:
-                    {
-                        bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                        string_type s;
-                        n.dump(s);
-                        return s;
-                    }
-                    default:
-                    {
-                        string_type s;
-                        encode_base64url(var_.byte_string_data_cast()->data(), 
-                                         var_.byte_string_data_cast()->length(),
-                                         s);
-                        return s;
-                    }
-                }
-            }
-            default:
-                return to_string(options);
-        }
+        return as_string(options,SAllocator());
     }
 
     template <class SAllocator=std::allocator<CharT>>
     string_type as_string(const basic_json_serializing_options<char_type>& options,
                           const SAllocator& allocator) const 
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
             case json_major_type::small_string_t:
             case json_major_type::string_t:
                 return string_type(as_string_view().data(),as_string_view().length(),allocator);
-            case json_major_type::byte_string_t:
-            {
-                string_type s(allocator);
-                encode_base64url(var_.byte_string_data_cast()->data(), 
-                                 var_.byte_string_data_cast()->data()+var_.byte_string_data_cast()->length(),
-                                 s);
-                return s;
-            }
             case json_major_type::byte_string_t:
             {
                 switch (var_.byte_string_data_cast()->tag())
@@ -3488,7 +3359,7 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
     const char_type* as_cstring() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::small_string_t:
             return var_.small_string_data_cast()->c_str();
@@ -3502,7 +3373,7 @@ public:
 
     size_t double_precision() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::double_t:
             return var_.double_data_cast()->precision();
@@ -3514,7 +3385,7 @@ public:
 
     basic_json& at(const string_view_type& name)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             JSONCONS_THROW(key_not_found(name.data(),name.length()));
@@ -3561,7 +3432,7 @@ public:
 
     const basic_json& at(const string_view_type& name) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             JSONCONS_THROW(key_not_found(name.data(),name.length()));
@@ -3584,7 +3455,7 @@ public:
 
     basic_json& at(size_t i)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             if (i >= array_value().size())
@@ -3601,7 +3472,7 @@ public:
 
     const basic_json& at(size_t i) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             if (i >= array_value().size())
@@ -3618,7 +3489,7 @@ public:
 
     object_iterator find(const string_view_type& name)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             return object_range().end();
@@ -3633,7 +3504,7 @@ public:
 
     const_object_iterator find(const string_view_type& name) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             return object_range().end();
@@ -3649,7 +3520,7 @@ public:
     template<class T>
     basic_json get(const string_view_type& name, T&& default_val) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             {
@@ -3677,7 +3548,7 @@ public:
     template<class T>
     T get_with_default(const string_view_type& name, const T& default_val) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             {
@@ -3705,7 +3576,7 @@ public:
     template<class T = std::basic_string<CharT>>
     T get_with_default(const string_view_type& name, const CharT* default_val) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             {
@@ -3734,7 +3605,7 @@ public:
 
     void shrink_to_fit()
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().shrink_to_fit();
@@ -3749,7 +3620,7 @@ public:
 
     void clear()
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().clear();
@@ -3764,7 +3635,7 @@ public:
 
     void erase(const_object_iterator pos)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             break;
@@ -3779,7 +3650,7 @@ public:
 
     void erase(const_object_iterator first, const_object_iterator last)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             break;
@@ -3794,7 +3665,7 @@ public:
 
     void erase(const_array_iterator pos)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().erase(pos);
@@ -3807,7 +3678,7 @@ public:
 
     void erase(const_array_iterator first, const_array_iterator last)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().erase(first, last);
@@ -3822,7 +3693,7 @@ public:
 
     void erase(const string_view_type& name)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             break;
@@ -3844,7 +3715,7 @@ public:
     template <class T>
     std::pair<object_iterator,bool> insert_or_assign(const string_view_type& name, T&& val)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3861,7 +3732,7 @@ public:
     template <class ... Args>
     std::pair<object_iterator,bool> try_emplace(const string_view_type& name, Args&&... args)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3878,7 +3749,7 @@ public:
     template <class T>
     void set_(key_storage_type&& name, T&& val)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3897,7 +3768,7 @@ public:
 
     void merge(const basic_json& source)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3913,7 +3784,7 @@ public:
 
     void merge(basic_json&& source)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3929,7 +3800,7 @@ public:
 
     void merge(object_iterator hint, const basic_json& source)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3945,7 +3816,7 @@ public:
 
     void merge(object_iterator hint, basic_json&& source)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3963,7 +3834,7 @@ public:
 
     void merge_or_update(const basic_json& source)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3979,7 +3850,7 @@ public:
 
     void merge_or_update(basic_json&& source)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -3995,7 +3866,7 @@ public:
 
     void merge_or_update(object_iterator hint, const basic_json& source)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -4011,7 +3882,7 @@ public:
 
     void merge_or_update(object_iterator hint, basic_json&& source)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -4036,7 +3907,7 @@ public:
     template <class T>
     object_iterator insert_or_assign(object_iterator hint, const string_view_type& name, T&& val)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -4053,7 +3924,7 @@ public:
     template <class ... Args>
     object_iterator try_emplace(object_iterator hint, const string_view_type& name, Args&&... args)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -4070,7 +3941,7 @@ public:
     template <class T>
     object_iterator set_(object_iterator hint, key_storage_type&& name, T&& val)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -4094,7 +3965,7 @@ public:
     template <class T>
     void push_back(T&& val)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().push_back(std::forward<T>(val));
@@ -4115,7 +3986,7 @@ public:
     template <class T>
     array_iterator insert(const_array_iterator pos, T&& val)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return array_value().insert(pos, std::forward<T>(val));
@@ -4130,7 +4001,7 @@ public:
     template <class InputIt>
     array_iterator insert(const_array_iterator pos, InputIt first, InputIt last)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return array_value().insert(pos, first, last);
@@ -4145,7 +4016,7 @@ public:
     template <class... Args> 
     array_iterator emplace(const_array_iterator pos, Args&&... args)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return array_value().emplace(pos, std::forward<Args>(args)...);
@@ -4160,7 +4031,7 @@ public:
     template <class... Args> 
     basic_json& emplace_back(Args&&... args)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return array_value().emplace_back(std::forward<Args>(args)...);
@@ -4171,9 +4042,9 @@ public:
         }
     }
 
-    json_major_type type_id() const
+    json_major_type major_type() const
     {
-        return var_.type_id();
+        return var_.major_type();
     }
 
     void swap(basic_json& b)
@@ -4335,7 +4206,7 @@ public:
     {
         static const basic_json a_null = null_type();
 
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             return a_null;
@@ -4353,12 +4224,12 @@ public:
 
     bool is_longlong() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::integer_t;
+        return var_.major_type() == json_major_type::integer_t;
     }
 
     bool is_ulonglong() const JSONCONS_NOEXCEPT
     {
-        return var_.type_id() == json_major_type::uinteger_t;
+        return var_.major_type() == json_major_type::uinteger_t;
     }
 
     long long as_longlong() const
@@ -4373,7 +4244,7 @@ public:
 
     int as_int() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::double_t:
             return static_cast<int>(var_.double_data_cast()->value());
@@ -4390,7 +4261,7 @@ public:
 
     unsigned int as_uint() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::double_t:
             return static_cast<unsigned int>(var_.double_data_cast()->value());
@@ -4407,7 +4278,7 @@ public:
 
     long as_long() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::double_t:
             return static_cast<long>(var_.double_data_cast()->value());
@@ -4424,7 +4295,7 @@ public:
 
     unsigned long as_ulong() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::double_t:
             return static_cast<unsigned long>(var_.double_data_cast()->value());
@@ -4441,7 +4312,7 @@ public:
 
     bool has_member(const key_storage_type& name) const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::object_t:
             {
@@ -4456,7 +4327,7 @@ public:
 
     void remove_range(size_t from_index, size_t to_index)
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             array_value().remove_range(from_index, to_index);
@@ -4545,7 +4416,7 @@ public:
     range<object_iterator> object_range()
     {
         static basic_json empty_object = object();
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             return range<object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
@@ -4559,7 +4430,7 @@ public:
     range<const_object_iterator> object_range() const
     {
         static const basic_json empty_object = object();
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             return range<const_object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
@@ -4572,7 +4443,7 @@ public:
 
     range<array_iterator> array_range()
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return range<array_iterator>(array_value().begin(),array_value().end());
@@ -4583,7 +4454,7 @@ public:
 
     range<const_array_iterator> array_range() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return range<const_array_iterator>(array_value().begin(),array_value().end());
@@ -4594,7 +4465,7 @@ public:
 
     array& array_value() 
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return var_.array_data_cast()->value();
@@ -4606,7 +4477,7 @@ public:
 
     const array& array_value() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::array_t:
             return var_.array_data_cast()->value();
@@ -4618,7 +4489,7 @@ public:
 
     object& object_value()
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             create_object_implicitly();
@@ -4633,7 +4504,7 @@ public:
 
     const object& object_value() const
     {
-        switch (var_.type_id())
+        switch (var_.major_type())
         {
         case json_major_type::empty_object_t:
             const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
