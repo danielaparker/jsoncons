@@ -1,3 +1,11 @@
+master
+------
+
+Enhancements
+
+- Added byte string formatting option `byte_string_chars_format::base16`
+
+
 v0.108.0
 --------
 

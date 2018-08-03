@@ -512,6 +512,15 @@ private:
         }
         switch (byte_string_format_)
         {
+            case byte_string_chars_format::base16:
+            {
+                std::basic_string<CharT> s;
+                encode_base16(data,length,s);
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+                break;
+            }
             case byte_string_chars_format::base64url:
             {
                 std::basic_string<CharT> s;

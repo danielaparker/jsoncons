@@ -47,6 +47,11 @@ The default, for a floating point value that was directly inserted into a json v
 Overrides [bignum format](bignum_chars_format.md) when serializing json.
 The default is [bignum_chars_format::base10](bignum_chars_format.md). 
 
+    byte_string_chars_format byte_string_format() const 
+    json_serializing_options& byte_string_format(byte_string_chars_format value)
+Overrides [byte string format](byte_string_chars_format.md) when serializing json.
+The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
+
     uint8_t precision() const 
     json_serializing_options& precision(uint8_t value)
 Overrides floating point precision when serializing json. 

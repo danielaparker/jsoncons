@@ -85,7 +85,7 @@ enum class bignum_chars_format : uint8_t {integer, base10, base64, base64url
 #endif
 };
 
-enum class byte_string_chars_format : uint8_t {base64,base64url};
+enum class byte_string_chars_format : uint8_t {base16,base64,base64url};
 
 template <class CharT>
 class basic_json_read_options
