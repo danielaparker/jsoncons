@@ -30,7 +30,6 @@ void byte_string_chars_format_examples()
     json_serializing_options options4;
     options4.byte_string_format(byte_string_chars_format::base64url);
     std::cout << "(4) "<< print(j, options4) << "\n\n";
-
 }
 
 void byte_string_examples()
