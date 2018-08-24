@@ -564,7 +564,7 @@ public:
         }
         if (q > 0)
         {
-            memmove( data_, data_+q, (length() - q)*sizeof(basic_type) );
+            memmove( data_, data_+q, (size_t)((length() - q)*sizeof(basic_type)) );
             set_length( length() - (uint16_t)q );
             k %= basic_type_bits;
             if ( k == 0 )
@@ -574,7 +574,7 @@ public:
             }
         }
 
-        int n = length() - 1;
+        size_t n = (size_t)(length() - 1);
         int64_t k1 = basic_type_bits - k;
         basic_type mask = (1 << k) - 1;
         for (size_t i = 0; i <= n; i++)
@@ -1431,7 +1431,7 @@ public:
             memset( data_+len_old, 0, (length_ - len_old)*sizeof(basic_type) );
         }
     }
-};
+}; 
 
 template <class Allocator>
 const uint64_t basic_bignum<Allocator>::max_basic_type = std::numeric_limits<uint64_t>::max();

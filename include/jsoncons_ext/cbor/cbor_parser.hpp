@@ -157,7 +157,7 @@ size_t get_byte_string_length(const uint8_t* first, const uint8_t* last,
             }
         case 0x5b: // byte string (eight-byte uint64_t for n follow)
             {
-                length = binary::from_big_endian<uint64_t>(p,last,endp);
+                length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -345,7 +345,7 @@ size_t get_text_string_length(const uint8_t* first, const uint8_t* last,
             }
         case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
             {
-                length = binary::from_big_endian<uint64_t>(p,last,endp);
+                length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -564,7 +564,7 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
 
         case 0xbb: // map (eight-byte uint64_t for n follow)
             {
-                size = binary::from_big_endian<uint64_t>(p,last,endp);
+                size = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -693,7 +693,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 
             case 0x9b: // array (eight-byte uint64_t for n follow)
             {
-                size = binary::from_big_endian<uint64_t>(p,last,endp);
+                size = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -1467,7 +1467,7 @@ size_t get_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     // array (eight-byte uint64_t for n follow)
     case 0x9b: 
     {
-        const auto len = binary::from_big_endian<int64_t>(p,last,endp);
+        size_t len = (size_t)binary::from_big_endian<int64_t>(p,last,endp);
         if (*endp == p)
         {
             JSONCONS_THROW(cbor_decode_error(last-p));
@@ -1551,7 +1551,7 @@ size_t get_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     // map (eight-byte uint64_t for n follow)
     case 0xbb: 
     {
-        const auto len = binary::from_big_endian<uint64_t>(p,last,endp);
+        size_t len = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
         if (*endp == p)
         {
             JSONCONS_THROW(cbor_decode_error(last-p));
@@ -2031,7 +2031,7 @@ public:
         case 0x9b:
             {
                 const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
+                size_t len = (size_t)binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
                     ec = cbor_parse_errc::unexpected_eof;
@@ -2138,7 +2138,7 @@ public:
         case 0xbb:
             {
                 const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
+                size_t len = (size_t)binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
                 if (endp == input_ptr_)
                 {
                     ec = cbor_parse_errc::unexpected_eof;
