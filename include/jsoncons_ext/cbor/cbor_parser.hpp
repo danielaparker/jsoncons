@@ -393,7 +393,9 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
             {
                 size_t length = *first & 0x1f;
                 *endp = p + length;
-                s = std::string(p, *endp);
+                //s = std::string(p, *endp);
+                s.resize(length);
+                std::copy(p,*endp,s.begin());
                 break;
             }
         case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
@@ -407,9 +409,9 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
                 {
                     p = *endp;
                     *endp = p + length;
-                    s = std::string(p, *endp);
-                    //s.resize(length);
-                    //std::copy(p,*endp,s.begin());
+                    //s = std::string(p, *endp);
+                    s.resize(length);
+                    std::copy(p,*endp,s.begin());
                 }
                 break;
             }
@@ -424,7 +426,9 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
                 {
                     p = *endp;
                     *endp = p + length;
-                    s = std::string(p, *endp);
+                    //s = std::string(p, *endp);
+                    s.resize(length);
+                    std::copy(p,*endp,s.begin());
                 }
                 break;
             }
@@ -454,7 +458,9 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
                 {
                     p = *endp;
                     *endp = p + length;
-                    s = std::string(p, *endp);
+                    //s = std::string(p, *endp);
+                    s.resize(length);
+                    std::copy(p,*endp,s.begin());
                 }
                 break;
             }
