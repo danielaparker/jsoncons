@@ -557,8 +557,6 @@ public:
                 default:
                     return jsonpointer_errc::expected_slash;
                 };
-                ++p_;
-                ++column_;
                 break;
             case jsonpointer::detail::pointer_state::nonzero_array_reference_token: 
                 switch (*p_)

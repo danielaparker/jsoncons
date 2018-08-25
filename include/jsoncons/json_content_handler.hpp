@@ -329,7 +329,7 @@ private:
 
     virtual void do_begin_object(const serializing_context& context) = 0;
 
-    virtual void do_begin_object(size_t length, const serializing_context& context) 
+    virtual void do_begin_object(size_t, const serializing_context& context) 
     {
         do_begin_object(context);
     }
@@ -338,7 +338,7 @@ private:
 
     virtual void do_begin_array(const serializing_context& context) = 0;
 
-    virtual void do_begin_array(size_t length, const serializing_context& context) 
+    virtual void do_begin_array(size_t, const serializing_context& context) 
     {
         do_begin_array(context);
     }
@@ -406,15 +406,15 @@ private:
     {
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
+    void do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
     {
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    void do_bignum_value(int, const uint8_t*, size_t, const serializing_context&) override
     {
     }
 
-    void do_double_value(double, const floating_point_options& fmt, const serializing_context&) override
+    void do_double_value(double, const floating_point_options&, const serializing_context&) override
     {
     }
 

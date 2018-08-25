@@ -89,7 +89,7 @@ private:
         writer_.flush();
     }
 
-    void do_begin_object(const serializing_context& context) override
+    void do_begin_object(const serializing_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_object));
         

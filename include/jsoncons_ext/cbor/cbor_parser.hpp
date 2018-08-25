@@ -398,7 +398,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
             }
         case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
             {
-                const auto length = binary::from_big_endian<uint8_t>(p,last,endp);
+                size_t length = (size_t)binary::from_big_endian<uint8_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -408,6 +408,8 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
                     p = *endp;
                     *endp = p + length;
                     s = std::string(p, *endp);
+                    //s.resize(length);
+                    //std::copy(p,*endp,s.begin());
                 }
                 break;
             }

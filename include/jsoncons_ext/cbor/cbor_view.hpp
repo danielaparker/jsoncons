@@ -82,7 +82,7 @@ public:
 
         if (major_type() == cbor_major_type::array)
         {
-            size_t n = detail::get_size(first_,last_,&begin);
+            /*size_t n = */ detail::get_size(first_,last_,&begin);
             if (begin == first_)
             {
                 JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
@@ -269,7 +269,7 @@ public:
         JSONCONS_ASSERT(is_array());
         const uint8_t* it = first_;
 
-        size_t len = detail::get_size(it, last_, &it);
+        /*size_t len = */ detail::get_size(it, last_, &it);
 
         for (size_t i = 0; i < index; ++i)
         {

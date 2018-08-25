@@ -504,7 +504,7 @@ private:
         end_value();
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
+    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -544,7 +544,7 @@ private:
         end_value();
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
