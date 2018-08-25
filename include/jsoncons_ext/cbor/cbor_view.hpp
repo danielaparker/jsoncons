@@ -835,7 +835,7 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
 
     std::vector<uint8_t> v;
     is.seekg(0, std::ios::end);   
-    v.resize(is.tellg());
+    v.resize((size_t)is.tellg());
     is.seekg(0, std::ios::beg);    
     is.read((char_type*)&v[0],v.size());
 

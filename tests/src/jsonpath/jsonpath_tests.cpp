@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(test_jsonpath)
                     {
                         s.append(buffer, sizeof(buffer));
                     }
-                    s.append(buffer, is.gcount());
+                    s.append(buffer, (size_t)is.gcount());
                     jsonpath_dictionary[dir_itr->path().stem()] = s;
                     //std::cout << ".jsonpath " << dir_itr->path().stem() << '\n';
                 }

@@ -211,7 +211,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
             break;
         case 0x58: // byte string (one-byte uint8_t for n follows)
             {
-                const auto length = binary::from_big_endian<uint8_t>(p,last,endp);
+                size_t length = (size_t)binary::from_big_endian<uint8_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -226,7 +226,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
             break;
         case 0x59: // byte string (two-byte uint16_t for n follow)
             {
-                const auto length = binary::from_big_endian<uint16_t>(p,last,endp);
+                size_t length = (size_t)binary::from_big_endian<uint16_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -241,7 +241,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
             break;
         case 0x5a: // byte string (four-byte uint32_t for n follow)
             {
-                const auto length = binary::from_big_endian<uint32_t>(p,last,endp);
+                size_t length = (size_t)binary::from_big_endian<uint32_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -256,7 +256,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
             break;
         case 0x5b: // byte string (eight-byte uint64_t for n follow)
             {
-                const auto length = binary::from_big_endian<uint64_t>(p,last,endp);
+                size_t length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -417,7 +417,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
             }
         case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
             {
-                const auto length = binary::from_big_endian<uint16_t>(p,last,endp);
+                size_t length = (size_t)binary::from_big_endian<uint16_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -434,7 +434,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
             }
         case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
             {
-                const auto length = binary::from_big_endian<uint32_t>(p,last,endp);
+                size_t length = (size_t)binary::from_big_endian<uint32_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -449,7 +449,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
             }
         case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
             {
-                const auto length = binary::from_big_endian<uint64_t>(p,last,endp);
+                size_t length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
