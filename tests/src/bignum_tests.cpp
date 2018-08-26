@@ -175,10 +175,10 @@ BOOST_AUTO_TEST_CASE(test_traits3)
     x.dump(signum,v);
 
     BOOST_REQUIRE(signum == -1);
-    for (auto c : v)
-    {
-        //std::cout << std::hex << (int)c;
-    }
+    //for (auto c : v)
+    //{
+    //    //std::cout << std::hex << (int)c;
+    //}
     //std::cout << std::endl;
 
     json j(x);

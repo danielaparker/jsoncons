@@ -69,13 +69,13 @@ private:
 
     union
     {
-        uint16_t capacity_;
+        size_t capacity_;
         basic_type values_[2];
     };
     basic_type* data_;
     bool        neg_;
     bool        dynamic_;
-    uint16_t    length_;
+    size_t      length_;
 public:
 //  Constructors and Destructor
     basic_bignum()
@@ -335,7 +335,7 @@ public:
         }
     }
 
-    uint16_t capacity() const { return dynamic_ ? capacity_ : 2; }
+    size_t capacity() const { return dynamic_ ? capacity_ : 2; }
 
 //  Operators
     bool operator!() const
@@ -530,10 +530,10 @@ public:
 
     basic_bignum& operator<<=( uint64_t k )
     {
-        uint64_t q = k / basic_type_bits;
+        size_t q = (size_t)(k / basic_type_bits);
         if ( q ) // Increase length_ by q:
         {
-            incr_length( (uint16_t)(length() + q) );
+            incr_length(length() + q);
             for (size_t i = length(); i-- > 0; )
                 data_[i] = ( i < q ? 0 : data_[i - q]);
             k %= basic_type_bits;
@@ -556,7 +556,7 @@ public:
 
     basic_bignum& operator>>=(uint64_t k)
     {
-        uint64_t q = (k / basic_type_bits);
+        size_t q = (size_t)(k / basic_type_bits);
         if ( q >= length() )
         {
             set_length( 0 );
@@ -565,7 +565,7 @@ public:
         if (q > 0)
         {
             memmove( data_, data_+q, (size_t)((length() - q)*sizeof(basic_type)) );
-            set_length( length() - (uint16_t)q );
+            set_length( length() - q );
             k %= basic_type_bits;
             if ( k == 0 )
             {
@@ -657,7 +657,7 @@ public:
 
     basic_bignum& operator&=( const basic_bignum<Allocator>& a )
     {
-        uint16_t old_length = length();
+        size_t old_length = length();
 
         set_length( (std::min)( length(), a.length() ) );
 
@@ -1065,8 +1065,8 @@ public:
         if ( neg_ != y.neg_ )
             return y.neg_ - neg_;
         int code = 0;
-        if ( length() == 0 || y.length() == 0 )
-            code = length() - y.length();
+        if ( length() == 0 && y.length() == 0 )
+            code = 0;
         else if ( length() < y.length() )
             code = -1;
         else if ( length() > y.length() )
@@ -1152,12 +1152,11 @@ public:
         return (qHi << basic_type_halfBits) + qLo;
     }
 
-    void subtractmul( basic_type* a, basic_type* b, int n,
-                                 basic_type& q ) const
+    void subtractmul( basic_type* a, basic_type* b, size_t n, basic_type& q ) const
     // a -= q * b: b in n positions; correct q if necessary
     {
         basic_type hi, lo, d, carry = 0;
-        int i;
+        size_t i;
         for ( i = 0; i < n; i++ )
         {
             DDproduct( b[i], q, hi, lo );
@@ -1187,7 +1186,7 @@ public:
 
     int normalize( basic_bignum<Allocator>& denom, basic_bignum<Allocator>& num, int& x ) const
     {
-        int r = denom.length() - 1;
+        size_t r = denom.length() - 1;
         basic_type y = denom.data_[r];
 
         x = 0;
@@ -1273,8 +1272,8 @@ public:
         }
         basic_bignum<Allocator> num0 = num, denom0 = denom;
         int second_done = normalize(denom, num, x);
-        int l = denom.length() - 1;
-        int n = num.length() - 1;
+        size_t l = denom.length() - 1;
+        size_t n = num.length() - 1;
         quot.set_length(n - l);
         for (size_t i=quot.length(); i-- > 0; )
             quot.data_[i] = 0;
@@ -1286,7 +1285,7 @@ public:
             quot.incr_length(quot.length() + 1);
         }
         basic_type d = denom.data_[l];
-        for ( int k = n; k > l; k-- )
+        for ( size_t k = n; k-- > l; )
         {
             basic_type q = DDquotient(rem.data_[k], rem.data_[k-1], d);
             subtractmul( rem.data_ + k - l - 1, denom.data_, l + 1, q );
@@ -1301,13 +1300,13 @@ public:
         }
     }
 
-    uint16_t length() const { return length_; }
+    size_t length() const { return length_; }
     basic_type* begin() { return data_; }
     const basic_type* begin() const { return data_; }
     basic_type* end() { return data_ + length_; }
     const basic_type* end() const { return data_ + length_; }
 
-    void set_length(uint16_t n)
+    void set_length(size_t n)
     {
        length_ = n;
        if ( length_ > capacity() )
@@ -1322,7 +1321,7 @@ public:
        }
     }
 
-    uint16_t round_up(uint16_t i) const // Find suitable new block size
+    size_t round_up(size_t i) const // Find suitable new block size
     {
         return (i/word_length + 1) * word_length;
     }
@@ -1400,14 +1399,14 @@ public:
         }
     }
 
-    void incr_length( uint16_t len_new )
+    void incr_length( size_t len_new )
     {
-        uint16_t len_old = length_;
+        size_t len_old = length_;
         length_ = len_new;  // length_ > len_old
 
         if ( length_ > capacity() )
         {
-            uint16_t capacity_new = round_up( length_ );
+            size_t capacity_new = round_up( length_ );
 
             basic_type* data_old = data_;
 
@@ -1430,7 +1429,7 @@ public:
             memset( data_+len_old, 0, (length_ - len_old)*sizeof(basic_type) );
         }
     }
-}; 
+};  
 
 template <class Allocator>
 const uint64_t basic_bignum<Allocator>::max_basic_type = std::numeric_limits<uint64_t>::max();
