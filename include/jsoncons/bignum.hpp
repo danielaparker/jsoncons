@@ -430,8 +430,8 @@ public:
     basic_bignum& operator*=( uint64_t y )
     {
         size_t len0 = length();
-        basic_type Hi;
-        basic_type Lo;
+        basic_type hi;
+        basic_type lo;
         basic_type dig = data_[0];
         basic_type carry = 0;
 
@@ -440,10 +440,10 @@ public:
         size_t i = 0;
         for (i = 0; i < len0; i++ )
         {
-            DDproduct( dig, y, Hi, Lo );
-            data_[i] = Lo + carry;
+            DDproduct( dig, y, hi, lo );
+            data_[i] = lo + carry;
             dig = data_[i+1];
-            carry = Hi + (data_[i] < Lo);
+            carry = hi + (data_[i] < lo);
         }
         data_[i] = carry;
         reduce();
@@ -480,7 +480,7 @@ public:
             else
             {
                 size_t lenProd = length() + y.length(), jA, jB;
-                basic_type sumHi = 0, sumLo, Hi, Lo,
+                basic_type sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bignum<Allocator> x = *this;
                 set_length( lenProd ); // Give *this length lenProd
@@ -495,13 +495,13 @@ public:
                         jB = i - jA;
                         if ( jB >= 0 && jB < y.length() )
                         {
-                            DDproduct( x.data_[jA], y.data_[jB], Hi, Lo );
+                            DDproduct( x.data_[jA], y.data_[jB], hi, lo );
                             sumLo_old = sumLo;
                             sumHi_old = sumHi;
-                            sumLo += Lo;
+                            sumLo += lo;
                             if ( sumLo < sumLo_old )
                                 sumHi++;
-                            sumHi += Hi;
+                            sumHi += hi;
                             carry += (sumHi < sumHi_old);
                         }
                     }
@@ -1091,23 +1091,23 @@ public:
     }
 
     void DDproduct( basic_type A, basic_type B,
-                    basic_type& Hi, basic_type& Lo ) const
-    // Multiplying two digits: (Hi, Lo) = A * B
+                    basic_type& hi, basic_type& lo ) const
+    // Multiplying two digits: (hi, lo) = A * B
     {
         basic_type hiA = A >> basic_type_halfBits, loA = A & r_mask,
                    hiB = B >> basic_type_halfBits, loB = B & r_mask,
                    mid1, mid2, old;
 
-        Lo = loA * loB;
-        Hi = hiA * hiB;
+        lo = loA * loB;
+        hi = hiA * hiB;
         mid1 = loA * hiB;
         mid2 = hiA * loB;
-        old = Lo;
-        Lo += mid1 << basic_type_halfBits;
-            Hi += (Lo < old) + (mid1 >> basic_type_halfBits);
-        old = Lo;
-        Lo += mid2 << basic_type_halfBits;
-            Hi += (Lo < old) + (mid2 >> basic_type_halfBits);
+        old = lo;
+        lo += mid1 << basic_type_halfBits;
+            hi += (lo < old) + (mid1 >> basic_type_halfBits);
+        old = lo;
+        lo += mid2 << basic_type_halfBits;
+            hi += (lo < old) + (mid2 >> basic_type_halfBits);
     }
 
     basic_type DDquotient( basic_type A, basic_type B, basic_type d ) const
@@ -1156,17 +1156,17 @@ public:
                                  basic_type& q ) const
     // a -= q * b: b in n positions; correct q if necessary
     {
-        basic_type Hi, Lo, d, carry = 0;
+        basic_type hi, lo, d, carry = 0;
         int i;
         for ( i = 0; i < n; i++ )
         {
-            DDproduct( b[i], q, Hi, Lo );
+            DDproduct( b[i], q, hi, lo );
             d = a[i];
-            a[i] -= Lo;
+            a[i] -= lo;
             if ( a[i] > d )
                 carry++;
             d = a[i + 1];
-            a[i + 1] -= Hi + carry;
+            a[i + 1] -= hi + carry;
             carry = a[i + 1] > d;
         }
         if ( carry ) // q was too large
@@ -1229,25 +1229,24 @@ public:
         {
             throw std::runtime_error( "Zero divide." );
         }
-        bool QuotNeg = neg_ ^ denom.neg_;
-        bool RemNeg = neg_;
-        int r, secondDone, x = 0, n;
-        basic_type q, d;
+        bool quot_neg = neg_ ^ denom.neg_;
+        bool rem_neg = neg_;
+        int x = 0;
         basic_bignum<Allocator> num = *this;
         num.neg_ = denom.neg_ = false;
         if ( num < denom )
         {
             quot = uint64_t(0);
             rem = num;
-            rem.neg_ = RemNeg;
+            rem.neg_ = rem_neg;
             return;
         }
         if ( denom.length() == 1 && num.length() == 1 )
         {
             quot = basic_type( num.data_[0]/denom.data_[0] );
             rem = basic_type( num.data_[0]%denom.data_[0] );
-            quot.neg_ = QuotNeg;
-            rem.neg_ = RemNeg;
+            quot.neg_ = quot_neg;
+            rem.neg_ = rem_neg;
             return;
         }
         else if (denom.length() == 1 && (denom.data_[0] & l_mask) == 0 )
@@ -1268,37 +1267,37 @@ public:
             }
             quot.reduce();
             rem = dHi;
-            quot.neg_ = QuotNeg;
-            rem.neg_ = RemNeg;
+            quot.neg_ = quot_neg;
+            rem.neg_ = rem_neg;
             return;
         }
         basic_bignum<Allocator> num0 = num, denom0 = denom;
-        secondDone = normalize(denom, num, x);
-        r = denom.length() - 1;
-        n = num.length() - 1;
-        quot.set_length(n - r);
+        int second_done = normalize(denom, num, x);
+        int l = denom.length() - 1;
+        int n = num.length() - 1;
+        quot.set_length(n - l);
         for (size_t i=quot.length(); i-- > 0; )
             quot.data_[i] = 0;
         rem = num;
-        if ( rem.data_[n] >= denom.data_[r] )
+        if ( rem.data_[n] >= denom.data_[l] )
         {
             rem.incr_length(rem.length() + 1);
             n++;
             quot.incr_length(quot.length() + 1);
         }
-        d = denom.data_[r];
-        for ( int k = n; k > r; k-- )
+        basic_type d = denom.data_[l];
+        for ( int k = n; k > l; k-- )
         {
-            q = DDquotient(rem.data_[k], rem.data_[k-1], d);
-            subtractmul( rem.data_ + k - r - 1, denom.data_, r + 1, q );
-            quot.data_[k - r - 1] = q;
+            basic_type q = DDquotient(rem.data_[k], rem.data_[k-1], d);
+            subtractmul( rem.data_ + k - l - 1, denom.data_, l + 1, q );
+            quot.data_[k - l - 1] = q;
         }
         quot.reduce();
-        quot.neg_ = QuotNeg;
+        quot.neg_ = quot_neg;
         if ( remDesired )
         {
-            unnormalize(rem, x, secondDone);
-            rem.neg_ = RemNeg;
+            unnormalize(rem, x, second_done);
+            rem.neg_ = rem_neg;
         }
     }
 
