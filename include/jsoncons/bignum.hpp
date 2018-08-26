@@ -1285,7 +1285,7 @@ public:
             quot.incr_length(quot.length() + 1);
         }
         basic_type d = denom.data_[l];
-        for ( size_t k = n; k-- > l; )
+        for ( size_t k = n; k > l; k-- )
         {
             basic_type q = DDquotient(rem.data_[k], rem.data_[k-1], d);
             subtractmul( rem.data_ + k - l - 1, denom.data_, l + 1, q );
