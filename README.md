@@ -487,15 +487,11 @@ Instructions for building the examples with CMake may be found in
 
 ## Supported compilers
 
-| Compiler        | Operating System             |Notes
-|-----------------|------------------------------|----------------
-| VS 2015      | Windows 10       |
-| g++-4.8      | Ubuntu           | `std::regex` isn't fully implemented in GCC 4.8., so `jsoncons_ext/jsonpath` regular expression filters aren't supported for that compiler. 
-| g++-6        | Ubuntu           |
-| g++-7        | Ubuntu           |
-| g++-8        | Ubuntu           |
-| clang-5.0    |
-| clang-6.0    |
+ Compiler     | Versions      | Operating System
+--------------|---------------|-----------------
+ VS           | 14.0          | Windows 10       
+ g++-         | 4.8, 6, 7,8   | Ubuntu           
+ clang        | 3.8, 5.0. 6.0 |
 
 ## Acknowledgements
 
