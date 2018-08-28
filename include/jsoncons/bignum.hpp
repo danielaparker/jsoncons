@@ -13,6 +13,7 @@
 #include <limits>
 #include <algorithm>
 #include <string>
+#include <cstring>
 
 namespace jsoncons {
 
