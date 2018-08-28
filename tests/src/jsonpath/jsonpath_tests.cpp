@@ -174,15 +174,19 @@ struct jsonpath_fixture
 
 TEST_CASE("test_jsonpath")
 {
+    std::cout << "Check 1\n";
     boost::filesystem::path p("./input/JSONPath");
 
+    std::cout << "Check 2\n";
     if (exists(p) && is_directory(p))
     {
+        std::cout << "Check 3\n";
         ojson document;
         std::map<boost::filesystem::path,std::string> jsonpath_dictionary;
         std::map<boost::filesystem::path,ojson> expected_dictionary;
 
         boost::filesystem::directory_iterator end_iter;
+        std::cout << "Check 4\n";
         for (boost::filesystem::directory_iterator dir_itr(p);
             dir_itr != end_iter;
             ++dir_itr)
