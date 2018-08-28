@@ -43,6 +43,7 @@ endif()
 
 target_include_directories (jsoncons_tests PUBLIC ${Boost_INCLUDE_DIRS}
                                            PUBLIC ../../../include
+                                           PUBLIC ../../../third_party
                                            PRIVATE ../../include)
 
 target_link_libraries (jsoncons_tests ${Boost_LIBRARIES})
