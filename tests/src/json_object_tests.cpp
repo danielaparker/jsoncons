@@ -392,7 +392,7 @@ TEST_CASE("test_object_equals")
     json c;
     c["field1"] = 10;
 
-    CHECK(a != c);
+    CHECK_FALSE(a == c);
 }
 
 TEST_CASE("test_json_object_iterator_1")
@@ -458,17 +458,17 @@ TEST_CASE("test_json_object_iterator_3")
     a["name3"] = "value3";
 
     json::const_object_iterator it = static_cast<const json&>(a).object_range().begin();
-    CHECK(it == a.object_range().begin());
-    CHECK(it != a.object_range().end());
+    CHECK((it == a.object_range().begin()));
+    CHECK_FALSE(it == a.object_range().end());
     CHECK((*it).key() == "name1");
     CHECK((*it).value() == json("value1"));
     ++it;
-    CHECK(it != a.object_range().end());
+    CHECK_FALSE(it == a.object_range().end());
     CHECK((*it).key() == "name2");
     CHECK((*it).value() == json("value2"));
 
     CHECK((*(it++)).key() == "name2");
-    CHECK(it != a.object_range().end());
+    CHECK_FALSE(it == a.object_range().end());
     CHECK((*it).key() == "name3");
     CHECK((*it).value() == json("value3"));
 
@@ -494,7 +494,7 @@ TEST_CASE("test_object_key_proxy")
     b["key2"] = json();
     b["key2"]["key3"] = std::move(a);
 
-    CHECK(!(a.is_object() || a.is_array() || a.is_string()));
+    CHECK_FALSE((a.is_object() || a.is_array() || a.is_string()));
 }
 
 // accessor tests
@@ -516,8 +516,8 @@ TEST_CASE("test_compare_with_string")
     a["key1"] = "value1";
     a["key2"] = "value2";
     CHECK(a["key"] == a["key"]);
-    CHECK(!(a["key"] == a["key1"]));
-    CHECK(!(a["key"] == a["key2"]));
+    CHECK_FALSE((a["key"] == a["key1"]));
+    CHECK_FALSE((a["key"] == a["key2"]));
 }
 
 TEST_CASE("test_count")
@@ -552,7 +552,7 @@ TEST_CASE("test_find")
     CHECK(it2 == obj.object_range().end());
 
     json::object_iterator it3 =  obj.find("key4");
-    CHECK(it3 != obj.object_range().end());
+    CHECK_FALSE(it3 == obj.object_range().end());
     CHECK(std::string("value4") ==it3->value().as<std::string>());
 }
 
@@ -576,7 +576,7 @@ TEST_CASE("test_as")
     CHECK(int(char_val) == 1);
 
     CHECK(obj["char_field"].is<char>());
-    CHECK(!obj["string_field"].is<char>());
+    CHECK_FALSE(obj["string_field"].is<char>());
 
     json parent;
     parent["child"] = obj;
@@ -621,7 +621,7 @@ TEST_CASE("test_is")
     CHECK(obj["field2"].major_type() == jsoncons::json_major_type::integer_t);
     CHECK(obj["field3"].major_type() == jsoncons::json_major_type::uinteger_t);
 
-    CHECK(!obj["field1"].is<std::string>());
+    CHECK_FALSE(obj["field1"].is<std::string>());
     CHECK(obj["field1"].is<short>());
     CHECK(obj["field1"].is<int>());
     CHECK(obj["field1"].is<long>());
@@ -629,20 +629,20 @@ TEST_CASE("test_is")
     CHECK(obj["field1"].is<unsigned int>());
     CHECK(obj["field1"].is<unsigned long>());
     CHECK(obj["field1"].is<unsigned long long>());
-    CHECK(!obj["field1"].is<double>());
+    CHECK_FALSE(obj["field1"].is<double>());
 
-    CHECK(!obj["field2"].is<std::string>());
+    CHECK_FALSE(obj["field2"].is<std::string>());
     CHECK(obj["field2"].is<short>());
     CHECK(obj["field2"].is<int>());
     CHECK(obj["field2"].is<long>());
     CHECK(obj["field2"].is<long long>());
-    CHECK(!obj["field2"].is<unsigned short>());
-    CHECK(!obj["field2"].is<unsigned int>());
-    CHECK(!obj["field2"].is<unsigned long>());
-    CHECK(!obj["field2"].is<unsigned long long>());
-    CHECK(!obj["field2"].is<double>());
+    CHECK_FALSE(obj["field2"].is<unsigned short>());
+    CHECK_FALSE(obj["field2"].is<unsigned int>());
+    CHECK_FALSE(obj["field2"].is<unsigned long>());
+    CHECK_FALSE(obj["field2"].is<unsigned long long>());
+    CHECK_FALSE(obj["field2"].is<double>());
 
-    CHECK(!obj["field3"].is<std::string>());
+    CHECK_FALSE(obj["field3"].is<std::string>());
     CHECK(obj["field3"].is<short>());
     CHECK(obj["field3"].is<int>());
     CHECK(obj["field3"].is<long>());
@@ -650,7 +650,7 @@ TEST_CASE("test_is")
     CHECK(obj["field3"].is<unsigned int>());
     CHECK(obj["field3"].is<unsigned long>());
     CHECK(obj["field3"].is<unsigned long long>());
-    CHECK(!obj["field3"].is<double>());
+    CHECK_FALSE(obj["field3"].is<double>());
 }
 
 TEST_CASE("test_is2")
@@ -659,14 +659,14 @@ TEST_CASE("test_is2")
 
     CHECK(obj["field1"].major_type() == jsoncons::json_major_type::uinteger_t);
 
-    CHECK(!obj["field1"].is<std::string>());
+    CHECK_FALSE(obj["field1"].is<std::string>());
     CHECK(obj["field1"].is<int>());
     CHECK(obj["field1"].is<long>());
     CHECK(obj["field1"].is<long long>());
     CHECK(obj["field1"].is<unsigned int>());
     CHECK(obj["field1"].is<unsigned long>());
     CHECK(obj["field1"].is<unsigned long long>());
-    CHECK(!obj["field1"].is<double>());
+    CHECK_FALSE(obj["field1"].is<double>());
 }
 
 TEST_CASE("test_is_type")

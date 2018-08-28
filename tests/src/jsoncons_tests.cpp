@@ -148,7 +148,7 @@ TEST_CASE("test_to_string")
 
     CHECK(root["null"].is_null());
     CHECK(root["null"].is<jsoncons::null_type>());
-    CHECK(!root["bool1"].as<bool>());
+    CHECK_FALSE(root["bool1"].as<bool>());
     CHECK(root["bool2"].as<bool>());
     CHECK(root["integer"].as<int>() == 12345678);
     CHECK(root["integer"].as<unsigned int>() == 12345678);
@@ -156,7 +156,7 @@ TEST_CASE("test_to_string")
     CHECK(root["double"].as<double>() == Approx(123456.01).epsilon(0.0000001));
     CHECK(root["escaped-string"].as<std::string>() == std::string("\\\n"));
 
-    CHECK(!root["bool1"].as<bool>());
+    CHECK_FALSE(root["bool1"].as<bool>());
     CHECK(root["bool2"].as<bool>());
     CHECK(root["integer"].as<int>() == 12345678);
     CHECK(root["integer"].as<unsigned int>() == 12345678);

@@ -207,7 +207,7 @@ TEST_CASE("test_boost_matrix")
     json a = A;
 
     CHECK(a.is<matrix<double>>());
-    CHECK(!a.is<matrix<int>>());
+    CHECK_FALSE(a.is<matrix<int>>());
 
     CHECK(a[0][0].as<double>()==A(0,0));
     CHECK(a[0][1].as<double>()==A(0,1));

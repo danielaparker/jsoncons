@@ -176,14 +176,14 @@ TEST_CASE("test_read_multiple")
     if (!reader.eof())
     {
         reader.read_next();
-        CHECK(!reader.eof());
+        CHECK_FALSE(reader.eof());
         json val = decoder.get_result();
         CHECK(1 == val["a"].as<int>());
     }
     if (!reader.eof())
     {
         reader.read_next();
-        CHECK(!reader.eof());
+        CHECK_FALSE(reader.eof());
         json val = decoder.get_result();
         CHECK(4 == val["a"].as<int>());
     }

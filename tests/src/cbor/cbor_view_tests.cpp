@@ -35,7 +35,7 @@ TEST_CASE("cbor_view_test")
 
     cbor_view v(c); 
     CHECK(v.is_object());
-    CHECK(!v.is_array());
+    CHECK_FALSE(v.is_array());
 
     ojson jv = decode_cbor<ojson>(v);
     CHECK(jv == j1);
@@ -95,13 +95,13 @@ TEST_CASE("jsonpointer_test")
 
     std::error_code ec;
     cbor_view application = jsonpointer::get(cbor_view(buffer), "/application", ec);
-    CHECK(!ec);
+    CHECK_FALSE(ec);
 
     json j2 = decode_cbor<json>(application);
     CHECK(j2 == j["application"]);
 
     cbor_view reputons_0_rated = jsonpointer::get(cbor_view(buffer), "/reputons", ec);
-    CHECK(!ec);
+    CHECK_FALSE(ec);
 
     json j3 = decode_cbor<json>(reputons_0_rated);
     json j4 = j["reputons"];

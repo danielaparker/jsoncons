@@ -25,8 +25,8 @@ TEST_CASE("test_object_equals_basic")
 
     CHECK(o1 == o2);
     CHECK(o2 == o1);
-    CHECK(!(o1 != o2));
-    CHECK(!(o2 != o1));
+    CHECK_FALSE((o1 != o2));
+    CHECK_FALSE((o2 != o1));
 }
 
 TEST_CASE("test_object_equals_diff_vals")
@@ -41,8 +41,8 @@ TEST_CASE("test_object_equals_diff_vals")
     o2["b"] = 4;
     o2["c"] = 3;
 
-    CHECK(!(o1 == o2));
-    CHECK(!(o2 == o1));
+    CHECK_FALSE((o1 == o2));
+    CHECK_FALSE((o2 == o1));
     CHECK(o1 != o2);
     CHECK(o2 != o1);
 }
@@ -59,8 +59,8 @@ TEST_CASE("test_object_equals_diff_el_names")
     o2["e"] = 2;
     o2["f"] = 3;
 
-    CHECK(!(o1 == o2));
-    CHECK(!(o2 == o1));
+    CHECK_FALSE((o1 == o2));
+    CHECK_FALSE((o2 == o1));
     CHECK(o1 != o2);
     CHECK(o2 != o1);
 }
@@ -76,8 +76,8 @@ TEST_CASE("test_object_equals_diff_sizes")
     o2["a"] = 1;
     o2["b"] = 2;
 
-    CHECK(!(o1 == o2));
-    CHECK(!(o2 == o1));
+    CHECK_FALSE((o1 == o2));
+    CHECK_FALSE((o2 == o1));
     CHECK(o1 != o2);
     CHECK(o2 != o1);
 }
@@ -92,8 +92,8 @@ TEST_CASE("test_object_equals_subtle_offsets")
     o2["b"] = 1;
     o2["c"] = 1;
 
-    CHECK(!(o1 == o2));
-    CHECK(!(o2 == o1));
+    CHECK_FALSE((o1 == o2));
+    CHECK_FALSE((o2 == o1));
     CHECK(o1 != o2);
     CHECK(o2 != o1);
 }

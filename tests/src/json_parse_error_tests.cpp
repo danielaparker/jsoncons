@@ -176,14 +176,14 @@ TEST_CASE("test_multiple")
     if (!reader.eof())
     {
         reader.read_next();
-        CHECK(!reader.eof());
+        CHECK_FALSE(reader.eof());
         json val = decoder.get_result();
         CHECK(1 == val["a"].as<int>());
     }
     if (!reader.eof())
     {
         reader.read_next();
-        CHECK(!reader.eof());
+        CHECK_FALSE(reader.eof());
         json val = decoder.get_result();
         CHECK(4 == val["a"].as<int>());
     }
@@ -201,7 +201,7 @@ TEST_CASE("test_uinteger_overflow")
     CHECK(m == j1.as_uinteger());
 
     json j2 =  json::parse(s2);
-    CHECK(!j2.is_uinteger());
+    CHECK_FALSE(j2.is_uinteger());
     CHECK(j2.is_bignum());
     CHECK(s2 == j2.as<std::string>());
 }
@@ -217,7 +217,7 @@ TEST_CASE("test_negative_integer_overflow")
     CHECK(m == j1.as_integer());
 
     json j2 =  json::parse(s2);
-    CHECK(!j2.is_integer());
+    CHECK_FALSE(j2.is_integer());
     CHECK(j2.is_bignum());
     CHECK(s2 == j2.as<std::string>());
 }
@@ -233,7 +233,7 @@ TEST_CASE("test_positive_integer_overflow")
     CHECK(m == j1.as_integer());
 
     json j2 =  json::parse(s2);
-    CHECK(!j2.is_integer());
+    CHECK_FALSE(j2.is_integer());
     CHECK(j2.is_bignum());
     CHECK(s2 == j2.as<std::string>());
 }

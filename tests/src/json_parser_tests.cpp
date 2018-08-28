@@ -131,7 +131,7 @@ TEST_CASE("test_parse_integer")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
-    CHECK(!parser.done());
+    CHECK_FALSE(parser.done());
 
     parser.end_parse();
     CHECK(parser.done());
@@ -240,7 +240,7 @@ TEST_CASE("test_parse_array_string")
 
     parser.update(s1.data(),s1.length());
     parser.parse_some();
-    CHECK(!parser.done());
+    CHECK_FALSE(parser.done());
     static std::string s2("]");
     parser.update(s2.data(), s2.length());
     parser.parse_some();
@@ -261,7 +261,7 @@ TEST_CASE("test_incremental_parsing")
 
     parser.update("[fal",4);
     parser.parse_some();
-    CHECK(!parser.done());
+    CHECK_FALSE(parser.done());
     CHECK(parser.source_exhausted());
     parser.update("se]",3);
     parser.parse_some();
@@ -271,7 +271,7 @@ TEST_CASE("test_incremental_parsing")
 
     json j = decoder.get_result();
     REQUIRE(j.is_array());
-    CHECK(!j[0].as<bool>());
+    CHECK_FALSE(j[0].as<bool>());
 }
 
 

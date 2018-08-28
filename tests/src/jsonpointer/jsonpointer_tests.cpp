@@ -21,7 +21,7 @@ void check_get_with_const_ref(const json& example, const std::string& pointer, c
 
     std::error_code ec;
     const json& result = jsonpointer::get(example,pointer,ec);
-    CHECK(!ec);
+    CHECK_FALSE(ec);
     CHECK(expected == result);
 }
 
@@ -35,7 +35,7 @@ void check_add(json& example, const std::string& path, const json& value, const 
 {
     std::error_code ec;
     jsonpointer::insert_or_assign(example, path, value, ec);
-    CHECK(!ec);
+    CHECK_FALSE(ec);
     CHECK(expected == example);
 }
 
@@ -43,7 +43,7 @@ void check_replace(json& example, const std::string& path, const json& value, co
 {
     std::error_code ec;
     jsonpointer::replace(example, path, value, ec);
-    CHECK(!ec);
+    CHECK_FALSE(ec);
     CHECK(expected == example);
 }
 
@@ -51,7 +51,7 @@ void check_remove(json& example, const std::string& path, const json& expected)
 {
     std::error_code ec;
     jsonpointer::remove(example, path, ec);
-    CHECK(!ec);
+    CHECK_FALSE(ec);
     CHECK(expected == example);
 }
 
@@ -111,7 +111,7 @@ json example = json::parse(R"(
 
     std::error_code ec;
     json& result = jsonpointer::get(example,"/foo/0",ec);
-    CHECK(!ec);
+    CHECK_FALSE(ec);
 
     result = "bat";
 
