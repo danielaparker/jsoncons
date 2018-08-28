@@ -60,7 +60,7 @@ TEST_CASE("test_object")
     //CHECK(4 == o["street_number"].as<int>());
 
     auto it = o.find("country");
-    CHECK(it != o.object_range().end());
+    CHECK_FALSE((it == o.object_range().end()));
     o.insert_or_assign(it,"province","Ontario");
 
     o.insert_or_assign("unit_type","O");
@@ -93,7 +93,7 @@ TEST_CASE("test_object_emplace")
     //CHECK(4 == o["street_number"].as<int>());
 
     auto it = o.find("country");
-    CHECK(it != o.object_range().end());
+    CHECK_FALSE((it == o.object_range().end()));
     o.try_emplace(it,"province","Ontario");
 
     o.try_emplace("unit_type","O");

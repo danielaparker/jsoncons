@@ -291,9 +291,9 @@ TEST_CASE("test_indefinite_length_object_iterator")
     cbor_view bv2 = b2;
 
     auto it2 = bv2.object_range().begin();
-    CHECK(it2 != bv2.object_range().end());
-    CHECK(++it2 != bv2.object_range().end());
-    CHECK(++it2 == bv2.object_range().end());
+    CHECK_FALSE((it2 == bv2.object_range().end()));
+    CHECK_FALSE((++it2 == bv2.object_range().end()));
+    CHECK((++it2 == bv2.object_range().end()));
 }
 
 TEST_CASE("test_indefinite_length_array_iterator")

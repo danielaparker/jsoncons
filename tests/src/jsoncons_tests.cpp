@@ -54,7 +54,7 @@ TEST_CASE("test_for_each_value")
     ++it;
     CHECK(it->value().major_type() == jsoncons::json_major_type::uinteger_t);
     ++it;
-    CHECK(it == val.object_range().end());
+    CHECK((it == val.object_range().end()));
 }
 
 TEST_CASE("test_assignment")
