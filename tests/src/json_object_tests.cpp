@@ -779,8 +779,18 @@ TEST_CASE("test_value_not_found_and_defaults")
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
 
-    REQUIRE_THROWS_AS((obj["outdoor_experience"].as<std::string>()),jsoncons::key_not_found);
-    REQUIRE_THROWS_WITH((obj["outdoor_experience"].as<std::string>()),"Key 'outdoor_experience' not found");
+    try
+    {
+        auto val = obj["outdoor_experience"].as<std::string>();
+        CHECK(false);
+    }
+    catch (const std::out_of_range& e)
+    {
+        CHECK(e.what() == std::string("Key 'outdoor_experience' not found"));
+    }
+
+    //REQUIRE_THROWS_AS((obj["outdoor_experience"].as<std::string>()),jsoncons::key_not_found);
+    //REQUIRE_THROWS_WITH((obj["outdoor_experience"].as<std::string>()),"Key 'outdoor_experience' not found");
 
     std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
 
