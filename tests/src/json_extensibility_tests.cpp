@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
@@ -126,14 +126,12 @@ namespace jsoncons
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
-BOOST_AUTO_TEST_SUITE(json_extensibility_tests)
-
-BOOST_AUTO_TEST_CASE(test_add_extensibility)
+TEST_CASE("test_add_extensibility")
 {
     json a = json::array();
     a.push_back(boost::gregorian::date(2013,10,14));
     auto d = a[0].as<boost::gregorian::date>();
-    BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,14),d);
+    CHECK(boost::gregorian::date(2013,10,14) == d);
 
     json o;
     o["ObservationDates"] = std::move(a);
@@ -141,8 +139,8 @@ BOOST_AUTO_TEST_CASE(test_add_extensibility)
     d = o["ObservationDates"][0].as<boost::gregorian::date>();
     auto d2 = o["ObservationDates"][1].as<boost::gregorian::date>();
 
-    BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,14),d);
-    BOOST_CHECK_EQUAL(boost::gregorian::date(2013,10,21),d2);
+    CHECK(boost::gregorian::date(2013,10,14)==d);
+    CHECK(boost::gregorian::date(2013,10,21)==d2);
 
     json deal;
     deal["maturity"] = boost::gregorian::date(2015,1,1);
@@ -155,25 +153,25 @@ BOOST_AUTO_TEST_CASE(test_add_extensibility)
     //std::cout << pretty_print(deal) << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(test_set_extensibility)
+TEST_CASE("test_set_extensibility")
 {
     json o;
     boost::gregorian::date d(boost::gregorian::day_clock::local_day());
     o.insert_or_assign("today",d);
     boost::gregorian::date val = o["today"].as<boost::gregorian::date>();
-    BOOST_CHECK_EQUAL(d,val);
+    CHECK(d == val);
 }
 
-BOOST_AUTO_TEST_CASE(test_assignment_extensibility)
+TEST_CASE("test_assignment_extensibility")
 {
     json o;
     boost::gregorian::date d(boost::gregorian::day_clock::local_day());
     o["today"] = d;
     boost::gregorian::date val = o["today"].as<boost::gregorian::date>();
-    BOOST_CHECK_EQUAL(d,val);
+    CHECK(d == val);
 }
 
-BOOST_AUTO_TEST_CASE(test_example)
+TEST_CASE("test_example")
 {
         using jsoncons::json;
         using boost::gregorian::date;
@@ -189,16 +187,16 @@ BOOST_AUTO_TEST_CASE(test_example)
 
         date maturity = deal["Maturity"].as<date>();
 
-        BOOST_CHECK(deal["Maturity"].as<date>() == date(2014,10,14));
-        BOOST_REQUIRE(deal["ObservationDates"].is_array());
-        BOOST_REQUIRE(deal["ObservationDates"].size() == 2);
-        BOOST_CHECK(deal["ObservationDates"][0].as<date>() == date(2014,2,14));
-        BOOST_CHECK(deal["ObservationDates"][1].as<date>() == date(2014,2,21));
+        CHECK(deal["Maturity"].as<date>() == date(2014,10,14));
+        REQUIRE(deal["ObservationDates"].is_array());
+        REQUIRE(deal["ObservationDates"].size() == 2);
+        CHECK(deal["ObservationDates"][0].as<date>() == date(2014,2,14));
+        CHECK(deal["ObservationDates"][1].as<date>() == date(2014,2,21));
 
         //std::cout << pretty_print(deal) << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(test_boost_matrix)
+TEST_CASE("test_boost_matrix")
 {
     matrix<double> A(2, 2);
     A(0, 0) = 1.1;
@@ -208,24 +206,22 @@ BOOST_AUTO_TEST_CASE(test_boost_matrix)
 
     json a = A;
 
-    BOOST_CHECK(a.is<matrix<double>>());
-    BOOST_CHECK(!a.is<matrix<int>>());
+    CHECK(a.is<matrix<double>>());
+    CHECK(!a.is<matrix<int>>());
 
-    BOOST_CHECK_EQUAL(a[0][0].as<double>(),A(0,0));
-    BOOST_CHECK_EQUAL(a[0][1].as<double>(),A(0,1));
-    BOOST_CHECK_EQUAL(a[1][0].as<double>(),A(1,0));
-    BOOST_CHECK_EQUAL(a[1][1].as<double>(),A(1,1));
+    CHECK(a[0][0].as<double>()==A(0,0));
+    CHECK(a[0][1].as<double>()==A(0,1));
+    CHECK(a[1][0].as<double>()==A(1,0));
+    CHECK(a[1][1].as<double>()==A(1,1));
 
     matrix<double> B = a.as<matrix<double>>();
 
-    BOOST_CHECK_EQUAL(B.size1(),a.size());
-    BOOST_CHECK_EQUAL(B.size2(),a[0].size());
+    CHECK(B.size1() ==a.size());
+    CHECK(B.size2() ==a[0].size());
 
-    BOOST_CHECK_EQUAL(a[0][0].as<double>(),B(0,0));
-    BOOST_CHECK_EQUAL(a[0][1].as<double>(),B(0,1));
-    BOOST_CHECK_EQUAL(a[1][0].as<double>(),B(1,0));
-    BOOST_CHECK_EQUAL(a[1][1].as<double>(),B(1,1));
+    CHECK(a[0][0].as<double>()==B(0,0));
+    CHECK(a[0][1].as<double>()==B(0,1));
+    CHECK(a[1][0].as<double>()==B(1,0));
+    CHECK(a[1][1].as<double>()==B(1,1));
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 

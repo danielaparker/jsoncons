@@ -1,11 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -21,8 +17,6 @@
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
-BOOST_AUTO_TEST_SUITE(jsonpatch_tests)
-
 void check_patch(json& target, const json& patch, std::error_code expected_ec, const json& expected)
 {
     std::error_code ec;
@@ -31,11 +25,11 @@ void check_patch(json& target, const json& patch, std::error_code expected_ec, c
     {
         std::cout << "target:\n" << target << std::endl;
     }
-    BOOST_CHECK(ec == expected_ec);
-    BOOST_CHECK_EQUAL(expected, target);
+    CHECK(ec == expected_ec);
+    CHECK(expected == target);
 }
 
-BOOST_AUTO_TEST_CASE(add_an_object_member)
+TEST_CASE("add_an_object_member")
 {
     json target = R"(
         { "foo": "bar"}
@@ -54,7 +48,7 @@ BOOST_AUTO_TEST_CASE(add_an_object_member)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(add_an_array_element)
+TEST_CASE("add_an_array_element")
 {
     json target = R"(
         { "foo": [ "bar", "baz" ] }
@@ -73,7 +67,7 @@ BOOST_AUTO_TEST_CASE(add_an_array_element)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(remove_an_object_member)
+TEST_CASE("remove_an_object_member")
 {
     json target = R"(
         {
@@ -95,7 +89,7 @@ BOOST_AUTO_TEST_CASE(remove_an_object_member)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(remove_an_array_element)
+TEST_CASE("remove_an_array_element")
 {
     json target = R"(
         { "foo": [ "bar", "qux", "baz" ] }
@@ -114,7 +108,7 @@ BOOST_AUTO_TEST_CASE(remove_an_array_element)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(replace_a_value)
+TEST_CASE("replace_a_value")
 {
     json target = R"(
         {
@@ -139,7 +133,7 @@ BOOST_AUTO_TEST_CASE(replace_a_value)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(move_a_value)
+TEST_CASE("move_a_value")
 {
     json target = R"(
         {
@@ -174,7 +168,7 @@ BOOST_AUTO_TEST_CASE(move_a_value)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(move_an_array_element)
+TEST_CASE("move_an_array_element")
 {
     json target = R"(
         { "foo": [ "all", "grass", "cows", "eat" ] }
@@ -193,7 +187,7 @@ BOOST_AUTO_TEST_CASE(move_an_array_element)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(add_to_nonexistent_target)
+TEST_CASE("add_to_nonexistent_target")
 {
     json target = R"(
         { "foo": "bar" }
@@ -210,7 +204,7 @@ BOOST_AUTO_TEST_CASE(add_to_nonexistent_target)
     check_patch(target,patch,jsonpatch::jsonpatch_errc::add_failed,expected);
 }
 
-BOOST_AUTO_TEST_CASE(testing_a_value_success)
+TEST_CASE("testing_a_value_success")
 {
     json target = R"(
         {
@@ -231,7 +225,7 @@ BOOST_AUTO_TEST_CASE(testing_a_value_success)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(testing_a_value_error)
+TEST_CASE("testing_a_value_error")
 {
     json target = R"(
         { "baz": "qux" }
@@ -249,7 +243,7 @@ BOOST_AUTO_TEST_CASE(testing_a_value_error)
     check_patch(target,patch,jsonpatch::jsonpatch_errc::test_failed,expected);
 }
 
-BOOST_AUTO_TEST_CASE(adding_nested_member_object)
+TEST_CASE("adding_nested_member_object")
 {
     json target = R"(
         { "foo": "bar" }
@@ -276,7 +270,7 @@ BOOST_AUTO_TEST_CASE(adding_nested_member_object)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(tilde_escape_ordering)
+TEST_CASE("tilde_escape_ordering")
 {
     json target = R"(
         {
@@ -303,7 +297,7 @@ BOOST_AUTO_TEST_CASE(tilde_escape_ordering)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(comparing_strings_and_numbers)
+TEST_CASE("comparing_strings_and_numbers")
 {
     json target = R"(
         {
@@ -324,7 +318,7 @@ BOOST_AUTO_TEST_CASE(comparing_strings_and_numbers)
     check_patch(target,patch,jsonpatch::jsonpatch_errc::test_failed,expected);
 }
 
-BOOST_AUTO_TEST_CASE(adding_an_array_value)
+TEST_CASE("adding_an_array_value")
 {
     json target = R"(
         { "foo": ["bar"] }
@@ -345,7 +339,7 @@ BOOST_AUTO_TEST_CASE(adding_an_array_value)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_add_add)
+TEST_CASE("test_add_add")
 {
     json target = R"(
         { "foo": "bar"}
@@ -365,7 +359,7 @@ BOOST_AUTO_TEST_CASE(test_add_add)
     check_patch(target,patch,std::error_code(),expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_add_add_add_fail)
+TEST_CASE("test_add_add_add_fail")
 {
     json target = R"(
         { "foo": "bar"}
@@ -384,7 +378,7 @@ BOOST_AUTO_TEST_CASE(test_add_add_add_fail)
     check_patch(target,patch,jsonpatch::jsonpatch_errc::add_failed,expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_add_remove_remove_fail)
+TEST_CASE("test_add_remove_remove_fail")
 {
     json target = R"(
         {
@@ -406,7 +400,7 @@ BOOST_AUTO_TEST_CASE(test_add_remove_remove_fail)
     check_patch(target,patch,jsonpatch::jsonpatch_errc::remove_failed,expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_move_copy_replace_remove_fail)
+TEST_CASE("test_move_copy_replace_remove_fail")
 {
     json target = R"(
         {
@@ -431,7 +425,7 @@ BOOST_AUTO_TEST_CASE(test_move_copy_replace_remove_fail)
 
 }
 
-BOOST_AUTO_TEST_CASE(test_diff1)
+TEST_CASE("test_diff1")
 {
     json source = R"(
         {"/": 9, "~1": 10, "foo": "bar"}
@@ -446,7 +440,7 @@ BOOST_AUTO_TEST_CASE(test_diff1)
     check_patch(source,patch,std::error_code(),target);
 }
 
-BOOST_AUTO_TEST_CASE(test_diff2)
+TEST_CASE("test_diff2")
 {
     json source = R"(
         { 
@@ -467,7 +461,7 @@ BOOST_AUTO_TEST_CASE(test_diff2)
     check_patch(source,patch,std::error_code(),target);
 }
 
-BOOST_AUTO_TEST_CASE(add_when_new_items_in_target_array1)
+TEST_CASE("add_when_new_items_in_target_array1")
 {
     jsoncons::json source = R"(
         {"/": 9, "foo": [ "bar"]}
@@ -482,7 +476,7 @@ BOOST_AUTO_TEST_CASE(add_when_new_items_in_target_array1)
     check_patch(source,patch,std::error_code(),target);
 }
 
-BOOST_AUTO_TEST_CASE(add_when_new_items_in_target_array2)
+TEST_CASE("add_when_new_items_in_target_array2")
 {
     jsoncons::json source = R"(
         {"/": 9, "foo": [ "bar", "bar"]}
@@ -496,8 +490,6 @@ BOOST_AUTO_TEST_CASE(add_when_new_items_in_target_array2)
 
     check_patch(source,patch,std::error_code(),target);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 
 

@@ -1,11 +1,7 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/cbor/cbor_parser.hpp>
@@ -17,8 +13,6 @@
 
 using namespace jsoncons;
 using namespace jsoncons::cbor;
-
-BOOST_AUTO_TEST_SUITE(cbor_parser_tests)
 
 void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 {
@@ -33,7 +27,7 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 
         json result = decoder.get_result();
 
-        BOOST_REQUIRE_MESSAGE(expected == result, expected.to_string());
+        REQUIRE(expected == result);
     }
     catch (const std::exception& e)
     {
@@ -42,7 +36,7 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_cbor_parsing)
+TEST_CASE("test_cbor_parsing")
 {
     // unsigned integer
     check_parsing({0x00},json(0U));
@@ -157,6 +151,4 @@ BOOST_AUTO_TEST_CASE(test_cbor_parsing)
     check_parsing({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
                   json(bignum(1,{0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00})));
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 

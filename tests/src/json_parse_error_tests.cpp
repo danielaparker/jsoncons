@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -12,14 +12,12 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_parse_error_tests)
-
 void test_parse_error(const std::string& text, std::error_code ec)
 {
+    REQUIRE_THROWS(json::parse(text));
     try
     {
-        json::parse(text);
-        BOOST_FAIL(text);
+        json::parse(text);        
     }
     catch (const parse_error& e)
     {
@@ -28,7 +26,7 @@ void test_parse_error(const std::string& text, std::error_code ec)
             std::cout << text << std::endl;
             std::cout << e.code().value() << " " << e.what() << std::endl; 
         }
-        BOOST_CHECK_EQUAL(ec, e.code());
+        CHECK(ec == e.code());
     }
 }
 
@@ -46,11 +44,11 @@ void test_parse_ec(const std::string& text, std::error_code expected)
     //          << " at line " << reader.line_number() 
     //          << " and column " << reader.column_number() << std::endl;
 
-    BOOST_CHECK(ec);
-    BOOST_CHECK_EQUAL(expected,ec);
+    CHECK(ec);
+    CHECK(expected == ec);
 }
 
-BOOST_AUTO_TEST_CASE(test_missing_separator)
+TEST_CASE("test_parse_missing_separator")
 {
     std::string jtext = R"({"field1"{}})";    
 
@@ -58,7 +56,7 @@ BOOST_AUTO_TEST_CASE(test_missing_separator)
     test_parse_ec(jtext, jsoncons::json_parse_errc::expected_colon);
 }
 
-BOOST_AUTO_TEST_CASE(test_invalid_value)
+TEST_CASE("test_invalid_value")
 {
     std::string jtext = R"({"field1":ru})";    
 
@@ -67,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_invalid_value)
 }
 
 
-BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
+TEST_CASE("test_unexpected_end_of_file")
 {
     std::string jtext = R"({"field1":{})";    
 
@@ -75,7 +73,7 @@ BOOST_AUTO_TEST_CASE(test_unexpected_end_of_file)
     test_parse_ec(jtext, jsoncons::json_parse_errc::unexpected_eof);
 }
 
-BOOST_AUTO_TEST_CASE(test_value_not_found)
+TEST_CASE("test_value_not_found")
 {
     std::string jtext = R"({"name":})";    
 
@@ -83,17 +81,17 @@ BOOST_AUTO_TEST_CASE(test_value_not_found)
     test_parse_ec(jtext, jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_escaped_characters)
+TEST_CASE("test_escaped_characters")
 {
     std::string input("[\"\\n\\b\\f\\r\\t\"]");
     std::string expected("\n\b\f\r\t");
 
     json o = json::parse(input);
-    BOOST_CHECK(expected == o[0].as<std::string>());
+    CHECK(expected == o[0].as<std::string>());
 }
 
 
-BOOST_AUTO_TEST_CASE(test_expected_colon)
+TEST_CASE("test_expected_colon")
 {
     test_parse_error("{\"name\" 10}", jsoncons::json_parse_errc::expected_colon);
     test_parse_error("{\"name\" true}", jsoncons::json_parse_errc::expected_colon);
@@ -104,7 +102,7 @@ BOOST_AUTO_TEST_CASE(test_expected_colon)
     test_parse_error("{\"name\" []}", jsoncons::json_parse_errc::expected_colon);
 }
 
-BOOST_AUTO_TEST_CASE(test_expected_name)
+TEST_CASE("test_expected_name")
 {
     test_parse_error("{10}", jsoncons::json_parse_errc::expected_name);
     test_parse_error("{true}", jsoncons::json_parse_errc::expected_name);
@@ -114,40 +112,40 @@ BOOST_AUTO_TEST_CASE(test_expected_name)
     test_parse_error("{[]}", jsoncons::json_parse_errc::expected_name);
 }
 
-BOOST_AUTO_TEST_CASE(test_expected_value)
+TEST_CASE("test_expected_value")
 {
     test_parse_error("[tru]", jsoncons::json_parse_errc::invalid_value);
     test_parse_error("[fa]", jsoncons::json_parse_errc::invalid_value);
     test_parse_error("[n]", jsoncons::json_parse_errc::invalid_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_parse_primitive_pass)
+TEST_CASE("test_parse_primitive_pass")
 {
     json val;
-    BOOST_CHECK_NO_THROW((val=json::parse("null")));
-    BOOST_CHECK_EQUAL(val,json::null());
-    BOOST_CHECK_NO_THROW((val=json::parse("false")));
-    BOOST_CHECK_EQUAL(val,json(false));
-    BOOST_CHECK_NO_THROW((val=json::parse("true")));
-    BOOST_CHECK_EQUAL(val,json(true));
-    BOOST_CHECK_NO_THROW((val=json::parse("10")));
-    BOOST_CHECK_EQUAL(val,json(10));
-    BOOST_CHECK_NO_THROW((val=json::parse("1.999")));
-    BOOST_CHECK_EQUAL(val,json(1.999));
-    BOOST_CHECK_NO_THROW((val=json::parse("\"string\"")));
-    BOOST_CHECK_EQUAL(val,json("string"));
+    CHECK_NOTHROW((val=json::parse("null")));
+    CHECK(val == json::null());
+    CHECK_NOTHROW((val=json::parse("false")));
+    CHECK(val == json(false));
+    CHECK_NOTHROW((val=json::parse("true")));
+    CHECK(val == json(true));
+    CHECK_NOTHROW((val=json::parse("10")));
+    CHECK(val == json(10));
+    CHECK_NOTHROW((val=json::parse("1.999")));
+    CHECK(val == json(1.999));
+    CHECK_NOTHROW((val=json::parse("\"string\"")));
+    CHECK(val == json("string"));
 }
 
-BOOST_AUTO_TEST_CASE(test_parse_empty_structures)
+TEST_CASE("test_parse_empty_structures")
 {
     json val;
-    BOOST_CHECK_NO_THROW((val=json::parse("{}")));
-    BOOST_CHECK_NO_THROW((val=json::parse("[]")));
-    BOOST_CHECK_NO_THROW((val=json::parse("{\"object\":{},\"array\":[]}")));
-    BOOST_CHECK_NO_THROW((val=json::parse("[[],{}]")));
+    CHECK_NOTHROW((val=json::parse("{}")));
+    CHECK_NOTHROW((val=json::parse("[]")));
+    CHECK_NOTHROW((val=json::parse("{\"object\":{},\"array\":[]}")));
+    CHECK_NOTHROW((val=json::parse("[[],{}]")));
 }
 
-BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)
+TEST_CASE("test_parse_primitive_fail")
 {
     test_parse_error("null {}", jsoncons::json_parse_errc::extra_character);
     test_parse_error("n ", jsoncons::json_parse_errc::invalid_value);
@@ -165,7 +163,7 @@ BOOST_AUTO_TEST_CASE(test_parse_primitive_fail)
     test_parse_error("\"string\"[]", jsoncons::json_parse_errc::extra_character);
 }
 
-BOOST_AUTO_TEST_CASE(test_multiple)
+TEST_CASE("test_multiple")
 {
     std::string in="{\"a\":1,\"b\":2,\"c\":3}{\"a\":4,\"b\":5,\"c\":6}";
     //std::cout << in << std::endl;
@@ -178,20 +176,20 @@ BOOST_AUTO_TEST_CASE(test_multiple)
     if (!reader.eof())
     {
         reader.read_next();
-        BOOST_CHECK(!reader.eof());
+        CHECK(!reader.eof());
         json val = decoder.get_result();
-        BOOST_CHECK_EQUAL(1,val["a"].as<int>());
+        CHECK(1 == val["a"].as<int>());
     }
     if (!reader.eof())
     {
         reader.read_next();
-        BOOST_CHECK(!reader.eof());
+        CHECK(!reader.eof());
         json val = decoder.get_result();
-        BOOST_CHECK_EQUAL(4,val["a"].as<int>());
+        CHECK(4 == val["a"].as<int>());
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_uinteger_overflow)
+TEST_CASE("test_uinteger_overflow")
 {
     uint64_t m = (std::numeric_limits<uint64_t>::max)();
     std::string s1 = std::to_string(m);
@@ -199,16 +197,16 @@ BOOST_AUTO_TEST_CASE(test_uinteger_overflow)
     s2.push_back('0');
     
     json j1 =  json::parse(s1);
-    BOOST_CHECK(j1.is_uinteger());
-    BOOST_CHECK(m == j1.as_uinteger());
+    CHECK(j1.is_uinteger());
+    CHECK(m == j1.as_uinteger());
 
     json j2 =  json::parse(s2);
-    BOOST_CHECK(!j2.is_uinteger());
-    BOOST_CHECK(j2.is_bignum());
-    BOOST_CHECK_EQUAL(s2,j2.as<std::string>());
+    CHECK(!j2.is_uinteger());
+    CHECK(j2.is_bignum());
+    CHECK(s2 == j2.as<std::string>());
 }
 
-BOOST_AUTO_TEST_CASE(test_negative_integer_overflow)
+TEST_CASE("test_negative_integer_overflow")
 {
     int64_t m = (std::numeric_limits<int64_t>::min)();
     std::string s1 = std::to_string(m);
@@ -216,15 +214,15 @@ BOOST_AUTO_TEST_CASE(test_negative_integer_overflow)
     s2.push_back('0');
     
     json j1 =  json::parse(s1);
-    BOOST_CHECK(m == j1.as_integer());
+    CHECK(m == j1.as_integer());
 
     json j2 =  json::parse(s2);
-    BOOST_CHECK(!j2.is_integer());
-    BOOST_CHECK(j2.is_bignum());
-    BOOST_CHECK_EQUAL(s2,j2.as<std::string>());
+    CHECK(!j2.is_integer());
+    CHECK(j2.is_bignum());
+    CHECK(s2 == j2.as<std::string>());
 }
 
-BOOST_AUTO_TEST_CASE(test_positive_integer_overflow)
+TEST_CASE("test_positive_integer_overflow")
 {
     int64_t m = (std::numeric_limits<int64_t>::max)();
     std::string s1 = std::to_string(m);
@@ -232,15 +230,13 @@ BOOST_AUTO_TEST_CASE(test_positive_integer_overflow)
     s2.push_back('0');
 
     json j1 =  json::parse(s1);
-    BOOST_CHECK(m == j1.as_integer());
+    CHECK(m == j1.as_integer());
 
     json j2 =  json::parse(s2);
-    BOOST_CHECK(!j2.is_integer());
-    BOOST_CHECK(j2.is_bignum());
-    BOOST_CHECK_EQUAL(s2,j2.as<std::string>());
+    CHECK(!j2.is_integer());
+    CHECK(j2.is_bignum());
+    CHECK(s2 == j2.as<std::string>());
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 
 

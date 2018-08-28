@@ -1,11 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -25,10 +21,8 @@
 #endif
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(JSONTestSuite_tests)
-
 #if defined(_MSC_VER)
-BOOST_AUTO_TEST_CASE(test_json)
+TEST_CASE("test_json")
 {
     boost::filesystem::path p("./input/JSONTestSuite");
 
@@ -69,7 +63,7 @@ BOOST_AUTO_TEST_CASE(test_json)
                         {
                             std::ostringstream os;
                             os << dir_itr->path().filename() << " should pass. " << e.what();
-                            BOOST_CHECK_MESSAGE( false, os.str());                        
+                            CHECK( false);                        
                         }
                     }
                     else if (dir_itr->path().filename().c_str()[0] == 'n')
@@ -84,7 +78,7 @@ BOOST_AUTO_TEST_CASE(test_json)
                             reader.read();
                             std::ostringstream os;
                             os << dir_itr->path().filename() << " should fail";
-                            BOOST_CHECK_MESSAGE(false, os.str());  
+                            CHECK(false);  
                         }
                         catch (const parse_error&)
                         {
@@ -99,8 +93,6 @@ BOOST_AUTO_TEST_CASE(test_json)
     }
 }
 #endif
-
-BOOST_AUTO_TEST_SUITE_END()
 
 
 

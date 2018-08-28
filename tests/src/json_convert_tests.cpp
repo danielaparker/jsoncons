@@ -1,7 +1,7 @@
 // Copyright 2017 Daniel Parker
 // Distributed under Boost license
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json.hpp>
 #include <sstream>
@@ -72,9 +72,7 @@ namespace jsoncons
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_convert_tests)
-
-BOOST_AUTO_TEST_CASE(convert_pair_test)
+TEST_CASE("convert_pair_test")
 {
     auto val = std::make_pair(false,std::string("foo"));
     std::string s;
@@ -83,10 +81,10 @@ BOOST_AUTO_TEST_CASE(convert_pair_test)
 
     auto result = jsoncons::decode_json<std::pair<bool,std::string>>(s);
 
-    BOOST_CHECK(val == result);
+    CHECK(val == result);
 }
 
-BOOST_AUTO_TEST_CASE(convert_vector_test)
+TEST_CASE("convert_vector_test")
 {
     std::vector<double> v = {1,2,3,4,5,6};
 
@@ -95,14 +93,14 @@ BOOST_AUTO_TEST_CASE(convert_vector_test)
 
     auto result = jsoncons::decode_json<std::vector<double>>(s);
 
-    BOOST_REQUIRE(v.size() == result.size());
+    REQUIRE(v.size() == result.size());
     for (size_t i = 0; i < result.size(); ++i)
     {
-        BOOST_CHECK_EQUAL(v[i],result[i]);
+        CHECK(v[i] == result[i]);
     }
 }
 
-BOOST_AUTO_TEST_CASE(convert_map_test)
+TEST_CASE("convert_map_test")
 {
     std::map<std::string,double> m = {{"a",1},{"b",2}};
 
@@ -110,27 +108,27 @@ BOOST_AUTO_TEST_CASE(convert_map_test)
     jsoncons::encode_json(m,s);
     auto result = jsoncons::decode_json<std::map<std::string,double>>(s);
 
-    BOOST_REQUIRE(result.size() == m.size());
-    BOOST_CHECK(m["a"] == result["a"]);
-    BOOST_CHECK(m["b"] == result["b"]);
+    REQUIRE(result.size() == m.size());
+    CHECK(m["a"] == result["a"]);
+    CHECK(m["b"] == result["b"]);
 }
 
-BOOST_AUTO_TEST_CASE(convert_array_test)
+TEST_CASE("convert_array_test")
 {
     std::array<double,4> v{1,2,3,4};
 
     std::string s;
     jsoncons::encode_json(v,s);
     std::array<double, 4> result = jsoncons::decode_json<std::array<double,4>>(s);
-    BOOST_REQUIRE(result.size() == v.size());
+    REQUIRE(result.size() == v.size());
     for (size_t i = 0; i < result.size(); ++i)
     {
-        BOOST_CHECK_EQUAL(v[i],result[i]);
+        CHECK(v[i] == result[i]);
     }
 }
 
 #if !defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-BOOST_AUTO_TEST_CASE(convert_tuple_test)
+TEST_CASE("convert_tuple_test")
 {
     typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
 
@@ -144,7 +142,7 @@ BOOST_AUTO_TEST_CASE(convert_tuple_test)
     jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
     std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employee_collection>(s);
-    BOOST_REQUIRE(employees2.size() == employees.size());
+    REQUIRE(employees2.size() == employees.size());
 
     std::cout << "\n(2)\n";
     for (const auto& pair : employees2)
@@ -154,7 +152,7 @@ BOOST_AUTO_TEST_CASE(convert_tuple_test)
 }
 #endif
 
-BOOST_AUTO_TEST_CASE(test_boost_matrix)
+TEST_CASE("test_encode_boost_matrix_to_json")
 {
     matrix<double> A(2, 2);
     A(0, 0) = 1.1;
@@ -168,7 +166,5 @@ BOOST_AUTO_TEST_CASE(test_boost_matrix)
     auto A2 = jsoncons::decode_json<matrix<double>>(s);
 
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 

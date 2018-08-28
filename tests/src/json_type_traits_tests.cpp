@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
@@ -29,9 +29,7 @@ struct json_type_traits<Json, own_vector> {
 };
 };
 
-BOOST_AUTO_TEST_SUITE(json_type_traits_tests)
-
-BOOST_AUTO_TEST_CASE(test_trait_type_erasure)
+TEST_CASE("test_trait_type_erasure")
 {
     json::object o;
 
@@ -42,7 +40,7 @@ BOOST_AUTO_TEST_CASE(test_trait_type_erasure)
     val.insert_or_assign("A",o);
 }
 
-BOOST_AUTO_TEST_CASE(test_assign_non_const_cstring)
+TEST_CASE("test_assign_non_const_cstring")
 {
     json root;
 
@@ -52,48 +50,48 @@ BOOST_AUTO_TEST_CASE(test_assign_non_const_cstring)
     root["Test"] = q;
 }
 
-BOOST_AUTO_TEST_CASE(test_uint8_t)
+TEST_CASE("test_uint8_t")
 {
     uint8_t x = 10;
 
     json o;
     o["u"] = x;
 
-    BOOST_CHECK(o["u"].is_number());
+    CHECK(o["u"].is_number());
 
     uint8_t y = o["u"].as<uint8_t>();
 
-    BOOST_CHECK(y == 10);
+    CHECK(y == 10);
 }
 
-BOOST_AUTO_TEST_CASE(test_float_assignment)
+TEST_CASE("test_float_assignment")
 {
     float x = 10.5;
 
     json o;
     o["float"] = x;
 
-    BOOST_CHECK(o["float"].is_number());
+    CHECK(o["float"].is_number());
 
     float y = o["float"].as<float>();
 
-    BOOST_CHECK_CLOSE(10.5,y,0.00001);
+    CHECK(10.5 == Approx(y).epsilon(0.00001));
 }
 
-BOOST_AUTO_TEST_CASE(test_float)
+TEST_CASE("test_float")
 {
     float x = 10.5;
 
     json o(x);
 
-    BOOST_CHECK(o.is<float>());
+    CHECK(o.is<float>());
 
     float y = o.as<float>();
 
-    BOOST_CHECK_CLOSE(10.5,y,0.00001);
+    CHECK(10.5 == Approx(y).epsilon(0.00001));
 }
 
-BOOST_AUTO_TEST_CASE(test_unsupported_type)
+TEST_CASE("test_unsupported_type")
 {
     json o;
 
@@ -101,41 +99,40 @@ BOOST_AUTO_TEST_CASE(test_unsupported_type)
     // compile error
 }
 
-BOOST_AUTO_TEST_CASE(test_as_json_value)
+TEST_CASE("test_as_json_value")
 {
     json a;
 
     a["first"] = "first"; 
     a["second"] = "second"; 
 
-    BOOST_CHECK_EQUAL(true,a.is<json>());
+    CHECK(true == a.is<json>());
     
     json b = a.as<json>();
-    BOOST_CHECK_EQUAL("first",b["first"].as<std::string>());
-    BOOST_CHECK_EQUAL("second",b["second"].as<std::string>());
+    CHECK("first" == b["first"].as<std::string>());
+    CHECK("second" == b["second"].as<std::string>());
 }
 
-BOOST_AUTO_TEST_CASE(test_byte_string_as_vector)
+TEST_CASE("test_byte_string_as_vector")
 {
     json a(byte_string{'H','e','l','l','o'});
 
-    BOOST_REQUIRE(a.is_byte_string());
+    REQUIRE(a.is_byte_string());
 
     auto bs = a.as<byte_string>();
 
-    BOOST_REQUIRE(5 == bs.size());
-    BOOST_CHECK('H' == bs[0]);
-    BOOST_CHECK('e' == bs[1]);
-    BOOST_CHECK('l' == bs[2]);
-    BOOST_CHECK('l' == bs[3]);
-    BOOST_CHECK('o' == bs[4]);
+    REQUIRE(5 == bs.size());
+    CHECK('H' == bs[0]);
+    CHECK('e' == bs[1]);
+    CHECK('l' == bs[2]);
+    CHECK('l' == bs[3]);
+    CHECK('o' == bs[4]);
 }
 /*
-BOOST_AUTO_TEST_CASE(test_own_vector)
+TEST_CASE("test_own_vector")
 {
     jsoncons::json j = own_vector({0,9,8,7});
     std::cout << j;
 }
 */
 
-BOOST_AUTO_TEST_SUITE_END()

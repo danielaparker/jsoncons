@@ -1,46 +1,42 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <list>
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_array_tests)
-
-BOOST_AUTO_TEST_CASE(test_initializer_list_of_integers)
+TEST_CASE("test_initializer_list_of_integers")
 {
     json arr = json::array{0,1,2,3};
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.size() == 4);
+    CHECK(arr.is_array());
+    CHECK(arr.size() == 4);
     for (size_t i = 0; i < arr.size(); ++i)
     {
-        BOOST_CHECK_EQUAL(i,arr[i].as<size_t>());
+        CHECK(i == arr[i].as<size_t>());
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list)
+TEST_CASE("test_assignment_to_initializer_list")
 {
     json arr = json::array({0,1,2,3});
 
     arr = json::array{0,1,2,3};
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.size() == 4);
+    CHECK(arr.is_array());
+    CHECK(arr.size() == 4);
     for (size_t i = 0; i < arr.size(); ++i)
     {
-        BOOST_CHECK_EQUAL(i,arr[i].as<size_t>());
+        CHECK(i == arr[i].as<size_t>());
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list2)
+TEST_CASE("test_assignment_to_initializer_list2")
 {
     json val;
     val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
@@ -53,18 +49,18 @@ BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list2)
                                       json::array{2},
                                       json::array{4,3}};
 
-    BOOST_CHECK(val["data"]["item"][0][0] == json(2));
-    BOOST_CHECK(val["data"]["item"][1][0] == json(4));
-    BOOST_CHECK(val["data"]["item"][2][0] == json(4));
-    BOOST_CHECK(val["data"]["item"][3][0] == json(4));
-    BOOST_CHECK(val["data"]["item"][4][0] == json(2));
-    BOOST_CHECK(val["data"]["item"][5][0] == json(4));
-    BOOST_CHECK(val["data"]["item"][6][0] == json(2));
-    BOOST_CHECK(val["data"]["item"][7][0] == json(4));
-    BOOST_CHECK(val["data"]["item"][7][1] == json(3));
+    CHECK(val["data"]["item"][0][0] == json(2));
+    CHECK(val["data"]["item"][1][0] == json(4));
+    CHECK(val["data"]["item"][2][0] == json(4));
+    CHECK(val["data"]["item"][3][0] == json(4));
+    CHECK(val["data"]["item"][4][0] == json(2));
+    CHECK(val["data"]["item"][5][0] == json(4));
+    CHECK(val["data"]["item"][6][0] == json(2));
+    CHECK(val["data"]["item"][7][0] == json(4));
+    CHECK(val["data"]["item"][7][1] == json(3));
 }
 
-BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list3)
+TEST_CASE("test_assignment_to_initializer_list3")
 {
     json val;
     val["data"]["id"] = json::array{0,1,2,3,4,5,6,7};
@@ -78,11 +74,11 @@ BOOST_AUTO_TEST_CASE(test_assignment_to_initializer_list3)
     [{"first":1,"second":2}]
     )");
 
-    BOOST_CHECK(expected_id == val["data"]["id"]);
-    BOOST_CHECK(expected_item == val["data"]["item"]);
+    CHECK(expected_id == val["data"]["id"]);
+    CHECK(expected_item == val["data"]["item"]);
 }
 
-BOOST_AUTO_TEST_CASE(test_assign_initializer_list_of_object)
+TEST_CASE("test_assign_initializer_list_of_object")
 {
     json arr = json::array();
 
@@ -90,12 +86,12 @@ BOOST_AUTO_TEST_CASE(test_assign_initializer_list_of_object)
     transaction["Debit"] = 10000;
 
     arr = json::array{transaction};
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.size() == 1);
-    BOOST_CHECK_EQUAL(arr[0], transaction);
+    CHECK(arr.is_array());
+    CHECK(arr.size() == 1);
+    CHECK(arr[0] == transaction);
 }
 
-BOOST_AUTO_TEST_CASE(test_initializer_list_of_objects)
+TEST_CASE("test_initializer_list_of_objects")
 {
     json book1;
     book1["author"] = "Smith";
@@ -106,139 +102,139 @@ BOOST_AUTO_TEST_CASE(test_initializer_list_of_objects)
     book2["title"] = "New Things";
 
     json arr = json::array{book1, book2};
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.size() == 2);
+    CHECK(arr.is_array());
+    CHECK(arr.size() == 2);
 
-    BOOST_CHECK_EQUAL(book1,arr[0]);
-    BOOST_CHECK_EQUAL(book2,arr[1]);
+    CHECK(book1 == arr[0]);
+    CHECK(book2 == arr[1]);
 }
 
-BOOST_AUTO_TEST_CASE(test_array_constructor)
+TEST_CASE("test_array_constructor")
 {
     json arr = json::array();
     arr.resize(10,10.0);
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.size() == 10);
-    BOOST_CHECK_CLOSE(arr[0].as<double>(), 10.0, 0.0000001);
+    CHECK(arr.is_array());
+    CHECK(arr.size() == 10);
+    CHECK(arr[0].as<double>() == Approx(10.0).epsilon(0.0000001));
 }
 
-BOOST_AUTO_TEST_CASE(test_make_array)
+TEST_CASE("test_make_array")
 {
     json arr = json::array();
-    BOOST_CHECK(arr.size() == 0);
+    CHECK(arr.size() == 0);
     arr.resize(10,10.0);
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.size() == 10);
-    BOOST_CHECK_CLOSE(arr[0].as<double>(), 10.0, 0.0000001);
+    CHECK(arr.is_array());
+    CHECK(arr.size() == 10);
+    CHECK(arr[0].as<double>() == Approx(10.0).epsilon(0.0000001));
 
 }
 
-BOOST_AUTO_TEST_CASE(test_add_element_to_array)
+TEST_CASE("test_add_element_to_array")
 {
     json arr = json::array();
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.is<json::array>());
+    CHECK(arr.is_array());
+    CHECK(arr.is<json::array>());
     arr.push_back("Toronto");
     arr.push_back("Vancouver");
     arr.insert(arr.array_range().begin(),"Montreal");
 
-    BOOST_CHECK(arr.size() == 3);
+    CHECK(arr.size() == 3);
 
-    BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
-    BOOST_CHECK(arr[1].as<std::string>() == std::string("Toronto"));
-    BOOST_CHECK(arr[2].as<std::string>() == std::string("Vancouver"));
+    CHECK(arr[0].as<std::string>() == std::string("Montreal"));
+    CHECK(arr[1].as<std::string>() == std::string("Toronto"));
+    CHECK(arr[2].as<std::string>() == std::string("Vancouver"));
 }
 
-BOOST_AUTO_TEST_CASE(test_emplace_element_to_array)
+TEST_CASE("test_emplace_element_to_array")
 {
     json a = json::array();
-    BOOST_CHECK(a.is_array());
-    BOOST_CHECK(a.is<json::array>());
+    CHECK(a.is_array());
+    CHECK(a.is<json::array>());
     a.emplace_back("Toronto");
     a.emplace_back("Vancouver");
     a.emplace(a.array_range().begin(),"Montreal");
 
-    BOOST_CHECK(a.size() == 3);
+    CHECK(a.size() == 3);
 
-    BOOST_CHECK(a[0].as<std::string>() == std::string("Montreal"));
-    BOOST_CHECK(a[1].as<std::string>() == std::string("Toronto"));
-    BOOST_CHECK(a[2].as<std::string>() == std::string("Vancouver"));
+    CHECK(a[0].as<std::string>() == std::string("Montreal"));
+    CHECK(a[1].as<std::string>() == std::string("Toronto"));
+    CHECK(a[2].as<std::string>() == std::string("Vancouver"));
 }
 
-BOOST_AUTO_TEST_CASE(test_array_add_pos)
+TEST_CASE("test_array_add_pos")
 {
     json arr = json::array();
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.is<json::array>());
+    CHECK(arr.is_array());
+    CHECK(arr.is<json::array>());
     arr.push_back("Toronto");
     arr.push_back("Vancouver");
     arr.insert(arr.array_range().begin(),"Montreal");
 
-    BOOST_CHECK(arr.size() == 3);
+    CHECK(arr.size() == 3);
 
-    BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
-    BOOST_CHECK(arr[1].as<std::string>() == std::string("Toronto"));
-    BOOST_CHECK(arr[2].as<std::string>() == std::string("Vancouver"));
+    CHECK(arr[0].as<std::string>() == std::string("Montreal"));
+    CHECK(arr[1].as<std::string>() == std::string("Toronto"));
+    CHECK(arr[2].as<std::string>() == std::string("Vancouver"));
 }
 
-BOOST_AUTO_TEST_CASE(test_array_erase_range)
+TEST_CASE("test_array_erase_range")
 {
     json arr = json::array();
-    BOOST_CHECK(arr.is_array());
-    BOOST_CHECK(arr.is<json::array>());
+    CHECK(arr.is_array());
+    CHECK(arr.is<json::array>());
     arr.push_back("Toronto");
     arr.push_back("Vancouver");
     arr.insert(arr.array_range().begin(),"Montreal");
 
-    BOOST_CHECK(arr.size() == 3);
+    CHECK(arr.size() == 3);
 
     arr.erase(arr.array_range().begin()+1,arr.array_range().end());
 
-    BOOST_CHECK(arr.size() == 1);
-    BOOST_CHECK(arr[0].as<std::string>() == std::string("Montreal"));
+    CHECK(arr.size() == 1);
+    CHECK(arr[0].as<std::string>() == std::string("Montreal"));
 }
 
-BOOST_AUTO_TEST_CASE(test_reserve_array_capacity)
+TEST_CASE("test_reserve_array_capacity")
 {
     json cities = json::array();
-    BOOST_CHECK(cities.is_array());
-    BOOST_CHECK(cities.is<json::array>());
+    CHECK(cities.is_array());
+    CHECK(cities.is<json::array>());
     cities.reserve(10);  // storage is allocated
-    BOOST_CHECK(cities.capacity() == 10);
-    BOOST_CHECK(cities.size() == 0);
+    CHECK(cities.capacity() == 10);
+    CHECK(cities.size() == 0);
 
     cities.push_back("Toronto");
-    BOOST_CHECK(cities.is_array());
-    BOOST_CHECK(cities.is<json::array>());
-    BOOST_CHECK(cities.capacity() == 10);
-    BOOST_CHECK(cities.size() == 1);
+    CHECK(cities.is_array());
+    CHECK(cities.is<json::array>());
+    CHECK(cities.capacity() == 10);
+    CHECK(cities.size() == 1);
     cities.push_back("Vancouver");
     cities.insert(cities.array_range().begin(),"Montreal");
-    BOOST_CHECK(cities.capacity() == 10);
-    BOOST_CHECK(cities.size() == 3);
+    CHECK(cities.capacity() == 10);
+    CHECK(cities.size() == 3);
 }
 
 
-BOOST_AUTO_TEST_CASE(test_one_dim_array)
+TEST_CASE("test_one_dim_array")
 {
     basic_json<char,sorted_policy,std::allocator<char>> a = basic_json<char,sorted_policy,std::allocator<char>>::make_array<1>(10,0);
-    BOOST_CHECK(a.size() == 10);
-    BOOST_CHECK(a[0].as_integer() == 0);
+    CHECK(a.size() == 10);
+    CHECK(a[0].as_integer() == 0);
     a[1] = 1;
     a[2] = 2;
-    BOOST_CHECK(a[1].as_integer() == 1);
-    BOOST_CHECK(a[2].as_integer() == 2);
-    BOOST_CHECK(a[9].as_integer() == 0);
+    CHECK(a[1].as_integer() == 1);
+    CHECK(a[2].as_integer() == 2);
+    CHECK(a[9].as_integer() == 0);
 
-    BOOST_CHECK(a[1].as<long long>() == 1);
-    BOOST_CHECK(a[2].as<long long>() == 2);
-    BOOST_CHECK(a[9].as<long long>() == 0);
+    CHECK(a[1].as<long long>() == 1);
+    CHECK(a[2].as<long long>() == 2);
+    CHECK(a[9].as<long long>() == 0);
 }
 
-BOOST_AUTO_TEST_CASE(test_two_dim_array)
+TEST_CASE("test_two_dim_array")
 {
     json a = json::make_array<2>(3,4,0);
-    BOOST_CHECK(a.size() == 3);
+    CHECK(a.size() == 3);
     a[0][0] = "Tenor";
     a[0][1] = "ATM vol";
     a[0][2] = "25-d-MS";
@@ -252,30 +248,30 @@ BOOST_AUTO_TEST_CASE(test_two_dim_array)
     a[2][2] = 0.009;
     a[2][3] = -0.005;
 
-    BOOST_CHECK_EQUAL(a[0][0].as<std::string>(), std::string("Tenor"));
-    BOOST_CHECK_CLOSE(a[2][3].as<double>(), -0.005, 0.00000001);
+    CHECK(a[0][0].as<std::string>() ==std::string("Tenor"));
+    CHECK(a[2][3].as<double>() == Approx(-0.005).epsilon(0.00000001));
 
-    BOOST_CHECK_EQUAL(a[0][0].as<std::string>(), std::string("Tenor"));
-    BOOST_CHECK_CLOSE(a[2][3].as<double>(), -0.005, 0.00000001);
+    CHECK(a[0][0].as<std::string>() ==std::string("Tenor"));
+    CHECK(a[2][3].as<double>() == Approx(-0.005).epsilon(0.00000001));
 }
 
-BOOST_AUTO_TEST_CASE(test_three_dim_array)
+TEST_CASE("test_three_dim_array")
 {
     json a = json::make_array<3>(4,3,2,0);
-    BOOST_CHECK(a.size() == 4);
+    CHECK(a.size() == 4);
     a[0][2][0] = 2;
     a[0][2][1] = 3;
 
-    BOOST_CHECK(a[0][2][0].as_integer() == 2);
-    BOOST_CHECK(a[0][2][1].as_integer() == 3);
-    BOOST_CHECK(a[3][2][1].as_integer() == 0);
+    CHECK(a[0][2][0].as_integer() == 2);
+    CHECK(a[0][2][1].as_integer() == 3);
+    CHECK(a[3][2][1].as_integer() == 0);
 
-    BOOST_CHECK(a[0][2][0].as<long long>() == 2);
-    BOOST_CHECK(a[0][2][1].as<long long>() == 3);
-    BOOST_CHECK(a[3][2][1].as<long long>() == 0);
+    CHECK(a[0][2][0].as<long long>() == 2);
+    CHECK(a[0][2][1].as<long long>() == 3);
+    CHECK(a[3][2][1].as<long long>() == 0);
 }
 
-BOOST_AUTO_TEST_CASE(test_assign_vector)
+TEST_CASE("test_array_assign_vector")
 {
     std::vector<std::string> vec;
     vec.push_back("Toronto");
@@ -285,14 +281,14 @@ BOOST_AUTO_TEST_CASE(test_assign_vector)
     json val;
     val = vec;
 
-    BOOST_CHECK(val.size() == 3);
-    BOOST_CHECK_EQUAL(val[0].as<std::string>(), std::string("Toronto"));
-    BOOST_CHECK_EQUAL(val[1].as<std::string>(), std::string("Vancouver"));
-    BOOST_CHECK_EQUAL(val[2].as<std::string>(), std::string("Montreal"));
+    CHECK(val.size() == 3);
+    CHECK(val[0].as<std::string>() ==std::string("Toronto"));
+    CHECK(val[1].as<std::string>() ==std::string("Vancouver"));
+    CHECK(val[2].as<std::string>() ==std::string("Montreal"));
 
 }
 
-BOOST_AUTO_TEST_CASE(test_assign_vector_of_bool)
+TEST_CASE("test_array_assign_vector_of_bool")
 {
     std::vector<bool> vec;
     vec.push_back(true);
@@ -302,23 +298,23 @@ BOOST_AUTO_TEST_CASE(test_assign_vector_of_bool)
     json val;
     val = vec;
 
-    BOOST_CHECK(val.size() == 3);
-    BOOST_CHECK_EQUAL(val[0].as<bool>(), true);
-    BOOST_CHECK_EQUAL(val[1].as<bool>(), false);
-    BOOST_CHECK_EQUAL(val[2].as<bool>(), true);
+    CHECK(val.size() == 3);
+    CHECK(val[0].as<bool>() == true);
+    CHECK(val[1].as<bool>() == false);
+    CHECK(val[2].as<bool>() == true);
 
 }
 
-BOOST_AUTO_TEST_CASE(test_add_null)
+TEST_CASE("test_array_add_null")
 {
     json a = json::array();
     a.push_back(jsoncons::null_type());
     a.push_back(json::null());
-    BOOST_CHECK(a[0].is_null());
-    BOOST_CHECK(a[1].is_null());
+    CHECK(a[0].is_null());
+    CHECK(a[1].is_null());
 }
 
-BOOST_AUTO_TEST_CASE(test_from_container)
+TEST_CASE("test_array_from_container")
 {
     std::vector<int> vec;
     vec.push_back(10);
@@ -326,10 +322,10 @@ BOOST_AUTO_TEST_CASE(test_from_container)
     vec.push_back(30);
 
     json val1 = vec;
-    BOOST_REQUIRE(vec.size() == 3);
-    BOOST_CHECK(vec[0] == 10);
-    BOOST_CHECK(vec[1] == 20);
-    BOOST_CHECK(vec[2] == 30);
+    REQUIRE(vec.size() == 3);
+    CHECK(vec[0] == 10);
+    CHECK(vec[1] == 20);
+    CHECK(vec[2] == 30);
 
     std::list<double> list;
     list.push_back(10.5);
@@ -337,11 +333,118 @@ BOOST_AUTO_TEST_CASE(test_from_container)
     list.push_back(30.5);
 
     json val2 = list;
-    BOOST_REQUIRE(val2.size() == 3);
-    BOOST_CHECK_CLOSE(val2[0].as<double>(),10.5,0.000001);
-    BOOST_CHECK_CLOSE(val2[1].as<double>(),20.5,0.000001);
-    BOOST_CHECK_CLOSE(val2[2].as<double>(),30.5,0.000001);
+    REQUIRE(val2.size() == 3);
+    CHECK(val2[0].as<double>() == Approx(10.5).epsilon(0.000001));
+    CHECK(val2[1].as<double>() == Approx(20.5).epsilon(0.000001));
+    CHECK(val2[2].as<double>() == Approx(30.5).epsilon(0.000001));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+TEST_CASE("test_array_as_vector_of_double")
+{
+    std::string s("[0,1.1,2,3.1]");
+    json val = json::parse(s);
+
+    std::vector<double> v = val.as<std::vector<double>>(); 
+    CHECK(v.size() == 4);
+    CHECK(v[0] == Approx(0.0).epsilon(0.0000000001));
+    CHECK(v[1] == Approx(1.1).epsilon(0.0000000001));
+    CHECK(v[2] == Approx(2.0).epsilon(0.0000000001));
+    CHECK(v[3] == Approx(3.1).epsilon(0.0000000001));
+}
+
+TEST_CASE("test_array_as_vector_of_bool")
+{
+    std::string s("[true,false,true]");
+    json val = json::parse(s);
+
+    std::vector<bool> v = val.as<std::vector<bool>>(); 
+    CHECK(v.size() == 3);
+    CHECK(v[0] == true);
+    CHECK(v[1] == false);
+    CHECK(v[2] == true);
+}
+
+TEST_CASE("test_array_as_vector_of_string")
+{
+    std::string s("[\"Hello\",\"World\"]");
+    json val = json::parse(s);
+
+    std::vector<std::string> v = val.as<std::vector<std::string>>(); 
+    CHECK(v.size() == 2);
+    CHECK(v[0] == "Hello");
+    CHECK(v[1] == "World");
+}
+
+TEST_CASE("test_array_as_vector_of_char")
+{
+    std::string s("[20,30]");
+    json val = json::parse(s);
+
+    std::vector<char> v = val.as<std::vector<char>>(); 
+    CHECK(v.size() == 2);
+    CHECK(v[0] == 20);
+    CHECK(v[1] == 30);
+}
+
+TEST_CASE("test_array_as_vector_of_int")
+{
+    std::string s("[0,1,2,3]");
+    json val = json::parse(s);
+
+    std::vector<int> v = val.as<std::vector<int>>(); 
+    CHECK(v.size() == 4);
+    CHECK(v[0]==0);
+    CHECK(v[1]==1);
+    CHECK(v[2]==2);
+    CHECK(v[3]==3);
+
+    std::vector<unsigned int> v1 = val.as<std::vector<unsigned int>>(); 
+    CHECK(v1.size() == 4);
+    CHECK(v1[0]==0);
+    CHECK(v1[1]==1);
+    CHECK(v1[2]==2);
+    CHECK(v1[3]==3);
+
+    std::vector<long> v2 = val.as<std::vector<long>>(); 
+    CHECK(v2.size() == 4);
+    CHECK(v2[0]==0);
+    CHECK(v2[1]==1);
+    CHECK(v2[2]==2);
+    CHECK(v2[3]==3);
+
+    std::vector<unsigned long> v3 = val.as<std::vector<unsigned long>>(); 
+    CHECK(v3.size() == 4);
+    CHECK(v3[0]==0);
+    CHECK(v3[1]==1);
+    CHECK(v3[2]==2);
+    CHECK(v3[3]==3);
+
+    std::vector<long long> v4 = val.as<std::vector<long long>>(); 
+    CHECK(v4.size() == 4);
+    CHECK(v4[0]==0);
+    CHECK(v4[1]==1);
+    CHECK(v4[2]==2);
+    CHECK(v4[3]==3);
+
+    std::vector<unsigned long long> v5 = val.as<std::vector<unsigned long long>>(); 
+    CHECK(v5.size() == 4);
+    CHECK(v5[0]==0);
+    CHECK(v5[1]==1);
+    CHECK(v5[2]==2);
+    CHECK(v5[3]==3);
+}
+
+TEST_CASE("test_array_as_vector_of_int_on_proxy")
+{
+    std::string s("[0,1,2,3]");
+    json val = json::parse(s);
+    json root;
+    root["val"] = val;
+    std::vector<int> v = root["val"].as<std::vector<int>>();
+    CHECK(v.size() == 4);
+    CHECK(v[0]==0);
+    CHECK(v[1]==1);
+    CHECK(v[2]==2);
+    CHECK(v[3]==3);
+}
 

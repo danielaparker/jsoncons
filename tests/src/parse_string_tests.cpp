@@ -1,7 +1,7 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -11,8 +11,6 @@
 #include <ctime>
 
 using namespace jsoncons;
-
-BOOST_AUTO_TEST_SUITE(parse_string_tests)
 
 struct jsonpath_filter_fixture
 {
@@ -34,7 +32,7 @@ private:
     }
 };
 
-BOOST_AUTO_TEST_CASE(test_parse_small_string1)
+TEST_CASE("test_parse_small_string1")
 {
     std::string input = "\"String\"";
     std::istringstream is(input);
@@ -48,10 +46,10 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string1)
     catch (const std::exception&)
     {
     }
-    BOOST_CHECK(decoder.is_valid());
+    CHECK(decoder.is_valid());
 }
 
-BOOST_AUTO_TEST_CASE(test_parse_small_string2)
+TEST_CASE("test_parse_small_string2")
 {
     std::string input = "\"Str\\\"ing\"";
     std::istringstream is(input);
@@ -65,10 +63,10 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string2)
     catch (const std::exception&)
     {
     }
-    BOOST_CHECK(decoder.is_valid());
+    CHECK(decoder.is_valid());
 }
 
-BOOST_AUTO_TEST_CASE(test_parse_small_string4)
+TEST_CASE("test_parse_small_string4")
 {
     std::string input = "\"Str\\\"ing\"";
 
@@ -85,11 +83,11 @@ BOOST_AUTO_TEST_CASE(test_parse_small_string4)
         catch (const std::exception&)
         {
         }
-        BOOST_CHECK(decoder.is_valid());
-        BOOST_CHECK_EQUAL(std::string("Str\"ing"),decoder.get_result().as<std::string>());
+        CHECK(decoder.is_valid());
+        CHECK(std::string("Str\"ing") == decoder.get_result().as<std::string>());
     }
 }
-BOOST_AUTO_TEST_CASE(test_parse_big_string1)
+TEST_CASE("test_parse_big_string1")
 {
     std::string input = "\"Big Str\\\"ing\"";
 
@@ -106,12 +104,12 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string1)
         catch (const std::exception&)
         {
         }
-        BOOST_CHECK(decoder.is_valid());
-        BOOST_CHECK_EQUAL(std::string("Big Str\"ing"),decoder.get_result().as<std::string>());
+        CHECK(decoder.is_valid());
+        CHECK(std::string("Big Str\"ing") == decoder.get_result().as<std::string>());
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_parse_big_string2)
+TEST_CASE("test_parse_big_string2")
 {
     std::string input = "\"Big\t Str\\\"ing\"";
 
@@ -129,11 +127,9 @@ BOOST_AUTO_TEST_CASE(test_parse_big_string2)
         catch (const std::exception&)
         {
         }
-        BOOST_CHECK(decoder.is_valid());
-        BOOST_CHECK_EQUAL(std::string("Big\t Str\"ing"),decoder.get_result().as<std::string>());
+        CHECK(decoder.is_valid());
+        CHECK(std::string("Big\t Str\"ing") == decoder.get_result().as<std::string>());
     //}
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 

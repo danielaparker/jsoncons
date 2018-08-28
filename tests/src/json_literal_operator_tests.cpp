@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
@@ -15,9 +15,7 @@
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
-BOOST_AUTO_TEST_SUITE(json_literal_operator_tests)
-
-BOOST_AUTO_TEST_CASE(json_literal_operator_test1)
+TEST_CASE("json_literal_operator_test1")
 {
     json j = R"(
 {
@@ -32,11 +30,11 @@ BOOST_AUTO_TEST_CASE(json_literal_operator_test1)
 }
 )"_json;
 
-    BOOST_CHECK(j["Currency"] == "USD");
+    CHECK(j["Currency"] == "USD");
 
 }
 
-BOOST_AUTO_TEST_CASE(ojson_literal_operator_test1)
+TEST_CASE("ojson_literal_operator_test1")
 {
     ojson j = R"(
 {
@@ -51,11 +49,11 @@ BOOST_AUTO_TEST_CASE(ojson_literal_operator_test1)
 }
 )"_ojson;
 
-    BOOST_CHECK(j["Currency"] == "USD");
+    CHECK(j["Currency"] == "USD");
 
 }
 
-BOOST_AUTO_TEST_CASE(json_literal_operator_test2)
+TEST_CASE("json_literal_operator_test2")
 {
     wjson j = LR"(
 {
@@ -70,11 +68,11 @@ BOOST_AUTO_TEST_CASE(json_literal_operator_test2)
 }
 )"_json;
 
-    BOOST_CHECK(j[L"Currency"] == L"USD");
+    CHECK(j[L"Currency"] == L"USD");
 
 }
 
-BOOST_AUTO_TEST_CASE(ojson_literal_operator_test2)
+TEST_CASE("ojson_literal_operator_test2")
 {
     wojson j = LR"(
 {
@@ -89,11 +87,9 @@ BOOST_AUTO_TEST_CASE(ojson_literal_operator_test2)
 }
 )"_ojson;
 
-    BOOST_CHECK(j[L"Currency"] == L"USD");
+    CHECK(j[L"Currency"] == L"USD");
 
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 #endif
 

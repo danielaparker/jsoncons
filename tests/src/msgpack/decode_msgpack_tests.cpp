@@ -1,11 +1,7 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <sstream>
@@ -17,12 +13,10 @@
 using namespace jsoncons;
 using namespace jsoncons::msgpack;
 
-BOOST_AUTO_TEST_SUITE(decode_msgpack_tests)
-
 void check_decode(const std::vector<uint8_t>& v, const json& expected)
 {
     json result = decode_msgpack<json>(v);
-    BOOST_REQUIRE_MESSAGE(expected == result, expected.to_string());
+    REQUIRE(expected == result);
 }
 
 void print_msgpack(const json j)
@@ -36,7 +30,7 @@ void print_msgpack(const json j)
     std::cout << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(decode_number_msgpack_test)
+TEST_CASE("decode_number_msgpack_test")
 {
     // positive fixint 0x00 - 0x7f
     check_decode({0x00},json(0U));
@@ -107,7 +101,7 @@ BOOST_AUTO_TEST_CASE(decode_number_msgpack_test)
 
 }
 
-BOOST_AUTO_TEST_CASE(decode_msgpack_arrays_and_maps)
+TEST_CASE("decode_msgpack_arrays_and_maps")
 {
     // fixarray
     check_decode({0x90},json::array());
@@ -121,6 +115,4 @@ BOOST_AUTO_TEST_CASE(decode_msgpack_arrays_and_maps)
     check_decode({0x81,0xa2,'o','c',0x91,'\0'}, json::parse("{\"oc\": [0]}"));
     check_decode({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 

@@ -1,11 +1,7 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
@@ -18,9 +14,7 @@
 using namespace jsoncons;
 using namespace jsoncons::cbor;
 
-BOOST_AUTO_TEST_SUITE(cbor_serializer_tests)
-
-BOOST_AUTO_TEST_CASE(test_serialize_to_stream)
+TEST_CASE("test_serialize_to_stream")
 {
 json j = json::parse(R"(
 {
@@ -48,10 +42,10 @@ json j = json::parse(R"(
 
     //std::cout << pretty_print(j2) << std::endl; 
 
-    BOOST_CHECK(j == j2);
+    CHECK(j == j2);
 }
 
-BOOST_AUTO_TEST_CASE(test_array)
+TEST_CASE("test_serialize_array")
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
@@ -76,7 +70,7 @@ BOOST_AUTO_TEST_CASE(test_array)
     }
 } 
 
-BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
+TEST_CASE("test_serialize_indefinite_length_array")
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
@@ -102,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_indefinite_length_array)
     }
 } 
 
-BOOST_AUTO_TEST_CASE(test_bignum)
+TEST_CASE("test_serialize_bignum")
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
@@ -117,7 +111,7 @@ BOOST_AUTO_TEST_CASE(test_bignum)
     try
     {
         json result = decode_cbor<json>(v);
-        BOOST_CHECK_EQUAL(std::string("18446744073709551616"),result[0].as<std::string>());
+        CHECK(std::string("18446744073709551616") == result[0].as<std::string>());
     }
     catch (const std::exception& e)
     {
@@ -125,7 +119,7 @@ BOOST_AUTO_TEST_CASE(test_bignum)
     }
 } 
 
-BOOST_AUTO_TEST_CASE(test_negative_bignum1)
+TEST_CASE("test_serialize_negative_bignum1")
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
@@ -140,7 +134,7 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum1)
     try
     {
         json result = decode_cbor<json>(v);
-        BOOST_CHECK_EQUAL(std::string("-18446744073709551617"),result[0].as<std::string>());
+        CHECK(std::string("-18446744073709551617") ==result[0].as<std::string>());
     }
     catch (const std::exception& e)
     {
@@ -148,7 +142,7 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum1)
     }
 } 
 
-BOOST_AUTO_TEST_CASE(test_negative_bignum2)
+TEST_CASE("test_serialize_negative_bignum2")
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
@@ -167,7 +161,7 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum2)
         options.bignum_format(bignum_chars_format::integer);
         std::string s;
         result.dump(s,options);
-        BOOST_CHECK_EQUAL(std::string("[-18446744073709551617]"),s);
+        CHECK(std::string("[-18446744073709551617]") ==s);
     }
     catch (const std::exception& e)
     {
@@ -175,7 +169,7 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum2)
     }
 } 
 
-BOOST_AUTO_TEST_CASE(test_negative_bignum3)
+TEST_CASE("test_serialize_negative_bignum3")
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
@@ -195,13 +189,11 @@ BOOST_AUTO_TEST_CASE(test_negative_bignum3)
         options.bignum_format(bignum_chars_format::base64url);
         std::string s;
         result.dump(s,options);
-        BOOST_CHECK_EQUAL(std::string("[\"~AQAAAAAAAAAA\"]"),s);
+        CHECK(std::string("[\"~AQAAAAAAAAAA\"]") == s);
     }
     catch (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
 } 
-
-BOOST_AUTO_TEST_SUITE_END()
 

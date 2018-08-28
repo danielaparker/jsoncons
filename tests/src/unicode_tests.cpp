@@ -1,11 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <sstream>
 #include <vector>
@@ -24,10 +20,7 @@ class A<T, typename std::enable_if<std::is_floating_point<T>::value>::type> {
 }; // specialization for floating point types
 
 
-BOOST_AUTO_TEST_SUITE(unicode_tests)
-
-
-BOOST_AUTO_TEST_CASE( test_is_same_size )
+TEST_CASE( "test_is_same_size" )
 {
 }
 
@@ -42,10 +35,10 @@ BOOST_AUTO_TEST_CASE( test_surrogate_pair )
     std::string output;
     value.dump(output,options);
 
-    BOOST_CHECK_EQUAL(input,output);
+    CHECK(input == output);
 }
 
-BOOST_AUTO_TEST_CASE(test_wide_surrogate_pair)
+TEST_CASE("test_wide_surrogate_pair")
 {
     std::wstring input = L"[\"\\u8A73\\u7D30\\u95B2\\u89A7\\uD800\\uDC01\\u4E00\"]";
     wjson value = wjson::parse(input);
@@ -54,7 +47,7 @@ BOOST_AUTO_TEST_CASE(test_wide_surrogate_pair)
     std::wstring output;
     value.dump(output,options);
 
-    BOOST_CHECK(input == output);
+    CHECK(input == output);
 }
 
 BOOST_AUTO_TEST_CASE( test1 )
@@ -62,8 +55,8 @@ BOOST_AUTO_TEST_CASE( test1 )
     std::istringstream is("{\"unicode_string_1\":\"\\uD800\\uDC00\"}");
 
     json root = json::parse(is);
-    BOOST_CHECK(root.is_object());
-    BOOST_CHECK(root.is<json::object>());
+    CHECK(root.is_object());
+    CHECK(root.is<json::object>());
 
     root["double_1"] = 10.0;
 
@@ -76,5 +69,4 @@ BOOST_AUTO_TEST_CASE( test1 )
     json copy(root);
 }
 #endif
-BOOST_AUTO_TEST_SUITE_END()
 

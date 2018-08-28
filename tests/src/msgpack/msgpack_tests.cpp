@@ -1,11 +1,7 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <sstream>
@@ -17,9 +13,7 @@
 using namespace jsoncons;
 using namespace jsoncons::msgpack;
 
-BOOST_AUTO_TEST_SUITE(msgpack_tests)
-
-BOOST_AUTO_TEST_CASE(msgpack_test)
+TEST_CASE("msgpack_test")
 {
     json j1;
     j1["zero"] = 0;
@@ -78,15 +72,15 @@ BOOST_AUTO_TEST_CASE(msgpack_test)
     size_t calculated_size = msgpack_Encoder_<json>::calculate_size(j1);
     std::vector<uint8_t> v;
     encode_msgpack(j1, v);
-    BOOST_CHECK(calculated_size == v.size());
-    BOOST_CHECK(calculated_size == v.capacity());
+    CHECK(calculated_size == v.size());
+    CHECK(calculated_size == v.capacity());
 
     json j2 = decode_msgpack<json>(v);
 
-    BOOST_CHECK_EQUAL(j1,j2);
+    CHECK(j1 == j2);
 } 
 
-BOOST_AUTO_TEST_CASE(msgpack_test2)
+TEST_CASE("msgpack_test2")
 {
     wjson j1;
     j1[L"zero"] = 0;
@@ -147,13 +141,11 @@ BOOST_AUTO_TEST_CASE(msgpack_test2)
     size_t calculated_size = msgpack_Encoder_<wjson>::calculate_size(j1);
     std::vector<uint8_t> v;
     encode_msgpack(j1, v);
-    BOOST_CHECK(calculated_size == v.size());
-    BOOST_CHECK(calculated_size == v.capacity());
+    CHECK(calculated_size == v.size());
+    CHECK(calculated_size == v.capacity());
 
     wjson j2 = decode_msgpack<wjson>(v);
 
-    BOOST_CHECK(j1 == j2);
+    CHECK(j1 == j2);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 

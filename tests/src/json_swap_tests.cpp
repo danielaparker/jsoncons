@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
@@ -12,19 +12,17 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(json_swap_tests)
-
 void check_swap(const json& j1, const json& j2)
 {
     json j3 = j1;
     json j4 = j2;
 
     j3.swap(j4);
-    BOOST_CHECK_EQUAL(j1,j4);
-    BOOST_CHECK_EQUAL(j2,j3);
+    CHECK(j1 == j4);
+    CHECK(j2 == j3);
 }
 
-BOOST_AUTO_TEST_CASE(test_swap)
+TEST_CASE("test_swap")
 {
     json j1 = json::null();
     json j2 = false;
@@ -148,6 +146,4 @@ BOOST_AUTO_TEST_CASE(test_swap)
     check_swap(j10,j9);
     check_swap(j10,j10);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 

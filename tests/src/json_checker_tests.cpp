@@ -1,11 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -20,21 +16,19 @@ using namespace jsoncons;
 
 using namespace boost::filesystem;
 
-BOOST_AUTO_TEST_SUITE(json_checker_tests)
-
-BOOST_AUTO_TEST_CASE(test_fail1)
+TEST_CASE("test_fail1")
 {
     std::string path = "./input/JSON_checker/fail1.json";
     std::fstream is(path);
-    BOOST_REQUIRE(is);
-    BOOST_CHECK_NO_THROW(json::parse(is));
+    REQUIRE(is);
+    CHECK_NOTHROW(json::parse(is));
 }
 
-BOOST_AUTO_TEST_CASE(test_fail2)
+TEST_CASE("test_fail2")
 {
     std::string in_file = "./input/JSON_checker/fail2.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -46,14 +40,14 @@ BOOST_AUTO_TEST_CASE(test_fail2)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::unexpected_eof);
+    CHECK(err == jsoncons::json_parse_errc::unexpected_eof);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail3)
+TEST_CASE("test_fail3")
 {
     std::string in_file = "./input/JSON_checker/fail3.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -65,14 +59,14 @@ BOOST_AUTO_TEST_CASE(test_fail3)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_name);
+    CHECK(err == jsoncons::json_parse_errc::expected_name);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail4)
+TEST_CASE("test_fail4")
 {
     std::string in_file = "./input/JSON_checker/fail4.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -84,14 +78,14 @@ BOOST_AUTO_TEST_CASE(test_fail4)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_comma);
+    CHECK(err == jsoncons::json_parse_errc::extra_comma);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail5)
+TEST_CASE("test_fail5")
 {
     std::string in_file = "./input/JSON_checker/fail5.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -103,14 +97,14 @@ BOOST_AUTO_TEST_CASE(test_fail5)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
+    CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail6)
+TEST_CASE("test_fail6")
 {
     std::string in_file = "./input/JSON_checker/fail6.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -123,14 +117,14 @@ BOOST_AUTO_TEST_CASE(test_fail6)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
+    CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail7)
+TEST_CASE("test_fail7")
 {
     std::string in_file = "./input/JSON_checker/fail7.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -142,14 +136,14 @@ BOOST_AUTO_TEST_CASE(test_fail7)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_character);
+    CHECK(err == jsoncons::json_parse_errc::extra_character);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail8)
+TEST_CASE("test_fail8")
 {
     std::string in_file = "./input/JSON_checker/fail8.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -162,14 +156,14 @@ BOOST_AUTO_TEST_CASE(test_fail8)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_character);
+    CHECK(err == jsoncons::json_parse_errc::extra_character);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail9)
+TEST_CASE("test_fail9")
 {
     std::string in_file = "./input/JSON_checker/fail9.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -182,14 +176,14 @@ BOOST_AUTO_TEST_CASE(test_fail9)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_comma);
+    CHECK(err == jsoncons::json_parse_errc::extra_comma);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail10)
+TEST_CASE("test_fail10")
 {
     std::string in_file = "./input/JSON_checker/fail10.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
     
@@ -201,14 +195,14 @@ BOOST_AUTO_TEST_CASE(test_fail10)
     {
         err = e.code();
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::extra_character);
+    CHECK(err == jsoncons::json_parse_errc::extra_character);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail11)
+TEST_CASE("test_fail11")
 {
     std::string in_file = "./input/JSON_checker/fail11.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -221,14 +215,14 @@ BOOST_AUTO_TEST_CASE(test_fail11)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_brace);
+    CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_brace);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail12)
+TEST_CASE("test_fail12")
 {
     std::string in_file = "./input/JSON_checker/fail12.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -241,14 +235,14 @@ BOOST_AUTO_TEST_CASE(test_fail12)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
+    CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail13)
+TEST_CASE("test_fail13")
 {
     std::string in_file = "./input/JSON_checker/fail13.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -261,14 +255,14 @@ BOOST_AUTO_TEST_CASE(test_fail13)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::leading_zero);
+    CHECK(err == jsoncons::json_parse_errc::leading_zero);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail14)
+TEST_CASE("test_fail14")
 {
     std::string in_file = "./input/JSON_checker/fail14.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -281,14 +275,14 @@ BOOST_AUTO_TEST_CASE(test_fail14)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::invalid_number);
+    CHECK(err == jsoncons::json_parse_errc::invalid_number);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail15)
+TEST_CASE("test_fail15")
 {
     std::string in_file = "./input/JSON_checker/fail15.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -301,14 +295,14 @@ BOOST_AUTO_TEST_CASE(test_fail15)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
+    CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail16)
+TEST_CASE("test_fail16")
 {
     std::string in_file = "./input/JSON_checker/fail16.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -321,14 +315,14 @@ BOOST_AUTO_TEST_CASE(test_fail16)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
+    CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail17)
+TEST_CASE("test_fail17")
 {
     std::string in_file = "./input/JSON_checker/fail17.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -341,16 +335,16 @@ BOOST_AUTO_TEST_CASE(test_fail17)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
+    CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail18)
+TEST_CASE("test_fail18")
 {
     std::error_code err;
 
     std::string in_file = "./input/JSON_checker/fail18.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
     try
     {
         json_serializing_options options;
@@ -362,14 +356,14 @@ BOOST_AUTO_TEST_CASE(test_fail18)
          err = e.code();
          //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::max_depth_exceeded);
+    CHECK(err == jsoncons::json_parse_errc::max_depth_exceeded);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail19)
+TEST_CASE("test_fail19")
 {
     std::string in_file = "./input/JSON_checker/fail19.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -382,14 +376,14 @@ BOOST_AUTO_TEST_CASE(test_fail19)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_colon);
+    CHECK(err == jsoncons::json_parse_errc::expected_colon);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail20)
+TEST_CASE("test_fail20")
 {
     std::string in_file = "./input/JSON_checker/fail20.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -402,14 +396,14 @@ BOOST_AUTO_TEST_CASE(test_fail20)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
+    CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail21)
+TEST_CASE("test_fail21")
 {
     std::string in_file = "./input/JSON_checker/fail21.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -422,14 +416,14 @@ BOOST_AUTO_TEST_CASE(test_fail21)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_colon);
+    CHECK(err == jsoncons::json_parse_errc::expected_colon);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail22)
+TEST_CASE("test_fail22")
 {
     std::string in_file = "./input/JSON_checker/fail22.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -442,14 +436,14 @@ BOOST_AUTO_TEST_CASE(test_fail22)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_bracket);
+    CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_bracket);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail23)
+TEST_CASE("test_fail23")
 {
     std::string in_file = "./input/JSON_checker/fail23.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -462,14 +456,14 @@ BOOST_AUTO_TEST_CASE(test_fail23)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::invalid_value);
+    CHECK(err == jsoncons::json_parse_errc::invalid_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail24)
+TEST_CASE("test_fail24")
 {
     std::string in_file = "./input/JSON_checker/fail24.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -483,14 +477,14 @@ BOOST_AUTO_TEST_CASE(test_fail24)
         //std::cout << in_file << " " << e.what() << std::endl;
     }
     // Single quote
-    BOOST_CHECK(err == jsoncons::json_parse_errc::single_quote);
+    CHECK(err == jsoncons::json_parse_errc::single_quote);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail25)
+TEST_CASE("test_fail25")
 {
     std::string in_file = "./input/JSON_checker/fail25.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -503,14 +497,14 @@ BOOST_AUTO_TEST_CASE(test_fail25)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_character_in_string);
+    CHECK(err == jsoncons::json_parse_errc::illegal_character_in_string);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail26)
+TEST_CASE("test_fail26")
 {
     std::string in_file = "./input/JSON_checker/fail26.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -523,14 +517,14 @@ BOOST_AUTO_TEST_CASE(test_fail26)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
+    CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail27)
+TEST_CASE("test_fail27")
 {
     std::string in_file = "./input/JSON_checker/fail27.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -543,14 +537,14 @@ BOOST_AUTO_TEST_CASE(test_fail27)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_character_in_string);
+    CHECK(err == jsoncons::json_parse_errc::illegal_character_in_string);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail28)
+TEST_CASE("test_fail28")
 {
     std::string in_file = "./input/JSON_checker/fail28.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -563,14 +557,14 @@ BOOST_AUTO_TEST_CASE(test_fail28)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
+    CHECK(err == jsoncons::json_parse_errc::illegal_escaped_character);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail29)
+TEST_CASE("test_fail29")
 {
     std::string in_file = "./input/JSON_checker/fail29.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -583,14 +577,14 @@ BOOST_AUTO_TEST_CASE(test_fail29)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
+    CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail30)
+TEST_CASE("test_fail30")
 {
     std::string in_file = "./input/JSON_checker/fail30.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -603,14 +597,14 @@ BOOST_AUTO_TEST_CASE(test_fail30)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
+    CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail31)
+TEST_CASE("test_fail31")
 {
     std::string in_file = "./input/JSON_checker/fail31.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -623,14 +617,14 @@ BOOST_AUTO_TEST_CASE(test_fail31)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_value);
+    CHECK(err == jsoncons::json_parse_errc::expected_value);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail32)
+TEST_CASE("test_fail32")
 {
     std::string in_file = "./input/JSON_checker/fail32.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -643,14 +637,14 @@ BOOST_AUTO_TEST_CASE(test_fail32)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::unexpected_eof);
+    CHECK(err == jsoncons::json_parse_errc::unexpected_eof);
 }
 
-BOOST_AUTO_TEST_CASE(test_fail33)
+TEST_CASE("test_fail33")
 {
     std::string in_file = "./input/JSON_checker/fail33.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -663,14 +657,14 @@ BOOST_AUTO_TEST_CASE(test_fail33)
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    BOOST_CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_bracket);
+    CHECK(err == jsoncons::json_parse_errc::expected_comma_or_right_bracket);
 }
 
-BOOST_AUTO_TEST_CASE(test_pass1)
+TEST_CASE("test_pass1")
 {
     std::string in_file = "./input/JSON_checker/pass1.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -685,11 +679,11 @@ BOOST_AUTO_TEST_CASE(test_pass1)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_pass2)
+TEST_CASE("test_pass2")
 {
     std::string in_file = "./input/JSON_checker/pass2.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -704,11 +698,11 @@ BOOST_AUTO_TEST_CASE(test_pass2)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_pass3)
+TEST_CASE("test_pass3")
 {
     std::string in_file = "./input/JSON_checker/pass3.json";
     std::ifstream is(in_file);
-    BOOST_REQUIRE(is);
+    REQUIRE(is);
 
     std::error_code err;
 
@@ -722,7 +716,5 @@ BOOST_AUTO_TEST_CASE(test_pass3)
         throw;
     }
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 

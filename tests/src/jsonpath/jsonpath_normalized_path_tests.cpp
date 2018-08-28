@@ -1,11 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -22,8 +18,6 @@ using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
 // https://jsonpath.herokuapp.com/
-
-BOOST_AUTO_TEST_SUITE(jsonpath_normalized_path_tests)
 
 const json store = json::parse(R"(
 {
@@ -65,7 +59,7 @@ const json store = json::parse(R"(
 }
 )");
 
-BOOST_AUTO_TEST_CASE(test_normalized_paths)
+TEST_CASE("test_normalized_paths")
 {
 
 const json expected = json::parse(R"(
@@ -77,10 +71,10 @@ const json expected = json::parse(R"(
     std::string path = "$.store.book[0].category";
 
     json result = json_query(store,"$.store.book[0].category",result_type::path);
-    BOOST_CHECK_EQUAL(expected,result);
+    CHECK(expected == result);
 }
 
-BOOST_AUTO_TEST_CASE(test_string_index)
+TEST_CASE("test_string_index")
 {
 
 const json expected = json::parse(R"(
@@ -93,13 +87,13 @@ const json expected = json::parse(R"(
     std::string path = "$.store.book.0.category[0,2]";
 
     json result = json_query(store,path,result_type::path);
-    BOOST_CHECK_EQUAL(expected,result);
+    CHECK(expected == result);
 
     //json result2 = json_query(store,path,result_type::value);
     //std::cout << pretty_print(result2) << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(test_array_length)
+TEST_CASE("test_array_length")
 {
 
 const json expected = json::parse(R"(
@@ -110,14 +104,14 @@ const json expected = json::parse(R"(
 
     std::string path = "$.store.book.length";
     json result = json_query(store,path,result_type::path);
-    BOOST_CHECK_EQUAL(expected,result);
+    CHECK(expected == result);
 
     std::string path2 = "$.store.book['length']";
     json result2 = json_query(store, path, result_type::path);
-    BOOST_CHECK_EQUAL(expected, result2);
+    CHECK(expected == result2);
 }
 
-BOOST_AUTO_TEST_CASE(test_price_filter)
+TEST_CASE("test_price_filter")
 {
 
 const json expected = json::parse(R"(
@@ -129,10 +123,10 @@ const json expected = json::parse(R"(
 
     std::string path = "$.store.book[?(@.price < 10)].title";
     json result = json_query(store,path,result_type::path);
-    BOOST_CHECK_EQUAL(expected,result);
+    CHECK(expected == result);
 }
 
-BOOST_AUTO_TEST_CASE(test_length_expression)
+TEST_CASE("test_length_expression")
 {
 
 const json expected = json::parse(R"(
@@ -143,10 +137,8 @@ const json expected = json::parse(R"(
 
     std::string path = "$.store.book[(@.length-1)].title";
     json result = json_query(store,path,result_type::path);
-    BOOST_CHECK_EQUAL(expected,result);
+    CHECK(expected == result);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 
 

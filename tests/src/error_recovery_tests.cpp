@@ -2,11 +2,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -16,8 +12,6 @@
 #include <ctime>
 
 using namespace jsoncons;
-
-BOOST_AUTO_TEST_SUITE(error_recovery_tests)
 
 class relaxed_error_handler : public parse_error_handler
 {
@@ -34,17 +28,17 @@ private:
     }
 };
 
-BOOST_AUTO_TEST_CASE(test_array_extra_comma)
+TEST_CASE("test_array_extra_comma")
 {
     relaxed_error_handler err_handler;
 
     json expected = json::parse("[1,2,3]");
     json val = json::parse("[1,2,3,]", err_handler);
 
-    BOOST_CHECK_EQUAL(expected,val);
+    CHECK(expected == val);
 }
 
-BOOST_AUTO_TEST_CASE(test_object_extra_comma)
+TEST_CASE("test_object_extra_comma")
 {
     relaxed_error_handler err_handler;
 
@@ -64,10 +58,10 @@ BOOST_AUTO_TEST_CASE(test_object_extra_comma)
     )", 
     err_handler);
 
-    BOOST_CHECK_EQUAL(expected,val);
+    CHECK(expected == val);
 }
 
-BOOST_AUTO_TEST_CASE(test_name_without_quotes)
+TEST_CASE("test_name_without_quotes")
 {
     relaxed_error_handler err_handler;
 
@@ -82,6 +76,4 @@ BOOST_AUTO_TEST_CASE(test_name_without_quotes)
     std::cout << val << std::endl;*/
 }
 
-
-BOOST_AUTO_TEST_SUITE_END()
 

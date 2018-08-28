@@ -1,11 +1,7 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <sstream>
@@ -17,9 +13,7 @@
 using namespace jsoncons;
 using namespace jsoncons::cbor;
 
-BOOST_AUTO_TEST_SUITE(cbor_tests)
-
-BOOST_AUTO_TEST_CASE(cbor_test_floating_point)
+TEST_CASE("cbor_test_floating_point")
 {
     json j1;
     j1["max double"] = (std::numeric_limits<double>::max)();
@@ -30,10 +24,10 @@ BOOST_AUTO_TEST_CASE(cbor_test_floating_point)
 
     json j2 = decode_cbor<json>(v);
 
-    BOOST_CHECK_EQUAL(j1,j2);
+    CHECK(j1 == j2);
 } 
 
-BOOST_AUTO_TEST_CASE(cbor_test)
+TEST_CASE("cbor_test")
 {
     json j1;
     j1["zero"] = 0;
@@ -94,10 +88,10 @@ BOOST_AUTO_TEST_CASE(cbor_test)
 
     json j2 = decode_cbor<json>(v);
 
-    BOOST_CHECK_EQUAL(j1,j2);
+    CHECK(j1 == j2);
 } 
 
-BOOST_AUTO_TEST_CASE(cbor_test2)
+TEST_CASE("cbor_test2")
 {
     wjson j1;
     j1[L"zero"] = 0;
@@ -160,10 +154,10 @@ BOOST_AUTO_TEST_CASE(cbor_test2)
 
     wjson j2 = decode_cbor<wjson>(v);
 
-    BOOST_CHECK(j1 == j2);
+    CHECK(j1 == j2);
 }
 
-BOOST_AUTO_TEST_CASE(cbor_reputon_test)
+TEST_CASE("cbor_reputon_test")
 {
 ojson j1 = ojson::parse(R"(
 {
@@ -183,9 +177,7 @@ ojson j1 = ojson::parse(R"(
     encode_cbor(j1, v);
 
     ojson j2 = decode_cbor<ojson>(v);
-    BOOST_CHECK(j1 == j2);
+    CHECK(j1 == j2);
     //std::cout << pretty_print(j2) << std::endl;
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 

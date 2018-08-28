@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
@@ -13,9 +13,7 @@
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
-BOOST_AUTO_TEST_SUITE(json_serializer_tests)
-
-BOOST_AUTO_TEST_CASE(test_byte_string_serialization)
+TEST_CASE("test_byte_string_serialization")
 {
     const uint8_t bs[] = {'H','e','l','l','o'};
     json j(byte_string_view(bs,sizeof(bs)));
@@ -30,10 +28,10 @@ BOOST_AUTO_TEST_CASE(test_byte_string_serialization)
 
     //std::cout << expected << " " << os.str() << std::endl;
 
-    BOOST_CHECK(expected == os.str());
+    CHECK(expected == os.str());
 }
 
-BOOST_AUTO_TEST_CASE(test_direct_serialization)
+TEST_CASE("test_direct_serialization")
 {
     matrix<double> A(2, 2);
     A(0, 0) = 1;
@@ -64,9 +62,7 @@ BOOST_AUTO_TEST_CASE(test_direct_serialization)
     [1.0,2.0],
     [3.0,4.0]
 ])";
-    BOOST_CHECK_EQUAL(expected1,os1.str());
+    CHECK(expected1 == os1.str());
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 

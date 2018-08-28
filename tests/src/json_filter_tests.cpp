@@ -1,11 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -17,8 +13,6 @@
 #include <jsoncons/json.hpp>
 
 using namespace jsoncons;
-
-BOOST_AUTO_TEST_SUITE(json_filter_tests)
 
 struct warning
 {
@@ -80,7 +74,7 @@ private:
     std::string member_name_;
 };
 
-BOOST_AUTO_TEST_CASE(test_filter)
+TEST_CASE("test_filter")
 {
     std::string in_file = "./input/address-book.json";
     std::string out_file = "./output/address-book-new.json";
@@ -92,13 +86,13 @@ BOOST_AUTO_TEST_CASE(test_filter)
     json_reader reader(is, filter);
     reader.read_next();
 
-    BOOST_CHECK_EQUAL(1,filter.warnings.size());
-    BOOST_CHECK_EQUAL("John", filter.warnings[0].name);
-    BOOST_CHECK_EQUAL(9, filter.warnings[0].line_number);
-    BOOST_CHECK_EQUAL(26, filter.warnings[0].column_number);
+    CHECK(1 == filter.warnings.size());
+    CHECK("John" ==filter.warnings[0].name);
+    CHECK(9 == filter.warnings[0].line_number);
+    CHECK(26 == filter.warnings[0].column_number);
 }
 
-BOOST_AUTO_TEST_CASE(test_filter2)
+TEST_CASE("test_filter2")
 {
     std::string in_file = "./input/address-book.json";
     std::string out_file = "./output/address-book-new.json";
@@ -114,13 +108,13 @@ BOOST_AUTO_TEST_CASE(test_filter2)
     json_reader reader(is, filter1);
     reader.read_next();
 
-    BOOST_CHECK_EQUAL(1,filter2.warnings.size());
-    BOOST_CHECK_EQUAL("John", filter2.warnings[0].name);
-    BOOST_CHECK_EQUAL(9, filter2.warnings[0].line_number);
-    BOOST_CHECK_EQUAL(26, filter2.warnings[0].column_number);
+    CHECK(1 == filter2.warnings.size());
+    CHECK("John" ==filter2.warnings[0].name);
+    CHECK(9 == filter2.warnings[0].line_number);
+    CHECK(26 == filter2.warnings[0].column_number);
 }
 
-BOOST_AUTO_TEST_CASE(test_rename_name)
+TEST_CASE("test_rename_name")
 {
     json j;
     try
@@ -142,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
     {
         std::cout << e.what() << std::endl;
     }
-    BOOST_CHECK_CLOSE(31.96,j["store"]["book"][0]["price"].as<double>(),0.001);
+    CHECK(j["store"]["book"][0]["price"].as<double>() == Approx(31.96).epsilon(0.001));
 
     std::stringstream ss;
     json_serializer serializer(ss);
@@ -150,10 +144,10 @@ BOOST_AUTO_TEST_CASE(test_rename_name)
     j.dump(filter);
 
     json j2 = json::parse(ss);
-    BOOST_CHECK_CLOSE(31.96,j2["store"]["book"][0]["price2"].as<double>(),0.001);
+    CHECK(j2["store"]["book"][0]["price2"].as<double>() == Approx(31.96).epsilon(0.001));
 }
 
-BOOST_AUTO_TEST_CASE(test_chained_filters)
+TEST_CASE("test_chained_filters")
 {
     ojson j = ojson::parse(R"({"first":1,"second":2,"fourth":3,"fifth":4})");
 
@@ -164,11 +158,10 @@ BOOST_AUTO_TEST_CASE(test_chained_filters)
 
     j.dump(filter1);
     ojson j2 = decoder.get_result();
-    BOOST_CHECK(j2.size() == 4);
-    BOOST_CHECK(j2["first"] == 1);
-    BOOST_CHECK(j2["second"] == 2);
-    BOOST_CHECK(j2["third"] == 3);
-    BOOST_CHECK(j2["fourth"] == 4);
+    CHECK(j2.size() == 4);
+    CHECK(j2["first"] == 1);
+    CHECK(j2["second"] == 2);
+    CHECK(j2["third"] == 3);
+    CHECK(j2["fourth"] == 4);
 }
 
-BOOST_AUTO_TEST_SUITE_END()

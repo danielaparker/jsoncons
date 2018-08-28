@@ -1,11 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
@@ -16,8 +12,6 @@
 #include <cstddef>
 
 using namespace jsoncons;
-
-BOOST_AUTO_TEST_SUITE(allocator_tests)
 
 class pool 
 { 
@@ -173,7 +167,7 @@ bool operator!=(const pool_allocator<T> &s0, const pool_allocator<T> &s1)
 }
 #if !defined(__GNUC__) 
 // basic_string doesn't satisfy C++11 allocator requirements
-BOOST_AUTO_TEST_CASE(test_string_allocation)
+TEST_CASE("test_string_allocation")
 {
 
     pool a_pool(1024);
@@ -188,10 +182,9 @@ BOOST_AUTO_TEST_CASE(test_string_allocation)
               << ", construct count = " << a_pool.construct_count_ 
               << ", destroy count = " << a_pool.destroy_count_ 
               << ", deallocate count = " << a_pool.deallocate_count_ << std::endl;
-    BOOST_CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
-    BOOST_CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
+    CHECK(a_pool.allocate_count_ == a_pool.deallocate_count_);
+    CHECK(a_pool.construct_count_ == a_pool.destroy_count_);
 
 }
 #endif
 
-BOOST_AUTO_TEST_SUITE_END()

@@ -1,11 +1,7 @@
 // Copyright 2017 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -20,48 +16,46 @@
 
 using namespace jsoncons;
 
-BOOST_AUTO_TEST_SUITE(jsonpointer_tests)
-
 void check_get_with_const_ref(const json& example, const std::string& pointer, const json& expected)
 {
 
     std::error_code ec;
     const json& result = jsonpointer::get(example,pointer,ec);
-    BOOST_CHECK(!ec);
-    BOOST_CHECK_EQUAL(expected,result);
+    CHECK(!ec);
+    CHECK(expected == result);
 }
 
 void check_contains(const json& example, const std::string& pointer, bool expected)
 {
     bool result = jsonpointer::contains(example,pointer);
-    BOOST_CHECK_EQUAL(expected,result);
+    CHECK(expected == result);
 }
 
 void check_add(json& example, const std::string& path, const json& value, const json& expected)
 {
     std::error_code ec;
     jsonpointer::insert_or_assign(example, path, value, ec);
-    BOOST_CHECK(!ec);
-    BOOST_CHECK_EQUAL(expected, example);
+    CHECK(!ec);
+    CHECK(expected == example);
 }
 
 void check_replace(json& example, const std::string& path, const json& value, const json& expected)
 {
     std::error_code ec;
     jsonpointer::replace(example, path, value, ec);
-    BOOST_CHECK(!ec);
-    BOOST_CHECK_EQUAL(expected, example);
+    CHECK(!ec);
+    CHECK(expected == example);
 }
 
 void check_remove(json& example, const std::string& path, const json& expected)
 {
     std::error_code ec;
     jsonpointer::remove(example, path, ec);
-    BOOST_CHECK(!ec);
-    BOOST_CHECK_EQUAL(expected, example);
+    CHECK(!ec);
+    CHECK(expected == example);
 }
 
-BOOST_AUTO_TEST_CASE(get_with_const_ref_test)
+TEST_CASE("get_with_const_ref_test")
 {
 // Example from RFC 6901
 const json example = json::parse(R"(
@@ -106,7 +100,7 @@ const json example = json::parse(R"(
     check_get_with_const_ref(example,"/m~0n",json(8));
 }
 
-BOOST_AUTO_TEST_CASE(get_with_ref_test)
+TEST_CASE("get_with_ref_test")
 {
 // Example from RFC 6901
 json example = json::parse(R"(
@@ -117,7 +111,7 @@ json example = json::parse(R"(
 
     std::error_code ec;
     json& result = jsonpointer::get(example,"/foo/0",ec);
-    BOOST_CHECK(!ec);
+    CHECK(!ec);
 
     result = "bat";
 
@@ -126,7 +120,7 @@ json example = json::parse(R"(
 
 // add
 
-BOOST_AUTO_TEST_CASE(test_add_object_member)
+TEST_CASE("test_add_object_member")
 {
     json example = json::parse(R"(
     { "foo": "bar"}
@@ -139,7 +133,7 @@ BOOST_AUTO_TEST_CASE(test_add_object_member)
     check_add(example,"/baz", json("qux"), expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_add_array_element)
+TEST_CASE("test_add_array_element")
 {
     json example = json::parse(R"(
     { "foo": [ "bar", "baz" ] }
@@ -152,7 +146,7 @@ BOOST_AUTO_TEST_CASE(test_add_array_element)
     check_add(example,"/foo/1", json("qux"), expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_add_array_value)
+TEST_CASE("test_add_array_value")
 {
     json example = json::parse(R"(
      { "foo": ["bar"] }
@@ -167,7 +161,7 @@ BOOST_AUTO_TEST_CASE(test_add_array_value)
 
 // remove
 
-BOOST_AUTO_TEST_CASE(test_remove_object_member)
+TEST_CASE("test_remove_object_member")
 {
     json example = json::parse(R"(
     { "foo": "bar", "baz" : "qux"}
@@ -180,7 +174,7 @@ BOOST_AUTO_TEST_CASE(test_remove_object_member)
     check_remove(example,"/baz", expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_remove_array_element)
+TEST_CASE("test_remove_array_element")
 {
     json example = json::parse(R"(
         { "foo": [ "bar", "qux", "baz" ] }
@@ -195,7 +189,7 @@ BOOST_AUTO_TEST_CASE(test_remove_array_element)
 
 // replace
 
-BOOST_AUTO_TEST_CASE(test_replace_object_value)
+TEST_CASE("test_replace_object_value")
 {
     json example = json::parse(R"(
         {
@@ -214,7 +208,7 @@ BOOST_AUTO_TEST_CASE(test_replace_object_value)
     check_replace(example,"/baz", json("boo"), expected);
 }
 
-BOOST_AUTO_TEST_CASE(test_replace_array_value)
+TEST_CASE("test_replace_array_value")
 {
     json example = json::parse(R"(
         { "foo": [ "bar", "baz" ] }
@@ -226,8 +220,6 @@ BOOST_AUTO_TEST_CASE(test_replace_array_value)
 
     check_replace(example,"/foo/1", json("qux"), expected);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
 
 

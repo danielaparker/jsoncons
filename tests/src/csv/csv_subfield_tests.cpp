@@ -1,11 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#ifdef __linux__
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#include <boost/test/unit_test.hpp>
+#include <catch/catch.hpp>
 //#include <jsoncons_ext/csv/csv_serializing_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons_ext/csv/csv_serializer.hpp>
@@ -20,9 +16,7 @@ using namespace jsoncons;
 using namespace jsoncons::csv;
 using namespace jsoncons::literals;
 
-BOOST_AUTO_TEST_SUITE(csv_subfield_tests)
-
-BOOST_AUTO_TEST_CASE(test_n_objects)
+TEST_CASE("test_n_objects")
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
 NY;LON,TOR,LON
@@ -62,7 +56,7 @@ NY,LON,TOR;LON
     try
     {
         json j = decode_csv<json>(s,options);
-        BOOST_CHECK_EQUAL(expected, j);
+        CHECK(expected == j);
         //std::cout << pretty_print(j) << std::endl;
     }
     catch (const std::exception& e)
@@ -71,7 +65,7 @@ NY,LON,TOR;LON
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_n_rows)
+TEST_CASE("test_n_rows")
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
 NY;LON,TOR,LON
@@ -104,7 +98,7 @@ NY,LON,TOR;LON
     try
     {
         json j = decode_csv<json>(s,options);
-        BOOST_CHECK_EQUAL(expected, j);
+        CHECK(expected == j);
         //std::cout << pretty_print(j) << std::endl;
     }
     catch (const std::exception& e)
@@ -113,7 +107,7 @@ NY,LON,TOR;LON
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_m_columns)
+TEST_CASE("test_m_columns")
 {
     const std::string s = R"(calculationPeriodCenters,paymentCenters,resetCenters
 NY;LON,TOR,LON
@@ -143,7 +137,7 @@ NY,LON,TOR;LON
     try
     {
         json j = decode_csv<json>(s,options);
-        BOOST_CHECK_EQUAL(expected, j);
+        CHECK(expected == j);
         //std::cout << pretty_print(j) << std::endl;
     }
     catch (const std::exception& e)
@@ -151,6 +145,4 @@ NY,LON,TOR;LON
         std::cerr << e.what() << std::endl;
     }
 }
-
-BOOST_AUTO_TEST_SUITE_END()
 
