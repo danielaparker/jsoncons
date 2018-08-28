@@ -779,15 +779,15 @@ TEST_CASE("test_value_not_found_and_defaults")
     obj["first_name"] = "Jane";
     obj["last_name"] = "Roe";
 
-    REQUIRE_THROWS_AS(obj["outdoor_experience"].as<std::string>(),std::out_of_range);
-    REQUIRE_THROWS_WITH(obj["outdoor_experience"].as<std::string>(),"Key 'outdoor_experience' not found");
+    REQUIRE_THROWS_AS(obj["outdoor_experience"]/*.as<std::string>()*/,std::out_of_range);
+    REQUIRE_THROWS_WITH(obj["outdoor_experience"]/*.as<std::string>()*/,"Key 'outdoor_experience' not found");
 
     std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
 
     CHECK(experience == "");
 
-    REQUIRE_THROWS_AS(obj["first_aid_certification"].as<std::string>(),std::out_of_range);
-    REQUIRE_THROWS_WITH(obj["first_aid_certification"].as<std::string>(),"Key 'first_aid_certification' not found");
+    REQUIRE_THROWS_AS(obj["first_aid_certification"]/*.as<std::string>()*/,std::out_of_range);
+    REQUIRE_THROWS_WITH(obj["first_aid_certification"]/*.as<std::string>()*/,"Key 'first_aid_certification' not found");
 }
 
 TEST_CASE("test_set_override")
