@@ -187,10 +187,12 @@ TEST_CASE("test_jsonpath")
             dir_itr != end_iter;
             ++dir_itr)
         {
+            std::cout << "Check 10\n";
             if (is_regular_file(dir_itr->status()))
             {
                 if (dir_itr->path().filename() == "json.json")
                 {
+                    std::cout << "Check 20\n";
                     try
                     {
                         boost::filesystem::ifstream is(dir_itr->path());
@@ -204,6 +206,7 @@ TEST_CASE("test_jsonpath")
                 }
                 else if (dir_itr->path().extension() == ".jsonpath")
                 {
+                    std::cout << "Check 30\n";
                     std::string s;
                     char buffer[4096];
                     boost::filesystem::ifstream is(dir_itr->path());
@@ -217,6 +220,7 @@ TEST_CASE("test_jsonpath")
                 }
                 else if (dir_itr->path().extension() == ".json")
                 {
+                    std::cout << "Check 40\n";
                     try
                     {
                         ojson j;
@@ -232,14 +236,17 @@ TEST_CASE("test_jsonpath")
                 }
             }
         }
+        std::cout << "Check 100\n";
         for (auto pair : jsonpath_dictionary)
         {
+            std::cout << "Check 110\n";
             auto it = expected_dictionary.find(pair.first);
             if (it != expected_dictionary.end())
             {
                 try
                 {
                     //std::cout << pair.second << '\n';
+                    std::cout << "Check 120\n";
                     ojson result = json_query(document, pair.second);
                     //if (it->second != result)
                     //{
@@ -255,6 +262,7 @@ TEST_CASE("test_jsonpath")
             }
             else
             {
+                std::cout << "Check 130\n";
                 std::cout << "Expected value for " << pair.first << "not found \n";
                 std::cout << pair.second << '\n';
                 ojson result = json_query(document,pair.second);
