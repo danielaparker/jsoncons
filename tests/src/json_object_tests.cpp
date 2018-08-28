@@ -796,8 +796,18 @@ TEST_CASE("test_value_not_found_and_defaults")
 
     CHECK(experience == "");
 
-    REQUIRE_THROWS_AS(obj["first_aid_certification"].as<std::string>(),std::out_of_range);
-    REQUIRE_THROWS_WITH(obj["first_aid_certification"].as<std::string>(),"Key 'first_aid_certification' not found");
+    try
+    {
+        auto val = obj["first_aid_certification"].as<std::string>();
+        CHECK(false);
+    }
+    catch (const std::out_of_range& e)
+    {
+        CHECK(e.what() == std::string("Key 'first_aid_certification' not found"));
+    }
+
+    //REQUIRE_THROWS_AS(obj["first_aid_certification"].as<std::string>(),std::out_of_range);
+    //REQUIRE_THROWS_WITH(obj["first_aid_certification"].as<std::string>(),"Key 'first_aid_certification' not found");
 }
 
 TEST_CASE("test_set_override")
