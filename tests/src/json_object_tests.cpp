@@ -468,7 +468,7 @@ TEST_CASE("test_json_object_iterator_3")
     CHECK((*it).value() == json("value2"));
 
     CHECK((*(it++)).key() == "name2");
-    CHECK_FALSE(it == a.object_range().end());
+    CHECK_FALSE((it == a.object_range().end()));
     CHECK((*it).key() == "name3");
     CHECK((*it).value() == json("value3"));
 
