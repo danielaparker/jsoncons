@@ -12,43 +12,25 @@ project (Tests CXX)
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
-# set (Boost_NO_BOOST_CMAKE ON)
-
-if (APPLE1 OR WIN32)
-    set(Boost_USE_STATIC_LIBS TRUE)
-endif()
-
-find_package (Boost COMPONENTS chrono thread date_time system REQUIRED)
-
 file(GLOB_RECURSE UnitTests_sources ../../src/*.cpp)
-
-if (APPLE1 OR WIN321)
-elseif()
-    ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
-endif()
 
 add_executable(jsoncons_tests
     ${UnitTests_sources}
 )
 
-if (APPLE OR WIN32)
 target_compile_definitions (jsoncons_tests PUBLIC)
-elseif()
-target_compile_definitions (jsoncons_tests PUBLIC BOOST_ALL_DYN_LINK)
-endif()
 
 if (NO_DEPRECATED)
 add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
 
-target_include_directories (jsoncons_tests PUBLIC ${Boost_INCLUDE_DIRS}
-                                           PUBLIC ../../../include
+target_include_directories (jsoncons_tests PUBLIC ../../../include
                                            PUBLIC ../../../third_party
                                            PRIVATE ../../include)
 
-# target_link_libraries (jsoncons_tests ${Boost_LIBRARIES})
+# target_link_libraries (jsoncons_tests)
 
-target_link_libraries (jsoncons_tests ${Boost})
+target_link_libraries (jsoncons_tests)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   # special link option on Linux because llvm stl rely on GNU stl

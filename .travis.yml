@@ -6,7 +6,6 @@ addon_shortcuts:
   xcode64: &xcode64
     apt:
       packages:
-        - libboost-all-dev
 
   clang38: &clang38
     apt:
@@ -17,7 +16,6 @@ addon_shortcuts:
       packages:
         - clang-3.8
         - libc++-dev
-        - libboost-all-dev
 
   clang50: &clang50
     apt:
@@ -28,7 +26,6 @@ addon_shortcuts:
       packages:
         - clang-5.0
         - libc++-dev
-        - libboost-all-dev
 
   clang60: &clang60
     apt:
@@ -39,7 +36,6 @@ addon_shortcuts:
       packages:
         - clang-6.0
         - libc++-dev
-        - libboost-all-dev
 
   gcc48: &gcc48
     apt:
@@ -47,7 +43,6 @@ addon_shortcuts:
         - ubuntu-toolchain-r-test
       packages:
         - g++-4.8
-        - libboost-all-dev
 
   gcc6: &gcc6
     apt:
@@ -55,7 +50,6 @@ addon_shortcuts:
         - ubuntu-toolchain-r-test
       packages:
         - g++-6
-        - libboost-all-dev
 
   gcc7: &gcc7
     apt:
@@ -63,7 +57,6 @@ addon_shortcuts:
         - ubuntu-toolchain-r-test
       packages:
         - g++-7
-        - libboost-all-dev
 
   gcc8: &gcc8
     apt:
@@ -71,7 +64,6 @@ addon_shortcuts:
         - ubuntu-toolchain-r-test
       packages:
         - g++-8
-        - libboost-all-dev
 
 addons:
   apt:
