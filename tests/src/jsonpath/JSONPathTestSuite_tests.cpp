@@ -16,14 +16,14 @@
 #include <filesystem>
 namespace fs = std::experimental::filesystem;
 #else
-#include <filesystem>
-namespace fs = std::filesystem;
+//#include <filesystem>
+//namespace fs = std::filesystem;
 #endif
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
-// #if defined(_MSC_VER) && _MSC_VER >= 1900
+#if defined(_MSC_VER) && _MSC_VER >= 1900
 TEST_CASE("JSONPath Test Suite")
 {
     ojson document;
@@ -103,6 +103,6 @@ TEST_CASE("JSONPath Test Suite")
         }
     }
 }
-// #endif
+#endif
 
 

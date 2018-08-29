@@ -19,13 +19,13 @@
 #include <filesystem>
 namespace fs = std::experimental::filesystem;
 #else
-#include <filesystem>
-namespace fs = std::filesystem;
+//#include <filesystem>
+//namespace fs = std::filesystem;
 #endif
 
 using namespace jsoncons;
 
-// #if defined(_MSC_VER) && _MSC_VER >= 1900
+#if defined(_MSC_VER) && _MSC_VER >= 1900
 TEST_CASE("JSON Parsing Test Suite")
 {
     SECTION("Expected success")
@@ -69,7 +69,7 @@ TEST_CASE("JSON Parsing Test Suite")
         }
     }
 }
-// #endif
+#endif
 
 
 
