@@ -99,9 +99,6 @@ matrix:
     - { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
 
   allow_failures:
-    - { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang38 }
-    - { env: 'STD=11 CXX=clang++-5.0 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang50 }
-    - { env: 'STD=11 CXX=clang++-6.0 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang60 }
     - { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
 
 script:
