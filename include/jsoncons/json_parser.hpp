@@ -334,7 +334,12 @@ public:
 
     void end_object(std::error_code& ec)
     {
-        JSONCONS_ASSERT(nesting_depth_ >= 1);
+        if (nesting_depth_ < 1)
+        {
+            err_handler_.fatal_error(json_parse_errc::unexpected_right_brace, *this);
+            ec = json_parse_errc::unexpected_right_brace;
+            return;
+        }
         --nesting_depth_;
         state_ = pop_state();
         if (state_ == parse_state::object)
@@ -374,7 +379,6 @@ public:
                 ec = json_parse_errc::max_depth_exceeded;
                 return;
             }
-
         }
         push_state(parse_state::array);
         state_ = parse_state::expect_value_or_end;
@@ -383,7 +387,12 @@ public:
 
     void end_array(std::error_code& ec)
     {
-        JSONCONS_ASSERT(nesting_depth_ >= 1);
+        if (nesting_depth_ < 1)
+        {
+            err_handler_.fatal_error(json_parse_errc::unexpected_right_bracket, *this);
+            ec = json_parse_errc::unexpected_right_bracket;
+            return;
+        }
         --nesting_depth_;
         state_ = pop_state();
         if (state_ == parse_state::array)

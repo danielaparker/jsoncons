@@ -3,8 +3,6 @@
 
 #include <catch/catch.hpp>
 #include <iostream>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -171,114 +169,6 @@ struct jsonpath_fixture
         return bicycle;
     }
 };
-
-TEST_CASE("test_jsonpath")
-{
-    std::cout << "Check 1\n";
-    boost::filesystem::path p("./input/JSONPath");
-
-    std::cout << "Check 2\n";
-    if (exists(p) && is_directory(p))
-    {
-        std::cout << "Check 3\n";
-        ojson document;
-        std::map<boost::filesystem::path,std::string> jsonpath_dictionary;
-        std::map<boost::filesystem::path,ojson> expected_dictionary;
-
-        boost::filesystem::directory_iterator end_iter;
-        std::cout << "Check 4\n";
-        for (boost::filesystem::directory_iterator dir_itr(p);
-            dir_itr != end_iter;
-            ++dir_itr)
-        {
-            std::cout << "Check 10\n";
-            if (is_regular_file(dir_itr->status()))
-            {
-                if (dir_itr->path().filename() == "json.json")
-                {
-                    std::cout << "Check 20\n";
-                    try
-                    {
-                        boost::filesystem::ifstream is(dir_itr->path());
-                        is >> document;
-                        //std::cout << dir_itr->path().filename() << '\n';
-                    }
-                    catch (const jsoncons::parse_error& e)
-                    {
-                        std::cerr << dir_itr->path() << " " << e.what() << std::endl;
-                    }
-                }
-                else if (dir_itr->path().extension() == ".jsonpath")
-                {
-                    std::cout << "Check 30\n";
-                    std::string s;
-                    char buffer[4096];
-                    boost::filesystem::ifstream is(dir_itr->path());
-                    while (is.read(buffer, sizeof(buffer)))
-                    {
-                        s.append(buffer, sizeof(buffer));
-                    }
-                    s.append(buffer, (size_t)is.gcount());
-                    jsonpath_dictionary[dir_itr->path().stem()] = s;
-                    //std::cout << ".jsonpath " << dir_itr->path().stem() << '\n';
-                }
-                else if (dir_itr->path().extension() == ".json")
-                {
-                    std::cout << "Check 40\n";
-                    try
-                    {
-                        ojson j;
-                        boost::filesystem::ifstream is(dir_itr->path());
-                        is >> j;
-                        expected_dictionary[dir_itr->path().stem()] = j;
-                        //std::cout << ".json " << dir_itr->path() << '\n';
-                    }
-                    catch (const jsoncons::parse_error& e)
-                    {
-                        std::cerr << dir_itr->path() << " " << e.what() << std::endl;
-                    }
-                }
-            }
-        }
-        std::cout << "Check 100\n";
-        for (auto pair : jsonpath_dictionary)
-        {
-            std::cout << "Check 110\n";
-            auto it = expected_dictionary.find(pair.first);
-            if (it != expected_dictionary.end())
-            {
-                try
-                {
-                    //std::cout << pair.second << '\n';
-                    std::cout << "Check 120\n";
-                    ojson result = json_query(document, pair.second);
-                    //if (it->second != result)
-                    //{
-                    //std::cout << pair.first << '\n';
-                        CHECK(it->second ==result);
-                    //}
-                }
-                catch (const jsoncons::parse_error& e)
-                {
-                    std::cerr << pair.first << " " << pair.second << " " << e.what() << std::endl;
-                }
-
-            }
-            else
-            {
-                std::cout << "Check 130\n";
-                std::cout << "Expected value for " << pair.first << "not found \n";
-                std::cout << pair.second << '\n';
-                ojson result = json_query(document,pair.second);
-                std::cout << pretty_print(result) << std::endl;
-            }
-        }
-    }
-    else
-    {
-        std::cout << p << " directory does not exist\n";
-    }
-}
 
 TEST_CASE("test_path")
 {

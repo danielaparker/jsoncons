@@ -1,10 +1,8 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2013-2018 Daniel Parker
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
 #include <iostream>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -16,83 +14,62 @@
 #include <fstream>
 #include <iostream>
 #include <locale>
-#if defined(_MSC_VER)
-#include <codecvt>
+
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#include <filesystem>
+namespace fs = std::experimental::filesystem;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
+
 using namespace jsoncons;
 
-#if defined(_MSC_VER)
-TEST_CASE("test_json")
+// #if defined(_MSC_VER) && _MSC_VER >= 1900
+TEST_CASE("JSON Parsing Test Suite")
 {
-    boost::filesystem::path p("./input/JSONTestSuite");
-
-    if (exists(p) && is_directory(p))
+    SECTION("Expected success")
     {
-
-        boost::filesystem::directory_iterator end_iter;
-        for (boost::filesystem::directory_iterator dir_itr(p);
-            dir_itr != end_iter;
-            ++dir_itr)
+        std::string path = "./input/JSONTestSuite";
+        for (auto& p : fs::directory_iterator(path))
         {
-            if (is_regular_file(dir_itr->status()))
+            if (fs::exists(p) && fs::is_regular_file(p) && p.path().extension() == ".json" && p.path().filename().c_str()[0] == 'y')
             {
-                if (dir_itr->path().extension() == ".json")
+                std::ifstream is(p.path().c_str());
+                strict_parse_error_handler err_handler;
+                json_reader reader(is, err_handler);
+                std::error_code ec;
+                reader.read(ec);
+                if (ec)
                 {
-                    if (dir_itr->path().filename().c_str()[0] == 'y')
-                    {
-                        try
-                        {
-                            if (dir_itr->path().filename().string().find("utf16") == std::string::npos)
-                            {
-                                boost::filesystem::ifstream is(dir_itr->path());
-                                json document;
-                                is >> document;
-                            }
-                            else
-                            {
-                                std::wifstream fin(dir_itr->path().c_str(), std::ios::binary);
-                                // apply BOM-sensitive UTF-16 facet
-                                fin.imbue(std::locale(fin.getloc(),
-                                                      new std::codecvt_utf16<wchar_t, 0x10ffff, std::consume_header>));
-                                //boost::filesystem::wifstream is(dir_itr->path());
-                                wjson document;
-                                fin >> document;
-                            }
-                        }
-                        catch (const parse_error& e)
-                        {
-                            std::ostringstream os;
-                            os << dir_itr->path().filename() << " should pass. " << e.what();
-                            CHECK( false);                        
-                        }
-                    }
-                    else if (dir_itr->path().filename().c_str()[0] == 'n')
-                    {
-                        try
-                        {
-                            std::ifstream is(dir_itr->path().c_str());
-
-                            json_decoder<ojson> decoder;
-                            strict_parse_error_handler err_handler;
-                            json_reader reader(is, decoder, err_handler);
-                            reader.read();
-                            std::ostringstream os;
-                            os << dir_itr->path().filename() << " should fail";
-                            CHECK(false);  
-                        }
-                        catch (const parse_error&)
-                        {
-                        }
-                        catch (const std::exception&)
-                        {
-                        }
-                    }
+                    std::cout << p.path().filename().string() << " failed, expected success\n";
                 }
+                CHECK_FALSE(ec);                        
+            }
+        }
+    }
+    SECTION("Expected failure")
+    {
+        std::string path = "./input/JSONTestSuite";
+        for (auto& p : fs::directory_iterator(path))
+        {
+            if (fs::exists(p) && fs::is_regular_file(p) && p.path().extension() == ".json" && p.path().filename().c_str()[0] == 'n')
+            {
+                std::ifstream is(p.path().c_str());
+                strict_parse_error_handler err_handler;
+                json_reader reader(is, err_handler);
+                std::error_code ec;
+                reader.read(ec);
+                if (!ec)
+                {
+                    std::cout << p.path().filename().string() << " succeeded, expected failure\n";
+                }
+                CHECK(ec);                        
             }
         }
     }
 }
-#endif
+// #endif
 
 
 
