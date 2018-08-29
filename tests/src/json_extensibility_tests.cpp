@@ -8,9 +8,10 @@
 #include <vector>
 #include <utility>
 #include <ctime>
-#include "boost/date_time/gregorian/gregorian.hpp"
-#include <boost/numeric/ublas/matrix.hpp>
+//#include "boost/date_time/gregorian/gregorian.hpp"
+//#include <boost/numeric/ublas/matrix.hpp>
 
+#if 0
 namespace jsoncons 
 {
     template <class Json>
@@ -224,4 +225,4 @@ TEST_CASE("test_boost_matrix")
     CHECK(a[1][0].as<double>()==B(1,0));
     CHECK(a[1][1].as<double>()==B(1,1));
 }
-
+#endif

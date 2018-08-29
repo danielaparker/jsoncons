@@ -1,0 +1,31 @@
+// Copyright 2018 Daniel Parker
+// Distributed under Boost license
+
+#include <boost/pool/pool_alloc.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/json_serializer.hpp>
+#include <sstream>
+#include <vector>
+#include <utility>
+#include <ctime>
+#include <cstddef>
+
+using namespace jsoncons;
+
+typedef basic_json<char,sorted_policy,boost::pool_allocator<char>> my_json;
+
+int main()
+{
+    jsoncons::json_decoder<my_json,boost::pool_allocator<char>> decoder;
+
+    static std::string s("[1,2,3,4,5,6]");
+    std::istringstream is(s);
+
+    basic_json_reader<char,boost::pool_allocator<char>> reader(is,decoder); 
+    reader.read();
+
+    my_json j = decoder.get_result();
+
+    std::cout << j << std::endl;
+}
+

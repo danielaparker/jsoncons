@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
+//#include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json.hpp>
 #include <sstream>
 #include <vector>
@@ -11,8 +11,9 @@
 #include <ctime>
 #include <cstdint>
 
-using boost::numeric::ublas::matrix;
+//using boost::numeric::ublas::matrix;
 
+/*
 namespace jsoncons
 {
     template<>
@@ -69,6 +70,7 @@ namespace jsoncons
         }
     };
 };
+*/
 
 using namespace jsoncons;
 
@@ -152,6 +154,7 @@ TEST_CASE("convert_tuple_test")
 }
 #endif
 
+/*
 TEST_CASE("test_encode_boost_matrix_to_json")
 {
     matrix<double> A(2, 2);
@@ -166,5 +169,6 @@ TEST_CASE("test_encode_boost_matrix_to_json")
     auto A2 = jsoncons::decode_json<matrix<double>>(s);
 
 }
+*/
 
 

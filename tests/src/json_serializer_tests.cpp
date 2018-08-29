@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
+//#include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
@@ -30,6 +30,7 @@ TEST_CASE("test_byte_string_serialization")
     CHECK(expected == os.str());
 }
 
+#if 0
 TEST_CASE("test_direct_serialization")
 {
     boost::numeric::ublas::matrix<double> A(2, 2);
@@ -63,5 +64,5 @@ TEST_CASE("test_direct_serialization")
 ])";
     CHECK(expected1 == os1.str());
 }
-
+#endif
 
