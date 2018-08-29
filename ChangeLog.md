@@ -5,6 +5,13 @@ Enhancements
 
 - Added byte string formatting option `byte_string_chars_format::base16`
 
+Changes
+
+- Scons dropped as a build system for tests and examples
+
+- Tests no longer depend on boost, boost test framework replaced by Catch2
+
+- All boost examples moved to `examples_boost` directory
 
 v0.108.0
 --------

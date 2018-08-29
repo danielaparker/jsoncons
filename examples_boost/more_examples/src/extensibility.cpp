@@ -126,77 +126,31 @@ namespace jsoncons
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
-void add_extensibility()
+void boost_date_conversions()
 {
-    json a = json::array();
-    a.push_back(boost::gregorian::date(2013,10,14));
-    auto d = a[0].as<boost::gregorian::date>();
-    assert(boost::gregorian::date(2013,10,14) == d);
-
-    json o;
-    o["ObservationDates"] = std::move(a);
-    o["ObservationDates"].push_back(boost::gregorian::date(2013,10,21));
-    d = o["ObservationDates"][0].as<boost::gregorian::date>();
-    auto d2 = o["ObservationDates"][1].as<boost::gregorian::date>();
-
-    assert(boost::gregorian::date(2013,10,14)==d);
-    assert(boost::gregorian::date(2013,10,21)==d2);
-
-    json deal;
-    deal["maturity"] = boost::gregorian::date(2015,1,1);
-    json observation_dates = json::array();
-    observation_dates.push_back(boost::gregorian::date(2013,10,21));
-    observation_dates.push_back(boost::gregorian::date(2013,10,28));
-    deal["observation_dates"] = std::move(observation_dates);
-
-
-    //std::cout << pretty_print(deal) << std::endl;
-}
-
-void set_extensibility()
-{
-    json o;
-    boost::gregorian::date d(boost::gregorian::day_clock::local_day());
-    o.insert_or_assign("today",d);
-    boost::gregorian::date val = o["today"].as<boost::gregorian::date>();
-    assert(d == val);
-}
-
-void assignment_extensibility()
-{
-    json o;
-    boost::gregorian::date d(boost::gregorian::day_clock::local_day());
-    o["today"] = d;
-    boost::gregorian::date val = o["today"].as<boost::gregorian::date>();
-    assert(d == val);
-}
-
-void an_example()
-{
-    using jsoncons::json;
     using boost::gregorian::date;
 
     json deal;
-    deal["Maturity"] = date(2014,10,14);
+    deal["maturity"] = date(2014,10,14);
 
     json observation_dates = json::array();
     observation_dates.push_back(date(2014,2,14));
     observation_dates.push_back(date(2014,2,21));
 
-    deal["ObservationDates"] = std::move(observation_dates);
+    deal["observationDates"] = std::move(observation_dates);
 
-    date maturity = deal["Maturity"].as<date>();
+    date maturity = deal["maturity"].as<date>();
 
-    assert(deal["Maturity"].as<date>() == date(2014,10,14));
-    assert(deal["ObservationDates"].is_array());
-    assert(deal["ObservationDates"].size() == 2);
-    assert(deal["ObservationDates"][0].as<date>() == date(2014,2,14));
-    assert(deal["ObservationDates"][1].as<date>() == date(2014,2,21));
+    assert(deal["maturity"].as<date>() == date(2014,10,14));
+    assert(deal["observationDates"].is_array());
+    assert(deal["observationDates"].size() == 2);
+    assert(deal["observationDates"][0].as<date>() == date(2014,2,14));
+    assert(deal["observationDates"][1].as<date>() == date(2014,2,21));
 
     std::cout << pretty_print(deal) << std::endl;
 }
 
-void boost_matrix()
+void boost_matrix_conversions()
 {
     matrix<double> A(2, 2);
     A(0, 0) = 1.1;
@@ -229,9 +183,6 @@ void extensibility_examples()
 {
     std::cout << "extensibility examples\n\n";
 
-    add_extensibility();
-    set_extensibility();
-    assignment_extensibility();
-    an_example();
-    boost_matrix();
+    boost_date_conversions();
+    boost_matrix_conversions();
 }
