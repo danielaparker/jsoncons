@@ -18,7 +18,7 @@ if (APPLE1 OR WIN32)
     set(Boost_USE_STATIC_LIBS TRUE)
 endif()
 
-find_package (Boost COMPONENTS filesystem chrono thread date_time unit_test_framework system REQUIRED)
+find_package (Boost COMPONENTS chrono thread date_time system REQUIRED)
 
 file(GLOB_RECURSE UnitTests_sources ../../src/*.cpp)
 
@@ -46,7 +46,9 @@ target_include_directories (jsoncons_tests PUBLIC ${Boost_INCLUDE_DIRS}
                                            PUBLIC ../../../third_party
                                            PRIVATE ../../include)
 
-target_link_libraries (jsoncons_tests ${Boost_LIBRARIES})
+# target_link_libraries (jsoncons_tests ${Boost_LIBRARIES})
+
+target_link_libraries (jsoncons_tests ${Boost})
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   # special link option on Linux because llvm stl rely on GNU stl

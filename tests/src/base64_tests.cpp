@@ -3,8 +3,6 @@
 
 #include <catch/catch.hpp>
 #include <iostream>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <sstream>
 #include <vector>
 #include <map>

@@ -10,7 +10,6 @@
 #include <utility>
 #include <ctime>
 #include <new>
-#include <boost/optional.hpp>
 
 using namespace jsoncons;
 

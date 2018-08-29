@@ -2,7 +2,6 @@
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
-#include <boost/numeric/ublas/io.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>

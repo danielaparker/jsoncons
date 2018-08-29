@@ -2,8 +2,6 @@
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_decoder.hpp>
@@ -13,8 +11,6 @@
 #include <ctime>
 
 using namespace jsoncons;
-
-using namespace boost::filesystem;
 
 TEST_CASE("test_fail1")
 {

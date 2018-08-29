@@ -11,7 +11,6 @@
 #include <ctime>
 
 using namespace jsoncons;
-using boost::numeric::ublas::matrix;
 
 TEST_CASE("test_byte_string_serialization")
 {
@@ -33,7 +32,7 @@ TEST_CASE("test_byte_string_serialization")
 
 TEST_CASE("test_direct_serialization")
 {
-    matrix<double> A(2, 2);
+    boost::numeric::ublas::matrix<double> A(2, 2);
     A(0, 0) = 1;
     A(0, 1) = 2;
     A(1, 0) = 3;
