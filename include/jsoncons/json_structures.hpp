@@ -781,7 +781,7 @@ public:
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
-            hint = try_emplace(hint, it->key(),it->value());
+            hint = insert_or_assign(hint, it->key(),it->value());
         }
     }
 
