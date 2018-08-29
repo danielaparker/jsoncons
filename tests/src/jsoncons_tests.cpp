@@ -9,7 +9,6 @@
 #include <utility>
 #include <ctime>
 #include <new>
-//#include <boost/optional.hpp>
 
 using namespace jsoncons;
 
@@ -34,13 +33,7 @@ TEST_CASE("test_shrink_to_fit")
     CHECK(3 == val.size());
     CHECK(1 == val[0].size());
 }
-/*
-TEST_CASE("test_boost_optional")
-{
-    boost::optional<jsoncons::json> opt_json;
-    opt_json = json::object();
-}
-*/
+
 TEST_CASE("test_for_each_value")
 {
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";

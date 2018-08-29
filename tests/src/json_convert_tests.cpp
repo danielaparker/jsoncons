@@ -2,7 +2,6 @@
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
-//#include <boost/numeric/ublas/matrix.hpp>
 #include <jsoncons/json.hpp>
 #include <sstream>
 #include <vector>
@@ -10,67 +9,6 @@
 #include <utility>
 #include <ctime>
 #include <cstdint>
-
-//using boost::numeric::ublas::matrix;
-
-/*
-namespace jsoncons
-{
-    template<>
-    struct json_convert_traits<matrix<double>>
-    {
-        template <class CharT>
-        static matrix<double> decode(std::basic_istringstream<CharT>& is,
-                                     const basic_json_serializing_options<CharT>& options)
-        {
-            basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-            if (j.is_array() && j.size() > 0)
-            {
-                size_t m = j.size();
-                size_t n = 0;
-                for (const auto& a : j.array_range())
-                {
-                    if (a.size() > n)
-                    {
-                        n = a.size();
-                    }
-                }
-
-                boost::numeric::ublas::matrix<double> A(m,n,double());
-                for (size_t i = 0; i < m; ++i)
-                {
-                    const auto& a = j[i];
-                    for (size_t j = 0; j < a.size(); ++j)
-                    {
-                        A(i,j) = a[j].template as<double>();
-                    }
-                }
-                return A;
-            }
-            else
-            {
-                boost::numeric::ublas::matrix<double> A;
-                return A;
-            }
-        }
-
-        static void encode(const matrix<double>& val, json_content_handler& handler)
-        {
-            handler.begin_array();
-            for (size_t i = 0; i < val.size1(); ++i)
-            {
-                handler.begin_array();
-                for (size_t j = 0; j < val.size2(); ++j)
-                {
-                    handler.double_value(val(i, j));
-                }
-                handler.end_array();
-            }
-            handler.end_array();
-        }
-    };
-};
-*/
 
 using namespace jsoncons;
 

@@ -14,8 +14,10 @@ using namespace jsoncons;
 
 typedef basic_json<char,sorted_policy,boost::pool_allocator<char>> my_json;
 
-int main()
+void pool_allocator_examples()
 {
+    std::cout << "pool_allocator examples\n\n";
+
     jsoncons::json_decoder<my_json,boost::pool_allocator<char>> decoder;
 
     static std::string s("[1,2,3,4,5,6]");

@@ -1,17 +1,16 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
-//#include "boost/date_time/gregorian/gregorian.hpp"
-//#include <boost/numeric/ublas/matrix.hpp>
+#include <cassert>
+#include "boost/date_time/gregorian/gregorian.hpp"
+#include <boost/numeric/ublas/matrix.hpp>
 
-#if 0
 namespace jsoncons 
 {
     template <class Json>
@@ -127,12 +126,12 @@ namespace jsoncons
 using namespace jsoncons;
 using boost::numeric::ublas::matrix;
 
-TEST_CASE("test_add_extensibility")
+void add_extensibility()
 {
     json a = json::array();
     a.push_back(boost::gregorian::date(2013,10,14));
     auto d = a[0].as<boost::gregorian::date>();
-    CHECK(boost::gregorian::date(2013,10,14) == d);
+    assert(boost::gregorian::date(2013,10,14) == d);
 
     json o;
     o["ObservationDates"] = std::move(a);
@@ -140,8 +139,8 @@ TEST_CASE("test_add_extensibility")
     d = o["ObservationDates"][0].as<boost::gregorian::date>();
     auto d2 = o["ObservationDates"][1].as<boost::gregorian::date>();
 
-    CHECK(boost::gregorian::date(2013,10,14)==d);
-    CHECK(boost::gregorian::date(2013,10,21)==d2);
+    assert(boost::gregorian::date(2013,10,14)==d);
+    assert(boost::gregorian::date(2013,10,21)==d2);
 
     json deal;
     deal["maturity"] = boost::gregorian::date(2015,1,1);
@@ -154,50 +153,50 @@ TEST_CASE("test_add_extensibility")
     //std::cout << pretty_print(deal) << std::endl;
 }
 
-TEST_CASE("test_set_extensibility")
+void set_extensibility()
 {
     json o;
     boost::gregorian::date d(boost::gregorian::day_clock::local_day());
     o.insert_or_assign("today",d);
     boost::gregorian::date val = o["today"].as<boost::gregorian::date>();
-    CHECK(d == val);
+    assert(d == val);
 }
 
-TEST_CASE("test_assignment_extensibility")
+void assignment_extensibility()
 {
     json o;
     boost::gregorian::date d(boost::gregorian::day_clock::local_day());
     o["today"] = d;
     boost::gregorian::date val = o["today"].as<boost::gregorian::date>();
-    CHECK(d == val);
+    assert(d == val);
 }
 
-TEST_CASE("test_example")
+void an_example()
 {
-        using jsoncons::json;
-        using boost::gregorian::date;
+    using jsoncons::json;
+    using boost::gregorian::date;
 
-        json deal;
-        deal["Maturity"] = date(2014,10,14);
+    json deal;
+    deal["Maturity"] = date(2014,10,14);
 
-        json observation_dates = json::array();
-        observation_dates.push_back(date(2014,2,14));
-        observation_dates.push_back(date(2014,2,21));
+    json observation_dates = json::array();
+    observation_dates.push_back(date(2014,2,14));
+    observation_dates.push_back(date(2014,2,21));
 
-        deal["ObservationDates"] = std::move(observation_dates);
+    deal["ObservationDates"] = std::move(observation_dates);
 
-        date maturity = deal["Maturity"].as<date>();
+    date maturity = deal["Maturity"].as<date>();
 
-        CHECK(deal["Maturity"].as<date>() == date(2014,10,14));
-        REQUIRE(deal["ObservationDates"].is_array());
-        REQUIRE(deal["ObservationDates"].size() == 2);
-        CHECK(deal["ObservationDates"][0].as<date>() == date(2014,2,14));
-        CHECK(deal["ObservationDates"][1].as<date>() == date(2014,2,21));
+    assert(deal["Maturity"].as<date>() == date(2014,10,14));
+    assert(deal["ObservationDates"].is_array());
+    assert(deal["ObservationDates"].size() == 2);
+    assert(deal["ObservationDates"][0].as<date>() == date(2014,2,14));
+    assert(deal["ObservationDates"][1].as<date>() == date(2014,2,21));
 
-        //std::cout << pretty_print(deal) << std::endl;
+    std::cout << pretty_print(deal) << std::endl;
 }
 
-TEST_CASE("test_boost_matrix")
+void boost_matrix()
 {
     matrix<double> A(2, 2);
     A(0, 0) = 1.1;
@@ -207,22 +206,32 @@ TEST_CASE("test_boost_matrix")
 
     json a = A;
 
-    CHECK(a.is<matrix<double>>());
-    CHECK_FALSE(a.is<matrix<int>>());
+    assert(a.is<matrix<double>>());
+    assert(!a.is<matrix<int>>());
 
-    CHECK(a[0][0].as<double>()==A(0,0));
-    CHECK(a[0][1].as<double>()==A(0,1));
-    CHECK(a[1][0].as<double>()==A(1,0));
-    CHECK(a[1][1].as<double>()==A(1,1));
+    assert(a[0][0].as<double>()==A(0,0));
+    assert(a[0][1].as<double>()==A(0,1));
+    assert(a[1][0].as<double>()==A(1,0));
+    assert(a[1][1].as<double>()==A(1,1));
 
     matrix<double> B = a.as<matrix<double>>();
 
-    CHECK(B.size1() ==a.size());
-    CHECK(B.size2() ==a[0].size());
+    assert(B.size1() ==a.size());
+    assert(B.size2() ==a[0].size());
 
-    CHECK(a[0][0].as<double>()==B(0,0));
-    CHECK(a[0][1].as<double>()==B(0,1));
-    CHECK(a[1][0].as<double>()==B(1,0));
-    CHECK(a[1][1].as<double>()==B(1,1));
+    assert(a[0][0].as<double>()==B(0,0));
+    assert(a[0][1].as<double>()==B(0,1));
+    assert(a[1][0].as<double>()==B(1,0));
+    assert(a[1][1].as<double>()==B(1,1));
 }
-#endif
+
+void extensibility_examples()
+{
+    std::cout << "extensibility examples\n\n";
+
+    add_extensibility();
+    set_extensibility();
+    assignment_extensibility();
+    an_example();
+    boost_matrix();
+}
