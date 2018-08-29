@@ -91,8 +91,8 @@ matrix:
     - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
     - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-fsanitize=address,memory,undefined,thread,leak', addons: *gcc7 }
     - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc7 }
-    - { env: 'STD=11 CXX=g++-8 CMAKEFLAGS=-fsanitize=address,memory,undefined,thread,leak', addons: *gcc8 }
-    - { env: 'STD=11 CXX=g++-8 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc8 }
+    - { env: 'STD=11 CXX=g++-8 CMAKEFLAGS=-fsanitize=address,memory,undefined,thread,leak' -lstdc++fs, addons: *gcc8 }
+    - { env: 'STD=11 CXX=g++-8 CMAKEFLAGS=-DNO_DEPRECATED=YES' -lstdc++fs, addons: *gcc8 }
     - { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang38 }
     - { env: 'STD=11 CXX=clang++-5.0 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang50 }
     - { env: 'STD=11 CXX=clang++-6.0 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang60 }
