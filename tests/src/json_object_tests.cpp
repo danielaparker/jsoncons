@@ -12,23 +12,27 @@
 
 using namespace jsoncons;
 
-TEST_CASE("as_test")
+TEST_CASE("json as<T>")
 {
-    json j;
-    std::string s = j.as<std::string>();
-    CHECK("{}" == s);
-}
-
-TEST_CASE("as_test2")
-{
-    try
+    SECTION("empty object as string")
     {
         json j;
-        std::string s = j["empty"].as<std::string>();
+        std::string s = j.as<std::string>();
+        CHECK("{}" == s);
     }
-    catch (const std::exception& e)
+
+    SECTION("key not found")
     {
-        std::cout << e.what() << std::endl;
+        try
+        {
+            json j;
+            std::string s = j["empty"].as<std::string>();
+            CHECK(false);
+        }
+        catch (const std::out_of_range& e)
+        {
+            CHECK(e.what() == std::string("Key 'empty' not found"));
+        }
     }
 }
 
@@ -962,7 +966,6 @@ json expected = json::parse(R"(
     j.merge(std::move(source));
     CHECK(j.size() == 3);
     CHECK(expected == j);
-    std::cout << pretty_print(j) << std::endl;
 
     j2.merge(std::move(source2));
     CHECK(j2.size() == 3);
@@ -1114,7 +1117,6 @@ json expected = json::parse(R"(
     j.merge_or_update(std::move(source));
     CHECK(j.size() == 3);
     CHECK(expected == j);
-    std::cout << pretty_print(j) << std::endl;
 
     j2.merge_or_update(std::move(source2));
     CHECK(j2.size() == 3);
