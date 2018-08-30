@@ -25,7 +25,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Writer=jsoncons::detail::ostream_buffered_writer<CharT>,class Allocator=std::allocator<CharT>>
+template<class CharT,class Writer=jsoncons::detail::stream_char_writer<CharT>,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer final : public basic_json_content_handler<CharT>
 {
 public:
@@ -522,7 +522,7 @@ template <class Json,class Allocator>
 void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_serializer<char_type,jsoncons::detail::ostream_buffered_writer<char_type>,Allocator> serializer(os,options);
+    basic_csv_serializer<char_type,jsoncons::detail::stream_char_writer<char_type>,Allocator> serializer(os,options);
     j.dump(serializer);
 }
 

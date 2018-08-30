@@ -27,7 +27,7 @@
 
 namespace jsoncons {
 
-template<class CharT,class Writer=detail::ostream_buffered_writer<CharT>>
+template<class CharT,class Writer=detail::stream_char_writer<CharT>>
 class basic_json_serializer final : public basic_json_content_handler<CharT>
 {
 public:
@@ -756,8 +756,8 @@ private:
     }
 };
 
-typedef basic_json_serializer<char,detail::ostream_buffered_writer<char>> json_serializer;
-typedef basic_json_serializer<wchar_t,detail::ostream_buffered_writer<wchar_t>> wjson_serializer;
+typedef basic_json_serializer<char,detail::stream_char_writer<char>> json_serializer;
+typedef basic_json_serializer<wchar_t,detail::stream_char_writer<wchar_t>> wjson_serializer;
 
 typedef basic_json_serializer<char,detail::string_writer<char>> json_string_serializer;
 typedef basic_json_serializer<wchar_t,detail::string_writer<wchar_t>> wjson_string_serializer;

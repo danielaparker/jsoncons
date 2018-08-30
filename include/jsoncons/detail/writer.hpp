@@ -28,7 +28,7 @@
 namespace jsoncons { namespace detail {
 
 template <class CharT>
-class ostream_buffered_writer
+class stream_char_writer
 {
 public:
     typedef CharT char_type;
@@ -43,19 +43,19 @@ private:
     CharT* p_;
 
     // Noncopyable and nonmoveable
-    ostream_buffered_writer(const ostream_buffered_writer&) = delete;
-    ostream_buffered_writer& operator=(const ostream_buffered_writer&) = delete;
+    stream_char_writer(const stream_char_writer&) = delete;
+    stream_char_writer& operator=(const stream_char_writer&) = delete;
 
 public:
-    ostream_buffered_writer(std::basic_ostream<CharT>& os)
+    stream_char_writer(std::basic_ostream<CharT>& os)
         : os_(os), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    ostream_buffered_writer(std::basic_ostream<CharT>& os, size_t buflen)
+    stream_char_writer(std::basic_ostream<CharT>& os, size_t buflen)
     : os_(os), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    ~ostream_buffered_writer()
+    ~stream_char_writer()
     {
         os_.write(begin_buffer_, buffer_length());
         os_.flush();
