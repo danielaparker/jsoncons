@@ -7,11 +7,18 @@ Enhancements
 
 Changes
 
-- Scons dropped as a build system for tests and examples
+- Scons dropped as a build system for tests and examples, use CMake
 
-- Tests no longer depend on boost, boost test framework replaced by Catch2
+- Tests no longer depend on boost, boost test framework replaced by Catch2.
+  boost code in tests moved to `examples_boost` directory.
 
-- All boost examples moved to `examples_boost` directory
+- Previously, if `json_parser` encountered an unopened object or array, e.g. "1]",
+  this would cause a JSONCONS_ASSERT failure, resulting in an `std::runtime_error`. This has been
+  changed to cause a `json_parse_errc::unexpected_right_brace` or `json_parse_errc::unexpected_right_bracket` error code. 
+
+Warning fixes
+
+- Eliminated vs2017 level 3 and level 4 warnings
 
 v0.108.0
 --------
