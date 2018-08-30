@@ -104,6 +104,89 @@ private:
     }
 };
 
+class stream_byte_writer
+{
+public:
+    typedef std::basic_ostream<char> output_type;
+private:
+    static const size_t default_buffer_length = 16384;
+
+    std::basic_ostream<char>& os_;
+    std::vector<uint8_t> buffer_;
+    uint8_t * begin_buffer_;
+    const uint8_t* end_buffer_;
+    uint8_t* p_;
+
+    // Noncopyable and nonmoveable
+    stream_byte_writer(const stream_byte_writer&) = delete;
+    stream_byte_writer& operator=(const stream_byte_writer&) = delete;
+
+public:
+    stream_byte_writer(std::basic_ostream<char>& os)
+        : os_(os), 
+          buffer_(default_buffer_length), 
+          begin_buffer_(buffer_.data()), 
+          end_buffer_(begin_buffer_+buffer_.size()), 
+          p_(begin_buffer_)
+    {
+    }
+    stream_byte_writer(std::basic_ostream<char>& os, size_t buflen)
+        : os_(os), 
+          buffer_(buflen), 
+          begin_buffer_(buffer_.data()), 
+          end_buffer_(begin_buffer_+buffer_.size()), 
+          p_(begin_buffer_)
+    {
+    }
+    ~stream_byte_writer()
+    {
+        os_.write((char*)begin_buffer_, buffer_length());
+        os_.flush();
+    }
+
+    void flush()
+    {
+        os_.write((char*)begin_buffer_, buffer_length());
+        p_ = buffer_.data();
+    }
+
+    void write(const uint8_t* s, size_t length)
+    {
+        size_t diff = end_buffer_ - p_;
+        if (diff >= length)
+        {
+            std::memcpy(p_, s, length*sizeof(uint8_t));
+            p_ += length;
+        }
+        else
+        {
+            os_.write((char*)begin_buffer_, buffer_length());
+            os_.write((char*)s,length);
+            p_ = begin_buffer_;
+        }
+    }
+
+    void put(uint8_t ch)
+    {
+        if (p_ < end_buffer_)
+        {
+            *p_++ = ch;
+        }
+        else
+        {
+            os_.write((char*)begin_buffer_, buffer_length());
+            p_ = begin_buffer_;
+            put(ch);
+        }
+    }
+private:
+
+    size_t buffer_length() const
+    {
+        return p_ - begin_buffer_;
+    }
+};
+
 template <class CharT>
 class string_writer 
 {
@@ -138,12 +221,10 @@ public:
     }
 };
 
-template <class CharT>
 class bytes_writer 
 {
 public:
-    typedef CharT char_type;
-    typedef std::vector<CharT> output_type;
+    typedef std::vector<uint8_t> output_type;
 private:
     output_type& s_;
 
@@ -161,12 +242,12 @@ public:
     {
     }
 
-    void write(const CharT* s, size_t length)
+    void write(const uint8_t* s, size_t length)
     {
-        s_.append(s,length);
+        s_.insert(s_.end(), s, s+length);
     }
 
-    void put(CharT ch)
+    void put(uint8_t ch)
     {
         s_.push_back(ch);
     }

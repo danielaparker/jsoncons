@@ -255,7 +255,7 @@ private:
         {
         }
 
-        void select(node_type& node, const string_type& path, reference val,
+        void select(node_type&, const string_type& path, reference val,
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
@@ -328,7 +328,7 @@ private:
         {
         }
 
-        void select(node_type& node, const string_type& path, reference val,
+        void select(node_type&, const string_type& path, reference val,
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>&) override
         {

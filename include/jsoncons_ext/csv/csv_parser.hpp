@@ -311,7 +311,7 @@ public:
                 }
                 break;
             case mapping_type::m_columns:
-                for (const auto& name : column_names_)
+                for (size_t i = 0; i < column_names_.size(); ++i)
                 {
                     decoders_.push_back(json_decoder<json_type>());
                     decoders_.back().begin_document();

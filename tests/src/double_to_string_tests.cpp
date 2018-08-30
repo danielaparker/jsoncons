@@ -24,8 +24,6 @@ std::basic_string<CharT> float_to_string(double val, uint8_t precision)
     return s;
 }
 
-const json_serializing_options options;
-
 TEST_CASE("test_double_to_string")
 {
     double x = 1.0e100;
