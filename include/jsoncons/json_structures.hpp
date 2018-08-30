@@ -781,7 +781,7 @@ public:
     {
         for (auto it = source.begin(); it != source.end(); ++it)
         {
-            hint = insert_or_assign(hint, it->key(),it->value());
+            hint = try_emplace(hint, it->key(),it->value());
         }
     }
 
@@ -1003,7 +1003,8 @@ public:
     typename std::enable_if<is_stateless<A>::value,iterator>::type 
     try_emplace(iterator hint, const string_view_type& name, Args&&... args)
     {
-        iterator it;
+        iterator it = hint;
+
         if (hint != this->members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,this->members_.end(), name, 
@@ -1030,6 +1031,7 @@ public:
                                         key_storage_type(name.begin(),name.end()),
                                         std::forward<Args>(args)...);
         }
+
         return it;
     }
 
@@ -1037,7 +1039,7 @@ public:
     typename std::enable_if<!is_stateless<A>::value,iterator>::type 
     try_emplace(iterator hint, const string_view_type& name, Args&&... args)
     {
-        iterator it;
+        iterator it = hint;
         if (hint != this->members_.end() && hint->key() <= name)
         {
             it = std::lower_bound(hint,this->members_.end(), name, 

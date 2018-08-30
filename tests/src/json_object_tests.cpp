@@ -823,6 +823,41 @@ TEST_CASE("test_set_override")
     CHECK(obj["height"].as<double>() == Approx(0.3).epsilon(0.00000000001));
 }
 
+TEST_CASE("try_emplace tests")
+{
+    json j = json::parse(R"(
+    {
+        "a" : 1,
+        "b" : 2
+    }
+    )");
+
+    json expected = json::parse(R"(
+    {
+        "a" : 1,
+        "b" : 2,
+        "c" : 3
+    }
+    )");
+
+    SECTION("try_emplace(const string_view_type& name, Args&&... args)")
+    {
+        j.try_emplace("c",3);
+
+        CHECK(j == expected);
+    }
+
+    SECTION("try_emplace(iterator hint, const string_view_type& name, Args&&... args)")
+    {
+        json::object_iterator it = j.object_range().begin();
+
+        j.try_emplace(it,"c",3);
+
+        CHECK(j == expected);
+    }
+}
+
+
 // merge tests
 
 TEST_CASE("test_json_merge")
