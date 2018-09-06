@@ -56,7 +56,7 @@ before_build:
 build_script:
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
-  - rmdir build_vc140x64 /S/Q
+## - rmdir build_vc140x64 /S/Q
   - mkdir build_vc140x64  & pushd build_vc140x64
   - cmake -G "Visual Studio 14 2015 Win64" ..
   - popd
