@@ -25,7 +25,7 @@ set(JSONCONS_JSON_CONFIG_INSTALL_DIR        "lib/cmake/${PROJECT_NAME}"
   CACHE INTERNAL "")
 set(JSONCONS_JSON_INCLUDE_INSTALL_DIR       "include")
 set(JSONCONS_JSON_TARGETS_EXPORT_NAME       "${PROJECT_NAME}Targets")
-set(JSONCONS_JSON_CMAKE_CONFIG_TEMPLATE     "cmake/config.cmake.in")
+set(JSONCONS_JSON_CMAKE_CONFIG_TEMPLATE     "build/cmake/config.cmake.in")
 set(JSONCONS_JSON_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}")
 set(JSONCONS_JSON_CMAKE_VERSION_CONFIG_FILE "${JSONCONS_JSON_CMAKE_CONFIG_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
 set(JSONCONS_JSON_CMAKE_PROJECT_CONFIG_FILE "${JSONCONS_JSON_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Config.cmake")
@@ -69,7 +69,7 @@ include(CTest) #adds option BUILD_TESTING (default ON)
 
 if(BUILD_TESTING AND JSON_BuildTests)
     enable_testing()
-    add_subdirectory(tests)
+    add_subdirectory(tests/build/cmake)
 endif()
 
 ##
