@@ -56,10 +56,16 @@ before_build:
 build_script:
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
+  - rmdir build_vc140x64 /S/Q
+  - mkdir build_vc140x64  & pushd build_vc140x64
+  - cmake -G "Visual Studio 14 2015 Win64" ..
+  - popd
+  - cmake --build build_vc140x64 --config Debug
+
 
 test_script:
   - set DIR=%~dp0
   - cd %DIR%..\..
-  - call "build/cmake/jsoncons_tests.exe"
+  - "build/cmake/build_vc140x64/Debug/jsoncons_tests.exe"
   - cd %DIR%
 
