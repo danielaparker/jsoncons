@@ -94,8 +94,8 @@ matrix:
     - { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
 
 script:
-  - pwd
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
+  - make -j2
   - ./run_tests.sh
 

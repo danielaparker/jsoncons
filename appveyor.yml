@@ -56,7 +56,6 @@ before_build:
 build_script:
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
-  - make -j2
 
 test_script:
   - ./run_tests.sh
