@@ -58,7 +58,7 @@ build_script:
 ##  - cmake $CMAKEFLAGS .
   - if exist build_vc140x64 rmdir build_vc140x64 /S/Q
   - mkdir build_vc140x64  & pushd build_vc140x64
-  - cmake $CMAKEFLAGS .
+  - cmake --build . --config Release
   - popd
   - cmake --build build_vc140x64 --config Debug
 
