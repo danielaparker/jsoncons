@@ -58,4 +58,8 @@ build_script:
   - cmake $CMAKEFLAGS .
 
 test_script:
-  - ctest -C Release -V -j
+  - set DIR=%~dp0
+  - cd %DIR%..\..
+  - call "build/cmake/jsoncons_tests.exe"
+  - cd %DIR%
+
