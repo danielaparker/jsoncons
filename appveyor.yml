@@ -58,9 +58,8 @@ build_script:
   - if exist build_vc140x64 rmdir build_vc140x64 /S/Q
   - mkdir build_vc140x64  & pushd build_vc140x64
   - cmake . -G "%GENERATOR%" -DCMAKE_CXX_FLAGS="%FLAGS%" -DCMAKE_IGNORE_PATH="C:/Program Files/Git/usr/bin"
-  - cmake $CMAKEFLAGS .
   - popd
-  - cmake --build build_vc140x64 --config Release
+  - cmake --build build_vc140x64 --config Debug
 
 
 test_script:
