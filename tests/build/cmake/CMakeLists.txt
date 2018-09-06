@@ -32,6 +32,18 @@ target_include_directories (jsoncons_tests PUBLIC ../../../include
 
 target_link_libraries (jsoncons_tests)
 
+    add_test(NAME "${testcase}_default"
+      COMMAND ${testcase} ${CATCH_TEST_FILTER}
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+    set_tests_properties("${testcase}_default" PROPERTIES LABELS "default")
+
+    add_test(NAME "${testcase}_all"
+      COMMAND ${testcase} ${CATCH_TEST_FILTER} "*"
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+    set_tests_properties("${testcase}_all" PROPERTIES LABELS "all")
+
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   # special link option on Linux because llvm stl rely on GNU stl
   target_link_libraries (jsoncons_tests -Wl,-lstdc++)
