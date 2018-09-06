@@ -58,5 +58,4 @@ build_script:
   - cmake $CMAKEFLAGS .
 
 test_script:
-  - ./run_tests.sh
-
+  - ctest -C Release -V -j
