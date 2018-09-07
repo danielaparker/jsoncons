@@ -53,18 +53,9 @@ install:
 before_build:
 
 build_script:
-  - cd tests/build/cmake
-##  - cmake $CMAKEFLAGS .
-  - if exist build_vc140x64 rmdir build_vc140x64 /S/Q
-  - mkdir build_vc140x64  & pushd build_vc140x64
-  - cmake . -G "%GENERATOR%" -DCMAKE_CXX_FLAGS="%FLAGS%" -DCMAKE_IGNORE_PATH="C:/Program Files/Git/usr/bin"
-  - popd
-  - cmake --build build_vc140x64 --config Debug
-
 
 test_script:
-  - set DIR=%~dp0
-  - cd %DIR%..\..
-  - "build/cmake/build_vc140x64/Debug/jsoncons_tests.exe"
-  - cd %DIR%
+  - cd tests/build/cmake
+  - cmake $CMAKEFLAGS .
+  - make -j2 && make test
 
