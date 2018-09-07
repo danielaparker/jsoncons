@@ -42,4 +42,4 @@ endif()
 enable_testing()
 
 # does the application run
-add_test(TestsRuns Tests)
+add_test(TestsRuns jsoncons_tests)
