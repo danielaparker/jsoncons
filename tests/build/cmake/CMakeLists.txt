@@ -13,14 +13,10 @@ set(JSONCONS_TESTS_SOURCE_DIR ${JSONCONS_PROJECT_DIR}/tests/src)
 set(JSONCONS_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/include)
 set(JSONCONS_THIRD_PARTY_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/third_party)
 
-enable_testing()
-
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
 file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
-
-add_executable(jsoncons_tests ${JSONCONS_TESTS_SOURCES})
 
 target_compile_definitions (jsoncons_tests PUBLIC)
 
@@ -42,12 +38,16 @@ target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
 
 set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(Catch INTERFACE)
-
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
+
+add_executable(jsoncons_tests ${JSONCONS_TESTS_SOURCES})
 
 target_link_libraries(jsoncons_tests Catch)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   # special link option on Linux because llvm stl rely on GNU stl
   target_link_libraries (jsoncons_tests -Wl,-lstdc++ Catch)
 endif()
+
+enable_testing()
+add_test(NAME jsoncons_test COMMAND jsoncons_tests)
 
