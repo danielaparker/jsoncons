@@ -3,7 +3,6 @@
 #
 
 cmake_minimum_required (VERSION 3.4)
-
 # load global config
 include (../../../build/cmake/config.cmake)
 
@@ -13,33 +12,24 @@ set(JSONCONS_TESTS_SOURCE_DIR ${JSONCONS_PROJECT_DIR}/tests/src)
 set(JSONCONS_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/include)
 set(JSONCONS_THIRD_PARTY_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/third_party)
 
+set(CTEST_OUTPUT_ON_FAILURE ON)
+
 # load per-platform configuration
-include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
-
-file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
-
-add_executable(jsoncons_tests ${JSONCONS_TESTS_SOURCES})
-target_compile_definitions (jsoncons_tests PUBLIC)
+include (${JSONCONS_PROJECT_DIR}/build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
 if (NO_DEPRECATED)
 add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
 
-target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
-                                           PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
-
-# target_link_libraries (jsoncons_tests)
-
-# if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-  # special link option on Linux because llvm stl rely on GNU stl
-  #target_link_libraries (jsoncons_tests -Wl,-lstdc++)
-#endif()
-
-# does the application run
-
 set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
+
+file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
+add_executable(jsoncons_tests ${JSONCONS_TESTS_SOURCES})
+target_compile_definitions (jsoncons_tests PUBLIC)
+target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
+                                           PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
 target_link_libraries(jsoncons_tests Catch)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
