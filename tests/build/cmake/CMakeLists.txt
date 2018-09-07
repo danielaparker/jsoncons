@@ -8,8 +8,8 @@ cmake_minimum_required (VERSION 3.4)
 include (../../../build/cmake/config.cmake)
 
 project (Tests CXX)
-# set(JSONCONS_TESTS_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../../src)
-set(JSONCONS_TESTS_SOURCE_DIR ../../src)
+set(JSONCONS_TESTS_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../../src)
+# set(JSONCONS_TESTS_SOURCE_DIR ../../src)
 
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
