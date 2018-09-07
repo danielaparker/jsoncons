@@ -3,18 +3,16 @@
 #
 
 cmake_minimum_required (VERSION 3.4)
-cmake_policy(SET CMP0074 NEW)
 
 # load global config
 include (../../../build/cmake/config.cmake)
 
 project (Tests CXX)
-set(JSONCONS_TESTS_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../../src)
+# set(JSONCONS_TESTS_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../../src)
+set(JSONCONS_TESTS_SOURCE_DIR ../../src)
 
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
-
-
 
 file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
 
