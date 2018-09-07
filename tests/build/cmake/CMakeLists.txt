@@ -9,6 +9,7 @@ include (../../../build/cmake/config.cmake)
 project (Tests CXX)
 set(JSONCONS_PROJECT_DIR ${PROJECT_SOURCE_DIR}/../../..)
 set(JSONCONS_TESTS_SOURCE_DIR ${JSONCONS_PROJECT_DIR}/tests/src)
+set(JSONCONS_TESTS_DIR ${JSONCONS_PROJECT_DIR}/tests)
 set(JSONCONS_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/include)
 set(JSONCONS_THIRD_PARTY_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/third_party)
 
@@ -38,5 +39,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL 
 endif()
 
 enable_testing()
-add_test(NAME jsoncons_test COMMAND jsoncons_tests)
+add_test(NAME jsoncons_tests WORKING_DIRECTORY ${JSONCONS_TESTS_DIR} COMMAND ${CMAKE_CURRENT_BINARY_DIR}/jsoncons_tests)
+
+ 
 
