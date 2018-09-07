@@ -22,6 +22,7 @@ class A<T, typename std::enable_if<std::is_floating_point<T>::value>::type> {
 
 TEST_CASE( "test_is_same_size" )
 {
+    CHECK(false);
 }
 
 #if 0
