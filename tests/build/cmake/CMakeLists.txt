@@ -8,8 +8,10 @@ cmake_minimum_required (VERSION 3.4)
 include (../../../build/cmake/config.cmake)
 
 project (Tests CXX)
-set(JSONCONS_TESTS_SOURCE_DIR ${PROJECT_SOURCE_DIR}/../../src)
-# set(JSONCONS_TESTS_SOURCE_DIR ../../src)
+set(JSONCONS_PROJECT_DIR ${PROJECT_SOURCE_DIR}/../../..)
+set(JSONCONS_TESTS_SOURCE_DIR ${JSONCONS_PROJECT_DIR}/tests/src)
+set(JSONCONS_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/include)
+set(JSONCONS_THIRD_PARTY_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/third_party)
 
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
@@ -24,9 +26,8 @@ if (NO_DEPRECATED)
 add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
 
-target_include_directories (jsoncons_tests PUBLIC ../../../include
-                                           PUBLIC ../../../third_party
-                                           PRIVATE ../../include)
+target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
+                                           PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
 # target_link_libraries (jsoncons_tests)
 
