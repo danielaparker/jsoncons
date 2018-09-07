@@ -21,7 +21,7 @@ file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
 add_executable(jsoncons_tests ${JSONCONS_TESTS_SOURCES})
 
 target_compile_definitions (jsoncons_tests PUBLIC)
-
+p
 if (NO_DEPRECATED)
 add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
@@ -37,3 +37,9 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL 
   # special link option on Linux because llvm stl rely on GNU stl
   target_link_libraries (jsoncons_tests -Wl,-lstdc++)
 endif()
+
+# add a "test" target:
+enable_testing()
+
+# does the application run
+add_test(TestsRuns Tests)

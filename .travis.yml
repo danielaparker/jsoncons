@@ -96,6 +96,5 @@ matrix:
 script:
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
-  - make -j2
-  - ./run_tests.sh
+  - make -j2 && make test
 
