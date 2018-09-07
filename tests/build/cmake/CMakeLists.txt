@@ -13,6 +13,8 @@ set(JSONCONS_TESTS_SOURCE_DIR ${JSONCONS_PROJECT_DIR}/tests/src)
 set(JSONCONS_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/include)
 set(JSONCONS_THIRD_PARTY_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/third_party)
 
+enable_testing()
+
 # load per-platform configuration
 include (../../../build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
@@ -35,9 +37,6 @@ target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
   # special link option on Linux because llvm stl rely on GNU stl
   #target_link_libraries (jsoncons_tests -Wl,-lstdc++)
 #endif()
-
-# add a "test" target:
-enable_testing()
 
 # does the application run
 
