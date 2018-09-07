@@ -21,7 +21,7 @@ file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
 add_executable(jsoncons_tests ${JSONCONS_TESTS_SOURCES})
 
 target_compile_definitions (jsoncons_tests PUBLIC)
-p
+
 if (NO_DEPRECATED)
 add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
