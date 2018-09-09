@@ -39,6 +39,7 @@ environment:
       GENERATOR: Visual Studio 15 2017
 
 init:
+  - pwd
   - cd tests/build/cmake
   - cmake --version
   - msbuild /version
