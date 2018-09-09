@@ -38,7 +38,9 @@ environment:
       FLAGS: "/permissive- /std:c++latest /utf-8"
       GENERATOR: Visual Studio 15 2017
 
-init: []
+init: 
+  - cmake --version
+  - msbuild /version
 
 install:
   - if "%COMPILER%"=="mingw" appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip -FileName ninja.zip
@@ -48,16 +50,14 @@ install:
   - if "%COMPILER%"=="mingw" g++ --version
 
 before_build:
-  - echo %CONFIGURATION%
   - cd tests/build/cmake
-  - cmake --version
-  - msbuild /version
   - md build
+  - cd build
   - cmake . -G "%GENERATOR%" -DCMAKE_CXX_FLAGS="%FLAGS%" -DCMAKE_IGNORE_PATH="C:/Program Files/Git/usr/bin"
 
 build_script:
-  - cmake --build ./build --config Release
+  - cmake --build . --config Release
   # - cmake $CMAKEFLAGS .
 
 test_script:
-  - ctest -C Release -V -j
+  - ctest -C Release 
