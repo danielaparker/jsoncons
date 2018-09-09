@@ -60,5 +60,4 @@ build_script:
   - cmake $CMAKEFLAGS .
 
 test_script:
-  # - ctest -C Release -V -j
-  - make test
+  - ctest -C Release -V -j
