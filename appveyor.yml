@@ -41,9 +41,6 @@ environment:
 init:
   - pwd
   - dir /S
-  - cd tests/build/cmake
-  - cmake --version
-  - msbuild /version
 
 install:
   - if "%COMPILER%"=="mingw" appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip -FileName ninja.zip
@@ -53,6 +50,11 @@ install:
   - if "%COMPILER%"=="mingw" g++ --version
 
 before_build:
+  - pwd
+  - dir /S
+  - cd tests/build/cmake
+  - cmake --version
+  - msbuild /version
   - cmake . -G "%GENERATOR%" -DCMAKE_CXX_FLAGS="%FLAGS%" -DCMAKE_IGNORE_PATH="C:/Program Files/Git/usr/bin"
 
 build_script:
