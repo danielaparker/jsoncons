@@ -38,9 +38,9 @@ environment:
       FLAGS: "/permissive- /std:c++latest /utf-8"
       GENERATOR: Visual Studio 15 2017
 
-init: 
-  - cmake --version
-  - msbuild /version
+init: []
+  # - cmake --version
+  # - msbuild /version
 
 install:
   - if "%COMPILER%"=="mingw" appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip -FileName ninja.zip
@@ -50,6 +50,8 @@ install:
   - if "%COMPILER%"=="mingw" g++ --version
 
 before_build:
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" (del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets")
+  - if defined BINDIR (set "PATH=%BINDIR%;%PATH:C:\Program Files\Git\usr\bin;=%")
   - cd tests/build/cmake
   - md build
   - cd build
