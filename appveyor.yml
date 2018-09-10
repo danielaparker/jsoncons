@@ -1,13 +1,11 @@
 version: '{build}'
 
+configuration:
+- Release
+- Debug
+
 environment:
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      COMPILER: mingw
-      platform: x86
-      FLAGS: ""
-      GENERATOR: Ninja
-
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       platform: x86
       FLAGS: ""
@@ -43,9 +41,6 @@ init: []
   # - msbuild /version
 
 install:
-  - if "%COMPILER%"=="mingw" appveyor DownloadFile https://github.com/ninja-build/ninja/releases/download/v1.6.0/ninja-win.zip -FileName ninja.zip
-  - if "%COMPILER%"=="mingw" 7z x ninja.zip -oC:\projects\deps\ninja > nul
-  - if "%COMPILER%"=="mingw" set PATH=C:\projects\deps\ninja;%PATH%
   - if "%COMPILER%"=="mingw" set PATH=C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin;%PATH%
   - if "%COMPILER%"=="mingw" g++ --version
 
@@ -59,7 +54,6 @@ before_build:
 
 build_script:
   - cmake --build . --config Release
-  # - cmake $CMAKEFLAGS .
 
 test_script:
   - ctest -C Release 
