@@ -37,8 +37,6 @@ environment:
       GENERATOR: Visual Studio 15 2017
 
 init: []
-  # - cmake --version
-  # - msbuild /version
 
 install:
   - if "%COMPILER%"=="mingw" set PATH=C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin;%PATH%
@@ -56,4 +54,4 @@ build_script:
   - cmake --build . --config Release
 
 test_script:
-  - ctest -C Release 
+  - ctest -C Release -V -j
