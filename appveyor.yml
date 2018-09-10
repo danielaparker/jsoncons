@@ -36,6 +36,11 @@ environment:
       FLAGS: "/permissive- /std:c++latest /utf-8"
       GENERATOR: Visual Studio 15 2017
 
+    - platform: vs
+      vsversion: 2017
+      arch: ARM
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
+
 init: []
 
 install:
