@@ -29,6 +29,9 @@ target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
 add_executable(jsoncons_tests ${JSONCONS_TESTS_SOURCES})
 target_compile_definitions (jsoncons_tests PUBLIC)
+target_compile_options(jsoncons_tests PUBLIC
+   "$<$<CXX_COMPILER_ID:MSVC>:/EHsc;$<$<CONFIG:Release>:/Od>>"
+)
 target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
