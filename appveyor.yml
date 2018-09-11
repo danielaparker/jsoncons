@@ -4,34 +4,42 @@ configuration:
 - Release
 
 environment:
+  vsversion: none
+  arch: default
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      platform: x86
+    - platform: vs
+      vsversion: 2015
+      arch: x86
       FLAGS: ""
       GENERATOR: Visual Studio 14 2015
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      platform: x86
+    - platform: vs
+      vsversion: 2015
+      arch: x86
       FLAGS: ""
       GENERATOR: Visual Studio 15 2017
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      platform: x86
+    - platform: vs
+      vsversion: 2015
+      arch: x86
       FLAGS: "/permissive- /std:c++latest /utf-8"
       GENERATOR: Visual Studio 15 2017
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      platform: x64
+    - platform: vs
+      vsversion: 2015
+      arch: x64
       FLAGS: ""
       GENERATOR: Visual Studio 14 2015
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      platform: x64
+    - platform: vs
+      vsversion: 2017
+      arch: x64
       FLAGS: ""
       GENERATOR: Visual Studio 15 2017
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      platform: x64
+    - platform: vs
+      vsversion: 2017
+      arch: x64
       FLAGS: "/permissive- /std:c++latest /utf-8"
       GENERATOR: Visual Studio 15 2017
 
@@ -40,7 +48,8 @@ environment:
       arch: ARM
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
 
-init: []
+init: 
+  - git config --global core.autocrlf input
 
 install:
   - if "%COMPILER%"=="mingw" set PATH=C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin;%PATH%
