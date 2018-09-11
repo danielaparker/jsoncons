@@ -88,4 +88,5 @@ build_script:
   - cmake --build . --config Release
 
 test_script:
-  - ctest -C Release -V -j
+  # Can not run ARM builds on x86/x64 build images
+  - if %platform%==vs ctest -C Release -V -j
