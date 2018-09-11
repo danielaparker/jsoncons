@@ -1780,7 +1780,7 @@ public:
 
 } // namespace detail
 
-class cbor_parser : public serializing_context
+class cbor_parser : public streaming_context
 {
     const uint8_t* begin_input_;
     const uint8_t* end_input_;

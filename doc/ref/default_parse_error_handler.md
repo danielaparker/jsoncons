@@ -14,7 +14,7 @@ class default_parse_error_handler;
   
 ##### Private virtual implementation methods
 
-     bool do_error(std::error_code ec, const serializing_context& context) override;
+     bool do_error(std::error_code ec, const streaming_context& context) override;
 
 Returns `false` if `ec` indicates a comment, otherwise `true`
     

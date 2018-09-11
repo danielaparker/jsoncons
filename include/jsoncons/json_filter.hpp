@@ -54,85 +54,85 @@ private:
         downstream_handler_.end_document();
     }
 
-    void do_begin_object(const serializing_context& context) override
+    void do_begin_object(const streaming_context& context) override
     {
         downstream_handler_.begin_object(context);
     }
 
-    void do_begin_object(size_t length, const serializing_context& context) override
+    void do_begin_object(size_t length, const streaming_context& context) override
     {
         downstream_handler_.begin_object(length, context);
     }
 
-    void do_end_object(const serializing_context& context) override
+    void do_end_object(const streaming_context& context) override
     {
         downstream_handler_.end_object(context);
     }
 
-    void do_begin_array(const serializing_context& context) override
+    void do_begin_array(const streaming_context& context) override
     {
         downstream_handler_.begin_array(context);
     }
 
-    void do_begin_array(size_t length, const serializing_context& context) override
+    void do_begin_array(size_t length, const streaming_context& context) override
     {
         downstream_handler_.begin_array(length, context);
     }
 
-    void do_end_array(const serializing_context& context) override
+    bool do_end_array(const streaming_context& context) override
     {
-        downstream_handler_.end_array(context);
+        return downstream_handler_.end_array(context);
     }
 
     void do_name(const string_view_type& name,
-                 const serializing_context& context) override
+                 const streaming_context& context) override
     {
         downstream_handler_.name(name,context);
     }
 
     void do_string_value(const string_view_type& value,
-                         const serializing_context& context) override
+                         const streaming_context& context) override
     {
         downstream_handler_.string_value(value,context);
     }
 
     void do_byte_string_value(const uint8_t* data, size_t length,
-                              const serializing_context& context) override
+                              const streaming_context& context) override
     {
         downstream_handler_.byte_string_value(data, length, context);
     }
 
     void do_bignum_value(int signum, const uint8_t* data, size_t length,
-                         const serializing_context& context) override
+                         const streaming_context& context) override
     {
         downstream_handler_.bignum_value(signum, data, length, context);
     }
 
     void do_double_value(double value, const floating_point_options& fmt,
-                         const serializing_context& context) override
+                         const streaming_context& context) override
     {
         downstream_handler_.double_value(value, fmt, context);
     }
 
     void do_integer_value(int64_t value,
-                          const serializing_context& context) override
+                          const streaming_context& context) override
     {
         downstream_handler_.integer_value(value,context);
     }
 
     void do_uinteger_value(uint64_t value,
-                           const serializing_context& context) override
+                           const streaming_context& context) override
     {
         downstream_handler_.uinteger_value(value,context);
     }
 
     void do_bool_value(bool value,
-                       const serializing_context& context) override
+                       const streaming_context& context) override
     {
         downstream_handler_.bool_value(value,context);
     }
 
-    void do_null_value(const serializing_context& context) override
+    void do_null_value(const streaming_context& context) override
     {
         downstream_handler_.null_value(context);
     }
@@ -180,7 +180,7 @@ public:
 
 private:
     void do_name(const string_view_type& name,
-                 const serializing_context& context) override
+                 const streaming_context& context) override
     {
         if (name == name_)
         {
@@ -226,38 +226,38 @@ private:
         downstream_handler_.end_document();
     }
 
-    void do_begin_object(const serializing_context& context) override
+    void do_begin_object(const streaming_context& context) override
     {
         downstream_handler_.begin_object(context);
     }
 
-    void do_begin_object(size_t length, const serializing_context& context) override
+    void do_begin_object(size_t length, const streaming_context& context) override
     {
         downstream_handler_.begin_object(length, context);
     }
 
-    void do_end_object(const serializing_context& context) override
+    void do_end_object(const streaming_context& context) override
     {
         downstream_handler_.end_object(context);
     }
 
-    void do_begin_array(const serializing_context& context) override
+    void do_begin_array(const streaming_context& context) override
     {
         downstream_handler_.begin_array(context);
     }
 
-    void do_begin_array(size_t length, const serializing_context& context) override
+    void do_begin_array(size_t length, const streaming_context& context) override
     {
         downstream_handler_.begin_array(length, context);
     }
 
-    void do_end_array(const serializing_context& context) override
+    bool do_end_array(const streaming_context& context) override
     {
-        downstream_handler_.end_array(context);
+        return downstream_handler_.end_array(context);
     }
 
     void do_name(const string_view_type& name,
-                 const serializing_context& context) override
+                 const streaming_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(name.begin(),name.end(),std::back_inserter(target),unicons::conv_flags::strict);
@@ -269,7 +269,7 @@ private:
     }
 
     void do_string_value(const string_view_type& value,
-                         const serializing_context& context) override
+                         const streaming_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(value.begin(),value.end(),std::back_inserter(target),unicons::conv_flags::strict);
@@ -281,42 +281,42 @@ private:
     }
 
     void do_byte_string_value(const uint8_t* data, size_t length,
-                              const serializing_context& context) override
+                              const streaming_context& context) override
     {
         downstream_handler_.byte_string_value(data, length, context);
     }
 
     void do_bignum_value(int signum, const uint8_t* data, size_t length,
-                         const serializing_context& context) override
+                         const streaming_context& context) override
     {
         downstream_handler_.bignum_value(signum, data, length, context);
     }
 
     void do_double_value(double value, const floating_point_options& fmt,
-                         const serializing_context& context) override
+                         const streaming_context& context) override
     {
         downstream_handler_.double_value(value, fmt, context);
     }
 
     void do_integer_value(int64_t value,
-                          const serializing_context& context) override
+                          const streaming_context& context) override
     {
         downstream_handler_.integer_value(value,context);
     }
 
     void do_uinteger_value(uint64_t value,
-                           const serializing_context& context) override
+                           const streaming_context& context) override
     {
         downstream_handler_.uinteger_value(value,context);
     }
 
     void do_bool_value(bool value,
-                       const serializing_context& context) override
+                       const streaming_context& context) override
     {
         downstream_handler_.bool_value(value,context);
     }
 
-    void do_null_value(const serializing_context& context) override
+    void do_null_value(const streaming_context& context) override
     {
         downstream_handler_.null_value(context);
     }

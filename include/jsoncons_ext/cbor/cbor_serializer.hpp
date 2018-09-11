@@ -89,14 +89,14 @@ private:
         writer_.flush();
     }
 
-    void do_begin_object(const serializing_context&) override
+    void do_begin_object(const streaming_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_object));
         
         writer_.put(0xbf);
     }
 
-    void do_begin_object(size_t length, const serializing_context&) override
+    void do_begin_object(size_t length, const streaming_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::object));
 
@@ -128,7 +128,7 @@ private:
         }
     }
 
-    void do_end_object(const serializing_context&) override
+    void do_end_object(const streaming_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -140,13 +140,13 @@ private:
         end_value();
     }
 
-    void do_begin_array(const serializing_context&) override
+    void do_begin_array(const streaming_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
         writer_.put(0x9f);
     }
 
-    void do_begin_array(size_t length, const serializing_context&) override
+    void do_begin_array(size_t length, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         stack_.push_back(stack_item(cbor_structure_type::array));
@@ -180,7 +180,7 @@ private:
         }
     }
 
-    void do_end_array(const serializing_context&) override
+    bool do_end_array(const streaming_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -189,21 +189,22 @@ private:
         }
         stack_.pop_back();
         end_value();
+        return true;
     }
 
-    void do_name(const string_view_type& name, const serializing_context& context) override
+    void do_name(const string_view_type& name, const streaming_context& context) override
     {
         do_string_value(name,context);
     }
 
-    void do_null_value(const serializing_context&) override
+    void do_null_value(const streaming_context&) override
     {
         writer_.put(0xf6);
 
         end_value();
     }
 
-    void do_string_value(const string_view_type& sv, const serializing_context&) override
+    void do_string_value(const string_view_type& sv, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         std::basic_string<uint8_t> target;
@@ -254,7 +255,7 @@ private:
         end_value();
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
+    void do_byte_string_value(const uint8_t* data, size_t length, const streaming_context&) override
     {
         std::vector<uint8_t> v;
 
@@ -296,7 +297,7 @@ private:
         end_value();
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context&) override
     {
         std::vector<uint8_t> v;
 
@@ -349,7 +350,7 @@ private:
         end_value();
     }
 
-    void do_double_value(double value, const floating_point_options&, const serializing_context&) override
+    void do_double_value(double value, const floating_point_options&, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         binary::to_big_endian(static_cast<uint8_t>(0xfb), v);
@@ -364,7 +365,7 @@ private:
         end_value();
     }
 
-    void do_integer_value(int64_t value, const serializing_context&) override
+    void do_integer_value(int64_t value, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         if (value >= 0)
@@ -428,7 +429,7 @@ private:
         end_value();
     }
 
-    void do_uinteger_value(uint64_t value, const serializing_context&) override
+    void do_uinteger_value(uint64_t value, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         if (value <= 0x17)
@@ -458,7 +459,7 @@ private:
         end_value();
     }
 
-    void do_bool_value(bool value, const serializing_context&) override
+    void do_bool_value(bool value, const streaming_context&) override
     {
         if (value)
         {

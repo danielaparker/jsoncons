@@ -10,7 +10,7 @@
 #include <string>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
-#include <jsoncons/serializing_context.hpp>
+#include <jsoncons/streaming_context.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #if !defined(JSONCONS_NO_DEPRECATED)
 #include <jsoncons/json_type_traits.hpp> // for null_type
@@ -41,110 +41,110 @@ public:
 
     void begin_object()
     {
-        do_begin_object(null_serializing_context());
+        do_begin_object(null_streaming_context());
     }
 
-    void begin_object(const serializing_context& context)
+    void begin_object(const streaming_context& context)
     {
         do_begin_object(context);
     }
 
     void begin_object(size_t length)
     {
-        do_begin_object(length, null_serializing_context());
+        do_begin_object(length, null_streaming_context());
     }
 
-    void begin_object(size_t length, const serializing_context& context)
+    void begin_object(size_t length, const streaming_context& context)
     {
         do_begin_object(length, context);
     }
 
     void end_object()
     {
-        do_end_object(null_serializing_context());
+        do_end_object(null_streaming_context());
     }
 
-    void end_object(const serializing_context& context)
+    void end_object(const streaming_context& context)
     {
         do_end_object(context);
     }
 
     void begin_array()
     {
-        do_begin_array(null_serializing_context());
+        do_begin_array(null_streaming_context());
     }
 
     void begin_array(size_t length)
     {
-        do_begin_array(length, null_serializing_context());
+        do_begin_array(length, null_streaming_context());
     }
 
-    void begin_array(const serializing_context& context)
+    void begin_array(const streaming_context& context)
     {
         do_begin_array(context);
     }
 
-    void begin_array(size_t length, const serializing_context& context)
+    void begin_array(size_t length, const streaming_context& context)
     {
         do_begin_array(length, context);
     }
 
-    void end_array()
+    bool end_array()
     {
-        do_end_array(null_serializing_context());
+        return do_end_array(null_streaming_context());
     }
 
-    void end_array(const serializing_context& context)
+    bool end_array(const streaming_context& context)
     {
-        do_end_array(context);
+        return do_end_array(context);
     }
 
     void name(const string_view_type& name)
     {
-        do_name(name, null_serializing_context());
+        do_name(name, null_streaming_context());
     }
 
-    void name(const string_view_type& name, const serializing_context& context)
+    void name(const string_view_type& name, const streaming_context& context)
     {
         do_name(name, context);
     }
 
     void string_value(const string_view_type& value) 
     {
-        do_string_value(value, null_serializing_context());
+        do_string_value(value, null_streaming_context());
     }
 
-    void string_value(const string_view_type& value, const serializing_context& context) 
+    void string_value(const string_view_type& value, const streaming_context& context) 
     {
         do_string_value(value, context);
     }
 
     void byte_string_value(const uint8_t* data, size_t length) 
     {
-        do_byte_string_value(data, length, null_serializing_context());
+        do_byte_string_value(data, length, null_streaming_context());
     }
 
-    void byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
+    void byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) 
     {
         do_byte_string_value(data, length, context);
     }
 
     void byte_string_value(const std::vector<uint8_t>& v) 
     {
-        do_byte_string_value(v.data(), v.size(), null_serializing_context());
+        do_byte_string_value(v.data(), v.size(), null_streaming_context());
     }
 
-    void byte_string_value(const std::vector<uint8_t>& v, const serializing_context& context) 
+    void byte_string_value(const std::vector<uint8_t>& v, const streaming_context& context) 
     {
         do_byte_string_value(v.data(), v.size(), context);
     }
 
     void bignum_value(int signum, const uint8_t* data, size_t length) 
     {
-        do_bignum_value(signum, data, length, null_serializing_context());
+        do_bignum_value(signum, data, length, null_streaming_context());
     }
 
-    void bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
+    void bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) 
     {
         do_bignum_value(signum, data, length, context);
     }
@@ -156,10 +156,10 @@ public:
         std::vector<uint8_t> v;
         n.dump(signum, v);
 
-        do_bignum_value(signum, v.data(), v.size(), null_serializing_context());
+        do_bignum_value(signum, v.data(), v.size(), null_streaming_context());
     }
 
-    void bignum_value(const string_view_type& s, const serializing_context& context) 
+    void bignum_value(const string_view_type& s, const streaming_context& context) 
     {
         bignum n(s.data(),s.size());
         int signum;
@@ -171,70 +171,70 @@ public:
 
     void integer_value(int64_t value)
     {
-        do_integer_value(value,null_serializing_context());
+        do_integer_value(value,null_streaming_context());
     }
 
-    void integer_value(int64_t value, const serializing_context& context)
+    void integer_value(int64_t value, const streaming_context& context)
     {
         do_integer_value(value,context);
     }
 
     void uinteger_value(uint64_t value)
     {
-        do_uinteger_value(value,null_serializing_context());
+        do_uinteger_value(value,null_streaming_context());
     }
 
-    void uinteger_value(uint64_t value, const serializing_context& context)
+    void uinteger_value(uint64_t value, const streaming_context& context)
     {
         do_uinteger_value(value,context);
     }
 
     void double_value(double value)
     {
-        do_double_value(value, floating_point_options(), null_serializing_context());
+        do_double_value(value, floating_point_options(), null_streaming_context());
     }
 
     void double_value(double value, uint8_t precision)
     {
-        do_double_value(value, floating_point_options(chars_format::general, precision), null_serializing_context());
+        do_double_value(value, floating_point_options(chars_format::general, precision), null_streaming_context());
     }
 
     void double_value(double value, const floating_point_options& fmt)
     {
-        do_double_value(value, fmt, null_serializing_context());
+        do_double_value(value, fmt, null_streaming_context());
     }
 
-    void double_value(double value, const serializing_context& context)
+    void double_value(double value, const streaming_context& context)
     {
         do_double_value(value, floating_point_options(), context);
     }
 
-    void double_value(double value, uint8_t precision, const serializing_context& context)
+    void double_value(double value, uint8_t precision, const streaming_context& context)
     {
         do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
-    void double_value(double value, const floating_point_options& fmt, const serializing_context& context)
+    void double_value(double value, const floating_point_options& fmt, const streaming_context& context)
     {
         do_double_value(value, fmt, context);
     }
 
     void bool_value(bool value) 
     {
-        do_bool_value(value,null_serializing_context());
+        do_bool_value(value,null_streaming_context());
     }
 
-    void bool_value(bool value, const serializing_context& context) 
+    void bool_value(bool value, const streaming_context& context) 
     {
         do_bool_value(value,context);
     }
 
     void null_value() 
     {
-        do_null_value(null_serializing_context());
+        do_null_value(null_streaming_context());
     }
 
-    void null_value(const serializing_context& context) 
+    void null_value(const streaming_context& context) 
     {
         do_null_value(context);
     }
@@ -251,72 +251,72 @@ public:
         do_end_document();
     }
 
-    void name(const CharT* p, size_t length, const serializing_context& context) 
+    void name(const CharT* p, size_t length, const streaming_context& context) 
     {
         do_name(string_view_type(p, length), context);
     }
 
-    void value(const std::basic_string<CharT>& value, const serializing_context& context) 
+    void value(const std::basic_string<CharT>& value, const streaming_context& context) 
     {
         do_string_value(value, context);
     }
 
-    void value(const CharT* p, size_t length, const serializing_context& context) 
+    void value(const CharT* p, size_t length, const streaming_context& context) 
     {
         do_string_value(string_view_type(p, length), context);
     }
 
-    void value(const CharT* p, const serializing_context& context)
+    void value(const CharT* p, const streaming_context& context)
     {
         do_string_value(string_view_type(p), context);
     }
 
-    void value(int value, const serializing_context& context) 
+    void value(int value, const streaming_context& context) 
     {
         do_integer_value(value,context);
     }
 
-    void value(long value, const serializing_context& context) 
+    void value(long value, const streaming_context& context) 
     {
         do_integer_value(value,context);
     }
 
-    void value(long long value, const serializing_context& context) 
+    void value(long long value, const streaming_context& context) 
     {
         do_integer_value(value,context);
     }
 
-    void value(unsigned int value, const serializing_context& context) 
+    void value(unsigned int value, const streaming_context& context) 
     {
         do_uinteger_value(value,context);
     }
 
-    void value(unsigned long value, const serializing_context& context) 
+    void value(unsigned long value, const streaming_context& context) 
     {
         do_uinteger_value(value,context);
     }
 
-    void value(unsigned long long value, const serializing_context& context) 
+    void value(unsigned long long value, const streaming_context& context) 
     {
         do_uinteger_value(value,context);
     }
 
-    void value(float value, uint8_t precision, const serializing_context& context)
+    void value(float value, uint8_t precision, const streaming_context& context)
     {
         do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
-    void value(double value, uint8_t precision, const serializing_context& context)
+    void value(double value, uint8_t precision, const streaming_context& context)
     {
         do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
-    void value(bool value, const serializing_context& context) 
+    void value(bool value, const streaming_context& context) 
     {
         do_bool_value(value,context);
     }
 
-    void value(null_type, const serializing_context& context)
+    void value(null_type, const streaming_context& context)
     {
         do_null_value(context);
     }
@@ -327,41 +327,41 @@ private:
 
     virtual void do_end_document() = 0;
 
-    virtual void do_begin_object(const serializing_context& context) = 0;
+    virtual void do_begin_object(const streaming_context& context) = 0;
 
-    virtual void do_begin_object(size_t, const serializing_context& context) 
+    virtual void do_begin_object(size_t, const streaming_context& context) 
     {
         do_begin_object(context);
     }
 
-    virtual void do_end_object(const serializing_context& context) = 0;
+    virtual void do_end_object(const streaming_context& context) = 0;
 
-    virtual void do_begin_array(const serializing_context& context) = 0;
+    virtual void do_begin_array(const streaming_context& context) = 0;
 
-    virtual void do_begin_array(size_t, const serializing_context& context) 
+    virtual void do_begin_array(size_t, const streaming_context& context) 
     {
         do_begin_array(context);
     }
 
-    virtual void do_end_array(const serializing_context& context) = 0;
+    virtual bool do_end_array(const streaming_context& context) = 0;
 
-    virtual void do_name(const string_view_type& name, const serializing_context& context) = 0;
+    virtual void do_name(const string_view_type& name, const streaming_context& context) = 0;
 
-    virtual void do_null_value(const serializing_context& context) = 0;
+    virtual void do_null_value(const streaming_context& context) = 0;
 
-    virtual void do_string_value(const string_view_type& value, const serializing_context& context) = 0;
+    virtual void do_string_value(const string_view_type& value, const streaming_context& context) = 0;
 
-    virtual void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual void do_byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) = 0;
 
-    virtual void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual void do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) = 0;
 
-    virtual void do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
+    virtual void do_double_value(double value, const floating_point_options& fmt, const streaming_context& context) = 0;
 
-    virtual void do_integer_value(int64_t value, const serializing_context& context) = 0;
+    virtual void do_integer_value(int64_t value, const streaming_context& context) = 0;
 
-    virtual void do_uinteger_value(uint64_t value, const serializing_context& context) = 0;
+    virtual void do_uinteger_value(uint64_t value, const streaming_context& context) = 0;
 
-    virtual void do_bool_value(bool value, const serializing_context& context) = 0;
+    virtual void do_bool_value(bool value, const streaming_context& context) = 0;
 };
 
 template <class CharT>
@@ -378,55 +378,56 @@ private:
     {
     }
 
-    void do_begin_object(const serializing_context&) override
+    void do_begin_object(const streaming_context&) override
     {
     }
 
-    void do_end_object(const serializing_context&) override
+    void do_end_object(const streaming_context&) override
     {
     }
 
-    void do_begin_array(const serializing_context&) override
+    void do_begin_array(const streaming_context&) override
     {
     }
 
-    void do_end_array(const serializing_context&) override
+    bool do_end_array(const streaming_context&) override
+    {
+        return true;
+    }
+
+    void do_name(const string_view_type&, const streaming_context&) override
     {
     }
 
-    void do_name(const string_view_type&, const serializing_context&) override
+    void do_null_value(const streaming_context&) override
     {
     }
 
-    void do_null_value(const serializing_context&) override
+    void do_string_value(const string_view_type&, const streaming_context&) override
     {
     }
 
-    void do_string_value(const string_view_type&, const serializing_context&) override
+    void do_byte_string_value(const uint8_t*, size_t, const streaming_context&) override
     {
     }
 
-    void do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
+    void do_bignum_value(int, const uint8_t*, size_t, const streaming_context&) override
     {
     }
 
-    void do_bignum_value(int, const uint8_t*, size_t, const serializing_context&) override
+    void do_double_value(double, const floating_point_options&, const streaming_context&) override
     {
     }
 
-    void do_double_value(double, const floating_point_options&, const serializing_context&) override
+    void do_integer_value(int64_t, const streaming_context&) override
     {
     }
 
-    void do_integer_value(int64_t, const serializing_context&) override
+    void do_uinteger_value(uint64_t, const streaming_context&) override
     {
     }
 
-    void do_uinteger_value(uint64_t, const serializing_context&) override
-    {
-    }
-
-    void do_bool_value(bool, const serializing_context&) override
+    void do_bool_value(bool, const streaming_context&) override
     {
     }
 };

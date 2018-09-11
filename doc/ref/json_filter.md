@@ -115,7 +115,7 @@ public:
 
 private:
     void do_name(const string_view_type& name, 
-                 const serializing_context& context) override
+                 const streaming_context& context) override
     {
         member_name_ = name;
         if (member_name_ != "name")
@@ -125,7 +125,7 @@ private:
     }
 
     void do_string_value(const string_view_type& s, 
-                         const serializing_context& context) override
+                         const streaming_context& context) override
     {
         if (member_name_ == "name")
         {

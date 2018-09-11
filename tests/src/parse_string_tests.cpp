@@ -26,7 +26,7 @@ public:
 private:
     std::error_code value_;
 
-    bool do_error(std::error_code ec, const serializing_context&) JSONCONS_NOEXCEPT
+    bool do_error(std::error_code ec, const streaming_context&) JSONCONS_NOEXCEPT
     {
         return (ec != value_) ? true: false;
     }

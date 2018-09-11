@@ -128,7 +128,7 @@ enum class path_state
 template<class Json,
          class JsonReference=const Json&,
          class PathCons=PathConstructor<Json>>
-class jsonpath_evaluator : private serializing_context
+class jsonpath_evaluator : private streaming_context
 {
 private:
     typedef typename Json::char_type char_type;

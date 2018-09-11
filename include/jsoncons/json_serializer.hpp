@@ -302,7 +302,7 @@ private:
         writer_.flush();
     }
 
-    void do_begin_object(const serializing_context&) override
+    void do_begin_object(const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -347,7 +347,7 @@ private:
         writer_.put('{');
     }
 
-    void do_end_object(const serializing_context&) override
+    void do_end_object(const streaming_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -365,7 +365,7 @@ private:
     }
 
 
-    void do_begin_array(const serializing_context&) override
+    void do_begin_array(const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -434,7 +434,7 @@ private:
         }
     }
 
-    void do_end_array(const serializing_context&) override
+    bool do_end_array(const streaming_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -448,9 +448,10 @@ private:
         stack_.pop_back();
         writer_.put(']');
         end_value();
+        return true;
     }
 
-    void do_name(const string_view_type& name, const serializing_context&) override
+    void do_name(const string_view_type& name, const streaming_context&) override
     {
         if (!stack_.empty())
         {
@@ -477,7 +478,7 @@ private:
         }
     }
 
-    void do_null_value(const serializing_context&) override
+    void do_null_value(const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -490,7 +491,7 @@ private:
         end_value();
     }
 
-    void do_string_value(const string_view_type& value, const serializing_context&) override
+    void do_string_value(const string_view_type& value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -504,7 +505,7 @@ private:
         end_value();
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
+    void do_byte_string_value(const uint8_t* data, size_t length, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -544,7 +545,7 @@ private:
         end_value();
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    void do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -602,7 +603,7 @@ private:
         end_value();
     }
 
-    void do_double_value(double value, const floating_point_options& fmt, const serializing_context&) override
+    void do_double_value(double value, const floating_point_options& fmt, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -656,7 +657,7 @@ private:
         end_value();
     }
 
-    void do_integer_value(int64_t value, const serializing_context&) override
+    void do_integer_value(int64_t value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -666,7 +667,7 @@ private:
         end_value();
     }
 
-    void do_uinteger_value(uint64_t value, const serializing_context&) override
+    void do_uinteger_value(uint64_t value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -676,7 +677,7 @@ private:
         end_value();
     }
 
-    void do_bool_value(bool value, const serializing_context&) override
+    void do_bool_value(bool value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
