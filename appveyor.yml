@@ -2,7 +2,6 @@ version: '{build}'
 
 configuration:
 - Release
-- Debug
 
 environment:
   matrix:
@@ -48,12 +47,32 @@ install:
   - if "%COMPILER%"=="mingw" g++ --version
 
 before_build:
-  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" (del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets")
-  - if defined BINDIR (set "PATH=%BINDIR%;%PATH:C:\Program Files\Git\usr\bin;=%")
+  - cd tests/build
+  # Remove the following from the path, as it will interfere with
+  # the MinGW builds
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+  - if %platform%==msvc call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
+  - if %platform%==msvc cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%P%
+  - if %platform%==vs (
+      set "makecommand=Visual Studio"
+    )
+  - set "vcx=false"
+  - set "vcs=false"
+  - if %platform%==vs (
+      set "vcx=true"
+    )
+  - if %arch%==x64 (
+      set "makecommand=%makecommand% Win64"
+    )
+  - if %arch%==ARM (
+      set "makecommand=%makecommand% ARM"
+    )
+
   - cd tests/build/cmake
   - md build
   - cd build
-  - cmake .. -G "%GENERATOR%" -DCMAKE_CXX_FLAGS="%FLAGS%" -DCMAKE_IGNORE_PATH="C:/Program Files/Git/usr/bin"
+  - if %platform%==vs cmake .. -G "%makecommand%" -DCMAKE_INSTALL_PREFIX=%P%
+  # - cmake .. -G "%GENERATOR%" -DCMAKE_CXX_FLAGS="%FLAGS%" -DCMAKE_IGNORE_PATH="C:/Program Files/Git/usr/bin"
 
 build_script:
   - cmake --build . --config Release
