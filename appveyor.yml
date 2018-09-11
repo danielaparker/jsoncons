@@ -70,6 +70,12 @@ before_build:
   - if %platform%==vs (
       set "vcx=true"
     )
+  - if %vsversion%==2015 (
+      set "makecommand=%makecommand% 14 %vsversion%"
+    )
+  - if %vsversion%==2017 (
+      set "makecommand=%makecommand% 15 %vsversion%"
+    )
   - if %arch%==x64 (
       set "makecommand=%makecommand% Win64"
     )
