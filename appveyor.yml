@@ -82,7 +82,6 @@ before_build:
   - md build
   - cd build
   - if %platform%==vs cmake .. -G "%makecommand%" -DCMAKE_INSTALL_PREFIX=%P%
-  # - cmake .. -G "%GENERATOR%" -DCMAKE_CXX_FLAGS="%FLAGS%" -DCMAKE_IGNORE_PATH="C:/Program Files/Git/usr/bin"
 
 build_script:
   - cmake --build . --config Release
