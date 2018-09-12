@@ -201,11 +201,11 @@ private:
 
     bool do_name(const string_view_type& name, const streaming_context& context) override
     {
-        do_string_value(name,context);
+        do_string(name,context);
         return true;
     }
 
-    bool do_null_value(const streaming_context&) override
+    bool do_null(const streaming_context&) override
     {
         writer_.put(0xf6);
 
@@ -213,7 +213,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, const streaming_context&) override
+    bool do_string(const string_view_type& sv, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         std::basic_string<uint8_t> target;
@@ -265,7 +265,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_byte_string(const uint8_t* data, size_t length, const streaming_context&) override
     {
         std::vector<uint8_t> v;
 
@@ -308,7 +308,7 @@ private:
         return true;
     }
 
-    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_bignum(int signum, const uint8_t* data, size_t length, const streaming_context&) override
     {
         std::vector<uint8_t> v;
 
@@ -362,7 +362,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double value, const floating_point_options&, const streaming_context&) override
+    bool do_double(double value, const floating_point_options&, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         binary::to_big_endian(static_cast<uint8_t>(0xfb), v);
@@ -378,7 +378,7 @@ private:
         return true;
     }
 
-    bool do_integer_value(int64_t value, const streaming_context&) override
+    bool do_integer(int64_t value, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         if (value >= 0)
@@ -443,7 +443,7 @@ private:
         return true;
     }
 
-    bool do_uinteger_value(uint64_t value, const streaming_context&) override
+    bool do_uinteger(uint64_t value, const streaming_context&) override
     {
         std::vector<uint8_t> v;
         if (value <= 0x17)
@@ -474,7 +474,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, const streaming_context&) override
+    bool do_bool(bool value, const streaming_context&) override
     {
         if (value)
         {

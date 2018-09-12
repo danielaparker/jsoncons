@@ -54,23 +54,23 @@ line and column information is provided in the [context](streaming_context.md) p
 Sends the name part of a name-value pair inside an object. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter.  
 
-    void string_value(const string_view_type& value) 
-    void string_value(const string_view_type& value, const streaming_context& context) 
+    void write_string(const string_view_type& value) 
+    void write_string(const string_view_type& value, const streaming_context& context) 
 Sends a string value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void byte_string_value(const uint8_t* data, size_t length) 
-    void byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) 
+    void write_byte_string(const uint8_t* data, size_t length) 
+    void write_byte_string(const uint8_t* data, size_t length, const streaming_context& context) 
 Sends a byte string value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void byte_string_value(const std::vector<uint8_t>& v) 
-    void byte_string_value(const std::vector<uint8_t>& v, const streaming_context& context) 
+    void write_byte_string(const std::vector<uint8_t>& v) 
+    void write_byte_string(const std::vector<uint8_t>& v, const streaming_context& context) 
 Sends a byte string value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void bignum_value(int signum, const uint8_t* data, size_t length) 
-    void bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) 
+    void write_bignum(int signum, const uint8_t* data, size_t length) 
+    void write_bignum(int signum, const uint8_t* data, size_t length, const streaming_context& context) 
 Sends a bignum using the sign-magnitude representation. 
 The magnitude is an unsigned integer `n` encoded as a byte string data item in big-endian byte-order.
 If the value of signum is 1, the value of the bignum is `n`. 
@@ -78,43 +78,43 @@ If the value of signum is -1, the value of the bignum is `-1 - n`.
 An empty list means a zero value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void bignum_value(const string_view_type& s) 
-    void bignum_value(const string_view_type& s, const streaming_context& context) 
+    void write_bignum(const string_view_type& s) 
+    void write_bignum(const string_view_type& s, const streaming_context& context) 
 Sends a bignum using the decimal string representation of a bignum. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void integer_value(int64_t value) 
-    void integer_value(int64_t value, const streaming_context& context)
+    void write_integer(int64_t value) 
+    void write_integer(int64_t value, const streaming_context& context)
 Sends a signed integer value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void uinteger_value(uint64_t value) 
-    void uinteger_value(uint64_t value, const streaming_context& context)
+    void write_uinteger(uint64_t value) 
+    void write_uinteger(uint64_t value, const streaming_context& context)
 Sends a non-negative integer value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void double_value(double value) 
-    void double_value(double value, const streaming_context& context)
+    void write_double(double value) 
+    void write_double(double value, const streaming_context& context)
 Sends a floating point value with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void double_value(double value, uint8_t precision) 
-    void double_value(double value, uint8_t precision, const streaming_context& context)
+    void write_double(double value, uint8_t precision) 
+    void write_double(double value, uint8_t precision, const streaming_context& context)
 Sends a floating point value with specified precision. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void double_value(double value, const floating_point_options& fmt) 
-    void double_value(double value, const floating_point_options& fmt, const streaming_context& context)
+    void write_double(double value, const floating_point_options& fmt) 
+    void write_double(double value, const floating_point_options& fmt, const streaming_context& context)
 Sends a floating point value with specified precision. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void bool_value(bool value) 
-    void bool_value(bool value, const streaming_context& context) 
+    void write_bool(bool value) 
+    void write_bool(bool value, const streaming_context& context) 
 Sends a boolean value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    void null_value() 
-    void null_value(const streaming_context& context) 
+    void write_null() 
+    void write_null(const streaming_context& context) 
 Sends a null value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
@@ -151,16 +151,16 @@ line and column information is provided in the [context](streaming_context.md) p
 Receives the name part of a name-value pair inside an object. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter.  
 
-    virtual bool do_string_value(const string_view_type& val, 
+    virtual bool do_string(const string_view_type& val, 
                                  const streaming_context& context) = 0;
 Receives a string value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    virtual bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) = 0;
+    virtual bool do_byte_string(const uint8_t* data, size_t length, const streaming_context& context) = 0;
 Receives a byte string value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    virtual bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) = 0;
+    virtual bool do_bignum(int signum, const uint8_t* data, size_t length, const streaming_context& context) = 0;
 Receives a bignum using the sign-magnitude representation. 
 The magnitude is an unsigned integer `n` encoded as a byte string data item in big-endian byte-order.
 If the value of signum is 1, the value of the bignum is `n`. 
@@ -168,24 +168,24 @@ If the value of signum is -1, the value of the bignum is `-1 - n`.
 An empty list means a zero value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    virtual bool do_integer_value(int64_t value, const streaming_context& context) = 0;
+    virtual bool do_integer(int64_t value, const streaming_context& context) = 0;
 Receives a signed integer value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    virtual bool do_uinteger_value(uint64_t value, 
+    virtual bool do_uinteger(uint64_t value, 
                                    const streaming_context& context) = 0;
 Receives a non-negative integer value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    virtual bool do_double_value(double value, const floating_point_options& fmt, const streaming_context& context) = 0;
+    virtual bool do_double(double value, const floating_point_options& fmt, const streaming_context& context) = 0;
 Receives a floating point value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    virtual bool do_bool_value(bool value, const streaming_context& context) = 0;
+    virtual bool do_bool(bool value, const streaming_context& context) = 0;
 Receives a boolean value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 
-    virtual bool do_null_value(const streaming_context& context) = 0;
+    virtual bool do_null(const streaming_context& context) = 0;
 Receives a null value. Contextual information including
 line and column information is provided in the [context](streaming_context.md) parameter. 
 

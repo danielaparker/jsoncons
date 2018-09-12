@@ -109,217 +109,348 @@ public:
         return do_name(name, context);
     }
 
-    bool string_value(const string_view_type& value) 
+    bool write_string(const string_view_type& value) 
     {
-        return do_string_value(value, null_streaming_context());
+        return do_string(value, null_streaming_context());
     }
 
-    bool string_value(const string_view_type& value, const streaming_context& context) 
+    bool write_string(const string_view_type& value, const streaming_context& context) 
     {
-        return do_string_value(value, context);
+        return do_string(value, context);
     }
 
-    bool byte_string_value(const uint8_t* data, size_t length) 
+    bool write_byte_string(const uint8_t* data, size_t length) 
     {
-        return do_byte_string_value(data, length, null_streaming_context());
+        return do_byte_string(data, length, null_streaming_context());
     }
 
-    bool byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) 
+    bool write_byte_string(const uint8_t* data, size_t length, const streaming_context& context) 
     {
-        return do_byte_string_value(data, length, context);
+        return do_byte_string(data, length, context);
     }
 
-    bool byte_string_value(const std::vector<uint8_t>& v) 
+    bool write_byte_string(const std::vector<uint8_t>& v) 
     {
-        return do_byte_string_value(v.data(), v.size(), null_streaming_context());
+        return do_byte_string(v.data(), v.size(), null_streaming_context());
     }
 
-    bool byte_string_value(const std::vector<uint8_t>& v, const streaming_context& context) 
+    bool write_byte_string(const std::vector<uint8_t>& v, const streaming_context& context) 
     {
-        return do_byte_string_value(v.data(), v.size(), context);
+        return do_byte_string(v.data(), v.size(), context);
     }
 
-    bool bignum_value(int signum, const uint8_t* data, size_t length) 
+    bool write_bignum(int signum, const uint8_t* data, size_t length) 
     {
-        return do_bignum_value(signum, data, length, null_streaming_context());
+        return do_bignum(signum, data, length, null_streaming_context());
     }
 
-    bool bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) 
+    bool write_bignum(int signum, const uint8_t* data, size_t length, const streaming_context& context) 
     {
-        return do_bignum_value(signum, data, length, context);
+        return do_bignum(signum, data, length, context);
     }
 
-    bool bignum_value(const string_view_type& s) 
+    bool write_bignum(const string_view_type& s) 
     {
         bignum n(s.data(),s.size());
         int signum;
         std::vector<uint8_t> v;
         n.dump(signum, v);
 
-        return do_bignum_value(signum, v.data(), v.size(), null_streaming_context());
+        return do_bignum(signum, v.data(), v.size(), null_streaming_context());
     }
 
-    bool bignum_value(const string_view_type& s, const streaming_context& context) 
+    bool write_bignum(const string_view_type& s, const streaming_context& context) 
     {
         bignum n(s.data(),s.size());
         int signum;
         std::vector<uint8_t> v;
         n.dump(signum, v);
 
-        return do_bignum_value(signum, v.data(), v.size(), context);
+        return do_bignum(signum, v.data(), v.size(), context);
     }
 
-    bool integer_value(int64_t value)
+    bool write_integer(int64_t value)
     {
-        return do_integer_value(value,null_streaming_context());
+        return do_integer(value,null_streaming_context());
     }
 
-    bool integer_value(int64_t value, const streaming_context& context)
+    bool write_integer(int64_t value, const streaming_context& context)
     {
-        return do_integer_value(value,context);
+        return do_integer(value,context);
     }
 
-    bool uinteger_value(uint64_t value)
+    bool write_uinteger(uint64_t value)
     {
-        return do_uinteger_value(value,null_streaming_context());
+        return do_uinteger(value,null_streaming_context());
     }
 
-    bool uinteger_value(uint64_t value, const streaming_context& context)
+    bool write_uinteger(uint64_t value, const streaming_context& context)
     {
-        return do_uinteger_value(value,context);
+        return do_uinteger(value,context);
     }
 
-    bool double_value(double value)
+    bool write_double(double value)
     {
-        return do_double_value(value, floating_point_options(), null_streaming_context());
+        return do_double(value, floating_point_options(), null_streaming_context());
     }
 
-    bool double_value(double value, uint8_t precision)
+    bool write_double(double value, uint8_t precision)
     {
-        return do_double_value(value, floating_point_options(chars_format::general, precision), null_streaming_context());
+        return do_double(value, floating_point_options(chars_format::general, precision), null_streaming_context());
     }
 
-    bool double_value(double value, const floating_point_options& fmt)
+    bool write_double(double value, const floating_point_options& fmt)
     {
-        return do_double_value(value, fmt, null_streaming_context());
+        return do_double(value, fmt, null_streaming_context());
     }
 
-    bool double_value(double value, const streaming_context& context)
+    bool write_double(double value, const streaming_context& context)
     {
-        return do_double_value(value, floating_point_options(), context);
+        return do_double(value, floating_point_options(), context);
     }
 
-    bool double_value(double value, uint8_t precision, const streaming_context& context)
+    bool write_double(double value, uint8_t precision, const streaming_context& context)
     {
-        return do_double_value(value, floating_point_options(chars_format::general, precision), context);
+        return do_double(value, floating_point_options(chars_format::general, precision), context);
     }
 
-    bool double_value(double value, const floating_point_options& fmt, const streaming_context& context)
+    bool write_double(double value, const floating_point_options& fmt, const streaming_context& context)
     {
-        return do_double_value(value, fmt, context);
+        return do_double(value, fmt, context);
     }
 
-    bool bool_value(bool value) 
+    bool write_bool(bool value) 
     {
-        return do_bool_value(value,null_streaming_context());
+        return do_bool(value,null_streaming_context());
     }
 
-    bool bool_value(bool value, const streaming_context& context) 
+    bool write_bool(bool value, const streaming_context& context) 
     {
-        return do_bool_value(value,context);
+        return do_bool(value,context);
     }
 
-    bool null_value() 
+    bool write_null() 
     {
-        return do_null_value(null_streaming_context());
+        return do_null(null_streaming_context());
     }
 
-    bool null_value(const streaming_context& context) 
+    bool write_null(const streaming_context& context) 
     {
-        return do_null_value(context);
+        return do_null(context);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    bool begin_json()
+    void begin_json()
     {
-        return do_begin_document();
+        begin_document();
     }
 
-    bool end_json()
+    void end_json()
     {
-        return do_end_document();
+        end_document();
     }
 
-    bool write_name(const CharT* p, size_t length, const streaming_context& context) 
+    void name(const CharT* p, size_t length, const streaming_context& context) 
     {
-        return do_name(string_view_type(p, length), context);
+        write_name(string_view_type(p, length), context);
     }
 
-    bool value(const std::basic_string<CharT>& value, const streaming_context& context) 
+    void value(const std::basic_string<CharT>& value, const streaming_context& context) 
     {
-        return do_string_value(value, context);
+        write_string(value, context);
     }
 
-    bool value(const CharT* p, size_t length, const streaming_context& context) 
+    void value(const CharT* p, size_t length, const streaming_context& context) 
     {
-        return do_string_value(string_view_type(p, length), context);
+        write_string(string_view_type(p, length), context);
     }
 
-    bool value(const CharT* p, const streaming_context& context)
+    void value(const CharT* p, const streaming_context& context)
     {
-        return do_string_value(string_view_type(p), context);
+        write_string(string_view_type(p), context);
     }
 
-    bool value(int value, const streaming_context& context) 
+    void value(int value, const streaming_context& context) 
     {
-        return do_integer_value(value,context);
+        write_integer(value,context);
     }
 
-    bool value(long value, const streaming_context& context) 
+    void value(long value, const streaming_context& context) 
     {
-        return do_integer_value(value,context);
+        write_integer(value,context);
     }
 
-    bool value(long long value, const streaming_context& context) 
+    void value(long long value, const streaming_context& context) 
     {
-        return do_integer_value(value,context);
+        write_integer(value,context);
     }
 
-    bool value(unsigned int value, const streaming_context& context) 
+    void value(unsigned int value, const streaming_context& context) 
     {
-        return do_uinteger_value(value,context);
+        write_uinteger(value,context);
     }
 
-    bool value(unsigned long value, const streaming_context& context) 
+    void value(unsigned long value, const streaming_context& context) 
     {
-        return do_uinteger_value(value,context);
+        write_uinteger(value,context);
     }
 
-    bool value(unsigned long long value, const streaming_context& context) 
+    void value(unsigned long long value, const streaming_context& context) 
     {
-        return do_uinteger_value(value,context);
+        write_uinteger(value,context);
     }
 
-    bool value(float value, uint8_t precision, const streaming_context& context)
+    void value(float value, uint8_t precision, const streaming_context& context)
     {
-        return do_double_value(value, floating_point_options(chars_format::general, precision), context);
+        write_double(value, precision, context);
     }
 
-    bool value(double value, uint8_t precision, const streaming_context& context)
+    void value(double value, uint8_t precision, const streaming_context& context)
     {
-        return do_double_value(value, floating_point_options(chars_format::general, precision), context);
+        write_double(value, precision, context);
     }
 
-    bool value(bool value, const streaming_context& context) 
+    void value(bool value, const streaming_context& context) 
     {
-        return do_bool_value(value,context);
+        write_bool(value,context);
     }
 
     bool value(null_type, const streaming_context& context)
     {
-        return do_null_value(context);
+        return write_null(context);
     }
+
+    void name(const string_view_type& name)
+    {
+        write_name(name);
+    }
+
+    void name(const string_view_type& name, const streaming_context& context)
+    {
+        write_name(name, context);
+    }
+
+    void string_value(const string_view_type& value) 
+    {
+        write_string(value);
+    }
+
+    void string_value(const string_view_type& value, const streaming_context& context) 
+    {
+        write_string(value, context);
+    }
+
+    void byte_string_value(const uint8_t* data, size_t length) 
+    {
+        write_byte_string(data, length);
+    }
+
+    void byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) 
+    {
+        write_byte_string(data, length, context);
+    }
+
+    void byte_string_value(const std::vector<uint8_t>& v) 
+    {
+        write_byte_string(v);
+    }
+
+    void byte_string_value(const std::vector<uint8_t>& v, const streaming_context& context) 
+    {
+        write_byte_string(v, context);
+    }
+
+    void bignum_value(int signum, const uint8_t* data, size_t length) 
+    {
+        write_bignum(signum, data, length);
+    }
+
+    void bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) 
+    {
+        write_bignum(signum, data, length, context);
+    }
+
+    void bignum_value(const string_view_type& s) 
+    {
+        write_bignum(s);
+    }
+
+    void bignum_value(const string_view_type& s, const streaming_context& context) 
+    {
+        write_bignum(s, context);
+    }
+
+    void integer_value(int64_t value)
+    {
+        write_integer(value);
+    }
+
+    void integer_value(int64_t value, const streaming_context& context)
+    {
+        write_integer(value,context);
+    }
+
+    void uinteger_value(uint64_t value)
+    {
+        write_uinteger(value);
+    }
+
+    void uinteger_value(uint64_t value, const streaming_context& context)
+    {
+        write_uinteger(value,context);
+    }
+
+    void double_value(double value)
+    {
+        write_double(value);
+    }
+
+    void double_value(double value, uint8_t precision)
+    {
+        write_double(value, precision);
+    }
+
+    void double_value(double value, const floating_point_options& fmt)
+    {
+        write_double(value, fmt);
+    }
+
+    void double_value(double value, const streaming_context& context)
+    {
+        write_double(value, context);
+    }
+
+    void double_value(double value, uint8_t precision, const streaming_context& context)
+    {
+        write_double(value, precision, context);
+    }
+
+    void double_value(double value, const floating_point_options& fmt, const streaming_context& context)
+    {
+        write_double(value, fmt, context);
+    }
+
+    void bool_value(bool value) 
+    {
+        write_bool(value);
+    }
+
+    void bool_value(bool value, const streaming_context& context) 
+    {
+        write_bool(value, context);
+    }
+
+    void null_value() 
+    {
+        write_null();
+    }
+
+    void null_value(const streaming_context& context) 
+    {
+        write_null(context);
+    }
+
 #endif
 
 private:
@@ -347,21 +478,21 @@ private:
 
     virtual bool do_name(const string_view_type& name, const streaming_context& context) = 0;
 
-    virtual bool do_null_value(const streaming_context& context) = 0;
+    virtual bool do_null(const streaming_context& context) = 0;
 
-    virtual bool do_string_value(const string_view_type& value, const streaming_context& context) = 0;
+    virtual bool do_string(const string_view_type& value, const streaming_context& context) = 0;
 
-    virtual bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) = 0;
+    virtual bool do_byte_string(const uint8_t* data, size_t length, const streaming_context& context) = 0;
 
-    virtual bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) = 0;
+    virtual bool do_bignum(int signum, const uint8_t* data, size_t length, const streaming_context& context) = 0;
 
-    virtual bool do_double_value(double value, const floating_point_options& fmt, const streaming_context& context) = 0;
+    virtual bool do_double(double value, const floating_point_options& fmt, const streaming_context& context) = 0;
 
-    virtual bool do_integer_value(int64_t value, const streaming_context& context) = 0;
+    virtual bool do_integer(int64_t value, const streaming_context& context) = 0;
 
-    virtual bool do_uinteger_value(uint64_t value, const streaming_context& context) = 0;
+    virtual bool do_uinteger(uint64_t value, const streaming_context& context) = 0;
 
-    virtual bool do_bool_value(bool value, const streaming_context& context) = 0;
+    virtual bool do_bool(bool value, const streaming_context& context) = 0;
 };
 
 template <class CharT>
@@ -405,42 +536,42 @@ private:
         return true;
     }
 
-    bool do_null_value(const streaming_context&) override
+    bool do_null(const streaming_context&) override
     {
         return true;
     }
 
-    bool do_string_value(const string_view_type&, const streaming_context&) override
+    bool do_string(const string_view_type&, const streaming_context&) override
     {
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t*, size_t, const streaming_context&) override
+    bool do_byte_string(const uint8_t*, size_t, const streaming_context&) override
     {
         return true;
     }
 
-    bool do_bignum_value(int, const uint8_t*, size_t, const streaming_context&) override
+    bool do_bignum(int, const uint8_t*, size_t, const streaming_context&) override
     {
         return true;
     }
 
-    bool do_double_value(double, const floating_point_options&, const streaming_context&) override
+    bool do_double(double, const floating_point_options&, const streaming_context&) override
     {
         return true;
     }
 
-    bool do_integer_value(int64_t, const streaming_context&) override
+    bool do_integer(int64_t, const streaming_context&) override
     {
         return true;
     }
 
-    bool do_uinteger_value(uint64_t, const streaming_context&) override
+    bool do_uinteger(uint64_t, const streaming_context&) override
     {
         return true;
     }
 
-    bool do_bool_value(bool, const streaming_context&) override
+    bool do_bool(bool, const streaming_context&) override
     {
         return true;
     }

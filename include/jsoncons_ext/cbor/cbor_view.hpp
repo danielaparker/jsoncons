@@ -637,13 +637,13 @@ public:
             case cbor_major_type::unsigned_integer:
             {
                 uint64_t value = as_uinteger();
-                handler.uinteger_value(value);
+                handler.write_uinteger(value);
                 break;
             }
             case cbor_major_type::negative_integer:
             {
                 int64_t value = as_integer();
-                handler.integer_value(value);
+                handler.write_integer(value);
                 break;
             }
             case cbor_major_type::byte_string:
@@ -654,7 +654,7 @@ public:
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
                 }
-                handler.byte_string_value(s.data(), s.size());
+                handler.write_byte_string(s.data(), s.size());
                 break;
             }
             case cbor_major_type::text_string:
@@ -665,7 +665,7 @@ public:
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
                 }
-                handler.string_value(s);
+                handler.write_string(s);
                 break;
             }
             case cbor_major_type::array:
@@ -726,7 +726,7 @@ public:
                     {
                         JSONCONS_THROW(cbor_decode_error(0));
                     }
-                    handler.bignum_value(1, v.data(), v.size());
+                    handler.write_bignum(1, v.data(), v.size());
                 }
                 else if (tag == 3)
                 {
@@ -736,7 +736,7 @@ public:
                     {
                         JSONCONS_THROW(cbor_decode_error(0));
                     }
-                    handler.bignum_value(-1, v.data(), v.size());
+                    handler.write_bignum(-1, v.data(), v.size());
                 }
                 break;
             }
@@ -745,20 +745,20 @@ public:
                 switch (type())
                 {
                     case 0xf5:
-                        handler.bool_value(true);
+                        handler.write_bool(true);
                         break;
                     case 0xf4:
-                        handler.bool_value(false);
+                        handler.write_bool(false);
                         break;
                     case 0xf6:
-                        handler.null_value();
+                        handler.write_null();
                         break;
                     case 0xf9:
                     case 0xfa:
                     case 0xfb:
                     {
                         double value = as_double();
-                        handler.double_value(value);
+                        handler.write_double(value);
                         break;
                     }
                     default:

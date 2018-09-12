@@ -97,7 +97,7 @@ private:
         other_handler_.write_name(target, context);
     }
 
-    bool do_string_value(const string_view_type& value, const streaming_context& context) override
+    bool do_string(const string_view_type& value, const streaming_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -107,32 +107,32 @@ private:
         {
             throw parse_error(result.ec,context.line_number(),context.column_number());
         }
-        other_handler_.string_value(target, context);
+        other_handler_.write_string(target, context);
     }
 
-    bool do_integer_value(int64_t value, const streaming_context& context) override
+    bool do_integer(int64_t value, const streaming_context& context) override
     {
-        other_handler_.integer_value(value, context);
+        other_handler_.write_integer(value, context);
     }
 
-    bool do_uinteger_value(uint64_t value, const streaming_context& context) override
+    bool do_uinteger(uint64_t value, const streaming_context& context) override
     {
-        other_handler_.uinteger_value(value, context);
+        other_handler_.write_uinteger(value, context);
     }
 
-    bool do_double_value(double value, const floating_point_options& fmt, const streaming_context& context) override
+    bool do_double(double value, const floating_point_options& fmt, const streaming_context& context) override
     {
-        other_handler_.double_value(value, fmt, context);
+        other_handler_.write_double(value, fmt, context);
     }
 
-    bool do_bool_value(bool value, const streaming_context& context) override
+    bool do_bool(bool value, const streaming_context& context) override
     {
-        other_handler_.bool_value(value, context);
+        other_handler_.write_bool(value, context);
     }
 
-    bool do_null_value(const streaming_context& context) override
+    bool do_null(const streaming_context& context) override
     {
-        other_handler_.null_value(context);
+        other_handler_.write_null(context);
     }
 };
 

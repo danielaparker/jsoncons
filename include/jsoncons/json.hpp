@@ -2740,39 +2740,39 @@ public:
         {
             case json_major_type::short_string_t:
             case json_major_type::long_string_t:
-                handler.string_value(as_string_view());
+                handler.write_string(as_string_view());
                 break;
             case json_major_type::byte_string_t:
                 switch (var_.byte_string_data_cast()->minor_type())
                 {
                     case json_minor_type::negative_bignum_t:
-                        handler.bignum_value(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                        handler.write_bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                         break;
                     case json_minor_type::positive_bignum_t:
-                        handler.bignum_value(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                        handler.write_bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                         break;
                     default:
-                        handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                        handler.write_byte_string(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
                         break;
                 }
                 break;
             case json_major_type::double_t:
-                handler.double_value(var_.double_data_cast()->value(), 
+                handler.write_double(var_.double_data_cast()->value(), 
                                      floating_point_options(var_.double_data_cast()->format(),
                                                             var_.double_data_cast()->precision(), 
                                                             var_.double_data_cast()->decimal_places()));
                 break;
             case json_major_type::integer_t:
-                handler.integer_value(var_.integer_data_cast()->value());
+                handler.write_integer(var_.integer_data_cast()->value());
                 break;
             case json_major_type::uinteger_t:
-                handler.uinteger_value(var_.uinteger_data_cast()->value());
+                handler.write_uinteger(var_.uinteger_data_cast()->value());
                 break;
             case json_major_type::bool_t:
-                handler.bool_value(var_.bool_data_cast()->value());
+                handler.write_bool(var_.bool_data_cast()->value());
                 break;
             case json_major_type::null_t:
-                handler.null_value();
+                handler.write_null();
                 break;
             case json_major_type::empty_object_t:
                 handler.begin_object(0);

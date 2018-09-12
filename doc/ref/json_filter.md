@@ -107,6 +107,8 @@ using namespace jsoncons;
 
 class name_fix_up_filter : public json_filter
 {
+    std::string member_name_;
+
 public:
     name_fix_up_filter(json_content_handler& handler)
         : json_filter(handler)
@@ -122,9 +124,10 @@ private:
         {
             this->downstream_handler().write_name(name, context);
         }
+        return true;
     }
 
-    bool do_string_value(const string_view_type& s, 
+    bool do_string(const string_view_type& s, 
                          const streaming_context& context) override
     {
         if (member_name_ == "name")
@@ -151,9 +154,8 @@ private:
         {
             this->downstream_handler().value(s, context);
         }
+        return true;
     }
-
-    std::string member_name_;
 };
 ```
 Configure a [rename_object_member_filter](rename_object_member_filter.md) to emit json events to a [json_serializer](json_serializer.md). 

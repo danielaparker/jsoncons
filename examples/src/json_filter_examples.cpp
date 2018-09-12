@@ -25,9 +25,10 @@ private:
         {
             this->downstream_handler().write_name(name, context);
         }
+        return true;
     }
 
-    bool do_string_value(const string_view_type& s, 
+    bool do_string(const string_view_type& s, 
                          const streaming_context& context) override
     {
         if (member_name_ == "name")
@@ -36,12 +37,12 @@ private:
             size_t start_last = s.find_first_not_of(" \t", end_first);
             this->downstream_handler().write_name("first-name", context);
             string_view_type first = s.substr(0, end_first);
-            this->downstream_handler().string_value(first, context);
+            this->downstream_handler().write_string(first, context);
             if (start_last != string_view_type::npos)
             {
                 this->downstream_handler().write_name("last-name", context);
                 string_view_type last = s.substr(start_last);
-                this->downstream_handler().string_value(last, context);
+                this->downstream_handler().write_string(last, context);
             }
             else
             {
@@ -52,8 +53,9 @@ private:
         }
         else
         {
-            this->downstream_handler().string_value(s, context);
+            this->downstream_handler().write_string(s, context);
         }
+        return true;
     }
 
     std::string member_name_;

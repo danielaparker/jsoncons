@@ -72,9 +72,9 @@ namespace jsoncons
         {
             handler.begin_object();
             handler.write_name("Name");
-            handler.string_value(val->name());
+            handler.write_string(val->name());
             handler.write_name("Pay");
-            handler.double_value(val->calculatePay());
+            handler.write_double(val->calculatePay());
             handler.end_object();
         }
     };

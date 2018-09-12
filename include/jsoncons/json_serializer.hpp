@@ -484,7 +484,7 @@ private:
         return true;
     }
 
-    bool do_null_value(const streaming_context&) override
+    bool do_null(const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -498,7 +498,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& value, const streaming_context&) override
+    bool do_string(const string_view_type& value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -513,7 +513,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_byte_string(const uint8_t* data, size_t length, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -554,7 +554,7 @@ private:
         return true;
     }
 
-    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_bignum(int signum, const uint8_t* data, size_t length, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -613,7 +613,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double value, const floating_point_options& fmt, const streaming_context&) override
+    bool do_double(double value, const floating_point_options& fmt, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -668,7 +668,7 @@ private:
         return true;
     }
 
-    bool do_integer_value(int64_t value, const streaming_context&) override
+    bool do_integer(int64_t value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -679,7 +679,7 @@ private:
         return true;
     }
 
-    bool do_uinteger_value(uint64_t value, const streaming_context&) override
+    bool do_uinteger(uint64_t value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -690,7 +690,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, const streaming_context&) override
+    bool do_bool(bool value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {

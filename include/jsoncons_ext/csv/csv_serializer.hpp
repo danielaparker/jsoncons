@@ -246,7 +246,7 @@ private:
         return true;
     }
 
-    bool do_null_value(const streaming_context&) override
+    bool do_null(const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -257,20 +257,20 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::detail::string_writer<CharT> bo(s);
-                    do_null_value(bo);
+                    do_null(bo);
                     bo.flush();
                     it->second = s;
                 }
             }
             else
             {
-                do_null_value(writer_);
+                do_null(writer_);
             }
         }
         return true;
     }
 
-    bool do_string_value(const string_view_type& val, const streaming_context&) override
+    bool do_string(const string_view_type& val, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -294,24 +294,24 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) override
+    bool do_byte_string(const uint8_t* data, size_t length, const streaming_context& context) override
     {
         std::basic_string<CharT> s;
         encode_base64url(data,length,s);
-        do_string_value(s,context);
+        do_string(s,context);
         return true;
     }
 
-    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) override
+    bool do_bignum(int signum, const uint8_t* data, size_t length, const streaming_context& context) override
     {
         bignum n = bignum(signum, data, length);
         std::basic_string<CharT> s;
         n.dump(s);
-        do_string_value(s,context);
+        do_string(s,context);
         return true;
     }
 
-    bool do_double_value(double val, const floating_point_options& fmt, const streaming_context&) override
+    bool do_double(double val, const floating_point_options& fmt, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -335,7 +335,7 @@ private:
         return true;
     }
 
-    bool do_integer_value(int64_t val, const streaming_context&) override
+    bool do_integer(int64_t val, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -359,7 +359,7 @@ private:
         return true;
     }
 
-    bool do_uinteger_value(uint64_t val, const streaming_context&) override
+    bool do_uinteger(uint64_t val, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -383,7 +383,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, const streaming_context&) override
+    bool do_bool(bool val, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -488,7 +488,7 @@ private:
     }
 
     template <class AnyWriter>
-    bool do_null_value(AnyWriter& writer) 
+    bool do_null(AnyWriter& writer) 
     {
         begin_value(writer);
         writer.write(jsoncons::detail::null_literal<CharT>().data(), 
