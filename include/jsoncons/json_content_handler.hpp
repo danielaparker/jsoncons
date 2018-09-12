@@ -499,7 +499,7 @@ template <class CharT>
 class basic_null_json_content_handler final : public basic_json_content_handler<CharT>
 {
 public:
-    using typename basic_json_content_handler<CharT>::string_view_type                                 ;
+    using typename basic_json_content_handler<CharT>::string_view_type;
 private:
     void do_begin_document() override
     {

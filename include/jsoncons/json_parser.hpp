@@ -446,6 +446,11 @@ public:
         nesting_depth_ = 0;
     }
 
+    void restart()
+    {
+        continue_ = true;
+    }
+
     void check_done()
     {
         std::error_code ec;
