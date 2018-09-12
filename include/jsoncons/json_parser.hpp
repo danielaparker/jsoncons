@@ -516,7 +516,7 @@ public:
                 break;
             case parse_state::start: 
                 {
-                    continue_ = handler_.begin_document();
+                    handler_.begin_document();
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:

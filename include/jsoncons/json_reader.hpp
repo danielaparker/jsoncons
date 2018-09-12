@@ -54,12 +54,12 @@ public:
 
 private:
 
-    bool do_begin_document() override
+    void do_begin_document() override
     {
         other_handler_.begin_document();
     }
 
-    bool do_end_document() override
+    void do_end_document() override
     {
         other_handler_.end_document();
     }

@@ -71,9 +71,9 @@ int main()
     bserializer.begin_document();
     bserializer.begin_array(); // indefinite length array
     bserializer.begin_array(3); // fixed length array
-    bserializer.string_value("Toronto");
-    bserializer.byte_string_value({'H','e','l','l','o'});
-    bserializer.bignum_value("-18446744073709551617");
+    bserializer.write_string("Toronto");
+    bserializer.write_byte_string({'H','e','l','l','o'});
+    bserializer.write_bignum("-18446744073709551617");
     bserializer.end_array();
     bserializer.end_array();
     bserializer.end_document();
@@ -489,7 +489,7 @@ Instructions for building the examples with CMake may be found in
 
  Compiler     | Versions      | Operating System
 --------------|---------------|-----------------
- VS           | 14.0, 15.0    | Windows 10       
+ VS           | vs2015, vs2017+| Windows 10       
  g++-         | 4.8, 6, 7,8   | Ubuntu           
  clang        | 3.8, 5.0. 6.0 |
 

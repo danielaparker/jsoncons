@@ -118,15 +118,13 @@ private:
         }
     }
 
-    bool do_begin_document() override
+    void do_begin_document() override
     {
-        return true;
     }
 
-    bool do_end_document() override
+    void do_end_document() override
     {
         writer_.flush();
-        return true;
     }
 
     bool do_begin_object(const streaming_context&) override
