@@ -2218,7 +2218,7 @@ private:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                handler_.write_name(basic_string_view<char>(s.data(),s.length()), *this);
             }
             break;
         default:

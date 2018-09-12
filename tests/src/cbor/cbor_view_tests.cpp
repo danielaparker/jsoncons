@@ -282,9 +282,9 @@ TEST_CASE("test_indefinite_length_object_iterator")
     cbor::cbor_bytes_serializer serializer2(b2);
     serializer2.begin_document();
     serializer2.begin_object(); // indefinite length object
-    serializer2.name("City");
+    serializer2.write_name("City");
     serializer2.string_value("Toronto");
-    serializer2.name("Province");
+    serializer2.write_name("Province");
     serializer2.string_value("Ontario");
     serializer2.end_object(); 
     serializer2.end_document();

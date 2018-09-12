@@ -208,7 +208,7 @@ public:
                 {
                     if (column_index_ < column_names_.size() + offset_)
                     {
-                        handler_.name(column_names_[column_index_ - offset_], *this);
+                        handler_.write_name(column_names_[column_index_ - offset_], *this);
                     }
                 }
                 break;
@@ -667,7 +667,7 @@ all_csv_states:
             handler_.begin_object(*this);
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
-                handler_.name(column_names_[i],*this);
+                handler_.write_name(column_names_[i],*this);
                 decoders_[i].end_array(*this);
                 decoders_[i].end_document();
                 decoders_[i].get_result().dump_fragment(fragment_filter);

@@ -701,7 +701,7 @@ public:
                     {
                         JSONCONS_THROW(cbor_decode_error(last_-it));
                     }
-                    handler.name(key);
+                    handler.write_name(key);
                     it = endp;
                     detail::walk(it, last_, &endp);
                     if (endp == it)

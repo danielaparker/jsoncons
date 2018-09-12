@@ -64,7 +64,6 @@ TEST_CASE("test_read_invalid_value")
     test_json_reader_ec(jtext, jsoncons::json_parse_errc::expected_value);
 }
 
-
 TEST_CASE("test_read_unexpected_end_of_file")
 {
     std::string jtext = R"({"field1":{})";    
@@ -72,6 +71,7 @@ TEST_CASE("test_read_unexpected_end_of_file")
     test_json_reader_error(jtext, jsoncons::json_parse_errc::unexpected_eof);
     test_json_reader_ec(jtext, jsoncons::json_parse_errc::unexpected_eof);
 }
+
 
 TEST_CASE("test_read_value_not_found")
 {

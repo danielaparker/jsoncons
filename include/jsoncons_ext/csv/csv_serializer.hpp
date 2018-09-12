@@ -118,21 +118,24 @@ private:
         }
     }
 
-    void do_begin_document() override
+    bool do_begin_document() override
     {
+        return true;
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
         writer_.flush();
+        return true;
     }
 
-    void do_begin_object(const streaming_context&) override
+    bool do_begin_object(const streaming_context&) override
     {
         stack_.push_back(stack_item(true));
+        return true;
     }
 
-    void do_end_object(const streaming_context&) override
+    bool do_end_object(const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -168,9 +171,10 @@ private:
         stack_.pop_back();
 
         end_value();
+        return true;
     }
 
-    void do_begin_array(const streaming_context&) override
+    bool do_begin_array(const streaming_context&) override
     {
         stack_.push_back(stack_item(false));
         if (stack_.size() == 2)
@@ -192,6 +196,7 @@ private:
                 }
             }
         }
+        return true;
     }
 
     bool do_end_array(const streaming_context&) override
@@ -207,7 +212,7 @@ private:
         return true;
     }
 
-    void do_name(const string_view_type& name, const streaming_context&) override
+    bool do_name(const string_view_type& name, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -218,10 +223,11 @@ private:
                 column_names_.push_back(string_type(name));
             }
         }
+        return true;
     }
 
     template <class AnyWriter>
-    void write_string(const CharT* s, size_t length, AnyWriter& writer)
+    bool write_string(const CharT* s, size_t length, AnyWriter& writer)
     {
         bool quote = false;
         if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
@@ -237,9 +243,10 @@ private:
             writer.put(parameters_.quote_char());
         }
 
+        return true;
     }
 
-    void do_null_value(const streaming_context&) override
+    bool do_null_value(const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -260,9 +267,10 @@ private:
                 do_null_value(writer_);
             }
         }
+        return true;
     }
 
-    void do_string_value(const string_view_type& val, const streaming_context&) override
+    bool do_string_value(const string_view_type& val, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -283,24 +291,27 @@ private:
                 value(val,writer_);
             }
         }
+        return true;
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) override
     {
         std::basic_string<CharT> s;
         encode_base64url(data,length,s);
         do_string_value(s,context);
+        return true;
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) override
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) override
     {
         bignum n = bignum(signum, data, length);
         std::basic_string<CharT> s;
         n.dump(s);
         do_string_value(s,context);
+        return true;
     }
 
-    void do_double_value(double val, const floating_point_options& fmt, const streaming_context&) override
+    bool do_double_value(double val, const floating_point_options& fmt, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -321,9 +332,10 @@ private:
                 value(val, fmt, writer_);
             }
         }
+        return true;
     }
 
-    void do_integer_value(int64_t val, const streaming_context&) override
+    bool do_integer_value(int64_t val, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -344,9 +356,10 @@ private:
                 value(val,writer_);
             }
         }
+        return true;
     }
 
-    void do_uinteger_value(uint64_t val, const streaming_context&) override
+    bool do_uinteger_value(uint64_t val, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -367,9 +380,10 @@ private:
                 value(val,writer_);
             }
         }
+        return true;
     }
 
-    void do_bool_value(bool val, const streaming_context&) override
+    bool do_bool_value(bool val, const streaming_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -390,6 +404,7 @@ private:
                 value(val,writer_);
             }
         }
+        return true;
     }
 
     template <class AnyWriter>
@@ -473,13 +488,13 @@ private:
     }
 
     template <class AnyWriter>
-    void do_null_value(AnyWriter& writer) 
+    bool do_null_value(AnyWriter& writer) 
     {
         begin_value(writer);
         writer.write(jsoncons::detail::null_literal<CharT>().data(), 
                      jsoncons::detail::null_literal<CharT>().length());
         end_value();
-
+        return true;
     }
 
     template <class AnyWriter>

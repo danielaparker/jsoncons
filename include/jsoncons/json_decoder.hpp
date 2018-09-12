@@ -149,15 +149,16 @@ private:
         stack_offsets_.pop_back();
     }
 
-    void do_begin_document() override
+    bool do_begin_document() override
     {
         stack_offsets_.clear();
         stack_.clear();
         stack_offsets_.push_back({0,false});
         is_valid_ = false;
+        return true;
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
         if (stack_.size() == 1)
         {
@@ -165,22 +166,26 @@ private:
             stack_.pop_back();
             is_valid_ = true;
         }
+        return true;
     }
 
-    void do_begin_object(const streaming_context&) override
+    bool do_begin_object(const streaming_context&) override
     {
         push_object();
+        return true;
     }
 
-    void do_end_object(const streaming_context&) override
+    bool do_end_object(const streaming_context&) override
     {
         end_structure();
         pop_object();
+        return true;
     }
 
-    void do_begin_array(const streaming_context&) override
+    bool do_begin_array(const streaming_context&) override
     {
         push_array();
+        return true;
     }
 
     bool do_end_array(const streaming_context&) override
@@ -218,12 +223,13 @@ private:
         }
     }
 
-    void do_name(const string_view_type& name, const streaming_context&) override
+    bool do_name(const string_view_type& name, const streaming_context&) override
     {
         stack_.push_back(key_storage_type(name.begin(),name.end(),string_allocator_));
+        return true;
     }
 
-    void do_string_value(const string_view_type& val, const streaming_context&) override
+    bool do_string_value(const string_view_type& val, const streaming_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -233,9 +239,10 @@ private:
         {
             stack_.push_back(Json(val.data(),val.length(),string_allocator_));
         }
+        return true;
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -245,9 +252,10 @@ private:
         {
             stack_.push_back(Json(byte_string_view(data,length),string_allocator_));
         }
+        return true;
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -257,9 +265,10 @@ private:
         {
             stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(signum,data,length)));
         }
+        return true;
     }
 
-    void do_integer_value(int64_t value, const streaming_context&) override
+    bool do_integer_value(int64_t value, const streaming_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -269,9 +278,10 @@ private:
         {
             stack_.push_back(Json(value));
         }
+        return true;
     }
 
-    void do_uinteger_value(uint64_t value, const streaming_context&) override
+    bool do_uinteger_value(uint64_t value, const streaming_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -281,9 +291,10 @@ private:
         {
             stack_.push_back(Json(value));
         }
+        return true;
     }
 
-    void do_double_value(double value, const floating_point_options& fmt, const streaming_context&) override
+    bool do_double_value(double value, const floating_point_options& fmt, const streaming_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -293,9 +304,10 @@ private:
         {
             stack_.push_back(Json(value,fmt));
         }
+        return true;
     }
 
-    void do_bool_value(bool value, const streaming_context&) override
+    bool do_bool_value(bool value, const streaming_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -305,9 +317,10 @@ private:
         {
             stack_.push_back(Json(value));
         }
+        return true;
     }
 
-    void do_null_value(const streaming_context&) override
+    bool do_null_value(const streaming_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -317,6 +330,7 @@ private:
         {
             stack_.push_back(Json(Json::null()));
         }
+        return true;
     }
 };
 

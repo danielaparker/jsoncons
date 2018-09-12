@@ -293,16 +293,18 @@ private:
         }
     }
     // Implementing methods
-    void do_begin_document() override
+    bool do_begin_document() override
     {
+        return true;
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
         writer_.flush();
+        return true;
     }
 
-    void do_begin_object(const streaming_context&) override
+    bool do_begin_object(const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -345,9 +347,10 @@ private:
             stack_.push_back(line_split_context(structure_type::object));
         }
         writer_.put('{');
+        return true;
     }
 
-    void do_end_object(const streaming_context&) override
+    bool do_end_object(const streaming_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -362,10 +365,11 @@ private:
         writer_.put('}');
 
         end_value();
+        return true;
     }
 
 
-    void do_begin_array(const streaming_context&) override
+    bool do_begin_array(const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -432,6 +436,7 @@ private:
             stack_.push_back(line_split_context(structure_type::array));
             writer_.put('[');
         }
+        return true;
     }
 
     bool do_end_array(const streaming_context&) override
@@ -451,7 +456,7 @@ private:
         return true;
     }
 
-    void do_name(const string_view_type& name, const streaming_context&) override
+    bool do_name(const string_view_type& name, const streaming_context&) override
     {
         if (!stack_.empty())
         {
@@ -476,9 +481,10 @@ private:
         {
             writer_.put(' ');
         }
+        return true;
     }
 
-    void do_null_value(const streaming_context&) override
+    bool do_null_value(const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -489,9 +495,10 @@ private:
                       detail::null_literal<CharT>().size());
 
         end_value();
+        return true;
     }
 
-    void do_string_value(const string_view_type& value, const streaming_context&) override
+    bool do_string_value(const string_view_type& value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -503,9 +510,10 @@ private:
         writer_. put('\"');
 
         end_value();
+        return true;
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -543,9 +551,10 @@ private:
         }
 
         end_value();
+        return true;
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -601,9 +610,10 @@ private:
         }
 
         end_value();
+        return true;
     }
 
-    void do_double_value(double value, const floating_point_options& fmt, const streaming_context&) override
+    bool do_double_value(double value, const floating_point_options& fmt, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -655,9 +665,10 @@ private:
         }
 
         end_value();
+        return true;
     }
 
-    void do_integer_value(int64_t value, const streaming_context&) override
+    bool do_integer_value(int64_t value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -665,9 +676,10 @@ private:
         }
         detail::print_integer(value, writer_);
         end_value();
+        return true;
     }
 
-    void do_uinteger_value(uint64_t value, const streaming_context&) override
+    bool do_uinteger_value(uint64_t value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -675,9 +687,10 @@ private:
         }
         detail::print_uinteger(value, writer_);
         end_value();
+        return true;
     }
 
-    void do_bool_value(bool value, const streaming_context&) override
+    bool do_bool_value(bool value, const streaming_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -696,6 +709,7 @@ private:
         }
 
         end_value();
+        return true;
     }
 
     void begin_scalar_value()

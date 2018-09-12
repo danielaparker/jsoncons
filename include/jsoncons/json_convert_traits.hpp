@@ -141,7 +141,7 @@ struct json_convert_traits<T,
         serializer.begin_object();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            serializer.name(it->first);
+            serializer.write_name(it->first);
             json_convert_traits<mapped_type>::encode(it->second,serializer);
         }
         serializer.end_object();

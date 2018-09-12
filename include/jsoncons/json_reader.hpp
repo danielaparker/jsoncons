@@ -54,27 +54,27 @@ public:
 
 private:
 
-    void do_begin_document() override
+    bool do_begin_document() override
     {
         other_handler_.begin_document();
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
         other_handler_.end_document();
     }
 
-    void do_begin_object(const streaming_context& context) override
+    bool do_begin_object(const streaming_context& context) override
     {
         other_handler_.begin_object(context);
     }
 
-    void do_end_object(const streaming_context& context) override
+    bool do_end_object(const streaming_context& context) override
     {
         other_handler_.end_object(context);
     }
 
-    void do_begin_array(const streaming_context& context) override
+    bool do_begin_array(const streaming_context& context) override
     {
         other_handler_.begin_array(context);
     }
@@ -84,7 +84,7 @@ private:
         return other_handler_.end_array(context);
     }
 
-    void do_name(const string_view_type& name, const streaming_context& context) override
+    bool do_name(const string_view_type& name, const streaming_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -94,10 +94,10 @@ private:
         {
             throw parse_error(result.ec,context.line_number(),context.column_number());
         }
-        other_handler_.name(target, context);
+        other_handler_.write_name(target, context);
     }
 
-    void do_string_value(const string_view_type& value, const streaming_context& context) override
+    bool do_string_value(const string_view_type& value, const streaming_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -110,27 +110,27 @@ private:
         other_handler_.string_value(target, context);
     }
 
-    void do_integer_value(int64_t value, const streaming_context& context) override
+    bool do_integer_value(int64_t value, const streaming_context& context) override
     {
         other_handler_.integer_value(value, context);
     }
 
-    void do_uinteger_value(uint64_t value, const streaming_context& context) override
+    bool do_uinteger_value(uint64_t value, const streaming_context& context) override
     {
         other_handler_.uinteger_value(value, context);
     }
 
-    void do_double_value(double value, const floating_point_options& fmt, const streaming_context& context) override
+    bool do_double_value(double value, const floating_point_options& fmt, const streaming_context& context) override
     {
         other_handler_.double_value(value, fmt, context);
     }
 
-    void do_bool_value(bool value, const streaming_context& context) override
+    bool do_bool_value(bool value, const streaming_context& context) override
     {
         other_handler_.bool_value(value, context);
     }
 
-    void do_null_value(const streaming_context& context) override
+    bool do_null_value(const streaming_context& context) override
     {
         other_handler_.null_value(context);
     }

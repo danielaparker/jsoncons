@@ -2784,7 +2784,7 @@ public:
                     const object& o = object_value();
                     for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                     {
-                        handler.name(string_view_type((it->key()).data(),it->key().length()));
+                        handler.write_name(string_view_type((it->key()).data(),it->key().length()));
                         it->value().dump_fragment(handler);
                     }
                     handler.end_object();

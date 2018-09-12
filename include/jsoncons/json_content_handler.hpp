@@ -29,64 +29,64 @@ public:
 
     virtual ~basic_json_content_handler() {}
 
-    void begin_document()
+    bool begin_document()
     {
-        do_begin_document();
+        return do_begin_document();
     }
 
-    void end_document()
+    bool end_document()
     {
-        do_end_document();
+        return do_end_document();
     }
 
-    void begin_object()
+    bool begin_object()
     {
-        do_begin_object(null_streaming_context());
+        return do_begin_object(null_streaming_context());
     }
 
-    void begin_object(const streaming_context& context)
+    bool begin_object(const streaming_context& context)
     {
-        do_begin_object(context);
+        return do_begin_object(context);
     }
 
-    void begin_object(size_t length)
+    bool begin_object(size_t length)
     {
-        do_begin_object(length, null_streaming_context());
+        return do_begin_object(length, null_streaming_context());
     }
 
-    void begin_object(size_t length, const streaming_context& context)
+    bool begin_object(size_t length, const streaming_context& context)
     {
-        do_begin_object(length, context);
+        return do_begin_object(length, context);
     }
 
-    void end_object()
+    bool end_object()
     {
-        do_end_object(null_streaming_context());
+        return do_end_object(null_streaming_context());
     }
 
-    void end_object(const streaming_context& context)
+    bool end_object(const streaming_context& context)
     {
-        do_end_object(context);
+        return do_end_object(context);
     }
 
-    void begin_array()
+    bool begin_array()
     {
-        do_begin_array(null_streaming_context());
+        return do_begin_array(null_streaming_context());
     }
 
-    void begin_array(size_t length)
+    bool begin_array(size_t length)
     {
-        do_begin_array(length, null_streaming_context());
+        return do_begin_array(length, null_streaming_context());
     }
 
-    void begin_array(const streaming_context& context)
+    bool begin_array(const streaming_context& context)
     {
-        do_begin_array(context);
+        return do_begin_array(context);
     }
 
-    void begin_array(size_t length, const streaming_context& context)
+    bool begin_array(size_t length, const streaming_context& context)
     {
-        do_begin_array(length, context);
+        return do_begin_array(length, context);
     }
 
     bool end_array()
@@ -99,269 +99,269 @@ public:
         return do_end_array(context);
     }
 
-    void name(const string_view_type& name)
+    bool write_name(const string_view_type& name)
     {
-        do_name(name, null_streaming_context());
+        return do_name(name, null_streaming_context());
     }
 
-    void name(const string_view_type& name, const streaming_context& context)
+    bool write_name(const string_view_type& name, const streaming_context& context)
     {
-        do_name(name, context);
+        return do_name(name, context);
     }
 
-    void string_value(const string_view_type& value) 
+    bool string_value(const string_view_type& value) 
     {
-        do_string_value(value, null_streaming_context());
+        return do_string_value(value, null_streaming_context());
     }
 
-    void string_value(const string_view_type& value, const streaming_context& context) 
+    bool string_value(const string_view_type& value, const streaming_context& context) 
     {
-        do_string_value(value, context);
+        return do_string_value(value, context);
     }
 
-    void byte_string_value(const uint8_t* data, size_t length) 
+    bool byte_string_value(const uint8_t* data, size_t length) 
     {
-        do_byte_string_value(data, length, null_streaming_context());
+        return do_byte_string_value(data, length, null_streaming_context());
     }
 
-    void byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) 
+    bool byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) 
     {
-        do_byte_string_value(data, length, context);
+        return do_byte_string_value(data, length, context);
     }
 
-    void byte_string_value(const std::vector<uint8_t>& v) 
+    bool byte_string_value(const std::vector<uint8_t>& v) 
     {
-        do_byte_string_value(v.data(), v.size(), null_streaming_context());
+        return do_byte_string_value(v.data(), v.size(), null_streaming_context());
     }
 
-    void byte_string_value(const std::vector<uint8_t>& v, const streaming_context& context) 
+    bool byte_string_value(const std::vector<uint8_t>& v, const streaming_context& context) 
     {
-        do_byte_string_value(v.data(), v.size(), context);
+        return do_byte_string_value(v.data(), v.size(), context);
     }
 
-    void bignum_value(int signum, const uint8_t* data, size_t length) 
+    bool bignum_value(int signum, const uint8_t* data, size_t length) 
     {
-        do_bignum_value(signum, data, length, null_streaming_context());
+        return do_bignum_value(signum, data, length, null_streaming_context());
     }
 
-    void bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) 
+    bool bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) 
     {
-        do_bignum_value(signum, data, length, context);
+        return do_bignum_value(signum, data, length, context);
     }
 
-    void bignum_value(const string_view_type& s) 
+    bool bignum_value(const string_view_type& s) 
     {
         bignum n(s.data(),s.size());
         int signum;
         std::vector<uint8_t> v;
         n.dump(signum, v);
 
-        do_bignum_value(signum, v.data(), v.size(), null_streaming_context());
+        return do_bignum_value(signum, v.data(), v.size(), null_streaming_context());
     }
 
-    void bignum_value(const string_view_type& s, const streaming_context& context) 
+    bool bignum_value(const string_view_type& s, const streaming_context& context) 
     {
         bignum n(s.data(),s.size());
         int signum;
         std::vector<uint8_t> v;
         n.dump(signum, v);
 
-        do_bignum_value(signum, v.data(), v.size(), context);
+        return do_bignum_value(signum, v.data(), v.size(), context);
     }
 
-    void integer_value(int64_t value)
+    bool integer_value(int64_t value)
     {
-        do_integer_value(value,null_streaming_context());
+        return do_integer_value(value,null_streaming_context());
     }
 
-    void integer_value(int64_t value, const streaming_context& context)
+    bool integer_value(int64_t value, const streaming_context& context)
     {
-        do_integer_value(value,context);
+        return do_integer_value(value,context);
     }
 
-    void uinteger_value(uint64_t value)
+    bool uinteger_value(uint64_t value)
     {
-        do_uinteger_value(value,null_streaming_context());
+        return do_uinteger_value(value,null_streaming_context());
     }
 
-    void uinteger_value(uint64_t value, const streaming_context& context)
+    bool uinteger_value(uint64_t value, const streaming_context& context)
     {
-        do_uinteger_value(value,context);
+        return do_uinteger_value(value,context);
     }
 
-    void double_value(double value)
+    bool double_value(double value)
     {
-        do_double_value(value, floating_point_options(), null_streaming_context());
+        return do_double_value(value, floating_point_options(), null_streaming_context());
     }
 
-    void double_value(double value, uint8_t precision)
+    bool double_value(double value, uint8_t precision)
     {
-        do_double_value(value, floating_point_options(chars_format::general, precision), null_streaming_context());
+        return do_double_value(value, floating_point_options(chars_format::general, precision), null_streaming_context());
     }
 
-    void double_value(double value, const floating_point_options& fmt)
+    bool double_value(double value, const floating_point_options& fmt)
     {
-        do_double_value(value, fmt, null_streaming_context());
+        return do_double_value(value, fmt, null_streaming_context());
     }
 
-    void double_value(double value, const streaming_context& context)
+    bool double_value(double value, const streaming_context& context)
     {
-        do_double_value(value, floating_point_options(), context);
+        return do_double_value(value, floating_point_options(), context);
     }
 
-    void double_value(double value, uint8_t precision, const streaming_context& context)
+    bool double_value(double value, uint8_t precision, const streaming_context& context)
     {
-        do_double_value(value, floating_point_options(chars_format::general, precision), context);
+        return do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
-    void double_value(double value, const floating_point_options& fmt, const streaming_context& context)
+    bool double_value(double value, const floating_point_options& fmt, const streaming_context& context)
     {
-        do_double_value(value, fmt, context);
+        return do_double_value(value, fmt, context);
     }
 
-    void bool_value(bool value) 
+    bool bool_value(bool value) 
     {
-        do_bool_value(value,null_streaming_context());
+        return do_bool_value(value,null_streaming_context());
     }
 
-    void bool_value(bool value, const streaming_context& context) 
+    bool bool_value(bool value, const streaming_context& context) 
     {
-        do_bool_value(value,context);
+        return do_bool_value(value,context);
     }
 
-    void null_value() 
+    bool null_value() 
     {
-        do_null_value(null_streaming_context());
+        return do_null_value(null_streaming_context());
     }
 
-    void null_value(const streaming_context& context) 
+    bool null_value(const streaming_context& context) 
     {
-        do_null_value(context);
+        return do_null_value(context);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    void begin_json()
+    bool begin_json()
     {
-        do_begin_document();
+        return do_begin_document();
     }
 
-    void end_json()
+    bool end_json()
     {
-        do_end_document();
+        return do_end_document();
     }
 
-    void name(const CharT* p, size_t length, const streaming_context& context) 
+    bool write_name(const CharT* p, size_t length, const streaming_context& context) 
     {
-        do_name(string_view_type(p, length), context);
+        return do_name(string_view_type(p, length), context);
     }
 
-    void value(const std::basic_string<CharT>& value, const streaming_context& context) 
+    bool value(const std::basic_string<CharT>& value, const streaming_context& context) 
     {
-        do_string_value(value, context);
+        return do_string_value(value, context);
     }
 
-    void value(const CharT* p, size_t length, const streaming_context& context) 
+    bool value(const CharT* p, size_t length, const streaming_context& context) 
     {
-        do_string_value(string_view_type(p, length), context);
+        return do_string_value(string_view_type(p, length), context);
     }
 
-    void value(const CharT* p, const streaming_context& context)
+    bool value(const CharT* p, const streaming_context& context)
     {
-        do_string_value(string_view_type(p), context);
+        return do_string_value(string_view_type(p), context);
     }
 
-    void value(int value, const streaming_context& context) 
+    bool value(int value, const streaming_context& context) 
     {
-        do_integer_value(value,context);
+        return do_integer_value(value,context);
     }
 
-    void value(long value, const streaming_context& context) 
+    bool value(long value, const streaming_context& context) 
     {
-        do_integer_value(value,context);
+        return do_integer_value(value,context);
     }
 
-    void value(long long value, const streaming_context& context) 
+    bool value(long long value, const streaming_context& context) 
     {
-        do_integer_value(value,context);
+        return do_integer_value(value,context);
     }
 
-    void value(unsigned int value, const streaming_context& context) 
+    bool value(unsigned int value, const streaming_context& context) 
     {
-        do_uinteger_value(value,context);
+        return do_uinteger_value(value,context);
     }
 
-    void value(unsigned long value, const streaming_context& context) 
+    bool value(unsigned long value, const streaming_context& context) 
     {
-        do_uinteger_value(value,context);
+        return do_uinteger_value(value,context);
     }
 
-    void value(unsigned long long value, const streaming_context& context) 
+    bool value(unsigned long long value, const streaming_context& context) 
     {
-        do_uinteger_value(value,context);
+        return do_uinteger_value(value,context);
     }
 
-    void value(float value, uint8_t precision, const streaming_context& context)
+    bool value(float value, uint8_t precision, const streaming_context& context)
     {
-        do_double_value(value, floating_point_options(chars_format::general, precision), context);
+        return do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
-    void value(double value, uint8_t precision, const streaming_context& context)
+    bool value(double value, uint8_t precision, const streaming_context& context)
     {
-        do_double_value(value, floating_point_options(chars_format::general, precision), context);
+        return do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
-    void value(bool value, const streaming_context& context) 
+    bool value(bool value, const streaming_context& context) 
     {
-        do_bool_value(value,context);
+        return do_bool_value(value,context);
     }
 
-    void value(null_type, const streaming_context& context)
+    bool value(null_type, const streaming_context& context)
     {
-        do_null_value(context);
+        return do_null_value(context);
     }
 #endif
 
 private:
-    virtual void do_begin_document() = 0;
+    virtual bool do_begin_document() = 0;
 
-    virtual void do_end_document() = 0;
+    virtual bool do_end_document() = 0;
 
-    virtual void do_begin_object(const streaming_context& context) = 0;
+    virtual bool do_begin_object(const streaming_context& context) = 0;
 
-    virtual void do_begin_object(size_t, const streaming_context& context) 
+    virtual bool do_begin_object(size_t, const streaming_context& context) 
     {
-        do_begin_object(context);
+        return do_begin_object(context);
     }
 
-    virtual void do_end_object(const streaming_context& context) = 0;
+    virtual bool do_end_object(const streaming_context& context) = 0;
 
-    virtual void do_begin_array(const streaming_context& context) = 0;
+    virtual bool do_begin_array(const streaming_context& context) = 0;
 
-    virtual void do_begin_array(size_t, const streaming_context& context) 
+    virtual bool do_begin_array(size_t, const streaming_context& context) 
     {
-        do_begin_array(context);
+        return do_begin_array(context);
     }
 
     virtual bool do_end_array(const streaming_context& context) = 0;
 
-    virtual void do_name(const string_view_type& name, const streaming_context& context) = 0;
+    virtual bool do_name(const string_view_type& name, const streaming_context& context) = 0;
 
-    virtual void do_null_value(const streaming_context& context) = 0;
+    virtual bool do_null_value(const streaming_context& context) = 0;
 
-    virtual void do_string_value(const string_view_type& value, const streaming_context& context) = 0;
+    virtual bool do_string_value(const string_view_type& value, const streaming_context& context) = 0;
 
-    virtual void do_byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) = 0;
+    virtual bool do_byte_string_value(const uint8_t* data, size_t length, const streaming_context& context) = 0;
 
-    virtual void do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) = 0;
+    virtual bool do_bignum_value(int signum, const uint8_t* data, size_t length, const streaming_context& context) = 0;
 
-    virtual void do_double_value(double value, const floating_point_options& fmt, const streaming_context& context) = 0;
+    virtual bool do_double_value(double value, const floating_point_options& fmt, const streaming_context& context) = 0;
 
-    virtual void do_integer_value(int64_t value, const streaming_context& context) = 0;
+    virtual bool do_integer_value(int64_t value, const streaming_context& context) = 0;
 
-    virtual void do_uinteger_value(uint64_t value, const streaming_context& context) = 0;
+    virtual bool do_uinteger_value(uint64_t value, const streaming_context& context) = 0;
 
-    virtual void do_bool_value(bool value, const streaming_context& context) = 0;
+    virtual bool do_bool_value(bool value, const streaming_context& context) = 0;
 };
 
 template <class CharT>
@@ -370,24 +370,29 @@ class basic_null_json_content_handler final : public basic_json_content_handler<
 public:
     using typename basic_json_content_handler<CharT>::string_view_type                                 ;
 private:
-    void do_begin_document() override
+    bool do_begin_document() override
     {
+        return true;
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
+        return true;
     }
 
-    void do_begin_object(const streaming_context&) override
+    bool do_begin_object(const streaming_context&) override
     {
+        return true;
     }
 
-    void do_end_object(const streaming_context&) override
+    bool do_end_object(const streaming_context&) override
     {
+        return true;
     }
 
-    void do_begin_array(const streaming_context&) override
+    bool do_begin_array(const streaming_context&) override
     {
+        return true;
     }
 
     bool do_end_array(const streaming_context&) override
@@ -395,40 +400,49 @@ private:
         return true;
     }
 
-    void do_name(const string_view_type&, const streaming_context&) override
+    bool do_name(const string_view_type&, const streaming_context&) override
     {
+        return true;
     }
 
-    void do_null_value(const streaming_context&) override
+    bool do_null_value(const streaming_context&) override
     {
+        return true;
     }
 
-    void do_string_value(const string_view_type&, const streaming_context&) override
+    bool do_string_value(const string_view_type&, const streaming_context&) override
     {
+        return true;
     }
 
-    void do_byte_string_value(const uint8_t*, size_t, const streaming_context&) override
+    bool do_byte_string_value(const uint8_t*, size_t, const streaming_context&) override
     {
+        return true;
     }
 
-    void do_bignum_value(int, const uint8_t*, size_t, const streaming_context&) override
+    bool do_bignum_value(int, const uint8_t*, size_t, const streaming_context&) override
     {
+        return true;
     }
 
-    void do_double_value(double, const floating_point_options&, const streaming_context&) override
+    bool do_double_value(double, const floating_point_options&, const streaming_context&) override
     {
+        return true;
     }
 
-    void do_integer_value(int64_t, const streaming_context&) override
+    bool do_integer_value(int64_t, const streaming_context&) override
     {
+        return true;
     }
 
-    void do_uinteger_value(uint64_t, const streaming_context&) override
+    bool do_uinteger_value(uint64_t, const streaming_context&) override
     {
+        return true;
     }
 
-    void do_bool_value(bool, const streaming_context&) override
+    bool do_bool_value(bool, const streaming_context&) override
     {
+        return true;
     }
 };
 

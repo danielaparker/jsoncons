@@ -225,7 +225,7 @@ struct serialization_traits<T,
         handler.begin_object();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            handler.name(it->first);
+            handler.write_name(it->first);
             serialization_traits<mapped_type>::encode(it->second,handler);
         }
         handler.end_object();

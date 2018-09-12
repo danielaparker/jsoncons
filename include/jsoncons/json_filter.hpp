@@ -44,39 +44,39 @@ public:
     }
 
 private:
-    void do_begin_document() override
+    bool do_begin_document() override
     {
-        downstream_handler_.begin_document();
+        return downstream_handler_.begin_document();
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
-        downstream_handler_.end_document();
+        return downstream_handler_.end_document();
     }
 
-    void do_begin_object(const streaming_context& context) override
+    bool do_begin_object(const streaming_context& context) override
     {
-        downstream_handler_.begin_object(context);
+        return downstream_handler_.begin_object(context);
     }
 
-    void do_begin_object(size_t length, const streaming_context& context) override
+    bool do_begin_object(size_t length, const streaming_context& context) override
     {
-        downstream_handler_.begin_object(length, context);
+        return downstream_handler_.begin_object(length, context);
     }
 
-    void do_end_object(const streaming_context& context) override
+    bool do_end_object(const streaming_context& context) override
     {
-        downstream_handler_.end_object(context);
+        return downstream_handler_.end_object(context);
     }
 
-    void do_begin_array(const streaming_context& context) override
+    bool do_begin_array(const streaming_context& context) override
     {
-        downstream_handler_.begin_array(context);
+        return downstream_handler_.begin_array(context);
     }
 
-    void do_begin_array(size_t length, const streaming_context& context) override
+    bool do_begin_array(size_t length, const streaming_context& context) override
     {
-        downstream_handler_.begin_array(length, context);
+        return downstream_handler_.begin_array(length, context);
     }
 
     bool do_end_array(const streaming_context& context) override
@@ -84,57 +84,57 @@ private:
         return downstream_handler_.end_array(context);
     }
 
-    void do_name(const string_view_type& name,
+    bool do_name(const string_view_type& name,
                  const streaming_context& context) override
     {
-        downstream_handler_.name(name,context);
+        return downstream_handler_.write_name(name,context);
     }
 
-    void do_string_value(const string_view_type& value,
+    bool do_string_value(const string_view_type& value,
                          const streaming_context& context) override
     {
-        downstream_handler_.string_value(value,context);
+        return downstream_handler_.string_value(value,context);
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length,
+    bool do_byte_string_value(const uint8_t* data, size_t length,
                               const streaming_context& context) override
     {
-        downstream_handler_.byte_string_value(data, length, context);
+        return downstream_handler_.byte_string_value(data, length, context);
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length,
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length,
                          const streaming_context& context) override
     {
-        downstream_handler_.bignum_value(signum, data, length, context);
+        return downstream_handler_.bignum_value(signum, data, length, context);
     }
 
-    void do_double_value(double value, const floating_point_options& fmt,
+    bool do_double_value(double value, const floating_point_options& fmt,
                          const streaming_context& context) override
     {
-        downstream_handler_.double_value(value, fmt, context);
+        return downstream_handler_.double_value(value, fmt, context);
     }
 
-    void do_integer_value(int64_t value,
+    bool do_integer_value(int64_t value,
                           const streaming_context& context) override
     {
-        downstream_handler_.integer_value(value,context);
+        return downstream_handler_.integer_value(value,context);
     }
 
-    void do_uinteger_value(uint64_t value,
+    bool do_uinteger_value(uint64_t value,
                            const streaming_context& context) override
     {
-        downstream_handler_.uinteger_value(value,context);
+        return downstream_handler_.uinteger_value(value,context);
     }
 
-    void do_bool_value(bool value,
+    bool do_bool_value(bool value,
                        const streaming_context& context) override
     {
-        downstream_handler_.bool_value(value,context);
+        return downstream_handler_.bool_value(value,context);
     }
 
-    void do_null_value(const streaming_context& context) override
+    bool do_null_value(const streaming_context& context) override
     {
-        downstream_handler_.null_value(context);
+        return downstream_handler_.null_value(context);
     }
 
 };
@@ -151,12 +151,14 @@ public:
     {
     }
 private:
-    void do_begin_document() override
+    bool do_begin_document() override
     {
+        return true;
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
+        return true;
     }
 };
 
@@ -179,16 +181,16 @@ public:
     }
 
 private:
-    void do_name(const string_view_type& name,
+    bool do_name(const string_view_type& name,
                  const streaming_context& context) override
     {
         if (name == name_)
         {
-            this->downstream_handler().name(new_name_,context);
+            return this->downstream_handler().write_name(new_name_,context);
         }
         else
         {
-            this->downstream_handler().name(name,context);
+            return this->downstream_handler().write_name(name,context);
         }
     }
 };
@@ -216,39 +218,39 @@ public:
     }
 
 private:
-    void do_begin_document() override
+    bool do_begin_document() override
     {
-        downstream_handler_.begin_document();
+        return downstream_handler_.begin_document();
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
-        downstream_handler_.end_document();
+        return downstream_handler_.end_document();
     }
 
-    void do_begin_object(const streaming_context& context) override
+    bool do_begin_object(const streaming_context& context) override
     {
-        downstream_handler_.begin_object(context);
+        return downstream_handler_.begin_object(context);
     }
 
-    void do_begin_object(size_t length, const streaming_context& context) override
+    bool do_begin_object(size_t length, const streaming_context& context) override
     {
-        downstream_handler_.begin_object(length, context);
+        return downstream_handler_.begin_object(length, context);
     }
 
-    void do_end_object(const streaming_context& context) override
+    bool do_end_object(const streaming_context& context) override
     {
-        downstream_handler_.end_object(context);
+        return downstream_handler_.end_object(context);
     }
 
-    void do_begin_array(const streaming_context& context) override
+    bool do_begin_array(const streaming_context& context) override
     {
-        downstream_handler_.begin_array(context);
+        return downstream_handler_.begin_array(context);
     }
 
-    void do_begin_array(size_t length, const streaming_context& context) override
+    bool do_begin_array(size_t length, const streaming_context& context) override
     {
-        downstream_handler_.begin_array(length, context);
+        return downstream_handler_.begin_array(length, context);
     }
 
     bool do_end_array(const streaming_context& context) override
@@ -256,7 +258,7 @@ private:
         return downstream_handler_.end_array(context);
     }
 
-    void do_name(const string_view_type& name,
+    bool do_name(const string_view_type& name,
                  const streaming_context& context) override
     {
         std::basic_string<CharT> target;
@@ -265,10 +267,10 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        downstream_handler().name(target,context);
+        return downstream_handler().write_name(target,context);
     }
 
-    void do_string_value(const string_view_type& value,
+    bool do_string_value(const string_view_type& value,
                          const streaming_context& context) override
     {
         std::basic_string<CharT> target;
@@ -277,48 +279,48 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        downstream_handler().string_value(target,context);
+        return downstream_handler().string_value(target,context);
     }
 
-    void do_byte_string_value(const uint8_t* data, size_t length,
+    bool do_byte_string_value(const uint8_t* data, size_t length,
                               const streaming_context& context) override
     {
-        downstream_handler_.byte_string_value(data, length, context);
+        return downstream_handler_.byte_string_value(data, length, context);
     }
 
-    void do_bignum_value(int signum, const uint8_t* data, size_t length,
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length,
                          const streaming_context& context) override
     {
-        downstream_handler_.bignum_value(signum, data, length, context);
+        return downstream_handler_.bignum_value(signum, data, length, context);
     }
 
-    void do_double_value(double value, const floating_point_options& fmt,
+    bool do_double_value(double value, const floating_point_options& fmt,
                          const streaming_context& context) override
     {
-        downstream_handler_.double_value(value, fmt, context);
+        return downstream_handler_.double_value(value, fmt, context);
     }
 
-    void do_integer_value(int64_t value,
+    bool do_integer_value(int64_t value,
                           const streaming_context& context) override
     {
-        downstream_handler_.integer_value(value,context);
+        return downstream_handler_.integer_value(value,context);
     }
 
-    void do_uinteger_value(uint64_t value,
+    bool do_uinteger_value(uint64_t value,
                            const streaming_context& context) override
     {
-        downstream_handler_.uinteger_value(value,context);
+        return downstream_handler_.uinteger_value(value,context);
     }
 
-    void do_bool_value(bool value,
+    bool do_bool_value(bool value,
                        const streaming_context& context) override
     {
-        downstream_handler_.bool_value(value,context);
+        return downstream_handler_.bool_value(value,context);
     }
 
-    void do_null_value(const streaming_context& context) override
+    bool do_null_value(const streaming_context& context) override
     {
-        downstream_handler_.null_value(context);
+        return downstream_handler_.null_value(context);
     }
 
 };

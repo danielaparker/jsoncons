@@ -61,7 +61,7 @@ public:
     {
     }
 
-    void do_string_value(const string_view_type& s, const streaming_context& context) override
+    bool do_string_value(const string_view_type& s, const streaming_context& context) override
     {
         if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
         {
@@ -79,6 +79,7 @@ public:
         {
             this->downstream_handler().string_value(s, context);
         }
+        return true;
     }
 };
 
@@ -179,7 +180,7 @@ class basic_json_parser : private streaming_context
     parse_state state_;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
-    bool continue_parse_;
+    bool continue_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -243,7 +244,7 @@ public:
          input_end_(nullptr),
          input_ptr_(nullptr),
          state_(parse_state::start),
-         continue_parse_(true)
+         continue_(true)
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
@@ -300,7 +301,7 @@ public:
 
     bool stopped() const
     {
-        return !continue_parse_;
+        return !continue_;
     }
 
     void skip_whitespace()
@@ -336,46 +337,47 @@ public:
         } 
         push_state(parse_state::object);
         state_ = parse_state::expect_member_name_or_end;
-        handler_.begin_object(*this);
+        continue_ = handler_.begin_object(*this);
     }
 
-    void end_object(std::error_code& ec)
+    bool end_object(std::error_code& ec)
     {
         if (nesting_depth_ < 1)
         {
             err_handler_.fatal_error(json_parse_errc::unexpected_right_brace, *this);
             ec = json_parse_errc::unexpected_right_brace;
-            return;
+            return false;
         }
         --nesting_depth_;
         state_ = pop_state();
         if (state_ == parse_state::object)
         {
-            handler_.end_object(*this);
+            continue_ = handler_.end_object(*this);
         }
         else if (state_ == parse_state::array)
         {
             err_handler_.fatal_error(json_parse_errc::expected_comma_or_right_bracket, *this);
             ec = json_parse_errc::expected_comma_or_right_bracket;
-            return;
+            return false;
         }
         else
         {
             err_handler_.fatal_error(json_parse_errc::unexpected_right_brace, *this);
             ec = json_parse_errc::unexpected_right_brace;
-            return;
+            return false;
         }
 
         if (parent() == parse_state::root)
         {
             state_ = parse_state::done;
-            continue_parse_ = false;
             handler_.end_document();
+            continue_ = false;
         }
         else
         {
             state_ = parse_state::expect_comma_or_end;
         }
+        return true;
     }
 
     void begin_array(std::error_code& ec)
@@ -390,7 +392,7 @@ public:
         }
         push_state(parse_state::array);
         state_ = parse_state::expect_value_or_end;
-        handler_.begin_array(*this);
+        continue_ = handler_.begin_array(*this);
     }
 
     bool end_array(std::error_code& ec)
@@ -405,7 +407,7 @@ public:
         state_ = pop_state();
         if (state_ == parse_state::array)
         {
-            continue_parse_ = handler_.end_array(*this);
+            continue_ = handler_.end_array(*this);
         }
         else if (state_ == parse_state::object)
         {
@@ -422,8 +424,8 @@ public:
         if (parent() == parse_state::root)
         {
             state_ = parse_state::done;
-            continue_parse_ = false;
             handler_.end_document();
+            continue_ = false;
         }
         else
         {
@@ -438,6 +440,7 @@ public:
         state_stack_.reserve(initial_stack_capacity_);
         push_state(parse_state::root);
         state_ = parse_state::start;
+        continue_ = true;
         line_ = 1;
         column_ = 1;
         nesting_depth_ = 0;
@@ -488,7 +491,7 @@ public:
     {
         const CharT* local_input_end = input_end_;
 
-        while ((input_ptr_ < local_input_end) && continue_parse_)
+        while ((input_ptr_ < local_input_end) && continue_)
         {
             switch (state_)
             {
@@ -513,7 +516,7 @@ public:
                 break;
             case parse_state::start: 
                 {
-                    handler_.begin_document();
+                    continue_ = handler_.begin_document();
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:
@@ -1199,12 +1202,12 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'e':
-                    handler_.bool_value(true,*this);
+                    continue_ = handler_.bool_value(true,*this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
-                        continue_parse_ = false;
                         handler_.end_document();
+                        continue_ = false;
                     }
                     else
                     {
@@ -1265,12 +1268,12 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'e':
-                    handler_.bool_value(false,*this);
+                    continue_ = handler_.bool_value(false,*this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
-                        continue_parse_ = false;
                         handler_.end_document();
+                        continue_ = false;
                     }
                     else
                     {
@@ -1317,12 +1320,12 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'l':
-                    handler_.null_value(*this);
+                    continue_ = handler_.null_value(*this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
-                        continue_parse_ = false;
                         handler_.end_document();
+                        continue_ = false;
                     }
                     else
                     {
@@ -1433,14 +1436,14 @@ public:
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
             {
-                handler_.bool_value(true,*this);
+                continue_ = handler_.bool_value(true,*this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == parse_state::root)
                 {
                     handler_.end_document();
                     state_ = parse_state::done;
-                    continue_parse_ = false;
+                    continue_ = false;
                 }
                 else
                 {
@@ -1468,14 +1471,14 @@ public:
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
-                handler_.null_value(*this);
+                continue_ = handler_.null_value(*this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == parse_state::root)
                 {
                     handler_.end_document();
                     state_ = parse_state::done;
-                    continue_parse_ = false;
+                    continue_ = false;
                 }
                 else
                 {
@@ -1503,14 +1506,14 @@ public:
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
             {
-                handler_.bool_value(false,*this);
+                continue_ = handler_.bool_value(false,*this);
                 input_ptr_ += 5;
                 column_ += 5;
                 if (parent() == parse_state::root)
                 {
                     handler_.end_document();
                     state_ = parse_state::done;
-                    continue_parse_ = false;
+                    continue_ = false;
                 }
                 else
                 {
@@ -2571,7 +2574,7 @@ private:
         jsoncons::detail::to_integer_result result = jsoncons::detail::to_integer(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
-            handler_.integer_value(result.value, *this);
+            continue_ = handler_.integer_value(result.value, *this);
             after_value(ec);
         }
         else
@@ -2581,7 +2584,7 @@ private:
             int signum = 0;
             bignum n(number_buffer_.c_str());
             n.dump(signum, byte_buffer_);
-            handler_.bignum_value(signum, byte_buffer_.data(), byte_buffer_.size(), *this);
+            continue_ = handler_.bignum_value(signum, byte_buffer_.data(), byte_buffer_.size(), *this);
             after_value(ec);
         }
     }
@@ -2591,7 +2594,7 @@ private:
         jsoncons::detail::to_uinteger_result result = jsoncons::detail::to_uinteger(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
-            handler_.uinteger_value(result.value, *this);
+            continue_ = handler_.uinteger_value(result.value, *this);
             after_value(ec);
         }
         else
@@ -2601,7 +2604,7 @@ private:
             int signum = 0;
             bignum n(number_buffer_.c_str());
             n.dump(signum, byte_buffer_);
-            handler_.bignum_value(1, byte_buffer_.data(), byte_buffer_.size(), *this);
+            continue_ = handler_.bignum_value(1, byte_buffer_.data(), byte_buffer_.size(), *this);
             after_value(ec);
         }
     }
@@ -2614,11 +2617,11 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
+                continue_ = handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
             }
             else
             {
-                handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), *this);
+                continue_ = handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), *this);
             }
         }
         catch (...)
@@ -2628,7 +2631,7 @@ private:
                 ec = json_parse_errc::invalid_number;
                 return;
             }
-            handler_.null_value(*this); // recovery
+            continue_ = handler_.null_value(*this); // recovery
         }
 
         after_value(ec);
@@ -2680,20 +2683,20 @@ private:
         switch (parent())
         {
         case parse_state::member_name:
-            handler_.name(string_view_type(s, length), *this);
+            continue_ = handler_.write_name(string_view_type(s, length), *this);
             state_ = pop_state();
             state_ = parse_state::expect_colon;
             break;
         case parse_state::object:
         case parse_state::array:
-            handler_.string_value(string_view_type(s, length), *this);
+            continue_ = handler_.string_value(string_view_type(s, length), *this);
             state_ = parse_state::expect_comma_or_end;
             break;
         case parse_state::root:
-            handler_.string_value(string_view_type(s, length), *this);
+            continue_ = handler_.string_value(string_view_type(s, length), *this);
             state_ = parse_state::done;
-            continue_parse_ = false;
             handler_.end_document();
+            continue_ = false;
             break;
         default:
             if (err_handler_.error(json_parse_errc::invalid_json_text, *this))
@@ -2737,8 +2740,8 @@ private:
             break;
         case parse_state::root:
             state_ = parse_state::done;
-            continue_parse_ = false;
             handler_.end_document();
+            continue_ = false;
             break;
         default:
             if (err_handler_.error(json_parse_errc::invalid_json_text, *this))
