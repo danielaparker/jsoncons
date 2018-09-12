@@ -127,13 +127,13 @@ private:
         writer_.flush();
     }
 
-    bool do_begin_object(const streaming_context&) override
+    bool do_begin_object(const serializing_context&) override
     {
         stack_.push_back(stack_item(true));
         return true;
     }
 
-    bool do_end_object(const streaming_context&) override
+    bool do_end_object(const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -172,7 +172,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(const streaming_context&) override
+    bool do_begin_array(const serializing_context&) override
     {
         stack_.push_back(stack_item(false));
         if (stack_.size() == 2)
@@ -197,7 +197,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const streaming_context&) override
+    bool do_end_array(const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -210,7 +210,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const streaming_context&) override
+    bool do_name(const string_view_type& name, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -244,7 +244,7 @@ private:
         return true;
     }
 
-    bool do_null(const streaming_context&) override
+    bool do_null(const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -268,7 +268,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& val, const streaming_context&) override
+    bool do_string(const string_view_type& val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -292,7 +292,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const uint8_t* data, size_t length, const streaming_context& context) override
+    bool do_byte_string(const uint8_t* data, size_t length, const serializing_context& context) override
     {
         std::basic_string<CharT> s;
         encode_base64url(data,length,s);
@@ -300,7 +300,7 @@ private:
         return true;
     }
 
-    bool do_bignum(int signum, const uint8_t* data, size_t length, const streaming_context& context) override
+    bool do_bignum(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
     {
         bignum n = bignum(signum, data, length);
         std::basic_string<CharT> s;
@@ -309,7 +309,7 @@ private:
         return true;
     }
 
-    bool do_double(double val, const floating_point_options& fmt, const streaming_context&) override
+    bool do_double(double val, const floating_point_options& fmt, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -333,7 +333,7 @@ private:
         return true;
     }
 
-    bool do_integer(int64_t val, const streaming_context&) override
+    bool do_integer(int64_t val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -357,7 +357,7 @@ private:
         return true;
     }
 
-    bool do_uinteger(uint64_t val, const streaming_context&) override
+    bool do_uinteger(uint64_t val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -381,7 +381,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool val, const streaming_context&) override
+    bool do_bool(bool val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {

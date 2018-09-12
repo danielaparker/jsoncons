@@ -4,15 +4,15 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_STREAMING_CONTEXT_HPP
-#define JSONCONS_STREAMING_CONTEXT_HPP
+#ifndef JSONCONS_SERIALIZING_CONTEXT_HPP
+#define JSONCONS_SERIALIZING_CONTEXT_HPP
 
 namespace jsoncons {
 
-class streaming_context
+class serializing_context
 {
 public:
-    virtual ~streaming_context() = default;
+    virtual ~serializing_context() = default;
 
     size_t line_number() const
     {
@@ -28,7 +28,7 @@ private:
     virtual size_t do_column_number() const = 0;
 };
 
-class null_streaming_context : public streaming_context
+class null_serializing_context : public serializing_context
 {
 private:
     size_t do_line_number() const override { return 0; }
@@ -37,8 +37,8 @@ private:
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef streaming_context serializing_context;
-typedef null_streaming_context null_serializing_context;
+typedef serializing_context serializing_context;
+typedef null_serializing_context null_serializing_context;
 #endif
 
 }

@@ -302,7 +302,7 @@ private:
         writer_.flush();
     }
 
-    bool do_begin_object(const streaming_context&) override
+    bool do_begin_object(const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -348,7 +348,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const streaming_context&) override
+    bool do_end_object(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -367,7 +367,7 @@ private:
     }
 
 
-    bool do_begin_array(const streaming_context&) override
+    bool do_begin_array(const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -437,7 +437,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const streaming_context&) override
+    bool do_end_array(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (indenting_)
@@ -454,7 +454,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const streaming_context&) override
+    bool do_name(const string_view_type& name, const serializing_context&) override
     {
         if (!stack_.empty())
         {
@@ -482,7 +482,7 @@ private:
         return true;
     }
 
-    bool do_null(const streaming_context&) override
+    bool do_null(const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -496,7 +496,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& value, const streaming_context&) override
+    bool do_string(const string_view_type& value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -511,7 +511,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_byte_string(const uint8_t* data, size_t length, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -552,7 +552,7 @@ private:
         return true;
     }
 
-    bool do_bignum(int signum, const uint8_t* data, size_t length, const streaming_context&) override
+    bool do_bignum(int signum, const uint8_t* data, size_t length, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -611,7 +611,7 @@ private:
         return true;
     }
 
-    bool do_double(double value, const floating_point_options& fmt, const streaming_context&) override
+    bool do_double(double value, const floating_point_options& fmt, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -666,7 +666,7 @@ private:
         return true;
     }
 
-    bool do_integer(int64_t value, const streaming_context&) override
+    bool do_integer(int64_t value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -677,7 +677,7 @@ private:
         return true;
     }
 
-    bool do_uinteger(uint64_t value, const streaming_context&) override
+    bool do_uinteger(uint64_t value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -688,7 +688,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool value, const streaming_context&) override
+    bool do_bool(bool value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {

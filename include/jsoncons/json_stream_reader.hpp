@@ -1,11 +1,11 @@
-// Copyright 2015 Daniel Parker
+// Copyright 2018 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONREADER_HPP
-#define JSONCONS_JSONREADER_HPP
+#ifndef JSONCONS_JSONSTREAMREADER_HPP
+#define JSONCONS_JSONSTREAMREADER_HPP
 
 #include <memory>
 #include <string>
@@ -23,121 +23,8 @@
 
 namespace jsoncons {
 
-// utf8_other_json_input_adapter
-
-template <class CharT>
-class json_utf8_other_content_handler_adapter : public json_content_handler
-{
-public:
-    using json_content_handler::string_view_type;
-private:
-    basic_null_json_content_handler<CharT> default_content_handler_;
-    basic_json_content_handler<CharT>& other_handler_;
-    //parse_error_handler& err_handler_;
-
-    // noncopyable and nonmoveable
-    json_utf8_other_content_handler_adapter<CharT>(const json_utf8_other_content_handler_adapter<CharT>&) = delete;
-    json_utf8_other_content_handler_adapter<CharT>& operator=(const json_utf8_other_content_handler_adapter<CharT>&) = delete;
-
-public:
-    json_utf8_other_content_handler_adapter()
-        : other_handler_(default_content_handler_)
-    {
-    }
-
-    json_utf8_other_content_handler_adapter(basic_json_content_handler<CharT>& other_handler/*,
-                                          parse_error_handler& err_handler*/)
-        : other_handler_(other_handler)/*,
-          err_handler_(err_handler)*/
-    {
-    }
-
-private:
-
-    void do_begin_document() override
-    {
-        other_handler_.begin_document();
-    }
-
-    void do_end_document() override
-    {
-        other_handler_.end_document();
-    }
-
-    bool do_begin_object(const serializing_context& context) override
-    {
-        other_handler_.begin_object(context);
-    }
-
-    bool do_end_object(const serializing_context& context) override
-    {
-        other_handler_.end_object(context);
-    }
-
-    bool do_begin_array(const serializing_context& context) override
-    {
-        other_handler_.begin_array(context);
-    }
-
-    bool do_end_array(const serializing_context& context) override
-    {
-        return other_handler_.end_array(context);
-    }
-
-    bool do_name(const string_view_type& name, const serializing_context& context) override
-    {
-        std::basic_string<CharT> target;
-        auto result = unicons::convert(
-            name.begin(), name.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
-        if (result.ec != unicons::conv_errc())
-        {
-            throw parse_error(result.ec,context.line_number(),context.column_number());
-        }
-        other_handler_.write_name(target, context);
-    }
-
-    bool do_string(const string_view_type& value, const serializing_context& context) override
-    {
-        std::basic_string<CharT> target;
-        auto result = unicons::convert(
-            value.begin(), value.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
-        if (result.ec != unicons::conv_errc())
-        {
-            throw parse_error(result.ec,context.line_number(),context.column_number());
-        }
-        other_handler_.write_string(target, context);
-    }
-
-    bool do_integer(int64_t value, const serializing_context& context) override
-    {
-        other_handler_.write_integer(value, context);
-    }
-
-    bool do_uinteger(uint64_t value, const serializing_context& context) override
-    {
-        other_handler_.write_uinteger(value, context);
-    }
-
-    bool do_double(double value, const floating_point_options& fmt, const serializing_context& context) override
-    {
-        other_handler_.write_double(value, fmt, context);
-    }
-
-    bool do_bool(bool value, const serializing_context& context) override
-    {
-        other_handler_.write_bool(value, context);
-    }
-
-    bool do_null(const serializing_context& context) override
-    {
-        other_handler_.write_null(context);
-    }
-};
-
 template<class CharT,class Allocator=std::allocator<char>>
-class basic_json_reader 
+class basic_json_stream_reader 
 {
     static const size_t default_max_buffer_length = 16384;
 
@@ -156,57 +43,57 @@ class basic_json_reader
     bool begin_;
 
     // Noncopyable and nonmoveable
-    basic_json_reader(const basic_json_reader&) = delete;
-    basic_json_reader& operator=(const basic_json_reader&) = delete;
+    basic_json_stream_reader(const basic_json_stream_reader&) = delete;
+    basic_json_stream_reader& operator=(const basic_json_stream_reader&) = delete;
 
 public:
 
-    basic_json_reader(std::basic_istream<CharT>& is)
-        : basic_json_reader(is,default_content_handler_,basic_json_serializing_options<CharT>(),default_err_handler_)
+    basic_json_stream_reader(std::basic_istream<CharT>& is)
+        : basic_json_stream_reader(is,default_content_handler_,basic_json_serializing_options<CharT>(),default_err_handler_)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is,
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
                       parse_error_handler& err_handler)
-        : basic_json_reader(is,default_content_handler_,basic_json_serializing_options<CharT>(),err_handler)
+        : basic_json_stream_reader(is,default_content_handler_,basic_json_serializing_options<CharT>(),err_handler)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is, 
+    basic_json_stream_reader(std::basic_istream<CharT>& is, 
                       basic_json_content_handler<CharT>& handler)
-        : basic_json_reader(is,handler,basic_json_serializing_options<CharT>(),default_err_handler_)
+        : basic_json_stream_reader(is,handler,basic_json_serializing_options<CharT>(),default_err_handler_)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is,
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
                       basic_json_content_handler<CharT>& handler,
                       parse_error_handler& err_handler)
-        : basic_json_reader(is,handler,basic_json_serializing_options<CharT>(),err_handler)
+        : basic_json_stream_reader(is,handler,basic_json_serializing_options<CharT>(),err_handler)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is, 
+    basic_json_stream_reader(std::basic_istream<CharT>& is, 
                       const basic_json_read_options<CharT>& options)
-        : basic_json_reader(is,default_content_handler_,options,default_err_handler_)
+        : basic_json_stream_reader(is,default_content_handler_,options,default_err_handler_)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is, 
+    basic_json_stream_reader(std::basic_istream<CharT>& is, 
                       const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
-        : basic_json_reader(is,default_content_handler_,options,err_handler)
+        : basic_json_stream_reader(is,default_content_handler_,options,err_handler)
     {
         buffer_.reserve(buffer_length_);
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is, 
+    basic_json_stream_reader(std::basic_istream<CharT>& is, 
                       basic_json_content_handler<CharT>& handler,
                       const basic_json_read_options<CharT>& options)
-        : basic_json_reader(is,handler,options,default_err_handler_)
+        : basic_json_stream_reader(is,handler,options,default_err_handler_)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is,
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
@@ -416,8 +303,8 @@ public:
 private:
 };
 
-typedef basic_json_reader<char> json_reader;
-typedef basic_json_reader<wchar_t> wjson_reader;
+typedef basic_json_stream_reader<char> json_stream_reader;
+typedef basic_json_stream_reader<wchar_t> wjson_stream_reader;
 
 }
 

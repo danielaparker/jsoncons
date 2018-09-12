@@ -56,7 +56,7 @@ enum class csv_state_type
 };
 
 template<class CharT,class Allocator=std::allocator<CharT>>
-class basic_csv_parser : private streaming_context
+class basic_csv_parser : private serializing_context
 {
     typedef basic_string_view<CharT> string_view_type;
     typedef CharT char_type;

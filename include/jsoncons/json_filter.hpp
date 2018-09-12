@@ -54,85 +54,85 @@ private:
         downstream_handler_.end_document();
     }
 
-    bool do_begin_object(const streaming_context& context) override
+    bool do_begin_object(const serializing_context& context) override
     {
         return downstream_handler_.begin_object(context);
     }
 
-    bool do_begin_object(size_t length, const streaming_context& context) override
+    bool do_begin_object(size_t length, const serializing_context& context) override
     {
         return downstream_handler_.begin_object(length, context);
     }
 
-    bool do_end_object(const streaming_context& context) override
+    bool do_end_object(const serializing_context& context) override
     {
         return downstream_handler_.end_object(context);
     }
 
-    bool do_begin_array(const streaming_context& context) override
+    bool do_begin_array(const serializing_context& context) override
     {
         return downstream_handler_.begin_array(context);
     }
 
-    bool do_begin_array(size_t length, const streaming_context& context) override
+    bool do_begin_array(size_t length, const serializing_context& context) override
     {
         return downstream_handler_.begin_array(length, context);
     }
 
-    bool do_end_array(const streaming_context& context) override
+    bool do_end_array(const serializing_context& context) override
     {
         return downstream_handler_.end_array(context);
     }
 
     bool do_name(const string_view_type& name,
-                 const streaming_context& context) override
+                 const serializing_context& context) override
     {
         return downstream_handler_.write_name(name,context);
     }
 
     bool do_string(const string_view_type& value,
-                         const streaming_context& context) override
+                         const serializing_context& context) override
     {
         return downstream_handler_.write_string(value,context);
     }
 
     bool do_byte_string(const uint8_t* data, size_t length,
-                              const streaming_context& context) override
+                              const serializing_context& context) override
     {
         return downstream_handler_.write_byte_string(data, length, context);
     }
 
     bool do_bignum(int signum, const uint8_t* data, size_t length,
-                         const streaming_context& context) override
+                         const serializing_context& context) override
     {
         return downstream_handler_.write_bignum(signum, data, length, context);
     }
 
     bool do_double(double value, const floating_point_options& fmt,
-                         const streaming_context& context) override
+                         const serializing_context& context) override
     {
         return downstream_handler_.write_double(value, fmt, context);
     }
 
     bool do_integer(int64_t value,
-                          const streaming_context& context) override
+                          const serializing_context& context) override
     {
         return downstream_handler_.write_integer(value,context);
     }
 
     bool do_uinteger(uint64_t value,
-                           const streaming_context& context) override
+                           const serializing_context& context) override
     {
         return downstream_handler_.write_uinteger(value,context);
     }
 
     bool do_bool(bool value,
-                       const streaming_context& context) override
+                       const serializing_context& context) override
     {
         return downstream_handler_.write_bool(value,context);
     }
 
-    bool do_null(const streaming_context& context) override
+    bool do_null(const serializing_context& context) override
     {
         return downstream_handler_.write_null(context);
     }
@@ -180,7 +180,7 @@ public:
 
 private:
     bool do_name(const string_view_type& name,
-                 const streaming_context& context) override
+                 const serializing_context& context) override
     {
         if (name == name_)
         {
@@ -226,38 +226,38 @@ private:
         downstream_handler_.end_document();
     }
 
-    bool do_begin_object(const streaming_context& context) override
+    bool do_begin_object(const serializing_context& context) override
     {
         return downstream_handler_.begin_object(context);
     }
 
-    bool do_begin_object(size_t length, const streaming_context& context) override
+    bool do_begin_object(size_t length, const serializing_context& context) override
     {
         return downstream_handler_.begin_object(length, context);
     }
 
-    bool do_end_object(const streaming_context& context) override
+    bool do_end_object(const serializing_context& context) override
     {
         return downstream_handler_.end_object(context);
     }
 
-    bool do_begin_array(const streaming_context& context) override
+    bool do_begin_array(const serializing_context& context) override
     {
         return downstream_handler_.begin_array(context);
     }
 
-    bool do_begin_array(size_t length, const streaming_context& context) override
+    bool do_begin_array(size_t length, const serializing_context& context) override
     {
         return downstream_handler_.begin_array(length, context);
     }
 
-    bool do_end_array(const streaming_context& context) override
+    bool do_end_array(const serializing_context& context) override
     {
         return downstream_handler_.end_array(context);
     }
 
     bool do_name(const string_view_type& name,
-                 const streaming_context& context) override
+                 const serializing_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(name.begin(),name.end(),std::back_inserter(target),unicons::conv_flags::strict);
@@ -269,7 +269,7 @@ private:
     }
 
     bool do_string(const string_view_type& value,
-                         const streaming_context& context) override
+                         const serializing_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(value.begin(),value.end(),std::back_inserter(target),unicons::conv_flags::strict);
@@ -281,42 +281,42 @@ private:
     }
 
     bool do_byte_string(const uint8_t* data, size_t length,
-                              const streaming_context& context) override
+                              const serializing_context& context) override
     {
         return downstream_handler_.write_byte_string(data, length, context);
     }
 
     bool do_bignum(int signum, const uint8_t* data, size_t length,
-                         const streaming_context& context) override
+                         const serializing_context& context) override
     {
         return downstream_handler_.write_bignum(signum, data, length, context);
     }
 
     bool do_double(double value, const floating_point_options& fmt,
-                         const streaming_context& context) override
+                         const serializing_context& context) override
     {
         return downstream_handler_.write_double(value, fmt, context);
     }
 
     bool do_integer(int64_t value,
-                          const streaming_context& context) override
+                          const serializing_context& context) override
     {
         return downstream_handler_.write_integer(value,context);
     }
 
     bool do_uinteger(uint64_t value,
-                           const streaming_context& context) override
+                           const serializing_context& context) override
     {
         return downstream_handler_.write_uinteger(value,context);
     }
 
     bool do_bool(bool value,
-                       const streaming_context& context) override
+                       const serializing_context& context) override
     {
         return downstream_handler_.write_bool(value,context);
     }
 
-    bool do_null(const streaming_context& context) override
+    bool do_null(const serializing_context& context) override
     {
         return downstream_handler_.write_null(context);
     }

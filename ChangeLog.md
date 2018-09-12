@@ -1,27 +1,28 @@
 master
 ------
 
-Changes to streaming API
+- Changes to streaming API
 
 The next release will include a JSON pull parser.
 
-To implement it using the existing JSON push parser, the function signatures
-have to be changed to return a bool value, to indicate whether to continue
-parsing. Along with the change in return value, some names have been changed.
-The virtual `do_` functions names have been trimmed of their `_value` suffix, 
-e.g. `do_integer_value` has been shortened to `do_integer`. The non-virtual
-functions `name`, `string_value`, `byte_string_value`, `bignum_value`, 
-`integer_value`, `uinteger_value`, `double_value`, `bool_value`, and 
-`null_value` have been changed to `write_name`, `write_string`, 
+To implement it using the existing JSON push parser, the `json_content_handler` 
+function signatures need to be changed to return a bool value, to indicate 
+whether to continue parsing. 
+
+In the spirit of "in for a penny, in for a pound", some names have also 
+been changed. The virtual `do_` functions names have been trimmed of their 
+`_value` suffix, e.g. `do_integer_value` has been shortened to `do_integer`. 
+The non-virtual functions `name`, `string_value`, `byte_string_value`, 
+`bignum_value`, `integer_value`, `uinteger_value`, `double_value`, `bool_value`, 
+and `null_value` have been changed to `write_name`, `write_string`, 
 `write_byte_string`, `write_bignum`, `write_integer`, `write_uinteger`, 
-`write_double`, `write_bool`, and `write_null`. Finally, the name
-`serializing_context` has been deprecated and changed to `streaming_context`.
+`write_double`, `write_bool`, and `write_null`. 
 
 For the `do_` functions, this is a breaking change. For the non-virtual 
 functions `begin_document`, `end_document`, `begin_array`, `end_array`, `integer_value`, 
 `double_value`, etc., this is a non breaking change, the old signatures have been 
-deprecated but preserved. In particular, the "Playing around with CBOR, JSON, and CSV"
-README example works as before.
+deprecated but preserved. For instance, the old "Playing around with CBOR, JSON, and 
+CSV" README example works without modifications.
 
 v0.109.0
 --------

@@ -34,7 +34,7 @@ public:
 
 private:
     bool do_name(const string_view_type& name,
-                 const streaming_context& context) override
+                 const serializing_context& context) override
     {
         member_name_ = std::string(name);
         if (member_name_ != "name")
@@ -45,7 +45,7 @@ private:
     }
 
     bool do_string(const string_view_type& s,
-                         const streaming_context& context) override
+                         const serializing_context& context) override
     {
         if (member_name_ == "name")
         {

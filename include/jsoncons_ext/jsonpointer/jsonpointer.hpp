@@ -195,7 +195,7 @@ struct path_setter
 };
 
 template<class J,class JReference>
-class jsonpointer_evaluator : private streaming_context
+class jsonpointer_evaluator : private serializing_context
 {
     typedef typename handle_type<J,JReference>::type type;
     typedef typename J::string_type string_type;
@@ -660,7 +660,7 @@ public:
 
 private:
 
-    // streaming_context
+    // serializing_context
 
     size_t do_line_number() const override
     {

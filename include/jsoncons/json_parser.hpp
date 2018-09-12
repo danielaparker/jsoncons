@@ -61,7 +61,7 @@ public:
     {
     }
 
-    bool do_string(const string_view_type& s, const streaming_context& context) override
+    bool do_string(const string_view_type& s, const serializing_context& context) override
     {
         if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
         {
@@ -101,7 +101,7 @@ enum class parse_state : uint8_t
     expect_value_or_end,
     expect_value,
     array, 
-    string_u1,
+    string,
     member_name,
     escape, 
     escape_u1, 
@@ -138,7 +138,7 @@ enum class parse_state : uint8_t
 };
 
 template <class CharT, class Allocator = std::allocator<char>>
-class basic_json_parser : private streaming_context
+class basic_json_parser : private serializing_context
 {
     static const size_t initial_string_buffer_capacity_ = 1024;
     static const size_t initial_number_buffer_capacity_ = 64;
@@ -560,9 +560,11 @@ public:
                             ++column_;
                             break;
                         case '\"':
-                            state_ = parse_state::string_u1;
+                            state_ = parse_state::string;
                             ++input_ptr_;
                             ++column_;
+                            parse_string(ec);
+                            if (ec) return;
                             break;
                         case '-':
                             number_buffer_.clear();
@@ -741,7 +743,9 @@ public:
                             ++input_ptr_;
                             ++column_;
                             push_state(parse_state::member_name);
-                            state_ = parse_state::string_u1;
+                            state_ = parse_state::string;
+                            parse_string(ec);
+                            if (ec) return;
                             break;
                         case '\'':
                             if (err_handler_.error(json_parse_errc::single_quote, *this))
@@ -802,7 +806,9 @@ public:
                             ++input_ptr_;
                             ++column_;
                             push_state(parse_state::member_name);
-                            state_ = parse_state::string_u1;
+                            state_ = parse_state::string;
+                            parse_string(ec);
+                            if (ec) return;
                             break;
                         case '}':
                             if (err_handler_.error(json_parse_errc::extra_comma, *this))
@@ -937,7 +943,9 @@ public:
                         case '\"':
                             ++input_ptr_;
                             ++column_;
-                            state_ = parse_state::string_u1;
+                            state_ = parse_state::string;
+                            parse_string(ec);
+                            if (ec) return;
                             break;
                         case '-':
                             number_buffer_.clear();
@@ -1079,7 +1087,9 @@ public:
                         case '\"':
                             ++input_ptr_;
                             ++column_;
-                            state_ = parse_state::string_u1;
+                            state_ = parse_state::string;
+                            parse_string(ec);
+                            if (ec) return;
                             break;
                         case '-':
                             number_buffer_.clear();
@@ -1144,7 +1154,7 @@ public:
                         }
                     }
                 break;
-            case parse_state::string_u1: 
+            case parse_state::string: 
             case parse_state::escape: 
             case parse_state::escape_u1: 
             case parse_state::escape_u2: 
@@ -1983,7 +1993,7 @@ exp3:
 
         switch (state_)
         {
-            case parse_state::string_u1:
+            case parse_state::string:
                 goto string_u1;
             case parse_state::escape:
                 goto escape;
@@ -2022,7 +2032,7 @@ string_u1:
                     if (err_handler_.error(json_parse_errc::illegal_control_character, *this))
                     {
                         ec = json_parse_errc::illegal_control_character;
-                        state_ = parse_state::string_u1;
+                        state_ = parse_state::string;
                         return;
                     }
                     // recovery - skip
@@ -2035,7 +2045,7 @@ string_u1:
                     }
                     string_buffer_.append(sb,input_ptr_-sb);
                     ++input_ptr_;
-                    state_ = parse_state::string_u1;
+                    state_ = parse_state::string;
                     return;
                 }
                 case '\r':
@@ -2044,7 +2054,7 @@ string_u1:
                     if (err_handler_.error(json_parse_errc::illegal_character_in_string, *this))
                     {
                         ec = json_parse_errc::illegal_character_in_string;
-                        state_ = parse_state::string_u1;
+                        state_ = parse_state::string;
                         return;
                     }
                     // recovery - keep
@@ -2067,7 +2077,7 @@ string_u1:
                     if (err_handler_.error(json_parse_errc::illegal_character_in_string, *this))
                     {
                         ec = json_parse_errc::illegal_character_in_string;
-                        state_ = parse_state::string_u1;
+                        state_ = parse_state::string;
                         return;
                     }
                     // recovery - keep
@@ -2090,7 +2100,7 @@ string_u1:
                     if (err_handler_.error(json_parse_errc::illegal_character_in_string, *this))
                     {
                         ec = json_parse_errc::illegal_character_in_string;
-                        state_ = parse_state::string_u1;
+                        state_ = parse_state::string;
                         return;
                     }
                     // recovery - keep
@@ -2103,7 +2113,7 @@ string_u1:
                     }
                     string_buffer_.append(sb, input_ptr_ - sb + 1);
                     ++input_ptr_;
-                    state_ = parse_state::string_u1;
+                    state_ = parse_state::string;
                     return;
                 }
                 case '\\': 
@@ -2162,7 +2172,7 @@ string_u1:
             }
             string_buffer_.append(sb,input_ptr_-sb);
             column_ += (input_ptr_ - sb + 1);
-            state_ = parse_state::string_u1;
+            state_ = parse_state::string;
             return;
         }
 
@@ -2304,7 +2314,7 @@ escape_u4:
                 unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
                 sb = ++input_ptr_;
                 ++column_;
-                state_ = parse_state::string_u1;
+                state_ = parse_state::string;
                 return;
             }
         }

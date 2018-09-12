@@ -1,7 +1,7 @@
-### jsoncons::streaming_context
+### jsoncons::serializing_context
 
 ```c++
-class streaming_context;
+class serializing_context;
 ```
 
 Provides contextual information for serializing and deserializing JSON and JSON-like data formats. This information may be used for error reporting.
