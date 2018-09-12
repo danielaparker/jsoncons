@@ -196,7 +196,6 @@ public:
                       parse_error_handler& err_handler)
         : basic_json_reader(is,default_content_handler_,options,err_handler)
     {
-        buffer_.reserve(buffer_length_);
     }
 
     basic_json_reader(std::basic_istream<CharT>& is, 
