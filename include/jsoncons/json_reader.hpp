@@ -94,10 +94,10 @@ private:
         {
             throw parse_error(result.ec,context.line_number(),context.column_number());
         }
-        other_handler_.write_name(target, context);
+        other_handler_.name(target, context);
     }
 
-    bool do_string(const string_view_type& value, const serializing_context& context) override
+    bool do_string_value(const string_view_type& value, const serializing_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -107,32 +107,32 @@ private:
         {
             throw parse_error(result.ec,context.line_number(),context.column_number());
         }
-        other_handler_.write_string(target, context);
+        other_handler_.string_value(target, context);
     }
 
-    bool do_integer(int64_t value, const serializing_context& context) override
+    bool do_int64_value(int64_t value, const serializing_context& context) override
     {
-        other_handler_.write_integer(value, context);
+        other_handler_.int64_value(value, context);
     }
 
-    bool do_uinteger(uint64_t value, const serializing_context& context) override
+    bool do_uint64_value(uint64_t value, const serializing_context& context) override
     {
-        other_handler_.write_uinteger(value, context);
+        other_handler_.uint64_value(value, context);
     }
 
-    bool do_double(double value, const floating_point_options& fmt, const serializing_context& context) override
+    bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) override
     {
-        other_handler_.write_double(value, fmt, context);
+        other_handler_.double_value(value, fmt, context);
     }
 
     bool do_bool(bool value, const serializing_context& context) override
     {
-        other_handler_.write_bool(value, context);
+        other_handler_.bool_value(value, context);
     }
 
-    bool do_null(const serializing_context& context) override
+    bool do_null_value(const serializing_context& context) override
     {
-        other_handler_.write_null(context);
+        other_handler_.null_value(context);
     }
 };
 

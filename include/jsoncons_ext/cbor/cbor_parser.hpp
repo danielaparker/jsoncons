@@ -1838,7 +1838,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.write_uinteger(val, *this);
+                handler_.uint64_value(val, *this);
             }
             break;
         case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
@@ -1859,7 +1859,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.write_integer(val, *this);
+                handler_.int64_value(val, *this);
             }
             break;
 
@@ -1874,7 +1874,7 @@ public:
                 }
                 input_ptr_ = endp;
 
-                handler_.write_bignum(1, v.data(), v.size(), *this);
+                handler_.bignum_value(1, v.data(), v.size(), *this);
             }
             break;
 
@@ -1889,23 +1889,23 @@ public:
                 }
                 input_ptr_ = endp;
 
-                handler_.write_bignum(-1, v.data(), v.size(), *this);
+                handler_.bignum_value(-1, v.data(), v.size(), *this);
             }
             break;
 
             // False
         case 0xf4:
-            handler_.write_bool(false, *this);
+            handler_.bool_value(false, *this);
             break;
 
             // True
         case 0xf5:
-            handler_.write_bool(true, *this);
+            handler_.bool_value(true, *this);
             break;
 
             // Null
         case 0xf6:
-            handler_.write_null(*this);
+            handler_.null_value(*this);
             break;
 
         case 0xf9: // Half-Precision Float (two-byte IEEE 754)
@@ -1922,7 +1922,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.write_double(val, *this);
+                handler_.double_value(val, *this);
             }
             break;
             // byte string (0x00..0x17 bytes follow)
@@ -1942,7 +1942,7 @@ public:
                 }
                 input_ptr_ = endp;
 
-                handler_.write_byte_string(v.data(), v.size(), *this);
+                handler_.byte_string_value(v.data(), v.size(), *this);
             }
             break;
 
@@ -1962,7 +1962,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.write_string(basic_string_view<char>(s.data(),s.length()), *this);
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), *this);
             }
             break;
 
@@ -2218,7 +2218,7 @@ private:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.write_name(basic_string_view<char>(s.data(),s.length()), *this);
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
             }
             break;
         default:

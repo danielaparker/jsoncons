@@ -99,144 +99,144 @@ public:
         return do_end_array(context);
     }
 
-    bool write_name(const string_view_type& name)
+    bool name(const string_view_type& name)
     {
         return do_name(name, null_serializing_context());
     }
 
-    bool write_name(const string_view_type& name, const serializing_context& context)
+    bool name(const string_view_type& name, const serializing_context& context)
     {
         return do_name(name, context);
     }
 
-    bool write_string(const string_view_type& value) 
+    bool string_value(const string_view_type& value) 
     {
-        return do_string(value, null_serializing_context());
+        return do_string_value(value, null_serializing_context());
     }
 
-    bool write_string(const string_view_type& value, const serializing_context& context) 
+    bool string_value(const string_view_type& value, const serializing_context& context) 
     {
-        return do_string(value, context);
+        return do_string_value(value, context);
     }
 
-    bool write_byte_string(const uint8_t* data, size_t length) 
+    bool byte_string_value(const uint8_t* data, size_t length) 
     {
-        return do_byte_string(data, length, null_serializing_context());
+        return do_byte_string_value(data, length, null_serializing_context());
     }
 
-    bool write_byte_string(const uint8_t* data, size_t length, const serializing_context& context) 
+    bool byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
     {
-        return do_byte_string(data, length, context);
+        return do_byte_string_value(data, length, context);
     }
 
-    bool write_byte_string(const std::vector<uint8_t>& v) 
+    bool byte_string_value(const std::vector<uint8_t>& v) 
     {
-        return do_byte_string(v.data(), v.size(), null_serializing_context());
+        return do_byte_string_value(v.data(), v.size(), null_serializing_context());
     }
 
-    bool write_byte_string(const std::vector<uint8_t>& v, const serializing_context& context) 
+    bool byte_string_value(const std::vector<uint8_t>& v, const serializing_context& context) 
     {
-        return do_byte_string(v.data(), v.size(), context);
+        return do_byte_string_value(v.data(), v.size(), context);
     }
 
-    bool write_bignum(int signum, const uint8_t* data, size_t length) 
+    bool bignum_value(int signum, const uint8_t* data, size_t length) 
     {
-        return do_bignum(signum, data, length, null_serializing_context());
+        return do_bignum_value(signum, data, length, null_serializing_context());
     }
 
-    bool write_bignum(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
+    bool bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
     {
-        return do_bignum(signum, data, length, context);
+        return do_bignum_value(signum, data, length, context);
     }
 
-    bool write_bignum(const string_view_type& s) 
-    {
-        bignum n(s.data(),s.size());
-        int signum;
-        std::vector<uint8_t> v;
-        n.dump(signum, v);
-
-        return do_bignum(signum, v.data(), v.size(), null_serializing_context());
-    }
-
-    bool write_bignum(const string_view_type& s, const serializing_context& context) 
+    bool bignum_value(const string_view_type& s) 
     {
         bignum n(s.data(),s.size());
         int signum;
         std::vector<uint8_t> v;
         n.dump(signum, v);
 
-        return do_bignum(signum, v.data(), v.size(), context);
+        return do_bignum_value(signum, v.data(), v.size(), null_serializing_context());
     }
 
-    bool write_integer(int64_t value)
+    bool bignum_value(const string_view_type& s, const serializing_context& context) 
     {
-        return do_integer(value,null_serializing_context());
+        bignum n(s.data(),s.size());
+        int signum;
+        std::vector<uint8_t> v;
+        n.dump(signum, v);
+
+        return do_bignum_value(signum, v.data(), v.size(), context);
     }
 
-    bool write_integer(int64_t value, const serializing_context& context)
+    bool int64_value(int64_t value)
     {
-        return do_integer(value,context);
+        return do_int64_value(value,null_serializing_context());
     }
 
-    bool write_uinteger(uint64_t value)
+    bool int64_value(int64_t value, const serializing_context& context)
     {
-        return do_uinteger(value,null_serializing_context());
+        return do_int64_value(value,context);
     }
 
-    bool write_uinteger(uint64_t value, const serializing_context& context)
+    bool uint64_value(uint64_t value)
     {
-        return do_uinteger(value,context);
+        return do_uint64_value(value,null_serializing_context());
     }
 
-    bool write_double(double value)
+    bool uint64_value(uint64_t value, const serializing_context& context)
     {
-        return do_double(value, floating_point_options(), null_serializing_context());
+        return do_uint64_value(value,context);
     }
 
-    bool write_double(double value, uint8_t precision)
+    bool double_value(double value)
     {
-        return do_double(value, floating_point_options(chars_format::general, precision), null_serializing_context());
+        return do_double_value(value, floating_point_options(), null_serializing_context());
     }
 
-    bool write_double(double value, const floating_point_options& fmt)
+    bool double_value(double value, uint8_t precision)
     {
-        return do_double(value, fmt, null_serializing_context());
+        return do_double_value(value, floating_point_options(chars_format::general, precision), null_serializing_context());
     }
 
-    bool write_double(double value, const serializing_context& context)
+    bool double_value(double value, const floating_point_options& fmt)
     {
-        return do_double(value, floating_point_options(), context);
+        return do_double_value(value, fmt, null_serializing_context());
     }
 
-    bool write_double(double value, uint8_t precision, const serializing_context& context)
+    bool double_value(double value, const serializing_context& context)
     {
-        return do_double(value, floating_point_options(chars_format::general, precision), context);
+        return do_double_value(value, floating_point_options(), context);
     }
 
-    bool write_double(double value, const floating_point_options& fmt, const serializing_context& context)
+    bool double_value(double value, uint8_t precision, const serializing_context& context)
     {
-        return do_double(value, fmt, context);
+        return do_double_value(value, floating_point_options(chars_format::general, precision), context);
     }
 
-    bool write_bool(bool value) 
+    bool double_value(double value, const floating_point_options& fmt, const serializing_context& context)
+    {
+        return do_double_value(value, fmt, context);
+    }
+
+    bool bool_value(bool value) 
     {
         return do_bool(value,null_serializing_context());
     }
 
-    bool write_bool(bool value, const serializing_context& context) 
+    bool bool_value(bool value, const serializing_context& context) 
     {
         return do_bool(value,context);
     }
 
-    bool write_null() 
+    bool null_value() 
     {
-        return do_null(null_serializing_context());
+        return do_null_value(null_serializing_context());
     }
 
-    bool write_null(const serializing_context& context) 
+    bool null_value(const serializing_context& context) 
     {
-        return do_null(context);
+        return do_null_value(context);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -253,202 +253,92 @@ public:
 
     void name(const CharT* p, size_t length, const serializing_context& context) 
     {
-        write_name(string_view_type(p, length), context);
+        name(string_view_type(p, length), context);
     }
 
     void value(const std::basic_string<CharT>& value, const serializing_context& context) 
     {
-        write_string(value, context);
+        string_value(value, context);
     }
 
     void value(const CharT* p, size_t length, const serializing_context& context) 
     {
-        write_string(string_view_type(p, length), context);
+        string_value(string_view_type(p, length), context);
     }
 
     void value(const CharT* p, const serializing_context& context)
     {
-        write_string(string_view_type(p), context);
+        string_value(string_view_type(p), context);
     }
 
     void value(int value, const serializing_context& context) 
     {
-        write_integer(value,context);
+        int64_value(value,context);
     }
 
     void value(long value, const serializing_context& context) 
     {
-        write_integer(value,context);
+        int64_value(value,context);
     }
 
     void value(long long value, const serializing_context& context) 
     {
-        write_integer(value,context);
+        int64_value(value,context);
     }
 
     void value(unsigned int value, const serializing_context& context) 
     {
-        write_uinteger(value,context);
+        uint64_value(value,context);
     }
 
     void value(unsigned long value, const serializing_context& context) 
     {
-        write_uinteger(value,context);
+        uint64_value(value,context);
     }
 
     void value(unsigned long long value, const serializing_context& context) 
     {
-        write_uinteger(value,context);
+        uint64_value(value,context);
     }
 
     void value(float value, uint8_t precision, const serializing_context& context)
     {
-        write_double(value, precision, context);
+        double_value(value, precision, context);
     }
 
     void value(double value, uint8_t precision, const serializing_context& context)
     {
-        write_double(value, precision, context);
+        double_value(value, precision, context);
     }
 
     void value(bool value, const serializing_context& context) 
     {
-        write_bool(value,context);
+        bool_value(value,context);
     }
 
     bool value(null_type, const serializing_context& context)
     {
-        return write_null(context);
-    }
-
-    void name(const string_view_type& name)
-    {
-        write_name(name);
-    }
-
-    void name(const string_view_type& name, const serializing_context& context)
-    {
-        write_name(name, context);
-    }
-
-    void string_value(const string_view_type& value) 
-    {
-        write_string(value);
-    }
-
-    void string_value(const string_view_type& value, const serializing_context& context) 
-    {
-        write_string(value, context);
-    }
-
-    void byte_string_value(const uint8_t* data, size_t length) 
-    {
-        write_byte_string(data, length);
-    }
-
-    void byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
-    {
-        write_byte_string(data, length, context);
-    }
-
-    void byte_string_value(const std::vector<uint8_t>& v) 
-    {
-        write_byte_string(v);
-    }
-
-    void byte_string_value(const std::vector<uint8_t>& v, const serializing_context& context) 
-    {
-        write_byte_string(v, context);
-    }
-
-    void bignum_value(int signum, const uint8_t* data, size_t length) 
-    {
-        write_bignum(signum, data, length);
-    }
-
-    void bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
-    {
-        write_bignum(signum, data, length, context);
-    }
-
-    void bignum_value(const string_view_type& s) 
-    {
-        write_bignum(s);
-    }
-
-    void bignum_value(const string_view_type& s, const serializing_context& context) 
-    {
-        write_bignum(s, context);
+        return null_value(context);
     }
 
     void integer_value(int64_t value)
     {
-        write_integer(value);
+        int64_value(value);
     }
 
     void integer_value(int64_t value, const serializing_context& context)
     {
-        write_integer(value,context);
+        int64_value(value,context);
     }
 
     void uinteger_value(uint64_t value)
     {
-        write_uinteger(value);
+        uint64_value(value);
     }
 
     void uinteger_value(uint64_t value, const serializing_context& context)
     {
-        write_uinteger(value,context);
-    }
-
-    void double_value(double value)
-    {
-        write_double(value);
-    }
-
-    void double_value(double value, uint8_t precision)
-    {
-        write_double(value, precision);
-    }
-
-    void double_value(double value, const floating_point_options& fmt)
-    {
-        write_double(value, fmt);
-    }
-
-    void double_value(double value, const serializing_context& context)
-    {
-        write_double(value, context);
-    }
-
-    void double_value(double value, uint8_t precision, const serializing_context& context)
-    {
-        write_double(value, precision, context);
-    }
-
-    void double_value(double value, const floating_point_options& fmt, const serializing_context& context)
-    {
-        write_double(value, fmt, context);
-    }
-
-    void bool_value(bool value) 
-    {
-        write_bool(value);
-    }
-
-    void bool_value(bool value, const serializing_context& context) 
-    {
-        write_bool(value, context);
-    }
-
-    void null_value() 
-    {
-        write_null();
-    }
-
-    void null_value(const serializing_context& context) 
-    {
-        write_null(context);
+        uint64_value(value,context);
     }
 
 #endif
@@ -478,19 +368,19 @@ private:
 
     virtual bool do_name(const string_view_type& name, const serializing_context& context) = 0;
 
-    virtual bool do_null(const serializing_context& context) = 0;
+    virtual bool do_null_value(const serializing_context& context) = 0;
 
-    virtual bool do_string(const string_view_type& value, const serializing_context& context) = 0;
+    virtual bool do_string_value(const string_view_type& value, const serializing_context& context) = 0;
 
-    virtual bool do_byte_string(const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
-    virtual bool do_bignum(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
-    virtual bool do_double(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
+    virtual bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
 
-    virtual bool do_integer(int64_t value, const serializing_context& context) = 0;
+    virtual bool do_int64_value(int64_t value, const serializing_context& context) = 0;
 
-    virtual bool do_uinteger(uint64_t value, const serializing_context& context) = 0;
+    virtual bool do_uint64_value(uint64_t value, const serializing_context& context) = 0;
 
     virtual bool do_bool(bool value, const serializing_context& context) = 0;
 };
@@ -534,37 +424,37 @@ private:
         return true;
     }
 
-    bool do_null(const serializing_context&) override
+    bool do_null_value(const serializing_context&) override
     {
         return true;
     }
 
-    bool do_string(const string_view_type&, const serializing_context&) override
+    bool do_string_value(const string_view_type&, const serializing_context&) override
     {
         return true;
     }
 
-    bool do_byte_string(const uint8_t*, size_t, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
     {
         return true;
     }
 
-    bool do_bignum(int, const uint8_t*, size_t, const serializing_context&) override
+    bool do_bignum_value(int, const uint8_t*, size_t, const serializing_context&) override
     {
         return true;
     }
 
-    bool do_double(double, const floating_point_options&, const serializing_context&) override
+    bool do_double_value(double, const floating_point_options&, const serializing_context&) override
     {
         return true;
     }
 
-    bool do_integer(int64_t, const serializing_context&) override
+    bool do_int64_value(int64_t, const serializing_context&) override
     {
         return true;
     }
 
-    bool do_uinteger(uint64_t, const serializing_context&) override
+    bool do_uint64_value(uint64_t, const serializing_context&) override
     {
         return true;
     }

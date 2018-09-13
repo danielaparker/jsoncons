@@ -21,9 +21,9 @@ namespace readme
         bserializer.begin_document();
         bserializer.begin_array(); // indefinite length array
         bserializer.begin_array(3); // fixed length array
-        bserializer.write_string("Toronto");
-        bserializer.write_byte_string({'H','e','l','l','o'});
-        bserializer.write_bignum("-18446744073709551617");
+        bserializer.string_value("Toronto");
+        bserializer.byte_string_value({'H','e','l','l','o'});
+        bserializer.bignum_value("-18446744073709551617");
         bserializer.end_array();
         bserializer.end_array();
         bserializer.end_document();

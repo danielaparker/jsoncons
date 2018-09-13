@@ -37,11 +37,19 @@ target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
 
 target_link_libraries(jsoncons_tests Catch)
 
+if (CXXSTD)
+set_target_properties (jsoncons_tests PROPERTIES
+    CXX_STANDARD ${CXXSTD}
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+  )
+else()
 set_target_properties (jsoncons_tests PROPERTIES
     CXX_STANDARD 11
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
   )
+endif()
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   # special link option on Linux because llvm stl rely on GNU stl

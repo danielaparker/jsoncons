@@ -71,10 +71,10 @@ namespace jsoncons
         static void encode(const std::shared_ptr<Employee>& val, json_content_handler& handler)
         {
             handler.begin_object();
-            handler.write_name("Name");
-            handler.write_string(val->name());
-            handler.write_name("Pay");
-            handler.write_double(val->calculatePay());
+            handler.name("Name");
+            handler.string_value(val->name());
+            handler.name("Pay");
+            handler.double_value(val->calculatePay());
             handler.end_object();
         }
     };
@@ -113,7 +113,7 @@ void streaming_example2()
 
     serializer.begin_document();       
     serializer.begin_object();       
-    serializer.write_name("Employees");       
+    serializer.name("Employees");       
     encode_fragment(employees, serializer);
     serializer.end_object();       
     serializer.end_document();       

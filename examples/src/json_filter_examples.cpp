@@ -23,26 +23,26 @@ private:
         member_name_ = std::string(name);
         if (member_name_ != "name")
         {
-            this->downstream_handler().write_name(name, context);
+            this->downstream_handler().name(name, context);
         }
         return true;
     }
 
-    bool do_string(const string_view_type& s, 
+    bool do_string_value(const string_view_type& s, 
                          const serializing_context& context) override
     {
         if (member_name_ == "name")
         {
             size_t end_first = s.find_first_of(" \t");
             size_t start_last = s.find_first_not_of(" \t", end_first);
-            this->downstream_handler().write_name("first-name", context);
+            this->downstream_handler().name("first-name", context);
             string_view_type first = s.substr(0, end_first);
-            this->downstream_handler().write_string(first, context);
+            this->downstream_handler().string_value(first, context);
             if (start_last != string_view_type::npos)
             {
-                this->downstream_handler().write_name("last-name", context);
+                this->downstream_handler().name("last-name", context);
                 string_view_type last = s.substr(start_last);
-                this->downstream_handler().write_string(last, context);
+                this->downstream_handler().string_value(last, context);
             }
             else
             {
@@ -53,7 +53,7 @@ private:
         }
         else
         {
-            this->downstream_handler().write_string(s, context);
+            this->downstream_handler().string_value(s, context);
         }
         return true;
     }

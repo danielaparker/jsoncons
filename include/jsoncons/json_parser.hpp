@@ -61,23 +61,23 @@ public:
     {
     }
 
-    bool do_string(const string_view_type& s, const serializing_context& context) override
+    bool do_string_value(const string_view_type& s, const serializing_context& context) override
     {
         if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
         {
-            this->downstream_handler().write_double(std::nan(""), context);
+            this->downstream_handler().double_value(std::nan(""), context);
         }
         else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
         {
-            this->downstream_handler().write_double(std::numeric_limits<double>::infinity(), context);
+            this->downstream_handler().double_value(std::numeric_limits<double>::infinity(), context);
         }
         else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
         {
-            this->downstream_handler().write_double(-std::numeric_limits<double>::infinity(), context);
+            this->downstream_handler().double_value(-std::numeric_limits<double>::infinity(), context);
         }
         else
         {
-            this->downstream_handler().write_string(s, context);
+            this->downstream_handler().string_value(s, context);
         }
         return true;
     }
@@ -1217,7 +1217,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'e':
-                    continue_ = handler_.write_bool(true,*this);
+                    continue_ = handler_.bool_value(true,*this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
@@ -1283,7 +1283,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'e':
-                    continue_ = handler_.write_bool(false,*this);
+                    continue_ = handler_.bool_value(false,*this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
@@ -1335,7 +1335,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'l':
-                    continue_ = handler_.write_null(*this);
+                    continue_ = handler_.null_value(*this);
                     if (parent() == parse_state::root)
                     {
                         state_ = parse_state::done;
@@ -1451,7 +1451,7 @@ public:
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
             {
-                continue_ = handler_.write_bool(true,*this);
+                continue_ = handler_.bool_value(true,*this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == parse_state::root)
@@ -1486,7 +1486,7 @@ public:
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
-                continue_ = handler_.write_null(*this);
+                continue_ = handler_.null_value(*this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == parse_state::root)
@@ -1521,7 +1521,7 @@ public:
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
             {
-                continue_ = handler_.write_bool(false,*this);
+                continue_ = handler_.bool_value(false,*this);
                 input_ptr_ += 5;
                 column_ += 5;
                 if (parent() == parse_state::root)
@@ -2589,7 +2589,7 @@ private:
         jsoncons::detail::to_integer_result result = jsoncons::detail::to_integer(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler_.write_integer(result.value, *this);
+            continue_ = handler_.int64_value(result.value, *this);
             after_value(ec);
         }
         else
@@ -2599,7 +2599,7 @@ private:
             int signum = 0;
             bignum n(number_buffer_.c_str());
             n.dump(signum, byte_buffer_);
-            continue_ = handler_.write_bignum(signum, byte_buffer_.data(), byte_buffer_.size(), *this);
+            continue_ = handler_.bignum_value(signum, byte_buffer_.data(), byte_buffer_.size(), *this);
             after_value(ec);
         }
     }
@@ -2609,7 +2609,7 @@ private:
         jsoncons::detail::to_uinteger_result result = jsoncons::detail::to_uinteger(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler_.write_uinteger(result.value, *this);
+            continue_ = handler_.uint64_value(result.value, *this);
             after_value(ec);
         }
         else
@@ -2619,7 +2619,7 @@ private:
             int signum = 0;
             bignum n(number_buffer_.c_str());
             n.dump(signum, byte_buffer_);
-            continue_ = handler_.write_bignum(1, byte_buffer_.data(), byte_buffer_.size(), *this);
+            continue_ = handler_.bignum_value(1, byte_buffer_.data(), byte_buffer_.size(), *this);
             after_value(ec);
         }
     }
@@ -2632,11 +2632,11 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                continue_ = handler_.write_double(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
+                continue_ = handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
             }
             else
             {
-                continue_ = handler_.write_double(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), *this);
+                continue_ = handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), *this);
             }
         }
         catch (...)
@@ -2646,7 +2646,7 @@ private:
                 ec = json_parse_errc::invalid_number;
                 return;
             }
-            continue_ = handler_.write_null(*this); // recovery
+            continue_ = handler_.null_value(*this); // recovery
         }
 
         after_value(ec);
@@ -2698,17 +2698,17 @@ private:
         switch (parent())
         {
         case parse_state::member_name:
-            continue_ = handler_.write_name(string_view_type(s, length), *this);
+            continue_ = handler_.name(string_view_type(s, length), *this);
             state_ = pop_state();
             state_ = parse_state::expect_colon;
             break;
         case parse_state::object:
         case parse_state::array:
-            continue_ = handler_.write_string(string_view_type(s, length), *this);
+            continue_ = handler_.string_value(string_view_type(s, length), *this);
             state_ = parse_state::expect_comma_or_end;
             break;
         case parse_state::root:
-            continue_ = handler_.write_string(string_view_type(s, length), *this);
+            continue_ = handler_.string_value(string_view_type(s, length), *this);
             state_ = parse_state::done;
             handler_.end_document();
             continue_ = false;

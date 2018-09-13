@@ -54,32 +54,32 @@ Indicates the end of an array. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_name(const string_view_type& name)
-    bool write_name(const string_view_type& name, const serializing_context& context)
+    bool name(const string_view_type& name)
+    bool name(const string_view_type& name, const serializing_context& context)
 Writes the name part of a name-value pair inside an object. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter.  
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_string(const string_view_type& value) 
-    bool write_string(const string_view_type& value, const serializing_context& context) 
+    bool string_value(const string_view_type& value) 
+    bool string_value(const string_view_type& value, const serializing_context& context) 
 Writes a string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_byte_string(const uint8_t* data, size_t length) 
-    bool write_byte_string(const uint8_t* data, size_t length, const serializing_context& context) 
+    bool byte_string_value(const uint8_t* data, size_t length) 
+    bool byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
 Writes a byte string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_byte_string(const std::vector<uint8_t>& v) 
-    bool write_byte_string(const std::vector<uint8_t>& v, const serializing_context& context) 
+    bool byte_string_value(const std::vector<uint8_t>& v) 
+    bool byte_string_value(const std::vector<uint8_t>& v, const serializing_context& context) 
 Writes a byte string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_bignum(int signum, const uint8_t* data, size_t length) 
-    bool write_bignum(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
+    bool bignum_value(int signum, const uint8_t* data, size_t length) 
+    bool bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
 Writes a bignum using the sign-magnitude representation. 
 The magnitude is an unsigned integer `n` encoded as a byte string data item in big-endian byte-order.
 If the value of signum is 1, the value of the bignum is `n`. 
@@ -88,50 +88,50 @@ An empty list means a zero value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_bignum(const string_view_type& s) 
-    bool write_bignum(const string_view_type& s, const serializing_context& context) 
+    bool bignum_value(const string_view_type& s) 
+    bool bignum_value(const string_view_type& s, const serializing_context& context) 
 Writes a bignum using the decimal string representation of a bignum. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_integer(int64_t value) 
-    bool write_integer(int64_t value, const serializing_context& context)
+    bool int64_value(int64_t value) 
+    bool int64_value(int64_t value, const serializing_context& context)
 Writes a signed integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_uinteger(uint64_t value) 
-    bool write_uinteger(uint64_t value, const serializing_context& context)
+    bool uint64_value(uint64_t value) 
+    bool uint64_value(uint64_t value, const serializing_context& context)
 Writes a non-negative integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_double(double value) 
-    bool write_double(double value, const serializing_context& context)
+    bool double_value(double value) 
+    bool double_value(double value, const serializing_context& context)
 Writes a floating point value with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_double(double value, uint8_t precision) 
-    bool write_double(double value, uint8_t precision, const serializing_context& context)
+    bool double_value(double value, uint8_t precision) 
+    bool double_value(double value, uint8_t precision, const serializing_context& context)
 Writes a floating point value with specified precision. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_double(double value, const floating_point_options& fmt) 
-    bool write_double(double value, const floating_point_options& fmt, const serializing_context& context)
+    bool double_value(double value, const floating_point_options& fmt) 
+    bool double_value(double value, const floating_point_options& fmt, const serializing_context& context)
 Writes a floating point value with specified precision. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_bool(bool value) 
-    bool write_bool(bool value, const serializing_context& context) 
+    bool bool_value(bool value) 
+    bool bool_value(bool value, const serializing_context& context) 
 Writes a boolean value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool write_null() 
-    bool write_null(const serializing_context& context) 
+    bool null_value() 
+    bool null_value(const serializing_context& context) 
 Writes a null value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -175,18 +175,18 @@ Handles the name part of a name-value pair inside an object. Contextual informat
 line and column information is provided in the [context](serializing_context.md) parameter.  
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_string(const string_view_type& val, 
+    virtual bool do_string_value(const string_view_type& val, 
                            const serializing_context& context) = 0;
 Handles a string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_byte_string(const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 Handles a byte string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_bignum(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
 Handles a bignum using the sign-magnitude representation. 
 The magnitude is an unsigned integer `n` encoded as a byte string data item in big-endian byte-order.
 If the value of signum is 1, the value of the bignum is `n`. 
@@ -195,18 +195,18 @@ An empty list means a zero value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_integer(int64_t value, const serializing_context& context) = 0;
+    virtual bool do_int64_value(int64_t value, const serializing_context& context) = 0;
 Handles a signed integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_uinteger(uint64_t value, 
+    virtual bool do_uint64_value(uint64_t value, 
                              const serializing_context& context) = 0;
 Handles a non-negative integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_double(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
+    virtual bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
 Handles a floating point value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -216,7 +216,7 @@ Handles a boolean value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_null(const serializing_context& context) = 0;
+    virtual bool do_null_value(const serializing_context& context) = 0;
 Handles a null value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

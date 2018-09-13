@@ -77,24 +77,21 @@ before_install:
 
 matrix:
   include:
-    - { env: 'CXXSTD=11 CXX=g++-4.8 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc48 }
-    - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc6 }
-    - { env: 'STD=11 CXX=g++-6 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
-    - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-fsanitize=address,memory,undefined,thread,leak', addons: *gcc7 }
-    - { env: 'STD=11 CXX=g++-7 CMAKEFLAGS=-DNO_DEPRECATED=YES', addons: *gcc7 }
-    - { env: 'STD=17 CXX=g++-8 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak -lstdc++fs"', addons: *gcc8 }
-    - { env: 'STD=17 CXX=g++-8 CMAKEFLAGS="-DNO_DEPRECATED=YES -fsanitize=address,memory,undefined,thread,leak -lstdc++fs"', addons: *gcc8 }
-    - { env: 'STD=11 CXX=clang++-3.8 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang38 }
-    - { env: 'STD=11 CXX=clang++-5.0 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang50 }
-    - { env: 'STD=11 CXX=clang++-6.0 CMAKEFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang60 }
-    - { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
-
-  allow_failures:
-    - { env: 'CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
+    - { env: 'CXXSTD=11 CXX=g++-4.8 CPPFLAGS="-fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc48 }
+    - { env: 'CXXSTD=11 CXX=g++-6 CPPFLAGS="-fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc6 }
+    - { env: 'CXXSTD=11 CXX=g++-6 CPPFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
+    - { env: 'CXXSTD=11 CXX=g++-7 CPPFLAGS=-fsanitize=address,memory,undefined,thread,leak', addons: *gcc7 }
+    - { env: 'CXXSTD=11 CXX=g++-7 CPPFLAGS=-DNO_DEPRECATED=YES', addons: *gcc7 }
+    - { env: 'CXXSTD=17 CXX=g++-8 CPPFLAGS="-fsanitize=address,memory,undefined,thread,leak -lstdc++fs"', addons: *gcc8 }
+    - { env: 'CXXSTD=17 CXX=g++-8 CPPFLAGS="-DNO_DEPRECATED=YES -fsanitize=address,memory,undefined,thread,leak -lstdc++fs"', addons: *gcc8 }
+    - { env: 'CXXSTD=11 CXX=clang++-3.8 CPPFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang38 }
+    - { env: 'CXXSTD=11 CXX=clang++-5.0 CPPFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang50 }
+    - { env: 'CXXSTD=11 CXX=clang++-6.0 CPPFLAGS="-fsanitize=address,memory,undefined,thread,leak"', addons: *clang60 }
+    - { env: 'CXXSTD=11 CXX=clang++', compiler: clang, osx_image: xcode6.4, addons: *xcode64}
 
 script:
   - cd tests/build/cmake
-  - cmake $CMAKEFLAGS .
+  - cmake .
   - cmake --build . --config Release
   - ctest -C Release -V -j
 

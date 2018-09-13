@@ -100,7 +100,7 @@ struct serialization_traits<T,
     template <class CharT>
     static void encode(T val, basic_json_content_handler<CharT>& handler)
     {
-        handler.write_integer(val);
+        handler.int64_value(val);
     }
 };
 
@@ -114,7 +114,7 @@ struct serialization_traits<T,
     template <class CharT>
     static void encode(T val, basic_json_content_handler<CharT>& handler)
     {
-        handler.write_uinteger(val);
+        handler.uint64_value(val);
     }
 };
 
@@ -128,7 +128,7 @@ struct serialization_traits<T,
     template <class CharT>
     static void encode(T val, basic_json_content_handler<CharT>& handler)
     {
-        handler.write_double(val);
+        handler.double_value(val);
     }
 };
 
@@ -140,7 +140,7 @@ struct serialization_traits<bool>
     template <class CharT>
     static void encode(bool val, basic_json_content_handler<CharT>& handler)
     {
-        handler.write_bool(val);
+        handler.bool_value(val);
     }
 };
 
@@ -154,7 +154,7 @@ struct serialization_traits<T,
     template <class CharT>
     static void encode(const T& val, basic_json_content_handler<CharT>& handler)
     {
-        handler.write_string(val);
+        handler.string_value(val);
     }
 };
 
@@ -164,7 +164,7 @@ struct serialization_traits<typename type_wrapper<CharT>::const_pointer_type>
     template <class CharT>
     static void encode(typename type_wrapper<CharT>::const_pointer_type val, basic_json_content_handler<CharT>& handler)
     {
-        handler.write_string(val);
+        handler.string_value(val);
     }
 };*/
 
@@ -225,7 +225,7 @@ struct serialization_traits<T,
         handler.begin_object();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
-            handler.write_name(it->first);
+            handler.name(it->first);
             serialization_traits<mapped_type>::encode(it->second,handler);
         }
         handler.end_object();

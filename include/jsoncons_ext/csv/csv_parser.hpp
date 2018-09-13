@@ -208,7 +208,7 @@ public:
                 {
                     if (column_index_ < column_names_.size() + offset_)
                     {
-                        handler_.write_name(column_names_[column_index_ - offset_], *this);
+                        handler_.name(column_names_[column_index_ - offset_], *this);
                     }
                 }
                 break;
@@ -305,7 +305,7 @@ public:
                     handler_.begin_array(*this);
                     for (const auto& name : column_names_)
                     {
-                        handler_.write_string(name, *this);
+                        handler_.string_value(name, *this);
                     }
                     handler_.end_array(*this);
                 }
@@ -667,7 +667,7 @@ all_csv_states:
             handler_.begin_object(*this);
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
-                handler_.write_name(column_names_[i],*this);
+                handler_.name(column_names_[i],*this);
                 decoders_[i].end_array(*this);
                 decoders_[i].end_document();
                 decoders_[i].get_result().dump_fragment(fragment_filter);
@@ -749,7 +749,7 @@ private:
             case mapping_type::n_rows:
                 if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                 {
-                    handler_.write_null(*this);
+                    handler_.null_value(*this);
                 }
                 else
                 {
@@ -763,7 +763,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.write_null(*this);
+                            handler_.null_value(*this);
                         }
                         else
                         {
@@ -774,7 +774,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.write_null(*this);
+                            handler_.null_value(*this);
                         }
                         else
                         {
@@ -822,7 +822,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.write_null(*this);
+                            handler_.null_value(*this);
                         }
                         else
                         {
@@ -833,7 +833,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.write_null(*this);
+                            handler_.null_value(*this);
                         }
                         else
                         {
@@ -894,7 +894,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler.write_integer(val, *this);
+                        handler.int64_value(val, *this);
                     }
                     else
                     {
@@ -907,7 +907,7 @@ private:
                         }
                         else
                         {
-                            handler.write_null(*this);
+                            handler.null_value(*this);
                         }
                     }
                 }
@@ -919,7 +919,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler.write_double(val, *this);
+                        handler.double_value(val, *this);
                     }
                     else
                     {
@@ -932,7 +932,7 @@ private:
                         }
                         else
                         {
-                            handler.write_null(*this);
+                            handler.null_value(*this);
                         }
                     }
                 }
@@ -941,19 +941,19 @@ private:
                 {
                     if (value.length() == 1 && value[0] == '0')
                     {
-                        handler.write_bool(false, *this);
+                        handler.bool_value(false, *this);
                     }
                     else if (value.length() == 1 && value[0] == '1')
                     {
-                        handler.write_bool(true, *this);
+                        handler.bool_value(true, *this);
                     }
                     else if (value.length() == 5 && ((value[0] == 'f' || value[0] == 'F') && (value[1] == 'a' || value[1] == 'A') && (value[2] == 'l' || value[2] == 'L') && (value[3] == 's' || value[3] == 'S') && (value[4] == 'e' || value[4] == 'E')))
                     {
-                        handler.write_bool(false, *this);
+                        handler.bool_value(false, *this);
                     }
                     else if (value.length() == 4 && ((value[0] == 't' || value[0] == 'T') && (value[1] == 'r' || value[1] == 'R') && (value[2] == 'u' || value[2] == 'U') && (value[3] == 'e' || value[3] == 'E')))
                     {
-                        handler.write_bool(true, *this);
+                        handler.bool_value(true, *this);
                     }
                     else
                     {
@@ -966,7 +966,7 @@ private:
                         }
                         else
                         {
-                            handler.write_null(*this);
+                            handler.null_value(*this);
                         }
                     }
                 }
@@ -974,7 +974,7 @@ private:
             default:
                 if (value.length() > 0)
                 {
-                    handler.write_string(value, *this);
+                    handler.string_value(value, *this);
                 }
                 else
                 {
@@ -987,7 +987,7 @@ private:
                     }
                     else
                     {
-                        handler.write_string(string_view_type(), *this);
+                        handler.string_value(string_view_type(), *this);
                     }
                 }
                 break;  
@@ -1001,7 +1001,7 @@ private:
             }
             else
             {
-                handler.write_string(value, *this);
+                handler.string_value(value, *this);
             }
         }
     }
@@ -1235,13 +1235,13 @@ private:
         switch (state)
         {
         case numeric_check_state::null:
-            handler.write_null(*this);
+            handler.null_value(*this);
             break;
         case numeric_check_state::boolean_true:
-            handler.write_bool(true,*this);
+            handler.bool_value(true,*this);
             break;
         case numeric_check_state::boolean_false:
-            handler.write_bool(false,*this);
+            handler.bool_value(false,*this);
             break;
         case numeric_check_state::zero:
         case numeric_check_state::integer:
@@ -1251,11 +1251,11 @@ private:
                     jsoncons::detail::to_integer_result result = jsoncons::detail::to_integer(value.data(), value.length());
                     if (!result.overflow)
                     {
-                        handler.write_integer(result.value,*this);
+                        handler.int64_value(result.value,*this);
                     }
                     else
                     {
-                        handler.write_string(value, *this);
+                        handler.string_value(value, *this);
                     }
                 }
                 else
@@ -1263,11 +1263,11 @@ private:
                     jsoncons::detail::to_uinteger_result result = jsoncons::detail::to_uinteger(value.data(), value.length());
                     if (!result.overflow)
                     {
-                        handler.write_uinteger(result.value,*this);
+                        handler.uint64_value(result.value,*this);
                     }
                     else
                     {
-                        handler.write_string(value, *this);
+                        handler.string_value(value, *this);
                     }
                 }
                 break;
@@ -1276,11 +1276,11 @@ private:
         case numeric_check_state::exp:
             {
                 double d = to_double_(buffer.data(), buffer.length());
-                handler.write_double(d, floating_point_options(format, precision, decimal_places), *this);
+                handler.double_value(d, floating_point_options(format, precision, decimal_places), *this);
                 break;
             }
         default:
-            handler.write_string(value, *this);
+            handler.string_value(value, *this);
         }
     }
 

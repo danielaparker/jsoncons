@@ -227,7 +227,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& val, const serializing_context&) override
+    bool do_string_value(const string_view_type& val, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -240,7 +240,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const uint8_t* data, size_t length, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -253,7 +253,7 @@ private:
         return true;
     }
 
-    bool do_bignum(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -266,7 +266,7 @@ private:
         return true;
     }
 
-    bool do_integer(int64_t value, const serializing_context&) override
+    bool do_int64_value(int64_t value, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -279,7 +279,7 @@ private:
         return true;
     }
 
-    bool do_uinteger(uint64_t value, const serializing_context&) override
+    bool do_uint64_value(uint64_t value, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -292,7 +292,7 @@ private:
         return true;
     }
 
-    bool do_double(double value, const floating_point_options& fmt, const serializing_context&) override
+    bool do_double_value(double value, const floating_point_options& fmt, const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {
@@ -318,7 +318,7 @@ private:
         return true;
     }
 
-    bool do_null(const serializing_context&) override
+    bool do_null_value(const serializing_context&) override
     {
         if (stack_offsets_.back().is_object_)
         {

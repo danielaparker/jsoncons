@@ -147,7 +147,7 @@ private:
         return false;
     }
 
-    bool do_null(const serializing_context&) override
+    bool do_null_value(const serializing_context&) override
     {
         event_ = basic_json_event<CharT,Allocator>(json_event_type::null, basic_json<CharT,sorted_policy,Allocator>(jsoncons::null_type()));
         return false;
@@ -159,37 +159,37 @@ private:
         return false;
     }
 
-    bool do_string(const string_view_type& s, const serializing_context&) override
+    bool do_string_value(const string_view_type& s, const serializing_context&) override
     {
         event_ = basic_json_event<CharT,Allocator>(json_event_type::string, basic_json<CharT,sorted_policy,Allocator>(s.data(), s.length()));
         return false;
     }
 
-    bool do_byte_string(const uint8_t*, size_t, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
     {
         // noop
         return false;
     }
 
-    bool do_bignum(int, const uint8_t*, size_t, const serializing_context&) override
+    bool do_bignum_value(int, const uint8_t*, size_t, const serializing_context&) override
     {
         event_ = basic_json_event<CharT,Allocator>(json_event_type::bignum);
         return false;
     }
 
-    bool do_integer(int64_t value, const serializing_context&) override
+    bool do_int64_value(int64_t value, const serializing_context&) override
     {
         event_ = basic_json_event<CharT,Allocator>(json_event_type::integer, basic_json<CharT,sorted_policy,Allocator>(value));
         return false;
     }
 
-    bool do_uinteger(uint64_t value, const serializing_context&) override
+    bool do_uint64_value(uint64_t value, const serializing_context&) override
     {
         event_ = basic_json_event<CharT,Allocator>(json_event_type::uinteger, basic_json<CharT,sorted_policy,Allocator>(value));
         return false;
     }
 
-    bool do_double(double value, const floating_point_options&, const serializing_context&) override
+    bool do_double_value(double value, const floating_point_options&, const serializing_context&) override
     {
         event_ = basic_json_event<CharT,Allocator>(json_event_type::floating_point, basic_json<CharT,sorted_policy,Allocator>(value));
         return false;

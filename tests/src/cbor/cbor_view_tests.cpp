@@ -116,16 +116,16 @@ TEST_CASE("as_string_test")
     jsoncons::cbor::cbor_bytes_serializer serializer(b);
     serializer.begin_document();
     serializer.begin_array(10);
-    serializer.write_bool(true);
-    serializer.write_bool(false);
-    serializer.write_null();
-    serializer.write_string("Toronto");
-    serializer.write_byte_string({'H','e','l','l','o'});
-    serializer.write_integer(-100);
-    serializer.write_uinteger(100);
-    serializer.write_bignum("18446744073709551616");
-    serializer.write_double(10.5);
-    serializer.write_bignum("-18446744073709551617");
+    serializer.bool_value(true);
+    serializer.bool_value(false);
+    serializer.null_value();
+    serializer.string_value("Toronto");
+    serializer.byte_string_value({'H','e','l','l','o'});
+    serializer.int64_value(-100);
+    serializer.uint64_value(100);
+    serializer.bignum_value("18446744073709551616");
+    serializer.double_value(10.5);
+    serializer.bignum_value("-18446744073709551617");
     serializer.end_array();
     serializer.end_document();
 
@@ -194,7 +194,7 @@ TEST_CASE("test_dump_to_string")
     serializer.begin_document();
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    serializer.write_bignum(-1, bytes.data(), bytes.size());
+    serializer.bignum_value(-1, bytes.data(), bytes.size());
     serializer.end_array();
     serializer.end_document();
 
@@ -234,7 +234,7 @@ TEST_CASE("test_dump_to_stream")
     serializer.begin_document();
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    serializer.write_bignum(-1, bytes.data(), bytes.size());
+    serializer.bignum_value(-1, bytes.data(), bytes.size());
     serializer.end_array();
     serializer.end_document();
 
@@ -282,10 +282,10 @@ TEST_CASE("test_indefinite_length_object_iterator")
     cbor::cbor_bytes_serializer serializer2(b2);
     serializer2.begin_document();
     serializer2.begin_object(); // indefinite length object
-    serializer2.write_name("City");
-    serializer2.write_string("Toronto");
-    serializer2.write_name("Province");
-    serializer2.write_string("Ontario");
+    serializer2.name("City");
+    serializer2.string_value("Toronto");
+    serializer2.name("Province");
+    serializer2.string_value("Ontario");
     serializer2.end_object(); 
     serializer2.end_document();
     cbor_view bv2 = b2;
@@ -311,8 +311,8 @@ TEST_CASE("test_indefinite_length_array_iterator")
     cbor::cbor_bytes_serializer serializer2(b2);
     serializer2.begin_document();
     serializer2.begin_array(); // indefinite length array
-    serializer2.write_string("Toronto");
-    serializer2.write_string("Ontario");
+    serializer2.string_value("Toronto");
+    serializer2.string_value("Ontario");
     serializer2.end_array(); 
     serializer2.end_document();
     cbor_view bv2 = b2;

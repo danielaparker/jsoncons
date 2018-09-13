@@ -225,7 +225,7 @@ private:
     }
 
     template <class AnyWriter>
-    bool write_string(const CharT* s, size_t length, AnyWriter& writer)
+    bool string_value(const CharT* s, size_t length, AnyWriter& writer)
     {
         bool quote = false;
         if (parameters_.quote_style() == quote_style_type::all || parameters_.quote_style() == quote_style_type::nonnumeric ||
@@ -244,7 +244,7 @@ private:
         return true;
     }
 
-    bool do_null(const serializing_context&) override
+    bool do_null_value(const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -255,20 +255,20 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::detail::string_writer<CharT> bo(s);
-                    do_null(bo);
+                    do_null_value(bo);
                     bo.flush();
                     it->second = s;
                 }
             }
             else
             {
-                do_null(writer_);
+                do_null_value(writer_);
             }
         }
         return true;
     }
 
-    bool do_string(const string_view_type& val, const serializing_context&) override
+    bool do_string_value(const string_view_type& val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -292,24 +292,24 @@ private:
         return true;
     }
 
-    bool do_byte_string(const uint8_t* data, size_t length, const serializing_context& context) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) override
     {
         std::basic_string<CharT> s;
         encode_base64url(data,length,s);
-        do_string(s,context);
+        do_string_value(s,context);
         return true;
     }
 
-    bool do_bignum(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
     {
         bignum n = bignum(signum, data, length);
         std::basic_string<CharT> s;
         n.dump(s);
-        do_string(s,context);
+        do_string_value(s,context);
         return true;
     }
 
-    bool do_double(double val, const floating_point_options& fmt, const serializing_context&) override
+    bool do_double_value(double val, const floating_point_options& fmt, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -333,7 +333,7 @@ private:
         return true;
     }
 
-    bool do_integer(int64_t val, const serializing_context&) override
+    bool do_int64_value(int64_t val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -357,7 +357,7 @@ private:
         return true;
     }
 
-    bool do_uinteger(uint64_t val, const serializing_context&) override
+    bool do_uint64_value(uint64_t val, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -409,7 +409,7 @@ private:
     void value(const string_view_type& value, AnyWriter& writer)
     {
         begin_value(writer);
-        write_string(value.data(),value.length(),writer);
+        string_value(value.data(),value.length(),writer);
         end_value();
     }
 
@@ -486,7 +486,7 @@ private:
     }
 
     template <class AnyWriter>
-    bool do_null(AnyWriter& writer) 
+    bool do_null_value(AnyWriter& writer) 
     {
         begin_value(writer);
         writer.write(jsoncons::detail::null_literal<CharT>().data(), 

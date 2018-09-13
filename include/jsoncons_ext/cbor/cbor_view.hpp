@@ -637,13 +637,13 @@ public:
             case cbor_major_type::unsigned_integer:
             {
                 uint64_t value = as_uinteger();
-                handler.write_uinteger(value);
+                handler.uint64_value(value);
                 break;
             }
             case cbor_major_type::negative_integer:
             {
                 int64_t value = as_integer();
-                handler.write_integer(value);
+                handler.int64_value(value);
                 break;
             }
             case cbor_major_type::byte_string:
@@ -654,7 +654,7 @@ public:
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
                 }
-                handler.write_byte_string(s.data(), s.size());
+                handler.byte_string_value(s.data(), s.size());
                 break;
             }
             case cbor_major_type::text_string:
@@ -665,7 +665,7 @@ public:
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
                 }
-                handler.write_string(s);
+                handler.string_value(s);
                 break;
             }
             case cbor_major_type::array:
@@ -701,7 +701,7 @@ public:
                     {
                         JSONCONS_THROW(cbor_decode_error(last_-it));
                     }
-                    handler.write_name(key);
+                    handler.name(key);
                     it = endp;
                     detail::walk(it, last_, &endp);
                     if (endp == it)
@@ -726,7 +726,7 @@ public:
                     {
                         JSONCONS_THROW(cbor_decode_error(0));
                     }
-                    handler.write_bignum(1, v.data(), v.size());
+                    handler.bignum_value(1, v.data(), v.size());
                 }
                 else if (tag == 3)
                 {
@@ -736,7 +736,7 @@ public:
                     {
                         JSONCONS_THROW(cbor_decode_error(0));
                     }
-                    handler.write_bignum(-1, v.data(), v.size());
+                    handler.bignum_value(-1, v.data(), v.size());
                 }
                 break;
             }
@@ -745,20 +745,20 @@ public:
                 switch (type())
                 {
                     case 0xf5:
-                        handler.write_bool(true);
+                        handler.bool_value(true);
                         break;
                     case 0xf4:
-                        handler.write_bool(false);
+                        handler.bool_value(false);
                         break;
                     case 0xf6:
-                        handler.write_null();
+                        handler.null_value();
                         break;
                     case 0xf9:
                     case 0xfa:
                     case 0xfb:
                     {
                         double value = as_double();
-                        handler.write_double(value);
+                        handler.double_value(value);
                         break;
                     }
                     default:

@@ -87,54 +87,54 @@ private:
     bool do_name(const string_view_type& name,
                  const serializing_context& context) override
     {
-        return downstream_handler_.write_name(name,context);
+        return downstream_handler_.name(name,context);
     }
 
-    bool do_string(const string_view_type& value,
+    bool do_string_value(const string_view_type& value,
                          const serializing_context& context) override
     {
-        return downstream_handler_.write_string(value,context);
+        return downstream_handler_.string_value(value,context);
     }
 
-    bool do_byte_string(const uint8_t* data, size_t length,
+    bool do_byte_string_value(const uint8_t* data, size_t length,
                               const serializing_context& context) override
     {
-        return downstream_handler_.write_byte_string(data, length, context);
+        return downstream_handler_.byte_string_value(data, length, context);
     }
 
-    bool do_bignum(int signum, const uint8_t* data, size_t length,
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length,
                          const serializing_context& context) override
     {
-        return downstream_handler_.write_bignum(signum, data, length, context);
+        return downstream_handler_.bignum_value(signum, data, length, context);
     }
 
-    bool do_double(double value, const floating_point_options& fmt,
+    bool do_double_value(double value, const floating_point_options& fmt,
                          const serializing_context& context) override
     {
-        return downstream_handler_.write_double(value, fmt, context);
+        return downstream_handler_.double_value(value, fmt, context);
     }
 
-    bool do_integer(int64_t value,
+    bool do_int64_value(int64_t value,
                           const serializing_context& context) override
     {
-        return downstream_handler_.write_integer(value,context);
+        return downstream_handler_.int64_value(value,context);
     }
 
-    bool do_uinteger(uint64_t value,
+    bool do_uint64_value(uint64_t value,
                            const serializing_context& context) override
     {
-        return downstream_handler_.write_uinteger(value,context);
+        return downstream_handler_.uint64_value(value,context);
     }
 
     bool do_bool(bool value,
                        const serializing_context& context) override
     {
-        return downstream_handler_.write_bool(value,context);
+        return downstream_handler_.bool_value(value,context);
     }
 
-    bool do_null(const serializing_context& context) override
+    bool do_null_value(const serializing_context& context) override
     {
-        return downstream_handler_.write_null(context);
+        return downstream_handler_.null_value(context);
     }
 
 };
@@ -184,11 +184,11 @@ private:
     {
         if (name == name_)
         {
-            return this->downstream_handler().write_name(new_name_,context);
+            return this->downstream_handler().name(new_name_,context);
         }
         else
         {
-            return this->downstream_handler().write_name(name,context);
+            return this->downstream_handler().name(name,context);
         }
     }
 };
@@ -265,10 +265,10 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        return downstream_handler().write_name(target,context);
+        return downstream_handler().name(target,context);
     }
 
-    bool do_string(const string_view_type& value,
+    bool do_string_value(const string_view_type& value,
                          const serializing_context& context) override
     {
         std::basic_string<CharT> target;
@@ -277,48 +277,48 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        return downstream_handler().write_string(target,context);
+        return downstream_handler().string_value(target,context);
     }
 
-    bool do_byte_string(const uint8_t* data, size_t length,
+    bool do_byte_string_value(const uint8_t* data, size_t length,
                               const serializing_context& context) override
     {
-        return downstream_handler_.write_byte_string(data, length, context);
+        return downstream_handler_.byte_string_value(data, length, context);
     }
 
-    bool do_bignum(int signum, const uint8_t* data, size_t length,
+    bool do_bignum_value(int signum, const uint8_t* data, size_t length,
                          const serializing_context& context) override
     {
-        return downstream_handler_.write_bignum(signum, data, length, context);
+        return downstream_handler_.bignum_value(signum, data, length, context);
     }
 
-    bool do_double(double value, const floating_point_options& fmt,
+    bool do_double_value(double value, const floating_point_options& fmt,
                          const serializing_context& context) override
     {
-        return downstream_handler_.write_double(value, fmt, context);
+        return downstream_handler_.double_value(value, fmt, context);
     }
 
-    bool do_integer(int64_t value,
+    bool do_int64_value(int64_t value,
                           const serializing_context& context) override
     {
-        return downstream_handler_.write_integer(value,context);
+        return downstream_handler_.int64_value(value,context);
     }
 
-    bool do_uinteger(uint64_t value,
+    bool do_uint64_value(uint64_t value,
                            const serializing_context& context) override
     {
-        return downstream_handler_.write_uinteger(value,context);
+        return downstream_handler_.uint64_value(value,context);
     }
 
     bool do_bool(bool value,
                        const serializing_context& context) override
     {
-        return downstream_handler_.write_bool(value,context);
+        return downstream_handler_.bool_value(value,context);
     }
 
-    bool do_null(const serializing_context& context) override
+    bool do_null_value(const serializing_context& context) override
     {
-        return downstream_handler_.write_null(context);
+        return downstream_handler_.null_value(context);
     }
 
 };

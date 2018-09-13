@@ -127,7 +127,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& s, 
+    bool do_string_value(const string_view_type& s, 
                          const serializing_context& context) override
     {
         if (member_name_ == "name")
