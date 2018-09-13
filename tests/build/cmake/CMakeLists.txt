@@ -40,7 +40,7 @@ target_link_libraries(jsoncons_tests Catch)
 
 message(STATUS "CXXSTD")
 message(STATUS "${CXXSTD}")
-if (${CXXSTD})
+if (CXXSTD)
 set_target_properties (jsoncons_tests PROPERTIES
    CXX_STANDARD ${CXXSTD}
    CXX_STANDARD_REQUIRED ON

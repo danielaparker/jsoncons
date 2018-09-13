@@ -77,7 +77,7 @@ before_install:
 
 matrix:
   include:
-    - { env: 'CXX=g++-4.8 CXXFLAGS="" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc48 }
+    - { env: 'CXX=g++-4.8 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc48 }
     - { env: 'CXXSTD=11 CXX=g++-6 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc6 }
     - { env: 'CXXSTD=11 CXX=g++-6 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc6 }
     - { env: 'CXXSTD=11 CXX=g++-7 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc7 }
@@ -91,7 +91,7 @@ matrix:
 
 script:
   - cd tests/build/cmake
-  - cmake .
-  - cmake ${CMAKE_OPTIONS} --build . --config Release
+  - cmake . ${CMAKE_OPTIONS}
+  - cmake --build . --config Release
   - ctest -C Release -V -j
 
