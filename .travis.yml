@@ -96,7 +96,6 @@ matrix:
 script:
   - cd tests/build/cmake
   - cmake $CMAKEFLAGS .
-  #- make -j2 # && make test
   - cmake --build . --config Release
   - ctest -C Release -V -j
 
