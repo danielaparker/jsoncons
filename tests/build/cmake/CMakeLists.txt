@@ -37,13 +37,7 @@ target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
 
 target_link_libraries(jsoncons_tests Catch)
 
-if (CXXSTD)
-set_target_properties (jsoncons_tests PROPERTIES
-    CXX_STANDARD ${CXXSTD}
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-  )
-else()
+if (NOT CMAKE_CXX_STANDARD)
 set_target_properties (jsoncons_tests PROPERTIES
     CXX_STANDARD 11
     CXX_STANDARD_REQUIRED ON
