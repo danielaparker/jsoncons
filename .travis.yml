@@ -77,21 +77,21 @@ before_install:
 
 matrix:
   include:
-    - { env: 'CXX_STANDARD=11 CXX=g++-4.8 CXXFLAGS="-std=c++11"', addons: *gcc48 }
-    - { env: 'CXX_STANDARD=11 CXX=g++-6', addons: *gcc6 }
-    - { env: 'CXX_STANDARD=11 CXX=g++-6 CXXFLAGS="-DNO_DEPRECATED=YES"', addons: *gcc6 }
-    - { env: 'CXX_STANDARD=11 CXX=g++-7', addons: *gcc7 }
-    - { env: 'CXX_STANDARD=11 CXX=g++-7 CXXFLAGS="-DNO_DEPRECATED=YES"', addons: *gcc7 }
-    - { env: 'CXX_STANDARD=17 CXX=g++-8', addons: *gcc8 }
-    - { env: 'CXX_STANDARD=17 CXX=g++-8 CXXFLAGS="-DNO_DEPRECATED=YES"', addons: *gcc8 }
-    - { env: 'CXX_STANDARD=11 CXX=clang++-3.8', addons: *clang38 }
-    - { env: 'CXX_STANDARD=11 CXX=clang++-5.0', addons: *clang50 }
-    - { env: 'CXX_STANDARD=11 CXX=clang++-6.0', addons: *clang60 }
-    - { env: 'CXX_STANDARD=11 CXX=clang++', compiler: clang, osx_image: xcode6.4', addons: *xcode64}
+    - { env: 'CXX=g++-4.8 CXXFLAGS="" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc48 }
+    - { env: 'CXXSTD=11 CXX=g++-6 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc6 }
+    - { env: 'CXXSTD=11 CXX=g++-6 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc6 }
+    - { env: 'CXXSTD=11 CXX=g++-7 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc7 }
+    - { env: 'CXXSTD=11 CXX=g++-7 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc7 }
+    - { env: 'CXXSTD=17 CXX=g++-8 CMAKE_OPTIONS="-DCXXSTD=17"', addons: *gcc8 }
+    - { env: 'CXXSTD=17 CXX=g++-8 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=17"', addons: *gcc8 }
+    - { env: 'CXXSTD=11 CXX=clang++-3.8 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang38 }
+    - { env: 'CXXSTD=11 CXX=clang++-5.0 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang50 }
+    - { env: 'CXXSTD=11 CXX=clang++-6.0 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang60 }
+    - { env: 'CXXSTD=11 CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode6.4', addons: *xcode64}
 
 script:
   - cd tests/build/cmake
   - cmake .
-  - cmake --build . --config Release
+  - cmake ${CMAKE_OPTIONS} --build . --config Release
   - ctest -C Release -V -j
 
