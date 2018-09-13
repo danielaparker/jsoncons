@@ -18,10 +18,10 @@ set(CTEST_OUTPUT_ON_FAILURE ON)
 # load per-platform configuration
 include (${JSONCONS_PROJECT_DIR}/build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
-message(STATUS "${NO_DEPRECATED}")
-if (NO_DEPRECATED)
-add_definitions(-DJSONCONS_NO_DEPRECATED)
-endif()
+# message(STATUS "${NO_DEPRECATED}")
+# if (NO_DEPRECATED)
+# add_definitions(-DJSONCONS_NO_DEPRECATED)
+# endif()
 
 set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(Catch INTERFACE)
@@ -38,16 +38,16 @@ target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
 
 target_link_libraries(jsoncons_tests Catch)
 
-message(STATUS "CMAKE_CXX_STANDARD")
-message(STATUS "${CMAKE_CXX_STANDARD}")
-if (NOT CMAKE_CXX_STANDARD)
-set_target_properties (jsoncons_tests PROPERTIES
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-  )
-message(STATUS "NO CMAKE_CXX_STANDARD")
-endif()
+# message(STATUS "CMAKE_CXX_STANDARD")
+# message(STATUS "${CMAKE_CXX_STANDARD}")
+# if (${NOT CMAKE_CXX_STANDARD})
+# set_target_properties (jsoncons_tests PROPERTIES
+#    CXX_STANDARD 11
+#    CXX_STANDARD_REQUIRED ON
+#    CXX_EXTENSIONS OFF
+#  )
+# message(STATUS "NO CMAKE_CXX_STANDARD")
+# endif()
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   # special link option on Linux because llvm stl rely on GNU stl
