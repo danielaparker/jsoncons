@@ -22,6 +22,12 @@ if (NO_DEPRECATED)
 add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
 
+set_target_properties (jsoncons_tests PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+  )
+
 set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
