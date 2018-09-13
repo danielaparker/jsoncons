@@ -5,24 +5,17 @@ master
 
 The next release will include a JSON pull parser, `json_event_reader`.
 
-To implement it using the existing JSON push parser, the `json_content_handler` 
-function signatures have to be changed to return a bool value, to indicate 
-whether to continue parsing. 
+To facilitate this, the `json_content_handler` function signatures have been 
+changed to return a bool value, to indicate whether parsing is to continue. 
 
-In the spirit of "in for a penny, in for a pound", some names have also 
-been changed. The virtual `do_` functions names have been trimmed of their 
-`_value` suffix, e.g. `do_integer_value` has been shortened to `do_integer`. 
-The non-virtual functions `name`, `string_value`, `byte_string_value`, 
-`bignum_value`, `integer_value`, `uinteger_value`, `double_value`, `bool_value`, 
-and `null_value` have been changed to `write_name`, `write_string`, 
-`write_byte_string`, `write_bignum`, `write_integer`, `write_uinteger`, 
-`write_double`, `write_bool`, and `write_null`. 
+In addition, the function names `integer_value` and `uinteger_value` have been 
+changed to `int64_value` and `uint64_value`, and the function names 
+`do_integer_value` and `do_uinteger_value` have been changed to `int64_value` 
+and `uint64_value`
 
-For the `do_` functions, this is a breaking change. For the non-virtual 
-functions `begin_document`, `end_document`, `begin_array`, `end_array`, `integer_value`, 
-`double_value`, etc., this is a non breaking change, the old signatures have been 
-deprecated but preserved. For instance, the old "Playing around with CBOR, JSON, and 
-CSV" README example works without modifications.
+For the virtual `do_` functions, this is a breaking change. For the non-virtual 
+functions `integer_value` and `uinteger_value`, this is a non breaking change, 
+the old signatures have been deprecated but preserved.
 
 v0.109.0
 --------
