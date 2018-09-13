@@ -77,7 +77,7 @@ before_install:
 
 matrix:
   include:
-    - { env: 'CMAKE_CXX_STANDARD=11 CXX=g++-4.8 CPPFLAGS="-fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc48 }
+    - { env: 'CMAKE_CXX_STANDARD=11 CXX=g++-4.8 CPPFLAGS="-std=c++17 -fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc48 }
     - { env: 'CMAKE_CXX_STANDARD=11 CXX=g++-6 CPPFLAGS="-fsanitize=address,memory,undefined,thread,leak -fuse-ld=gold"', addons: *gcc6 }
     - { env: 'CMAKE_CXX_STANDARD=11 CXX=g++-6 CPPFLAGS=-DNO_DEPRECATED=YES', addons: *gcc6 }
     - { env: 'CMAKE_CXX_STANDARD=11 CXX=g++-7 CPPFLAGS=-fsanitize=address,memory,undefined,thread,leak', addons: *gcc7 }
