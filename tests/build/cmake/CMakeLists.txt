@@ -22,12 +22,6 @@ if (NO_DEPRECATED)
 add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
 
-set_target_properties (jsoncons_tests PROPERTIES
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-  )
-
 set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
@@ -42,6 +36,13 @@ target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
 target_link_libraries(jsoncons_tests Catch)
+
+set_target_properties (jsoncons_tests PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+  )
+
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   # special link option on Linux because llvm stl rely on GNU stl
   target_link_libraries (jsoncons_tests -Wl,-lstdc++ Catch)
