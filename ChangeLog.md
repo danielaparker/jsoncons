@@ -3,10 +3,10 @@ master
 
 - Changes to streaming API
 
-The next release will include a JSON pull parser.
+The next release will include a JSON pull parser, `json_event_reader`.
 
 To implement it using the existing JSON push parser, the `json_content_handler` 
-function signatures need to be changed to return a bool value, to indicate 
+function signatures have to be changed to return a bool value, to indicate 
 whether to continue parsing. 
 
 In the spirit of "in for a penny, in for a pound", some names have also 

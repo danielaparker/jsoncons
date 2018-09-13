@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <ios>
+#include <iterator>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
@@ -69,13 +70,13 @@ public:
     template<class T, class... Args>
     bool is(Args&&... args) const
     {
-        return value_.is<T>(std::forward<Args>(args)...);
+        return value_.template is<T>(std::forward<Args>(args)...);
     }
 
     template<class T, class... Args>
     T as(Args&&... args) const
     {
-        return value_.as<T>(std::forward<Args>(args)...);
+        return value_.template as<T>(std::forward<Args>(args)...);
     }
 
     json_event_type event_type() const {return event_type_;}
@@ -196,6 +197,77 @@ private:
 };
 
 template<class CharT,class Allocator=std::allocator<char>>
+class basic_json_event_reader;
+
+template <class CharT, class Allocator>
+class json_event_iterator
+{
+    static const size_t npos = size_t(-1);
+public:
+    typedef basic_json_event<CharT,Allocator> value_type;
+    typedef std::forward_iterator_tag iterator_category;
+    typedef ptrdiff_t difference_type;
+    typedef const value_type& reference;
+    typedef const value_type* pointer;
+private:
+    basic_json_event_reader<CharT,Allocator>* reader_;
+    size_t index_;
+public:
+
+    json_event_iterator()
+        : reader_(nullptr), index_(npos)
+    {
+    }
+
+    json_event_iterator(basic_json_event_reader<CharT,Allocator>* reader)
+        : reader_(reader), index_(0)
+    {
+    }
+
+    json_event_iterator(const json_event_iterator<CharT,Allocator>& other) 
+        : reader_(other.reader_), index_(other.index_)
+    {
+    } 
+
+    json_event_iterator<CharT, Allocator>& operator++()
+    {
+        if (reader_ && !reader_->done())
+        {
+            reader_->read_next();
+            ++index_;
+        }
+        else
+        {
+            index_ = npos;
+        }
+        return *this;
+    }
+
+    json_event_iterator<CharT, Allocator> operator++(int)
+    {
+        json_event_iterator<CharT,Allocator> temp(*this);
+        ++(*this);
+        return temp;
+    }
+
+    reference operator*() const
+    {
+        return reader_->event();
+    }
+
+    friend bool operator==(const json_event_iterator<CharT,Allocator>& it1, const json_event_iterator<CharT, Allocator>& it2)
+    {
+        return it1.index_ == it2.index_;
+    }
+
+    friend bool operator!=(const json_event_iterator<CharT, Allocator>& it1, const json_event_iterator<CharT, Allocator>& it2)
+    {
+        return !(it1 == it2);
+    }
+private:
+};
+
+template<class CharT,class Allocator>
 class basic_json_event_reader 
 {
     static const size_t default_max_buffer_length = 16384;
@@ -217,6 +289,8 @@ class basic_json_event_reader
     // Noncopyable and nonmoveable
     basic_json_event_reader(const basic_json_event_reader&) = delete;
     basic_json_event_reader& operator=(const basic_json_event_reader&) = delete;
+
+    typedef json_event_iterator<CharT,Allocator> iterator;
 
 public:
 
@@ -249,6 +323,16 @@ public:
         buffer_.reserve(buffer_length_);
     }
 
+    iterator begin()
+    {
+        return iterator(this);
+    }
+
+    iterator end()
+    {
+        return iterator();
+    }
+
     size_t buffer_length() const
     {
         return buffer_length_;
@@ -265,7 +349,7 @@ public:
         return parser_.done();
     }
 
-    basic_json_event<CharT,Allocator> event() const
+    const basic_json_event<CharT,Allocator>& event() const
     {
         return event_handler_.event();
     }
@@ -419,7 +503,6 @@ public:
             check_done(ec);
         }
     }
-
 private:
 };
 

@@ -41,9 +41,8 @@ TEST_CASE("json event reader tests")
 
     json_event_reader event_reader(is);
 
-    while (!event_reader.done())
+    for (const auto& event : event_reader)
     {
-        auto event = event_reader.event();
         switch (event.event_type())
         {
             case json_event_type::name:
@@ -54,9 +53,9 @@ TEST_CASE("json event reader tests")
                 break;
             case json_event_type::integer:
             case json_event_type::uinteger:
+                std::cout << event.as<std::string>() << "\n";
                 break;
         }
-        event_reader.read_next();
     }
 }
 
