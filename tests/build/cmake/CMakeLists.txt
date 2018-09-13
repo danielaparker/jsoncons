@@ -38,6 +38,7 @@ target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
 
 target_link_libraries(jsoncons_tests Catch)
 
+message(STATUS "CMAKE_CXX_STANDARD")
 message(STATUS "${CMAKE_CXX_STANDARD}")
 if (NOT CMAKE_CXX_STANDARD)
 set_target_properties (jsoncons_tests PROPERTIES
@@ -45,6 +46,7 @@ set_target_properties (jsoncons_tests PROPERTIES
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
   )
+message(STATUS "NO CMAKE_CXX_STANDARD")
 endif()
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux" AND ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
