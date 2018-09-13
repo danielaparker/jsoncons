@@ -18,6 +18,7 @@ set(CTEST_OUTPUT_ON_FAILURE ON)
 # load per-platform configuration
 include (${JSONCONS_PROJECT_DIR}/build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
+message(STATUS "${NO_DEPRECATED}")
 if (NO_DEPRECATED)
 add_definitions(-DJSONCONS_NO_DEPRECATED)
 endif()
