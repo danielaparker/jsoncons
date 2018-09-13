@@ -66,17 +66,17 @@ private:
 
     bool do_begin_object(const serializing_context& context) override
     {
-        other_handler_.begin_object(context);
+        return other_handler_.begin_object(context);
     }
 
     bool do_end_object(const serializing_context& context) override
     {
-        other_handler_.end_object(context);
+        return other_handler_.end_object(context);
     }
 
     bool do_begin_array(const serializing_context& context) override
     {
-        other_handler_.begin_array(context);
+        return other_handler_.begin_array(context);
     }
 
     bool do_end_array(const serializing_context& context) override
@@ -94,7 +94,7 @@ private:
         {
             throw parse_error(result.ec,context.line_number(),context.column_number());
         }
-        other_handler_.name(target, context);
+        return other_handler_.name(target, context);
     }
 
     bool do_string_value(const string_view_type& value, const serializing_context& context) override
@@ -107,32 +107,32 @@ private:
         {
             throw parse_error(result.ec,context.line_number(),context.column_number());
         }
-        other_handler_.string_value(target, context);
+        return other_handler_.string_value(target, context);
     }
 
     bool do_int64_value(int64_t value, const serializing_context& context) override
     {
-        other_handler_.int64_value(value, context);
+        return other_handler_.int64_value(value, context);
     }
 
     bool do_uint64_value(uint64_t value, const serializing_context& context) override
     {
-        other_handler_.uint64_value(value, context);
+        return other_handler_.uint64_value(value, context);
     }
 
     bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) override
     {
-        other_handler_.double_value(value, fmt, context);
+        return other_handler_.double_value(value, fmt, context);
     }
 
     bool do_bool(bool value, const serializing_context& context) override
     {
-        other_handler_.bool_value(value, context);
+        return other_handler_.bool_value(value, context);
     }
 
     bool do_null_value(const serializing_context& context) override
     {
-        other_handler_.null_value(context);
+        return other_handler_.null_value(context);
     }
 };
 
