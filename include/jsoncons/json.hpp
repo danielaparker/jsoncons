@@ -2858,7 +2858,7 @@ public:
     void dump(std::basic_ostream<char_type>& os, bool pprint) const
     {
         basic_json_serializer<char_type> serializer(os, pprint);
-        dump(serializer);
+        dump(serializer;
     }
 
     void dump(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options, bool pprint) const
