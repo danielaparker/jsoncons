@@ -487,11 +487,18 @@ Instructions for building the examples with CMake may be found in
 
 ## Supported compilers
 
- Compiler     | Versions      | Operating System
---------------|---------------|-----------------
- VS           | vs2015, vs2017+| Windows 10       
- g++-         | 4.8, 6, 7,8   | Ubuntu           
- clang        | 3.8, 5.0. 6.0 |
+ Compiler       | Version|Architecture| Operating System
+----------------|---------------------|-----------------
+ VS             | vs2015| x64         | Windows 10      
+ VS             | vs2017| x64         | Windows 10      
+ g++-           | 4.8   | x64         | Ubuntu          
+ g++-           | 6     | x64         | Ubuntu          
+ g++-           | 7     | x64         | Ubuntu          
+ g++-           | 8     | x64         | Ubuntu          
+ clang          | 3.8   | x64         |                 
+ clang          | 5.0   | x64         |                 
+ clang          | 6.0   | x64         |                 
+ Clang Xcode 6.4|          
 
 ## Acknowledgements
 
