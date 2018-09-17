@@ -176,7 +176,7 @@ private:
 };
 
 
-template <class CharT, class Allocator>
+template <class CharT, class Allocator=std::allocator<CharT>>
 class basic_json_event_handler final : public basic_json_content_handler<CharT>
 {
 public:

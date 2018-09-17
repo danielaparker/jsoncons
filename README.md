@@ -470,6 +470,76 @@ Output:
 ]
 ```
 
+### Pull parser example
+
+```c++
+#include <jsoncons/json_event_reader.hpp>
+#include <string>
+#include <sstream>
+
+int main()
+{
+    std::string s = R"(
+    [
+        {
+            "enrollmentNo" : 100,
+            "firstName" : "Tom",
+            "lastName" : "Cochrane",
+            "mark" : 55              
+        },
+        {
+            "enrollmentNo" : 101,
+            "firstName" : "Catherine",
+            "lastName" : "Smith",
+            "mark" : 95              
+        },
+        {
+            "enrollmentNo" : 102,
+            "firstName" : "William",
+            "lastName" : "Skeleton",
+            "mark" : 60              
+        }
+    ]
+    )";
+
+    std::istringstream is(s);
+
+    json_event_reader event_reader(is);
+
+    for (const auto& event : event_reader)
+    {
+        switch (event.event_type())
+        {
+            case json_event_type::name:
+                std::cout << event.as<std::string>() << ": ";
+                break;
+            case json_event_type::string_value:
+                std::cout << event.as<std::string>() << "\n";
+                break;
+            case json_event_type::int64_value:
+            case json_event_type::uint64_value:
+                std::cout << event.as<std::string>() << "\n";
+                break;
+        }
+    }
+}
+```
+Output:
+```json
+enrollmentNo: 100
+firstName: Tom
+lastName: Cochrane
+mark: 55
+enrollmentNo: 101
+firstName: Catherine
+lastName: Smith
+mark: 95
+enrollmentNo: 102
+firstName: William
+lastName: Skeleton
+mark: 60
+```
+
 ## Building the test suite and examples with CMake
 
 [CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
