@@ -139,6 +139,7 @@ public:
         else
         {
             format = chars_format::general;
+            decimal_places = 0;
         }             
 
         char number_buffer[200]; 

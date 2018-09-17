@@ -102,7 +102,9 @@ TEST_CASE("test_cbor_parsing")
                  json(byte_string_view(v.data(),v.size())));
 
     // string
+    std::cout << "Check 10\n";
     check_parsing({0x60},json(""));
+    std::cout << "Check 20\n";
     check_parsing({0x61,' '},json(" "));
     check_parsing({0x78,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
                  json("123456789012345678901234"));
@@ -118,9 +120,13 @@ TEST_CASE("test_cbor_parsing")
 
 
     // text strings with undefined length
+    std::cout << "Check 30\n";
     check_parsing({0x7f,0xff}, json(""));
+    std::cout << "Check 40\n";
     check_parsing({0x7f,0x60,0xff}, json(""));
+    std::cout << "Check 50\n";
     check_parsing({0x7f,0x60,0x60,0xff}, json(""));
+    std::cout << "Check 60\n";
 
     check_parsing({0x7f,0x63,'H','e','l',0x62,'l','o',0xff}, json("Hello"));
     check_parsing({0x7f,0x61,'H',0x61,'e',0x61,'l',0x61,'l',0x61,'o',0xff}, json("Hello"));
