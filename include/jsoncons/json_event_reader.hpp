@@ -34,52 +34,138 @@ enum class json_event_type
     begin_array = 4,
     end_array = 5,
     name = 6,
-    string = 7,
-    byte_string = 8,
-    bignum = 9,
-    integer = 10,
-    uinteger = 11,
-    floating_point = 12,
-    boolean = 13,
-    null = 14
+    string_value = 7,
+    byte_string_value = 8,
+    bignum_value = 9,
+    int64_value = 10,
+    uint64_value = 11,
+    double_value = 12,
+    bool_value = 13,
+    null_value = 14
 };
 
 template<class CharT,class Allocator=std::allocator<char>>
 class basic_json_event
 {
+    typedef basic_json<CharT,sorted_policy,Allocator> json_type;
     json_event_type event_type_;
-    basic_json<CharT,sorted_policy,Allocator> value_;
+    union
+    {
+        bool bool_value_;
+        int64_t int64_value_;
+        uint64_t uint64_value_;
+        double double_value_;
+        const CharT* string_data_;
+    } value_;
+    size_t length_;
 public:
     basic_json_event(json_event_type event_type)
-        : event_type_(event_type)
+        : event_type_(event_type), length_(0)
     {
     }
 
-    basic_json_event(json_event_type event_type,
-                     basic_json<CharT,sorted_policy,Allocator>&& value)
-        : event_type_(event_type), value_(std::move(value))
+    basic_json_event(null_type value)
+        : event_type_(json_event_type::null_value), length_(0)
     {
     }
 
-    basic_json_event(json_event_type event_type,
-                     const basic_json<CharT,sorted_policy,Allocator>& value)
-        : event_type_(event_type), value_(value)
+    basic_json_event(bool value)
+        : event_type_(json_event_type::bool_value), length_(0)
     {
+        value_.bool_value_ = value;
+    }
+
+    basic_json_event(int64_t value)
+        : event_type_(json_event_type::int64_value), length_(0)
+    {
+        value_.int64_value_ = value;
+    }
+
+    basic_json_event(uint64_t value)
+        : event_type_(json_event_type::uint64_value), length_(0)
+    {
+        value_.uint64_value_ = value;
+    }
+
+    basic_json_event(double value)
+        : event_type_(json_event_type::double_value), length_(0)
+    {
+        value_.double_value_ = value;
+    }
+
+    basic_json_event(const CharT* data, size_t length, json_event_type type = json_event_type::string_value)
+        : event_type_(type), length_(length)
+    {
+        value_.string_data_ = data;
+        length_ = length;
+    }
+
+    template<class T, class Traits, class OtherAllocator, class CharT_ = CharT>
+    typename std::enable_if<std::is_same<T,std::basic_string<CharT_,Traits,OtherAllocator>>::value,T>::type
+    is() const
+    {
+        switch (event_type_)
+        {
+            case json_event_type::name:
+            case json_event_type::string_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     template<class T, class... Args>
     bool is(Args&&... args) const
     {
-        return value_.template is<T>(std::forward<Args>(args)...);
+        return as_json().is<T>(std::forward<Args>(args)...);
+    }
+
+    template<class T, class Traits, class OtherAllocator, class CharT_ = CharT>
+    typename std::enable_if<std::is_same<T,std::basic_string<CharT_,Traits,OtherAllocator>>::value,T>::type
+    as() const
+    {
+        switch (event_type_)
+        {
+            case json_event_type::name:
+            case json_event_type::string_value:
+                return std::basic_string<CharT>(value_.string_data_,length_);
+            default:
+                return as_json().as<T>();
+        }
     }
 
     template<class T, class... Args>
     T as(Args&&... args) const
     {
-        return value_.template as<T>(std::forward<Args>(args)...);
+        return as_json().as<T>(std::forward<Args>(args)...);
     }
 
     json_event_type event_type() const {return event_type_;}
+private:
+    json_type as_json() const
+    {
+        switch (event_type_)
+        {
+            case json_event_type::name:
+                return json_type(value_.string_data_,length_);
+            case json_event_type::string_value:
+                return json_type(value_.string_data_,length_);
+            case json_event_type::bignum_value:
+                return json_type();
+            case json_event_type::int64_value:
+                return json_type(value_.int64_value_);
+            case json_event_type::uint64_value:
+                return json_type(value_.uint64_value_);
+            case json_event_type::double_value:
+                return json_type(value_.double_value_);
+            case json_event_type::bool_value:
+                return json_type(value_.bool_value_);
+            case json_event_type::null_value:
+                return json_type(jsoncons::null_type());
+            default:
+                throw std::invalid_argument("Invalid argument.");
+        }
+    }
 };
 
 
@@ -143,25 +229,25 @@ private:
 
     bool do_name(const string_view_type& name, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::name, basic_json<CharT,sorted_policy,Allocator>(name.data(),name.length()));
+        event_ = basic_json_event<CharT,Allocator>(name.data(), name.length(), json_event_type::name);
         return false;
     }
 
     bool do_null_value(const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::null, basic_json<CharT,sorted_policy,Allocator>(jsoncons::null_type()));
+        event_ = basic_json_event<CharT,Allocator>(json_event_type::null_value);
         return false;
     }
 
     bool do_bool(bool value, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::boolean, basic_json<CharT,sorted_policy,Allocator>(value));
+        event_ = basic_json_event<CharT,Allocator>(value);
         return false;
     }
 
     bool do_string_value(const string_view_type& s, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::string, basic_json<CharT,sorted_policy,Allocator>(s.data(), s.length()));
+        event_ = basic_json_event<CharT,Allocator>(s.data(), s.length(), json_event_type::string_value);
         return false;
     }
 
@@ -173,25 +259,25 @@ private:
 
     bool do_bignum_value(int, const uint8_t*, size_t, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::bignum);
+        event_ = basic_json_event<CharT,Allocator>(json_event_type::bignum_value);
         return false;
     }
 
     bool do_int64_value(int64_t value, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::integer, basic_json<CharT,sorted_policy,Allocator>(value));
+        event_ = basic_json_event<CharT,Allocator>(value);
         return false;
     }
 
     bool do_uint64_value(uint64_t value, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::uinteger, basic_json<CharT,sorted_policy,Allocator>(value));
+        event_ = basic_json_event<CharT,Allocator>(value);
         return false;
     }
 
     bool do_double_value(double value, const floating_point_options&, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::floating_point, basic_json<CharT,sorted_policy,Allocator>(value));
+        event_ = basic_json_event<CharT,Allocator>(value);
         return false;
     }
 };

@@ -48,11 +48,11 @@ TEST_CASE("json event reader tests")
             case json_event_type::name:
                 std::cout << event.as<std::string>() << ": ";
                 break;
-            case json_event_type::string:
+            case json_event_type::string_value:
                 std::cout << event.as<std::string>() << "\n";
                 break;
-            case json_event_type::integer:
-            case json_event_type::uinteger:
+            case json_event_type::int64_value:
+            case json_event_type::uint64_value:
                 std::cout << event.as<std::string>() << "\n";
                 break;
         }
