@@ -783,7 +783,6 @@ public:
         {
             int signum;
             std::vector<uint8_t> data;
-
             n.dump(signum, data);
             if (signum == -1)
             {

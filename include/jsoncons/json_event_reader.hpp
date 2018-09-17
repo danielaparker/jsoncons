@@ -59,52 +59,45 @@ class basic_json_event
         const uint8_t* byte_string_data_;
     } value_;
     size_t length_;
-    int signum_;
 public:
     basic_json_event(json_event_type event_type)
-        : event_type_(event_type), length_(0), signum_(0)
+        : event_type_(event_type), length_(0)
     {
     }
 
     basic_json_event(null_type value)
-        : event_type_(json_event_type::null_value), length_(0), signum_(0)
+        : event_type_(json_event_type::null_value), length_(0)
     {
     }
 
     basic_json_event(bool value)
-        : event_type_(json_event_type::bool_value), length_(0), signum_(0)
+        : event_type_(json_event_type::bool_value), length_(0)
     {
         value_.bool_value_ = value;
     }
 
     basic_json_event(int64_t value)
-        : event_type_(json_event_type::int64_value), length_(0), signum_(0)
+        : event_type_(json_event_type::int64_value), length_(0)
     {
         value_.int64_value_ = value;
     }
 
     basic_json_event(uint64_t value)
-        : event_type_(json_event_type::uint64_value), length_(0), signum_(0)
+        : event_type_(json_event_type::uint64_value), length_(0)
     {
         value_.uint64_value_ = value;
     }
 
     basic_json_event(double value)
-        : event_type_(json_event_type::double_value), length_(0), signum_(0)
+        : event_type_(json_event_type::double_value), length_(0)
     {
         value_.double_value_ = value;
     }
 
     basic_json_event(const CharT* data, size_t length, json_event_type type = json_event_type::string_value)
-        : event_type_(type), length_(length), signum_(0)
+        : event_type_(type), length_(length)
     {
         value_.string_data_ = data;
-    }
-
-    basic_json_event(int signum, const uint8_t* data, size_t length)
-        : event_type_(json_event_type::bignum_value), length_(length), signum_(signum)
-    {
-        value_.byte_string_data_ = data;
     }
 
     template<class T, class Traits, class OtherAllocator, class CharT_ = CharT>
@@ -158,7 +151,7 @@ private:
             case json_event_type::string_value:
                 return json_type(value_.string_data_,length_);
             case json_event_type::bignum_value:
-                return json_type(basic_bignum<Allocator>(signum_,value_.byte_string_data_,length_));
+                return json_type(basic_bignum<Allocator>(value_.string_data_,length_));
             case json_event_type::int64_value:
                 return json_type(value_.int64_value_);
             case json_event_type::uint64_value:
@@ -264,9 +257,9 @@ private:
         return false;
     }
 
-    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    bool do_bignum_value(const string_view_type& value, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(signum, data, length);
+        event_ = basic_json_event<CharT,Allocator>(value.data(), value.length(), json_event_type::bignum_value);
         return false;
     }
 

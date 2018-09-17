@@ -253,15 +253,16 @@ private:
         return true;
     }
 
-    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    bool do_bignum_value(const string_view_type& value, const serializing_context&) override
     {
+        basic_bignum<json_byte_allocator_type> n(value.data(), value.length());
         if (stack_offsets_.back().is_object_)
         {
-            stack_.back().value_ = Json(basic_bignum<json_byte_allocator_type>(signum,data,length));
+            stack_.back().value_ = Json(n);
         }
         else
         {
-            stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(signum,data,length)));
+            stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(value.data(), value.length())));
         }
         return true;
     }

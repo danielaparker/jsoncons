@@ -141,32 +141,28 @@ public:
 
     bool bignum_value(int signum, const uint8_t* data, size_t length) 
     {
-        return do_bignum_value(signum, data, length, null_serializing_context());
+        bignum n(signum, data, length);
+        std::basic_string<CharT> s;
+        n.dump(s);
+        return do_bignum_value(s, null_serializing_context());
     }
 
     bool bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
     {
-        return do_bignum_value(signum, data, length, context);
+        bignum n(signum, data, length);
+        std::basic_string<CharT> s;
+        n.dump(s);
+        return do_bignum_value(s, context);
     }
 
     bool bignum_value(const string_view_type& s) 
     {
-        bignum n(s.data(),s.size());
-        int signum;
-        std::vector<uint8_t> v;
-        n.dump(signum, v);
-
-        return do_bignum_value(signum, v.data(), v.size(), null_serializing_context());
+        return do_bignum_value(s, null_serializing_context());
     }
 
     bool bignum_value(const string_view_type& s, const serializing_context& context) 
     {
-        bignum n(s.data(),s.size());
-        int signum;
-        std::vector<uint8_t> v;
-        n.dump(signum, v);
-
-        return do_bignum_value(signum, v.data(), v.size(), context);
+        return do_bignum_value(s, context);
     }
 
     bool int64_value(int64_t value)
@@ -374,7 +370,7 @@ private:
 
     virtual bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
-    virtual bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual bool do_bignum_value(const string_view_type& value, const serializing_context& context) = 0;
 
     virtual bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
 
@@ -439,7 +435,7 @@ private:
         return true;
     }
 
-    bool do_bignum_value(int, const uint8_t*, size_t, const serializing_context&) override
+    bool do_bignum_value(const string_view_type&, const serializing_context&) override
     {
         return true;
     }

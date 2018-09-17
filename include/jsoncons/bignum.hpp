@@ -132,21 +132,24 @@ public:
         }
     }
 
-    explicit basic_bignum(const char* str)
+    template <typename CharT>
+    explicit basic_bignum(const CharT* str)
     {
         initialize(str, strlen(str));
     }
 
-    basic_bignum(const char* data, size_t length)
+    template <typename CharT>
+    basic_bignum(const CharT* data, size_t length)
     {
         initialize(data, length);
     }
 
-    void initialize(const char* data, size_t length)
+    template <typename CharT>
+    void initialize(const CharT* data, size_t length)
     {
         bool neg = false;
 
-        const char* end = data+length;
+        const CharT* end = data+length;
         while (data != end && isspace(*data))
         {
             ++data;

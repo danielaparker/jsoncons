@@ -300,12 +300,9 @@ private:
         return true;
     }
 
-    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) override
+    bool do_bignum_value(const string_view_type& value, const serializing_context& context) override
     {
-        bignum n = bignum(signum, data, length);
-        std::basic_string<CharT> s;
-        n.dump(s);
-        do_string_value(s,context);
+        do_string_value(value, context);
         return true;
     }
 

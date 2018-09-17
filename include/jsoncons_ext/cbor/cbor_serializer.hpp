@@ -306,10 +306,15 @@ private:
         return true;
     }
 
-    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    bool do_bignum_value(const string_view_type& value, const serializing_context&) override
     {
-        std::vector<uint8_t> v;
+        bignum n(value.data(), value.length());
+        int signum;
+        std::vector<uint8_t> data;
+        n.dump(signum, data);
+        size_t length = data.size();
 
+        std::vector<uint8_t> v;
         if (signum == -1)
         {
             v.push_back(0xc3);

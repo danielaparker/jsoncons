@@ -552,7 +552,7 @@ private:
         return true;
     }
 
-    bool do_bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context&) override
+    bool do_bignum_value(const string_view_type& value, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -563,16 +563,18 @@ private:
         {
             case bignum_chars_format::integer:
             {
-                bignum n = bignum(signum, data, length);
-                std::basic_string<CharT> s;
-                n.dump(s);
-                writer_.write(s.data(),s.size());
+                writer_.write(value.data(),value.size());
                 break;
             }
             case bignum_chars_format::base64:
             {
+                bignum n(value.data(), value.length());
+                int signum;
+                std::vector<uint8_t> v;
+                n.dump(signum, v);
+
                 std::basic_string<CharT> s;
-                encode_base64(data, length, s);
+                encode_base64(v.data(), v.size(), s);
                 if (signum == -1)
                 {
                     s.insert(s.begin(), '~');
@@ -584,8 +586,13 @@ private:
             }
             case bignum_chars_format::base64url:
             {
+                bignum n(value.data(), value.length());
+                int signum;
+                std::vector<uint8_t> v;
+                n.dump(signum, v);
+
                 std::basic_string<CharT> s;
-                encode_base64url(data, length, s);
+                encode_base64url(v.data(), v.size(), s);
                 if (signum == -1)
                 {
                     s.insert(s.begin(), '~');
@@ -597,11 +604,8 @@ private:
             }
             default:
             {
-                bignum n = bignum(signum, data, length);
-                std::basic_string<CharT> s;
-                n.dump(s);
                 writer_. put('\"');
-                writer_.write(s.data(),s.size());
+                writer_.write(value.data(),value.size());
                 writer_. put('\"');
                 break;
             }
