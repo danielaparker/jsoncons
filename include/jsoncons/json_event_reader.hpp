@@ -124,7 +124,7 @@ public:
     template<class T, class... Args>
     bool is(Args&&... args) const
     {
-        return as_json().is<T>(std::forward<Args>(args)...);
+        return as_json().template is<T>(std::forward<Args>(args)...);
     }
 
     template<class T, class Traits, class OtherAllocator, class CharT_ = CharT>
@@ -137,14 +137,14 @@ public:
             case json_event_type::string_value:
                 return std::basic_string<CharT>(value_.string_data_,length_);
             default:
-                return as_json().as<T>();
+                return as_json().template as<T>();
         }
     }
 
     template<class T, class... Args>
     T as(Args&&... args) const
     {
-        return as_json().as<T>(std::forward<Args>(args)...);
+        return as_json().template as<T>(std::forward<Args>(args)...);
     }
 
     json_event_type event_type() const {return event_type_;}
