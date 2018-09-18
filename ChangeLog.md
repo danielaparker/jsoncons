@@ -8,11 +8,17 @@ The next release will include a JSON pull parser, `json_event_reader`.
 To facilitate this, the `json_content_handler` function signatures have been 
 changed to return a bool value, to indicate whether parsing is to continue. 
 
-In addition, the function names `integer_value` and `uinteger_value` have been 
-changed to `int64_value` and `uint64_value`, and the function names 
-`do_integer_value` and `do_uinteger_value` have been changed to `int64_value` 
-and `uint64_value`
+And while we're at it:
 
+- The function names `integer_value` and `uinteger_value` have been 
+  changed to `int64_value` and `uint64_value`, and the function names 
+  `do_integer_value` and `do_uinteger_value` have been changed to 
+  `int64_value` and `uint64_value`.
+- The signature of `do_bignum` has been changed to 
+```
+    bool do_bignum_value(const string_view_type& value, 
+                         const serializing_context& context)
+```
 For the virtual `do_` functions, this is a breaking change. For the non-virtual 
 functions `integer_value` and `uinteger_value`, this is a non breaking change, 
 the old signatures have been deprecated but preserved.

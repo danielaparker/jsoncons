@@ -392,7 +392,7 @@ public:
     }
 
     basic_json_event_reader(std::basic_istream<CharT>& is, 
-                      const basic_json_read_options<CharT>& options)
+                            const basic_json_read_options<CharT>& options)
         : basic_json_event_reader(is,options,default_err_handler_)
     {
     }
@@ -409,12 +409,12 @@ public:
         buffer_.reserve(buffer_length_);
     }
 
-    iterator begin()
+    iterator begin() const
     {
         return iterator(this);
     }
 
-    iterator end()
+    iterator end() const
     {
         return iterator();
     }

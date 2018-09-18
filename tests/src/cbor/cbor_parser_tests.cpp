@@ -48,7 +48,7 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 
 TEST_CASE("test_cbor_parsing")
 {
-#if 0
+//#if 0
     // unsigned integer
     check_parsing({0x00},json(0U));
     check_parsing({0x01},json(1U));
@@ -62,7 +62,7 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x1a,0xff,0xff,0xff,0xff},json(4294967295U));
     check_parsing({0x1b,0,0,0,1,0,0,0,0},json(4294967296U));
     check_parsing({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<uint64_t>::max()));
-#endif
+//#endif
 
     // positive signed integer
     check_parsing({0x00},json(0));
