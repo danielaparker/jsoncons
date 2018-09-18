@@ -36,8 +36,9 @@ void pull_parser_example1()
 
     json_event_reader event_reader(is);
 
-    for (const auto& event : event_reader)
+    for (; event_reader.has_next(); event_reader.next())
     {
+        const auto& event = event_reader.current();
         switch (event.event_type())
         {
             case json_event_type::name:

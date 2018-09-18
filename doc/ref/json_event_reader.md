@@ -1,7 +1,7 @@
 ### jsoncons::json_event_reader
 
 ```c++
-typedef basic_json_event_reader<char> json_reader
+typedef basic_json_event_reader<char,std::allocator<char>> json_reader
 ```
 
 `json_event_reader` is noncopyable and nonmoveable.
@@ -46,9 +46,6 @@ Note: It is the programmer's responsibility to ensure that `json_event_reader` d
 
 #### Member functions
 
-    iterator begin()
-
-    iterator end()
 
 ### Examples
 
@@ -90,8 +87,9 @@ int main()
 
     json_event_reader event_reader(is);
 
-    for (const auto& event : event_reader)
+    for (; event_reader.has_next(); event_reader.next())
     {
+        const auto& event = event_reader.current();
         switch (event.event_type())
         {
             case json_event_type::name:
