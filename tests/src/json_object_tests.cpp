@@ -621,9 +621,9 @@ TEST_CASE("test_is")
     obj["field2"] = -10;
     obj["field3"] = 10U;
 
-    CHECK(obj["field1"].major_type() == jsoncons::json_major_type::integer_t);
-    CHECK(obj["field2"].major_type() == jsoncons::json_major_type::integer_t);
-    CHECK(obj["field3"].major_type() == jsoncons::json_major_type::uinteger_t);
+    CHECK(obj["field1"].major_type() == jsoncons::major_type_tag::integer_t);
+    CHECK(obj["field2"].major_type() == jsoncons::major_type_tag::integer_t);
+    CHECK(obj["field3"].major_type() == jsoncons::major_type_tag::uinteger_t);
 
     CHECK_FALSE(obj["field1"].is<std::string>());
     CHECK(obj["field1"].is<short>());
@@ -661,7 +661,7 @@ TEST_CASE("test_is2")
 {
     json obj = json::parse("{\"field1\":10}");
 
-    CHECK(obj["field1"].major_type() == jsoncons::json_major_type::uinteger_t);
+    CHECK(obj["field1"].major_type() == jsoncons::major_type_tag::uinteger_t);
 
     CHECK_FALSE(obj["field1"].is<std::string>());
     CHECK(obj["field1"].is<int>());

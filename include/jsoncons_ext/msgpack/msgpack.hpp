@@ -100,21 +100,21 @@ public:
     {
         switch (jval.major_type())
         {
-            case json_major_type::null_t:
+            case major_type_tag::null_t:
             {
                 // nil
                 action(static_cast<uint8_t>(msgpack_format::nil_cd), v);
                 break;
             }
 
-            case json_major_type::bool_t:
+            case major_type_tag::bool_t:
             {
                 // true and false
                 action(static_cast<uint8_t>(jval.as_bool() ? msgpack_format::true_cd : msgpack_format::false_cd),v);
                 break;
             }
 
-            case json_major_type::integer_t:
+            case major_type_tag::integer_t:
             {
                 int64_t val = jval.as_integer();
                 if (val >= 0)
@@ -184,7 +184,7 @@ public:
                 break;
             }
 
-        case json_major_type::uinteger_t:
+        case major_type_tag::uinteger_t:
             {
                 uint64_t val = jval.as_uinteger();
                 if (val <= (std::numeric_limits<int8_t>::max)())
@@ -219,7 +219,7 @@ public:
                 break;
             }
 
-            case json_major_type::double_t:
+            case major_type_tag::double_t:
             {
                 // float 64
                 action(static_cast<uint8_t>(msgpack_format::float64_cd), v);
@@ -227,14 +227,14 @@ public:
                 break;
             }
 
-            case json_major_type::short_string_t:
-            case json_major_type::long_string_t:
+            case major_type_tag::short_string_t:
+            case major_type_tag::long_string_t:
             {
                 encode_string(jval.as_string_view(), action, v);
                 break;
             }
 
-            case json_major_type::array_t:
+            case major_type_tag::array_t:
             {
                 const auto length = jval.array_value().size();
                 if (length <= 15)
@@ -263,7 +263,7 @@ public:
                 break;
             }
 
-            case json_major_type::object_t:
+            case major_type_tag::object_t:
             {
                 const auto length = jval.object_value().size();
                 if (length <= 15)
