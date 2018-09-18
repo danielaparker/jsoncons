@@ -128,8 +128,6 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x5f,0x43,'H','e','l',0x42,'l','o',0xff}, json(byte_string("Hello")));
     check_parsing({0x5f,0x41,'H',0x41,'e',0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
     check_parsing({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
-#endif
-#if 0
 
     // text strings with undefined length
     std::cout << "Check 30\n";
@@ -155,6 +153,7 @@ TEST_CASE("test_cbor_parsing")
     // indefinite length arrays
     check_parsing({0x9f,0xff},json::array());
     check_parsing({0x9f,0x9f,0xff,0xff},json::parse("[[]]"));
+#endif
 
     // maps
     check_parsing({0xa0},json::object());
@@ -165,11 +164,11 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0xbf,0xff},json::object());
     check_parsing({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
     // bignum
-
-#endif
-
+#if 0
     check_parsing({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
                   json(bignum(1,{0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00})));
 
+
+#endif
 }
 
