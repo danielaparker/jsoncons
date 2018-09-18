@@ -58,7 +58,7 @@ public:
         const uint8_t* endp;
         const uint8_t* begin;
 
-        if (major_type() == cbor_major_type::map)
+        if (physical_type() == cbor_major_type::map)
         {
             detail::get_size(first_,last_,&begin);
             if (begin == first_)
@@ -80,7 +80,7 @@ public:
         const uint8_t* endp;
         const uint8_t* begin;
 
-        if (major_type() == cbor_major_type::array)
+        if (physical_type() == cbor_major_type::array)
         {
             /*size_t n = */ detail::get_size(first_,last_,&begin);
             if (begin == first_)
@@ -154,7 +154,7 @@ public:
         return first_[0];
     }
 
-    cbor_major_type major_type() const
+    cbor_major_type physical_type() const
     {
         return get_major_type(type());
     }
@@ -436,7 +436,7 @@ public:
 
     std::string as_string() const
     {
-        switch (major_type())
+        switch (physical_type())
         {
             case cbor_major_type::text_string:
             {
@@ -505,7 +505,7 @@ public:
     template <typename BAllocator=std::allocator<char>>
     basic_byte_string<BAllocator> as_byte_string() const
     {
-        switch (major_type())
+        switch (physical_type())
         {
             case cbor_major_type::byte_string:
             {
@@ -527,7 +527,7 @@ public:
 
     bignum as_bignum() const
     {
-        switch (major_type())
+        switch (physical_type())
         {
             case cbor_major_type::semantic_tag:
             {
@@ -632,7 +632,7 @@ public:
     {
         // If it's a non indefinite length string, dump view
         // If it's an indefinite length string, dump view
-        switch (major_type())
+        switch (physical_type())
         {
             case cbor_major_type::unsigned_integer:
             {

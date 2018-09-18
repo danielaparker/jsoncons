@@ -34,11 +34,6 @@ enum class cbor_major_type : uint8_t
     simple = 0x7
 };
 
-const uint8_t major_type_shift = 0x05;
-const unsigned major_type_mask = (~0U << major_type_shift);
-const uint8_t indefinite_length = 0x1f;
-const uint8_t additional_information_mask = (1U << 5) - 1;
-
 namespace additional_information
 {
     const uint8_t indefinite_length = 0x1f;
@@ -47,6 +42,7 @@ namespace additional_information
 inline
 cbor_major_type get_major_type(uint8_t type)
 {
+    static const uint8_t major_type_shift = 0x05;
     uint8_t value = type >> major_type_shift;
     return static_cast<cbor_major_type>(value);
 }
@@ -54,6 +50,7 @@ cbor_major_type get_major_type(uint8_t type)
 inline
 uint8_t get_additional_information_value(uint8_t type)
 {
+    static const uint8_t additional_information_mask = (1U << 5) - 1;
     uint8_t value = type & additional_information_mask;
     return value;
 }
