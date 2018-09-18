@@ -27,16 +27,6 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 
         json result = decoder.get_result();
 
-        std::cout << "\nv: ";
-        if (expected == "")
-        {
-            for (auto c : v)
-            {
-                std::cout << (int)c << " ";
-            }
-        }
-        std::cout << "\n";
-
         REQUIRE(expected == result);
     }
     catch (const std::exception& e)
@@ -48,7 +38,6 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 
 TEST_CASE("test_cbor_parsing")
 {
-//#if 0
     // unsigned integer
     check_parsing({0x00},json(0U));
     check_parsing({0x01},json(1U));
@@ -62,7 +51,6 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x1a,0xff,0xff,0xff,0xff},json(4294967295U));
     check_parsing({0x1b,0,0,0,1,0,0,0,0},json(4294967296U));
     check_parsing({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<uint64_t>::max()));
-//#endif
 
     // positive signed integer
     check_parsing({0x00},json(0));
@@ -87,7 +75,6 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x39,0xff,0xff},json(-65536));
     check_parsing({0x3a,0,1,0x00,0x00},json(-65537));
 
-//#endif
     check_parsing({0x3a,0xff,0xff,0xff,0xff},json(-4294967296));
     check_parsing({0x3b,0,0,0,1,0,0,0,0},json(-4294967297));
 
@@ -115,9 +102,7 @@ TEST_CASE("test_cbor_parsing")
                  json(byte_string_view(v.data(),v.size())));
 
     // string
-    std::cout << "Check 10\n";
     check_parsing({0x60},json(""));
-    std::cout << "Check 20\n";
     check_parsing({0x61,' '},json(" "));
     check_parsing({0x78,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
                  json("123456789012345678901234"));
@@ -132,15 +117,11 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string("Hello")));
 
     // text strings with undefined length
-    std::cout << "Check 30\n";
 
     check_parsing({0x7f,0xff}, json(""));
 
-    std::cout << "Check 40\n";
     check_parsing({0x7f,0x60,0xff}, json(""));
-    std::cout << "Check 50\n";
     check_parsing({0x7f,0x60,0x60,0xff}, json(""));
-    std::cout << "Check 60\n";
     check_parsing({0x7f,0x63,'H','e','l',0x62,'l','o',0xff}, json("Hello"));
     check_parsing({0x7f,0x61,'H',0x61,'e',0x61,'l',0x61,'l',0x61,'o',0xff}, json("Hello"));
     check_parsing({0x7f,0x61,'H',0x61,'e',0x61,'l',0x60,0x61,'l',0x61,'o',0xff}, json("Hello"));
