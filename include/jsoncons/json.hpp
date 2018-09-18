@@ -1059,6 +1059,19 @@ public:
             return reinterpret_cast<const array_data*>(&data_);
         }
 
+        size_t size() const
+        {
+            switch (physical_type())
+            {
+            case physical_type_tag::array_t:
+                return array_data_cast()->value().size();
+            case physical_type_tag::object_t:
+                return object_data_cast()->value().size();
+            default:
+                return 0;
+            }
+        }
+
         string_view_type as_string_view() const
         {
             switch (physical_type())
@@ -1134,7 +1147,7 @@ public:
                 case physical_type_tag::empty_object_t:
                     return true;
                 case physical_type_tag::object_t:
-                    return rhs.object_data_cast()->value().size() == 0;
+                    return rhs.size() == 0;
                 default:
                     return false;
                 }
@@ -1233,7 +1246,7 @@ public:
                 switch (rhs.physical_type())
                 {
                 case physical_type_tag::empty_object_t:
-                    return object_data_cast()->value().size() == 0;
+                    return size() == 0;
                 case physical_type_tag::object_t:
                     return object_data_cast()->value() == rhs.object_data_cast()->value();
                 default:
