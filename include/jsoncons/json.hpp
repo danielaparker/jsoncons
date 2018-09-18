@@ -110,8 +110,7 @@ enum class semantic_type_tag : uint8_t
     double_t = 0x04,
     string_t = 0x05,
     byte_string_t = 0x06,
-    positive_bignum_t = 0x07,
-    negative_bignum_t = 0x08,
+    bignum_t = 0x07,
     array_t = 0x09,
     empty_object_t = 0x0a,
     object_t = 0x0b
@@ -789,40 +788,32 @@ public:
 
         variant(const basic_bignum<byte_allocator_type>& n)
         {
-            int signum;
-            std::vector<uint8_t> data;
+            std::basic_string<CharT> s;
+            n.dump(s);
 
-            n.dump(signum, data);
-            if (signum == -1)
+            if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::negative_bignum_t,
-                                                                     data.data(), data.size(), 
-                                                                     byte_allocator_type());
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_type_tag::bignum_t, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::positive_bignum_t,
-                                                                     data.data(), data.size(), 
-                                                                     byte_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_type_tag::bignum_t, s.data(), s.length(), char_allocator_type());
             }
         }
 
-        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& allocator)
+        variant(const basic_bignum<byte_allocator_type>& n, 
+                const Allocator& allocator)
         {
-            int signum;
-            std::vector<uint8_t> data;
-            n.dump(signum, data);
-            if (signum == -1)
+            std::basic_string<CharT> s;
+            n.dump(s);
+
+            if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::negative_bignum_t,
-                                                                     data.data(), data.size(), 
-                                                                     byte_allocator_type(allocator));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_type_tag::bignum_t, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::positive_bignum_t,
-                                                                     data.data(), data.size(), 
-                                                                     byte_allocator_type(allocator));
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_type_tag::bignum_t, s.data(), s.length(), char_allocator_type(allocator));
             }
         }
 
@@ -1101,14 +1092,11 @@ public:
         {
             switch (semantic_type())
             {
-                case semantic_type_tag::negative_bignum_t:
-                    return bignum(-1, byte_string_data_cast()->data(),byte_string_data_cast()->length());
-                    break;
-                case semantic_type_tag::positive_bignum_t:
-                    return bignum(1, byte_string_data_cast()->data(),byte_string_data_cast()->length());
+                case semantic_type_tag::bignum_t:
+                    return bignum(as_string_view().data(), as_string_view().length());
                     break;
                 default:
-                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Byte string but not a bignum"));
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
                     break;
             }
         }
@@ -2780,11 +2768,8 @@ public:
             case semantic_type_tag::string_t:
                 handler.string_value(as_string_view());
                 break;
-            case semantic_type_tag::negative_bignum_t:
-                handler.bignum_value(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                break;
-            case semantic_type_tag::positive_bignum_t:
-                handler.bignum_value(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+            case semantic_type_tag::bignum_t:
+                handler.bignum_value(as_string_view());
                 break;
             case semantic_type_tag::byte_string_t:
                 handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
@@ -3012,7 +2997,7 @@ public:
 
     bool is_bignum() const JSONCONS_NOEXCEPT
     {
-        return var_.semantic_type() == semantic_type_tag::negative_bignum_t || var_.semantic_type() == semantic_type_tag::positive_bignum_t;
+        return var_.semantic_type() == semantic_type_tag::bignum_t;
     }
 
     bool is_bool() const JSONCONS_NOEXCEPT
@@ -3339,20 +3324,12 @@ public:
         switch (var_.semantic_type())
         {
             case semantic_type_tag::string_t:
+            {
                 return string_type(as_string_view().data(),as_string_view().length(),allocator);
-            case semantic_type_tag::negative_bignum_t:
-            {
-                bignum n = bignum(-1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                string_type s(allocator);
-                n.dump(s);
-                return s;
             }
-            case semantic_type_tag::positive_bignum_t:
+            case semantic_type_tag::bignum_t:
             {
-                bignum n = bignum(1, var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
-                string_type s(allocator);
-                n.dump(s);
-                return s;
+                return string_type(as_string_view().data(),as_string_view().length(),allocator);
             }
             case semantic_type_tag::byte_string_t:
             {

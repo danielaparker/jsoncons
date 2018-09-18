@@ -62,6 +62,7 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x1a,0xff,0xff,0xff,0xff},json(4294967295U));
     check_parsing({0x1b,0,0,0,1,0,0,0,0},json(4294967296U));
     check_parsing({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<uint64_t>::max()));
+#endif
 
     // positive signed integer
     check_parsing({0x00},json(0));
@@ -85,10 +86,11 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x39,0x01,0x00},json(-257));
     check_parsing({0x39,0xff,0xff},json(-65536));
     check_parsing({0x3a,0,1,0x00,0x00},json(-65537));
-#endif
+
+//#endif
     check_parsing({0x3a,0xff,0xff,0xff,0xff},json(-4294967296));
     check_parsing({0x3b,0,0,0,1,0,0,0,0},json(-4294967297));
-//#endif
+
     // null, true, false
     check_parsing({0xf6},json::null());
     check_parsing({0xf5},json(true));
