@@ -86,7 +86,7 @@ public:
     }
 };
 
-enum class physical_type_tag : uint8_t 
+enum class data_type_tag : uint8_t 
 {
     null_t = 0x00,
     bool_t = 0x01,
@@ -187,8 +187,8 @@ public:
                 : type_(type)
             {}
 
-            data_base(physical_type_tag physical_type, semantic_type_tag semantic_type)
-                : type_((static_cast<uint8_t>(physical_type) << major_type_shift) | static_cast<uint8_t>(semantic_type))
+            data_base(data_type_tag data_type, semantic_type_tag semantic_type)
+                : type_((static_cast<uint8_t>(data_type) << major_type_shift) | static_cast<uint8_t>(semantic_type))
             {}
 
             uint8_t type() const 
@@ -196,11 +196,11 @@ public:
                 return type_;
             }
 
-            physical_type_tag physical_type() const 
+            data_type_tag data_type() const 
             {
 
                 uint8_t value = type_ >> major_type_shift;
-                return static_cast<physical_type_tag>(value);
+                return static_cast<data_type_tag>(value);
             }
 
             semantic_type_tag semantic_type() const 
@@ -214,7 +214,7 @@ public:
         {
         public:
             null_data()
-                : data_base(physical_type_tag::null_t, semantic_type_tag::null_t)
+                : data_base(data_type_tag::null_t, semantic_type_tag::null_t)
             {
             }
         };
@@ -223,7 +223,7 @@ public:
         {
         public:
             empty_object_data()
-                : data_base(physical_type_tag::empty_object_t, semantic_type_tag::empty_object_t)
+                : data_base(data_type_tag::empty_object_t, semantic_type_tag::empty_object_t)
             {
             }
         };
@@ -233,7 +233,7 @@ public:
             bool val_;
         public:
             bool_data(bool val)
-                : data_base(physical_type_tag::bool_t, semantic_type_tag::bool_t),val_(val)
+                : data_base(data_type_tag::bool_t, semantic_type_tag::bool_t),val_(val)
             {
             }
 
@@ -254,7 +254,7 @@ public:
             int64_t val_;
         public:
             integer_data(int64_t val)
-                : data_base(physical_type_tag::integer_t, semantic_type_tag::integer_t),val_(val)
+                : data_base(data_type_tag::integer_t, semantic_type_tag::integer_t),val_(val)
             {
             }
 
@@ -274,7 +274,7 @@ public:
             uint64_t val_;
         public:
             uinteger_data(uint64_t val)
-                : data_base(physical_type_tag::uinteger_t, semantic_type_tag::uinteger_t),val_(val)
+                : data_base(data_type_tag::uinteger_t, semantic_type_tag::uinteger_t),val_(val)
             {
             }
 
@@ -297,7 +297,7 @@ public:
             double val_;
         public:
             double_data(double val)
-                : data_base(physical_type_tag::double_t, semantic_type_tag::double_t), 
+                : data_base(data_type_tag::double_t, semantic_type_tag::double_t), 
                   format_(static_cast<uint8_t>(chars_format::general)),
                   precision_(0), 
                   decimal_places_(0), 
@@ -305,7 +305,7 @@ public:
             {
             }
             double_data(double val, const floating_point_options& fmt)
-                : data_base(physical_type_tag::double_t, semantic_type_tag::double_t), 
+                : data_base(data_type_tag::double_t, semantic_type_tag::double_t), 
                   format_(static_cast<uint8_t>(fmt.format())), 
                   precision_(fmt.precision()), 
                   decimal_places_(fmt.decimal_places()), 
@@ -351,8 +351,8 @@ public:
         public:
             static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
-            short_string_data(const char_type* p, uint8_t length)
-                : data_base(physical_type_tag::short_string_t, semantic_type_tag::string_t), length_(length)
+            short_string_data(semantic_type_tag semantic_type, const char_type* p, uint8_t length)
+                : data_base(data_type_tag::short_string_t, semantic_type), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
@@ -389,8 +389,15 @@ public:
 
             pointer ptr_;
         public:
+
+            long_string_data(semantic_type_tag semantic_type, const char_type* data, size_t length, const Allocator& a)
+                : data_base(data_type_tag::long_string_t, semantic_type)
+            {
+                ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
+            }
+
             long_string_data(const long_string_data& val)
-                : data_base(physical_type_tag::long_string_t, semantic_type_tag::string_t)
+                : data_base(data_type_tag::long_string_t, semantic_type_tag::string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
@@ -405,12 +412,6 @@ public:
                 : data_base(val.type())
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
-            }
-
-            long_string_data(const char_type* data, size_t length, const Allocator& a)
-                : data_base(physical_type_tag::long_string_t, semantic_type_tag::string_t)
-            {
-                ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
 
             ~long_string_data()
@@ -472,7 +473,7 @@ public:
             }
         public:
             byte_string_data(semantic_type_tag semantic_type, const uint8_t* data, size_t length, const Allocator& a)
-                : data_base(physical_type_tag::byte_string_t, semantic_type)
+                : data_base(data_type_tag::byte_string_t, semantic_type)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
@@ -549,13 +550,13 @@ public:
             }
         public:
             array_data(const array& val)
-                : data_base(physical_type_tag::array_t, semantic_type_tag::array_t)
+                : data_base(data_type_tag::array_t, semantic_type_tag::array_t)
             {
                 create(val.get_allocator(), val);
             }
 
             array_data(const array& val, const Allocator& a)
-                : data_base(physical_type_tag::array_t, semantic_type_tag::array_t)
+                : data_base(data_type_tag::array_t, semantic_type_tag::array_t)
             {
                 create(array_allocator(a), val, a);
             }
@@ -631,19 +632,19 @@ public:
             }
         public:
             explicit object_data(const Allocator& a)
-                : data_base(physical_type_tag::object_t, semantic_type_tag::object_t)
+                : data_base(data_type_tag::object_t, semantic_type_tag::object_t)
             {
                 create(a,a);
             }
 
             explicit object_data(const object& val)
-                : data_base(physical_type_tag::object_t, semantic_type_tag::object_t)
+                : data_base(data_type_tag::object_t, semantic_type_tag::object_t)
             {
                 create(val.get_allocator(), val);
             }
 
             explicit object_data(const object& val, const Allocator& a)
-                : data_base(physical_type_tag::object_t, semantic_type_tag::object_t)
+                : data_base(data_type_tag::object_t, semantic_type_tag::object_t)
             {
                 create(object_allocator(a), val, a);
             }
@@ -768,11 +769,11 @@ public:
         {
             if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_type_tag::string_t, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(s, length, char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_type_tag::string_t, s, length, char_allocator_type());
             }
         }
 
@@ -830,11 +831,11 @@ public:
             size_t length = char_traits_type::length(s);
             if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_type_tag::string_t, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(s, length, char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_type_tag::string_t, s, length, char_allocator_type());
             }
         }
 
@@ -843,11 +844,11 @@ public:
             size_t length = char_traits_type::length(s);
             if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_type_tag::string_t, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(s, length, alloc);
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_type_tag::string_t, s, length, alloc);
             }
         }
 
@@ -855,11 +856,11 @@ public:
         {
             if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_type_tag::string_t, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(s, length, alloc);
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_type_tag::string_t, s, length, alloc);
             }
         }
         variant(const object& val)
@@ -886,18 +887,18 @@ public:
 
         void Destroy_()
         {
-            switch (physical_type())
+            switch (data_type())
             {
-                case physical_type_tag::long_string_t:
+                case data_type_tag::long_string_t:
                     reinterpret_cast<long_string_data*>(&data_)->~long_string_data();
                     break;
-                case physical_type_tag::byte_string_t:
+                case data_type_tag::byte_string_t:
                     reinterpret_cast<byte_string_data*>(&data_)->~byte_string_data();
                     break;
-                case physical_type_tag::array_t:
+                case data_type_tag::array_t:
                     reinterpret_cast<array_data*>(&data_)->~array_data();
                     break;
-                case physical_type_tag::object_t:
+                case data_type_tag::object_t:
                     reinterpret_cast<object_data*>(&data_)->~object_data();
                     break;
                 default:
@@ -910,39 +911,39 @@ public:
             if (this !=&val)
             {
                 Destroy_();
-                switch (val.physical_type())
+                switch (val.data_type())
                 {
-                case physical_type_tag::null_t:
+                case data_type_tag::null_t:
                     new(reinterpret_cast<void*>(&data_))null_data();
                     break;
-                case physical_type_tag::empty_object_t:
+                case data_type_tag::empty_object_t:
                     new(reinterpret_cast<void*>(&data_))empty_object_data();
                     break;
-                case physical_type_tag::bool_t:
+                case data_type_tag::bool_t:
                     new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
                     break;
-                case physical_type_tag::integer_t:
+                case data_type_tag::integer_t:
                     new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
                     break;
-                case physical_type_tag::uinteger_t:
+                case data_type_tag::uinteger_t:
                     new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
                     break;
-                case physical_type_tag::double_t:
+                case data_type_tag::double_t:
                     new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                     break;
-                case physical_type_tag::short_string_t:
+                case data_type_tag::short_string_t:
                     new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
                     break;
-                case physical_type_tag::long_string_t:
+                case data_type_tag::long_string_t:
                     new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
                     break;
-                case physical_type_tag::byte_string_t:
+                case data_type_tag::byte_string_t:
                     new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
                     break;
-                case physical_type_tag::array_t:
+                case data_type_tag::array_t:
                     new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
                     break;
-                case physical_type_tag::object_t:
+                case data_type_tag::object_t:
                     new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
                     break;
                 default:
@@ -962,9 +963,9 @@ public:
             return *this;
         }
 
-        physical_type_tag physical_type() const
+        data_type_tag data_type() const
         {
-            return reinterpret_cast<const data_base*>(&data_)->physical_type();
+            return reinterpret_cast<const data_base*>(&data_)->data_type();
         }
 
         semantic_type_tag semantic_type() const
@@ -1049,11 +1050,11 @@ public:
 
         size_t size() const
         {
-            switch (physical_type())
+            switch (data_type())
             {
-            case physical_type_tag::array_t:
+            case data_type_tag::array_t:
                 return array_data_cast()->value().size();
-            case physical_type_tag::object_t:
+            case data_type_tag::object_t:
                 return object_data_cast()->value().size();
             default:
                 return 0;
@@ -1062,11 +1063,11 @@ public:
 
         string_view_type as_string_view() const
         {
-            switch (physical_type())
+            switch (data_type())
             {
-            case physical_type_tag::short_string_t:
+            case data_type_tag::short_string_t:
                 return string_view_type(short_string_data_cast()->data(),short_string_data_cast()->length());
-            case physical_type_tag::long_string_t:
+            case data_type_tag::long_string_t:
                 return string_view_type(string_data_cast()->data(),string_data_cast()->length());
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
@@ -1076,9 +1077,9 @@ public:
         template <typename BAllocator=std::allocator<char>>
         basic_byte_string<BAllocator> as_byte_string() const
         {
-            switch (physical_type())
+            switch (data_type())
             {
-            case physical_type_tag::byte_string_t:
+            case data_type_tag::byte_string_t:
                 return basic_byte_string<BAllocator>(byte_string_data_cast()->data(),byte_string_data_cast()->length());
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a byte string"));
@@ -1087,9 +1088,9 @@ public:
 
         byte_string_view as_byte_string_view() const
         {
-            switch (physical_type())
+            switch (data_type())
             {
-            case physical_type_tag::byte_string_t:
+            case data_type_tag::byte_string_t:
                 return byte_string_view(byte_string_data_cast()->data(),byte_string_data_cast()->length());
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a byte string"));
@@ -1118,91 +1119,91 @@ public:
             {
                 return true;
             }
-            switch (physical_type())
+            switch (data_type())
             {
-            case physical_type_tag::null_t:
-                switch (rhs.physical_type())
+            case data_type_tag::null_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::null_t:
+                case data_type_tag::null_t:
                     return true;
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::empty_object_t:
-                switch (rhs.physical_type())
+            case data_type_tag::empty_object_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::empty_object_t:
+                case data_type_tag::empty_object_t:
                     return true;
-                case physical_type_tag::object_t:
+                case data_type_tag::object_t:
                     return rhs.size() == 0;
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::bool_t:
-                switch (rhs.physical_type())
+            case data_type_tag::bool_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::bool_t:
+                case data_type_tag::bool_t:
                     return bool_data_cast()->value() == rhs.bool_data_cast()->value();
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::integer_t:
-                switch (rhs.physical_type())
+            case data_type_tag::integer_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::integer_t:
+                case data_type_tag::integer_t:
                     return integer_data_cast()->value() == rhs.integer_data_cast()->value();
-                case physical_type_tag::uinteger_t:
+                case data_type_tag::uinteger_t:
                     return integer_data_cast()->value() >= 0 ? static_cast<uint64_t>(integer_data_cast()->value()) == rhs.uinteger_data_cast()->value() : false;
-                case physical_type_tag::double_t:
+                case data_type_tag::double_t:
                     return static_cast<double>(integer_data_cast()->value()) == rhs.double_data_cast()->value();
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::uinteger_t:
-                switch (rhs.physical_type())
+            case data_type_tag::uinteger_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::integer_t:
+                case data_type_tag::integer_t:
                     return rhs.integer_data_cast()->value() >= 0 ? uinteger_data_cast()->value() == static_cast<uint64_t>(rhs.integer_data_cast()->value()) : false;
-                case physical_type_tag::uinteger_t:
+                case data_type_tag::uinteger_t:
                     return uinteger_data_cast()->value() == rhs.uinteger_data_cast()->value();
-                case physical_type_tag::double_t:
+                case data_type_tag::double_t:
                     return static_cast<double>(uinteger_data_cast()->value()) == rhs.double_data_cast()->value();
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::double_t:
-                switch (rhs.physical_type())
+            case data_type_tag::double_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::integer_t:
+                case data_type_tag::integer_t:
                     return double_data_cast()->value() == static_cast<double>(rhs.integer_data_cast()->value());
-                case physical_type_tag::uinteger_t:
+                case data_type_tag::uinteger_t:
                     return double_data_cast()->value() == static_cast<double>(rhs.uinteger_data_cast()->value());
-                case physical_type_tag::double_t:
+                case data_type_tag::double_t:
                     return double_data_cast()->value() == rhs.double_data_cast()->value();
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::short_string_t:
-                switch (rhs.physical_type())
+            case data_type_tag::short_string_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::short_string_t:
+                case data_type_tag::short_string_t:
                     return as_string_view() == rhs.as_string_view();
-                case physical_type_tag::long_string_t:
+                case data_type_tag::long_string_t:
                     return as_string_view() == rhs.as_string_view();
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::byte_string_t:
-                switch (rhs.physical_type())
+            case data_type_tag::byte_string_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::byte_string_t:
+                case data_type_tag::byte_string_t:
                     {
                         return semantic_type() == rhs.semantic_type() && as_byte_string_view() == rhs.as_byte_string_view();
                     }
@@ -1210,32 +1211,32 @@ public:
                     return false;
                 }
                 break;
-            case physical_type_tag::long_string_t:
-                switch (rhs.physical_type())
+            case data_type_tag::long_string_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::short_string_t:
+                case data_type_tag::short_string_t:
                     return as_string_view() == rhs.as_string_view();
-                case physical_type_tag::long_string_t:
+                case data_type_tag::long_string_t:
                     return as_string_view() == rhs.as_string_view();
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::array_t:
-                switch (rhs.physical_type())
+            case data_type_tag::array_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::array_t:
+                case data_type_tag::array_t:
                     return array_data_cast()->value() == rhs.array_data_cast()->value();
                 default:
                     return false;
                 }
                 break;
-            case physical_type_tag::object_t:
-                switch (rhs.physical_type())
+            case data_type_tag::object_t:
+                switch (rhs.data_type())
                 {
-                case physical_type_tag::empty_object_t:
+                case data_type_tag::empty_object_t:
                     return size() == 0;
-                case physical_type_tag::object_t:
+                case data_type_tag::object_t:
                     return object_data_cast()->value() == rhs.object_data_cast()->value();
                 default:
                     return false;
@@ -1274,57 +1275,57 @@ public:
             }
 
             variant temp(other);
-            switch (physical_type())
+            switch (data_type())
             {
-            case physical_type_tag::null_t:
+            case data_type_tag::null_t:
                 new(reinterpret_cast<void*>(&(other.data_)))null_data();
                 break;
-            case physical_type_tag::empty_object_t:
+            case data_type_tag::empty_object_t:
                 new(reinterpret_cast<void*>(&(other.data_)))empty_object_data();
                 break;
-            case physical_type_tag::bool_t:
+            case data_type_tag::bool_t:
                 new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
                 break;
-            case physical_type_tag::integer_t:
+            case data_type_tag::integer_t:
                 new(reinterpret_cast<void*>(&(other.data_)))integer_data(*integer_data_cast());
                 break;
-            case physical_type_tag::uinteger_t:
+            case data_type_tag::uinteger_t:
                 new(reinterpret_cast<void*>(&(other.data_)))uinteger_data(*uinteger_data_cast());
                 break;
-            case physical_type_tag::double_t:
+            case data_type_tag::double_t:
                 new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
                 break;
-            case physical_type_tag::short_string_t:
+            case data_type_tag::short_string_t:
                 new(reinterpret_cast<void*>(&(other.data_)))short_string_data(*short_string_data_cast());
                 break;
-            case physical_type_tag::long_string_t:
+            case data_type_tag::long_string_t:
                 new(reinterpret_cast<void*>(&other.data_))long_string_data(std::move(*string_data_cast()));
                 break;
-            case physical_type_tag::byte_string_t:
+            case data_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
                 break;
-            case physical_type_tag::array_t:
+            case data_type_tag::array_t:
                 new(reinterpret_cast<void*>(&(other.data_)))array_data(std::move(*array_data_cast()));
                 break;
-            case physical_type_tag::object_t:
+            case data_type_tag::object_t:
                 new(reinterpret_cast<void*>(&(other.data_)))object_data(std::move(*object_data_cast()));
                 break;
             default:
                 JSONCONS_UNREACHABLE();
                 break;
             }
-            switch (temp.physical_type())
+            switch (temp.data_type())
             {
-            case physical_type_tag::long_string_t:
+            case data_type_tag::long_string_t:
                 new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*temp.string_data_cast()));
                 break;
-            case physical_type_tag::byte_string_t:
+            case data_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
                 break;
-            case physical_type_tag::array_t:
+            case data_type_tag::array_t:
                 new(reinterpret_cast<void*>(&(data_)))array_data(std::move(*temp.array_data_cast()));
                 break;
-            case physical_type_tag::object_t:
+            case data_type_tag::object_t:
                 new(reinterpret_cast<void*>(&(data_)))object_data(std::move(*temp.object_data_cast()));
                 break;
             default:
@@ -1336,39 +1337,39 @@ public:
 
         void Init_(const variant& val)
         {
-            switch (val.physical_type())
+            switch (val.data_type())
             {
-            case physical_type_tag::null_t:
+            case data_type_tag::null_t:
                 new(reinterpret_cast<void*>(&data_))null_data();
                 break;
-            case physical_type_tag::empty_object_t:
+            case data_type_tag::empty_object_t:
                 new(reinterpret_cast<void*>(&data_))empty_object_data();
                 break;
-            case physical_type_tag::bool_t:
+            case data_type_tag::bool_t:
                 new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
                 break;
-            case physical_type_tag::integer_t:
+            case data_type_tag::integer_t:
                 new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
                 break;
-            case physical_type_tag::uinteger_t:
+            case data_type_tag::uinteger_t:
                 new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
                 break;
-            case physical_type_tag::double_t:
+            case data_type_tag::double_t:
                 new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
                 break;
-            case physical_type_tag::short_string_t:
+            case data_type_tag::short_string_t:
                 new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
                 break;
-            case physical_type_tag::long_string_t:
+            case data_type_tag::long_string_t:
                 new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
                 break;
-            case physical_type_tag::byte_string_t:
+            case data_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
                 break;
-            case physical_type_tag::object_t:
+            case data_type_tag::object_t:
                 new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()));
                 break;
-            case physical_type_tag::array_t:
+            case data_type_tag::array_t:
                 new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()));
                 break;
             default:
@@ -1378,27 +1379,27 @@ public:
 
         void Init_(const variant& val, const Allocator& a)
         {
-            switch (val.physical_type())
+            switch (val.data_type())
             {
-            case physical_type_tag::null_t:
-            case physical_type_tag::empty_object_t:
-            case physical_type_tag::bool_t:
-            case physical_type_tag::integer_t:
-            case physical_type_tag::uinteger_t:
-            case physical_type_tag::double_t:
-            case physical_type_tag::short_string_t:
+            case data_type_tag::null_t:
+            case data_type_tag::empty_object_t:
+            case data_type_tag::bool_t:
+            case data_type_tag::integer_t:
+            case data_type_tag::uinteger_t:
+            case data_type_tag::double_t:
+            case data_type_tag::short_string_t:
                 Init_(val);
                 break;
-            case physical_type_tag::long_string_t:
+            case data_type_tag::long_string_t:
                 new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()),a);
                 break;
-            case physical_type_tag::byte_string_t:
+            case data_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()),a);
                 break;
-            case physical_type_tag::array_t:
+            case data_type_tag::array_t:
                 new(reinterpret_cast<void*>(&data_))array_data(*(val.array_data_cast()),a);
                 break;
-            case physical_type_tag::object_t:
+            case data_type_tag::object_t:
                 new(reinterpret_cast<void*>(&data_))object_data(*(val.object_data_cast()),a);
                 break;
             default:
@@ -1408,36 +1409,36 @@ public:
 
         void Init_rv_(variant&& val) JSONCONS_NOEXCEPT
         {
-            switch (val.physical_type())
+            switch (val.data_type())
             {
-            case physical_type_tag::null_t:
-            case physical_type_tag::empty_object_t:
-            case physical_type_tag::double_t:
-            case physical_type_tag::integer_t:
-            case physical_type_tag::uinteger_t:
-            case physical_type_tag::bool_t:
-            case physical_type_tag::short_string_t:
+            case data_type_tag::null_t:
+            case data_type_tag::empty_object_t:
+            case data_type_tag::double_t:
+            case data_type_tag::integer_t:
+            case data_type_tag::uinteger_t:
+            case data_type_tag::bool_t:
+            case data_type_tag::short_string_t:
                 Init_(val);
                 break;
-            case physical_type_tag::long_string_t:
+            case data_type_tag::long_string_t:
                 {
                     new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*val.string_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
                 }
                 break;
-            case physical_type_tag::byte_string_t:
+            case data_type_tag::byte_string_t:
                 {
                     new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*val.byte_string_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
                 }
                 break;
-            case physical_type_tag::array_t:
+            case data_type_tag::array_t:
                 {
                     new(reinterpret_cast<void*>(&data_))array_data(std::move(*val.array_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
                 }
                 break;
-            case physical_type_tag::object_t:
+            case data_type_tag::object_t:
                 {
                     new(reinterpret_cast<void*>(&data_))object_data(std::move(*val.object_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
@@ -1456,18 +1457,18 @@ public:
 
         void Init_rv_(variant&& val, const Allocator& a, std::false_type) JSONCONS_NOEXCEPT
         {
-            switch (val.physical_type())
+            switch (val.data_type())
             {
-            case physical_type_tag::null_t:
-            case physical_type_tag::empty_object_t:
-            case physical_type_tag::double_t:
-            case physical_type_tag::integer_t:
-            case physical_type_tag::uinteger_t:
-            case physical_type_tag::bool_t:
-            case physical_type_tag::short_string_t:
+            case data_type_tag::null_t:
+            case data_type_tag::empty_object_t:
+            case data_type_tag::double_t:
+            case data_type_tag::integer_t:
+            case data_type_tag::uinteger_t:
+            case data_type_tag::bool_t:
+            case data_type_tag::short_string_t:
                 Init_(std::forward<variant>(val));
                 break;
-            case physical_type_tag::long_string_t:
+            case data_type_tag::long_string_t:
                 {
                     if (a == val.string_data_cast()->get_allocator())
                     {
@@ -1479,7 +1480,7 @@ public:
                     }
                 }
                 break;
-            case physical_type_tag::byte_string_t:
+            case data_type_tag::byte_string_t:
                 {
                     if (a == val.byte_string_data_cast()->get_allocator())
                     {
@@ -1491,7 +1492,7 @@ public:
                     }
                 }
                 break;
-            case physical_type_tag::object_t:
+            case data_type_tag::object_t:
                 {
                     if (a == val.object_data_cast()->get_allocator())
                     {
@@ -1503,7 +1504,7 @@ public:
                     }
                 }
                 break;
-            case physical_type_tag::array_t:
+            case data_type_tag::array_t:
                 {
                     if (a == val.array_data_cast()->get_allocator())
                     {
@@ -1607,9 +1608,9 @@ public:
             return evaluate().size();
         }
 
-        physical_type_tag physical_type() const
+        data_type_tag data_type() const
         {
-            return evaluate().physical_type();
+            return evaluate().data_type();
         }
 
         size_t count(const string_view_type& name) const
@@ -2691,13 +2692,13 @@ public:
 
     size_t size() const JSONCONS_NOEXCEPT
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             return 0;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().size();
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return array_value().size();
         default:
             return 0;
@@ -2716,12 +2717,12 @@ public:
 
     json_proxy<basic_json> operator[](const string_view_type& name)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t: 
+        case data_type_tag::empty_object_t: 
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return json_proxy<basic_json>(*this, key_storage_type(name.begin(),name.end(),char_allocator_type(object_value().get_allocator())));
             break;
         default:
@@ -2955,9 +2956,9 @@ public:
 
     bool has_key(const string_view_type& name) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 return it != object_range().end();
@@ -2970,9 +2971,9 @@ public:
 
     size_t count(const string_view_type& name) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 auto it = object_value().find(name);
                 if (it == object_range().end())
@@ -3001,7 +3002,7 @@ public:
 
     bool is_string() const JSONCONS_NOEXCEPT
     {
-        return (var_.physical_type() == physical_type_tag::long_string_t) || (var_.physical_type() == physical_type_tag::short_string_t);
+        return (var_.data_type() == data_type_tag::long_string_t) || (var_.data_type() == data_type_tag::short_string_t);
     }
 
     bool is_byte_string() const JSONCONS_NOEXCEPT
@@ -3026,42 +3027,42 @@ public:
 
     bool is_array() const JSONCONS_NOEXCEPT
     {
-        return var_.physical_type() == physical_type_tag::array_t;
+        return var_.data_type() == data_type_tag::array_t;
     }
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.physical_type() == physical_type_tag::integer_t || (var_.physical_type() == physical_type_tag::uinteger_t&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
+        return var_.data_type() == data_type_tag::integer_t || (var_.data_type() == data_type_tag::uinteger_t&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
     {
-        return var_.physical_type() == physical_type_tag::uinteger_t || (var_.physical_type() == physical_type_tag::integer_t&& as_integer() >= 0);
+        return var_.data_type() == data_type_tag::uinteger_t || (var_.data_type() == data_type_tag::integer_t&& as_integer() >= 0);
     }
 
     bool is_double() const JSONCONS_NOEXCEPT
     {
-        return var_.physical_type() == physical_type_tag::double_t;
+        return var_.data_type() == data_type_tag::double_t;
     }
 
     bool is_number() const JSONCONS_NOEXCEPT
     {
-        return var_.physical_type() == physical_type_tag::integer_t || var_.physical_type() == physical_type_tag::uinteger_t || var_.physical_type() == physical_type_tag::double_t;
+        return var_.data_type() == data_type_tag::integer_t || var_.data_type() == data_type_tag::uinteger_t || var_.data_type() == data_type_tag::double_t;
     }
 
     bool empty() const JSONCONS_NOEXCEPT
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::short_string_t:
+        case data_type_tag::short_string_t:
             return var_.short_string_data_cast()->length() == 0;
-        case physical_type_tag::long_string_t:
+        case data_type_tag::long_string_t:
             return var_.string_data_cast()->length() == 0;
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return array_value().size() == 0;
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             return true;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().size() == 0;
         default:
             return false;
@@ -3070,11 +3071,11 @@ public:
 
     size_t capacity() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return array_value().capacity();
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().capacity();
         default:
             return 0;
@@ -3097,18 +3098,18 @@ public:
 
     void reserve(size_t n)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().reserve(n);
             break;
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
         {
             create_object_implicitly();
             object_value().reserve(n);
         }
         break;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
         {
             object_value().reserve(n);
         }
@@ -3120,9 +3121,9 @@ public:
 
     void resize(size_t n)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().resize(n);
             break;
         default:
@@ -3133,9 +3134,9 @@ public:
     template <class T>
     void resize(size_t n, T val)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().resize(n, val);
             break;
         default:
@@ -3158,10 +3159,10 @@ public:
 
     bool as_bool() const 
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::short_string_t:
-        case physical_type_tag::long_string_t:
+        case data_type_tag::short_string_t:
+        case data_type_tag::long_string_t:
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3172,13 +3173,13 @@ public:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
             }
             break;
-        case physical_type_tag::bool_t:
+        case data_type_tag::bool_t:
             return var_.bool_data_cast()->value();
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return var_.double_data_cast()->value() != 0.0;
-        case physical_type_tag::integer_t:
+        case data_type_tag::integer_t:
             return var_.integer_data_cast()->value() != 0;
-        case physical_type_tag::uinteger_t:
+        case data_type_tag::uinteger_t:
             return var_.uinteger_data_cast()->value() != 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
@@ -3187,10 +3188,10 @@ public:
 
     int64_t as_integer() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::short_string_t:
-        case physical_type_tag::long_string_t:
+        case data_type_tag::short_string_t:
+        case data_type_tag::long_string_t:
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3201,13 +3202,13 @@ public:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
             }
             break;
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return static_cast<int64_t>(var_.double_data_cast()->value());
-        case physical_type_tag::integer_t:
+        case data_type_tag::integer_t:
             return static_cast<int64_t>(var_.integer_data_cast()->value());
-        case physical_type_tag::uinteger_t:
+        case data_type_tag::uinteger_t:
             return static_cast<int64_t>(var_.uinteger_data_cast()->value());
-        case physical_type_tag::bool_t:
+        case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
@@ -3216,10 +3217,10 @@ public:
 
     uint64_t as_uinteger() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::short_string_t:
-        case physical_type_tag::long_string_t:
+        case data_type_tag::short_string_t:
+        case data_type_tag::long_string_t:
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3230,13 +3231,13 @@ public:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
             }
             break;
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return static_cast<uint64_t>(var_.double_data_cast()->value());
-        case physical_type_tag::integer_t:
+        case data_type_tag::integer_t:
             return static_cast<uint64_t>(var_.integer_data_cast()->value());
-        case physical_type_tag::uinteger_t:
+        case data_type_tag::uinteger_t:
             return static_cast<uint64_t>(var_.uinteger_data_cast()->value());
-        case physical_type_tag::bool_t:
+        case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
@@ -3245,9 +3246,9 @@ public:
 
     size_t precision() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return var_.double_data_cast()->precision();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -3256,9 +3257,9 @@ public:
 
     size_t decimal_places() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return var_.double_data_cast()->decimal_places();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -3267,10 +3268,10 @@ public:
 
     double as_double() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::short_string_t:
-        case physical_type_tag::long_string_t:
+        case data_type_tag::short_string_t:
+        case data_type_tag::long_string_t:
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3281,11 +3282,11 @@ public:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
             }
             break;
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return var_.double_data_cast()->value();
-        case physical_type_tag::integer_t:
+        case data_type_tag::integer_t:
             return static_cast<double>(var_.integer_data_cast()->value());
-        case physical_type_tag::uinteger_t:
+        case data_type_tag::uinteger_t:
             return static_cast<double>(var_.uinteger_data_cast()->value());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -3374,11 +3375,11 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
     const char_type* as_cstring() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::short_string_t:
+        case data_type_tag::short_string_t:
             return var_.short_string_data_cast()->c_str();
-        case physical_type_tag::long_string_t:
+        case data_type_tag::long_string_t:
             return var_.string_data_cast()->c_str();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a cstring"));
@@ -3388,9 +3389,9 @@ public:
 
     size_t double_precision() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return var_.double_data_cast()->precision();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -3400,11 +3401,11 @@ public:
 
     basic_json& at(const string_view_type& name)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             JSONCONS_THROW(key_not_found(name.data(),name.length()));
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 auto it = object_value().find(name);
                 if (it == object_range().end())
@@ -3447,11 +3448,11 @@ public:
 
     const basic_json& at(const string_view_type& name) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             JSONCONS_THROW(key_not_found(name.data(),name.length()));
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 auto it = object_value().find(name);
                 if (it == object_range().end())
@@ -3470,15 +3471,15 @@ public:
 
     basic_json& at(size_t i)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             if (i >= array_value().size())
             {
                 JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
             }
             return array_value().operator[](i);
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().at(i);
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Index on non-array value not supported"));
@@ -3487,15 +3488,15 @@ public:
 
     const basic_json& at(size_t i) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             if (i >= array_value().size())
             {
                 JSONCONS_THROW(json_exception_impl<std::out_of_range>("Invalid array subscript"));
             }
             return array_value().operator[](i);
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().at(i);
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Index on non-array value not supported"));
@@ -3504,11 +3505,11 @@ public:
 
     object_iterator find(const string_view_type& name)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             return object_range().end();
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().find(name);
         default:
             {
@@ -3519,11 +3520,11 @@ public:
 
     const_object_iterator find(const string_view_type& name) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             return object_range().end();
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().find(name);
         default:
             {
@@ -3535,13 +3536,13 @@ public:
     template<class T>
     basic_json get(const string_view_type& name, T&& default_val) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             {
                 return basic_json(std::forward<T>(default_val));
             }
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
@@ -3563,13 +3564,13 @@ public:
     template<class T>
     T get_with_default(const string_view_type& name, const T& default_val) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             {
                 return default_val;
             }
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
@@ -3591,13 +3592,13 @@ public:
     template<class T = std::basic_string<CharT>>
     T get_with_default(const string_view_type& name, const CharT* default_val) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             {
                 return T(default_val);
             }
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
@@ -3620,12 +3621,12 @@ public:
 
     void shrink_to_fit()
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().shrink_to_fit();
             break;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             object_value().shrink_to_fit();
             break;
         default:
@@ -3635,12 +3636,12 @@ public:
 
     void clear()
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().clear();
             break;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             object_value().clear();
             break;
         default:
@@ -3650,11 +3651,11 @@ public:
 
     void erase(const_object_iterator pos)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             break;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             object_value().erase(pos);
             break;
         default:
@@ -3665,11 +3666,11 @@ public:
 
     void erase(const_object_iterator first, const_object_iterator last)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             break;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             object_value().erase(first, last);
             break;
         default:
@@ -3680,9 +3681,9 @@ public:
 
     void erase(const_array_iterator pos)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().erase(pos);
             break;
         default:
@@ -3693,9 +3694,9 @@ public:
 
     void erase(const_array_iterator first, const_array_iterator last)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().erase(first, last);
             break;
         default:
@@ -3708,11 +3709,11 @@ public:
 
     void erase(const string_view_type& name)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             break;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             object_value().erase(name);
             break;
         default:
@@ -3730,12 +3731,12 @@ public:
     template <class T>
     std::pair<object_iterator,bool> insert_or_assign(const string_view_type& name, T&& val)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().insert_or_assign(name, std::forward<T>(val));
         default:
             {
@@ -3747,12 +3748,12 @@ public:
     template <class ... Args>
     std::pair<object_iterator,bool> try_emplace(const string_view_type& name, Args&&... args)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().try_emplace(name, std::forward<Args>(args)...);
         default:
             {
@@ -3764,12 +3765,12 @@ public:
     template <class T>
     void set_(key_storage_type&& name, T&& val)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             object_value().set_(std::forward<key_storage_type>(name), std::forward<T>(val));
             break;
         default:
@@ -3783,12 +3784,12 @@ public:
 
     void merge(const basic_json& source)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().merge(source.object_value());
         default:
             {
@@ -3799,12 +3800,12 @@ public:
 
     void merge(basic_json&& source)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().merge(std::move(source.object_value()));
         default:
             {
@@ -3815,12 +3816,12 @@ public:
 
     void merge(object_iterator hint, const basic_json& source)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().merge(hint, source.object_value());
         default:
             {
@@ -3831,12 +3832,12 @@ public:
 
     void merge(object_iterator hint, basic_json&& source)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().merge(hint, std::move(source.object_value()));
         default:
             {
@@ -3849,12 +3850,12 @@ public:
 
     void merge_or_update(const basic_json& source)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().merge_or_update(source.object_value());
         default:
             {
@@ -3865,12 +3866,12 @@ public:
 
     void merge_or_update(basic_json&& source)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().merge_or_update(std::move(source.object_value()));
         default:
             {
@@ -3881,12 +3882,12 @@ public:
 
     void merge_or_update(object_iterator hint, const basic_json& source)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().merge_or_update(hint, source.object_value());
         default:
             {
@@ -3897,12 +3898,12 @@ public:
 
     void merge_or_update(object_iterator hint, basic_json&& source)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().merge_or_update(hint, std::move(source.object_value()));
         default:
             {
@@ -3922,12 +3923,12 @@ public:
     template <class T>
     object_iterator insert_or_assign(object_iterator hint, const string_view_type& name, T&& val)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().insert_or_assign(hint, name, std::forward<T>(val));
         default:
             {
@@ -3939,12 +3940,12 @@ public:
     template <class ... Args>
     object_iterator try_emplace(object_iterator hint, const string_view_type& name, Args&&... args)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().try_emplace(hint, name, std::forward<Args>(args)...);
         default:
             {
@@ -3956,12 +3957,12 @@ public:
     template <class T>
     object_iterator set_(object_iterator hint, key_storage_type&& name, T&& val)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return object_value().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(val));
             break;
         default:
@@ -3980,9 +3981,9 @@ public:
     template <class T>
     void push_back(T&& val)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().push_back(std::forward<T>(val));
             break;
         default:
@@ -4001,9 +4002,9 @@ public:
     template <class T>
     array_iterator insert(const_array_iterator pos, T&& val)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return array_value().insert(pos, std::forward<T>(val));
             break;
         default:
@@ -4016,9 +4017,9 @@ public:
     template <class InputIt>
     array_iterator insert(const_array_iterator pos, InputIt first, InputIt last)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return array_value().insert(pos, first, last);
             break;
         default:
@@ -4031,9 +4032,9 @@ public:
     template <class... Args> 
     array_iterator emplace(const_array_iterator pos, Args&&... args)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return array_value().emplace(pos, std::forward<Args>(args)...);
             break;
         default:
@@ -4046,9 +4047,9 @@ public:
     template <class... Args> 
     basic_json& emplace_back(Args&&... args)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return array_value().emplace_back(std::forward<Args>(args)...);
         default:
             {
@@ -4057,9 +4058,9 @@ public:
         }
     }
 
-    physical_type_tag physical_type() const
+    data_type_tag data_type() const
     {
-        return var_.physical_type();
+        return var_.data_type();
     }
 
     void swap(basic_json& b)
@@ -4221,11 +4222,11 @@ public:
     {
         static const basic_json a_null = null_type();
 
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             return a_null;
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 return it != object_range().end() ? it->value() : a_null;
@@ -4239,12 +4240,12 @@ public:
 
     bool is_longlong() const JSONCONS_NOEXCEPT
     {
-        return var_.physical_type() == physical_type_tag::integer_t;
+        return var_.data_type() == data_type_tag::integer_t;
     }
 
     bool is_ulonglong() const JSONCONS_NOEXCEPT
     {
-        return var_.physical_type() == physical_type_tag::uinteger_t;
+        return var_.data_type() == data_type_tag::uinteger_t;
     }
 
     long long as_longlong() const
@@ -4259,15 +4260,15 @@ public:
 
     int as_int() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return static_cast<int>(var_.double_data_cast()->value());
-        case physical_type_tag::integer_t:
+        case data_type_tag::integer_t:
             return static_cast<int>(var_.integer_data_cast()->value());
-        case physical_type_tag::uinteger_t:
+        case data_type_tag::uinteger_t:
             return static_cast<int>(var_.uinteger_data_cast()->value());
-        case physical_type_tag::bool_t:
+        case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an int"));
@@ -4276,15 +4277,15 @@ public:
 
     unsigned int as_uint() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return static_cast<unsigned int>(var_.double_data_cast()->value());
-        case physical_type_tag::integer_t:
+        case data_type_tag::integer_t:
             return static_cast<unsigned int>(var_.integer_data_cast()->value());
-        case physical_type_tag::uinteger_t:
+        case data_type_tag::uinteger_t:
             return static_cast<unsigned int>(var_.uinteger_data_cast()->value());
-        case physical_type_tag::bool_t:
+        case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned int"));
@@ -4293,15 +4294,15 @@ public:
 
     long as_long() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return static_cast<long>(var_.double_data_cast()->value());
-        case physical_type_tag::integer_t:
+        case data_type_tag::integer_t:
             return static_cast<long>(var_.integer_data_cast()->value());
-        case physical_type_tag::uinteger_t:
+        case data_type_tag::uinteger_t:
             return static_cast<long>(var_.uinteger_data_cast()->value());
-        case physical_type_tag::bool_t:
+        case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a long"));
@@ -4310,15 +4311,15 @@ public:
 
     unsigned long as_ulong() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::double_t:
+        case data_type_tag::double_t:
             return static_cast<unsigned long>(var_.double_data_cast()->value());
-        case physical_type_tag::integer_t:
+        case data_type_tag::integer_t:
             return static_cast<unsigned long>(var_.integer_data_cast()->value());
-        case physical_type_tag::uinteger_t:
+        case data_type_tag::uinteger_t:
             return static_cast<unsigned long>(var_.uinteger_data_cast()->value());
-        case physical_type_tag::bool_t:
+        case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned long"));
@@ -4327,9 +4328,9 @@ public:
 
     bool has_member(const key_storage_type& name) const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             {
                 const_object_iterator it = object_value().find(name);
                 return it != object_range().end();
@@ -4342,9 +4343,9 @@ public:
 
     void remove_range(size_t from_index, size_t to_index)
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             array_value().remove_range(from_index, to_index);
             break;
         default:
@@ -4431,11 +4432,11 @@ public:
     range<object_iterator> object_range()
     {
         static basic_json empty_object = object();
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             return range<object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return range<object_iterator>(object_value().begin(),object_value().end());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an object"));
@@ -4445,11 +4446,11 @@ public:
     range<const_object_iterator> object_range() const
     {
         static const basic_json empty_object = object();
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             return range<const_object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return range<const_object_iterator>(object_value().begin(),object_value().end());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an object"));
@@ -4458,9 +4459,9 @@ public:
 
     range<array_iterator> array_range()
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return range<array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an array"));
@@ -4469,9 +4470,9 @@ public:
 
     range<const_array_iterator> array_range() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return range<const_array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an array"));
@@ -4480,9 +4481,9 @@ public:
 
     array& array_value() 
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return var_.array_data_cast()->value();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Bad array cast"));
@@ -4492,9 +4493,9 @@ public:
 
     const array& array_value() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::array_t:
+        case data_type_tag::array_t:
             return var_.array_data_cast()->value();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Bad array cast"));
@@ -4504,12 +4505,12 @@ public:
 
     object& object_value()
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             create_object_implicitly();
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return var_.object_data_cast()->value();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Bad object cast"));
@@ -4519,12 +4520,12 @@ public:
 
     const object& object_value() const
     {
-        switch (var_.physical_type())
+        switch (var_.data_type())
         {
-        case physical_type_tag::empty_object_t:
+        case data_type_tag::empty_object_t:
             const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
             // FALLTHRU
-        case physical_type_tag::object_t:
+        case data_type_tag::object_t:
             return var_.object_data_cast()->value();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Bad object cast"));

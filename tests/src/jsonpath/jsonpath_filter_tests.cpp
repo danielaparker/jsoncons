@@ -450,7 +450,7 @@ TEST_CASE("test_jsonpath_filter_uni")
     auto res = parser.parse(parent, expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
     auto result1 = res.eval(parent);
 
-    //std::cout << (int)result1.physical_type() << std::endl;
+    //std::cout << (int)result1.data_type() << std::endl;
     std::cout << "result1=" << result1 << std::endl;
     CHECK(result1 == json(0));
 

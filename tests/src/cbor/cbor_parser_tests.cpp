@@ -76,7 +76,6 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x1a,0xff,0xff,0xff,0xff},json(4294967295));
     check_parsing({0x1b,0,0,0,1,0,0,0,0},json(4294967296));
     check_parsing({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<int64_t>::max()));
-
     // negative integers
     check_parsing({0x20},json(-1));
     check_parsing({0x21},json(-2));
@@ -86,9 +85,10 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x39,0x01,0x00},json(-257));
     check_parsing({0x39,0xff,0xff},json(-65536));
     check_parsing({0x3a,0,1,0x00,0x00},json(-65537));
+#endif
     check_parsing({0x3a,0xff,0xff,0xff,0xff},json(-4294967296));
     check_parsing({0x3b,0,0,0,1,0,0,0,0},json(-4294967297));
-#endif
+//#endif
     // null, true, false
     check_parsing({0xf6},json::null());
     check_parsing({0xf5},json(true));
@@ -98,7 +98,6 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0xfb,0,0,0,0,0,0,0,0},json(0.0));
     check_parsing({0xfb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
     check_parsing({0xfb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
-//#endif
 
     // byte string
     std::vector<uint8_t> v;
