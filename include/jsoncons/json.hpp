@@ -86,23 +86,6 @@ public:
     }
 };
 
-enum class type_tag : uint8_t 
-{
-    null_t = 0x00,
-    bool_t = 0x11,
-    integer_t = 0x22,
-    uinteger_t = 0x33,
-    double_t = 0x44,
-    short_string_t = 0x55,
-    long_string_t = 0x65,
-    byte_string_t = 0x76,
-    positive_bignum_t = 0x77,
-    negative_bignum_t = 0x78,
-    array_t = 0x89,
-    empty_object_t = 0xaa, // 0x0a
-    object_t = 0x9b
-};
-
 enum class physical_type_tag : uint8_t 
 {
     null_t = 0x00,
@@ -195,29 +178,34 @@ public:
     {
         class data_base
         {
-            uint8_t type_id_;
+            static const uint8_t major_type_shift = 0x04;
+            static const uint8_t additional_information_mask = (1U << 4) - 1;
+
+            uint8_t type_;
         public:
-            data_base(type_tag id)
-                : type_id_(static_cast<uint8_t>(id))
+            data_base(uint8_t type)
+                : type_(type)
             {}
 
-            type_tag type() const 
+            data_base(physical_type_tag physical_type, semantic_type_tag semantic_type)
+                : type_((static_cast<uint8_t>(physical_type) << major_type_shift) | static_cast<uint8_t>(semantic_type))
+            {}
+
+            uint8_t type() const 
             {
-                return static_cast<type_tag>(type_id_);
+                return type_;
             }
 
             physical_type_tag physical_type() const 
             {
-                static const uint8_t major_type_shift = 0x04;
 
-                uint8_t value = type_id_ >> major_type_shift;
+                uint8_t value = type_ >> major_type_shift;
                 return static_cast<physical_type_tag>(value);
             }
 
             semantic_type_tag semantic_type() const 
             {
-                static const uint8_t additional_information_mask = (1U << 4) - 1;
-                uint8_t value = type_id_ & additional_information_mask;
+                uint8_t value = type_ & additional_information_mask;
                 return static_cast<semantic_type_tag>(value);
             }
         };
@@ -226,7 +214,7 @@ public:
         {
         public:
             null_data()
-                : data_base(type_tag::null_t)
+                : data_base(physical_type_tag::null_t, semantic_type_tag::null_t)
             {
             }
         };
@@ -235,7 +223,7 @@ public:
         {
         public:
             empty_object_data()
-                : data_base(type_tag::empty_object_t)
+                : data_base(physical_type_tag::empty_object_t, semantic_type_tag::empty_object_t)
             {
             }
         };
@@ -245,12 +233,12 @@ public:
             bool val_;
         public:
             bool_data(bool val)
-                : data_base(type_tag::bool_t),val_(val)
+                : data_base(physical_type_tag::bool_t, semantic_type_tag::bool_t),val_(val)
             {
             }
 
             bool_data(const bool_data& val)
-                : data_base(type_tag::bool_t),val_(val.val_)
+                : data_base(val.type()),val_(val.val_)
             {
             }
 
@@ -266,12 +254,12 @@ public:
             int64_t val_;
         public:
             integer_data(int64_t val)
-                : data_base(type_tag::integer_t),val_(val)
+                : data_base(physical_type_tag::integer_t, semantic_type_tag::integer_t),val_(val)
             {
             }
 
             integer_data(const integer_data& val)
-                : data_base(type_tag::integer_t),val_(val.val_)
+                : data_base(val.type()),val_(val.val_)
             {
             }
 
@@ -286,12 +274,12 @@ public:
             uint64_t val_;
         public:
             uinteger_data(uint64_t val)
-                : data_base(type_tag::uinteger_t),val_(val)
+                : data_base(physical_type_tag::uinteger_t, semantic_type_tag::uinteger_t),val_(val)
             {
             }
 
             uinteger_data(const uinteger_data& val)
-                : data_base(type_tag::uinteger_t),val_(val.val_)
+                : data_base(val.type()),val_(val.val_)
             {
             }
 
@@ -309,7 +297,7 @@ public:
             double val_;
         public:
             double_data(double val)
-                : data_base(type_tag::double_t), 
+                : data_base(physical_type_tag::double_t, semantic_type_tag::double_t), 
                   format_(static_cast<uint8_t>(chars_format::general)),
                   precision_(0), 
                   decimal_places_(0), 
@@ -317,7 +305,7 @@ public:
             {
             }
             double_data(double val, const floating_point_options& fmt)
-                : data_base(type_tag::double_t), 
+                : data_base(physical_type_tag::double_t, semantic_type_tag::double_t), 
                   format_(static_cast<uint8_t>(fmt.format())), 
                   precision_(fmt.precision()), 
                   decimal_places_(fmt.decimal_places()), 
@@ -326,7 +314,7 @@ public:
             }
 
             double_data(const double_data& val)
-                : data_base(type_tag::double_t),
+                : data_base(val.type()),
                   format_(static_cast<uint8_t>(val.format())),
                   precision_(val.precision()), 
                   decimal_places_(val.decimal_places()), 
@@ -364,7 +352,7 @@ public:
             static const size_t max_length = (14 / sizeof(char_type)) - 1;
 
             short_string_data(const char_type* p, uint8_t length)
-                : data_base(type_tag::short_string_t), length_(length)
+                : data_base(physical_type_tag::short_string_t, semantic_type_tag::string_t), length_(length)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
@@ -372,7 +360,7 @@ public:
             }
 
             short_string_data(const short_string_data& val)
-                : data_base(type_tag::short_string_t), length_(val.length_)
+                : data_base(val.type()), length_(val.length_)
             {
                 std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
                 data_[length_] = 0;
@@ -394,38 +382,38 @@ public:
             }
         };
 
-        // string_data
-        class string_data final : public data_base
+        // long_string_data
+        class long_string_data final : public data_base
         {
             typedef typename detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
             pointer ptr_;
         public:
-            string_data(const string_data& val)
-                : data_base(type_tag::long_string_t)
+            long_string_data(const long_string_data& val)
+                : data_base(physical_type_tag::long_string_t, semantic_type_tag::string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
-            string_data(string_data&& val)
-                : data_base(type_tag::long_string_t), ptr_(nullptr)
+            long_string_data(long_string_data&& val)
+                : data_base(val.type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
-            string_data(const string_data& val, const Allocator& a)
-                : data_base(type_tag::long_string_t)
+            long_string_data(const long_string_data& val, const Allocator& a)
+                : data_base(val.type())
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
             }
 
-            string_data(const char_type* data, size_t length, const Allocator& a)
-                : data_base(type_tag::long_string_t)
+            long_string_data(const char_type* data, size_t length, const Allocator& a)
+                : data_base(physical_type_tag::long_string_t, semantic_type_tag::string_t)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
 
-            ~string_data()
+            ~long_string_data()
             {
                 if (ptr_ != nullptr)
                 {
@@ -433,7 +421,7 @@ public:
                 }
             }
 
-            void swap(string_data& val)
+            void swap(long_string_data& val)
             {
                 std::swap(val.ptr_,ptr_);
             }
@@ -483,8 +471,8 @@ public:
                 }
             }
         public:
-            byte_string_data(const uint8_t* data, size_t length, const Allocator& a, type_tag tag = type_tag::byte_string_t)
-                : data_base(tag)
+            byte_string_data(semantic_type_tag semantic_type, const uint8_t* data, size_t length, const Allocator& a)
+                : data_base(physical_type_tag::byte_string_t, semantic_type)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
@@ -561,31 +549,31 @@ public:
             }
         public:
             array_data(const array& val)
-                : data_base(type_tag::array_t)
+                : data_base(physical_type_tag::array_t, semantic_type_tag::array_t)
             {
                 create(val.get_allocator(), val);
             }
 
             array_data(const array& val, const Allocator& a)
-                : data_base(type_tag::array_t)
+                : data_base(physical_type_tag::array_t, semantic_type_tag::array_t)
             {
                 create(array_allocator(a), val, a);
             }
 
             array_data(const array_data& val)
-                : data_base(type_tag::array_t)
+                : data_base(val.type())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             array_data(array_data&& val)
-                : data_base(type_tag::array_t), ptr_(nullptr)
+                : data_base(val.type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_, ptr_);
             }
 
             array_data(const array_data& val, const Allocator& a)
-                : data_base(type_tag::array_t)
+                : data_base(val.type())
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
@@ -643,37 +631,37 @@ public:
             }
         public:
             explicit object_data(const Allocator& a)
-                : data_base(type_tag::object_t)
+                : data_base(physical_type_tag::object_t, semantic_type_tag::object_t)
             {
                 create(a,a);
             }
 
             explicit object_data(const object& val)
-                : data_base(type_tag::object_t)
+                : data_base(physical_type_tag::object_t, semantic_type_tag::object_t)
             {
                 create(val.get_allocator(), val);
             }
 
             explicit object_data(const object& val, const Allocator& a)
-                : data_base(type_tag::object_t)
+                : data_base(physical_type_tag::object_t, semantic_type_tag::object_t)
             {
                 create(object_allocator(a), val, a);
             }
 
             explicit object_data(const object_data& val)
-                : data_base(type_tag::object_t)
+                : data_base(val.type())
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             explicit object_data(object_data&& val)
-                : data_base(type_tag::object_t), ptr_(nullptr)
+                : data_base(val.type()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             explicit object_data(const object_data& val, const Allocator& a)
-                : data_base(type_tag::object_t)
+                : data_base(val.type())
             {
                 create(object_allocator(a), *(val.ptr_), a);
             }
@@ -710,8 +698,8 @@ public:
         };
 
     private:
-        static const size_t data_size = static_max<sizeof(uinteger_data),sizeof(double_data),sizeof(short_string_data), sizeof(string_data), sizeof(array_data), sizeof(object_data)>::value;
-        static const size_t data_align = static_max<JSONCONS_ALIGNOF(uinteger_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(short_string_data),JSONCONS_ALIGNOF(string_data),JSONCONS_ALIGNOF(array_data),JSONCONS_ALIGNOF(object_data)>::value;
+        static const size_t data_size = static_max<sizeof(uinteger_data),sizeof(double_data),sizeof(short_string_data), sizeof(long_string_data), sizeof(array_data), sizeof(object_data)>::value;
+        static const size_t data_align = static_max<JSONCONS_ALIGNOF(uinteger_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(short_string_data),JSONCONS_ALIGNOF(long_string_data),JSONCONS_ALIGNOF(array_data),JSONCONS_ALIGNOF(object_data)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
@@ -784,18 +772,18 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(s, length, char_allocator_type());
             }
         }
 
         variant(const byte_string_view& bs)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(bs.data(), bs.length(), byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::byte_string_t, bs.data(), bs.length(), byte_allocator_type());
         }
 
         variant(const byte_string_view& bs, const Allocator& allocator)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(bs.data(), bs.length(), allocator);
+            new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::byte_string_t, bs.data(), bs.length(), allocator);
         }
 
         variant(const basic_bignum<byte_allocator_type>& n)
@@ -806,15 +794,15 @@ public:
             n.dump(signum, data);
             if (signum == -1)
             {
-                new(reinterpret_cast<void*>(&data_))byte_string_data(data.data(), data.size(), 
-                                                                     byte_allocator_type(),
-                                                                     type_tag::negative_bignum_t);
+                new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::negative_bignum_t,
+                                                                     data.data(), data.size(), 
+                                                                     byte_allocator_type());
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))byte_string_data(data.data(), data.size(), 
-                                                                     byte_allocator_type(),
-                                                                     type_tag::positive_bignum_t);
+                new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::positive_bignum_t,
+                                                                     data.data(), data.size(), 
+                                                                     byte_allocator_type());
             }
         }
 
@@ -825,15 +813,15 @@ public:
             n.dump(signum, data);
             if (signum == -1)
             {
-                new(reinterpret_cast<void*>(&data_))byte_string_data(data.data(), data.size(), 
-                                                                     byte_allocator_type(allocator),
-                                                                     type_tag::negative_bignum_t);
+                new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::negative_bignum_t,
+                                                                     data.data(), data.size(), 
+                                                                     byte_allocator_type(allocator));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))byte_string_data(data.data(), data.size(), 
-                                                                     byte_allocator_type(allocator),
-                                                                     type_tag::positive_bignum_t);
+                new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_type_tag::positive_bignum_t,
+                                                                     data.data(), data.size(), 
+                                                                     byte_allocator_type(allocator));
             }
         }
 
@@ -846,7 +834,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(s, length, char_allocator_type());
             }
         }
 
@@ -859,7 +847,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, alloc);
+                new(reinterpret_cast<void*>(&data_))long_string_data(s, length, alloc);
             }
         }
 
@@ -871,7 +859,7 @@ public:
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))string_data(s, length, alloc);
+                new(reinterpret_cast<void*>(&data_))long_string_data(s, length, alloc);
             }
         }
         variant(const object& val)
@@ -901,7 +889,7 @@ public:
             switch (physical_type())
             {
                 case physical_type_tag::long_string_t:
-                    reinterpret_cast<string_data*>(&data_)->~string_data();
+                    reinterpret_cast<long_string_data*>(&data_)->~long_string_data();
                     break;
                 case physical_type_tag::byte_string_t:
                     reinterpret_cast<byte_string_data*>(&data_)->~byte_string_data();
@@ -946,7 +934,7 @@ public:
                     new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
                     break;
                 case physical_type_tag::long_string_t:
-                    new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
                     break;
                 case physical_type_tag::byte_string_t:
                     new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
@@ -1019,14 +1007,14 @@ public:
             return reinterpret_cast<const short_string_data*>(&data_);
         }
 
-        string_data* string_data_cast()
+        long_string_data* string_data_cast()
         {
-            return reinterpret_cast<string_data*>(&data_);
+            return reinterpret_cast<long_string_data*>(&data_);
         }
 
-        const string_data* string_data_cast() const
+        const long_string_data* string_data_cast() const
         {
-            return reinterpret_cast<const string_data*>(&data_);
+            return reinterpret_cast<const long_string_data*>(&data_);
         }
 
         byte_string_data* byte_string_data_cast()
@@ -1310,7 +1298,7 @@ public:
                 new(reinterpret_cast<void*>(&(other.data_)))short_string_data(*short_string_data_cast());
                 break;
             case physical_type_tag::long_string_t:
-                new(reinterpret_cast<void*>(&other.data_))string_data(std::move(*string_data_cast()));
+                new(reinterpret_cast<void*>(&other.data_))long_string_data(std::move(*string_data_cast()));
                 break;
             case physical_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&other.data_))byte_string_data(std::move(*byte_string_data_cast()));
@@ -1328,7 +1316,7 @@ public:
             switch (temp.physical_type())
             {
             case physical_type_tag::long_string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(std::move(*temp.string_data_cast()));
+                new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*temp.string_data_cast()));
                 break;
             case physical_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(std::move(*temp.byte_string_data_cast()));
@@ -1372,7 +1360,7 @@ public:
                 new(reinterpret_cast<void*>(&data_))short_string_data(*(val.short_string_data_cast()));
                 break;
             case physical_type_tag::long_string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()));
+                new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()));
                 break;
             case physical_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()));
@@ -1402,7 +1390,7 @@ public:
                 Init_(val);
                 break;
             case physical_type_tag::long_string_t:
-                new(reinterpret_cast<void*>(&data_))string_data(*(val.string_data_cast()),a);
+                new(reinterpret_cast<void*>(&data_))long_string_data(*(val.string_data_cast()),a);
                 break;
             case physical_type_tag::byte_string_t:
                 new(reinterpret_cast<void*>(&data_))byte_string_data(*(val.byte_string_data_cast()),a);
@@ -1433,7 +1421,7 @@ public:
                 break;
             case physical_type_tag::long_string_t:
                 {
-                    new(reinterpret_cast<void*>(&data_))string_data(std::move(*val.string_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))long_string_data(std::move(*val.string_data_cast()));
                     new(reinterpret_cast<void*>(&val.data_))null_data();
                 }
                 break;
