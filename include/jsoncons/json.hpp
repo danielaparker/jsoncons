@@ -248,16 +248,16 @@ public:
 
         };
 
-        class integer_data final : public data_base
+        class int64_data final : public data_base
         {
             int64_t val_;
         public:
-            integer_data(int64_t val)
+            int64_data(int64_t val)
                 : data_base(data_type_tag::integer_t, semantic_type_tag::integer_t),val_(val)
             {
             }
 
-            integer_data(const integer_data& val)
+            int64_data(const int64_data& val)
                 : data_base(val.type()),val_(val.val_)
             {
             }
@@ -268,16 +268,16 @@ public:
             }
         };
 
-        class uinteger_data final : public data_base
+        class uint64_data final : public data_base
         {
             uint64_t val_;
         public:
-            uinteger_data(uint64_t val)
+            uint64_data(uint64_t val)
                 : data_base(data_type_tag::uinteger_t, semantic_type_tag::uinteger_t),val_(val)
             {
             }
 
-            uinteger_data(const uinteger_data& val)
+            uint64_data(const uint64_data& val)
                 : data_base(val.type()),val_(val.val_)
             {
             }
@@ -698,8 +698,8 @@ public:
         };
 
     private:
-        static const size_t data_size = static_max<sizeof(uinteger_data),sizeof(double_data),sizeof(short_string_data), sizeof(long_string_data), sizeof(array_data), sizeof(object_data)>::value;
-        static const size_t data_align = static_max<JSONCONS_ALIGNOF(uinteger_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(short_string_data),JSONCONS_ALIGNOF(long_string_data),JSONCONS_ALIGNOF(array_data),JSONCONS_ALIGNOF(object_data)>::value;
+        static const size_t data_size = static_max<sizeof(uint64_data),sizeof(double_data),sizeof(short_string_data), sizeof(long_string_data), sizeof(array_data), sizeof(object_data)>::value;
+        static const size_t data_align = static_max<JSONCONS_ALIGNOF(uint64_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(short_string_data),JSONCONS_ALIGNOF(long_string_data),JSONCONS_ALIGNOF(array_data),JSONCONS_ALIGNOF(object_data)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
@@ -746,15 +746,15 @@ public:
         }
         explicit variant(int64_t val)
         {
-            new(reinterpret_cast<void*>(&data_))integer_data(val);
+            new(reinterpret_cast<void*>(&data_))int64_data(val);
         }
         explicit variant(uint64_t val, const Allocator&)
         {
-            new(reinterpret_cast<void*>(&data_))uinteger_data(val);
+            new(reinterpret_cast<void*>(&data_))uint64_data(val);
         }
         explicit variant(uint64_t val)
         {
-            new(reinterpret_cast<void*>(&data_))uinteger_data(val);
+            new(reinterpret_cast<void*>(&data_))uint64_data(val);
         }
         variant(double val)
         {
@@ -914,10 +914,10 @@ public:
                     new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
                     break;
                 case data_type_tag::integer_t:
-                    new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))int64_data(*(val.int64_data_cast()));
                     break;
                 case data_type_tag::uinteger_t:
-                    new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
+                    new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
                     break;
                 case data_type_tag::double_t:
                     new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
@@ -979,14 +979,14 @@ public:
             return reinterpret_cast<const bool_data*>(&data_);
         }
 
-        const integer_data* integer_data_cast() const
+        const int64_data* int64_data_cast() const
         {
-            return reinterpret_cast<const integer_data*>(&data_);
+            return reinterpret_cast<const int64_data*>(&data_);
         }
 
-        const uinteger_data* uinteger_data_cast() const
+        const uint64_data* uint64_data_cast() const
         {
-            return reinterpret_cast<const uinteger_data*>(&data_);
+            return reinterpret_cast<const uint64_data*>(&data_);
         }
 
         const double_data* double_data_cast() const
@@ -1142,11 +1142,11 @@ public:
                 switch (rhs.data_type())
                 {
                 case data_type_tag::integer_t:
-                    return integer_data_cast()->value() == rhs.integer_data_cast()->value();
+                    return int64_data_cast()->value() == rhs.int64_data_cast()->value();
                 case data_type_tag::uinteger_t:
-                    return integer_data_cast()->value() >= 0 ? static_cast<uint64_t>(integer_data_cast()->value()) == rhs.uinteger_data_cast()->value() : false;
+                    return int64_data_cast()->value() >= 0 ? static_cast<uint64_t>(int64_data_cast()->value()) == rhs.uint64_data_cast()->value() : false;
                 case data_type_tag::double_t:
-                    return static_cast<double>(integer_data_cast()->value()) == rhs.double_data_cast()->value();
+                    return static_cast<double>(int64_data_cast()->value()) == rhs.double_data_cast()->value();
                 default:
                     return false;
                 }
@@ -1155,11 +1155,11 @@ public:
                 switch (rhs.data_type())
                 {
                 case data_type_tag::integer_t:
-                    return rhs.integer_data_cast()->value() >= 0 ? uinteger_data_cast()->value() == static_cast<uint64_t>(rhs.integer_data_cast()->value()) : false;
+                    return rhs.int64_data_cast()->value() >= 0 ? uint64_data_cast()->value() == static_cast<uint64_t>(rhs.int64_data_cast()->value()) : false;
                 case data_type_tag::uinteger_t:
-                    return uinteger_data_cast()->value() == rhs.uinteger_data_cast()->value();
+                    return uint64_data_cast()->value() == rhs.uint64_data_cast()->value();
                 case data_type_tag::double_t:
-                    return static_cast<double>(uinteger_data_cast()->value()) == rhs.double_data_cast()->value();
+                    return static_cast<double>(uint64_data_cast()->value()) == rhs.double_data_cast()->value();
                 default:
                     return false;
                 }
@@ -1168,9 +1168,9 @@ public:
                 switch (rhs.data_type())
                 {
                 case data_type_tag::integer_t:
-                    return double_data_cast()->value() == static_cast<double>(rhs.integer_data_cast()->value());
+                    return double_data_cast()->value() == static_cast<double>(rhs.int64_data_cast()->value());
                 case data_type_tag::uinteger_t:
-                    return double_data_cast()->value() == static_cast<double>(rhs.uinteger_data_cast()->value());
+                    return double_data_cast()->value() == static_cast<double>(rhs.uint64_data_cast()->value());
                 case data_type_tag::double_t:
                     return double_data_cast()->value() == rhs.double_data_cast()->value();
                 default:
@@ -1275,10 +1275,10 @@ public:
                 new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
                 break;
             case data_type_tag::integer_t:
-                new(reinterpret_cast<void*>(&(other.data_)))integer_data(*integer_data_cast());
+                new(reinterpret_cast<void*>(&(other.data_)))int64_data(*int64_data_cast());
                 break;
             case data_type_tag::uinteger_t:
-                new(reinterpret_cast<void*>(&(other.data_)))uinteger_data(*uinteger_data_cast());
+                new(reinterpret_cast<void*>(&(other.data_)))uint64_data(*uint64_data_cast());
                 break;
             case data_type_tag::double_t:
                 new(reinterpret_cast<void*>(&(other.data_)))double_data(*double_data_cast());
@@ -1337,10 +1337,10 @@ public:
                 new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
                 break;
             case data_type_tag::integer_t:
-                new(reinterpret_cast<void*>(&data_))integer_data(*(val.integer_data_cast()));
+                new(reinterpret_cast<void*>(&data_))int64_data(*(val.int64_data_cast()));
                 break;
             case data_type_tag::uinteger_t:
-                new(reinterpret_cast<void*>(&data_))uinteger_data(*(val.uinteger_data_cast()));
+                new(reinterpret_cast<void*>(&data_))uint64_data(*(val.uint64_data_cast()));
                 break;
             case data_type_tag::double_t:
                 new(reinterpret_cast<void*>(&data_))double_data(*(val.double_data_cast()));
@@ -2781,10 +2781,10 @@ public:
                                                             var_.double_data_cast()->decimal_places()));
                 break;
             case semantic_type_tag::integer_t:
-                handler.int64_value(var_.integer_data_cast()->value());
+                handler.int64_value(var_.int64_data_cast()->value());
                 break;
             case semantic_type_tag::uinteger_t:
-                handler.uint64_value(var_.uinteger_data_cast()->value());
+                handler.uint64_value(var_.uint64_data_cast()->value());
                 break;
             case semantic_type_tag::bool_t:
                 handler.bool_value(var_.bool_data_cast()->value());
@@ -3163,9 +3163,9 @@ public:
         case data_type_tag::double_t:
             return var_.double_data_cast()->value() != 0.0;
         case data_type_tag::integer_t:
-            return var_.integer_data_cast()->value() != 0;
+            return var_.int64_data_cast()->value() != 0;
         case data_type_tag::uinteger_t:
-            return var_.uinteger_data_cast()->value() != 0;
+            return var_.uint64_data_cast()->value() != 0;
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
         }
@@ -3190,9 +3190,9 @@ public:
         case data_type_tag::double_t:
             return static_cast<int64_t>(var_.double_data_cast()->value());
         case data_type_tag::integer_t:
-            return static_cast<int64_t>(var_.integer_data_cast()->value());
+            return static_cast<int64_t>(var_.int64_data_cast()->value());
         case data_type_tag::uinteger_t:
-            return static_cast<int64_t>(var_.uinteger_data_cast()->value());
+            return static_cast<int64_t>(var_.uint64_data_cast()->value());
         case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
@@ -3219,9 +3219,9 @@ public:
         case data_type_tag::double_t:
             return static_cast<uint64_t>(var_.double_data_cast()->value());
         case data_type_tag::integer_t:
-            return static_cast<uint64_t>(var_.integer_data_cast()->value());
+            return static_cast<uint64_t>(var_.int64_data_cast()->value());
         case data_type_tag::uinteger_t:
-            return static_cast<uint64_t>(var_.uinteger_data_cast()->value());
+            return static_cast<uint64_t>(var_.uint64_data_cast()->value());
         case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
@@ -3270,9 +3270,9 @@ public:
         case data_type_tag::double_t:
             return var_.double_data_cast()->value();
         case data_type_tag::integer_t:
-            return static_cast<double>(var_.integer_data_cast()->value());
+            return static_cast<double>(var_.int64_data_cast()->value());
         case data_type_tag::uinteger_t:
-            return static_cast<double>(var_.uinteger_data_cast()->value());
+            return static_cast<double>(var_.uint64_data_cast()->value());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
@@ -4242,9 +4242,9 @@ public:
         case data_type_tag::double_t:
             return static_cast<int>(var_.double_data_cast()->value());
         case data_type_tag::integer_t:
-            return static_cast<int>(var_.integer_data_cast()->value());
+            return static_cast<int>(var_.int64_data_cast()->value());
         case data_type_tag::uinteger_t:
-            return static_cast<int>(var_.uinteger_data_cast()->value());
+            return static_cast<int>(var_.uint64_data_cast()->value());
         case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
@@ -4259,9 +4259,9 @@ public:
         case data_type_tag::double_t:
             return static_cast<unsigned int>(var_.double_data_cast()->value());
         case data_type_tag::integer_t:
-            return static_cast<unsigned int>(var_.integer_data_cast()->value());
+            return static_cast<unsigned int>(var_.int64_data_cast()->value());
         case data_type_tag::uinteger_t:
-            return static_cast<unsigned int>(var_.uinteger_data_cast()->value());
+            return static_cast<unsigned int>(var_.uint64_data_cast()->value());
         case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
@@ -4276,9 +4276,9 @@ public:
         case data_type_tag::double_t:
             return static_cast<long>(var_.double_data_cast()->value());
         case data_type_tag::integer_t:
-            return static_cast<long>(var_.integer_data_cast()->value());
+            return static_cast<long>(var_.int64_data_cast()->value());
         case data_type_tag::uinteger_t:
-            return static_cast<long>(var_.uinteger_data_cast()->value());
+            return static_cast<long>(var_.uint64_data_cast()->value());
         case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
@@ -4293,9 +4293,9 @@ public:
         case data_type_tag::double_t:
             return static_cast<unsigned long>(var_.double_data_cast()->value());
         case data_type_tag::integer_t:
-            return static_cast<unsigned long>(var_.integer_data_cast()->value());
+            return static_cast<unsigned long>(var_.int64_data_cast()->value());
         case data_type_tag::uinteger_t:
-            return static_cast<unsigned long>(var_.uinteger_data_cast()->value());
+            return static_cast<unsigned long>(var_.uint64_data_cast()->value());
         case data_type_tag::bool_t:
             return var_.bool_data_cast()->value() ? 1 : 0;
         default:
