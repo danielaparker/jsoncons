@@ -1,14 +1,14 @@
 ### jsoncons::json_event_reader
 
 ```c++
-typedef basic_json_event_reader<char,std::allocator<char>> json_reader
+typedef basic_json_event_reader<char,std::allocator<char>> json_event_reader
 ```
 
 `json_event_reader` is noncopyable and nonmoveable.
 
 #### Header
 ```c++
-#include <jsoncons/json_reader.hpp>
+#include <jsoncons/json_event_reader.hpp>
 
 A pull parser for parsing json events.
 ```
@@ -46,6 +46,14 @@ Note: It is the programmer's responsibility to ensure that `json_event_reader` d
 
 #### Member functions
 
+    bool has_next() const;
+    Check if there are more events.
+
+    const json_event& current() const;
+    Returns the current [json_event](json_event.md).
+
+    void next();
+    Get the next event. 
 
 ### Examples
 

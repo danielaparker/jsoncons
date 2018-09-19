@@ -27,21 +27,20 @@ namespace jsoncons {
 
 enum class json_event_type
 {
-    begin_document = 0,
-    end_document = 1,
-    begin_object = 2,
-    end_object = 3,
-    begin_array = 4,
-    end_array = 5,
-    name = 6,
-    string_value = 7,
-    byte_string_value = 8,
-    bignum_value = 9,
-    int64_value = 10,
-    uint64_value = 11,
-    double_value = 12,
-    bool_value = 13,
-    null_value = 14
+    begin_document,
+    end_document,
+    begin_object,
+    end_object,
+    begin_array,
+    end_array,
+    name,
+    string_value,
+    bignum_value,
+    int64_value,
+    uint64_value,
+    double_value,
+    bool_value,
+    null_value
 };
 
 template<class CharT,class Allocator=std::allocator<char>>
@@ -102,7 +101,7 @@ public:
 
     template<class T, class Traits, class OtherAllocator, class CharT_ = CharT>
     typename std::enable_if<std::is_same<T,std::basic_string<CharT_,Traits,OtherAllocator>>::value,T>::type
-    is() const
+    is() const JSONCONS_NOEXCEPT
     {
         switch (event_type_)
         {
@@ -115,7 +114,7 @@ public:
     }
 
     template<class T, class... Args>
-    bool is(Args&&... args) const
+    bool is(Args&&... args) const JSONCONS_NOEXCEPT
     {
         return as_json().template is<T>(std::forward<Args>(args)...);
     }
@@ -140,7 +139,7 @@ public:
         return as_json().template as<T>(std::forward<Args>(args)...);
     }
 
-    json_event_type event_type() const {return event_type_;}
+    json_event_type event_type() const JSONCONS_NOEXCEPT {return event_type_;}
 private:
     json_type as_json() const
     {
@@ -163,7 +162,7 @@ private:
             case json_event_type::null_value:
                 return json_type(jsoncons::null_type());
             default:
-                throw std::invalid_argument("Invalid argument.");
+                JSONCONS_UNREACHABLE();
         }
     }
 };
@@ -253,8 +252,7 @@ private:
 
     bool do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::byte_string_value);
-        return false;
+        JSONCONS_UNREACHABLE();
     }
 
     bool do_bignum_value(const string_view_type& value, const serializing_context&) override
@@ -512,8 +510,8 @@ private:
 typedef basic_json_event_reader<char,std::allocator<char>> json_event_reader;
 typedef basic_json_event_reader<wchar_t, std::allocator<wchar_t>> wjson_event_reader;
 
-typedef basic_json_event<char> json_event;
-typedef basic_json_event<wchar_t> wjson_event;
+typedef basic_json_event<char,std::allocator<char>> json_event;
+typedef basic_json_event<wchar_t,std::allocator<wchar_t>> wjson_event;
 
 }
 
