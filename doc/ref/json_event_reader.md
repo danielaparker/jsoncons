@@ -48,13 +48,13 @@ Note: It is the programmer's responsibility to ensure that `json_event_reader` d
 #### Member functions
 
     bool has_next() const;
-    Check if there are more events.
+Check if there are more events.
 
     const json_event& current() const;
-    Returns the current [json_event](json_event.md).
+Returns the current [json_event](json_event.md).
 
     void next();
-    Get the next event. 
+Get the next event. 
 
 ### Examples
 
