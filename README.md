@@ -565,11 +565,11 @@ Instructions for building the examples with CMake may be found in
 |             | vs2017 | x86,x64     | Windows 10       |       |
 | g++-        | 4.8    | x64         | Ubuntu           |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported |
 |             | 6      | x64         | Ubuntu           |       |
-|             | 7      | x64         | Ubuntu           |       |    
+|             | 7      | x64         | Ubuntu           |       |
 |             | 8      | x64         | Ubuntu           |       |
-| clang       | 3.8    | x64         | Ubuntu           |       |     
-|             | 5.0    | x64         | Ubuntu           |       |     
-|             | 6.0    | x64         | Ubuntu           |       |     
+| clang       | 3.8    | x64         | Ubuntu           |       |
+|             | 5.0    | x64         | Ubuntu           |       |
+|             | 6.0    | x64         | Ubuntu           |       |
 | clang xcode | 6.4    | x64         | OSX              |       |
 |             | 7.3    | x64         | OSX              |       |
 |             | 8      | x64         | OSX              |       |
