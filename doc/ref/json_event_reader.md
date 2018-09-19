@@ -9,9 +9,10 @@ typedef basic_json_event_reader<char,std::allocator<char>> json_event_reader
 #### Header
 ```c++
 #include <jsoncons/json_event_reader.hpp>
+```
 
 A pull parser for parsing json events.
-```
+
 #### Constructors
 
     basic_json_event_reader(std::istream& is); // (1)

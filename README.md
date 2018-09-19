@@ -559,28 +559,28 @@ Instructions for building the examples with CMake may be found in
 
 ## Supported compilers
 
- Compiler    | Version|Architecture | Operating System | Notes
--------------|--------|-------------|------------------|-------
- VS          | vs2015 | x86,x64     | Windows 10       |
-             | vs2017 | x86,x64     | Windows 10       |
- g++-        | 4.8    | x64         | Ubuntu           |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported
-             | 6      | x64         | Ubuntu           |
-             | 7      | x64         | Ubuntu           |
-             | 8      | x64         | Ubuntu           |
- clang       | 3.8    | x64         | Ubuntu           |     
-             | 5.0    | x64         | Ubuntu           |     
-             | 6.0    | x64         | Ubuntu           |     
- clang xcode | 6.4    | x64         | OSX              |
-             | 7.3    | x64         | OSX              |
-             | 8      | x64         | OSX              |
-             | 8.1    | x64         | OSX              |
-             | 8.2    | x64         | OSX              |
-             | 8.3    | x64         | OSX              |
-             | 9      | x64         | OSX              |
-             | 9.1    | x64         | OSX              |
-             | 9.2    | x64         | OSX              |
-             | 9.3    | x64         | OSX              |
-             | 9.4    | x64         | OSX              |
+| Compiler    | Version|Architecture | Operating System | Notes |
+|-------------|--------|-------------|------------------|-------|
+| VS          | vs2015 | x86,x64     | Windows 10       |       |
+|             | vs2017 | x86,x64     | Windows 10       |       |
+| g++-        | 4.8    | x64         | Ubuntu           |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported |
+|             | 6      | x64         | Ubuntu           |       |
+|             | 7      | x64         | Ubuntu           |       |    
+|             | 8      | x64         | Ubuntu           |       |
+| clang       | 3.8    | x64         | Ubuntu           |       |     
+|             | 5.0    | x64         | Ubuntu           |       |     
+|             | 6.0    | x64         | Ubuntu           |       |     
+| clang xcode | 6.4    | x64         | OSX              |       |
+|             | 7.3    | x64         | OSX              |       |
+|             | 8      | x64         | OSX              |       |
+|             | 8.1    | x64         | OSX              |       |
+|             | 8.2    | x64         | OSX              |       |
+|             | 8.3    | x64         | OSX              |       |
+|             | 9      | x64         | OSX              |       |
+|             | 9.1    | x64         | OSX              |       |
+|             | 9.2    | x64         | OSX              |       |
+|             | 9.3    | x64         | OSX              |       |
+|             | 9.4    | x64         | OSX              |       |
                                                        
 ## Acknowledgements
 
