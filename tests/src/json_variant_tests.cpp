@@ -38,14 +38,14 @@ TEST_CASE("test_move_constructor")
     json::variant var2(std::move(var1));
     //CHECK(data_type_tag::null_t == var1.data_type());
     CHECK(data_type_tag::integer_t == var2.data_type());
-    CHECK(var2.integer_data_cast()->value() == val1);
+    CHECK(var2.int64_data_cast()->value() == val1);
 
     uint64_t val3 = 9999;
     json::variant var3(val3);
     json::variant var4(std::move(var3));
     //CHECK(data_type_tag::null_t == var3.data_type());
     CHECK(data_type_tag::uinteger_t == var4.data_type());
-    CHECK(var4.uinteger_data_cast()->value() == val3);
+    CHECK(var4.uint64_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
     json::variant var5(val5);
@@ -106,14 +106,14 @@ TEST_CASE("test_copy_constructor")
     json::variant var2(var1);
     CHECK(data_type_tag::integer_t == var1.data_type());
     CHECK(data_type_tag::integer_t == var2.data_type());
-    CHECK(var2.integer_data_cast()->value() == val1);
+    CHECK(var2.int64_data_cast()->value() == val1);
 
     uint64_t val3 = 123456789;
     json::variant var3(val3);
     json::variant var4(var3);
     CHECK(data_type_tag::uinteger_t == var3.data_type());
     CHECK(data_type_tag::uinteger_t == var4.data_type());
-    CHECK(var4.uinteger_data_cast()->value() == val3);
+    CHECK(var4.uint64_data_cast()->value() == val3);
 
     double val5 = 123456789.9;
     json::variant var5(val5,floating_point_options());
