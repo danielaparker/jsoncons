@@ -540,6 +540,8 @@ lastName: Skeleton
 mark: 60
 ```
 
+See [json_event_reader](doc/ref/json_event_reader.md)
+
 ## Building the test suite and examples with CMake
 
 [CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
@@ -558,7 +560,7 @@ Instructions for building the examples with CMake may be found in
 ## Supported compilers
 
  Compiler    | Version|Architecture | Operating System | Notes
--------------|----------------------|--------------------------
+-------------|--------|-------------|------------------|-------
  VS          | vs2015 | x86,x64     | Windows 10       |
              | vs2017 | x86,x64     | Windows 10       |
  g++-        | 4.8    | x64         | Ubuntu           |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported

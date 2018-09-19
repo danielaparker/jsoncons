@@ -8,7 +8,7 @@ typedef basic_json_event<char,std::allocator<char>> json_event;
 ```c++
 #include <jsoncons/json_event_reader.hpp>
 
-A json events.
+A json event.
 ```
 
 #### Member functions

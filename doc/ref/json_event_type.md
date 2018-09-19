@@ -1,5 +1,10 @@
 ### jsoncons::json_event_type
 
+#### Header
+```c++
+#include <jsoncons/json_event_reader.hpp>
+```
+
 ```c++
 enum class json_event_type
 {
