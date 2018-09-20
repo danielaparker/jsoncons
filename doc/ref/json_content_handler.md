@@ -18,10 +18,10 @@ Member type                         |Definition
 
 #### Public producer interface
 
-    void begin_document()
+    bool begin_document ()
 Indicates the beginning of a sequence of JSON events. 
 
-    void end_document()
+    bool end_document()
 Indicates the end of a sequence of JSON events. 
 
     bool begin_object()
@@ -138,10 +138,10 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 
 #### Private virtual consumer interface
 
-    virtual void do_begin_document() = 0;
+    virtual bool do_begin_document() = 0;
 Handles the beginning of a sequence of JSON events.
 
-    virtual void do_end_document() = 0;
+    virtual bool do_end_document() = 0;
 Handles the end of a sequence of JSON events.
 
     virtual bool do_begin_object(const serializing_context& context) = 0;

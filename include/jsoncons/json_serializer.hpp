@@ -293,13 +293,15 @@ private:
         }
     }
     // Implementing methods
-    void do_begin_document() override
+    bool do_begin_document() override
     {
+        return true;
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
         writer_.flush();
+        return true;
     }
 
     bool do_begin_object(const serializing_context&) override

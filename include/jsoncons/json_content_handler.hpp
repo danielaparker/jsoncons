@@ -29,14 +29,14 @@ public:
 
     virtual ~basic_json_content_handler() {}
 
-    void begin_document()
+    bool begin_document ()
     {
-        do_begin_document();
+        return do_begin_document();
     }
 
-    void end_document()
+    bool end_document()
     {
-        do_end_document();
+        return do_end_document();
     }
 
     bool begin_object()
@@ -340,9 +340,9 @@ public:
 #endif
 
 private:
-    virtual void do_begin_document() = 0;
+    virtual bool do_begin_document() = 0;
 
-    virtual void do_end_document() = 0;
+    virtual bool do_end_document() = 0;
 
     virtual bool do_begin_object(const serializing_context& context) = 0;
 
@@ -387,12 +387,14 @@ class basic_null_json_content_handler final : public basic_json_content_handler<
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
 private:
-    void do_begin_document() override
+    bool do_begin_document() override
     {
+        return true;
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
+        return true;
     }
 
     bool do_begin_object(const serializing_context&) override

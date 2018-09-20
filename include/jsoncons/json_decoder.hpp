@@ -149,15 +149,16 @@ private:
         stack_offsets_.pop_back();
     }
 
-    void do_begin_document() override
+    bool do_begin_document() override
     {
         stack_offsets_.clear();
         stack_.clear();
         stack_offsets_.push_back({0,false});
         is_valid_ = false;
+        return true;
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
         if (stack_.size() == 1)
         {
@@ -165,6 +166,7 @@ private:
             stack_.pop_back();
             is_valid_ = true;
         }
+        return true;
     }
 
     bool do_begin_object(const serializing_context&) override

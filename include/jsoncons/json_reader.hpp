@@ -54,14 +54,14 @@ public:
 
 private:
 
-    void do_begin_document() override
+    bool do_begin_document() override
     {
-        other_handler_.begin_document();
+        return other_handler_.begin_document();
     }
 
-    void do_end_document() override
+    bool do_end_document() override
     {
-        other_handler_.end_document();
+        return other_handler_.end_document();
     }
 
     bool do_begin_object(const serializing_context& context) override
