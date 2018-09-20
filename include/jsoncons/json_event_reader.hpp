@@ -27,20 +27,20 @@ namespace jsoncons {
 
 enum class json_event_type
 {
-    begin_document,
-    end_document,
-    begin_object,
-    end_object,
-    begin_array,
-    end_array,
-    name,
-    string_value,
-    bignum_value,
-    int64_value,
-    uint64_value,
-    double_value,
-    bool_value,
-    null_value
+    begin_document = 0,
+    end_document = 1,
+    begin_array = 2,
+    end_array = 3,
+    begin_object = 4,
+    end_object = 5,
+    name = 6,
+    string_value = 7,
+    null_value = 8,
+    bool_value = 9,
+    int64_value = 10,
+    uint64_value = 11,
+    bignum_value= 12,
+    double_value = 13
 };
 
 template<class CharT,class Allocator=std::allocator<char>>
@@ -334,6 +334,10 @@ public:
          begin_(true)
     {
         buffer_.reserve(buffer_length_);
+        if (!done())
+        {
+            next();
+        }
     }
 
     size_t buffer_length() const
@@ -347,9 +351,9 @@ public:
         buffer_.reserve(buffer_length_);
     }
 
-    bool has_next() const
+    bool done() const
     {
-        return !parser_.done();
+        return parser_.done();
     }
 
     const basic_json_event<CharT,Allocator>& current() const

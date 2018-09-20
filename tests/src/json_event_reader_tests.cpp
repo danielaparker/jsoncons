@@ -39,25 +39,105 @@ TEST_CASE("json event reader tests")
 
     std::istringstream is(s);
 
-    json_event_reader event_reader(is);
+    json_event_reader reader(is);
 
-    for (; event_reader.has_next(); event_reader.next())
-    {
-        const auto& event = event_reader.current();
-        switch (event.event_type())
-        {
-            case json_event_type::name:
-                std::cout << event.as<std::string>() << ": ";
-                break;
-            case json_event_type::string_value:
-                std::cout << event.as<std::string>() << "\n";
-                break;
-            case json_event_type::int64_value:
-            case json_event_type::uint64_value:
-                std::cout << event.as<std::string>() << "\n";
-                break;
-        }
-    }
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::begin_document);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::begin_array);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::begin_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::end_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::begin_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::end_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::begin_object);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::string_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::name);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::uint64_value);
+    reader.next();
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == json_event_type::end_object);
+    reader.next();
+    CHECK(reader.done());
 }
 
 

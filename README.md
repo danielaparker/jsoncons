@@ -506,7 +506,7 @@ int main()
 
     json_event_reader event_reader(is);
 
-    for (; event_reader.has_next(); event_reader.next())
+    for (; !event_reader.done(); event_reader.next())
     {
         const auto& event = event_reader.current();
         switch (event.event_type())

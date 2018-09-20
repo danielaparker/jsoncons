@@ -89,6 +89,7 @@ enum class parse_state : uint8_t
 {
     root,
     start, 
+    begin_document, 
     slash,  
     slash_slash, 
     slash_star, 
@@ -518,6 +519,12 @@ public:
                 state_ = pop_state();
                 break;
             case parse_state::start: 
+                continue_ = handler_.begin_document();
+                state_ = parse_state::begin_document;
+                if (!continue_)
+                    break;
+                // FALLTHRU
+            case parse_state::begin_document: 
                 {
                     handler_.begin_document();
                     switch (*input_ptr_)

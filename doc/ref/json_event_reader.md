@@ -47,8 +47,8 @@ Note: It is the programmer's responsibility to ensure that `json_event_reader` d
 
 #### Member functions
 
-    bool has_next() const;
-Check if there are more events.
+    bool done() const;
+Check if there are no more events.
 
     const json_event& current() const;
 Returns the current [json_event](json_event.md).
@@ -96,7 +96,7 @@ int main()
 
     json_event_reader event_reader(is);
 
-    for (; event_reader.has_next(); event_reader.next())
+    for (; !event_reader.done(); event_reader.next())
     {
         const auto& event = event_reader.current();
         switch (event.event_type())
