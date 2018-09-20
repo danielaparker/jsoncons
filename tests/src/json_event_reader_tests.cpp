@@ -136,6 +136,12 @@ TEST_CASE("json event reader tests")
     reader.next();
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::end_object);
+    //reader.next();
+    //REQUIRE_FALSE(reader.done());
+    //CHECK(reader.current().event_type() == json_event_type::end_array);
+    //reader.next();
+    //REQUIRE_FALSE(reader.done());
+    //CHECK(reader.current().event_type() == json_event_type::end_document);
     reader.next();
     CHECK(reader.done());
 }
