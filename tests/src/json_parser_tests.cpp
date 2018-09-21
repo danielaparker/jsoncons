@@ -77,6 +77,7 @@ TEST_CASE("test_parse_empty_object")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
+    parser.end_parse();
     CHECK(parser.done());
 
     parser.end_parse();
@@ -95,6 +96,7 @@ TEST_CASE("test_parse_array")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
+    parser.end_parse();
     CHECK(parser.done());
 
     parser.end_parse();
@@ -113,6 +115,7 @@ TEST_CASE("test_parse_string")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
+    parser.end_parse();
     CHECK(parser.done());
 
     parser.end_parse();
@@ -131,8 +134,6 @@ TEST_CASE("test_parse_integer")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
-    CHECK_FALSE(parser.done());
-
     parser.end_parse();
     CHECK(parser.done());
 
@@ -150,9 +151,8 @@ TEST_CASE("test_parse_integer_space")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
-    CHECK(parser.done());
-
     parser.end_parse();
+    CHECK(parser.done());
 
     json j = decoder.get_result();
 }
@@ -168,9 +168,8 @@ TEST_CASE("test_parse_double_space")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
-    CHECK(parser.done());
-
     parser.end_parse();
+    CHECK(parser.done());
 
     json j = decoder.get_result();
 }
@@ -186,9 +185,8 @@ TEST_CASE("test_parse_false")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
-    CHECK(parser.done());
-
     parser.end_parse();
+    CHECK(parser.done());
 
     json j = decoder.get_result();
 }
@@ -204,9 +202,8 @@ TEST_CASE("test_parse_true")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
-    CHECK(parser.done());
-
     parser.end_parse();
+    CHECK(parser.done());
 
     json j = decoder.get_result();
 }
@@ -222,9 +219,8 @@ TEST_CASE("test_parse_null")
 
     parser.update(s.data(),s.length());
     parser.parse_some();
-    CHECK(parser.done());
-
     parser.end_parse();
+    CHECK(parser.done());
 
     json j = decoder.get_result();
 }
@@ -244,10 +240,8 @@ TEST_CASE("test_parse_array_string")
     static std::string s2("]");
     parser.update(s2.data(), s2.length());
     parser.parse_some();
-
-    CHECK(parser.done());
-
     parser.end_parse();
+    CHECK(parser.done());
 
     json j = decoder.get_result();
 }

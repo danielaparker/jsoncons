@@ -90,6 +90,8 @@ enum class parse_state : uint8_t
     root,
     start, 
     begin_document, 
+    before_end_document, 
+    end_document, 
     slash,  
     slash_slash, 
     slash_star, 
@@ -374,9 +376,7 @@ public:
 
         if (parent() == parse_state::root)
         {
-            state_ = parse_state::done;
-            handler_.end_document();
-            continue_ = false;
+            state_ = parse_state::before_end_document;
         }
         else
         {
@@ -431,9 +431,7 @@ public:
         }
         if (parent() == parse_state::root)
         {
-            state_ = parse_state::done;
-            handler_.end_document();
-            continue_ = false;
+            state_ = parse_state::before_end_document;
         }
         else
         {
@@ -505,29 +503,53 @@ public:
     {
         const CharT* local_input_end = input_end_;
 
-        if (input_ptr_ == local_input_end)
+        if (input_ptr_ == local_input_end && continue_)
         {
             if (parent() == parse_state::root)
             {
                 switch (state_)
                 {
-                case parse_state::zero:  
-                case parse_state::integer:
-                    end_integer_value(ec);
-                    if (ec) return;
-                    break;
-                case parse_state::fraction2:
-                    end_fraction_value(chars_format::fixed,ec);
-                    if (ec) return;
-                    break;
-                case parse_state::exp3:
-                    end_fraction_value(chars_format::scientific,ec);
-                    if (ec) return;
-                    break;
-                default:
-                    break;
+                    case parse_state::zero:  
+                    case parse_state::integer:
+                        end_integer_value(ec);
+                        if (ec) return;
+                        break;
+                    case parse_state::fraction2:
+                        end_fraction_value(chars_format::fixed,ec);
+                        if (ec) return;
+                        break;
+                    case parse_state::exp3:
+                        end_fraction_value(chars_format::scientific,ec);
+                        if (ec) return;
+                        break;
+                    case parse_state::before_end_document:
+                        continue_ = handler_.end_document();
+                        state_ = parse_state::end_document;
+                        break;
+                    case parse_state::end_document:
+                        state_ = parse_state::done;
+                        continue_ = false;
+                        break;
+                    default:
+                        continue_ = err_handler_.error(json_parse_errc::unexpected_eof, *this);
+                        if (!continue_)
+                        {
+                            ec = json_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        break;
                 }
             }
+            else
+            {
+                continue_ = err_handler_.error(json_parse_errc::unexpected_eof, *this);
+                if (!continue_)
+                {
+                    ec = json_parse_errc::unexpected_eof;
+                    return;
+                }
+            }
+            /*
             if (state_ == parse_state::lf || state_ == parse_state::cr)
             { 
                 state_ = pop_state();
@@ -541,12 +563,21 @@ public:
                     return;
                 }
             }
+            */
         }
 
         while ((input_ptr_ < local_input_end) && continue_)
         {
             switch (state_)
             {
+            case parse_state::before_end_document:
+                continue_ = handler_.end_document();
+                state_ = parse_state::end_document;
+                break;
+            case parse_state::end_document:
+                state_ = parse_state::done;
+                continue_ = false;
+                break;
             case parse_state::cr:
                 ++line_;
                 column_ = 1;
@@ -1299,9 +1330,7 @@ public:
                     continue_ = handler_.bool_value(true,*this);
                     if (parent() == parse_state::root)
                     {
-                        state_ = parse_state::done;
-                        handler_.end_document();
-                        continue_ = false;
+                        state_ = parse_state::before_end_document;
                     }
                     else
                     {
@@ -1369,9 +1398,7 @@ public:
                     continue_ = handler_.bool_value(false,*this);
                     if (parent() == parse_state::root)
                     {
-                        state_ = parse_state::done;
-                        handler_.end_document();
-                        continue_ = false;
+                        state_ = parse_state::before_end_document;
                     }
                     else
                     {
@@ -1424,9 +1451,7 @@ public:
                     continue_ = handler_.null_value(*this);
                     if (parent() == parse_state::root)
                     {
-                        state_ = parse_state::done;
-                        handler_.end_document();
-                        continue_ = false;
+                        state_ = parse_state::before_end_document;
                     }
                     else
                     {
@@ -1546,9 +1571,7 @@ public:
                 column_ += 4;
                 if (parent() == parse_state::root)
                 {
-                    handler_.end_document();
-                    state_ = parse_state::done;
-                    continue_ = false;
+                    state_ = parse_state::before_end_document;
                 }
                 else
                 {
@@ -1582,9 +1605,7 @@ public:
                 column_ += 4;
                 if (parent() == parse_state::root)
                 {
-                    handler_.end_document();
-                    state_ = parse_state::done;
-                    continue_ = false;
+                    state_ = parse_state::before_end_document;
                 }
                 else
                 {
@@ -1618,9 +1639,7 @@ public:
                 column_ += 5;
                 if (parent() == parse_state::root)
                 {
-                    handler_.end_document();
-                    state_ = parse_state::done;
-                    continue_ = false;
+                    state_ = parse_state::before_end_document;
                 }
                 else
                 {
@@ -2632,14 +2651,32 @@ escape_u9:
             case parse_state::integer:
                 end_integer_value(ec);
                 if (ec) return;
+                handler_.end_document();
+                state_ = parse_state::done;
+                continue_ = false;
                 break;
             case parse_state::fraction2:
                 end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
+                handler_.end_document();
+                state_ = parse_state::done;
+                continue_ = false;
                 break;
             case parse_state::exp3:
                 end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
+                handler_.end_document();
+                state_ = parse_state::done;
+                continue_ = false;
+                break;
+            case parse_state::before_end_document:
+                handler_.end_document();
+                state_ = parse_state::done;
+                continue_ = false;
+                break;
+            case parse_state::end_document:
+                state_ = parse_state::done;
+                continue_ = false;
                 break;
             default:
                 break;
@@ -2827,9 +2864,7 @@ private:
             break;
         case parse_state::root:
             continue_ = handler_.string_value(string_view_type(s, length), *this);
-            state_ = parse_state::done;
-            handler_.end_document();
-            continue_ = false;
+            state_ = parse_state::before_end_document;
             break;
         default:
             continue_ = err_handler_.error(json_parse_errc::invalid_json_text, *this);
@@ -2874,9 +2909,7 @@ private:
             state_ = parse_state::expect_comma_or_end;
             break;
         case parse_state::root:
-            state_ = parse_state::done;
-            handler_.end_document();
-            continue_ = false;
+            state_ = parse_state::before_end_document;
             break;
         default:
             continue_ = err_handler_.error(json_parse_errc::invalid_json_text, *this);
