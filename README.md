@@ -14,7 +14,7 @@ data formats (e.g. CBOR). It supports
 
 It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with MS VC++ 2015, GCC 4.8, GCC 4.9, GCC 6.2.0 and recent versions of clang. 
+jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It has been tested with vs2015, vs2017, GCC 4.8 and later, GCC 6.2.0 and recent versions of clang. 
 
 ## Get jsoncons
 
