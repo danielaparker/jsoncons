@@ -1724,18 +1724,12 @@ zero:
             case '}':
                 end_integer_value(ec);
                 if (ec) return;
-                end_object(ec);
-                ++input_ptr_;
-                ++column_;
-                if (ec) return;
+                state_ = parse_state::expect_comma_or_end;
                 return;
             case ']':
                 end_integer_value(ec);
                 if (ec) return;
-                end_array(ec);
-                ++input_ptr_;
-                ++column_;
-                if (ec) return;
+                state_ = parse_state::expect_comma_or_end;
                 return;
             case '.':
                 decimal_places_ = 0; 
@@ -1809,18 +1803,12 @@ integer:
             case '}':
                 end_integer_value(ec);
                 if (ec) return;
-                end_object(ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++column_;
+                state_ = parse_state::expect_comma_or_end;
                 return;
             case ']':
                 end_integer_value(ec);
                 if (ec) return;
-                end_array(ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++column_;
+                state_ = parse_state::expect_comma_or_end;
                 return;
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 number_buffer_.push_back(static_cast<char>(*input_ptr_));
@@ -1916,18 +1904,12 @@ fraction2:
             case '}':
                 end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
-                end_object(ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++column_;
+                state_ = parse_state::expect_comma_or_end;
                 return;
             case ']':
                 end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
-                end_array(ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++column_;
+                state_ = parse_state::expect_comma_or_end;
                 return;
             case ',':
                 end_fraction_value(chars_format::fixed,ec);
@@ -2046,18 +2028,12 @@ exp3:
             case '}':
                 end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
-                end_object(ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++column_;
+                state_ = parse_state::expect_comma_or_end;
                 return;
             case ']':
                 end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
-                end_array(ec);
-                if (ec) return;
-                ++input_ptr_;
-                ++column_;
+                state_ = parse_state::expect_comma_or_end;
                 return;
             case ',':
                 end_fraction_value(chars_format::scientific,ec);
