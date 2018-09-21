@@ -402,7 +402,7 @@ public:
     void read_next(std::error_code& ec)
     {
         parser_.restart();
-        while (!eof_ && !parser_.stopped())
+        while (!parser_.stopped())
         {
             if (parser_.source_exhausted())
             {
@@ -418,18 +418,11 @@ public:
                 }
                 else
                 {
+                    parser_.update(buffer_.data(),0);
                     eof_ = true;
                 }
             }
-            if (!eof_)
-            {
-                parser_.parse_some(ec);
-                if (ec) return;
-            }
-        }
-        if (!parser_.stopped())
-        {
-            parser_.end_parse(ec);
+            parser_.parse_some(ec);
             if (ec) return;
         }
     }
