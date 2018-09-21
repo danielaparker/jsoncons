@@ -21,7 +21,7 @@ will then report all warnings and errors through this interface.
 
     void error(std::error_code ec,
                const serializing_context& context) throw (parse_error) = 0
-Called for recoverable errors. Calls `do_error`, if `do_error` returns `true`, throws a [parse_error](parse_error.md), otherwise an attempt is made to recover.
+Called for recoverable errors. Calls `do_error`, if `do_error` returns `false`, throws a [parse_error](parse_error.md), otherwise an attempt is made to recover.
 
     void fatal_error(std::error_code ec,
                      const serializing_context& context) throw (parse_error) = 0
@@ -32,7 +32,7 @@ Called for unrecoverable errors. Calls `do_fatal_error` and throws a [parse_erro
     virtual bool do_error(std::error_code ec,
                           const serializing_context& context) = 0
 Receive an error event, possibly recoverable. An [error_code](json_error_category.md) indicates the type of error. Contextual information including
-line and column information is provided in the [context](serializing_context.md) parameter. Returns `true` to fail, `false` to attempt recovery.
+line and column information is provided in the [context](serializing_context.md) parameter. Returns `false` to fail, `true` to attempt recovery.
 
     virtual void do_fatal_error(std::error_code ec,
                                 const serializing_context& context) = 0

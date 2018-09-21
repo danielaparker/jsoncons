@@ -16,6 +16,6 @@ class default_parse_error_handler;
 
      bool do_error(std::error_code ec, const serializing_context& context) override;
 
-Returns `false` if `ec` indicates a comment, otherwise `true`
+Returns `true` if `ec` indicates a comment, otherwise `false`
     
 

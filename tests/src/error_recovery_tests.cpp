@@ -22,9 +22,9 @@ private:
     {
         if (ec == jsoncons::json_parse_errc::extra_comma)
         {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 };
 

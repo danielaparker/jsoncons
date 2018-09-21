@@ -125,11 +125,11 @@ private:
 
         if (code == illegal_comment)
         {
-            return false;
+            return true; // Recover, allow comments
         }
         else
         {
-            return true;
+            return false;
         }
     }
 };
@@ -139,7 +139,7 @@ class strict_parse_error_handler : public parse_error_handler
 private:
     bool do_error(std::error_code, const serializing_context&) JSONCONS_NOEXCEPT override
     {
-        return true;
+        return false;
     }
 };
 

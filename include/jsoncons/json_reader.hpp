@@ -280,7 +280,7 @@ public:
     void read_next(std::error_code& ec)
     {
         parser_.reset();
-        while (/*!eof_ &&*/ !parser_.stopped())
+        while (!parser_.stopped())
         {
             if (parser_.source_exhausted())
             {
@@ -300,17 +300,9 @@ public:
                     eof_ = true;
                 }
             }
-            //if (!eof_)
-            {
-                parser_.parse_some(ec);
-                if (ec) return;
-            }
+            parser_.parse_some(ec);
+            if (ec) return;
         }
-        //if (!parser_.stopped())
-        //{
-        //    parser_.end_parse(ec);
-        //    if (ec) return;
-        //}
     }
 
     void check_done()

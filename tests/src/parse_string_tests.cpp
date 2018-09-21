@@ -28,7 +28,7 @@ private:
 
     bool do_error(std::error_code ec, const serializing_context&) JSONCONS_NOEXCEPT
     {
-        return (ec != value_) ? true: false;
+        return ec == value_; // if returns true, use default processing
     }
 };
 
