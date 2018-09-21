@@ -173,20 +173,15 @@ TEST_CASE("test_read_multiple")
     jsoncons::json_decoder<json> decoder;
     json_reader reader(is,decoder);
 
-    if (!reader.eof())
-    {
-        reader.read_next();
-        CHECK_FALSE(reader.eof());
-        json val = decoder.get_result();
-        CHECK(1 == val["a"].as<int>());
-    }
-    if (!reader.eof())
-    {
-        reader.read_next();
-        CHECK_FALSE(reader.eof());
-        json val = decoder.get_result();
-        CHECK(4 == val["a"].as<int>());
-    }
+    REQUIRE_FALSE(reader.eof());
+    reader.read_next();
+    json val = decoder.get_result();
+    CHECK(1 == val["a"].as<int>());
+    REQUIRE_FALSE(reader.eof());
+    reader.read_next();
+    json val2 = decoder.get_result();
+    CHECK(4 == val2["a"].as<int>());
+    CHECK(reader.eof());
 }
 
 
