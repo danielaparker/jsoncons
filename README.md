@@ -430,7 +430,7 @@ int main()
     )");
 
     json_serializer serializer(std::cout, jsoncons::indenting::indent); // pretty print
-    serializer.begin_json();
+    serializer.begin_document();
     serializer.begin_array();
     for (const auto& book : some_books.array_range())
     {
@@ -441,7 +441,7 @@ int main()
         book.dump_fragment(serializer);
     }
     serializer.end_array();
-    serializer.end_json();
+    serializer.end_document();
 }
 ```
 Output:

@@ -134,12 +134,12 @@ int main()
 
     json_serializer serializer(std::cout, jsoncons::indenting::indent); 
 
-    serializer.begin_json();       
+    serializer.begin_document();       
     serializer.begin_object();       
     serializer.write_name("Employees");       
     encode_fragment(employees, serializer);
     serializer.end_object();       
-    serializer.end_json();       
+    serializer.end_document();       
 }
 ```
 Output:
