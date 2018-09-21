@@ -3068,17 +3068,10 @@ public:
     }
 
     template<class U=Allocator>
-    typename std::enable_if<is_stateless<U>::value,void>::type
-    create_object_implicitly()
+    void create_object_implicitly()
     {
+        static_assert(is_stateless<U>::value, "Cannot create object implicitly - allocator is stateful.");
         var_ = variant(Allocator());
-    }
-
-    template<class U=Allocator>
-    typename std::enable_if<!is_stateless<U>::value,void>::type
-    create_object_implicitly() const
-    {
-        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Cannot create object implicitly - allocator is not default constructible."));
     }
 
     void reserve(size_t n)
