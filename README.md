@@ -10,7 +10,7 @@ data formats (e.g. CBOR). It supports
 
 - Converting from JSON-like text or binary data to C++ objects and back.
 
-- Streaming JSON read and write events, somewhat analogously to SAX and StAX processing in the XML world. 
+- Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 
 It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
