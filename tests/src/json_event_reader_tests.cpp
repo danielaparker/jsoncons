@@ -26,8 +26,7 @@ TEST_CASE("json event reader tests")
             "enrollmentNo" : 101,
             "firstName" : "Catherine",
             "lastName" : "Smith",
-            "mark" : 95              
-        },
+            "mark" : 95 },
         {
             "enrollmentNo" : 102,
             "firstName" : "William",

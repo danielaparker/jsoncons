@@ -531,8 +531,9 @@ public:
                     break;
                 default:
                     err_handler_.fatal_error(json_parse_errc::unexpected_eof, *this);
+                    ec = json_parse_errc::unexpected_eof;
                     continue_ = false;
-                    break;
+                    return;
             }
         }
 
@@ -2613,39 +2614,43 @@ escape_u9:
 
     void end_parse(std::error_code& ec)
     {
-        switch (state_)
+        if (continue_)
         {
-            case parse_state::zero:  
-            case parse_state::integer:
-                end_integer_value(ec);
-                if (ec) return;
-                break;
-            case parse_state::fraction2:
-                end_fraction_value(chars_format::fixed,ec);
-                if (ec) return;
-                break;
-            case parse_state::exp3:
-                end_fraction_value(chars_format::scientific,ec);
-                if (ec) return;
-                break;
-            default:
-                break;
-        }
-        switch (state_)
-        {
-            case parse_state::before_end_document:
-                handler_.end_document();
-                state_ = parse_state::done;
-                continue_ = false;
-                break;
-            case parse_state::end_document:
-                state_ = parse_state::done;
-                continue_ = false;
-                break;
-            default:
-                err_handler_.error(json_parse_errc::unexpected_eof, *this);
-                continue_ = false;
-                break;
+            switch (state_)
+            {
+                case parse_state::zero:  
+                case parse_state::integer:
+                    end_integer_value(ec);
+                    if (ec) return;
+                    break;
+                case parse_state::fraction2:
+                    end_fraction_value(chars_format::fixed,ec);
+                    if (ec) return;
+                    break;
+                case parse_state::exp3:
+                    end_fraction_value(chars_format::scientific,ec);
+                    if (ec) return;
+                    break;
+                default:
+                    break;
+            }
+            switch (state_)
+            {
+                case parse_state::before_end_document:
+                    handler_.end_document();
+                    state_ = parse_state::done;
+                    continue_ = false;
+                    break;
+                case parse_state::end_document:
+                    state_ = parse_state::done;
+                    continue_ = false;
+                    break;
+                default:
+                    err_handler_.fatal_error(json_parse_errc::unexpected_eof, *this);
+                    ec = json_parse_errc::unexpected_eof;
+                    continue_ = false;
+                    return;
+            }
         }
     }
 
