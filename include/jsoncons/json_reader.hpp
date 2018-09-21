@@ -296,6 +296,7 @@ public:
                 }
                 else
                 {
+                    parser_.update(buffer_.data(),0);
                     eof_ = true;
                 }
             }
