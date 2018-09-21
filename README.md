@@ -8,7 +8,7 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 - Serializing the unpacked representation into different JSON-like text or binary data.
 
-- Converting from JSON-like text or binary data to C++ objects and back.
+- Converting from JSON-like text or binary data to C++ objects and back via [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md).
 
 - Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 
