@@ -427,7 +427,7 @@ public:
                 if (ec) return;
             }
         }
-        if (eof_)
+        if (!parser_.stopped())
         {
             parser_.end_parse(ec);
             if (ec) return;
