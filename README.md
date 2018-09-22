@@ -4,7 +4,7 @@ jsoncons is a C++, header-only library for constructing [JSON](http://www.json.o
 data formats such as [CBOR](http://cbor.io/). It supports 
 
 - Parsing JSON-like text or binary data into an unpacked representation
-  (`jsoncons::basic_json`) that defines an interface for accessing and modifying that data (including bignum and byte string values.)
+  (`jsoncons::basic_json`) that defines an interface for accessing and modifying that data (covers bignum and byte string values.)
 
 - Serializing the unpacked representation into different JSON-like text or binary data.
 
