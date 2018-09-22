@@ -97,6 +97,7 @@ class basic_csv_parser : private serializing_context
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
+    bool continue_;
 
 public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
@@ -129,7 +130,8 @@ public:
          offset_(0),
          begin_input_(nullptr),
          input_end_(nullptr),
-         input_ptr_(nullptr)
+         input_ptr_(nullptr),
+         continue_(true)
     {
         depth_ = default_depth;
         state_ = csv_state_type::start;
@@ -146,6 +148,11 @@ public:
     bool done() const
     {
         return state_ == csv_state_type::done;
+    }
+
+    bool stopped() const
+    {
+        return !continue_;
     }
 
     bool source_exhausted() const
@@ -187,7 +194,7 @@ public:
                 {
                     if (column_index_ < column_names_.size() + offset_)
                     {
-                        handler_.name(column_names_[column_index_ - offset_], *this);
+                        continue_ = handler_.name(column_names_[column_index_ - offset_], *this);
                     }
                 }
                 break;
@@ -207,7 +214,7 @@ public:
         {
         case mapping_type::n_rows:
         case mapping_type::n_objects:
-            handler_.begin_array(*this);
+            continue_ = handler_.begin_array(*this);
             break;
         case mapping_type::m_columns:
             decoders_[column_index_].begin_array(*this);
@@ -226,7 +233,7 @@ public:
             {
             case mapping_type::n_rows:
             case mapping_type::n_objects:
-                handler_.end_array(*this);
+                continue_ = handler_.end_array(*this);
                 break;
             case mapping_type::m_columns:
                 decoders_[column_index_].end_array(*this);
@@ -246,10 +253,10 @@ public:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
-                handler_.begin_array(*this);
+                continue_ = handler_.begin_array(*this);
                 break;
             case mapping_type::n_objects:
-                handler_.begin_object(*this);
+                continue_ = handler_.begin_object(*this);
                 break;
             case mapping_type::m_columns:
                 break;
@@ -265,7 +272,7 @@ public:
         {
             if (level_ > 0)
             {
-                handler_.end_array(*this);
+                continue_ = handler_.end_array(*this);
                 level_ = 0;
             }
         }
@@ -281,12 +288,12 @@ public:
             case mapping_type::n_rows:
                 if (column_names_.size() > 0)
                 {
-                    handler_.begin_array(*this);
+                    continue_ = handler_.begin_array(*this);
                     for (const auto& name : column_names_)
                     {
-                        handler_.string_value(name, *this);
+                        continue_ = handler_.string_value(name, *this);
                     }
-                    handler_.end_array(*this);
+                    continue_ = handler_.end_array(*this);
                 }
                 break;
             case mapping_type::m_columns:
@@ -306,10 +313,10 @@ public:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
-                handler_.end_array(*this);
+                continue_ = handler_.end_array(*this);
                 break;
             case mapping_type::n_objects:
-                handler_.end_object(*this);
+                continue_ = handler_.end_object(*this);
                 break;
             default:
                 break;
@@ -321,7 +328,7 @@ public:
     void reset()
     {
         push_mode(csv_mode_type::initial);
-        handler_.begin_document();
+        continue_ = handler_.begin_document();
 
         for (auto name : parameters_.column_names())
         {
@@ -345,7 +352,7 @@ public:
         }
         if (parameters_.mapping() != mapping_type::m_columns)
         {
-            handler_.begin_array(*this);
+            continue_ = handler_.begin_array(*this);
         }
         state_ = csv_state_type::expect_value;
         column_index_ = 0;
@@ -545,8 +552,9 @@ all_csv_states:
                 }
                 break;
             default:
-                err_handler_.fatal_error(csv_parse_errc::invalid_state, *this);
+                err_continue_ = handler_.fatal_error(csv_parse_errc::invalid_state, *this);
                 ec = csv_parse_errc::invalid_state;
+                continue_ = false;
                 return;
             }
             if (line_ > parameters_.max_lines())
@@ -644,27 +652,28 @@ all_csv_states:
         if (parameters_.mapping() == mapping_type::m_columns)
         {
             basic_json_fragment_filter<CharT> fragment_filter(handler_);
-            handler_.begin_object(*this);
+            continue_ = handler_.begin_object(*this);
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
-                handler_.name(column_names_[i],*this);
+                continue_ = handler_.name(column_names_[i],*this);
                 decoders_[i].end_array(*this);
                 decoders_[i].end_document();
                 decoders_[i].get_result().dump_fragment(fragment_filter);
             }
-            handler_.end_object(*this);
+            continue_ = handler_.end_object(*this);
         }
         else
         {
-            handler_.end_array(*this);
+            continue_ = handler_.end_array(*this);
         }
         if (!pop_mode(csv_mode_type::initial))
         {
-            err_handler_.fatal_error(csv_parse_errc::unexpected_eof, *this);
+            err_continue_ = handler_.fatal_error(csv_parse_errc::unexpected_eof, *this);
             ec = csv_parse_errc::unexpected_eof;
+            continue_ = false;
             return;
         }
-        handler_.end_document();
+        continue_ = handler_.end_document();
     }
 
     csv_state_type state() const
@@ -736,7 +745,7 @@ private:
             case mapping_type::n_rows:
                 if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                 {
-                    handler_.null_value(*this);
+                    continue_ = handler_.null_value(*this);
                 }
                 else
                 {
@@ -750,7 +759,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.null_value(*this);
+                            continue_ = handler_.null_value(*this);
                         }
                         else
                         {
@@ -761,7 +770,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.null_value(*this);
+                            continue_ = handler_.null_value(*this);
                         }
                         else
                         {
@@ -809,7 +818,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.null_value(*this);
+                            continue_ = handler_.null_value(*this);
                         }
                         else
                         {
@@ -820,7 +829,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            handler_.null_value(*this);
+                            continue_ = handler_.null_value(*this);
                         }
                         else
                         {
@@ -838,8 +847,9 @@ private:
             }
             break;
         default:
-            err_handler_.fatal_error(csv_parse_errc::invalid_csv_text, *this);
+            err_continue_ = handler_.fatal_error(csv_parse_errc::invalid_csv_text, *this);
             ec = csv_parse_errc::invalid_csv_text;
+            continue_ = false;
             return;
         }
         state_ = csv_state_type::expect_value;
