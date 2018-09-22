@@ -36,12 +36,12 @@ You must ensure that the input stream, input handler, and error handler exist as
 
     csv_reader(std::istream& is,
                json_content_handler& handler,
-               parse_error_handler& err_handler,
-               const csv_serializing_options& options)
+               const csv_serializing_options& options,
+               parse_error_handler& err_handler)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_content_handler](json_content_handler.md) that receives
-JSON events, the specified [parse_error_handler](parse_error_handler.md),
-and [csv_serializing_options](csv_serializing_options.md).
+JSON events, [csv_serializing_options](csv_serializing_options.md),
+and the specified [parse_error_handler](parse_error_handler.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
 #### Member functions
