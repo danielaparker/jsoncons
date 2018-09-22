@@ -44,6 +44,8 @@ class basic_csv_reader
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
+    default_parse_error_handler default_err_handler_;
+
     basic_csv_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
     std::vector<CharT,char_allocator_type> buffer_;
@@ -61,47 +63,40 @@ public:
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_content_handler<CharT>& handler)
 
-       : parser_(handler),
-         is_(is),
-         buffer_length_(default_max_buffer_length),
-         buffer_position_(0),
-         eof_(false)
+       : basic_csv_reader(is, 
+                          handler, 
+                          basic_csv_serializing_options<CharT,Allocator>(), 
+                          default_err_handler_)
     {
-        buffer_.reserve(buffer_length_);
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_content_handler<CharT>& handler,
-                     basic_csv_serializing_options<CharT,Allocator> options)
+                     const basic_csv_serializing_options<CharT,Allocator>& options)
 
-       : parser_(handler,options),
-         is_(is),
-         buffer_length_(default_max_buffer_length),
-         buffer_position_(0),
-         eof_(false)
+        : basic_csv_reader(is, 
+                           handler, 
+                           options, 
+                           default_err_handler_)
     {
-        buffer_.reserve(buffer_length_);
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler)
-       :
-         parser_(handler,err_handler),
-         is_(is),
-         buffer_length_(default_max_buffer_length),
-         buffer_position_(0),
-         eof_(false)
+        : basic_csv_reader(is, 
+                           handler, 
+                           basic_csv_serializing_options<CharT,Allocator>(), 
+                           err_handler)
     {
-        buffer_.reserve(buffer_length_);
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_content_handler<CharT>& handler,
-                     parse_error_handler& err_handler,
-                     basic_csv_serializing_options<CharT,Allocator> options)
+                     basic_csv_serializing_options<CharT,Allocator> options,
+                     parse_error_handler& err_handler)
        :
-         parser_(handler,err_handler,options),
+         parser_(handler, options, err_handler),
          is_(is),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
