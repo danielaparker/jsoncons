@@ -668,7 +668,7 @@ all_csv_states:
         }
         if (!pop_mode(csv_mode_type::initial))
         {
-            err_continue_ = handler_.fatal_error(csv_parse_errc::unexpected_eof, *this);
+            err_handler_.fatal_error(csv_parse_errc::unexpected_eof, *this);
             ec = csv_parse_errc::unexpected_eof;
             continue_ = false;
             return;
