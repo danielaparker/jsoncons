@@ -100,21 +100,21 @@ public:
     {
         switch (jval.data_type())
         {
-            case data_type_tag::null_t:
+            case data_type_tag::null_tag:
             {
                 // nil
                 action(static_cast<uint8_t>(msgpack_format::nil_cd), v);
                 break;
             }
 
-            case data_type_tag::bool_t:
+            case data_type_tag::bool_tag:
             {
                 // true and false
                 action(static_cast<uint8_t>(jval.as_bool() ? msgpack_format::true_cd : msgpack_format::false_cd),v);
                 break;
             }
 
-            case data_type_tag::integer_t:
+            case data_type_tag::int64_tag:
             {
                 int64_t val = jval.as_integer();
                 if (val >= 0)
@@ -184,7 +184,7 @@ public:
                 break;
             }
 
-        case data_type_tag::uinteger_t:
+        case data_type_tag::uint64_tag:
             {
                 uint64_t val = jval.as_uinteger();
                 if (val <= (std::numeric_limits<int8_t>::max)())
@@ -219,7 +219,7 @@ public:
                 break;
             }
 
-            case data_type_tag::double_t:
+            case data_type_tag::double_tag:
             {
                 // float 64
                 action(static_cast<uint8_t>(msgpack_format::float64_cd), v);
@@ -227,14 +227,14 @@ public:
                 break;
             }
 
-            case data_type_tag::short_string_t:
-            case data_type_tag::long_string_t:
+            case data_type_tag::short_string_tag:
+            case data_type_tag::long_string_tag:
             {
                 encode_string(jval.as_string_view(), action, v);
                 break;
             }
 
-            case data_type_tag::array_t:
+            case data_type_tag::array_tag:
             {
                 const auto length = jval.array_value().size();
                 if (length <= 15)
@@ -263,7 +263,7 @@ public:
                 break;
             }
 
-            case data_type_tag::object_t:
+            case data_type_tag::object_tag:
             {
                 const auto length = jval.object_value().size();
                 if (length <= 15)
