@@ -77,7 +77,6 @@ class basic_csv_parser : private serializing_context
     std::vector<csv_mode_type,csv_mode_allocator_type> stack_;
     basic_json_content_handler<CharT>& handler_;
     parse_error_handler& err_handler_;
-    size_t index_;
     unsigned long column_;
     unsigned long line_;
     CharT curr_char_;
@@ -95,77 +94,42 @@ class basic_csv_parser : private serializing_context
     size_t offset_;
     jsoncons::detail::string_to_double to_double_; 
     std::vector<json_decoder<json_type>> decoders_;
+    const CharT* begin_input_;
+    const CharT* input_end_;
+    const CharT* input_ptr_;
 
 public:
     basic_csv_parser(basic_json_content_handler<CharT>& handler)
-       : top_(-1),
-         stack_(default_depth),
-         handler_(handler),
-         err_handler_(default_err_handler_),
-         index_(0),
-         filter_(handler),
-         level_(0),
-         offset_(0)
+       : basic_csv_parser(handler, basic_csv_serializing_options<CharT,Allocator>(), default_err_handler_)
     {
-        depth_ = default_depth;
-        state_ = csv_state_type::start;
-        top_ = -1;
-        line_ = 1;
-        column_ = 0;
-        column_index_ = 0;
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     basic_csv_serializing_options<CharT,Allocator> options)
-       : top_(-1),
-         stack_(default_depth),
-         handler_(handler),
-         err_handler_(default_err_handler_),
-         index_(0),
-         parameters_(options),
-         filter_(handler),
-         level_(0),
-         offset_(0)
-   {
-        depth_ = default_depth;
-        state_ = csv_state_type::start;
-        top_ = -1;
-        line_ = 1;
-        column_ = 0;
-        column_index_ = 0;
+                     const basic_csv_serializing_options<CharT,Allocator>& options)
+        : basic_csv_parser(handler, options, default_err_handler_)
+    {
     }
 
     basic_csv_parser(basic_json_content_handler<CharT>& handler,
+                     parse_error_handler& err_handler)
+        : basic_csv_parser(handler, basic_csv_serializing_options<CharT,Allocator>(), err_handler)
+    {
+    }
+
+    basic_csv_parser(basic_json_content_handler<CharT>& handler,
+                     const basic_csv_serializing_options<CharT,Allocator>& options,
                      parse_error_handler& err_handler)
        : top_(-1),
          stack_(default_depth),
          handler_(handler),
          err_handler_(err_handler),
-         index_(0),
-         filter_(handler),
-         level_(0),
-         offset_(0)
-    {
-        depth_ = default_depth;
-        state_ = csv_state_type::start;
-        top_ = -1;
-        line_ = 1;
-        column_ = 0;
-        column_index_ = 0;
-    }
-
-    basic_csv_parser(basic_json_content_handler<CharT>& handler,
-                     parse_error_handler& err_handler,
-                     basic_csv_serializing_options<CharT,Allocator> options)
-       : top_(-1),
-         stack_(default_depth),
-         handler_(handler),
-         err_handler_(err_handler),
-         index_(0),
          parameters_(options),
          filter_(handler),
          level_(0),
-         offset_(0)
+         offset_(0),
+         begin_input_(nullptr),
+         input_end_(nullptr),
+         input_ptr_(nullptr)
     {
         depth_ = default_depth;
         state_ = csv_state_type::start;
@@ -182,6 +146,21 @@ public:
     bool done() const
     {
         return state_ == csv_state_type::done;
+    }
+
+    bool source_exhausted() const
+    {
+        return input_ptr_ == input_end_;
+    }
+
+    size_t line_number() const
+    {
+        return line_;
+    }
+
+    size_t column_number() const
+    {
+        return column_;
     }
 
     const std::vector<std::basic_string<CharT>>& column_labels() const
@@ -376,22 +355,23 @@ public:
         level_ = 0;
     }
 
-    void parse(const CharT* p, size_t start, size_t length)
+    void parse()
     {
         std::error_code ec;
-        parse(p, start, length, ec);
+        parse(ec);
         if (ec)
         {
             throw parse_error(ec,line_,column_);
         }
     }
 
-    void parse(const CharT* p, size_t start, size_t length, std::error_code& ec)
+    void parse(std::error_code& ec)
     {
-        index_ = start;
-        for (; index_ < length && state_ != csv_state_type::done; ++index_)
+        const CharT* local_input_end = input_end_;
+
+        for (; (input_ptr_ < local_input_end) && state_ != csv_state_type::done; ++input_ptr_)
         {
-            curr_char_ = p[index_];
+            curr_char_ = *input_ptr_;
 all_csv_states:
             switch (state_)
             {
@@ -692,9 +672,16 @@ all_csv_states:
         return state_;
     }
 
-    size_t index() const
+    void update(const string_view_type sv)
     {
-        return index_;
+        update(sv.data(),sv.length());
+    }
+
+    void update(const CharT* data, size_t length)
+    {
+        begin_input_ = data;
+        input_end_ = data + length;
+        input_ptr_ = begin_input_;
     }
 private:
 

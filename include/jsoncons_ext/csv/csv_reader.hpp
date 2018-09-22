@@ -50,7 +50,6 @@ class basic_csv_reader
     size_t buffer_length_;
     size_t buffer_position_;
     bool eof_;
-    size_t index_;
 public:
     // Structural characters
     static const size_t default_max_buffer_length = 16384;
@@ -66,8 +65,7 @@ public:
          is_(is),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         eof_(false),
-         index_(0)
+         eof_(false)
     {
         buffer_.reserve(buffer_length_);
     }
@@ -80,8 +78,7 @@ public:
          is_(is),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         eof_(false),
-         index_(0)
+         eof_(false)
     {
         buffer_.reserve(buffer_length_);
     }
@@ -94,8 +91,7 @@ public:
          is_(is),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         eof_(false),
-         index_(0)
+         eof_(false)
     {
         buffer_.reserve(buffer_length_);
     }
@@ -109,8 +105,7 @@ public:
          is_(is),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
-         eof_(false),
-         index_(0)
+         eof_(false)
     {
         buffer_.reserve(buffer_length_);
     }
@@ -121,10 +116,20 @@ public:
 
     void read()
     {
+        std::error_code ec;
+        read(ec);
+        if (ec)
+        {
+            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+        }
+    }
+
+    void read(std::error_code& ec)
+    {
         parser_.reset();
         while (!eof_ && !parser_.done())
         {
-            if (!(index_ < buffer_.size()))
+            if (parser_.source_exhausted())
             {
                 if (!is_.eof())
                 {
@@ -136,17 +141,17 @@ public:
                     {
                         eof_ = true;
                     }
-                    index_ = 0;
+                    parser_.update(buffer_.data(),buffer_.size());
                 }
                 else
                 {
+                    parser_.update(buffer_.data(),0);
                     eof_ = true;
                 }
             }
             if (!eof_)
             {
-                parser_.parse(buffer_.data(),index_,buffer_.size());
-                index_ = parser_.index();
+                parser_.parse(ec);
             }
         }
         parser_.end_parse();
@@ -202,7 +207,8 @@ Json decode_csv(typename Json::string_view_type s, const basic_csv_serializing_o
 
     basic_csv_parser<typename Json::char_type,Allocator> parser(decoder, options);
     parser.reset();
-    parser.parse(s.data(), 0, s.size());
+    parser.update(s.data(), s.size());
+    parser.parse();
     parser.end_parse();
     return decoder.get_result();
 }
