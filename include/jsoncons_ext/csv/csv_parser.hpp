@@ -552,7 +552,7 @@ all_csv_states:
                 }
                 break;
             default:
-                err_continue_ = handler_.fatal_error(csv_parse_errc::invalid_state, *this);
+                err_handler_.fatal_error(csv_parse_errc::invalid_state, *this);
                 ec = csv_parse_errc::invalid_state;
                 continue_ = false;
                 return;
@@ -847,7 +847,7 @@ private:
             }
             break;
         default:
-            err_continue_ = handler_.fatal_error(csv_parse_errc::invalid_csv_text, *this);
+            err_handler_.fatal_error(csv_parse_errc::invalid_csv_text, *this);
             ec = csv_parse_errc::invalid_csv_text;
             continue_ = false;
             return;
