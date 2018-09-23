@@ -79,7 +79,6 @@ class basic_csv_parser : private serializing_context
     parse_error_handler& err_handler_;
     unsigned long column_;
     unsigned long line_;
-    CharT curr_char_;
     CharT prev_char_;
     string_type value_buffer_;
     int depth_;
@@ -357,22 +356,21 @@ public:
         state_ = csv_state_type::expect_value;
         column_index_ = 0;
         prev_char_ = 0;
-        curr_char_ = 0;
         column_ = 1;
         level_ = 0;
     }
 
-    void parse()
+    void parse_some()
     {
         std::error_code ec;
-        parse(ec);
+        parse_some(ec);
         if (ec)
         {
             throw parse_error(ec,line_,column_);
         }
     }
 
-    void parse(std::error_code& ec)
+    void parse_some(std::error_code& ec)
     {
         const CharT* local_input_end = input_end_;
 
@@ -463,12 +461,12 @@ public:
 
         for (; (input_ptr_ < local_input_end) && continue_; ++input_ptr_)
         {
-            curr_char_ = *input_ptr_;
+            CharT curr_char = *input_ptr_;
 all_csv_states:
             switch (state_)
             {
             case csv_state_type::comment:
-                if (curr_char_ == '\n')
+                if (curr_char == '\n')
                 {
                     state_ = csv_state_type::expect_value;
                 }
@@ -479,7 +477,7 @@ all_csv_states:
                 }
                 break;
             case csv_state_type::expect_value:
-                if (column_ == 1 && curr_char_ == parameters_.comment_starter())
+                if (column_ == 1 && curr_char == parameters_.comment_starter())
                 {
                     state_ = csv_state_type::comment;
                 }
@@ -491,9 +489,9 @@ all_csv_states:
                 break;
             case csv_state_type::escaped_value: 
                 {
-                    if (curr_char_ == parameters_.quote_char())
+                    if (curr_char == parameters_.quote_char())
                     {
-                        value_buffer_.push_back(static_cast<CharT>(curr_char_));
+                        value_buffer_.push_back(static_cast<CharT>(curr_char));
                         state_ = csv_state_type::quoted_string;
                     }
                     else if (parameters_.quote_escape_char() == parameters_.quote_char())
@@ -505,25 +503,25 @@ all_csv_states:
                 break;
             case csv_state_type::quoted_string: 
                 {
-                    if (curr_char_ == parameters_.quote_escape_char())
+                    if (curr_char == parameters_.quote_escape_char())
                     {
                         state_ = csv_state_type::escaped_value;
                     }
-                    else if (curr_char_ == parameters_.quote_char())
+                    else if (curr_char == parameters_.quote_char())
                     {
                         state_ = csv_state_type::between_fields;
                     }
                     else
                     {
-                        value_buffer_.push_back(static_cast<CharT>(curr_char_));
+                        value_buffer_.push_back(static_cast<CharT>(curr_char));
                     }
                 }
                 break;
             case csv_state_type::between_fields:
-                if (prev_char_ == '\r' && curr_char_ == '\n')
+                if (prev_char_ == '\r' && curr_char == '\n')
                 {
                 }
-                else if (curr_char_ == '\r' || curr_char_ == '\n')
+                else if (curr_char == '\r' || curr_char == '\n')
                 {
                     if (parameters_.trim_leading() || parameters_.trim_trailing())
                     {
@@ -546,7 +544,7 @@ all_csv_states:
                     }
                     state_ = csv_state_type::expect_value;
                 }
-                else if (curr_char_ == parameters_.field_delimiter() || (parameters_.subfield_delimiter().second && curr_char_ == parameters_.subfield_delimiter().first))
+                else if (curr_char == parameters_.field_delimiter() || (parameters_.subfield_delimiter().second && curr_char == parameters_.subfield_delimiter().first))
                 {
                     if (column_index_ == 0 && stack_[top_] != csv_mode_type::subfields)
                     {
@@ -559,14 +557,14 @@ all_csv_states:
                     if (stack_[top_] != csv_mode_type::subfields)
                     {
                         before_field();
-                        if (parameters_.subfield_delimiter().second && curr_char_ == parameters_.subfield_delimiter().first)
+                        if (parameters_.subfield_delimiter().second && curr_char == parameters_.subfield_delimiter().first)
                         {
                             before_multi_valued_field();
                         }
                     }
                     end_quoted_string_value(ec);
                     if (ec) return;
-                    if (curr_char_ == parameters_.field_delimiter())
+                    if (curr_char == parameters_.field_delimiter())
                     {
                         after_field();
                     }
@@ -575,10 +573,10 @@ all_csv_states:
                 break;
             case csv_state_type::unquoted_string: 
                 {
-                    if (prev_char_ == '\r' && curr_char_ == '\n')
+                    if (prev_char_ == '\r' && curr_char == '\n')
                     {
                     }
-                    else if (curr_char_ == '\r' || curr_char_ == '\n')
+                    else if (curr_char == '\r' || curr_char == '\n')
                     {
                         if (parameters_.trim_leading() || parameters_.trim_trailing())
                         {
@@ -600,7 +598,7 @@ all_csv_states:
                         }
                         state_ = csv_state_type::expect_value;
                     }
-                    else if (curr_char_ == parameters_.field_delimiter() || (parameters_.subfield_delimiter().second && curr_char_ == parameters_.subfield_delimiter().first))
+                    else if (curr_char == parameters_.field_delimiter() || (parameters_.subfield_delimiter().second && curr_char == parameters_.subfield_delimiter().first))
                     {
                         if (column_index_ == 0 && stack_[top_] != csv_mode_type::subfields)
                         {
@@ -613,26 +611,26 @@ all_csv_states:
                         if (stack_[top_] != csv_mode_type::subfields)
                         {
                             before_field();
-                            if (parameters_.subfield_delimiter().second && curr_char_ == parameters_.subfield_delimiter().first)
+                            if (parameters_.subfield_delimiter().second && curr_char == parameters_.subfield_delimiter().first)
                             {
                                 before_multi_valued_field();
                             }
                         }
                         end_unquoted_string_value();
-                        if (curr_char_ == parameters_.field_delimiter())
+                        if (curr_char == parameters_.field_delimiter())
                         {
                             after_field();
                         }
                         state_ = csv_state_type::unquoted_string;
                     }
-                    else if (curr_char_ == parameters_.quote_char())
+                    else if (curr_char == parameters_.quote_char())
                     {
                         value_buffer_.clear();
                         state_ = csv_state_type::quoted_string;
                     }
                     else
                     {
-                        value_buffer_.push_back(static_cast<CharT>(curr_char_));
+                        value_buffer_.push_back(static_cast<CharT>(curr_char));
                     }
                 }
                 break;
@@ -647,7 +645,7 @@ all_csv_states:
                 state_ = csv_state_type::done;
                 continue_ = false;
             }
-            switch (curr_char_)
+            switch (curr_char)
             {
             case '\r':
                 ++line_;
@@ -664,7 +662,7 @@ all_csv_states:
                 ++column_;
                 break;
             }
-            prev_char_ = curr_char_;
+            prev_char_ = curr_char;
         }
     }
 
@@ -680,87 +678,10 @@ all_csv_states:
 
     void end_parse(std::error_code& ec)
     {
-        switch (state_)
+        while (continue_)
         {
-        case csv_state_type::unquoted_string: 
-            if (parameters_.trim_leading() || parameters_.trim_trailing())
-            {
-                trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
-            }
-            if (!parameters_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
-            {
-                if (column_index_ == 0)
-                {
-                    before_record();
-                }
-                if (stack_[top_] != csv_mode_type::subfields)
-                {
-                    before_field();
-                }
-                end_unquoted_string_value();
-                after_field();
-            }
-            break;
-        case csv_state_type::escaped_value:
-            if (parameters_.quote_escape_char() == parameters_.quote_char())
-            {
-                if (column_index_ == 0)
-                {
-                    before_record();
-                }
-                if (stack_[top_] != csv_mode_type::subfields)
-                {
-                    before_field();
-                }
-                end_quoted_string_value(ec);
-                if (ec) return;
-                after_field();
-            }
-            break;
-        default:
-            break;
+            parse_some(ec);
         }
-        if (column_index_ > 0)
-        {
-            after_record();
-        }
-        switch (stack_[top_])
-        {
-        case csv_mode_type::header:
-            pop_mode(csv_mode_type::header);
-            break;
-        case csv_mode_type::data:
-            pop_mode(csv_mode_type::data);
-            break;
-        default:
-            break;
-        }
-        if (parameters_.mapping() == mapping_type::m_columns)
-        {
-            basic_json_fragment_filter<CharT> fragment_filter(handler_);
-            continue_ = handler_.begin_object(*this);
-            for (size_t i = 0; i < column_names_.size(); ++i)
-            {
-                continue_ = handler_.name(column_names_[i],*this);
-                decoders_[i].end_array(*this);
-                decoders_[i].end_document();
-                decoders_[i].get_result().dump_fragment(fragment_filter);
-            }
-            continue_ = handler_.end_object(*this);
-        }
-        else
-        {
-            continue_ = handler_.end_array(*this);
-        }
-        if (!pop_mode(csv_mode_type::initial))
-        {
-            err_handler_.fatal_error(csv_parse_errc::unexpected_eof, *this);
-            ec = csv_parse_errc::unexpected_eof;
-            continue_ = false;
-            return;
-        }
-        continue_ = handler_.end_document();
-        continue_ = false;
     }
 
     csv_state_type state() const

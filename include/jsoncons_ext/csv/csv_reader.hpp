@@ -144,10 +144,9 @@ public:
                     eof_ = true;
                 }
             }
-            parser_.parse(ec);
+            parser_.parse_some(ec);
             if (ec) return;
         }
-        //parser_.end_parse();
     }
 
     bool eof() const
@@ -201,7 +200,7 @@ Json decode_csv(typename Json::string_view_type s, const basic_csv_serializing_o
     basic_csv_parser<typename Json::char_type,Allocator> parser(decoder, options);
     parser.reset();
     parser.update(s.data(), s.size());
-    parser.parse();
+    parser.parse_some();
     parser.end_parse();
     return decoder.get_result();
 }
