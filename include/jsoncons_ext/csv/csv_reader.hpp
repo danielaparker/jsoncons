@@ -122,7 +122,7 @@ public:
     void read(std::error_code& ec)
     {
         parser_.reset();
-        while (!eof_ && !parser_.done())
+        while (!eof_ && !parser_.stopped())
         {
             if (parser_.source_exhausted())
             {
@@ -147,6 +147,7 @@ public:
             if (!eof_)
             {
                 parser_.parse(ec);
+                if (ec) return;
             }
         }
         parser_.end_parse();

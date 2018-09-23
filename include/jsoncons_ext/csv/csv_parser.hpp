@@ -376,7 +376,7 @@ public:
     {
         const CharT* local_input_end = input_end_;
 
-        for (; (input_ptr_ < local_input_end) && state_ != csv_state_type::done; ++input_ptr_)
+        for (; (input_ptr_ < local_input_end) && continue_; ++input_ptr_)
         {
             curr_char_ = *input_ptr_;
 all_csv_states:
@@ -560,6 +560,7 @@ all_csv_states:
             if (line_ > parameters_.max_lines())
             {
                 state_ = csv_state_type::done;
+                continue_ = false;
             }
             switch (curr_char_)
             {
