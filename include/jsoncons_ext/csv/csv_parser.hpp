@@ -376,6 +376,91 @@ public:
     {
         const CharT* local_input_end = input_end_;
 
+        if (input_ptr_ == local_input_end && continue_)
+        {
+            switch (state_)
+            {
+            case csv_state_type::unquoted_string: 
+                if (parameters_.trim_leading() || parameters_.trim_trailing())
+                {
+                    trim_string_buffer(parameters_.trim_leading(),parameters_.trim_trailing());
+                }
+                if (!parameters_.ignore_empty_lines() || (column_index_ > 0 || value_buffer_.length() > 0))
+                {
+                    if (column_index_ == 0)
+                    {
+                        before_record();
+                    }
+                    if (stack_[top_] != csv_mode_type::subfields)
+                    {
+                        before_field();
+                    }
+                    end_unquoted_string_value();
+                    after_field();
+                }
+                break;
+            case csv_state_type::escaped_value:
+                if (parameters_.quote_escape_char() == parameters_.quote_char())
+                {
+                    if (column_index_ == 0)
+                    {
+                        before_record();
+                    }
+                    if (stack_[top_] != csv_mode_type::subfields)
+                    {
+                        before_field();
+                    }
+                    end_quoted_string_value(ec);
+                    if (ec) return;
+                    after_field();
+                }
+                break;
+            default:
+                break;
+            }
+            if (column_index_ > 0)
+            {
+                after_record();
+            }
+            switch (stack_[top_])
+            {
+            case csv_mode_type::header:
+                pop_mode(csv_mode_type::header);
+                break;
+            case csv_mode_type::data:
+                pop_mode(csv_mode_type::data);
+                break;
+            default:
+                break;
+            }
+            if (parameters_.mapping() == mapping_type::m_columns)
+            {
+                basic_json_fragment_filter<CharT> fragment_filter(handler_);
+                continue_ = handler_.begin_object(*this);
+                for (size_t i = 0; i < column_names_.size(); ++i)
+                {
+                    continue_ = handler_.name(column_names_[i],*this);
+                    decoders_[i].end_array(*this);
+                    decoders_[i].end_document();
+                    decoders_[i].get_result().dump_fragment(fragment_filter);
+                }
+                continue_ = handler_.end_object(*this);
+            }
+            else
+            {
+                continue_ = handler_.end_array(*this);
+            }
+            if (!pop_mode(csv_mode_type::initial))
+            {
+                err_handler_.fatal_error(csv_parse_errc::unexpected_eof, *this);
+                ec = csv_parse_errc::unexpected_eof;
+                continue_ = false;
+                return;
+            }
+            continue_ = handler_.end_document();
+            continue_ = false;
+        }
+
         for (; (input_ptr_ < local_input_end) && continue_; ++input_ptr_)
         {
             curr_char_ = *input_ptr_;
@@ -675,6 +760,7 @@ all_csv_states:
             return;
         }
         continue_ = handler_.end_document();
+        continue_ = false;
     }
 
     csv_state_type state() const
