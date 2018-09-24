@@ -139,6 +139,17 @@ T * to_plain_pointer(T * ptr)
     return (ptr);
 }  
 
+// has_char_traits_member_type
+
+template <class T, class Enable=void>
+struct has_char_traits_member_type : std::false_type {};
+
+template <class T>
+struct has_char_traits_member_type<T, 
+                                   typename std::enable_if<std::is_same<typename T::traits_type,std::char_traits<typename T::value_type>>::value
+>::type> : std::true_type {};
+
+
 // is_string_like
 
 template <class T, class Enable=void>
@@ -146,7 +157,7 @@ struct is_string_like : std::false_type {};
 
 template <class T>
 struct is_string_like<T, 
-                      typename std::enable_if<!std::is_void<typename T::traits_type>::value && !std::is_void<typename T::allocator_type>::value
+                      typename std::enable_if<has_char_traits_member_type<T>::value && !std::is_void<typename T::allocator_type>::value
 >::type> : std::true_type {};
 
 // is_string_view_like
@@ -156,7 +167,7 @@ struct is_string_view_like : std::false_type {};
 
 template <class T>
 struct is_string_view_like<T, 
-                      typename std::enable_if<!std::is_void<typename T::traits_type>::value && !is_string_like<T>::value
+                      typename std::enable_if<has_char_traits_member_type<T>::value && !is_string_like<T>::value
 >::type> : std::true_type {};
 
 // is_integer_like

@@ -32,7 +32,7 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
             std::cout << "v: ";
             for (auto b : v)
             {
-                std::cout << (int)b;
+                std::cout << "0x" << std::hex << (int)b;
             }
             std::cout << "\n";
             std::cout << "expected: " << expected << "\n";
