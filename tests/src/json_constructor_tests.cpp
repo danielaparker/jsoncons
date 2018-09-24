@@ -19,5 +19,6 @@ TEST_CASE("json(jsoncons::basic_string_view)")
     json j(sv);
 
     CHECK(j.as<json::string_view_type>() == sv);
+    CHECK(j.as_string_view() == sv);
 }
 

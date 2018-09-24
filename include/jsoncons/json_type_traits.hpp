@@ -73,6 +73,17 @@ struct is_compatible_string_type<Json,T,
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
+// is_compatible_string_view_type
+template<class Json, class T, class Enable=void>
+struct is_compatible_string_view_type : std::false_type {};
+
+template<class Json, class T>
+struct is_compatible_string_view_type<Json,T, 
+    typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
+    detail::is_string_view_like<T>::value && 
+    !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
+>::type> : std::true_type {};
+
 // is_compatible_array_type
 template<class Json, class T, class Enable=void>
 struct is_compatible_array_type : std::false_type {};
@@ -622,6 +633,33 @@ struct json_type_traits<Json, T,
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
                         typename std::enable_if<detail::is_compatible_string_type<Json,T>::value>::type>
+{
+    typedef typename Json::allocator_type allocator_type;
+
+    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    {
+        return j.is_string();
+    }
+
+    static T as(const Json& j)
+    {
+   	    return T(j.as_string());
+    }
+
+    static Json to_json(const T& val)
+    {
+        return Json(typename Json::variant(val.data(), val.size()));
+    }
+
+    static Json to_json(const T& val, const allocator_type& allocator)
+    {
+        return Json(typename Json::variant(val.data(),val.size(),allocator));
+    }
+};
+
+template<class Json, typename T>
+struct json_type_traits<Json, T, 
+                        typename std::enable_if<detail::is_compatible_string_view_type<Json,T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
