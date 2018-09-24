@@ -27,6 +27,18 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 
         json result = decoder.get_result();
 
+        if (!(expected == result))
+        {
+            std::cout << "v: ";
+            for (auto b : v)
+            {
+                std::cout << (int)b;
+            }
+            std::cout << "\n";
+            std::cout << "expected: " << expected << "\n";
+            std::cout << "result: " << result << "\n";
+        }
+
         REQUIRE(expected == result);
     }
     catch (const std::exception& e)
