@@ -180,11 +180,11 @@ double decode_half(uint16_t half)
     double val;
     if (exp == 0) 
     {
-        val = ldexp(mant, -24);
+        val = ldexp((double)mant, -24);
     }
     else if (exp != 31) 
     {
-        val = ldexp(mant + 1024, exp - 25);
+        val = ldexp(mant + 1024.0, exp - 25);
     } 
     else
     {
