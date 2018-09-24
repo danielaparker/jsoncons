@@ -624,7 +624,6 @@ struct json_type_traits<Json, T,
                         typename std::enable_if<detail::is_compatible_string_type<Json,T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
-	typedef typename T::allocator_type string_allocator_type;
 
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
@@ -633,7 +632,7 @@ struct json_type_traits<Json, T,
 
     static T as(const Json& j)
     {
-   	    return j.as_string();
+   	    return T(j.as_string_view());
     }
 
     static Json to_json(const T& val)
