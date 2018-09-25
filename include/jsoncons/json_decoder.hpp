@@ -121,7 +121,12 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = Json(object(object_allocator_));
                 break;
+            case structure_type::array_t:
+                stack_.push_back(Json(object(object_allocator_)));
+                break;
             default:
+                stack_.clear();
+                is_valid_ = false;
                 stack_.push_back(Json(object(object_allocator_)));
                 break;
         }
@@ -147,7 +152,12 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = Json(array(array_allocator_));
                 break;
+            case structure_type::array_t:
+                stack_.push_back(Json(array(array_allocator_)));
+                break;
             default:
+                stack_.clear();
+                is_valid_ = false;
                 stack_.push_back(Json(array(array_allocator_)));
                 break;
         }
@@ -168,19 +178,11 @@ private:
 
     bool do_begin_document() override
     {
-        stack_.clear();
-        is_valid_ = false;
         return true;
     }
 
     bool do_end_document() override
     {
-        if (stack_.size() == 1)
-        {
-            //result_.swap(stack_.front().value_);
-            //stack_.pop_back();
-            //is_valid_ = true;
-        }
         return true;
     }
 
@@ -388,9 +390,7 @@ private:
                 stack_.push_back(Json(Json::null()));
                 break;
             default:
-                stack_.push_back(Json(Json::null()));
-                result_.swap(stack_.front().value_);
-                stack_.pop_back();
+                result_ = Json(Json::null());
                 is_valid_ = true;
                 break;
         }
