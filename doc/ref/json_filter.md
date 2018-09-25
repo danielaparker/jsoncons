@@ -30,8 +30,8 @@ You must ensure that the `handler` exists as long as does `json_filter`, as `jso
 
 #### Accessors
 
-    json_content_handler& downstream_handler()
-Returns a reference to the JSON handler that sends json events to downstream handlers. 
+    json_content_handler& destination_handler()
+Returns a reference to the JSON handler that sends json events to a destination handler. 
 
 ### Examples
 
@@ -122,7 +122,7 @@ private:
         member_name_ = name;
         if (member_name_ != "name")
         {
-            this->downstream_handler().write_name(name, context);
+            this->destination_handler().write_name(name, context);
         }
         return true;
     }
@@ -134,14 +134,14 @@ private:
         {
             size_t end_first = val.find_first_of(" \t");
             size_t start_last = val.find_first_not_of(" \t", end_first);
-            this->downstream_handler().write_name("first-name", context);
+            this->destination_handler().write_name("first-name", context);
             string_view_type first = val.substr(0, end_first);
-            this->downstream_handler().value(first, context);
+            this->destination_handler().value(first, context);
             if (start_last != string_view_type::npos)
             {
-                this->downstream_handler().write_name("last-name", context);
+                this->destination_handler().write_name("last-name", context);
                 string_view_type last = val.substr(start_last);
-                this->downstream_handler().value(last, context);
+                this->destination_handler().value(last, context);
             }
             else
             {
@@ -152,7 +152,7 @@ private:
         }
         else
         {
-            this->downstream_handler().value(s, context);
+            this->destination_handler().value(s, context);
         }
         return true;
     }

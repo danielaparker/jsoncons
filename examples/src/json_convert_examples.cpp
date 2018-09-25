@@ -120,7 +120,6 @@ void streaming_example2()
     std::cout << "\n\n";
 }
 
-
 void streaming_example3()
 {
     std::vector<std::shared_ptr<Employee>> employees; 

@@ -20,116 +20,121 @@ class basic_json_filter : public basic_json_content_handler<CharT>
 public:
     using typename basic_json_content_handler<CharT>::string_view_type                                 ;
 private:
-    basic_json_content_handler<CharT>& downstream_handler_;
+    basic_json_content_handler<CharT>& destination_handler_;
 
     // noncopyable and nonmoveable
     basic_json_filter<CharT>(const basic_json_filter<CharT>&) = delete;
     basic_json_filter<CharT>& operator=(const basic_json_filter<CharT>&) = delete;
 public:
     basic_json_filter(basic_json_content_handler<CharT>& handler)
-        : downstream_handler_(handler)
+        : destination_handler_(handler)
     {
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     basic_json_content_handler<CharT>& input_handler()
     {
-        return downstream_handler_;
+        return destination_handler_;
     }
-#endif
 
     basic_json_content_handler<CharT>& downstream_handler()
     {
-        return downstream_handler_;
+        return destination_handler_;
+    }
+#endif
+
+    basic_json_content_handler<CharT>& destination_handler()
+    {
+        return destination_handler_;
     }
 
 private:
     void do_flush() override
     {
-        downstream_handler_.flush();
+        destination_handler_.flush();
     }
 
     bool do_begin_object(const serializing_context& context) override
     {
-        return downstream_handler_.begin_object(context);
+        return destination_handler_.begin_object(context);
     }
 
     bool do_begin_object(size_t length, const serializing_context& context) override
     {
-        return downstream_handler_.begin_object(length, context);
+        return destination_handler_.begin_object(length, context);
     }
 
     bool do_end_object(const serializing_context& context) override
     {
-        return downstream_handler_.end_object(context);
+        return destination_handler_.end_object(context);
     }
 
     bool do_begin_array(const serializing_context& context) override
     {
-        return downstream_handler_.begin_array(context);
+        return destination_handler_.begin_array(context);
     }
 
     bool do_begin_array(size_t length, const serializing_context& context) override
     {
-        return downstream_handler_.begin_array(length, context);
+        return destination_handler_.begin_array(length, context);
     }
 
     bool do_end_array(const serializing_context& context) override
     {
-        return downstream_handler_.end_array(context);
+        return destination_handler_.end_array(context);
     }
 
     bool do_name(const string_view_type& name,
                  const serializing_context& context) override
     {
-        return downstream_handler_.name(name,context);
+        return destination_handler_.name(name,context);
     }
 
     bool do_string_value(const string_view_type& value,
                          const serializing_context& context) override
     {
-        return downstream_handler_.string_value(value,context);
+        return destination_handler_.string_value(value,context);
     }
 
     bool do_byte_string_value(const uint8_t* data, size_t length,
                               const serializing_context& context) override
     {
-        return downstream_handler_.byte_string_value(data, length, context);
+        return destination_handler_.byte_string_value(data, length, context);
     }
 
     bool do_bignum_value(const string_view_type& value,
                          const serializing_context& context) override
     {
-        return downstream_handler_.bignum_value(value, context);
+        return destination_handler_.bignum_value(value, context);
     }
 
     bool do_double_value(double value, const floating_point_options& fmt,
                          const serializing_context& context) override
     {
-        return downstream_handler_.double_value(value, fmt, context);
+        return destination_handler_.double_value(value, fmt, context);
     }
 
     bool do_int64_value(int64_t value,
                           const serializing_context& context) override
     {
-        return downstream_handler_.int64_value(value,context);
+        return destination_handler_.int64_value(value,context);
     }
 
     bool do_uint64_value(uint64_t value,
                            const serializing_context& context) override
     {
-        return downstream_handler_.uint64_value(value,context);
+        return destination_handler_.uint64_value(value,context);
     }
 
     bool do_bool(bool value,
                        const serializing_context& context) override
     {
-        return downstream_handler_.bool_value(value,context);
+        return destination_handler_.bool_value(value,context);
     }
 
     bool do_null_value(const serializing_context& context) override
     {
-        return downstream_handler_.null_value(context);
+        return destination_handler_.null_value(context);
     }
 
 };
@@ -175,11 +180,11 @@ private:
     {
         if (name == name_)
         {
-            return this->downstream_handler().name(new_name_,context);
+            return this->destination_handler().name(new_name_,context);
         }
         else
         {
-            return this->downstream_handler().name(name,context);
+            return this->destination_handler().name(name,context);
         }
     }
 };
@@ -190,56 +195,56 @@ class basic_utf8_adaptor : public basic_json_content_handler<char>
 public:
     using typename basic_json_content_handler<char>::string_view_type;
 private:
-    basic_json_content_handler<CharT>& downstream_handler_;
+    basic_json_content_handler<CharT>& destination_handler_;
 
     // noncopyable and nonmoveable
     basic_utf8_adaptor<CharT>(const basic_utf8_adaptor<CharT>&) = delete;
     basic_utf8_adaptor<CharT>& operator=(const basic_utf8_adaptor<CharT>&) = delete;
 public:
     basic_utf8_adaptor(basic_json_content_handler<CharT>& handler)
-        : downstream_handler_(handler)
+        : destination_handler_(handler)
     {
     }
 
-    basic_json_content_handler<CharT>& downstream_handler()
+    basic_json_content_handler<CharT>& destination_handler()
     {
-        return downstream_handler_;
+        return destination_handler_;
     }
 
 private:
     void do_flush() override
     {
-        downstream_handler_.flush();
+        destination_handler_.flush();
     }
 
     bool do_begin_object(const serializing_context& context) override
     {
-        return downstream_handler_.begin_object(context);
+        return destination_handler_.begin_object(context);
     }
 
     bool do_begin_object(size_t length, const serializing_context& context) override
     {
-        return downstream_handler_.begin_object(length, context);
+        return destination_handler_.begin_object(length, context);
     }
 
     bool do_end_object(const serializing_context& context) override
     {
-        return downstream_handler_.end_object(context);
+        return destination_handler_.end_object(context);
     }
 
     bool do_begin_array(const serializing_context& context) override
     {
-        return downstream_handler_.begin_array(context);
+        return destination_handler_.begin_array(context);
     }
 
     bool do_begin_array(size_t length, const serializing_context& context) override
     {
-        return downstream_handler_.begin_array(length, context);
+        return destination_handler_.begin_array(length, context);
     }
 
     bool do_end_array(const serializing_context& context) override
     {
-        return downstream_handler_.end_array(context);
+        return destination_handler_.end_array(context);
     }
 
     bool do_name(const string_view_type& name,
@@ -251,7 +256,7 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        return downstream_handler().name(target,context);
+        return destination_handler().name(target,context);
     }
 
     bool do_string_value(const string_view_type& value,
@@ -263,13 +268,13 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        return downstream_handler().string_value(target,context);
+        return destination_handler().string_value(target,context);
     }
 
     bool do_byte_string_value(const uint8_t* data, size_t length,
                               const serializing_context& context) override
     {
-        return downstream_handler_.byte_string_value(data, length, context);
+        return destination_handler_.byte_string_value(data, length, context);
     }
 
     bool do_bignum_value(const string_view_type& value,
@@ -281,36 +286,36 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        return downstream_handler_.bignum_value(target, context);
+        return destination_handler_.bignum_value(target, context);
     }
 
     bool do_double_value(double value, const floating_point_options& fmt,
                          const serializing_context& context) override
     {
-        return downstream_handler_.double_value(value, fmt, context);
+        return destination_handler_.double_value(value, fmt, context);
     }
 
     bool do_int64_value(int64_t value,
                           const serializing_context& context) override
     {
-        return downstream_handler_.int64_value(value,context);
+        return destination_handler_.int64_value(value,context);
     }
 
     bool do_uint64_value(uint64_t value,
                            const serializing_context& context) override
     {
-        return downstream_handler_.uint64_value(value,context);
+        return destination_handler_.uint64_value(value,context);
     }
 
     bool do_bool(bool value,
                        const serializing_context& context) override
     {
-        return downstream_handler_.bool_value(value,context);
+        return destination_handler_.bool_value(value,context);
     }
 
     bool do_null_value(const serializing_context& context) override
     {
-        return downstream_handler_.null_value(context);
+        return destination_handler_.null_value(context);
     }
 
 };

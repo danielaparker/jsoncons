@@ -213,5 +213,5 @@ line and column information is provided in the [context](serializing_context.md)
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual void do_flush() = 0;
-Flushes whatever is buffered to the destination.
+Allows producers of json events to flush whatever they've buffered.
 

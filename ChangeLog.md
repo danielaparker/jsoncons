@@ -1,27 +1,66 @@
 master
 ------
 
-- Changes to streaming API
+### New features
 
-The next release will include a JSON pull parser, `json_event_reader`.
+- A JSON pull parser, `json_event_reader`, has been added. This 
+  required a change to the `json_content_handler` function signatures,
+  the return values has been changed to bool, to indicate whether 
+  parsing is to continue.    
 
-To facilitate this, the `json_content_handler` function signatures have been 
-changed to return a bool value, to indicate whether parsing is to continue. 
+### Changes to `json_content_handler` and related streaming classes
 
-And while we're at it:
+#### Non-breaking changes
+
+These changes apply to users that call the public functions defined by
+`json_content_handler`, e.g. begin_object, end_object, etc., but are
+non-breaking because the old function signatures, while deprecated,
+have been preserved. 
+
+- The public functions defined by `json_content_handler` have been changed 
+  to return a bool value, to indicate whether parsing is to continue.
 
 - The function names `integer_value` and `uinteger_value` have been 
-  changed to `int64_value` and `uint64_value`, and the function names 
-  `do_integer_value` and `do_uinteger_value` have been changed to 
-  `int64_value` and `uint64_value`.
-- The signature of `do_bignum` has been changed to 
+  changed to `int64_value` and `uint64_value`.
+
+- The function names `begin_document` and `end_document` have been 
+  deprecated. The deprecated `begin_document` does nothing, and the 
+  deprecated `end_document` calls `do_flush`.
+
+- The function `flush` has been added, which calls `do_flush`.
+
+- The `json` member function `dump_fragment` has been deprecated, as with
+  the dropping of `begin_document` and `end_document`, it is now
+  equivalent to `dump`. 
+
+- The function `encode_fragment` has been deprecated, as with
+  the dropping of `begin_document` and `end_document`, it is now
+  equivalent to `encode_json`. 
+
+- The `json_filter` member function `downstream_handler` has been
+  renamed to `destination_handler`.
+
+#### Breaking changes
+
+These changes will affect users who have written classes that implement
+all or part of `json_content_handler`, including extensions to `json_filter`.
+
+- The virtual functions defined for `json_content_handler`, `do_begin_object`,
+  `do_end_object`, etc. have been changed to return a bool value, to indicate 
+  whether serializing or deserializing is to continue. 
+
+- The virtual functions `do_begin_document` and `do_end_document` have been removed.
+  A virtual function `do_flush` has been added to allow producers of json events to 
+  flush whatever they've buffered.
+
+- The function names `do_integer_value` and `do_uinteger_value` have been changed to 
+  `do_int64_value` and `do_uint64_value`.
+
+- The signature of `do_bignum_value` has been changed to 
 ```
     bool do_bignum_value(const string_view_type& value, 
                          const serializing_context& context)
 ```
-For the virtual `do_` functions, this is a breaking change. For the non-virtual 
-functions `integer_value` and `uinteger_value`, this is a non breaking change, 
-the old signatures have been deprecated but preserved.
 
 v0.109.0
 --------

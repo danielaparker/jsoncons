@@ -65,19 +65,19 @@ public:
     {
         if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
         {
-            this->downstream_handler().double_value(std::nan(""), context);
+            this->destination_handler().double_value(std::nan(""), context);
         }
         else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
         {
-            this->downstream_handler().double_value(std::numeric_limits<double>::infinity(), context);
+            this->destination_handler().double_value(std::numeric_limits<double>::infinity(), context);
         }
         else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
         {
-            this->downstream_handler().double_value(-std::numeric_limits<double>::infinity(), context);
+            this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), context);
         }
         else
         {
-            this->downstream_handler().string_value(s, context);
+            this->destination_handler().string_value(s, context);
         }
         return true;
     }
