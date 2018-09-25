@@ -2797,7 +2797,7 @@ public:
                     for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                     {
                         handler.name(string_view_type((it->key()).data(),it->key().length()));
-                        it->value().dump_fragment(handler);
+                        it->value().dump(handler);
                     }
                     handler.end_object();
                 }
@@ -2808,7 +2808,7 @@ public:
                     const array& o = array_value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {
-                        it->dump_fragment(handler);
+                        it->dump(handler);
                     }
                     handler.end_array();
                 }

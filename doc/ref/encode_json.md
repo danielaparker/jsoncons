@@ -131,7 +131,7 @@ int main()
 
     serializer.begin_object();       
     serializer.write_name("Employees");       
-    encode_fragment(employees, serializer);
+    encode_json(employees, serializer);
     serializer.end_object();       
     serializer.flush();       
 }

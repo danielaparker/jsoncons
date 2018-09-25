@@ -238,11 +238,13 @@ void encode_json(const T& val, basic_json_content_handler<CharT>& handler)
     handler.flush();
 }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
 template <class T, class CharT>
 void encode_fragment(const T& val, basic_json_content_handler<CharT>& handler)
 {
     json_convert_traits<T>::encode(val,handler);
 }
+#endif
 
 template <class T, class CharT>
 void encode_json(const T& val, std::basic_ostream<CharT>& os)

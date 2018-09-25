@@ -113,7 +113,7 @@ void streaming_example2()
 
     serializer.begin_object();       
     serializer.name("Employees");       
-    encode_fragment(employees, serializer);
+    encode_json(employees, serializer);
     serializer.end_object();       
     serializer.flush();       
 

@@ -138,11 +138,11 @@ int main()
     serializer.begin_array();
     for (const auto& book : some_books.array_range())
     {
-        book.dump_fragment(serializer);
+        book.dump(serializer);
     }
     for (const auto& book : more_books.array_range())
     {
-        book.dump_fragment(serializer);
+        book.dump(serializer);
     }
     serializer.end_array();
     serializer.flush();
