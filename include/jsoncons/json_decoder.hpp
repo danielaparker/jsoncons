@@ -89,8 +89,9 @@ public:
           is_valid_(false) 
 
     {
-        stack_offsets_.reserve(100);
         stack_.reserve(1000);
+        stack_offsets_.reserve(100);
+        stack_offsets_.push_back({0,structure_type::root_t});
     }
 
     bool is_valid() const
@@ -155,9 +156,7 @@ private:
 
     bool do_begin_document() override
     {
-        stack_offsets_.clear();
         stack_.clear();
-        stack_offsets_.push_back({0,structure_type::root_t});
         is_valid_ = false;
         return true;
     }
