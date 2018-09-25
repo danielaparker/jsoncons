@@ -8,6 +8,8 @@ master
   the return values has been changed to bool, to indicate whether 
   parsing is to continue.    
 
+- `json_parser` has new member function `stopped()`. 
+
 ### Changes to `json_content_handler` and related streaming classes
 
 #### Non-breaking changes
@@ -15,7 +17,10 @@ master
 These changes apply to users that call the public functions defined by
 `json_content_handler`, e.g. begin_object, end_object, etc., but are
 non-breaking because the old function signatures, while deprecated,
-have been preserved. 
+have been preserved. Going forward, however, users should remove
+calls to `begin_document`, replace `end_document` with `flush`,
+and replace `integer_value` and `end_integer_value` with `int64_value`
+and `uint64_value`.
 
 - The public functions defined by `json_content_handler` have been changed 
   to return a bool value, to indicate whether parsing is to continue.
