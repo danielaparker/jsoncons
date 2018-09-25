@@ -132,6 +132,12 @@ private:
     {
         stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
         stack_offsets_.pop_back();
+        if (stack_.size() == 1)
+        {
+            result_.swap(stack_.front().value_);
+            stack_.pop_back();
+            is_valid_ = true;
+        }
     }
 
     void push_array()
@@ -152,6 +158,12 @@ private:
     {
         stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
         stack_offsets_.pop_back();
+        if (stack_.size() == 1)
+        {
+            result_.swap(stack_.front().value_);
+            stack_.pop_back();
+            is_valid_ = true;
+        }
     }
 
     bool do_begin_document() override
@@ -165,9 +177,9 @@ private:
     {
         if (stack_.size() == 1)
         {
-            result_.swap(stack_.front().value_);
-            stack_.pop_back();
-            is_valid_ = true;
+            //result_.swap(stack_.front().value_);
+            //stack_.pop_back();
+            //is_valid_ = true;
         }
         return true;
     }
@@ -245,8 +257,12 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = Json(val.data(),val.length(),string_allocator_);
                 break;
-            default:
+            case structure_type::array_t:
                 stack_.push_back(Json(val.data(),val.length(),string_allocator_));
+                break;
+            default:
+                result_ = Json(val.data(),val.length(),string_allocator_);
+                is_valid_ = true;
                 break;
         }
         return true;
@@ -257,10 +273,14 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(byte_string_view(data,length),string_allocator_);
+                stack_.back().value_ = Json(byte_string_view(data,length),byte_allocator_);
+                break;
+            case structure_type::array_t:
+                stack_.push_back(Json(byte_string_view(data,length),byte_allocator_));
                 break;
             default:
-                stack_.push_back(Json(byte_string_view(data,length),string_allocator_));
+                result_ = Json(byte_string_view(data,length),byte_allocator_);
+                is_valid_ = true;
                 break;
         }
         return true;
@@ -274,8 +294,12 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = Json(n);
                 break;
-            default:
+            case structure_type::array_t:
                 stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(value.data(), value.length())));
+                break;
+            default:
+                result_ = Json(basic_bignum<json_byte_allocator_type>(value.data(), value.length()));
+                is_valid_ = true;
                 break;
         }
         return true;
@@ -288,8 +312,12 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = value;
                 break;
-            default:
+            case structure_type::array_t:
                 stack_.push_back(Json(value));
+                break;
+            default:
+                result_ = Json(value);
+                is_valid_ = true;
                 break;
         }
         return true;
@@ -302,8 +330,12 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = value;
                 break;
-            default:
+            case structure_type::array_t:
                 stack_.push_back(Json(value));
+                break;
+            default:
+                result_ = Json(value);
+                is_valid_ = true;
                 break;
         }
         return true;
@@ -316,8 +348,12 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = Json(value, fmt);
                 break;
-            default:
+            case structure_type::array_t:
                 stack_.push_back(Json(value, fmt));
+                break;
+            default:
+                result_ = Json(value, fmt);
+                is_valid_ = true;
                 break;
         }
         return true;
@@ -330,8 +366,12 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = value;
                 break;
-            default:
+            case structure_type::array_t:
                 stack_.push_back(Json(value));
+                break;
+            default:
+                result_ = Json(value);
+                is_valid_ = true;
                 break;
         }
         return true;
@@ -344,8 +384,14 @@ private:
             case structure_type::object_t:
                 stack_.back().value_ = Json::null();
                 break;
+            case structure_type::array_t:
+                stack_.push_back(Json(Json::null()));
+                break;
             default:
                 stack_.push_back(Json(Json::null()));
+                result_.swap(stack_.front().value_);
+                stack_.pop_back();
+                is_valid_ = true;
                 break;
         }
         return true;
