@@ -114,7 +114,17 @@ public:
 
 private:
 
-    void push_object()
+    bool do_begin_document() override
+    {
+        return true;
+    }
+
+    bool do_end_document() override
+    {
+        return true;
+    }
+
+    bool do_begin_object(const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -128,24 +138,20 @@ private:
                 stack_.clear();
                 is_valid_ = false;
                 stack_.push_back(Json(object(object_allocator_)));
+                result_ = Json(object(object_allocator_));
                 break;
         }
         stack_offsets_.push_back({stack_.size()-1,structure_type::object_t});
+        return true;
     }
 
-    void pop_object()
+    bool do_end_object(const serializing_context&) override
     {
-        stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
-        stack_offsets_.pop_back();
-        if (stack_.size() == 1)
-        {
-            result_.swap(stack_.front().value_);
-            stack_.pop_back();
-            is_valid_ = true;
-        }
+        end_structure();
+        return true;
     }
 
-    void push_array()
+    bool do_begin_array(const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
@@ -159,56 +165,16 @@ private:
                 stack_.clear();
                 is_valid_ = false;
                 stack_.push_back(Json(array(array_allocator_)));
+                result_ = Json(array(array_allocator_));
                 break;
         }
         stack_offsets_.push_back({stack_.size()-1,structure_type::array_t});
-    }
-
-    void pop_array()
-    {
-        stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
-        stack_offsets_.pop_back();
-        if (stack_.size() == 1)
-        {
-            result_.swap(stack_.front().value_);
-            stack_.pop_back();
-            is_valid_ = true;
-        }
-    }
-
-    bool do_begin_document() override
-    {
-        return true;
-    }
-
-    bool do_end_document() override
-    {
-        return true;
-    }
-
-    bool do_begin_object(const serializing_context&) override
-    {
-        push_object();
-        return true;
-    }
-
-    bool do_end_object(const serializing_context&) override
-    {
-        end_structure();
-        pop_object();
-        return true;
-    }
-
-    bool do_begin_array(const serializing_context&) override
-    {
-        push_array();
         return true;
     }
 
     bool do_end_array(const serializing_context&) override
     {
         end_structure();
-        pop_array();
         return true;
     }
 
@@ -243,6 +209,14 @@ private:
                     }
                 }
                 break;
+        }
+        stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
+        stack_offsets_.pop_back();
+        if (stack_offsets_.back().type_ == structure_type::root_t)
+        {
+            result_.swap(stack_.front().value_);
+            stack_.pop_back();
+            is_valid_ = true;
         }
     }
 
