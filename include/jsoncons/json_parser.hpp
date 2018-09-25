@@ -89,9 +89,7 @@ enum class parse_state : uint8_t
 {
     root,
     start, 
-    begin_document, 
-    before_end_document, 
-    end_document, 
+    before_done, 
     slash,  
     slash_slash, 
     slash_star, 
@@ -376,7 +374,7 @@ public:
 
         if (parent() == parse_state::root)
         {
-            state_ = parse_state::before_end_document;
+            state_ = parse_state::before_done;
         }
         else
         {
@@ -431,7 +429,7 @@ public:
         }
         if (parent() == parse_state::root)
         {
-            state_ = parse_state::before_end_document;
+            state_ = parse_state::before_done;
         }
         else
         {
@@ -520,12 +518,8 @@ public:
                     end_fraction_value(chars_format::scientific,ec);
                     if (ec) return;
                     break;
-                case parse_state::before_end_document:
+                case parse_state::before_done:
                     handler_.flush();
-                    state_ = parse_state::done;
-                    continue_ = false;
-                    break;
-                case parse_state::end_document:
                     state_ = parse_state::done;
                     continue_ = false;
                     break;
@@ -541,11 +535,8 @@ public:
         {
             switch (state_)
             {
-            case parse_state::before_end_document:
+            case parse_state::before_done:
                 handler_.flush();
-                state_ = parse_state::end_document;
-                break;
-            case parse_state::end_document:
                 state_ = parse_state::done;
                 continue_ = false;
                 break;
@@ -569,11 +560,6 @@ public:
                 state_ = pop_state();
                 break;
             case parse_state::start: 
-                state_ = parse_state::begin_document;
-                if (!continue_)
-                    break;
-                // FALLTHRU
-            case parse_state::begin_document: 
                 {
                     switch (*input_ptr_)
                     {
@@ -1299,7 +1285,7 @@ public:
                     continue_ = handler_.bool_value(true,*this);
                     if (parent() == parse_state::root)
                     {
-                        state_ = parse_state::before_end_document;
+                        state_ = parse_state::before_done;
                     }
                     else
                     {
@@ -1367,7 +1353,7 @@ public:
                     continue_ = handler_.bool_value(false,*this);
                     if (parent() == parse_state::root)
                     {
-                        state_ = parse_state::before_end_document;
+                        state_ = parse_state::before_done;
                     }
                     else
                     {
@@ -1420,7 +1406,7 @@ public:
                     continue_ = handler_.null_value(*this);
                     if (parent() == parse_state::root)
                     {
-                        state_ = parse_state::before_end_document;
+                        state_ = parse_state::before_done;
                     }
                     else
                     {
@@ -1540,7 +1526,7 @@ public:
                 column_ += 4;
                 if (parent() == parse_state::root)
                 {
-                    state_ = parse_state::before_end_document;
+                    state_ = parse_state::before_done;
                 }
                 else
                 {
@@ -1574,7 +1560,7 @@ public:
                 column_ += 4;
                 if (parent() == parse_state::root)
                 {
-                    state_ = parse_state::before_end_document;
+                    state_ = parse_state::before_done;
                 }
                 else
                 {
@@ -1608,7 +1594,7 @@ public:
                 column_ += 5;
                 if (parent() == parse_state::root)
                 {
-                    state_ = parse_state::before_end_document;
+                    state_ = parse_state::before_done;
                 }
                 else
                 {
@@ -2761,7 +2747,7 @@ private:
             break;
         case parse_state::root:
             continue_ = handler_.string_value(string_view_type(s, length), *this);
-            state_ = parse_state::before_end_document;
+            state_ = parse_state::before_done;
             break;
         default:
             continue_ = err_handler_.error(json_parse_errc::invalid_json_text, *this);
@@ -2806,7 +2792,7 @@ private:
             state_ = parse_state::expect_comma_or_end;
             break;
         case parse_state::root:
-            state_ = parse_state::before_end_document;
+            state_ = parse_state::before_done;
             break;
         default:
             continue_ = err_handler_.error(json_parse_errc::invalid_json_text, *this);
