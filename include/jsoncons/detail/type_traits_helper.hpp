@@ -146,7 +146,7 @@ struct has_char_traits_member_type : std::false_type {};
 
 template <class T>
 struct has_char_traits_member_type<T, 
-                                   typename std::enable_if<std::is_same<typename T::traits_type,std::char_traits<typename T::value_type>>::value
+                                   typename std::enable_if<std::is_same<typename T::traits_type::char_type, typename T::value_type>::value
 >::type> : std::true_type {};
 
 
