@@ -297,18 +297,17 @@ void dump_json_fragments()
     )");
 
     json_serializer serializer(std::cout, jsoncons::indenting::indent); // pretty print
-    serializer.begin_document();
     serializer.begin_array();
     for (const auto& book : some_books.array_range())
     {
-        book.dump_fragment(serializer);
+        book.dump(serializer);
     }
     for (const auto& book : more_books.array_range())
     {
-        book.dump_fragment(serializer);
+        book.dump(serializer);
     }
     serializer.end_array();
-    serializer.end_document();
+    serializer.flush();
 }
 
 void nan_inf_replacement()

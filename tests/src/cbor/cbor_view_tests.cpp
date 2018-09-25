@@ -114,7 +114,6 @@ TEST_CASE("as_string_test")
 {
     std::vector<uint8_t> b;
     jsoncons::cbor::cbor_bytes_serializer serializer(b);
-    serializer.begin_document();
     serializer.begin_array(10);
     serializer.bool_value(true);
     serializer.bool_value(false);
@@ -127,7 +126,7 @@ TEST_CASE("as_string_test")
     serializer.double_value(10.5);
     serializer.bignum_value("-18446744073709551617");
     serializer.end_array();
-    serializer.end_document();
+    serializer.flush();
 
     jsoncons::cbor::cbor_view bv = b;
 
@@ -191,12 +190,11 @@ TEST_CASE("test_dump_to_string")
 {
     std::vector<uint8_t> b;
     cbor_bytes_serializer serializer(b);
-    serializer.begin_document();
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     serializer.bignum_value(-1, bytes.data(), bytes.size());
     serializer.end_array();
-    serializer.end_document();
+    serializer.flush();
 
     cbor_view bv = b;
 
@@ -231,12 +229,11 @@ TEST_CASE("test_dump_to_stream")
 {
     std::vector<uint8_t> b;
     cbor_bytes_serializer serializer(b);
-    serializer.begin_document();
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     serializer.bignum_value(-1, bytes.data(), bytes.size());
     serializer.end_array();
-    serializer.end_document();
+    serializer.flush();
 
     cbor_view bv = b;
 
@@ -271,23 +268,21 @@ TEST_CASE("test_indefinite_length_object_iterator")
 {
     std::vector<uint8_t> b1;
     cbor::cbor_bytes_serializer serializer1(b1);
-    serializer1.begin_document();
     serializer1.begin_object(); // indefinite length object
     serializer1.end_object(); 
-    serializer1.end_document();
+    serializer1.flush();
     cbor_view bv1 = b1;
     CHECK(bv1.object_range().begin() == bv1.object_range().end());
 
     std::vector<uint8_t> b2;
     cbor::cbor_bytes_serializer serializer2(b2);
-    serializer2.begin_document();
     serializer2.begin_object(); // indefinite length object
     serializer2.name("City");
     serializer2.string_value("Toronto");
     serializer2.name("Province");
     serializer2.string_value("Ontario");
     serializer2.end_object(); 
-    serializer2.end_document();
+    serializer2.flush();
     cbor_view bv2 = b2;
 
     auto it2 = bv2.object_range().begin();
@@ -300,21 +295,19 @@ TEST_CASE("test_indefinite_length_array_iterator")
 {
     std::vector<uint8_t> b1;
     cbor::cbor_bytes_serializer serializer1(b1);
-    serializer1.begin_document();
     serializer1.begin_array(); // indefinite length array
     serializer1.end_array(); 
-    serializer1.end_document();
+    serializer1.flush();
     cbor_view bv1 = b1;
     CHECK(bv1.array_range().begin() == bv1.array_range().end());
 
     std::vector<uint8_t> b2;
     cbor::cbor_bytes_serializer serializer2(b2);
-    serializer2.begin_document();
     serializer2.begin_array(); // indefinite length array
     serializer2.string_value("Toronto");
     serializer2.string_value("Ontario");
     serializer2.end_array(); 
-    serializer2.end_document();
+    serializer2.flush();
     cbor_view bv2 = b2;
 
     CHECK(bv2.size() == 2);

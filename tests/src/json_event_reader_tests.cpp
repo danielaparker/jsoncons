@@ -20,12 +20,8 @@ TEST_CASE("json_event_reader string_value test")
     json_event_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::string_value);
     reader.next();
-    CHECK(reader.current().event_type() == json_event_type::end_document);
     CHECK(reader.done());
 }
 
@@ -37,12 +33,8 @@ TEST_CASE("json_event_reader null_value test")
     json_event_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::null_value);
     reader.next();
-    CHECK(reader.current().event_type() == json_event_type::end_document);
     CHECK(reader.done());
 }
 
@@ -54,12 +46,8 @@ TEST_CASE("json_event_reader bool_value test")
     json_event_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::bool_value);
     reader.next();
-    CHECK(reader.current().event_type() == json_event_type::end_document);
     CHECK(reader.done());
 }
 
@@ -71,12 +59,8 @@ TEST_CASE("json_event_reader int64_value test")
     json_event_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::int64_value);
     reader.next();
-    CHECK(reader.current().event_type() == json_event_type::end_document);
     CHECK(reader.done());
 }
 
@@ -88,12 +72,8 @@ TEST_CASE("json_event_reader uint64_value test")
     json_event_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::uint64_value);
     reader.next();
-    CHECK(reader.current().event_type() == json_event_type::end_document);
     CHECK(reader.done());
 }
 
@@ -105,12 +85,8 @@ TEST_CASE("json_event_reader bignum_value test")
     json_event_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::bignum_value);
     reader.next();
-    CHECK(reader.current().event_type() == json_event_type::end_document);
     CHECK(reader.done());
 }
 
@@ -122,12 +98,8 @@ TEST_CASE("json_event_reader double_value test")
     json_event_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::double_value);
     reader.next();
-    CHECK(reader.current().event_type() == json_event_type::end_document);
     CHECK(reader.done());
 }
 
@@ -159,9 +131,6 @@ TEST_CASE("json_event_reader array_value test")
 
     json_event_reader reader(is);
 
-    REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::begin_array);
     reader.next();
@@ -258,9 +227,6 @@ TEST_CASE("json_event_reader array_value test")
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::end_array);
     reader.next();
-    REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::end_document);
-    reader.next();
     CHECK(reader.done());
 }
 
@@ -291,9 +257,6 @@ TEST_CASE("json_event_reader object_value test")
     json_event_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::begin_document);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::begin_object);
     reader.next();
     REQUIRE_FALSE(reader.done());
@@ -322,9 +285,6 @@ TEST_CASE("json_event_reader object_value test")
     reader.next();
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == json_event_type::end_object);
-    reader.next();
-    REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == json_event_type::end_document);
     reader.next();
     CHECK(reader.done());
 }

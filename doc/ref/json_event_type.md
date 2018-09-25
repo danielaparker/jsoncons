@@ -8,8 +8,6 @@
 ```c++
 enum class json_event_type
 {
-    begin_document,
-    end_document,
     begin_object,
     end_object,
     begin_array,

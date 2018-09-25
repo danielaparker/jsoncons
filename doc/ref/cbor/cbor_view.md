@@ -117,7 +117,7 @@ cbor_view(const cbor_view& other); // (4)
 
 <table border="0">
   <tr>
-    <td><a href="json/dump.md"</a>dump, dump_fragment</td>
+    <td><a href="json/dump.md"</a>dump</td>
     <td>Serializes json value to a string, stream, or output handler.</td> 
   </tr>
 </table>

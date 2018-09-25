@@ -69,14 +69,13 @@ struct json_convert_traits<T,
     template <class CharT>
     static void encode(const T& val, basic_json_content_handler<CharT>& serializer)
     {
-        serializer.begin_document();
         serializer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             json_convert_traits<value_type>::encode(*it,serializer);
         }
         serializer.end_array();
-        serializer.end_document();
+        serializer.flush();
     }
 };
 
@@ -105,14 +104,13 @@ struct json_convert_traits<std::array<T,N>>
     template <class CharT>
     static void encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& serializer)
     {
-        serializer.begin_document();
         serializer.begin_array();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
             json_convert_traits<value_type>::encode(*it,serializer);
         }
         serializer.end_array();
-        serializer.end_document();
+        serializer.flush();
     }
 };
 
@@ -137,7 +135,6 @@ struct json_convert_traits<T,
     template <class CharT>
     static void encode(const T& val, basic_json_content_handler<CharT>& serializer)
     {
-        serializer.begin_document();
         serializer.begin_object();
         for (auto it = std::begin(val); it != std::end(val); ++it)
         {
@@ -145,7 +142,7 @@ struct json_convert_traits<T,
             json_convert_traits<mapped_type>::encode(it->second,serializer);
         }
         serializer.end_object();
-        serializer.end_document();
+        serializer.flush();
     }
 };
 
@@ -237,9 +234,8 @@ T decode_json(std::basic_istringstream<CharT>& is,
 template <class T, class CharT>
 void encode_json(const T& val, basic_json_content_handler<CharT>& handler)
 {
-    handler.begin_document();
     json_convert_traits<T>::encode(val,handler);
-    handler.end_document();
+    handler.flush();
 }
 
 template <class T, class CharT>

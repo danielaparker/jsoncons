@@ -521,7 +521,7 @@ public:
                     if (ec) return;
                     break;
                 case parse_state::before_end_document:
-                    handler_.end_document();
+                    handler_.flush();
                     state_ = parse_state::done;
                     continue_ = false;
                     break;
@@ -542,7 +542,7 @@ public:
             switch (state_)
             {
             case parse_state::before_end_document:
-                continue_ = handler_.end_document();
+                handler_.flush();
                 state_ = parse_state::end_document;
                 break;
             case parse_state::end_document:
@@ -569,14 +569,12 @@ public:
                 state_ = pop_state();
                 break;
             case parse_state::start: 
-                continue_ = handler_.begin_document();
                 state_ = parse_state::begin_document;
                 if (!continue_)
                     break;
                 // FALLTHRU
             case parse_state::begin_document: 
                 {
-                    handler_.begin_document();
                     switch (*input_ptr_)
                     {
                         JSONCONS_ILLEGAL_CONTROL_CHARACTER:

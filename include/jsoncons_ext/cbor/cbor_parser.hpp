@@ -1808,11 +1808,6 @@ public:
 
     void parse_some(std::error_code& ec)
     {
-        if (nesting_depth_ == 0)
-        {
-            handler_.begin_document();
-        }
-
         const uint8_t* pos = input_ptr_++;
         switch (*pos)
         {
@@ -2190,7 +2185,7 @@ public:
         }
         if (nesting_depth_ == 0)
         {
-            handler_.end_document();
+            handler_.flush();
         }
     }
 private:

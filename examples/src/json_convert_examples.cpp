@@ -111,12 +111,11 @@ void streaming_example2()
 
     json_serializer serializer(std::cout, jsoncons::indenting::indent); 
 
-    serializer.begin_document();       
     serializer.begin_object();       
     serializer.name("Employees");       
     encode_fragment(employees, serializer);
     serializer.end_object();       
-    serializer.end_document();       
+    serializer.flush();       
 
     std::cout << "\n\n";
 }

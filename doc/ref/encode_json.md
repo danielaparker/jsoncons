@@ -13,28 +13,23 @@ template <class T, class CharT>
 void encode_json(const T& val, basic_json_content_handler<CharT>& handler); // (1)
 
 template <class T, class CharT>
-void encode_fragment(const T& val, basic_json_content_handler<CharT>& handler); // (2)
-
-template <class T, class CharT>
-void encode_json(const T& val, std::basic_ostream<CharT>& os); // (3)
+void encode_json(const T& val, std::basic_ostream<CharT>& os); // (2)
 
 template <class T, class CharT>
 void encode_json(const T& val, 
                  const basic_json_serializing_options<CharT>& options,
-                 std::basic_ostream<CharT>& os); // (4)
+                 std::basic_ostream<CharT>& os); // (3)
 
 template <class T, class CharT>
-void encode_json(const T& val, std::basic_ostream<CharT>& os, indenting line_indent); // (5)
+void encode_json(const T& val, std::basic_ostream<CharT>& os, indenting line_indent); // (4)
 
 template <class T, class CharT>
 void encode_json(const T& val, 
                  const basic_json_serializing_options<CharT>& options,
-                 std::basic_ostream<CharT>& os, indenting line_indent); // (6)
+                 std::basic_ostream<CharT>& os, indenting line_indent); // (5)
 ```
 
-(1) Calls `begin_document()` on `handler`, applies `json_convert_traits` to serialize `val` to JSON output stream, and calls `end_document()` on `handler`.
-
-(2) Applies `json_convert_traits` to serialize `val` to JSON output stream, but does not call begin_document() and `end_document()`.
+(1) Applies `json_convert_traits` to serialize `val` to JSON output stream.
 
 #### Parameters
 
@@ -134,12 +129,11 @@ int main()
 
     json_serializer serializer(std::cout, jsoncons::indenting::indent); 
 
-    serializer.begin_document();       
     serializer.begin_object();       
     serializer.write_name("Employees");       
     encode_fragment(employees, serializer);
     serializer.end_object();       
-    serializer.end_document();       
+    serializer.flush();       
 }
 ```
 Output:

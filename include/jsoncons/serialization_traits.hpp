@@ -41,24 +41,24 @@ struct serialization_traits
 template <class CharT, class T>
 void dump(const T& val, basic_json_content_handler<CharT>& handler)
 {
-    handler.begin_document();
     serialization_traits<T>::encode(val,handler);
-    handler.end_document();
+    handler.flush();
 }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template <class CharT, class T>
 void dump_body(const T& val, basic_json_content_handler<CharT>& handler)
 {
-    dump_fragment(val,handler);
+    dump(val,handler);
 }
-#endif
 
 template <class CharT, class T>
 void dump_fragment(const T& val, basic_json_content_handler<CharT>& handler)
 {
     serialization_traits<T>::encode(val,handler);
 }
+#endif
+
 
 template <class CharT, class T>
 void dump(const T& val, std::basic_ostream<CharT>& os)

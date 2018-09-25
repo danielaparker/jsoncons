@@ -178,6 +178,13 @@ public:
 
     ~basic_json_serializer()
     {
+        try
+        {
+            writer_.flush();
+        }
+        catch (...)
+        {
+        }
     }
 
 
@@ -293,15 +300,9 @@ private:
         }
     }
     // Implementing methods
-    bool do_begin_document() override
-    {
-        return true;
-    }
-
-    bool do_end_document() override
+    void do_flush() override
     {
         writer_.flush();
-        return true;
     }
 
     bool do_begin_object(const serializing_context&) override

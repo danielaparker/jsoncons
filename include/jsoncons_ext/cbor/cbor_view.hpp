@@ -623,13 +623,6 @@ public:
 
     void dump(json_content_handler& handler) const
     {
-        handler.begin_document();
-        dump_fragment(handler);
-        handler.end_document();
-    }
-
-    void dump_fragment(json_content_handler& handler) const
-    {
         // If it's a non indefinite length string, dump view
         // If it's an indefinite length string, dump view
         switch (data_type())
@@ -767,6 +760,7 @@ public:
                 break;
             }
         }
+        handler.flush();
     }
 
     friend std::ostream& operator<<(std::ostream& os, const cbor_view& bv)
@@ -774,7 +768,13 @@ public:
         bv.dump(os);
         return os;
     }
+#if !defined(JSONCONS_NO_DEPRECATED)
 
+    void dump_fragment(json_content_handler& handler) const
+    {
+        dump(handler);
+    }
+#endif
 };
 // decode_cbor
 

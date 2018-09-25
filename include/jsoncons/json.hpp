@@ -2755,13 +2755,7 @@ public:
         dump(serializer);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    void dump_body(basic_json_content_handler<char_type>& handler) const
-    {
-        dump_fragment(handler);
-    }
-#endif
-    void dump_fragment(basic_json_content_handler<char_type>& handler) const
+    void dump(basic_json_content_handler<char_type>& handler) const
     {
         switch (var_.semantic_type())
         {
@@ -2822,12 +2816,7 @@ public:
             default:
                 break;
         }
-    }
-    void dump(basic_json_content_handler<char_type>& handler) const
-    {
-        handler.begin_document();
-        dump_fragment(handler);
-        handler.end_document();
+        handler.flush();
     }
 
     void dump(std::basic_ostream<char_type>& os) const
@@ -2858,7 +2847,7 @@ public:
     {
         string_type s(allocator);
         basic_json_serializer<char_type,detail::string_writer<char_type>> serializer(s);
-        dump_fragment(serializer);
+        dump(serializer);
         return s;
     }
 
@@ -2867,11 +2856,20 @@ public:
     {
         string_type s(allocator);
         basic_json_serializer<char_type,detail::string_writer<char_type>> serializer(s,options);
-        dump_fragment(serializer);
+        dump(serializer);
         return s;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+    void dump_fragment(basic_json_content_handler<char_type>& handler) const
+    {
+        dump(handler);
+    }
+
+    void dump_body(basic_json_content_handler<char_type>& handler) const
+    {
+        dump(handler);
+    }
 
     void dump(std::basic_ostream<char_type>& os, bool pprint) const
     {
@@ -2911,9 +2909,7 @@ public:
 
     void to_stream(basic_json_content_handler<char_type>& handler) const
     {
-        handler.begin_document();
-        dump_fragment(handler);
-        handler.end_document();
+        dump(handler);
     }
 
     void to_stream(std::basic_ostream<char_type>& os) const
@@ -3336,7 +3332,7 @@ public:
             {
                 string_type s(allocator);
                 basic_json_serializer<char_type,detail::string_writer<char_type>> serializer(s,options);
-                dump_fragment(serializer);
+                dump(serializer);
                 return s;
             }
         }

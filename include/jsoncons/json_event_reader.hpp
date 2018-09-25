@@ -27,20 +27,18 @@ namespace jsoncons {
 
 enum class json_event_type
 {
-    begin_document = 0,
-    end_document = 1,
-    begin_array = 2,
-    end_array = 3,
-    begin_object = 4,
-    end_object = 5,
-    name = 6,
-    string_value = 7,
-    null_value = 8,
-    bool_value = 9,
-    int64_value = 10,
-    uint64_value = 11,
-    bignum_value= 12,
-    double_value = 13
+    begin_array,
+    end_array,
+    begin_object,
+    end_object,
+    name,
+    string_value,
+    null_value,
+    bool_value,
+    int64_value,
+    uint64_value ,
+    bignum_value,
+    double_value
 };
 
 template<class CharT,class Allocator=std::allocator<char>>
@@ -177,7 +175,7 @@ private:
     basic_json_event<CharT,Allocator> event_;
 public:
     basic_json_event_handler()
-        : event_(json_event_type::begin_document)
+        : event_(json_event_type::null_value)
     {
     }
 
@@ -191,18 +189,6 @@ public:
         return event_;
     }
 private:
-
-    bool do_begin_document() override
-    {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::begin_document);
-        return false;
-    }
-
-    bool do_end_document() override
-    {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::end_document);
-        return false;
-    }
 
     bool do_begin_object(const serializing_context&) override
     {
@@ -279,6 +265,10 @@ private:
     {
         event_ = basic_json_event<CharT,Allocator>(value);
         return false;
+    }
+
+    void do_flush() override
+    {
     }
 };
 

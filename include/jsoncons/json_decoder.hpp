@@ -114,14 +114,8 @@ public:
 
 private:
 
-    bool do_begin_document() override
+    void do_flush() override
     {
-        return true;
-    }
-
-    bool do_end_document() override
-    {
-        return true;
     }
 
     bool do_begin_object(const serializing_context&) override

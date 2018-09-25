@@ -17,16 +17,15 @@ namespace readme
     {
         // Construct some CBOR using the streaming API
         std::vector<uint8_t> b;
-        cbor::cbor_bytes_serializer bserializer(b);
-        bserializer.begin_document();
-        bserializer.begin_array(); // indefinite length array
-        bserializer.begin_array(3); // fixed length array
-        bserializer.string_value("Toronto");
-        bserializer.byte_string_value({'H','e','l','l','o'});
-        bserializer.bignum_value("-18446744073709551617");
-        bserializer.end_array();
-        bserializer.end_array();
-        bserializer.end_document();
+        cbor::cbor_bytes_serializer bwriter(b);
+        bwriter.begin_array(); // indefinite length array
+        bwriter.begin_array(3); // fixed length array
+        bwriter.string_value("Toronto");
+        bwriter.byte_string_value({'H','e','l','l','o'});
+        bwriter.bignum_value("-18446744073709551617");
+        bwriter.end_array();
+        bwriter.end_array();
+        bwriter.flush();
 
         // Print bytes
         std::cout << "(1)\n";

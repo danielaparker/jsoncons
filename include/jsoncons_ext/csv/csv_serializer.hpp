@@ -93,6 +93,17 @@ public:
     {
     }
 
+    ~basic_csv_serializer()
+    {
+        try
+        {
+            writer_.flush();
+        }
+        catch (...)
+        {
+        }
+    }
+
 private:
 
     template<class AnyWriter>
@@ -118,15 +129,9 @@ private:
         }
     }
 
-    bool do_begin_document() override
-    {
-        return true;
-    }
-
-    bool do_end_document() override
+    void do_flush() override
     {
         writer_.flush();
-        return true;
     }
 
     bool do_begin_object(const serializing_context&) override

@@ -44,14 +44,9 @@ public:
     }
 
 private:
-    bool do_begin_document() override
+    void do_flush() override
     {
-        return downstream_handler_.begin_document();
-    }
-
-    bool do_end_document() override
-    {
-        return downstream_handler_.end_document();
+        downstream_handler_.flush();
     }
 
     bool do_begin_object(const serializing_context& context) override
@@ -151,14 +146,8 @@ public:
     {
     }
 private:
-    bool do_begin_document() override
+    void do_flush() override
     {
-        return true;
-    }
-
-    bool do_end_document() override
-    {
-        return true;
     }
 };
 
@@ -218,14 +207,9 @@ public:
     }
 
 private:
-    bool do_begin_document() override
+    void do_flush() override
     {
-        return downstream_handler_.begin_document();
-    }
-
-    bool do_end_document() override
-    {
-        return downstream_handler_.end_document();
+        downstream_handler_.flush();
     }
 
     bool do_begin_object(const serializing_context& context) override

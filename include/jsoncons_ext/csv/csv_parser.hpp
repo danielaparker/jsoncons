@@ -299,7 +299,6 @@ public:
                 for (size_t i = 0; i < column_names_.size(); ++i)
                 {
                     decoders_.push_back(json_decoder<json_type>());
-                    decoders_.back().begin_document();
                     decoders_.back().begin_array(*this);
                 }
                 break;
@@ -327,7 +326,6 @@ public:
     void reset()
     {
         push_mode(csv_mode_type::initial);
-        continue_ = handler_.begin_document();
 
         for (auto name : parameters_.column_names())
         {
@@ -439,8 +437,8 @@ public:
                 {
                     continue_ = handler_.name(column_names_[i],*this);
                     decoders_[i].end_array(*this);
-                    decoders_[i].end_document();
-                    decoders_[i].get_result().dump_fragment(fragment_filter);
+                    decoders_[i].flush();
+                    decoders_[i].get_result().dump(fragment_filter);
                 }
                 continue_ = handler_.end_object(*this);
             }
@@ -455,7 +453,7 @@ public:
                 continue_ = false;
                 return;
             }
-            continue_ = handler_.end_document();
+            handler_.flush();
             continue_ = false;
         }
 

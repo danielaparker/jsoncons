@@ -18,12 +18,6 @@ Member type                         |Definition
 
 #### Public producer interface
 
-    bool begin_document ()
-Indicates the beginning of a sequence of JSON events. 
-
-    bool end_document()
-Indicates the end of a sequence of JSON events. 
-
     bool begin_object()
     bool begin_object(const serializing_context& context)
 Indicates the begining of an object. Contextual information including
@@ -136,13 +130,10 @@ Writes a null value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
+    void flush()
+Flushes whatever is buffered to the destination.
+
 #### Private virtual consumer interface
-
-    virtual bool do_begin_document() = 0;
-Handles the beginning of a sequence of JSON events.
-
-    virtual bool do_end_document() = 0;
-Handles the end of a sequence of JSON events.
 
     virtual bool do_begin_object(const serializing_context& context) = 0;
 Handles the beginning of an object. Contextual information including
@@ -220,4 +211,7 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 Handles a null value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
+
+    virtual void do_flush() = 0;
+Flushes whatever is buffered to the destination.
 

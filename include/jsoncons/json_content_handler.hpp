@@ -29,14 +29,9 @@ public:
 
     virtual ~basic_json_content_handler() {}
 
-    bool begin_document ()
+    void flush()
     {
-        return do_begin_document();
-    }
-
-    bool end_document()
-    {
-        return do_end_document();
+        do_flush();
     }
 
     bool begin_object()
@@ -237,9 +232,19 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+    bool begin_document()
+    {
+        return true;
+    }
+
+    bool end_document()
+    {
+        flush();
+        return true;
+    }
+
     void begin_json()
     {
-        begin_document();
     }
 
     void end_json()
@@ -340,9 +345,7 @@ public:
 #endif
 
 private:
-    virtual bool do_begin_document() = 0;
-
-    virtual bool do_end_document() = 0;
+    virtual void do_flush() = 0;
 
     virtual bool do_begin_object(const serializing_context& context) = 0;
 
@@ -387,14 +390,8 @@ class basic_null_json_content_handler final : public basic_json_content_handler<
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
 private:
-    bool do_begin_document() override
+    void do_flush() override
     {
-        return true;
-    }
-
-    bool do_end_document() override
-    {
-        return true;
     }
 
     bool do_begin_object(const serializing_context&) override
