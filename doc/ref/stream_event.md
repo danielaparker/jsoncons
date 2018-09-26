@@ -1,20 +1,20 @@
-### jsoncons::json_event
+### jsoncons::stream_event
 
 ```c++
-typedef basic_json_event<char,std::allocator<char>> json_event;
+typedef basic_stream_event<char,std::allocator<char>> stream_event;
 ```
 
 #### Header
 ```c++
-#include <jsoncons/json_event_reader.hpp>
+#include <jsoncons/stream_reader.hpp>
 
-A json event.
+A JSON-like data event.
 ```
 
 #### Member functions
 
-    json_event_type event_type();
-Returns a [json_event_type](json_event_type.md) for this event.
+    stream_event_type event_type();
+Returns a [stream_event_type](stream_event_type.md) for this event.
 
     template <class T, class... Args>
     bool is(Args&&... args) const noexcept;

@@ -3,10 +3,11 @@ master
 
 ### New features
 
-- A JSON pull parser, `json_event_reader`, has been added. This 
+- A JSON pull parser, `json_stream_reader`, has been added. This 
   required a change to the `json_content_handler` function signatures,
   the return values has been changed to bool, to indicate whether 
-  parsing is to continue.    
+  parsing is to continue. (An earlier version on master was
+  called `json_event_reader`.)    
 
 - `json_parser` has new member function `stopped()`. 
 

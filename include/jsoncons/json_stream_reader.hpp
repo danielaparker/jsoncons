@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONEVENTREADER_HPP
-#define JSONCONS_JSONEVENTREADER_HPP
+#ifndef JSONCONS_JSONSTREAMREADER_HPP
+#define JSONCONS_JSONSTREAMREADER_HPP
 
 #include <memory>
 #include <string>
@@ -22,169 +22,29 @@
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json.hpp>
+#include <jsoncons/stream_reader.hpp>
 
 namespace jsoncons {
 
-enum class json_event_type
-{
-    begin_array,
-    end_array,
-    begin_object,
-    end_object,
-    name,
-    string_value,
-    null_value,
-    bool_value,
-    int64_value,
-    uint64_value ,
-    bignum_value,
-    double_value
-};
-
-template<class CharT,class Allocator=std::allocator<char>>
-class basic_json_event
-{
-    typedef basic_json<CharT,sorted_policy,Allocator> json_type;
-    json_event_type event_type_;
-    union
-    {
-        bool bool_value_;
-        int64_t int64_value_;
-        uint64_t uint64_value_;
-        double double_value_;
-        const CharT* string_data_;
-        const uint8_t* byte_string_data_;
-    } value_;
-    size_t length_;
-public:
-    basic_json_event(json_event_type event_type)
-        : event_type_(event_type), length_(0)
-    {
-    }
-
-    basic_json_event(null_type value)
-        : event_type_(json_event_type::null_value), length_(0)
-    {
-    }
-
-    basic_json_event(bool value)
-        : event_type_(json_event_type::bool_value), length_(0)
-    {
-        value_.bool_value_ = value;
-    }
-
-    basic_json_event(int64_t value)
-        : event_type_(json_event_type::int64_value), length_(0)
-    {
-        value_.int64_value_ = value;
-    }
-
-    basic_json_event(uint64_t value)
-        : event_type_(json_event_type::uint64_value), length_(0)
-    {
-        value_.uint64_value_ = value;
-    }
-
-    basic_json_event(double value)
-        : event_type_(json_event_type::double_value), length_(0)
-    {
-        value_.double_value_ = value;
-    }
-
-    basic_json_event(const CharT* data, size_t length, json_event_type type = json_event_type::string_value)
-        : event_type_(type), length_(length)
-    {
-        value_.string_data_ = data;
-    }
-
-    template<class T, class Traits, class OtherAllocator, class CharT_ = CharT>
-    typename std::enable_if<std::is_same<T,std::basic_string<CharT_,Traits,OtherAllocator>>::value,T>::type
-    is() const JSONCONS_NOEXCEPT
-    {
-        switch (event_type_)
-        {
-            case json_event_type::name:
-            case json_event_type::string_value:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    template<class T, class... Args>
-    bool is(Args&&... args) const JSONCONS_NOEXCEPT
-    {
-        return as_json().template is<T>(std::forward<Args>(args)...);
-    }
-
-    template<class T, class Traits, class OtherAllocator, class CharT_ = CharT>
-    typename std::enable_if<std::is_same<T,std::basic_string<CharT_,Traits,OtherAllocator>>::value,T>::type
-    as() const
-    {
-        switch (event_type_)
-        {
-            case json_event_type::name:
-            case json_event_type::string_value:
-                return std::basic_string<CharT>(value_.string_data_,length_);
-            default:
-                return as_json().template as<T>();
-        }
-    }
-
-    template<class T, class... Args>
-    T as(Args&&... args) const
-    {
-        return as_json().template as<T>(std::forward<Args>(args)...);
-    }
-
-    json_event_type event_type() const JSONCONS_NOEXCEPT {return event_type_;}
-private:
-    json_type as_json() const
-    {
-        switch (event_type_)
-        {
-            case json_event_type::name:
-                return json_type(value_.string_data_,length_);
-            case json_event_type::string_value:
-                return json_type(value_.string_data_,length_);
-            case json_event_type::bignum_value:
-                return json_type(basic_bignum<Allocator>(value_.string_data_,length_));
-            case json_event_type::int64_value:
-                return json_type(value_.int64_value_);
-            case json_event_type::uint64_value:
-                return json_type(value_.uint64_value_);
-            case json_event_type::double_value:
-                return json_type(value_.double_value_);
-            case json_event_type::bool_value:
-                return json_type(value_.bool_value_);
-            case json_event_type::null_value:
-                return json_type(jsoncons::null_type());
-            default:
-                JSONCONS_UNREACHABLE();
-        }
-    }
-};
-
-
 template <class CharT, class Allocator=std::allocator<CharT>>
-class basic_json_event_handler final : public basic_json_content_handler<CharT>
+class basic_stream_event_handler final : public basic_json_content_handler<CharT>
 {
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
 private:
-    basic_json_event<CharT,Allocator> event_;
+    basic_stream_event<CharT,Allocator> event_;
 public:
-    basic_json_event_handler()
-        : event_(json_event_type::null_value)
+    basic_stream_event_handler()
+        : event_(stream_event_type::null_value)
     {
     }
 
-    basic_json_event_handler(json_event_type event_type)
+    basic_stream_event_handler(stream_event_type event_type)
         : event_(event_type)
     {
     }
 
-    const basic_json_event<CharT,Allocator>& event() const
+    const basic_stream_event<CharT,Allocator>& event() const
     {
         return event_;
     }
@@ -192,49 +52,49 @@ private:
 
     bool do_begin_object(const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::begin_object);
+        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::begin_object);
         return false;
     }
 
     bool do_end_object(const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::end_object);
+        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::end_object);
         return false;
     }
 
     bool do_begin_array(const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::begin_array);
+        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::begin_array);
         return false;
     }
 
     bool do_end_array(const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::end_array);
+        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::end_array);
         return false;
     }
 
     bool do_name(const string_view_type& name, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(name.data(), name.length(), json_event_type::name);
+        event_ = basic_stream_event<CharT,Allocator>(name.data(), name.length(), stream_event_type::name);
         return false;
     }
 
     bool do_null_value(const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(json_event_type::null_value);
+        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::null_value);
         return false;
     }
 
     bool do_bool(bool value, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(value);
+        event_ = basic_stream_event<CharT,Allocator>(value);
         return false;
     }
 
     bool do_string_value(const string_view_type& s, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(s.data(), s.length(), json_event_type::string_value);
+        event_ = basic_stream_event<CharT,Allocator>(s.data(), s.length(), stream_event_type::string_value);
         return false;
     }
 
@@ -245,25 +105,25 @@ private:
 
     bool do_bignum_value(const string_view_type& value, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(value.data(), value.length(), json_event_type::bignum_value);
+        event_ = basic_stream_event<CharT,Allocator>(value.data(), value.length(), stream_event_type::bignum_value);
         return false;
     }
 
     bool do_int64_value(int64_t value, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(value);
+        event_ = basic_stream_event<CharT,Allocator>(value);
         return false;
     }
 
     bool do_uint64_value(uint64_t value, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(value);
+        event_ = basic_stream_event<CharT,Allocator>(value);
         return false;
     }
 
     bool do_double_value(double value, const floating_point_options&, const serializing_context&) override
     {
-        event_ = basic_json_event<CharT,Allocator>(value);
+        event_ = basic_stream_event<CharT,Allocator>(value);
         return false;
     }
 
@@ -273,11 +133,11 @@ private:
 };
 
 template<class CharT,class Allocator>
-class basic_json_event_reader 
+class basic_json_stream_reader : basic_stream_reader<CharT,Allocator>
 {
     static const size_t default_max_buffer_length = 16384;
 
-    basic_json_event_handler<CharT, Allocator> event_handler_;
+    basic_stream_event_handler<CharT, Allocator> event_handler_;
     default_parse_error_handler default_err_handler_;
 
     typedef CharT char_type;
@@ -292,29 +152,29 @@ class basic_json_event_reader
     bool begin_;
 
     // Noncopyable and nonmoveable
-    basic_json_event_reader(const basic_json_event_reader&) = delete;
-    basic_json_event_reader& operator=(const basic_json_event_reader&) = delete;
+    basic_json_stream_reader(const basic_json_stream_reader&) = delete;
+    basic_json_stream_reader& operator=(const basic_json_stream_reader&) = delete;
 
 public:
 
-    basic_json_event_reader(std::basic_istream<CharT>& is)
-        : basic_json_event_reader(is,basic_json_serializing_options<CharT>(),default_err_handler_)
+    basic_json_stream_reader(std::basic_istream<CharT>& is)
+        : basic_json_stream_reader(is,basic_json_serializing_options<CharT>(),default_err_handler_)
     {
     }
 
-    basic_json_event_reader(std::basic_istream<CharT>& is,
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
                       parse_error_handler& err_handler)
-        : basic_json_event_reader(is,basic_json_serializing_options<CharT>(),err_handler)
+        : basic_json_stream_reader(is,basic_json_serializing_options<CharT>(),err_handler)
     {
     }
 
-    basic_json_event_reader(std::basic_istream<CharT>& is, 
+    basic_json_stream_reader(std::basic_istream<CharT>& is, 
                             const basic_json_read_options<CharT>& options)
-        : basic_json_event_reader(is,options,default_err_handler_)
+        : basic_json_stream_reader(is,options,default_err_handler_)
     {
     }
 
-    basic_json_event_reader(std::basic_istream<CharT>& is, 
+    basic_json_stream_reader(std::basic_istream<CharT>& is, 
                             const basic_json_read_options<CharT>& options,
                             parse_error_handler& err_handler)
        : parser_(event_handler_,options,err_handler),
@@ -341,17 +201,17 @@ public:
         buffer_.reserve(buffer_length_);
     }
 
-    bool done() const
+    bool done() const override
     {
         return parser_.done();
     }
 
-    const basic_json_event<CharT,Allocator>& current() const
+    const basic_stream_event<CharT,Allocator>& current() const override
     {
         return event_handler_.event();
     }
 
-    void next()
+    void next() override
     {
         std::error_code ec;
         read_next(ec);
@@ -427,12 +287,12 @@ public:
         }
     }
 
-    size_t line_number() const
+    size_t line_number() const override
     {
         return parser_.line_number();
     }
 
-    size_t column_number() const
+    size_t column_number() const override
     {
         return parser_.column_number();
     }
@@ -496,11 +356,11 @@ public:
 private:
 };
 
-typedef basic_json_event_reader<char,std::allocator<char>> json_event_reader;
-typedef basic_json_event_reader<wchar_t, std::allocator<wchar_t>> wjson_event_reader;
+typedef basic_json_stream_reader<char,std::allocator<char>> json_stream_reader;
+typedef basic_json_stream_reader<wchar_t, std::allocator<wchar_t>> wjson_stream_reader;
 
-typedef basic_json_event<char,std::allocator<char>> json_event;
-typedef basic_json_event<wchar_t,std::allocator<wchar_t>> wjson_event;
+typedef basic_stream_event<char,std::allocator<char>> stream_event;
+typedef basic_stream_event<wchar_t,std::allocator<wchar_t>> wstream_event;
 
 }
 

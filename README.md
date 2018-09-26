@@ -471,7 +471,7 @@ Output:
 ### Pull parser example
 
 ```c++
-#include <jsoncons/json_event_reader.hpp>
+#include <jsoncons/json_stream_reader.hpp>
 #include <string>
 #include <sstream>
 
@@ -502,21 +502,21 @@ int main()
 
     std::istringstream is(s);
 
-    json_event_reader event_reader(is);
+    json_stream_reader reader(is);
 
-    for (; !event_reader.done(); event_reader.next())
+    for (; !reader.done(); reader.next())
     {
-        const auto& event = event_reader.current();
+        const auto& event = reader.current();
         switch (event.event_type())
         {
-            case json_event_type::name:
+            case stream_event_type::name:
                 std::cout << event.as<std::string>() << ": ";
                 break;
-            case json_event_type::string_value:
+            case stream_event_type::string_value:
                 std::cout << event.as<std::string>() << "\n";
                 break;
-            case json_event_type::int64_value:
-            case json_event_type::uint64_value:
+            case stream_event_type::int64_value:
+            case stream_event_type::uint64_value:
                 std::cout << event.as<std::string>() << "\n";
                 break;
         }
@@ -539,7 +539,7 @@ lastName: Skeleton
 mark: 60
 ```
 
-See [json_event_reader](doc/ref/json_event_reader.md)
+See [json_stream_reader](doc/ref/json_stream_reader.md)
 
 ## Building the test suite and examples with CMake
 
