@@ -578,7 +578,7 @@ public:
     void dump(std::basic_string<char,Traits,SAllocator>& s, indenting line_indent) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_serializer<char,string_type>> serializer(s, line_indent);
+        basic_json_serializer<char,string_type> serializer(s, line_indent);
         dump(serializer);
     }
 

@@ -1251,7 +1251,7 @@ private:
             {
                 if (is_negative)
                 {
-                    jsoncons::detail::to_integer_result result = jsoncons::detail::to_integer(value.data(), value.length());
+                    jsoncons::detail::to_int64_result result = jsoncons::detail::to_int64(value.data(), value.length());
                     if (!result.overflow)
                     {
                         handler.int64_value(result.value,*this);
@@ -1263,7 +1263,7 @@ private:
                 }
                 else
                 {
-                    jsoncons::detail::to_uinteger_result result = jsoncons::detail::to_uinteger(value.data(), value.length());
+                    jsoncons::detail::to_uint64_result result = jsoncons::detail::to_uint64(value.data(), value.length());
                     if (!result.overflow)
                     {
                         handler.uint64_value(result.value,*this);
