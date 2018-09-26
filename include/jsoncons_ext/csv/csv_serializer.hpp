@@ -261,7 +261,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<CharT> bo(s);
+                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
                     do_null_value(bo);
                     bo.flush();
                     it->second = s;
@@ -285,7 +285,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<CharT> bo(s);
+                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -323,7 +323,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<CharT> bo(s);
+                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
                     value(val, fmt, bo);
                     bo.flush();
                     it->second = s;
@@ -347,7 +347,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<CharT> bo(s);
+                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -371,7 +371,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<CharT> bo(s);
+                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -395,7 +395,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<CharT> bo(s);
+                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -532,7 +532,7 @@ template <class Json>
 void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_serializer<char_type,jsoncons::detail::string_writer<char>> serializer(s);
+    basic_csv_serializer<char_type,jsoncons::detail::string_writer<std::basic_string<typename Json::char_type>>> serializer(s);
     j.dump(serializer);
 }
 
@@ -548,12 +548,12 @@ template <class Json,class Allocator>
 void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_serializer<char_type,jsoncons::detail::string_writer<char>,Allocator> serializer(s,options);
+    basic_csv_serializer<char_type,jsoncons::detail::string_writer<std::basic_string<typename Json::char_type>>,Allocator> serializer(s,options);
     j.dump(serializer);
 }
 
 typedef basic_csv_serializer<char> csv_serializer;
-typedef basic_json_serializer<char,jsoncons::detail::string_writer<char>> csv_string_serializer;
+typedef basic_json_serializer<char,jsoncons::detail::string_writer<std::string>> csv_string_serializer;
 
 }}
 

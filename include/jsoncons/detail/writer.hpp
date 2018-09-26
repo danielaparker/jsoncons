@@ -187,21 +187,21 @@ private:
     }
 };
 
-template <class CharT>
+template <class StringT>
 class string_writer 
 {
 public:
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> output_type;
+    typedef typename StringT::value_type char_type;
+    typedef StringT output_type;
 private:
-    std::basic_string<CharT>& s_;
+    output_type& s_;
 
     // Noncopyable and nonmoveable
     string_writer(const string_writer&) = delete;
     string_writer& operator=(const string_writer&) = delete;
 public:
 
-    string_writer(std::basic_string<CharT>& s)
+    string_writer(output_type& s)
         : s_(s)
     {
     }
@@ -210,12 +210,12 @@ public:
     {
     }
 
-    void write(const CharT* s, size_t length)
+    void write(const char_type* s, size_t length)
     {
         s_.append(s,length);
     }
 
-    void put(CharT ch)
+    void put(char_type ch)
     {
         s_.push_back(ch);
     }

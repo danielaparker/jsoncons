@@ -112,19 +112,19 @@ public:
                 break;
             case stream_event_type::int64_value:
             {
-                detail::string_writer<CharT> writer(s);
+                detail::string_writer<T> writer(s);
                 detail::print_integer(value_.int64_value_, writer);
                 break;
             }
             case stream_event_type::uint64_value:
             {
-                detail::string_writer<CharT> writer(s);
+                detail::string_writer<T> writer(s);
                 detail::print_uinteger(value_.uint64_value_, writer);
                 break;
             }
             case stream_event_type::double_value:
             {
-                detail::string_writer<CharT> writer(s);
+                detail::string_writer<T> writer(s);
                 floating_point_options def;
                 detail::print_double f(def);
                 f(value_.double_value_, def, writer);
@@ -132,7 +132,7 @@ public:
             }
             case stream_event_type::bool_value:
             {
-                detail::string_writer<CharT> writer(s);
+                detail::string_writer<T> writer(s);
                 if (value_.bool_value_)
                 {
                     writer.write(detail::true_literal<CharT>().data(),
@@ -147,7 +147,7 @@ public:
             }
             case stream_event_type::null_value:
             {
-                detail::string_writer<CharT> writer(s);
+                detail::string_writer<T> writer(s);
                 writer.write(detail::null_literal<CharT>().data(), 
                              detail::null_literal<CharT>().size());
                 break;
