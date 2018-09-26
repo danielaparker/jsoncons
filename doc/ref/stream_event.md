@@ -1,7 +1,7 @@
 ### jsoncons::stream_event
 
 ```c++
-typedef basic_stream_event<char,std::allocator<char>> stream_event;
+typedef basic_stream_event<char> stream_event;
 ```
 
 #### Header
@@ -15,10 +15,6 @@ A JSON-like data event.
 
     stream_event_type event_type();
 Returns a [stream_event_type](stream_event_type.md) for this event.
-
-    template <class T, class... Args>
-    bool is(Args&&... args) const noexcept;
-Returns `true` if the json value is the same as type `T`.
 
     template <class T, class... Args>
     T as(Args&&... args) const;

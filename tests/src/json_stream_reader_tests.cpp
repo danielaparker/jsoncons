@@ -21,6 +21,36 @@ TEST_CASE("json_stream_reader string_value test")
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().as<std::string>() == std::string("Tom"));
+    reader.next();
+    CHECK(reader.done());
+}
+
+TEST_CASE("json_stream_reader string_value as<int> test")
+{
+    std::string s = R"("-100")";
+    std::istringstream is(s);
+
+    json_stream_reader reader(is);
+
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().as<int>() == -100);
+    reader.next();
+    CHECK(reader.done());
+}
+
+TEST_CASE("json_stream_reader string_value as<unsigned> test")
+{
+    std::string s = R"("100")";
+    std::istringstream is(s);
+
+    json_stream_reader reader(is);
+
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().as<int>() == 100);
+    CHECK(reader.current().as<unsigned>() == 100);
     reader.next();
     CHECK(reader.done());
 }
@@ -60,6 +90,7 @@ TEST_CASE("json_stream_reader int64_value test")
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == stream_event_type::int64_value);
+    CHECK(reader.current().as<int>() == -100);
     reader.next();
     CHECK(reader.done());
 }
@@ -73,6 +104,8 @@ TEST_CASE("json_stream_reader uint64_value test")
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().as<int>() == 100);
+    CHECK(reader.current().as<unsigned>() == 100);
     reader.next();
     CHECK(reader.done());
 }
