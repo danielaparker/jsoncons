@@ -542,10 +542,14 @@ bool operator>(const std::basic_string<CharT,Traits,Allocator>& lhs,
 #if !defined(JSONCONS_HAS_STRING_VIEW)
 template <class CharT, class Traits = std::char_traits<CharT>>
 using basic_string_view = Basic_string_view_<CharT, Traits>;
+using string_view = Basic_string_view_<char, std::char_traits<char>>;
+using wstring_view = Basic_string_view_<wchar_t, std::char_traits<wchar_t>>;
 #else
 #include <string_view>
 template <class CharT, class Traits = std::char_traits<CharT>>
 using basic_string_view = std::basic_string_view<CharT, Traits>;
+using string_view = std::string_view;
+using wstring_view = std::wstring_view;
 #endif
 
 static const char* base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

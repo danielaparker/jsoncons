@@ -100,15 +100,15 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<std::is_same<T,std::basic_string<CharT_>>::value,T>::type
+    typename std::enable_if<detail::is_string_like<T>::value && std::is_same<typename T::value_type,CharT_>::value,T>::type
     as() const
     {
-        std::basic_string<CharT> s;
+        T s;
         switch (event_type_)
         {
             case stream_event_type::name:
             case stream_event_type::string_value:
-                s = std::basic_string<CharT>(value_.string_data_,length_);
+                s = T(value_.string_data_,length_);
                 break;
             case stream_event_type::int64_value:
             {
@@ -152,6 +152,23 @@ public:
                              detail::null_literal<CharT>().size());
                 break;
             }
+            default:
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
+        }
+        return s;
+    }
+
+    template<class T, class CharT_ = CharT>
+    typename std::enable_if<detail::is_string_view_like<T>::value && std::is_same<typename T::value_type,CharT_>::value,T>::type
+    as() const
+    {
+        T s;
+        switch (event_type_)
+        {
+            case stream_event_type::name:
+            case stream_event_type::string_value:
+                s = T(value_.string_data_,length_);
+                break;
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
         }
