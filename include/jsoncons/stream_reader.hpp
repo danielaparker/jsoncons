@@ -348,8 +348,31 @@ public:
     virtual size_t column_number() const = 0;
 };
 
+template<class CharT>
+class basic_stream_filter
+{
+public:
+
+    virtual ~basic_stream_filter() = default;
+
+    virtual bool accept(const basic_stream_event<CharT>& event) = 0;
+};
+
+template<class CharT>
+class default_basic_stream_filter : public basic_stream_filter<CharT>
+{
+public:
+    bool accept(const basic_stream_event<CharT>&) override
+    {
+        return true;
+    }
+};
+
 typedef basic_stream_reader<char> stream_reader;
 typedef basic_stream_reader<wchar_t> wstream_reader;
+
+typedef basic_stream_filter<char> stream_filter;
+typedef basic_stream_filter<wchar_t> wstream_filter;
 
 typedef basic_stream_event<char> stream_event;
 typedef basic_stream_event<wchar_t> wstream_event;

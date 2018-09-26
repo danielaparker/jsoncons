@@ -519,7 +519,7 @@ int main()
                 break;
             case stream_event_type::int64_value:
             case stream_event_type::uint64_value:
-                // Convert integer value to std::string
+                // Converts integer value to std::string
                 std::cout << event.as<std::string>() << "\n";
                 break;
         }
@@ -542,7 +542,7 @@ lastName: Skeleton
 mark: 60
 ```
 
-See [json_stream_reader](doc/ref/json_stream_reader.md)
+See [json_stream_reader](doc/ref/json_stream_reader.md) 
 
 ## Building the test suite and examples with CMake
 

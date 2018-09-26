@@ -138,12 +138,15 @@ class basic_json_stream_reader : basic_stream_reader<CharT>
     basic_stream_event_handler<CharT> event_handler_;
     default_parse_error_handler default_err_handler_;
 
+    default_basic_stream_filter<CharT> default_filter_;
+
     typedef CharT char_type;
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
     basic_json_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
+    basic_stream_filter<CharT>& filter_;
     bool eof_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
@@ -156,27 +159,49 @@ class basic_json_stream_reader : basic_stream_reader<CharT>
 public:
 
     basic_json_stream_reader(std::basic_istream<CharT>& is)
-        : basic_json_stream_reader(is,basic_json_serializing_options<CharT>(),default_err_handler_)
+        : basic_json_stream_reader(is,default_filter_,basic_json_serializing_options<CharT>(),default_err_handler_)
     {
     }
 
     basic_json_stream_reader(std::basic_istream<CharT>& is,
-                      parse_error_handler& err_handler)
-        : basic_json_stream_reader(is,basic_json_serializing_options<CharT>(),err_handler)
+                             basic_stream_filter<CharT>& filter)
+        : basic_json_stream_reader(is,filter,basic_json_serializing_options<CharT>(),default_err_handler_)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
+                             parse_error_handler& err_handler)
+        : basic_json_stream_reader(is,default_filter_,basic_json_serializing_options<CharT>(),err_handler)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
+                             basic_stream_filter<CharT>& filter,
+                             parse_error_handler& err_handler)
+        : basic_json_stream_reader(is,filter,basic_json_serializing_options<CharT>(),err_handler)
     {
     }
 
     basic_json_stream_reader(std::basic_istream<CharT>& is, 
-                            const basic_json_read_options<CharT>& options)
-        : basic_json_stream_reader(is,options,default_err_handler_)
+                             const basic_json_read_options<CharT>& options)
+        : basic_json_stream_reader(is,default_filter_,options,default_err_handler_)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
+                             basic_stream_filter<CharT>& filter, 
+                             const basic_json_read_options<CharT>& options)
+        : basic_json_stream_reader(is,filter,options,default_err_handler_)
     {
     }
 
     basic_json_stream_reader(std::basic_istream<CharT>& is, 
-                            const basic_json_read_options<CharT>& options,
-                            parse_error_handler& err_handler)
+                             basic_stream_filter<CharT>& filter,
+                             const basic_json_read_options<CharT>& options,
+                             parse_error_handler& err_handler)
        : parser_(event_handler_,options,err_handler),
          is_(is),
+         filter_(filter),
          eof_(false),
          buffer_length_(default_max_buffer_length),
          begin_(true)
@@ -212,11 +237,15 @@ public:
     void next() override
     {
         std::error_code ec;
-        read_next(ec);
-        if (ec)
+
+        do
         {
-            throw parse_error(ec,parser_.line_number(),parser_.column_number());
-        }
+            read_next(ec);
+            if (ec)
+            {
+                throw parse_error(ec,parser_.line_number(),parser_.column_number());
+            }
+        } while (!done() && !filter_.accept(current()));
     }
 
     void read_buffer(std::error_code& ec)
