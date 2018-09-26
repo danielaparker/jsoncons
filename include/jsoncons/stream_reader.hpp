@@ -58,6 +58,7 @@ class basic_stream_event
         const uint8_t* byte_string_data_;
     } value_;
     size_t length_;
+    floating_point_options fmt_;
 public:
     basic_stream_event(stream_event_type event_type)
         : event_type_(event_type), length_(0)
@@ -87,8 +88,8 @@ public:
         value_.uint64_value_ = value;
     }
 
-    basic_stream_event(double value)
-        : event_type_(stream_event_type::double_value), length_(0)
+    basic_stream_event(double value, const floating_point_options& fmt)
+        : event_type_(stream_event_type::double_value), length_(0), fmt_(fmt)
     {
         value_.double_value_ = value;
     }
@@ -125,9 +126,8 @@ public:
             case stream_event_type::double_value:
             {
                 detail::string_writer<T> writer(s);
-                floating_point_options def;
-                detail::print_double f(def);
-                f(value_.double_value_, def, writer);
+                detail::print_double f(fmt_);
+                f(value_.double_value_, fmt_, writer);
                 break;
             }
             case stream_event_type::bool_value:

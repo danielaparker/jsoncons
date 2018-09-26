@@ -22,14 +22,14 @@ A pull parser for parsing json events.
     basic_json_stream_reader(std::istream& is); // (1)
 
     basic_json_stream_reader(std::istream& is, 
-                            const json_read_options& options); // (2)
+                             const json_read_options& options); // (2)
 
     json_stream_reader(std::istream& is, 
-                      parse_error_handler& err_handler); // (3)
+                       parse_error_handler& err_handler); // (3)
 
-    json_reader(std::istream& is, 
-                const json_read_options& options,
-                parse_error_handler& err_handler); // (4)
+    json_stream_reader(std::istream& is, 
+                       const json_read_options& options,
+                       parse_error_handler& err_handler); // (4)
 
 (1) Constructs a `json_reader` that reads from an input stream `is` of 
 JSON text, uses default [json_read_options](json_read_options)
@@ -106,13 +106,16 @@ int main()
         switch (event.event_type())
         {
             case stream_event_type::name:
-                std::cout << event.as<std::string>() << ": ";
+                // Returned data is string, so can use as<jsoncons::string_view>()>()
+                std::cout << event.as<jsoncons::string_view>() << ": ";
                 break;
             case stream_event_type::string_value:
-                std::cout << event.as<std::string>() << "\n";
+                // Can use as<std::string_view>() if your compiler supports it
+                std::cout << event.as<jsoncons::string_view>() << "\n";
                 break;
             case stream_event_type::int64_value:
             case stream_event_type::uint64_value:
+                // Converts integer value to std::string
                 std::cout << event.as<std::string>() << "\n";
                 break;
         }

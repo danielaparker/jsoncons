@@ -510,13 +510,16 @@ int main()
         switch (event.event_type())
         {
             case stream_event_type::name:
-                std::cout << event.as<std::string>() << ": ";
+                // Returned data is string, so can use as<jsoncons::string_view>()>()
+                std::cout << event.as<jsoncons::string_view>() << ": ";
                 break;
             case stream_event_type::string_value:
-                std::cout << event.as<std::string>() << "\n";
+                // Can use as<std::string_view>() if your compiler supports it
+                std::cout << event.as<jsoncons::string_view>() << "\n";
                 break;
             case stream_event_type::int64_value:
             case stream_event_type::uint64_value:
+                // Convert integer value to std::string
                 std::cout << event.as<std::string>() << "\n";
                 break;
         }

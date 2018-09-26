@@ -119,9 +119,9 @@ private:
         return false;
     }
 
-    bool do_double_value(double value, const floating_point_options&, const serializing_context&) override
+    bool do_double_value(double value, const floating_point_options& fmt, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT>(value);
+        event_ = basic_stream_event<CharT>(value, fmt);
         return false;
     }
 

@@ -505,6 +505,7 @@ int main()
         csv_examples();
 
         more_examples();
+
         mulitple_json_objects();
 
         wjson_examples();
@@ -556,6 +557,7 @@ int main()
         byte_string_examples();
 
         pull_parser_examples();
+
     }
     catch (const std::exception& e)
     {

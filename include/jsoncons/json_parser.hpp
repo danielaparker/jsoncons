@@ -523,6 +523,13 @@ public:
                     state_ = parse_state::done;
                     continue_ = false;
                     break;
+                case parse_state::start:
+                    continue_ = false;
+                    break;
+                case parse_state::cr:
+                case parse_state::lf:
+                    state_ = pop_state();
+                    break;
                 default:
                     err_handler_.fatal_error(json_parse_errc::unexpected_eof, *this);
                     ec = json_parse_errc::unexpected_eof;
