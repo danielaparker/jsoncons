@@ -1,7 +1,7 @@
 ### jsoncons::json_stream_reader
 
 ```c++
-typedef basic_json_stream_reader<char,std::allocator<char>> stream_reader
+typedef basic_json_stream_reader<char> stream_reader
 ```
 
 #### Header

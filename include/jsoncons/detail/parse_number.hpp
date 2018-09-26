@@ -31,6 +31,50 @@ struct to_integer_result
     bool overflow;
 };
 
+template <class CharT>
+bool is_integer(const CharT* s, size_t length)
+{
+    const CharT* end = s + length; 
+    if (s == end)
+    {
+        return false;
+    }
+    if (*s == '-')
+    {
+        ++s;
+    }
+    if (s == end)
+    {
+        return false;
+    }
+    for (;s < end; ++s)
+    {
+        if (!(*s >= '0' && *s <= '9'))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <class CharT>
+bool is_uinteger(const CharT* s, size_t length)
+{
+    const CharT* end = s + length; 
+    if (s == end)
+    {
+        return false;
+    }
+    for (;s < end; ++s)
+    {
+        if (!(*s >= '0' && *s <= '9'))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 // Precondition: s satisfies
 
 // digit

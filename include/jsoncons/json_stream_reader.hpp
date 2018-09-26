@@ -20,19 +20,17 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
-#include <jsoncons/json_parser.hpp>
-#include <jsoncons/json.hpp>
 #include <jsoncons/stream_reader.hpp>
 
 namespace jsoncons {
 
-template <class CharT, class Allocator=std::allocator<CharT>>
+template <class CharT>
 class basic_stream_event_handler final : public basic_json_content_handler<CharT>
 {
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
 private:
-    basic_stream_event<CharT,Allocator> event_;
+    basic_stream_event<CharT> event_;
 public:
     basic_stream_event_handler()
         : event_(stream_event_type::null_value)
@@ -44,7 +42,7 @@ public:
     {
     }
 
-    const basic_stream_event<CharT,Allocator>& event() const
+    const basic_stream_event<CharT>& event() const
     {
         return event_;
     }
@@ -52,49 +50,49 @@ private:
 
     bool do_begin_object(const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::begin_object);
+        event_ = basic_stream_event<CharT>(stream_event_type::begin_object);
         return false;
     }
 
     bool do_end_object(const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::end_object);
+        event_ = basic_stream_event<CharT>(stream_event_type::end_object);
         return false;
     }
 
     bool do_begin_array(const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::begin_array);
+        event_ = basic_stream_event<CharT>(stream_event_type::begin_array);
         return false;
     }
 
     bool do_end_array(const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::end_array);
+        event_ = basic_stream_event<CharT>(stream_event_type::end_array);
         return false;
     }
 
     bool do_name(const string_view_type& name, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(name.data(), name.length(), stream_event_type::name);
+        event_ = basic_stream_event<CharT>(name.data(), name.length(), stream_event_type::name);
         return false;
     }
 
     bool do_null_value(const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(stream_event_type::null_value);
+        event_ = basic_stream_event<CharT>(stream_event_type::null_value);
         return false;
     }
 
     bool do_bool(bool value, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(value);
+        event_ = basic_stream_event<CharT>(value);
         return false;
     }
 
     bool do_string_value(const string_view_type& s, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(s.data(), s.length(), stream_event_type::string_value);
+        event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::string_value);
         return false;
     }
 
@@ -105,25 +103,25 @@ private:
 
     bool do_bignum_value(const string_view_type& value, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(value.data(), value.length(), stream_event_type::bignum_value);
+        event_ = basic_stream_event<CharT>(value.data(), value.length(), stream_event_type::bignum_value);
         return false;
     }
 
     bool do_int64_value(int64_t value, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(value);
+        event_ = basic_stream_event<CharT>(value);
         return false;
     }
 
     bool do_uint64_value(uint64_t value, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(value);
+        event_ = basic_stream_event<CharT>(value);
         return false;
     }
 
     bool do_double_value(double value, const floating_point_options&, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT,Allocator>(value);
+        event_ = basic_stream_event<CharT>(value);
         return false;
     }
 
@@ -133,11 +131,11 @@ private:
 };
 
 template<class CharT,class Allocator>
-class basic_json_stream_reader : basic_stream_reader<CharT,Allocator>
+class basic_json_stream_reader : basic_stream_reader<CharT>
 {
     static const size_t default_max_buffer_length = 16384;
 
-    basic_stream_event_handler<CharT, Allocator> event_handler_;
+    basic_stream_event_handler<CharT> event_handler_;
     default_parse_error_handler default_err_handler_;
 
     typedef CharT char_type;
@@ -206,7 +204,7 @@ public:
         return parser_.done();
     }
 
-    const basic_stream_event<CharT,Allocator>& current() const override
+    const basic_stream_event<CharT>& current() const override
     {
         return event_handler_.event();
     }
@@ -358,9 +356,6 @@ private:
 
 typedef basic_json_stream_reader<char,std::allocator<char>> json_stream_reader;
 typedef basic_json_stream_reader<wchar_t, std::allocator<wchar_t>> wjson_stream_reader;
-
-typedef basic_stream_event<char,std::allocator<char>> stream_event;
-typedef basic_stream_event<wchar_t,std::allocator<wchar_t>> wstream_event;
 
 }
 
