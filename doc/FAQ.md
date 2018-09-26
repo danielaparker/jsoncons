@@ -511,14 +511,14 @@ for (const auto& member : j.object_range())
 
 #### Is there a way to use `string_view` to access the actual memory that's being used to hold a string?
 
-Use `as_string_view()`, e.g.
+You can use `j.as<jsoncons::string_view>()`, e.g.
 ```c++
 json j = json::parse("\"Hello World\"");
-auto sv = j.as_string_view();
+auto sv = j.as<jsoncons::string_view>();
 ```
-`sv` supports the member functions of `std::string_view`, including `data()` and `size()`. 
-If your compiler supports `std::string_view` and `JSONCONS_HAS_STRING_VIEW` is defined, 
-`sv` is a `std::string_view`.
+`jsoncons::string_view` supports the member functions of `std::string_view`, including `data()` and `size()`. 
+
+If your compiler supports `std::string_view`, you can use `j.as<std::string_view>()`.
 
 <div id="E2"/>
 
