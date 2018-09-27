@@ -2,39 +2,39 @@
 
 ### Deserializing
 
-[How can I parse JSON from a string?](#A1)  
-[How can I parse JSON from a file?](#A2)  
-[How can I validate JSON without incurring parse exceptions?](#A3)  
+[Parse JSON from a string](#A1)  
+[Parse JSON from a file](#A2)  
+[Validate JSON without incurring parse exceptions](#A3)  
 [What if I want to allow comments? What if I don't?](#A4)  
-[Can I set a maximum nesting depth?](#A5)  
-[Is there any way to prevent the alphabetic sort of the outputted JSON? Retaining the original insertion order?](#A6)  
+[Setting a maximum nesting depth](#A5)  
+[Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 
 ### Serializing
 
-[How can I serialize a json value to a string?](#B1)  
-[How can I serialize a json value to a stream?](#B2)  
-[How can I escape all non-ascii characters?](#B3)  
-[How can I replace the representation of NaN, Inf and -Inf when serializing? And when reading in again?](#B4)
+[Serialize a json value to a string](#B1)  
+[Serialize a json value to a stream](#B2)  
+[Escape all non-ascii characters](#B3)  
+[Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
 
 ### Constructing
 
-[How do I construct a json object?](#C1)  
-[How do I construct a json array?](#C2)  
-[How do I insert a new value in an array at a specific position?](#C3)  
-[How do I create arrays of arrays of arrays of ...](#C4)  
-[Is it possible to merge two json objects?](#C5)  
+[Construct a json object](#C1)  
+[Construct a json array](#C2)  
+[Insert a new value in an array at a specific position](#C3)  
+[Create arrays of arrays of arrays of ...](#C4)  
+[Merge two json objects](#C5)  
 
 ### Iterating
 
-[How can I iterate over a json array?](#D1)  
-[How can I iterate over a json object?](#D2)  
+[Iterate over a json array](#D1)  
+[Iterate over a json object](#D2)  
 
 ### Getters
 
 [Is there a way to use `string_view` to access the actual memory that's being used to hold a string?](#E1)  
 [I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double.](#E2)  
 [I want to look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E3)  
-[How do I retrieve a value in a hierarchy of JSON objects?](#E4)  
+[Retrieve a value in a hierarchy of JSON objects](#E4)  
 
 ### Search and Replace
 
@@ -45,7 +45,7 @@
 
 <div id="A1"/> 
 
-#### How can I parse JSON from a string?
+#### Parse JSON from a string
 
 ```
 std::string s = R"({"first":1,"second":2,"fourth":3,"fifth":4})";    
@@ -68,7 +68,7 @@ json j = R"(
 
 <div id="A2"/> 
 
-#### How can I parse JSON from a file?
+#### Parse JSON from a file
 
 ```
 std::ifstream is("myfile.json");    
@@ -78,7 +78,7 @@ json j = json::parse(is);
 
 <div id="A3"/> 
 
-#### How can I validate JSON without incurring parse exceptions?
+#### Validate JSON without incurring parse exceptions
 ```c++
 std::string s = R"(
 {
@@ -144,9 +144,9 @@ Output:
 
 <div id="A5"/> 
 
-#### Can I set a maximum nesting depth?
+#### Setting a maximum nesting depth
 
-Yes, like this,
+Like this,
 ```c++
 std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
 try
@@ -167,9 +167,9 @@ Maximum JSON depth exceeded at line 1 and column 21
 
 <div id="A6"/> 
 
-#### Is there any way to prevent the alphabetic sort of the outputted JSON? Retaining the original insertion order?
+#### Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order
 
-Yes. Use `ojson` instead of `json` (or `wojson` instead of `wjson`) to retain the original insertion order. 
+Use `ojson` instead of `json` (or `wojson` instead of `wjson`) to retain the original insertion order. 
 
 ```c++
 ojson j = ojson::parse(R"(
@@ -223,7 +223,7 @@ Output:
 
 <div id="B1"/>
 
-#### How can I serialize a json value to a string?
+#### Serialize a json value to a string
 
 ```
 std::string s;
@@ -235,7 +235,7 @@ j.dump(s, indenting::indent); // pretty print
 
 <div id="B2"/>
 
-#### How can I serialize a json value to a stream?
+#### Serialize a json value to a stream
 
 ```
 j.dump(std::cout); // compressed
@@ -251,7 +251,7 @@ std::cout << pretty_print(j) << std::endl; // pretty print
 
 <div id="B3"/>
 
-#### How can I escape all non-ascii characters?
+#### Escape all non-ascii characters
 
 ```
 json_serializing_options options;
@@ -270,7 +270,7 @@ std::cout << pretty_print(j, options) << std::endl; // pretty print
 
 <div id="B4"/>
 
-#### How can I replace the representation of NaN, Inf and -Inf when serializing? And when reading in again?
+#### Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.
 
 Set the serializing options for `nan_replacement`, `pos_inf_replacement` and `neg_inf_replacement` to distinct string values.
 
@@ -324,7 +324,7 @@ Output:
 
 <div id="C1"/>
 
-#### How do I construct a json object?
+#### Construct a json object
 
 Start with an empty json object and insert some name-value pairs,
 
@@ -350,7 +350,7 @@ json file_settings = json::object{
 
 <div id="C2"/>
 
-#### How do I construct a json array?
+#### Construct a json array
 
 Insert values into a json array,
 
@@ -368,7 +368,7 @@ json image_formats = json::array{"JPEG","PSD","TIFF","DNG"};
 
 <div id="C3"/>
 
-#### How do I insert a new value in an array at a specific position?
+#### Insert a new value in an array at a specific position
 
 ```c++
 json cities = json::array(); // an empty array
@@ -386,7 +386,7 @@ Output:
 
 <div id="C4"/>
 
-#### How do I create arrays of arrays of arrays of ...
+#### Create arrays of arrays of arrays of ...
 
 Like this:
 
@@ -434,7 +434,7 @@ Output:
 
 <div id="C5"/>
 
-#### Is it possible to merge two json objects?
+#### Merge two json objects
 
 [json::merge](ref/json/merge.md) inserts another json object's key-value pairs into a json object,
 unless they already exist with an equivalent key.
@@ -476,7 +476,7 @@ Output:
 
 <div id="D1"/>
 
-#### How can I iterate over a json array?
+#### Iterate over a json array
 
 ```c++
 json j = json::array{1,2,3,4};
@@ -489,7 +489,7 @@ for (auto val : j.array_range())
 
 <div id="D2"/>
 
-#### How can I iterate over a json object?
+#### Iterate over a json object
 
 ```c++
 json j = json::object{
@@ -548,7 +548,7 @@ double sale_price = j.get_with_default("sale_price", 22.0); // returns 22.0
 
 <div id="E4"/>
  
-#### How do I retrieve a value in a hierarchy of JSON objects?
+#### Retrieve a value in a hierarchy of JSON objects
 
 ```c++
 #include <jsoncons/json.hpp>
