@@ -42,7 +42,7 @@ data formats such as [CBOR](http://cbor.io/). It supports
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
 SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
-Its unpacked in-memory representation of JSON is more compact than most, and can be made more compact still using a user supplied
+Its unpacked in-memory representation of JSON is more compact than most, and can be made more compact still with a user-supplied
 allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md),
 built on top of its incremental parser.  
 
