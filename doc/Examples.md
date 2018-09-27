@@ -31,7 +31,7 @@
 
 ### Getters
 
-[Using `string_view` to access the actual memory that's being used to hold a string](#E1)  
+[Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
 [I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double.](#E2)  
 [I want to look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E3)  
 [Retrieve a value in a hierarchy of JSON objects](#E4)  
@@ -509,7 +509,7 @@ for (const auto& member : j.object_range())
 
 <div id="E1"/>
 
-#### Using `string_view` to access the actual memory that's being used to hold a string
+#### Use `string_view` to access the actual memory that's being used to hold a string
 
 You can use `j.as<jsoncons::string_view>()`, e.g.
 ```c++
