@@ -182,6 +182,7 @@ class basic_json_parser : private serializing_context
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool continue_;
+    bool done_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -245,7 +246,8 @@ public:
          input_end_(nullptr),
          input_ptr_(nullptr),
          state_(parse_state::start),
-         continue_(true)
+         continue_(true),
+         done_(false)
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
         number_buffer_.reserve(initial_number_buffer_capacity_);
@@ -297,7 +299,7 @@ public:
 
     bool done() const
     {
-        return state_ == parse_state::done;
+        return done_;
     }
 
     bool stopped() const
@@ -499,6 +501,7 @@ public:
         push_state(parse_state::root);
         state_ = parse_state::start;
         continue_ = true;
+        done_ = false;
         line_ = 1;
         column_ = 1;
         nesting_depth_ = 0;
@@ -521,11 +524,7 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        if (state_ == parse_state::cr || state_ == parse_state::lf)
-        {
-            state_ = pop_state();
-        }
-        if (state_ != parse_state::done)
+        if (!done_)
         {
             continue_ = err_handler_.error(json_parse_errc::unexpected_eof, *this);
             if (!continue_)
@@ -579,6 +578,7 @@ public:
                     break;
                 case parse_state::before_done:
                     handler_.flush();
+                    done_ = true;
                     state_ = parse_state::done;
                     continue_ = false;
                     break;
@@ -607,6 +607,7 @@ public:
             {
             case parse_state::before_done:
                 handler_.flush();
+                done_ = true;
                 state_ = parse_state::done;
                 continue_ = false;
                 break;
