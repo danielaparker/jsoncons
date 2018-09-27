@@ -6,7 +6,7 @@
 [Parse JSON from a file](#A2)  
 [Validate JSON without incurring parse exceptions](#A3)  
 [What if I want to allow comments? What if I don't?](#A4)  
-[Setting a maximum nesting depth](#A5)  
+[Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 
 ### Serializing
@@ -144,7 +144,7 @@ Output:
 
 <div id="A5"/> 
 
-#### Setting a maximum nesting depth
+#### Set a maximum nesting depth
 
 Like this,
 ```c++
