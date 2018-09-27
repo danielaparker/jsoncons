@@ -4,7 +4,7 @@
 typedef basic_json_stream_reader<char,std::allocator<char>> json_stream_reader
 ```
 
-A pull parser for parsing json events. A typical pull parsing application will 
+A pull parser for parsing json events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
 

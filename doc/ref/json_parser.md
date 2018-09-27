@@ -3,21 +3,32 @@
 ```c++
 typedef basic_json_parser<char> json_parser
 ```
-`json_parser` is an incremental json parser. It can be fed its input in chunks.  
+`json_parser` is an incremental json parser. It can be fed its input
+in chunks, and does not require an entire file to be loaded in memory
+at one time.
 
- A buffer of text is supplied to the parser with a call to `update(buffer)`. 
- If a subsequent call to `parse_some` reaches the end of the buffer in the middle of parsing, 
- say after digesting the sequence 'f', 'a', 'l', member function `done()` will return `false`, 
- and `source_exhausted()` will return `true`. Additional text can then be supplied to the parser, 
- `parse_some` called again, and parsing will continue from where it left off. `end_done` should be called
- When there is no more input to feed to the parser, `parse_some` should continue to be called 
- until `stopped()` returns true, or alternatively `end_parse` may be called. Once the parser has read a complete JSON text, 
- `done()` will return `true`. `check_done` can be called to check if the input has any unconsumed non-whitespace characters,
- which would normally be considered an error.  
+A buffer of text is supplied to the parser with a call to `update(buffer)`. 
+If a subsequent call to `parse_some` reaches the end of the buffer in the middle of parsing, 
+say after digesting the sequence 'f', 'a', 'l', member function `stopped()` will return `false` 
+and `source_exhausted()` will return `true`. Additional JSON text can be supplied to the parser, 
+`parse_some` called again, and parsing will resume from where it left off. 
 
-`json_parser` is used by [json_reader](json_reader.md) to read from a stream in chunks.
+A typical application will repeatedly call the `parse_some` function 
+until `stopped()` returns true. A stopped state indicates that a content
+handler function returned `false`, an error occured, or a complete JSON 
+text has been consumed. If the latter, `done() `will return `true`.
+  
+As an alternative to repeatedly calling `parse_some()` until `stopped()`
+returns `true`, when `source_exhausted()` is `true` and there is
+no more input, `end_parse` may be called.  
+ 
+`check_done` can be called to check if the input has any unconsumed 
+non-whitespace characters, which would normally be considered an error.  
 
- `json_parser` is noncopyable and nonmoveable.
+`json_parser` is used by the push parser [json_reader](json_reader.md),
+and by the pull parser [json_stream_reader](json_stream_reader.md).
+
+`json_parser` is noncopyable and nonmoveable.
 
 #### Header
 ```c++
@@ -91,7 +102,7 @@ Returns `true` when the parser has consumed a complete JSON text, `false` otherw
 
     bool stopped() const
 Returns `true` if the parser is stopped, `false` otherwise.
-The parser may go into a stopped state as a result of a content handler
+The parser may enter a stopped state as a result of a content handler
 function returning `false`, an error handler function returning `false`,
 or after having consumed a complete JSON text.
 
@@ -107,11 +118,13 @@ Parses the source until a complete json text has been consumed or the source has
 Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
     void end_parse()
-Called after there is no more input.
+Called after `source_exhausted()` is `true` and there is no more input. 
+Repeatedly calls `parse_some()` until `stopped()` returns `true`
 Throws [parse_error](parse_error.md) if parsing fails.
 
     void end_parse(std::error_code& ec)
-Called after there is no more input.
+Called after `source_exhausted()` is `true` and there is no more input. 
+Repeatedly calls `parse_some()` until `stopped()` returns `true`
 Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
     void skip_bom()
