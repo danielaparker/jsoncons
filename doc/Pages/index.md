@@ -39,7 +39,12 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 - Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 
-For more information, consult the latest [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/doc/Roadmap.md). 
+Compared to other json libraries, jsoncons has been designed to handle very large json documents. Our 
+[json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
+incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
+Our unpacked representation of a json text is more compact than most, and can be made more compact still using a custom
+allocator. We also support JSON processing with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md),
+for minimal memory footprint.  
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
 
@@ -917,4 +922,5 @@ Output:
 }
 ```
 
+For more information, consult the latest [documentation](https://github.com/danielaparker/jsoncons/blob/master/doc/Home.md) and [roadmap](https://github.com/danielaparker/jsoncons/blob/master/doc/Roadmap.md). 
 
