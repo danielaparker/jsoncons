@@ -305,23 +305,78 @@ public:
         return !continue_;
     }
 
+    void skip_space()
+    {
+        const CharT* local_input_end = input_end_;
+        while (input_ptr_ != local_input_end) 
+        {
+            switch (*input_ptr_)
+            {
+                case ' ':
+                case '\t':
+                    ++input_ptr_;
+                    ++column_;                     
+                    break;
+                case '\r': 
+                    push_state(state_);
+                    ++input_ptr_;
+                    ++column_;
+                    state_ = parse_state::cr;
+                    return; 
+                case '\n': 
+                    ++input_ptr_;
+                    ++column_;
+                    push_state(state_);
+                    state_ = parse_state::lf;
+                    return;   
+                default:
+                    return;
+            }
+        }
+    }
+
     void skip_whitespace()
     {
         const CharT* local_input_end = input_end_;
-        for (;;) 
+
+        while (input_ptr_ != local_input_end) 
         {
-            if (JSONCONS_UNLIKELY(input_ptr_ == local_input_end)) 
+            switch (state_)
             {
-                return;
-            } 
-            else if (*input_ptr_ == ' ' || *input_ptr_ == '\t') 
-            {
-                ++input_ptr_;
-                ++column_;                     
-            } 
-            else 
-            {
-                return;
+                case parse_state::cr:
+                    ++line_;
+                    column_ = 1;
+                    switch (*input_ptr_)
+                    {
+                    case '\n':
+                        state_ = pop_state();
+                        ++input_ptr_;
+                        break;
+                    default:
+                        state_ = pop_state();
+                        break;
+                    }
+                    break;
+
+                case parse_state::lf:
+                    ++line_;
+                    column_ = 1;
+                    state_ = pop_state();
+                    break;
+
+                default:
+                    switch (*input_ptr_)
+                    {
+                        case ' ':
+                        case '\t':
+                        case '\n':
+                        case '\r':
+                            skip_space();
+                            break;
+                        default:
+                            return;
+                    }
+                    break;
             }
         }
     }
@@ -466,6 +521,10 @@ public:
 
     void check_done(std::error_code& ec)
     {
+        if (state_ == parse_state::cr || state_ == parse_state::lf)
+        {
+            state_ = pop_state();
+        }
         if (state_ != parse_state::done)
         {
             continue_ = err_handler_.error(json_parse_errc::unexpected_eof, *this);
@@ -523,14 +582,18 @@ public:
                     state_ = parse_state::done;
                     continue_ = false;
                     break;
-                case parse_state::start:
+                case parse_state::done:
                     continue_ = false;
                     break;
+                //case parse_state::start:
+                //    continue_ = false;
+                //    break;
                 case parse_state::cr:
                 case parse_state::lf:
                     state_ = pop_state();
                     break;
                 default:
+                    //std::cout << "state: " << (int) state_ << "\n";
                     err_handler_.fatal_error(json_parse_errc::unexpected_eof, *this);
                     ec = json_parse_errc::unexpected_eof;
                     continue_ = false;
@@ -591,7 +654,7 @@ public:
                             state_ = parse_state::lf;
                             break;   
                         case ' ':case '\t':
-                            skip_whitespace();
+                            skip_space();
                             break;
                         case '/': 
                             ++input_ptr_;
@@ -706,7 +769,7 @@ public:
                             state_ = parse_state::lf;
                             break;   
                         case ' ':case '\t':
-                            skip_whitespace();
+                            skip_space();
                             break;
                         case '/':
                             ++input_ptr_;
@@ -784,7 +847,7 @@ public:
                             state_ = parse_state::lf;
                             break;   
                         case ' ':case '\t':
-                            skip_whitespace();
+                            skip_space();
                             break;
                         case '/':
                             ++input_ptr_;
@@ -856,7 +919,7 @@ public:
                             state_ = parse_state::lf;
                             break;   
                         case ' ':case '\t':
-                            skip_whitespace();
+                            skip_space();
                             break;
                         case '/': 
                             ++input_ptr_;
@@ -934,7 +997,7 @@ public:
                             ++column_;
                             break;   
                         case ' ':case '\t':
-                            skip_whitespace();
+                            skip_space();
                             break;
                         case '/': 
                             push_state(state_);
@@ -988,7 +1051,7 @@ public:
                             state_ = parse_state::lf;
                             break;   
                         case ' ':case '\t':
-                            skip_whitespace();
+                            skip_space();
                             break;
                         case '/': 
                             push_state(state_);
@@ -1131,7 +1194,7 @@ public:
                             state_ = parse_state::lf;
                             break;   
                         case ' ':case '\t':
-                            skip_whitespace();
+                            skip_space();
                             break;
                         case '/': 
                             ++input_ptr_;
@@ -1702,7 +1765,7 @@ zero:
             case ' ':case '\t':
                 end_integer_value(ec);
                 if (ec) return;
-                skip_whitespace();
+                skip_space();
                 return;
             case '/': 
                 end_integer_value(ec);
@@ -1781,7 +1844,7 @@ integer:
             case ' ':case '\t':
                 end_integer_value(ec);
                 if (ec) return;
-                skip_whitespace();
+                skip_space();
                 return;
             case '/': 
                 end_integer_value(ec);
@@ -1882,7 +1945,7 @@ fraction2:
             case ' ':case '\t':
                 end_fraction_value(chars_format::fixed,ec);
                 if (ec) return;
-                skip_whitespace();
+                skip_space();
                 return;
             case '/': 
                 end_fraction_value(chars_format::fixed,ec);
@@ -2006,7 +2069,7 @@ exp3:
             case ' ':case '\t':
                 end_fraction_value(chars_format::scientific,ec);
                 if (ec) return;
-                skip_whitespace();
+                skip_space();
                 return;
             case '/': 
                 end_fraction_value(chars_format::scientific,ec);
