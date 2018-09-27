@@ -5,8 +5,8 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 [json](ref/json.md)  
 [json_parser](ref/json_parser.md)  
 [json_reader](ref/json_reader.md)  
-[json_stream_reader](ref/json_stream_reader.md)  
 [json_decoder](ref/json_decoder.md)  
+[json_stream_reader](ref/json_stream_reader.md)  
 
 [ojson](ref/ojson.md)  
 
