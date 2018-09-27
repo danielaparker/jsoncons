@@ -103,7 +103,7 @@ Returns `true` when the parser has consumed a complete JSON text, `false` otherw
     bool stopped() const
 Returns `true` if the parser is stopped, `false` otherwise.
 The parser may enter a stopped state as a result of a content handler
-function returning `false`, an error handler function returning `false`,
+function returning `false`, an error occurred,
 or after having consumed a complete JSON text.
 
     bool source_exhausted() const
