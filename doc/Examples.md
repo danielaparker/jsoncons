@@ -1,6 +1,6 @@
-## Examples
+# Examples
 
-### Deserializing
+### Parsing
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
@@ -8,6 +8,7 @@
 [How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
+[Parse a very large JSON file with json_stream_reader](#A7)  
 
 ### Serializing
 
@@ -32,7 +33,7 @@
 ### Getters
 
 [Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
-[I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double.](#E2)  
+[Given a string in a `json` object that represents a decimal number, assign it to a double](#E2)  
 [Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E3)  
 [Retrieve a value in a hierarchy of JSON objects](#E4)  
 
@@ -218,6 +219,68 @@ Output:
     "postal_code": "M5H 2N2"
 }
 ```
+
+<div id="A7"/> 
+
+### Parse a very large JSON file with json_stream_reader
+
+```c++
+#include <jsoncons/json_stream_reader.hpp>
+#include <string>
+#include <sstream>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::string s = R"(
+    [
+        {
+            "enrollmentNo" : 100,
+            "firstName" : "Tom",
+            "lastName" : "Cochrane",
+            "mark" : 55              
+        },
+        {
+            "enrollmentNo" : 101,
+            "firstName" : "Catherine",
+            "lastName" : "Smith",
+            "mark" : 95              
+        },
+        {
+            "enrollmentNo" : 102,
+            "firstName" : "William",
+            "lastName" : "Skeleton",
+            "mark" : 60              
+        }
+    ]
+    )";
+
+    std::istringstream is(s);
+
+    json_stream_reader reader(is);
+
+    for (; !reader.done(); reader.next())
+    {
+        const auto& event = reader.current();
+        switch (event.event_type())
+        {
+            case stream_event_type::name:
+                std::cout << event.as<jsoncons::string_view>() << ": ";
+                break;
+            case stream_event_type::string_value:
+                std::cout << event.as<jsoncons::string_view>() << "\n";
+                break;
+            case stream_event_type::int64_value:
+            case stream_event_type::uint64_value:
+                std::cout << event.as<std::string>() << "\n";
+                break;
+        }
+    }
+}
+```
+
+See [json_stream_reader](ref/json_stream_reader.md)
 
 ### Serializing
 
@@ -522,7 +585,7 @@ If your compiler supports `std::string_view`, you can also use `j.as<std::string
 
 <div id="E2"/>
 
-#### I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double. 
+#### Given a string in a `json` object that represents a decimal number, assign it to a double
 
 ```c++
 json j = json::object{
