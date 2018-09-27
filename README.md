@@ -12,7 +12,13 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 - Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 
-It is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
+Compared to othe json libraries, jsoncons has been designed to handle very large json documents. Our 
+[json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
+incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
+Our unpacked representation of a json text is more compact than most, and can be made more compact still using a custom
+allocator. We also support JSON processing with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md).  
+
+jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons) and [Travis](https://travis-ci.org/danielaparker/jsoncons) with vs2015 and vs2017 on Windows 10, GCC 4.8 and later on Ubuntu, clang 3.8 and later on Ubuntu, and clang xcode 6.4 and later on OSX. 
 
