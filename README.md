@@ -18,9 +18,9 @@ incremental parser that can be fed its input in chunks, and does not require an 
 Our unpacked representation of a json text is more compact than most, and can be made more compact still using a custom
 allocator. We also support JSON processing with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md).  
 
-jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
-
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons) and [Travis](https://travis-ci.org/danielaparker/jsoncons) with vs2015 and vs2017 on Windows 10, GCC 4.8 and later on Ubuntu, clang 3.8 and later on Ubuntu, and clang xcode 6.4 and later on OSX. 
+
+jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
 ## Get jsoncons
 
