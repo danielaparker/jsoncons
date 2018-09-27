@@ -11,6 +11,15 @@ master
 
 - `json_parser` has new member function `stopped()`. 
 
+- The `json::is` function now supports `is<jsoncons::string_view>()`,
+  and if your compiler has `std::string_view`, `is<std::string_view>()`
+  as well. It returns `true` if the json value is a string, otherwise
+  `false`.
+
+- The `json::as` function now supports `as<jsoncons::string_view>()`,
+  and if your compiler has `std::string_view`, `as<std::string_view>()`
+  as well.
+
 ### Changes to `json_content_handler` and related streaming classes
 
 #### Non-breaking changes
