@@ -87,10 +87,13 @@ Note: It is the programmer's responsibility to ensure that `json_reader` does no
 Update the parser with a chunk of JSON
 
     bool done() const
-Returns `true` when the parser has consumed a complete json text, `false` otherwise
+Returns `true` when the parser has consumed a complete JSON text, `false` otherwise
 
     bool stopped() const
 Returns `true` if the parser is stopped, `false` otherwise.
+The parser may go into a stopped state as a result of a content handler
+function returning `false`, an error handler function returning `false`,
+or after having consumed a complete JSON text.
 
     bool source_exhausted() const
 Returns `true` if the input in the source buffer has been exhausted, `false` otherwise
@@ -123,7 +126,12 @@ Throws [parse_error](parse_error.md) if parsing fails.
 Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
     size_t reset() const
-Resets the state of the parser to it's initial state
+Resets the state of the parser to its initial state. In this state
+`stopped()` returns `false` and `done()` returns `false`.
+
+    size_t restart() const
+Resets the `stopped` state of the parser to `false`, allowing parsing
+to continue.
 
 ### Examples
 
