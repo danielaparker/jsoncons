@@ -43,7 +43,9 @@ For more information, consult the latest [documentation](https://github.com/dani
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
 
-To install the librray, the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
+To install the librray, download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
+
+Or, download the latest code on [master](https://github.com/danielaparker/jsoncons/archive/master.zip).
 
 The jsoncons classes and functions are in namespace `jsoncons`. You need to include the header file
 ```c++ 
