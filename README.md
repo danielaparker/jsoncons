@@ -12,12 +12,12 @@ data formats such as [CBOR](http://cbor.io/). It supports
 
 - Streaming JSON read and write events, somewhat analogously to SAX (push parsing) and StAX (pull parsing) in the XML world. 
 
-Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. Our 
-[json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
+Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
+SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
-Our unpacked in-memory representation of JSON is more compact than most, and can be made more compact still using a custom
-allocator. We also support memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md),
-built on top of our incremental parser.  
+Its unpacked in-memory representation of JSON is more compact than most, and can be made more compact still using a user supplied
+allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md),
+built on top of its incremental parser.  
 
 jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons) and [Travis](https://travis-ci.org/danielaparker/jsoncons) with vs2015 and vs2017 on Windows 10, GCC 4.8 and later on Ubuntu, clang 3.8 and later on Ubuntu, and clang xcode 6.4 and later on OSX. 
 
