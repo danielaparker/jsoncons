@@ -4,7 +4,9 @@
 typedef basic_json_stream_reader<char,std::allocator<char>> json_stream_reader
 ```
 
-A pull parser for parsing json events.
+A pull parser for parsing json events. A typical application will 
+repeatedly process the `current()` event and call the `next()`
+function to advance to the next event, until `done()` returns `true`.
 
 `json_stream_reader` is noncopyable and nonmoveable.
 
@@ -78,13 +80,13 @@ Note: It is the programmer's responsibility to ensure that `json_stream_reader` 
 #### Member functions
 
     bool done() const override;
-Check if there are no more events.
+Checks if there are no more events.
 
     const stream_event& current() const override;
 Returns the current [stream_event](stream_event.md).
 
     void next() override;
-Get the next event. 
+Advances to the next event. 
 
 ### Examples
 

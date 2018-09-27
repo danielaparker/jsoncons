@@ -477,6 +477,10 @@ Output:
 
 ### Pull parser example
 
+A typical pull parser application will repeatedly process the `current()` 
+event and call `next()` to advance to the next event, until `done()` 
+returns `true`.
+
 ```c++
 #include <jsoncons/json_stream_reader.hpp>
 #include <string>
