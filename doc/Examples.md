@@ -5,7 +5,7 @@
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
 [Validate JSON without incurring parse exceptions](#A3)  
-[What if I want to allow comments? What if I don't?](#A4)  
+[How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 
@@ -33,13 +33,13 @@
 
 [Use `string_view` to access the actual memory that's being used to hold a string](#E1)  
 [I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double.](#E2)  
-[I want to look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E3)  
+[Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E3)  
 [Retrieve a value in a hierarchy of JSON objects](#E4)  
 
 ### Search and Replace
 
-[Is there a way to search for and repace an object member key?](#F1)  
-[Is there a way to search for and replace a value?](#F2)  
+[Search for and repace an object member key](#F1)  
+[Search for and replace a value](#F2)  
 
 ### Deserializing
 
@@ -107,7 +107,7 @@ Expected name separator ':' on line 4 and column 20
 
 <div id="A4"/> 
 
-#### What if I want to allow comments? What if I don't?
+#### How to allow comments? How not to?
 
 jsoncons, by default, accepts and ignores C-style comments
 
@@ -534,7 +534,7 @@ double price = j["price"].as<double>();
 
 <div id="E3"/>
 
-#### I want to look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.
+#### Look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.
  
 ```c++
 json j = json::object{
@@ -599,7 +599,7 @@ int main()
  
 <div id="F1"/>
 
-#### Is there a way to search for and repace an object member key?
+#### Search for and repace an object member key
 
 You can rename object members with the built in filter [rename_object_member_filter](ref/rename_object_member_filter.md)
 
@@ -642,7 +642,7 @@ Output:
  
 <div id="F2"/>
 
-#### Is there a way to search for and replace a value?
+#### Search for and replace a value
 
 You can use [json_replace](ref/jsonpath/json_replace.md) in the `jsonpath` extension
 
