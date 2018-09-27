@@ -31,7 +31,7 @@
 
 ### Getters
 
-[Is there a way to use `string_view` to access the actual memory that's being used to hold a string?](#E1)  
+[Using `string_view` to access the actual memory that's being used to hold a string](#E1)  
 [I have a string in a JSON object that I know represents a decimal number, and I want to assign it to a C++ double.](#E2)  
 [I want to look up a key, if found, return the value converted to type T, otherwise, return a default value of type T.](#E3)  
 [Retrieve a value in a hierarchy of JSON objects](#E4)  
@@ -509,7 +509,7 @@ for (const auto& member : j.object_range())
 
 <div id="E1"/>
 
-#### Is there a way to use `string_view` to access the actual memory that's being used to hold a string?
+#### Using `string_view` to access the actual memory that's being used to hold a string
 
 You can use `j.as<jsoncons::string_view>()`, e.g.
 ```c++
@@ -518,7 +518,7 @@ auto sv = j.as<jsoncons::string_view>();
 ```
 `jsoncons::string_view` supports the member functions of `std::string_view`, including `data()` and `size()`. 
 
-If your compiler supports `std::string_view`, you can use `j.as<std::string_view>()`.
+If your compiler supports `std::string_view`, you can also use `j.as<std::string_view>()`.
 
 <div id="E2"/>
 
