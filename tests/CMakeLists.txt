@@ -65,8 +65,6 @@ add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 find_package(Threads)
 
-# include_directories(${GTEST_INCLUDE_DIRS})
-
 set(XSIMD_TESTS
     src/tests_main.cpp
     src/json_stream_reader_tests.cpp
@@ -74,7 +72,7 @@ set(XSIMD_TESTS
 
 set(XSIMD_TARGET test_xsimd)
 add_executable(${XSIMD_TARGET} EXCLUDE_FROM_ALL ${XSIMD_TESTS} ${XSIMD_HEADERS})
-# target_link_libraries(${XSIMD_TARGET} xsimd ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+# target_link_libraries(${XSIMD_TARGET} xsimd ${CMAKE_THREAD_LIBS_INIT})
 target_include_directories (${XSIMD_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
