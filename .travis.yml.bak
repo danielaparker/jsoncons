@@ -46,35 +46,6 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.8
-            - llvm-toolchain-precise
-          packages:
-            - clang-3.9
-            - g++-arm-linux-gnueabi
-            - g++-multilib
-            - gcc-multilib
-            - qemu
-            - qemu-system-arm
-            - libc++-dev
-      env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.7.3 ARM_SETTINGS="armv7-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi" CMAKE_OPTIONS="-DCXXSTD=11"
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - clang-3.9
-            - g++-arm-linux-gnueabi
-            - g++-multilib
-            - gcc-multilib
-            - qemu
-            - qemu-system-arm
-      env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.7.3 ARM_SETTINGS="armv8-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
           packages:
             - clang-3.9
             - g++-4.8-aarch64-linux-gnu
@@ -177,18 +148,18 @@ install:
       else
         cmake . -DBUILD_TESTS=ON  ${CMAKE_OPTIONS};
       fi
-    - make -j2 test_xsimd
+    - make -j2 test_jsoncons
     - cd tests
 script:
     - if [[ "$CROSS_COMPILE" == 1 ]]; then
         if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]]; then
-          qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./test_xsimd ;
+          qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./test_jsoncons ;
         else
-          qemu-arm -L /usr/arm-linux-gnueabi/ ./test_xsimd ;
+          qemu-arm -L /usr/arm-linux-gnueabi/ ./test_jsoncons ;
         fi
       elif [[ "$AVX512" == 1 ]] ; then
         uname -m ;
-        ../intel-sde-downloader/sde-external-8.16.0-2018-01-30-lin/sde64 -cnl -- ./test_xsimd ;
+        ../intel-sde-downloader/sde-external-8.16.0-2018-01-30-lin/sde64 -cnl -- ./test_jsoncons ;
       else
-        ./test_xsimd;
+        ./test_jsoncons;
       fi

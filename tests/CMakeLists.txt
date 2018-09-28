@@ -4,7 +4,7 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(jsoncons-test)
 
     find_package(jsoncons REQUIRED CONFIG)
-    set(XSIMD_INCLUDE_DIR ${jsoncons_INCLUDE_DIRS})
+    set(JSONCONS_INCLUDE_DIR ${jsoncons_INCLUDE_DIRS})
 endif ()
 
 message(STATUS "Forcing tests build type to Release")
@@ -65,21 +65,21 @@ add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 find_package(Threads)
 
-set(XSIMD_TESTS
+set(JSONCONS_TESTS
     src/tests_main.cpp
     src/json_stream_reader_tests.cpp
 )
 
-set(XSIMD_TARGET test_jsoncons)
-add_executable(${XSIMD_TARGET} EXCLUDE_FROM_ALL ${XSIMD_TESTS} ${XSIMD_HEADERS})
-# target_link_libraries(${XSIMD_TARGET} jsoncons ${CMAKE_THREAD_LIBS_INIT})
-target_include_directories (${XSIMD_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
+set(JSONCONS_TARGET test_jsoncons)
+add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS} ${JSONCONS_HEADERS})
+# target_link_libraries(${JSONCONS_TARGET} jsoncons ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories (${JSONCONS_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
-target_link_libraries(${XSIMD_TARGET} Catch)
+target_link_libraries(${JSONCONS_TARGET} Catch)
 
 if (CROSS_COMPILE_ARM)
-    add_custom_target(xtest COMMAND qemu-arm -L /usr/arm-linux-gnueabi/ test_jsoncons DEPENDS ${XSIMD_TARGET})
+    add_custom_target(xtest COMMAND qemu-arm -L /usr/arm-linux-gnueabi/ test_jsoncons DEPENDS ${JSONCONS_TARGET})
 else()
-    add_custom_target(xtest COMMAND test_jsoncons DEPENDS ${XSIMD_TARGET})
+    add_custom_target(xtest COMMAND test_jsoncons DEPENDS ${JSONCONS_TARGET})
 endif()
