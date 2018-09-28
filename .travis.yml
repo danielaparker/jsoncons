@@ -46,6 +46,8 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-3.8
+            - llvm-toolchain-precise
           packages:
             - clang-3.9
             - g++-arm-linux-gnueabi
@@ -53,7 +55,8 @@ matrix:
             - gcc-multilib
             - qemu
             - qemu-system-arm
-      env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.7.3 ARM_SETTINGS="armv7-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
+            - libc++-dev
+      env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.7.3 ARM_SETTINGS="armv7-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi" CMAKE_OPTIONS="-DCXXSTD=11"
     - os: linux
       addons:
         apt:
@@ -156,9 +159,9 @@ install:
           ln -s /usr/bin/aarch64-linux-gnu-ld $HOME/linker_bin/ld ;
           echo "SETTING GNU LINKER DIR" ;
           ls -al $HOME/linker_bin/ld ;
-          cmake . -DBUILD_TESTS=ON -DCROSS_COMPILE_ARM=ON -DDOWNLOAD_GTEST=ON -DARM_ARCH_DIRECTORY="$ARM_ARCH_DIR" -DARM_GCC_VER="$GCC_VER" -DTARGET_ARCH="$ARM_SETTINGS --prefix=$HOME/linker_bin/" ;
+          cmake . -DBUILD_TESTS=ON -DCROSS_COMPILE_ARM=ON -DDOWNLOAD_GTEST=ON -DARM_ARCH_DIRECTORY="$ARM_ARCH_DIR" -DARM_GCC_VER="$GCC_VER" -DTARGET_ARCH="$ARM_SETTINGS --prefix=$HOME/linker_bin/"  ${CMAKE_OPTIONS};
         else
-          cmake . -DBUILD_TESTS=ON -DCROSS_COMPILE_ARM=ON -DDOWNLOAD_GTEST=ON -DARM_ARCH_DIRECTORY="$ARM_ARCH_DIR" -DARM_GCC_VER="$GCC_VER" -DTARGET_ARCH="$ARM_SETTINGS" ;
+          cmake . -DBUILD_TESTS=ON -DCROSS_COMPILE_ARM=ON -DDOWNLOAD_GTEST=ON -DARM_ARCH_DIRECTORY="$ARM_ARCH_DIR" -DARM_GCC_VER="$GCC_VER" -DTARGET_ARCH="$ARM_SETTINGS"  ${CMAKE_OPTIONS};
         fi
       elif [[ "$ENABLE_FALLBACK" == 1 ]] ; then
         cmake -DBUILD_TESTS=ON -DENABLE_FALLBACK=ON -DENABLE_XTL_COMPLEX=ON . ;
@@ -170,9 +173,9 @@ install:
         export PATH="$HOME/miniconda/bin:$PATH" ;
         export CC=x86_64-conda_cos6-linux-gnu-gcc CXX=x86_64-conda_cos6-linux-gnu-g++ ;
         which $CXX ;
-        cmake . -DBUILD_TESTS=ON -DTARGET_ARCH=skylake-avx512 -DCMAKE_INSTALL_PREFIX=$HOME/miniconda -DDOWNLOAD_GTEST=ON ;
+        cmake . -DBUILD_TESTS=ON -DTARGET_ARCH=skylake-avx512 -DCMAKE_INSTALL_PREFIX=$HOME/miniconda -DDOWNLOAD_GTEST=ON  ${CMAKE_OPTIONS};
       else
-        cmake . -DBUILD_TESTS=ON ;
+        cmake . -DBUILD_TESTS=ON  ${CMAKE_OPTIONS};
       fi
     - make -j2 test_xsimd
     - cd tests
