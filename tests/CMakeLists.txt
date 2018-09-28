@@ -76,7 +76,7 @@ set(XSIMD_TESTS
 set(XSIMD_TARGET test_xsimd)
 add_executable(${XSIMD_TARGET} EXCLUDE_FROM_ALL ${XSIMD_TESTS} ${XSIMD_HEADERS})
 # target_link_libraries(${XSIMD_TARGET} xsimd ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-target_include_directories (jsoncons_tests PUBLIC ${JSONCONS_INCLUDE_DIR}
+target_include_directories (${XSIMD_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
 target_link_libraries(${XSIMD_TARGET} Catch)
