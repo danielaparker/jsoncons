@@ -21,71 +21,7 @@ message(STATUS "xsimd v${${PROJECT_NAME}_VERSION}")
 # =====
 
 set(XSIMD_HEADERS
-    ${XSIMD_INCLUDE_DIR}/xsimd/xsimd.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/config/xsimd_align.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/config/xsimd_config.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/config/xsimd_include.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/config/xsimd_instruction_set.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_basic_math.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_error.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_exp_reduction.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_exponential.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_fp_manipulation.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_fp_sign.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_gamma.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_horner.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_hyperbolic.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_invtrigo.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_logarithm.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_math.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_math_complex.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_numerical_constant.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_power.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_rem_pio2.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_rounding.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_trigo_reduction.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/math/xsimd_trigonometric.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/memory/xsimd_aligned_allocator.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/memory/xsimd_aligned_stack_buffer.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/memory/xsimd_alignment.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx_complex.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx_conversion.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx_double.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx_float.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx_int8.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx_int32.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx_int64.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx512_bool.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx512_complex.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx512_conversion.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx512_double.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx512_float.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx512_int8.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx512_int32.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_avx512_int64.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_bool.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_complex.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_conversion.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_double.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_float.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_int8.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_int32.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_int64.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_neon_uint8.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_base.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_complex_base.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_fallback.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_int_conversion.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_sse_complex.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_sse_conversion.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_sse_double.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_sse_float.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_sse_int8.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_sse_int32.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_sse_int64.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_traits.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_types_include.hpp
-    ${XSIMD_INCLUDE_DIR}/xsimd/types/xsimd_utils.hpp
+    ${XSIMD_INCLUDE_DIR}/jsoncons/json.hpp
 )
 
 add_library(xsimd INTERFACE)
@@ -128,7 +64,7 @@ install(TARGETS xsimd
 export(EXPORT ${PROJECT_NAME}-targets
        FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
 
-install(DIRECTORY ${XSIMD_INCLUDE_DIR}/xsimd
+install(DIRECTORY ${XSIMD_INCLUDE_DIR}/jsoncons
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
