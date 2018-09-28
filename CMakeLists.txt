@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(xsimd)
 
+set(JSONCONS_PROJECT_DIR ${PROJECT_SOURCE_DIR})
 set(XSIMD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Versionning

@@ -55,7 +55,6 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
-set(JSONCONS_PROJECT_DIR ${PROJECT_SOURCE_DIR}/..)
 set(JSONCONS_TESTS_DIR ${JSONCONS_PROJECT_DIR}/tests)
 set(JSONCONS_TESTS_SOURCE_DIR ${JSONCONS_PROJECT_DIR}/tests/src)
 set(JSONCONS_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/include)
@@ -66,7 +65,7 @@ add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 find_package(Threads)
 
-include_directories(${GTEST_INCLUDE_DIRS})
+# include_directories(${GTEST_INCLUDE_DIRS})
 
 set(XSIMD_TESTS
     src/tests_main.cpp
