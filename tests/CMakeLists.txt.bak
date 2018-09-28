@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    project(jsoncons-test)
+    project(xsimd-test)
 
-    find_package(jsoncons REQUIRED CONFIG)
-    set(XSIMD_INCLUDE_DIR ${jsoncons_INCLUDE_DIRS})
+    find_package(xsimd REQUIRED CONFIG)
+    set(XSIMD_INCLUDE_DIR ${xsimd_INCLUDE_DIRS})
 endif ()
 
 message(STATUS "Forcing tests build type to Release")
@@ -44,7 +44,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         elseif (HAS_CPP11_FLAG)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fPIC -march=${TARGET_ARCH} -Wunused-parameter -Wextra -Wreorder -std=c++11")
         else()
-            message(FATAL_ERROR "Unsupported compiler -- jsoncons requires C++11 support!")
+            message(FATAL_ERROR "Unsupported compiler -- xsimd requires C++11 support!")
         endif()
     endif()
 endif()
@@ -70,16 +70,16 @@ set(XSIMD_TESTS
     src/json_stream_reader_tests.cpp
 )
 
-set(XSIMD_TARGET test_jsoncons)
+set(XSIMD_TARGET test_xsimd)
 add_executable(${XSIMD_TARGET} EXCLUDE_FROM_ALL ${XSIMD_TESTS} ${XSIMD_HEADERS})
-# target_link_libraries(${XSIMD_TARGET} jsoncons ${CMAKE_THREAD_LIBS_INIT})
+# target_link_libraries(${XSIMD_TARGET} xsimd ${CMAKE_THREAD_LIBS_INIT})
 target_include_directories (${XSIMD_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
 target_link_libraries(${XSIMD_TARGET} Catch)
 
 if (CROSS_COMPILE_ARM)
-    add_custom_target(xtest COMMAND qemu-arm -L /usr/arm-linux-gnueabi/ test_jsoncons DEPENDS ${XSIMD_TARGET})
+    add_custom_target(xtest COMMAND qemu-arm -L /usr/arm-linux-gnueabi/ test_xsimd DEPENDS ${XSIMD_TARGET})
 else()
-    add_custom_target(xtest COMMAND test_jsoncons DEPENDS ${XSIMD_TARGET})
+    add_custom_target(xtest COMMAND test_xsimd DEPENDS ${XSIMD_TARGET})
 endif()
