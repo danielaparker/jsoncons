@@ -6,7 +6,7 @@ set(XSIMD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Versionning
 # ===========
 
-file(STRINGS "${XSIMD_INCLUDE_DIR}/xsimd/config/xsimd_config.hpp" xsimd_version_defines
+file(STRINGS "${XSIMD_INCLUDE_DIR}/jsoncons/version.hpp" xsimd_version_defines
      REGEX "#define XSIMD_VERSION_(MAJOR|MINOR|PATCH)")
 foreach(ver ${xsimd_version_defines})
     if(ver MATCHES "#define XSIMD_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")

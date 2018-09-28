@@ -8,9 +8,13 @@
 #define JSONCONS_VERSION_HPP
 
 #include <iostream>
+    
+#define XSIMD_VERSION_MAJOR 0
+#define XSIMD_VERSION_MINOR 109
+#define XSIMD_VERSION_PATCH 0
 
 namespace jsoncons {
-    
+
 struct versioning_info
 {
     versioning_info(unsigned int major,
