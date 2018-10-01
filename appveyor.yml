@@ -79,9 +79,7 @@ before_build:
       set "makecommand=%makecommand% ARM"
     )
 
-  - md build
-  - cd build
-  - if %platform%==vs cmake .. -G "%makecommand%" -DCMAKE_INSTALL_PREFIX=%P%
+  - if %platform%==vs cmake . -G "%makecommand%" -DCMAKE_INSTALL_PREFIX=%P%
 
 build_script:
   - cmake --build . --config Release
