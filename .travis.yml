@@ -92,20 +92,20 @@ before_install:
       fi
 install:
     # Define the version of miniconda to download
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        MINCONDA_OS=$MINCONDA_LINUX;
-      elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        MINCONDA_OS=$MINCONDA_OSX;
-      fi
-    - wget "http://repo.continuum.io/miniconda/Miniconda3-$MINCONDA_VERSION-$MINCONDA_OS.sh" -O miniconda.sh;
-    - bash miniconda.sh -b -p $HOME/miniconda
-    - export PATH="$HOME/miniconda/bin:$PATH"
+    # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    #    MINCONDA_OS=$MINCONDA_LINUX;
+    #  elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    #    MINCONDA_OS=$MINCONDA_OSX;
+    #  fi
+    #- wget "http://repo.continuum.io/miniconda/Miniconda3-$MINCONDA_VERSION-$MINCONDA_OS.sh" -O miniconda.sh;
+    # - bash miniconda.sh -b -p $HOME/miniconda
+    # - export PATH="$HOME/miniconda/bin:$PATH"
     - hash -r
-    - conda config --set always_yes yes --set changeps1 no
-    - conda update -q conda
+    # - conda config --set always_yes yes --set changeps1 no
+    # - conda update -q conda
     # Useful for debugging any issues with conda
-    - conda info -a
-    - conda install gtest cmake -c conda-forge
+    # - conda info -a
+    # - conda install gtest cmake -c conda-forge
     - if [[ "$CROSS_COMPILE" == 1 ]] ; then
         if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]] ; then
           mkdir $HOME/linker_bin ;
@@ -128,9 +128,6 @@ script:
         else
           qemu-arm -L /usr/arm-linux-gnueabi/ ./test_jsoncons ;
         fi
-      elif [[ "$AVX512" == 1 ]] ; then
-        uname -m ;
-        ../intel-sde-downloader/sde-external-8.16.0-2018-01-30-lin/sde64 -cnl -- ./test_jsoncons ;
       else
         ./test_jsoncons;
       fi
