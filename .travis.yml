@@ -72,7 +72,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       compiler: clang
-      env: CXX=clang++  CC=clang
+      env: CXX=clang++
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -81,17 +81,16 @@ env:
 before_install:
     - |
       # Configure build variables
-      export CXX;
-      # if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      #  if [[ "$COMPILER" == "gcc" ]]; then
-      #    export CXX=g++-$GCC CC=gcc-$GCC;
-      #  fi
-      #  if [[ "$COMPILER" == "clang" ]]; then
-      #    export CXX=clang++-$CLANG CC=clang-$CLANG;
-      #  fi
-      # elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      #  export CXX=clang++ CC=clang;
-      # fi
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        if [[ "$COMPILER" == "gcc" ]]; then
+          export CXX=g++-$GCC CC=gcc-$GCC;
+        fi
+        if [[ "$COMPILER" == "clang" ]]; then
+          export CXX=clang++-$CLANG CC=clang-$CLANG;
+        fi
+      elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        export CXX=clang++ CC=clang;
+      fi
 install:
     - if [[ "$CROSS_COMPILE" == 1 ]] ; then
         if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]] ; then
