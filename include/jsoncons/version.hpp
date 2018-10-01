@@ -45,7 +45,7 @@ struct versioning_info
 inline
 versioning_info version()
 {
-    static versioning_info ver(0, 109, 0);
+    static versioning_info ver(0, 110, 1);
     return ver;
 }
 

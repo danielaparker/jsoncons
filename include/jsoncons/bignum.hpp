@@ -233,6 +233,7 @@ public:
 
     basic_bignum(unsigned short u)
     {
+        neg_ = false;
         initialize_from_integer( u );
     }
 
@@ -245,6 +246,7 @@ public:
 
     basic_bignum(unsigned int u)
     {
+        neg_ = false;
         initialize_from_integer( u );
     }
 
@@ -257,6 +259,7 @@ public:
 
     basic_bignum(unsigned long u)
     {
+        neg_ = false;
         initialize_from_integer( u );
     }
 
@@ -269,6 +272,7 @@ public:
 
     basic_bignum(unsigned long long u)
     {
+        neg_ = false;
         initialize_from_integer( u );
     }
 
@@ -335,7 +339,7 @@ public:
     {
         if ( dynamic_ )
         {
-            delete[] data_;
+            allocator().deallocate(data_, capacity_);
         }
     }
 
@@ -1455,4 +1459,3 @@ typedef basic_bignum<std::allocator<uint8_t>> bignum;
 }
 
 #endif
-
