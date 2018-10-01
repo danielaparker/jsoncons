@@ -13,7 +13,7 @@
 #include <cstddef>
 #include <vector>
 #include <locale>
-#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
 

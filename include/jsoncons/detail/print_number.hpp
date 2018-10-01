@@ -21,7 +21,7 @@
 #include <limits> 
 #include <algorithm>
 #include <exception>
-#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 

@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <exception>
 #include <ostream>
-#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace detail {
 

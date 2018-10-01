@@ -8,7 +8,7 @@ set(JSONCONS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # Versioning
 # ==========
 
-file(STRINGS "${JSONCONS_INCLUDE_DIR}/jsoncons/version.hpp" jsoncons_version_defines
+file(STRINGS "${JSONCONS_INCLUDE_DIR}/jsoncons/config/version.hpp" jsoncons_version_defines
      REGEX "#define JSONCONS_VERSION_(MAJOR|MINOR|PATCH)")
 foreach(ver ${jsoncons_version_defines})
     if(ver MATCHES "#define JSONCONS_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")

@@ -99,6 +99,34 @@ matrix:
       osx_image: xcode8.1
       compiler: clang
 
+    - os: osx
+      osx_image: xcode8.2
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode9
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode9.1
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode9.2
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode9.3
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
+
 before_install:
     - |
       # Configure build variables

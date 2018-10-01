@@ -18,7 +18,7 @@
 #include <typeinfo>
 #include <cstring>
 #include <jsoncons/json_fwd.hpp>
-#include <jsoncons/version.hpp>
+#include <jsoncons/config/version.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>

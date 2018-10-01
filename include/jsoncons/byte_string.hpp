@@ -26,7 +26,7 @@
 #include <exception>
 #include <array>
 #include <initializer_list>
-#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #if !defined(JSONCONS_NO_TO_CHARS)
 #include <charconv>

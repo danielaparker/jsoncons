@@ -17,7 +17,7 @@
 #include <vector>
 #include <iterator>
 #include <jsoncons/detail/unicode_traits.hpp>
-#include <jsoncons/jsoncons_config.hpp>
+#include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
 
