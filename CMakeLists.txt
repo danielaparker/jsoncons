@@ -22,9 +22,8 @@ message(STATUS "jsoncons v${${PROJECT_NAME}_VERSION}")
 # Build
 # =====
 
-set(JSONCONS_HEADERS
-    ${JSONCONS_INCLUDE_DIR}/jsoncons/json.hpp
-)
+
+file(GLOB_RECURSE JSONCONS_HEADERS ${JSONCONS_INCLUDE_DIR}/*.hpp)
 
 add_library(jsoncons INTERFACE)
 target_include_directories(jsoncons INTERFACE $<BUILD_INTERFACE:${JSONCONS_INCLUDE_DIR}>

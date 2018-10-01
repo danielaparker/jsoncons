@@ -9,9 +9,9 @@
 
 #include <iostream>
     
-#define XSIMD_VERSION_MAJOR 0
-#define XSIMD_VERSION_MINOR 109
-#define XSIMD_VERSION_PATCH 0
+#define JSONCONS_VERSION_MAJOR 0
+#define JSONCONS_VERSION_MINOR 110
+#define JSONCONS_VERSION_PATCH 1
 
 namespace jsoncons {
 
@@ -45,7 +45,7 @@ struct versioning_info
 inline
 versioning_info version()
 {
-    static versioning_info ver(0, 110, 1);
+    static versioning_info ver(JSONCONS_VERSION_MAJOR, JSONCONS_VERSION_MINOR, JSONCONS_VERSION_PATCH);
     return ver;
 }
 
