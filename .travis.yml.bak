@@ -1,0 +1,107 @@
+dist: trusty
+
+sudo: required
+
+addon_shortcuts:
+  xcode64: &xcode64
+    apt:
+      packages:
+
+  clang38: &clang38
+    apt:
+      sources:
+        - llvm-toolchain-trusty-3.8
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-precise
+      packages:
+        - clang-3.8
+        - libc++-dev
+
+  clang50: &clang50
+    apt:
+      sources:
+        - llvm-toolchain-trusty-5.0
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-precise
+      packages:
+        - clang-5.0
+        - libc++-dev
+
+  clang60: &clang60
+    apt:
+      sources:
+        - llvm-toolchain-trusty-6.0
+        - ubuntu-toolchain-r-test
+        - llvm-toolchain-precise
+      packages:
+        - clang-6.0
+        - libc++-dev
+
+  gcc48: &gcc48
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-4.8
+
+  gcc6: &gcc6
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-6
+
+  gcc7: &gcc7
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-7
+
+  gcc8: &gcc8
+    apt:
+      sources:
+        - ubuntu-toolchain-r-test
+      packages:
+        - g++-8
+
+addons:
+  apt:
+    update: true
+    packages:
+      - cmake
+
+before_install:
+  - curl -L http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+  - echo 'deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.8 main' | sudo tee /etc/apt/sources.list
+
+matrix:
+  include:
+    - { env: 'CXX=g++-4.8 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc48 }
+    - { env: 'CXX=g++-6 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc6 }
+    - { env: 'CXX=g++-6 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc6 }
+    - { env: 'CXX=g++-7 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc7 }
+    - { env: 'CXX=g++-7 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc7 }
+    - { env: 'CXX=g++-8 CMAKE_OPTIONS="-DCXXSTD=17"', addons: *gcc8 }
+    - { env: 'CXX=g++-8 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=17"', addons: *gcc8 }
+    - { env: 'CXX=clang++-3.8 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang38 }
+    - { env: 'CXX=clang++-5.0 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang50 }
+    - { env: 'CXX=clang++-6.0 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang60 }
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode6.4'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode7.3'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode8'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode8.1'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode8.2'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode8.3'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9.1'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9.2'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9.3'}
+    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9.4'}
+
+script:
+  - cd tests/build/cmake
+  - cmake . ${CMAKE_OPTIONS}
+  - cmake --build . --config Release
+  - ctest -C Release -V -j
+
