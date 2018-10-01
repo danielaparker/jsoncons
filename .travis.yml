@@ -51,7 +51,7 @@ matrix:
             - gcc-4.8-multilib
             - qemu
             - qemu-system-arm
-      env: CXX=clang++-3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi"
+      env: CXX=clang++-3.9 CC=clang-3.9 COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi"
 
     - os: linux
       addons:
@@ -85,8 +85,53 @@ matrix:
             - clang-6.0
       env: CXX=clang++-6.0
 
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+      env: CXX=clang++-6.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
+
     - os: osx
       osx_image: xcode8.1
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode8.2
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9.1
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9.2
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9.3
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9.4
       compiler: clang
       env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
 
