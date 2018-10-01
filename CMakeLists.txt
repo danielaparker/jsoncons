@@ -29,19 +29,7 @@ add_library(jsoncons INTERFACE)
 target_include_directories(jsoncons INTERFACE $<BUILD_INTERFACE:${JSONCONS_INCLUDE_DIR}>
                                            $<INSTALL_INTERFACE:include>)
 
-OPTION(ENABLE_FALLBACK "build tests/benchmarks with fallback implementation" OFF)
-OPTION(ENABLE_XTL_COMPLEX "enables support for xcomplex defined in xtl" OFF)
 OPTION(BUILD_TESTS "jsoncons test suite" OFF)
-
-if(ENABLE_FALLBACK)
-    add_definitions(-DJSONCONS_ENABLE_FALLBACK=1)
-endif()
-
-if(ENABLE_XTL_COMPLEX)
-    add_definitions(-DJSONCONS_ENABLE_XTL_COMPLEX=1)
-    find_package(xtl 0.4.11 REQUIRED)
-    target_link_libraries(jsoncons INTERFACE xtl)
-endif()
 
 if(BUILD_TESTS)
     add_subdirectory(tests)
@@ -73,8 +61,8 @@ configure_package_config_file(${PROJECT_NAME}Config.cmake.in
 # jsoncons is header-only and does not depend on the architecture.
 # Remove CMAKE_SIZEOF_VOID_P from xtensorConfigVersion.cmake so that an xtensorConfig.cmake
 # generated for a 64 bit target can be used for 32 bit targets and vice versa.
-set(_XTENSOR_CMAKE_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})
-unset(CMAKE_SIZEOF_VOID_P)
+# set(_XTENSOR_CMAKE_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})
+# unset(CMAKE_SIZEOF_VOID_P)
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
                                  VERSION ${${PROJECT_NAME}_VERSION}
                                  COMPATIBILITY AnyNewerVersion)
