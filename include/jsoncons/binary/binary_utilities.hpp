@@ -135,7 +135,7 @@ inline
 uint16_t encode_half(double val)
 {
 #ifdef __F16C__
-    return _cvtss_sh(val, 3);
+    return _cvtss_sh((float)val, 3);
 #else
     uint64_t v;
     memcpy(&v, &val, sizeof(v));

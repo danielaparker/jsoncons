@@ -144,7 +144,7 @@ public:
         return first_;
     }
 
-    const size_t buflen() const
+    size_t buflen() const
     {
         return last_ - first_;
     }

@@ -1438,7 +1438,7 @@ public:
             }
         }
 
-        void Init_rv_(variant&& val, const Allocator& a, std::true_type) JSONCONS_NOEXCEPT
+        void Init_rv_(variant&& val, const Allocator&, std::true_type) JSONCONS_NOEXCEPT
         {
             Init_rv_(std::forward<variant>(val));
         }
@@ -2515,7 +2515,7 @@ public:
     {
     }
 
-    basic_json(basic_json&& other, const Allocator& allocator) JSONCONS_NOEXCEPT
+    basic_json(basic_json&& other, const Allocator&) JSONCONS_NOEXCEPT
         : var_(std::move(other.var_) /*,allocator*/ )
     {
     }

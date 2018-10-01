@@ -196,7 +196,7 @@ public:
     }
 
     basic_json_serializer(output_type& os, const basic_json_serializing_options<CharT>& options, bool pprint)
-        : basic_json_serializer(os, basic_json_serializing_options<CharT>(), (pprint ? indenting::indent : indenting::no_indent))
+        : basic_json_serializer(os, options, (pprint ? indenting::indent : indenting::no_indent))
     {
     }
 #endif
