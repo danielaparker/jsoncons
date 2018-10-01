@@ -1,107 +1,163 @@
+language: cpp
 dist: trusty
-
-sudo: required
-
-addon_shortcuts:
-  xcode64: &xcode64
-    apt:
-      packages:
-
-  clang38: &clang38
-    apt:
-      sources:
-        - llvm-toolchain-trusty-3.8
-        - ubuntu-toolchain-r-test
-        - llvm-toolchain-precise
-      packages:
-        - clang-3.8
-        - libc++-dev
-
-  clang50: &clang50
-    apt:
-      sources:
-        - llvm-toolchain-trusty-5.0
-        - ubuntu-toolchain-r-test
-        - llvm-toolchain-precise
-      packages:
-        - clang-5.0
-        - libc++-dev
-
-  clang60: &clang60
-    apt:
-      sources:
-        - llvm-toolchain-trusty-6.0
-        - ubuntu-toolchain-r-test
-        - llvm-toolchain-precise
-      packages:
-        - clang-6.0
-        - libc++-dev
-
-  gcc48: &gcc48
-    apt:
-      sources:
-        - ubuntu-toolchain-r-test
-      packages:
-        - g++-4.8
-
-  gcc6: &gcc6
-    apt:
-      sources:
-        - ubuntu-toolchain-r-test
-      packages:
-        - g++-6
-
-  gcc7: &gcc7
-    apt:
-      sources:
-        - ubuntu-toolchain-r-test
-      packages:
-        - g++-7
-
-  gcc8: &gcc8
-    apt:
-      sources:
-        - ubuntu-toolchain-r-test
-      packages:
-        - g++-8
-
-addons:
-  apt:
-    update: true
-    packages:
-      - cmake
-
-before_install:
-  - curl -L http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-  - echo 'deb http://llvm.org/apt/trusty/ llvm-toolchain-trusty-3.8 main' | sudo tee /etc/apt/sources.list
-
 matrix:
   include:
-    - { env: 'CXX=g++-4.8 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc48 }
-    - { env: 'CXX=g++-6 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc6 }
-    - { env: 'CXX=g++-6 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc6 }
-    - { env: 'CXX=g++-7 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc7 }
-    - { env: 'CXX=g++-7 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=11"', addons: *gcc7 }
-    - { env: 'CXX=g++-8 CMAKE_OPTIONS="-DCXXSTD=17"', addons: *gcc8 }
-    - { env: 'CXX=g++-8 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" CMAKE_OPTIONS="-DCXXSTD=17"', addons: *gcc8 }
-    - { env: 'CXX=clang++-3.8 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang38 }
-    - { env: 'CXX=clang++-5.0 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang50 }
-    - { env: 'CXX=clang++-6.0 CMAKE_OPTIONS="-DCXXSTD=11"', addons: *clang60 }
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode6.4'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode7.3'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode8'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode8.1'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode8.2'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode8.3'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9.1'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9.2'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9.3'}
-    - { env: 'CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"', compiler: clang, osx_image: xcode9.4'}
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.8
+      env: CXX=g++-4.8 CMAKE_OPTIONS="-DCXXSTD=11"
 
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env: CXX=g++-4.9
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: CXX=g++-5
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env: CXX=g++-6
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-3.9
+            - g++-4.8-aarch64-linux-gnu
+            - gcc-4.8-aarch64-linux-gnu
+            - g++-4.8-multilib
+            - gcc-4.8-multilib
+            - qemu
+            - qemu-system-arm
+      env: CXX=clang++-3.9 CC=clang-3.9 COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi"
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - g++-4.9
+            - clang-4.0
+      env: CXX=clang++-4.0
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - g++-4.9
+            - clang-5.0
+      env: CXX=clang++-5.0
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+      env: CXX=clang++-6.0
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+      env: CXX=clang++-6.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
+
+    - os: osx
+      osx_image: xcode8.1
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode8.2
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9.1
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9.2
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9.3
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
+      env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
+
+install:
+    - if [[ "$CROSS_COMPILE" == 1 ]] ; then
+        if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]] ; then
+          mkdir $HOME/linker_bin ;
+          ln -s /usr/bin/aarch64-linux-gnu-ld $HOME/linker_bin/ld ;
+          echo "SETTING GNU LINKER DIR" ;
+          ls -al $HOME/linker_bin/ld ;
+          cmake . -DBUILD_TESTS=ON -DCROSS_COMPILE_ARM=ON -DARM_ARCH_DIRECTORY="$ARM_ARCH_DIR" -DARM_GCC_VER="$GCC_VER" -DTARGET_ARCH="$ARM_SETTINGS --prefix=$HOME/linker_bin/"  ${CMAKE_OPTIONS};
+        else
+          cmake . -DBUILD_TESTS=ON -DCROSS_COMPILE_ARM=ON -DARM_ARCH_DIRECTORY="$ARM_ARCH_DIR" -DARM_GCC_VER="$GCC_VER" -DTARGET_ARCH="$ARM_SETTINGS"  ${CMAKE_OPTIONS};
+        fi
+      else
+        cmake . -DBUILD_TESTS=ON  ${CMAKE_OPTIONS};
+      fi
+    - make -j2 test_jsoncons
+    - cd tests
 script:
-  - cd tests/build/cmake
-  - cmake . ${CMAKE_OPTIONS}
-  - cmake --build . --config Release
-  - ctest -C Release -V -j
-
+    - if [[ "$CROSS_COMPILE" == 1 ]]; then
+        if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]]; then
+          qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./test_jsoncons ;
+        else
+          qemu-arm -L /usr/arm-linux-gnueabi/ ./test_jsoncons ;
+        fi
+      else
+        ./test_jsoncons;
+      fi
