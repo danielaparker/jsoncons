@@ -52,7 +52,7 @@ install:
   - if "%COMPILER%"=="mingw" g++ --version
 
 before_build:
-  - cd tests/build/cmake
+  # - cd tests/build/cmake
   # Remove the following from the path, as it will interfere with
   # the MinGW builds
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
@@ -85,6 +85,7 @@ before_build:
 
 build_script:
   - cmake --build . --config Release
+  - cd tests
 
 test_script:
   - set "testplatform=%platform%"
