@@ -9,7 +9,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: COMPILER=gcc GCC=4.9
+      env: CXX=g++-4.9 COMPILER=gcc GCC=4.9
     - os: linux
       addons:
         apt:
@@ -17,7 +17,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc GCC=5
+      env: CXX=g++-5 COMPILER=gcc GCC=5
     - os: linux
       addons:
         apt:
@@ -25,7 +25,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6
+      env: CXX=g++-6 COMPILER=gcc GCC=6
     - os: linux
       addons:
         apt:
@@ -39,7 +39,7 @@ matrix:
             - gcc-4.8-multilib
             - qemu
             - qemu-system-arm
-      env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi"
+      env: CXX=clang++-3.9 CC=clang-3.9 COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi"
     - os: linux
       addons:
         apt:
@@ -49,7 +49,7 @@ matrix:
           packages:
             - g++-4.9
             - clang-4.0
-      env: COMPILER=clang CLANG=4.0
+      env: CXX=clang++-4.0 COMPILER=clang CLANG=4.0
     - os: linux
       addons:
         apt:
@@ -59,7 +59,7 @@ matrix:
           packages:
             - g++-4.9
             - clang-5.0
-      env: COMPILER=clang CLANG=5.0
+      env: CXX=clang++-5.0 COMPILER=clang CLANG=5.0
     - os: linux
       addons:
         apt:
@@ -68,28 +68,29 @@ matrix:
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-6.0
-      env: COMPILER=clang CLANG=6.0
+      env: CXX=clang++-6.0 COMPILER=clang CLANG=6.0
     - os: osx
       osx_image: xcode8
       compiler: clang
+      env: CXX=clang++ CC=clang
 env:
   global:
     - MINCONDA_VERSION="latest"
     - MINCONDA_LINUX="Linux-x86_64"
     - MINCONDA_OSX="MacOSX-x86_64"
-before_install:
-    - |
+# before_install:
+    # - |
       # Configure build variables
-      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        if [[ "$COMPILER" == "gcc" ]]; then
-          export CXX=g++-$GCC CC=gcc-$GCC;
-        fi
-        if [[ "$COMPILER" == "clang" ]]; then
-          export CXX=clang++-$CLANG CC=clang-$CLANG;
-        fi
-      elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        export CXX=clang++ CC=clang;
-      fi
+      # if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      #  if [[ "$COMPILER" == "gcc" ]]; then
+      #    export CXX=g++-$GCC CC=gcc-$GCC;
+      #  fi
+      #  if [[ "$COMPILER" == "clang" ]]; then
+      #    export CXX=clang++-$CLANG CC=clang-$CLANG;
+      #  fi
+      # elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      #  export CXX=clang++ CC=clang;
+      # fi
 install:
     - if [[ "$CROSS_COMPILE" == 1 ]] ; then
         if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]] ; then
