@@ -8,8 +8,18 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - g++-4.8
+      env: COMPILER=gcc VERSION=4.8 CXXFLAGS="-DCXXSTD=11" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
             - g++-4.9
       env: COMPILER=gcc VERSION=4.9
+
     - os: linux
       addons:
         apt:
@@ -18,6 +28,7 @@ matrix:
           packages:
             - g++-5
       env: COMPILER=gcc VERSION=5
+
     - os: linux
       addons:
         apt:
@@ -26,6 +37,7 @@ matrix:
           packages:
             - g++-6
       env: COMPILER=gcc VERSION=6
+
     - os: linux
       addons:
         apt:
@@ -40,6 +52,7 @@ matrix:
             - qemu
             - qemu-system-arm
       env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi"
+
     - os: linux
       addons:
         apt:
@@ -50,6 +63,7 @@ matrix:
             - g++-4.9
             - clang-4.0
       env: COMPILER=clang VERSION=4.0
+
     - os: linux
       addons:
         apt:
@@ -60,6 +74,7 @@ matrix:
             - g++-4.9
             - clang-5.0
       env: COMPILER=clang VERSION=5.0
+
     - os: linux
       addons:
         apt:
@@ -69,6 +84,17 @@ matrix:
           packages:
             - clang-6.0
       env: COMPILER=clang VERSION=6.0
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+      env: COMPILER=clang VERSION=6.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
+
     - os: osx
       osx_image: xcode8
       compiler: clang
