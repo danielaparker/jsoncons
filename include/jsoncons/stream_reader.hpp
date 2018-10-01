@@ -65,7 +65,7 @@ public:
     {
     }
 
-    basic_stream_event(null_type value)
+    basic_stream_event(null_type)
         : event_type_(stream_event_type::null_value), length_(0)
     {
     }
