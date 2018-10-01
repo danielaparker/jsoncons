@@ -3141,6 +3141,11 @@ public:
         {
         case data_type_tag::short_string_tag:
         case data_type_tag::long_string_tag:
+            if (var_.semantic_type() == semantic_type_tag::bignum_tag)
+            {
+                return static_cast<bool>(var_.as_bignum());
+            }
+
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3170,6 +3175,11 @@ public:
         {
         case data_type_tag::short_string_tag:
         case data_type_tag::long_string_tag:
+            if (var_.semantic_type() == semantic_type_tag::bignum_tag)
+            {
+                return static_cast<int64_t>(var_.as_bignum());
+            }
+
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3199,6 +3209,11 @@ public:
         {
         case data_type_tag::short_string_tag:
         case data_type_tag::long_string_tag:
+            if (var_.semantic_type() == semantic_type_tag::bignum_tag)
+            {
+                return static_cast<uint64_t>(var_.as_bignum());
+            }
+
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
@@ -3250,6 +3265,11 @@ public:
         {
         case data_type_tag::short_string_tag:
         case data_type_tag::long_string_tag:
+            if (var_.semantic_type() == semantic_type_tag::bignum_tag)
+            {
+                return static_cast<double>(var_.as_bignum());
+            }
+
             try
             {
                 basic_json j = basic_json::parse(as_string_view());
