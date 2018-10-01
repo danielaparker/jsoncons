@@ -86,7 +86,7 @@ matrix:
       env: CXX=clang++-6.0
 
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode8.1
       compiler: clang
       env: CXX=clang++ CMAKE_OPTIONS="-DCXXSTD=11"
 
