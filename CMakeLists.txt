@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.4)
+
 project(jsoncons)
 
 set(JSONCONS_PROJECT_DIR ${PROJECT_SOURCE_DIR})
@@ -59,10 +60,7 @@ configure_package_config_file(${PROJECT_NAME}Config.cmake.in
                               INSTALL_DESTINATION ${JSONCONS_CMAKECONFIG_INSTALL_DIR})
 
 # jsoncons is header-only and does not depend on the architecture.
-# Remove CMAKE_SIZEOF_VOID_P from xtensorConfigVersion.cmake so that an xtensorConfig.cmake
-# generated for a 64 bit target can be used for 32 bit targets and vice versa.
-# set(_XTENSOR_CMAKE_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})
-# unset(CMAKE_SIZEOF_VOID_P)
+
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
                                  VERSION ${${PROJECT_NAME}_VERSION}
                                  COMPATIBILITY AnyNewerVersion)
