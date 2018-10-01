@@ -1,5 +1,15 @@
-master
-------
+v0.110.1
+--------
+
+Bug fixes contributed by Cebtenzzre
+
+- Fixed a case where `as_double()`, `as_integer()` etc on a `basic_json` 
+  value led to an infinite recursion when the value was a bignum 
+
+- Fixed undefined behavior in bignum class
+
+v0.110.0
+--------
 
 ### New features
 
