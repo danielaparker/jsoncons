@@ -152,8 +152,6 @@ class basic_json_parser : private serializing_context
 
     basic_json_content_handler<CharT>& handler_;
     parse_error_handler& err_handler_;
-    uint32_t cp_;
-    uint32_t cp2_;
 
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
@@ -164,25 +162,26 @@ class basic_json_parser : private serializing_context
     std::basic_string<char,std::char_traits<char>,numeral_allocator_type> number_buffer_;
     std::vector<uint8_t,byte_allocator_type> byte_buffer_;
 
+    int initial_stack_capacity_;
+    size_t max_nesting_depth_;
+    size_t nesting_depth_;
+    uint32_t cp_;
+    uint32_t cp2_;
     uint8_t precision_;
     uint8_t decimal_places_;
-
     size_t line_;
     size_t column_;
-    size_t nesting_depth_;
-    int initial_stack_capacity_;
-
-    size_t max_nesting_depth_;
-    detail::string_to_double to_double_;
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
-
     parse_state state_;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
-    std::vector<parse_state,parse_state_allocator_type> state_stack_;
     bool continue_;
     bool done_;
+
+    detail::string_to_double to_double_;
+
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    std::vector<parse_state,parse_state_allocator_type> state_stack_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -233,15 +232,15 @@ public:
        : replacement_filter_(handler,options),
          handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_ : handler),
          err_handler_(err_handler),
+         initial_stack_capacity_(default_initial_stack_capacity_),
          max_nesting_depth_(options.max_nesting_depth()),
+         nesting_depth_(0), 
          cp_(0),
          cp2_(0),
          precision_(0), 
          decimal_places_(0), 
          line_(1),
          column_(1),
-         nesting_depth_(0), 
-         initial_stack_capacity_(default_initial_stack_capacity_),
          begin_input_(nullptr),
          input_end_(nullptr),
          input_ptr_(nullptr),
