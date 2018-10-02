@@ -52,9 +52,9 @@ before_build:
 
   - if %platform%==vs cmake . -G "%makecommand%" -D BUILD_TESTS=1 -D CMAKE_BUILD_TYPE=Release .
 
-install:
+build_script:
   - cmake --build . --config Release
   - cd tests
 
-build_script:
+test_script:
   - .\test_jsoncons
