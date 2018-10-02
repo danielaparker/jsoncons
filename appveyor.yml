@@ -78,4 +78,9 @@ build_script:
   - cd tests
 
 test_script:
-  - if %arch%!=ARM .\Release\test_jsoncons
+  - set "testplatform=%platform%"
+  # Can not run ARM builds on x86/x64 build images
+  - if %arch%==ARM (
+      set "testplatform=none"
+    )
+  - if %testplatform%==vs .\Release\test_jsoncons
