@@ -8,7 +8,7 @@ platform:
 
 environment:
   matrix:
-    - MINICONDA: C:\jsoncons-conda
+    # - MINICONDA: C:\jsoncons-conda
     - MAKE_COMMAND: Visual Studio 14 2015
 
 init:
