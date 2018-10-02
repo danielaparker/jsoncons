@@ -44,6 +44,9 @@ environment:
       arch: ARM
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
 
+# clone directory
+clone_folder: c:\projects\jsoncons
+
 init: 
   - git config --global core.autocrlf input
 
@@ -52,7 +55,10 @@ install:
   - if "%COMPILER%"=="mingw" g++ --version
 
 before_build:
-  # Remove the following from the path, as it will interfere with
+  cd c:\projects\jsoncons
+  - echo Directory before starting build...
+  - dir
+  - echo Starting pre-build step...  # Remove the following from the path, as it will interfere with
   # the MinGW builds
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
   - if %platform%==msvc call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
