@@ -18,7 +18,7 @@
 #include <iterator>
 #include <jsoncons/json.hpp>
 #include <jsoncons/pretty_print.hpp>
-#include <jsoncons/binary/binary_utilities.hpp>
+#include <jsoncons/config/binary_utilities.hpp>
 #include <jsoncons_ext/cbor/cbor_parser.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 

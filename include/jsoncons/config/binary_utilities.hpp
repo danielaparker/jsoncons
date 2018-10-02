@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BINARY_BINARY_UTILITIES_HPP
-#define JSONCONS_BINARY_BINARY_UTILITIES_HPP
+#ifndef JSONCONS_CONFIG_BINARY_UTILITIES_HPP
+#define JSONCONS_CONFIG_BINARY_UTILITIES_HPP
 
 #include <assert.h>
 #include <cfloat>

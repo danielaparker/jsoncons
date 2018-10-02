@@ -19,7 +19,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/binary/binary_utilities.hpp>
+#include <jsoncons/config/binary_utilities.hpp>
 #include <jsoncons/detail/writer.hpp>
 
 namespace jsoncons { namespace cbor {
