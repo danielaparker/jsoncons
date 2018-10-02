@@ -68,7 +68,7 @@ target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
 
-set(JSONCONS_TARGET jsoncons_tests)
+set(JSONCONS_TARGET test_jsoncons)
 add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS_SOURCES} ${JSONCONS_HEADERS})
 target_include_directories (${JSONCONS_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
@@ -76,11 +76,8 @@ target_include_directories (${JSONCONS_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
 target_link_libraries(${JSONCONS_TARGET} Catch)
 
 if (CROSS_COMPILE_ARM)
-    add_custom_target(xtest COMMAND qemu-arm -L /usr/arm-linux-gnueabi/ jsoncons_tests DEPENDS ${JSONCONS_TARGET})
+    add_custom_target(jtest COMMAND qemu-arm -L /usr/arm-linux-gnueabi/ test_jsoncons DEPENDS ${JSONCONS_TARGET})
 else()
-    add_custom_target(xtest COMMAND jsoncons_tests DEPENDS ${JSONCONS_TARGET})
+    add_custom_target(jtest COMMAND test_jsoncons DEPENDS ${JSONCONS_TARGET})
 endif()
-
-enable_testing()
-add_test(NAME jsoncons_tests WORKING_DIRECTORY ${JSONCONS_TESTS_DIR} COMMAND ${CMAKE_CURRENT_BINARY_DIR}/jsoncons_tests)
 

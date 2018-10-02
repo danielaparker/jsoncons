@@ -154,15 +154,15 @@ install:
       else
         cmake . -DBUILD_TESTS=ON  ${CMAKE_OPTIONS};
       fi
-    - make -j2 jsoncons_tests
+    - make -j2 test_jsoncons
     - cd tests
 script:
     - if [[ "$CROSS_COMPILE" == 1 ]]; then
         if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]]; then
-          qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./jsoncons_tests ;
+          qemu-aarch64 -L /usr/aarch64-linux-gnu/ ./test_jsoncons ;
         else
-          qemu-arm -L /usr/arm-linux-gnueabi/ ./jsoncons_tests ;
+          qemu-arm -L /usr/arm-linux-gnueabi/ ./test_jsoncons ;
         fi
       else
-        ./jsoncons_tests;
+        ./test_jsoncons;
       fi
