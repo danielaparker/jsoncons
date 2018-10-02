@@ -9,12 +9,14 @@ platform:
 environment:
   matrix:
     - MINICONDA: C:\jsoncons-conda
+    - MAKE_COMMAND: Visual Studio 14 2015
 
 init:
   - C:\"Program Files (x86)"\"Microsoft Visual Studio 14.0"\VC\vcvarsall.bat %PLATFORM%
 
 install:
-  - cmake -G "NMake Makefiles" -D BUILD_TESTS=1 -D CMAKE_BUILD_TYPE=Release .
+  # - cmake -G "NMake Makefiles" -D BUILD_TESTS=1 -D CMAKE_BUILD_TYPE=Release .
+  - cmake -G "%MAKE_COMMAND%" -D BUILD_TESTS=1 -D CMAKE_BUILD_TYPE=Release .
   - cmake --build . --target test_jsoncons --config Release
   # - nmake test_jsoncons
   - cd tests
