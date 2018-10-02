@@ -19,9 +19,20 @@ Its unpacked in-memory representation of JSON is more compact than most, and can
 allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md),
 built on top of its incremental parser.  
 
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons) and [Travis](https://travis-ci.org/danielaparker/jsoncons) with vs2015 and vs2017 on Windows 10, GCC 4.8 and later on Ubuntu, clang 3.8 and later on Ubuntu, and clang xcode 6.4 and later on OSX. 
-
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
+
+## Supported compilers
+
+jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons) and [Travis](https://travis-ci.org/danielaparker/jsoncons).
+
+| Compiler                | Version          |Architecture | Operating System | Notes |
+|-------------------------|------------------|-------------|------------------|-------|
+| Microsoft Visual Studio | vs2015 and above | x86,x64     | Windows 10       |       |
+| g++                     | 4.8 and above    | x64         | Ubuntu           |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
+| clang                   | 3.8 and above    | x64         | Ubuntu           |       |
+| clang xcode             | 6.4 and above    | x64         | OSX              |       |
+
+We also cross compile ARM on Travis using clang and the emulator qemu. 
 
 ## Get jsoncons
 
@@ -569,17 +580,12 @@ Instructions for building the test suite with CMake may be found in
 Instructions for building the examples with CMake may be found in
 
     jsoncons/examples/build/cmake/README.txt
-
-## Supported compilers
-
-| Compiler                | Version          |Architecture | Operating System | Notes |
-|-------------------------|------------------|-------------|------------------|-------|
-| Microsoft Visual Studio | vs2015 and above | x86,x64     | Windows 10       |       |
-| g++                     | 4.8 and above    | x64         | Ubuntu           |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-| clang                   | 3.8 and above    | x64         | Ubuntu           |       |
-| clang xcode             | 8.1 and above    | x64         | OSX              |       |
                                                        
 ## Acknowledgements
+
+Special debt owed to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor), which this library draws on for platform dependent binary configuration.
+
+A _big_ thanks to Milo Yip, author of [RapidJSON](http://rapidjson.org/), for raising the quality of JSON libraries across the board, by publishing [the benchmarks](https://github.com/miloyip/nativejson-benchmark), and contacting the authors of various projects to communicate the results.
 
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.txt)
 

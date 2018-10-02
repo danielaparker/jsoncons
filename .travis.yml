@@ -1,5 +1,7 @@
 language: cpp
 dist: trusty
+sudo: required
+
 matrix:
   include:
     - os: linux
@@ -38,6 +40,20 @@ matrix:
             - g++-6
       env: COMPILER=gcc VERSION=6 SANITIZE=1
 
+    # - os: linux
+    #  addons:
+    #    apt:
+    #      sources:
+    #        - ubuntu-toolchain-r-test
+    #      packages:
+    #        - clang-3.9
+    #        - g++-arm-linux-gnueabi
+    #        - g++-multilib
+    #        - gcc-multilib
+    #        - qemu
+    #        - qemu-system-arm
+    #  env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.8.4 ARM_SETTINGS="armv7-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
+
     - os: linux
       addons:
         apt:
@@ -46,11 +62,12 @@ matrix:
           packages:
             - clang-3.9
             - g++-arm-linux-gnueabi
-            - g++-multilib
-            - gcc-multilib
+            - gcc-arm-linux-gnueabi
+            - g++-4.8-multilib
+            - gcc-4.8-multilib
             - qemu
             - qemu-system-arm
-      env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.8.4 ARM_SETTINGS="armv7-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
+      env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.8.4 ARM_SETTINGS="armv7-a -target arm-linux-gnueabi"
 
     - os: linux
       addons:
