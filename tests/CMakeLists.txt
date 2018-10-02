@@ -78,3 +78,7 @@ if (CROSS_COMPILE_ARM)
 else()
     add_custom_target(xtest COMMAND test_jsoncons DEPENDS ${JSONCONS_TARGET})
 endif()
+
+enable_testing()
+add_test(NAME jsoncons_tests WORKING_DIRECTORY ${JSONCONS_TESTS_DIR} COMMAND ${CMAKE_CURRENT_BINARY_DIR}/jsoncons_tests)
+
