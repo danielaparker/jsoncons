@@ -92,4 +92,4 @@ test_script:
       set "testplatform=none"
     )
   # - if %testplatform%==vs ctest -C Release -V -j
-  - if %testplatform%==vs ./test_jsoncons
+  - if %testplatform%==vs test_jsoncons
