@@ -1,24 +1,69 @@
 build: false
 
-os: Visual Studio 2015
+# os: Visual Studio 2015
 
-platform:
-  - x64
-  - x86
+# platform:
+#  - x64
+#  - x86
 
 environment:
+  vsversion: none
+  arch: default
   matrix:
+    - platform: vs
+      vsversion: 2015
+      arch: x86
+      FLAGS: ""
+      MAKE_COMMAND: Visual Studio 14 2015
+
+    - platform: vs
+      vsversion: 2015
+      arch: x86
+      FLAGS: ""
+      MAKE_COMMAND: Visual Studio 14 2015
+
+    - platform: vs
+      vsversion: 2015
+      arch: x86
+      FLAGS: "/permissive- /std:c++latest /utf-8"
+      MAKE_COMMAND: Visual Studio 14 2015
+
+    - platform: vs
+      vsversion: 2015
+      arch: x64
+      FLAGS: ""
+      MAKE_COMMAND: Visual Studio 14 2015 Win64
+
+    - platform: vs
+      vsversion: 2017
+      arch: x64
+      FLAGS: ""
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      MAKE_COMMAND: Visual Studio 15 2017 Win64
+
+    - platform: vs
+      vsversion: 2017
+      arch: x64
+      FLAGS: "/permissive- /std:c++latest /utf-8"
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      MAKE_COMMAND: Visual Studio 15 2017 Win64
+
+    - platform: vs
+      vsversion: 2017
+      arch: ARM
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
+      MAKE_COMMAND: Visual Studio 15 2017 Win64
+
+# environment:
+  # matrix:
     # - MINICONDA: C:\jsoncons-conda
-    - MAKE_COMMAND: Visual Studio 14 2015
 
 init:
   - C:\"Program Files (x86)"\"Microsoft Visual Studio 14.0"\VC\vcvarsall.bat %PLATFORM%
 
 install:
-  # - cmake -G "NMake Makefiles" -D BUILD_TESTS=1 -D CMAKE_BUILD_TYPE=Release .
   - cmake -G "%MAKE_COMMAND%" -D BUILD_TESTS=1 .
   - cmake --build . --target test_jsoncons --config Release
-  # - nmake test_jsoncons
   - cd tests
 
 build_script:
