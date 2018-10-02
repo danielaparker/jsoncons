@@ -53,7 +53,7 @@ before_build:
   - if %platform%==vs cmake . -G "%makecommand%" -D BUILD_TESTS=1 -D CMAKE_BUILD_TYPE=Release .
 
 install:
-  - nmake test_jsoncons
+  - cmake --build . --config Release
   - cd tests
 
 build_script:
