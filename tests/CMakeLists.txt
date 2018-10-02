@@ -27,7 +27,7 @@ set(ARM_ARCH_DIRECTORY "arm-linux-gnueabi" CACHE STRING "ARM arch header dir")
 set(ARM_GCC_VER "4.7.3" CACHE STRING "ARM GCC header dir")
 
 # load per-platform configuration
-include (${JSONCONS_PROJECT_DIR}/build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
+include (${JSONCONS_PROJECT_DIR}/build_files/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     if (CROSS_COMPILE_ARM)

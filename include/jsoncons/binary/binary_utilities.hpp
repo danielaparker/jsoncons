@@ -172,7 +172,7 @@ uint16_t encode_half(double val)
 inline 
 double decode_half(uint16_t half)
 {
-#ifdef __F16C__
+#ifdef __F16C__ && !defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))
     return _cvtsh_ss(half);
 #else
     int exp = (half >> 10) & 0x1f;

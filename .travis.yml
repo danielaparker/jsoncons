@@ -45,6 +45,20 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-3.9
+            - g++-arm-linux-gnueabi
+            - g++-multilib
+            - gcc-multilib
+            - qemu
+            - qemu-system-arm
+      env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.7.3 ARM_SETTINGS="armv7-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-3.9
             - g++-4.8-aarch64-linux-gnu
             - gcc-4.8-aarch64-linux-gnu
             - g++-4.8-multilib
@@ -94,6 +108,18 @@ matrix:
           packages:
             - clang-6.0
       env: COMPILER=clang VERSION=6.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
+
+    - os: osx
+      osx_image: xcode6.4
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
 
     - os: osx
       osx_image: xcode8.1
