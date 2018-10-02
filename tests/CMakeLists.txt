@@ -26,6 +26,9 @@ set(TARGET_ARCH "native" CACHE STRING "Target architecture arguments")
 set(ARM_ARCH_DIRECTORY "arm-linux-gnueabi" CACHE STRING "ARM arch header dir")
 set(ARM_GCC_VER "4.7.3" CACHE STRING "ARM GCC header dir")
 
+# load per-platform configuration
+include (${JSONCONS_PROJECT_DIR}/build/cmake/${CMAKE_SYSTEM_NAME}.cmake)
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     if (CROSS_COMPILE_ARM)
         # We're cross-compiling with clang++ on Travis, this is all pretty specific and just for testing
@@ -51,7 +54,6 @@ endif()
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
