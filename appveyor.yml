@@ -16,7 +16,7 @@ init:
 
 install:
   # - cmake -G "NMake Makefiles" -D BUILD_TESTS=1 -D CMAKE_BUILD_TYPE=Release .
-  - cmake -G "%MAKE_COMMAND%" -D BUILD_TESTS=1 
+  - cmake -G "%MAKE_COMMAND%" -D BUILD_TESTS=1 .
   - cmake --build . --target test_jsoncons --config Release
   # - nmake test_jsoncons
   - cd tests
