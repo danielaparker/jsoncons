@@ -11,32 +11,32 @@ environment:
       vsversion: 2015
       arch: x86
       FLAGS: ""
-      GENERATOR: Visual Studio 14 2015
+      MAKE_COMMAND: Visual Studio 14 2015
 
     - platform: vs
       vsversion: 2015
       arch: x86
       FLAGS: ""
-      GENERATOR: Visual Studio 14 2015
+      MAKE_COMMAND: Visual Studio 14 2015
 
     - platform: vs
       vsversion: 2015
       arch: x86
       FLAGS: "/permissive- /std:c++latest /utf-8"
-      GENERATOR: Visual Studio 14 2015
+      MAKE_COMMAND: Visual Studio 14 2015
 
     - platform: vs
       vsversion: 2015
       arch: x64
       FLAGS: ""
-      GENERATOR: Visual Studio 14 2015
+      MAKE_COMMAND: Visual Studio 14 2015
 
     - platform: vs
       vsversion: 2017
       arch: x64
       FLAGS: ""
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      GENERATOR: Visual Studio 15 2017
+      MAKE_COMMAND: Visual Studio 15 2017
 
     - platform: vs
       vsversion: 2017
@@ -48,7 +48,7 @@ environment:
       vsversion: 2017
       arch: ARM
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
-      GENERATOR: Visual Studio 15 2017
+      MAKE_COMMAND: Visual Studio 15 2017
 
 init: 
   - git config --global core.autocrlf input
@@ -58,11 +58,10 @@ install:
   - if "%COMPILER%"=="mingw" g++ --version
 
 before_build:
-  - cmake . -G "%GENERATOR%" -DBUILD_TESTS=ON 
+  - cmake . -G "%MAKE_COMMAND%" -DCMAKE_INSTALL_PREFIX=%P%
 
 build_script:
-  # - cmake --build . --config Release
-    - make -j2 jsoncons_tests
+   - cmake --build . --config Release
 
 test_script:
   - set "testplatform=%platform%"
