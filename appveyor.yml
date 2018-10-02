@@ -78,4 +78,4 @@ build_script:
   - cd tests
 
 test_script:
-  - .\Release\test_jsoncons
+  - if %arch%!=ARM .\Release\test_jsoncons
