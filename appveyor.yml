@@ -52,12 +52,11 @@ install:
   - if "%COMPILER%"=="mingw" g++ --version
 
 before_build:
-  # - cd tests/build/cmake
   # Remove the following from the path, as it will interfere with
   # the MinGW builds
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
   - if %platform%==msvc call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
-  - if %platform%==msvc cmake -G "NMake Makefiles" -DBUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=%P%
+  - if %platform%==msvc cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%P%
   - if %platform%==vs (
       set "makecommand=Visual Studio"
     )
@@ -79,11 +78,10 @@ before_build:
       set "makecommand=%makecommand% ARM"
     )
 
-  - if %platform%==vs cmake . -G "%makecommand%" -DBUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=%P% 
+  - if %platform%==vs cmake .. -G "%makecommand%" -DBUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=%P%
 
 build_script:
   - cmake --build . --config Release
-  - cd tests
 
 test_script:
   - set "testplatform=%platform%"
@@ -91,5 +89,4 @@ test_script:
   - if %arch%==ARM (
       set "testplatform=none"
     )
-  # - if %testplatform%==vs ctest -C Release -V -j
-  - if %testplatform%==vs test_jsoncons
+  - if %testplatform%==vs ctest -C Release -V -j
