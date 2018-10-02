@@ -61,21 +61,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - clang-3.9
-            - g++-arm-linux-gnueabi
-            - gcc-arm-linux-gnueabi
-            - g++-4.8-multilib
-            - gcc-4.8-multilib
-            - qemu
-            - qemu-system-arm
-      env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.8.4 ARM_SETTINGS="armv7-a -target arm-linux-gnueabi"
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - clang-3.9
             - g++-4.8-aarch64-linux-gnu
             - gcc-4.8-aarch64-linux-gnu
             - g++-4.8-multilib
@@ -184,6 +169,15 @@ before_install:
         export CXX=clang++ CC=clang;
       fi
 install:
+    # get CMake (only for systems with brew - macOS)
+    - |
+     if [[ (-x $(which brew)) ]]; then
+       brew update
+       brew install cmake 
+       brew upgrade cmake
+       cmake --version
+     fi
+
     - if [[ "$CROSS_COMPILE" == 1 ]] ; then
         if [[ "$ARM_ARCH_DIR" == "aarch64-linux-gnu" ]] ; then
           mkdir $HOME/linker_bin ;

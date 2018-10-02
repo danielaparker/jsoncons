@@ -32,7 +32,7 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 | clang                   | 3.8 and above    | x64         | Ubuntu           |       |
 | clang xcode             | 6.4 and above    | x64         | OSX              |       |
 
-We also cross compile ARM on Travis using clang and the emulator qemu. 
+It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
 
 ## Get jsoncons
 
