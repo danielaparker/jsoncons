@@ -29,7 +29,7 @@ add_library(jsoncons INTERFACE)
 target_include_directories(jsoncons INTERFACE $<BUILD_INTERFACE:${JSONCONS_INCLUDE_DIR}>
                                            $<INSTALL_INTERFACE:include>)
 
-OPTION(BUILD_TESTS "jsoncons test suite" OFF)
+OPTION(BUILD_TESTS "jsoncons test suite" ON)
 
 if(BUILD_TESTS)
     add_subdirectory(tests)
