@@ -57,9 +57,6 @@ install:
   - if "%COMPILER%"=="mingw" set PATH=C:\mingw-w64\x86_64-7.3.0-posix-seh-rt_v5-rev0\mingw64\bin;%PATH%
   - if "%COMPILER%"=="mingw" g++ --version
 
-build_script:
-  - cmake --build . --config Release
-
 before_build:
   - cmake . -G "%GENERATOR%" . -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS="%FLAGS%" -DCMAKE_IGNORE_PATH="C:/Program Files/Git/usr/bin"
 
