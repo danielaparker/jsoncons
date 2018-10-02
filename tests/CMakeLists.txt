@@ -19,6 +19,7 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 ################
 
 OPTION(CROSS_COMPILE_ARM "cross compile for ARM targets" OFF)
+OPTION(SANITIZE "sanitize" OFF)
 
 # Note: to compile on ARM (or cross compile), you may need to add the following:
 # -DTARGET_ARCH="armv8-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
@@ -47,7 +48,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
         else()
             message(FATAL_ERROR "Unsupported compiler -- jsoncons requires C++11 support!")
         endif()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2 -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
+        if (SANITIZE)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2 -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
     endif()
 endif()
 

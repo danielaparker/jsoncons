@@ -19,6 +19,10 @@
 #include <sstream>
 #include <vector>
 
+#if defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))
+#define APPLE_MISSING_INTRINSICS 1
+#endif
+
 // The definitions below follow the definitions in compiler_support_p.h, https://github.com/01org/tinycbor
 // MIT license
 
@@ -134,7 +138,7 @@ static inline bool add_check_overflow(size_t v1, size_t v2, size_t *r)
 inline 
 uint16_t encode_half(double val)
 {
-#ifdef __F16C__
+#if defined(__F16C__) && !defined(APPLE_MISSING_INTRINSICS)
     return _cvtss_sh((float)val, 3);
 #else
     uint64_t v;
@@ -172,7 +176,7 @@ uint16_t encode_half(double val)
 inline 
 double decode_half(uint16_t half)
 {
-#ifdef __F16C__ && !defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))
+#if defined(__F16C__) && !defined(APPLE_MISSING_INTRINSICS)
     return _cvtsh_ss(half);
 #else
     int exp = (half >> 10) & 0x1f;

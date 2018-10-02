@@ -18,7 +18,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: COMPILER=gcc VERSION=4.9
+      env: COMPILER=gcc VERSION=4.9 SANITIZE=1
 
     - os: linux
       addons:
@@ -27,7 +27,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc VERSION=5
+      env: COMPILER=gcc VERSION=5 SANITIZE=1
 
     - os: linux
       addons:
@@ -36,7 +36,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc VERSION=6
+      env: COMPILER=gcc VERSION=6 SANITIZE=1
 
     - os: linux
       addons:
@@ -87,7 +87,7 @@ matrix:
           packages:
             - g++-4.9
             - clang-5.0
-      env: COMPILER=clang VERSION=5.0
+      env: COMPILER=clang VERSION=5.0 SANITIZE=1
 
     - os: linux
       addons:
@@ -97,7 +97,7 @@ matrix:
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-6.0
-      env: COMPILER=clang VERSION=6.0
+      env: COMPILER=clang VERSION=6.0 SANITIZE=1
 
     - os: linux
       addons:
