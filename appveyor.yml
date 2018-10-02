@@ -91,4 +91,5 @@ test_script:
   - if %arch%==ARM (
       set "testplatform=none"
     )
-  - if %testplatform%==vs ctest -C Release -V -j
+  # - if %testplatform%==vs ctest -C Release -V -j
+  - if %testplatform%==vs ./test_jsoncons
