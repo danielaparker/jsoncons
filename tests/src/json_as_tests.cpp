@@ -26,12 +26,9 @@ TEST_CASE("json::as<long long>()")
     jsoncons::json j(jsoncons::bignum("18446744073709551616"));
     CHECK(j.is_bignum());
 
-#if defined(__GNUC__) 
-    std::cout << "GCC sizeof(long long): " << sizeof(long long) << "\n\n";
-#elif defined (__clang__)
-    std::cout << "clang sizeof(long long): " << sizeof(long long) << "\n\n";
-#else
-    std::cout << "vs sizeof(long long): " << sizeof(long long) << "\n\n";
+#if defined(__GNUC__)  && (__GNUC__ >= 6 
+    __int128 val = std::numeric_limits<__int128>::max();
+    std::cout << "sizeof(__int128): " << sizeof(__int128) << "\n\n";
 #endif
 }
 
