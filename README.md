@@ -610,7 +610,7 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-// Use a stream filter to filter out all events except name 
+// A stream filter to filter out all events except name 
 // and restrict name to "author"
 
 class author_filter : public stream_filter
@@ -637,22 +637,23 @@ public:
         }
     }
 };
+```
+```c++
+std::istringstream is(example);
 
-    std::istringstream is(example);
+author_filter filter;
+json_stream_reader reader(is, filter);
 
-    author_filter filter;
-    json_stream_reader reader(is, filter);
-
-    for (; !reader.done(); reader.next())
+for (; !reader.done(); reader.next())
+{
+    const auto& event = reader.current();
+    switch (event.event_type())
     {
-        const auto& event = reader.current();
-        switch (event.event_type())
-        {
-            case stream_event_type::string_value:
-                std::cout << event.as<jsoncons::string_view>() << "\n";
-                break;
-        }
+        case stream_event_type::string_value:
+            std::cout << event.as<jsoncons::string_view>() << "\n";
+            break;
     }
+}
 ```
 Output:
 ```
