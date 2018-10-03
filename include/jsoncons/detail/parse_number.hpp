@@ -83,7 +83,7 @@ bool is_uinteger(const CharT* s, size_t length)
 }
 
 template <class T, class CharT>
-to_integer_result to_integer(const CharT* s, size_t length)
+to_integer_result<T> to_integer(const CharT* s, size_t length)
 {
     JSONCONS_ASSERT(length > 0);
 
@@ -136,7 +136,7 @@ to_integer_result to_integer(const CharT* s, size_t length)
         }
     }
 
-    return to_integer_result({ n,overflow });
+    return to_integer_result<T>({ n,overflow });
 }
 
 // Precondition: s satisfies
