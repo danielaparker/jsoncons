@@ -21,3 +21,17 @@ TEST_CASE("json::as<jsoncons::string_view>()")
     CHECK(j2.as<jsoncons::string_view>() == jsoncons::string_view(s2));
 }
 
+TEST_CASE("json::as<long long>()")
+{
+    jsoncons::json j(jsoncons::bignum("18446744073709551616"));
+    CHECK(j.is_bignum());
+
+#if defined(__GNUC__) 
+    std::cout << "GCC sizeof(long long): " << sizeof(long long) << "\n\n";
+#elif defined (__clang__)
+    std::cout << "clang sizeof(long long): " << sizeof(long long) << "\n\n";
+#else
+    std::cout << "vs sizeof(long long): " << sizeof(long long) << "\n\n";
+#endif
+}
+
