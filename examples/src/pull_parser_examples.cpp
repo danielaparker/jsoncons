@@ -56,10 +56,11 @@ void reading_a_json_stream()
                 std::cout << "end_object\n";
                 break;
             case stream_event_type::name:
-                std::cout << "name: " << event.as<std::string>() << "\n";
+                // If underlying type is string, can return as string_view
+                std::cout << "name: " << event.as<jsoncons::string_view>() << "\n";
                 break;
             case stream_event_type::string_value:
-                std::cout << "string_value: " << event.as<std::string>() << "\n";
+                std::cout << "string_value: " << event.as<jsoncons::string_view>() << "\n";
                 break;
             case stream_event_type::null_value:
                 std::cout << "null_value: " << event.as<std::string>() << "\n";
@@ -78,6 +79,7 @@ void reading_a_json_stream()
                 std::cout << "bignum_value: " << event.as<std::string>() << "\n";
                 break;
             case stream_event_type::double_value:
+                // Return as string, could also use event.as<double>()
                 std::cout << "double_value: " << event.as<std::string>() << "\n";
                 break;
             default:
