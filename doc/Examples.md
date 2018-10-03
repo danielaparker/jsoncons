@@ -224,63 +224,182 @@ Output:
 
 ### Parse a very large JSON file with json_stream_reader
 
+
+A typical pull parsing application will repeatedly process the `current()` 
+event and call `next()` to advance to the next event, until `done()` 
+returns `true`.
+
+The example JSON text, `book_catalog.json`, is used by the examples below.
+
+```json
+[ 
+  { 
+      "author" : "Haruki Murakami",
+      "title" : "Hard-Boiled Wonderland and the End of the World",
+      "isbn" : "0679743464",
+      "publisher" : "Vintage",
+      "date" : "1993-03-02",
+      "price": 18.90
+  },
+  { 
+      "author" : "Graham Greene",
+      "title" : "The Comedians",
+      "isbn" : "0099478374",
+      "publisher" : "Vintage Classics",
+      "date" : "2005-09-21",
+      "price": 15.74
+  }
+]
+```
+
+#### Reading the JSON stream
 ```c++
-#include <jsoncons/json_stream_reader.hpp>
-#include <string>
-#include <sstream>
+std::ifstream is("book_catalog.json");
 
-using namespace jsoncons;
+json_stream_reader reader(is);
 
-int main()
+for (; !reader.done(); reader.next())
 {
-    std::string s = R"(
-    [
-        {
-            "enrollmentNo" : 100,
-            "firstName" : "Tom",
-            "lastName" : "Cochrane",
-            "mark" : 55              
-        },
-        {
-            "enrollmentNo" : 101,
-            "firstName" : "Catherine",
-            "lastName" : "Smith",
-            "mark" : 95              
-        },
-        {
-            "enrollmentNo" : 102,
-            "firstName" : "William",
-            "lastName" : "Skeleton",
-            "mark" : 60              
-        }
-    ]
-    )";
-
-    std::istringstream is(s);
-
-    json_stream_reader reader(is);
-
-    for (; !reader.done(); reader.next())
+    const auto& event = reader.current();
+    switch (event.event_type())
     {
-        const auto& event = reader.current();
-        switch (event.event_type())
-        {
-            case stream_event_type::name:
-                std::cout << event.as<jsoncons::string_view>() << ": ";
-                break;
-            case stream_event_type::string_value:
-                std::cout << event.as<jsoncons::string_view>() << "\n";
-                break;
-            case stream_event_type::int64_value:
-            case stream_event_type::uint64_value:
-                std::cout << event.as<std::string>() << "\n";
-                break;
-        }
+        case stream_event_type::begin_array:
+            std::cout << "begin_array\n";
+            break;
+        case stream_event_type::end_array:
+            std::cout << "end_array\n";
+            break;
+        case stream_event_type::begin_object:
+            std::cout << "begin_object\n";
+            break;
+        case stream_event_type::end_object:
+            std::cout << "end_object\n";
+            break;
+        case stream_event_type::name:
+            // If underlying type is string, can return as string_view
+            std::cout << "name: " << event.as<jsoncons::string_view>() << "\n";
+            break;
+        case stream_event_type::string_value:
+            std::cout << "string_value: " << event.as<jsoncons::string_view>() << "\n";
+            break;
+        case stream_event_type::null_value:
+            std::cout << "null_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::bool_value:
+            std::cout << "bool_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::int64_value:
+            std::cout << "int64_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::uint64_value:
+            std::cout << "uint64_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::bignum_value:
+            // Returned if 64 bit integer overflow
+            std::cout << "bignum_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::double_value:
+            // Return as string, could also use event.as<double>()
+            std::cout << "double_value: " << event.as<std::string>() << "\n";
+            break;
+        default:
+            std::cout << "Unhandled event type\n";
+            break;
     }
 }
 ```
+Output:
+```
+begin_array
+begin_object
+name: author
+string_value: Haruki Murakami
+name: title
+string_value: Hard-Boiled Wonderland and the End of the World
+name: isbn
+string_value: 0679743464
+name: publisher
+string_value: Vintage
+name: date
+string_value: 1993-03-02
+name: price
+double_value: 18.90
+end_object
+begin_object
+name: author
+string_value: Graham Greene
+name: title
+string_value: The Comedians
+name: isbn
+string_value: 0099478374
+name: publisher
+string_value: Vintage Classics
+name: date
+string_value: 2005-09-21
+name: price
+double_value: 15.74
+end_object
+end_array
+```
 
-See [json_stream_reader](ref/json_stream_reader.md)
+#### Implementing a stream_filter
+
+```c++
+// A stream filter to filter out all events except name 
+// and restrict name to "author"
+
+class author_filter : public stream_filter
+{
+    bool accept_next_ = false;
+public:
+    bool accept(const stream_event& event) override
+    {
+        if (event.event_type()  == stream_event_type::name &&
+            event.as<jsoncons::string_view>() == "author")
+        {
+            accept_next_ = true;
+            return false;
+        }
+        else if (accept_next_)
+        {
+            accept_next_ = false;
+            return true;
+        }
+        else
+        {
+            accept_next_ = false;
+            return false;
+        }
+    }
+};
+```
+
+#### Filtering the JSON stream
+
+```c++
+std::ifstream is("book_catalog.json");
+
+author_filter filter;
+json_stream_reader reader(is, filter);
+
+for (; !reader.done(); reader.next())
+{
+    const auto& event = reader.current();
+    switch (event.event_type())
+    {
+        case stream_event_type::string_value:
+            std::cout << event.as<jsoncons::string_view>() << "\n";
+            break;
+    }
+}
+```
+Output:
+```
+Haruki Murakami
+Graham Greene
+```
+
+See [json_stream_reader](doc/ref/json_stream_reader.md) 
 
 ### Serializing
 

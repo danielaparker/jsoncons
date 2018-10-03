@@ -494,9 +494,9 @@ A typical pull parsing application will repeatedly process the `current()`
 event and call `next()` to advance to the next event, until `done()` 
 returns `true`.
 
-```c++
-// Example JSON text
-const std::string example = R"(
+The example JSON text, `book_catalog.json`, is used by the examples below.
+
+```json
 [ 
   { 
       "author" : "Haruki Murakami",
@@ -515,12 +515,11 @@ const std::string example = R"(
       "price": 15.74
   }
 ]
-)";
 ```
 
 #### Reading the JSON stream
 ```c++
-std::istringstream is(example);
+std::ifstream is("book_catalog.json");
 
 json_stream_reader reader(is);
 
@@ -643,7 +642,7 @@ public:
 #### Filtering the JSON stream
 
 ```c++
-std::istringstream is(example);
+std::ifstream is("book_catalog.json");
 
 author_filter filter;
 json_stream_reader reader(is, filter);
