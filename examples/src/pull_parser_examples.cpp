@@ -25,14 +25,6 @@ const std::string example = R"(
       "publisher" : "Vintage Classics",
       "date" : "2005-09-21",
       "price": 15.74
-  },
-  { 
-      "author" : "Charles Palliser",
-      "title" : "Betrayals",
-      "isbn" : "0345404351",
-      "publisher" : "Ballantine Books",
-      "date" : "2015-04-14",
-      "price": 28.13
   }
 ]
 )";
