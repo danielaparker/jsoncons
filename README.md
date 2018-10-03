@@ -171,7 +171,7 @@ The library includes four instantiations of `basic_json`:
 
 [Pull parser example](#E3)
 
-[Dump json fragments into a larger document](#E4)
+[Dump json content into a larger document](#E4)
 
 <div id="E1"/>
 
@@ -603,7 +603,7 @@ See [json_stream_reader](doc/ref/json_stream_reader.md)
 
 <div id="E4"/>
 
-### Dump json fragments into a larger document
+### Dump json content into a larger document
 
 ```c++
 #include <jsoncons/json.hpp>

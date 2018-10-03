@@ -95,7 +95,7 @@ Charles Bukowski,Women: A Novel,12.0
 Ivan Passer,Cutter's Way,
 ```
 
-#### Dump json fragments into a larger document
+#### Dump json content into a larger document
 
 ```c++
 #include <jsoncons/json.hpp>
