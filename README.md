@@ -34,6 +34,8 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 
 It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
 
+UndefinedBehaviorSanitizer (UBSan) is enabled for selected gcc and clang builds.
+
 ## Get jsoncons
 
 Download the [latest release](https://github.com/danielaparker/jsoncons/releases) and unpack the zip file. Copy the directory `include/jsoncons` to your `include` directory. If you wish to use extensions, copy `include/jsoncons_ext` as well. 
