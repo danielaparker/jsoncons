@@ -1,3 +1,17 @@
+v0.110.2
+--------
+
+Continuous integration:
+
+- jsoncons is now cross compiled for ARMv8-A architecture on Travis using 
+  clang and executed using the emulator qemu.
+
+- UndefinedBehaviorSanitizer (UBSan) is enabled for selected gcc and clang builds.
+
+Maintenance:
+
+- Removed compiler warnings
+
 v0.110.1
 --------
 
