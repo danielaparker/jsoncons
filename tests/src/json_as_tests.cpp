@@ -30,12 +30,12 @@ TEST_CASE("json::as<long long>()")
     std::string s1 = "18446744073709551616"; 
     CHECK(jsoncons::detail::is_integer(s1.data(), s1.length()));
     jsoncons::detail::to_integer_result<__int128> result1 = jsoncons::detail::to_integer<__int128>(s1.data(), s1.length());
-    CHECK_NOT(result1.overflow);
+    CHECK_FALSE(result1.overflow);
 
     std::string s2 = "-18446744073709551617";
     CHECK(jsoncons::detail::is_integer(s2.data(), s2.length()));
     jsoncons::detail::to_integer_result<__int128> result2 = jsoncons::detail::to_integer<__int128>(s2.data(), s2.length());
-    CHECK_NOT(result2.overflow);
+    CHECK_FALSE(result2.overflow);
     //std::cout << "sizeof(__int128): " << sizeof(__int128) << "\n\n";
 #endif
 }
