@@ -31,6 +31,13 @@ struct to_int64_result
     bool overflow;
 };
 
+template <class T>
+struct to_integer_result
+{
+    T value;
+    bool overflow;
+};
+
 template <class CharT>
 bool is_integer(const CharT* s, size_t length)
 {
@@ -73,6 +80,63 @@ bool is_uinteger(const CharT* s, size_t length)
         }
     }
     return true;
+}
+
+template <class T, class CharT>
+to_integer_result to_integer(const CharT* s, size_t length)
+{
+    JSONCONS_ASSERT(length > 0);
+
+    T n = 0;
+    bool overflow = false;
+    const CharT* end = s + length; 
+    if (*s == '-')
+    {
+        static const T min_value = (std::numeric_limits<T>::min)();
+        static const T min_value_div_10 = min_value / 10;
+        ++s;
+        for (; s < end; ++s)
+        {
+            T x = *s - '0';
+            if (n < min_value_div_10)
+            {
+                overflow = true;
+                break;
+            }
+            n = n * 10;
+            if (n < min_value + x)
+            {
+                overflow = true;
+                break;
+            }
+
+            n -= x;
+        }
+    }
+    else
+    {
+        static const T max_value = (std::numeric_limits<T>::max)();
+        static const T max_value_div_10 = max_value / 10;
+        for (; s < end; ++s)
+        {
+            T x = *s - '0';
+            if (n > max_value_div_10)
+            {
+                overflow = true;
+                break;
+            }
+            n = n * 10;
+            if (n > max_value - x)
+            {
+                overflow = true;
+                break;
+            }
+
+            n += x;
+        }
+    }
+
+    return to_integer_result({ n,overflow });
 }
 
 // Precondition: s satisfies
