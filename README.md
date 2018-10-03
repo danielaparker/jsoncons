@@ -34,7 +34,7 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 
 It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
 
-UndefinedBehaviorSanitizer (UBSan) is enabled for selected gcc and clang builds.
+[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) is enabled for selected gcc and clang builds.
 
 ## Get jsoncons
 
