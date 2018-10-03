@@ -27,6 +27,9 @@ TEST_CASE("json::as<long long>()")
     CHECK(j.is_bignum());
 
 #if defined(__GNUC__)  && (__GNUC__ >= 6)
+    CHECK(std::numeric_limits<__int128>::is_specialized);
+    CHECK(std::numeric_limits<unsigned __int128>::is_specialized);
+
     std::string s1 = "18446744073709551616"; 
     CHECK(jsoncons::detail::is_integer(s1.data(), s1.length()));
     jsoncons::detail::to_integer_result<__int128> result1 = jsoncons::detail::to_integer<__int128>(s1.data(), s1.length());
