@@ -40,19 +40,23 @@ matrix:
             - g++-6
       env: COMPILER=gcc VERSION=6 SANITIZE=1
 
-    # - os: linux
-    #  addons:
-    #    apt:
-    #      sources:
-    #        - ubuntu-toolchain-r-test
-    #      packages:
-    #        - clang-3.9
-    #        - g++-arm-linux-gnueabi
-    #        - g++-multilib
-    #        - gcc-multilib
-    #        - qemu
-    #        - qemu-system-arm
-    #  env: COMPILER=clang CLANG=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=arm-linux-gnueabi GCC_VER=4.8.4 ARM_SETTINGS="armv7-a -mfpu=neon -mfloat-abi=softfp -target arm-linux-gnueabi"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env: COMPILER=gcc VERSION=7 SANITIZE=1
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      env: COMPILER=gcc VERSION=8 SANITIZE=1
 
     - os: linux
       addons:
