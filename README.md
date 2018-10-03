@@ -518,7 +518,7 @@ const std::string example = R"(
 )";
 ```
 
-#### Reading a JSON stream
+#### Reading the JSON stream
 ```c++
 std::istringstream is(example);
 
@@ -607,7 +607,7 @@ end_object
 end_array
 ```
 
-#### Filtering a JSON stream
+#### Implementing a stream_filter
 
 ```c++
 // A stream filter to filter out all events except name 
@@ -638,6 +638,9 @@ public:
     }
 };
 ```
+
+#### Filtering the JSON stream
+
 ```c++
 std::istringstream is(example);
 
