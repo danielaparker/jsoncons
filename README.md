@@ -574,14 +574,6 @@ See [json_stream_reader](doc/ref/json_stream_reader.md)
 ```
 sudo apt-get install cmake
 ```
-
-Instructions for building the test suite with CMake may be found in
-
-    jsoncons/tests/build/cmake/README.txt
-
-Instructions for building the examples with CMake may be found in
-
-    jsoncons/examples/build/cmake/README.txt
                                                        
 ## Acknowledgements
 
