@@ -88,8 +88,7 @@ It consists of an array of book elements, each element is an object with members
 Read the JSON text into a `json` value,
 ```c++
 std::ifstream is("books.json");
-json books;
-is >> books;
+json books = json::parse(is);
 ```
 Loop through the book array elements, using a range-based for loop
 ```c++

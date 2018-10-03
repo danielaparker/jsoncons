@@ -165,6 +165,16 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
+[Playing around with CBOR, JSON, and CSV](#E1)
+
+[Convert JSON text to C++ objects, and back](#E2)
+
+[Pull parser example](#E3)
+
+[Dump json content into a larger document](#E4)
+
+<div id="E1"/>
+
 ### Playing around with CBOR, JSON, and CSV
 
 ```c++
@@ -353,6 +363,8 @@ See [json_type_traits](doc/ref/json_type_traits.md)
 
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
+<div id="E2"/>
+
 ### Convert JSON text to C++ objects, and back
 
 The functions `decode_json` and `encode_json` convert JSON 
@@ -409,7 +421,189 @@ John Smith: Software Engineer
 
 See [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
 
-### Dump json fragments into a larger document
+<div id="E3"/>
+
+### Pull parser example
+
+A typical pull parsing application will repeatedly process the `current()` 
+event and call `next()` to advance to the next event, until `done()` 
+returns `true`.
+
+The example JSON text, `book_catalog.json`, is used by the examples below.
+
+```json
+[ 
+  { 
+      "author" : "Haruki Murakami",
+      "title" : "Hard-Boiled Wonderland and the End of the World",
+      "isbn" : "0679743464",
+      "publisher" : "Vintage",
+      "date" : "1993-03-02",
+      "price": 18.90
+  },
+  { 
+      "author" : "Graham Greene",
+      "title" : "The Comedians",
+      "isbn" : "0099478374",
+      "publisher" : "Vintage Classics",
+      "date" : "2005-09-21",
+      "price": 15.74
+  }
+]
+```
+
+#### Reading the JSON stream
+```c++
+std::ifstream is("book_catalog.json");
+
+json_stream_reader reader(is);
+
+for (; !reader.done(); reader.next())
+{
+    const auto& event = reader.current();
+    switch (event.event_type())
+    {
+        case stream_event_type::begin_array:
+            std::cout << "begin_array\n";
+            break;
+        case stream_event_type::end_array:
+            std::cout << "end_array\n";
+            break;
+        case stream_event_type::begin_object:
+            std::cout << "begin_object\n";
+            break;
+        case stream_event_type::end_object:
+            std::cout << "end_object\n";
+            break;
+        case stream_event_type::name:
+            // If underlying type is string, can return as string_view
+            std::cout << "name: " << event.as<jsoncons::string_view>() << "\n";
+            break;
+        case stream_event_type::string_value:
+            std::cout << "string_value: " << event.as<jsoncons::string_view>() << "\n";
+            break;
+        case stream_event_type::null_value:
+            std::cout << "null_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::bool_value:
+            std::cout << "bool_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::int64_value:
+            std::cout << "int64_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::uint64_value:
+            std::cout << "uint64_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::bignum_value:
+            // Returned if 64 bit integer overflow
+            std::cout << "bignum_value: " << event.as<std::string>() << "\n";
+            break;
+        case stream_event_type::double_value:
+            // Return as string, could also use event.as<double>()
+            std::cout << "double_value: " << event.as<std::string>() << "\n";
+            break;
+        default:
+            std::cout << "Unhandled event type\n";
+            break;
+    }
+}
+```
+Output:
+```
+begin_array
+begin_object
+name: author
+string_value: Haruki Murakami
+name: title
+string_value: Hard-Boiled Wonderland and the End of the World
+name: isbn
+string_value: 0679743464
+name: publisher
+string_value: Vintage
+name: date
+string_value: 1993-03-02
+name: price
+double_value: 18.90
+end_object
+begin_object
+name: author
+string_value: Graham Greene
+name: title
+string_value: The Comedians
+name: isbn
+string_value: 0099478374
+name: publisher
+string_value: Vintage Classics
+name: date
+string_value: 2005-09-21
+name: price
+double_value: 15.74
+end_object
+end_array
+```
+
+#### Implementing a stream_filter
+
+```c++
+// A stream filter to filter out all events except name 
+// and restrict name to "author"
+
+class author_filter : public stream_filter
+{
+    bool accept_next_ = false;
+public:
+    bool accept(const stream_event& event) override
+    {
+        if (event.event_type()  == stream_event_type::name &&
+            event.as<jsoncons::string_view>() == "author")
+        {
+            accept_next_ = true;
+            return false;
+        }
+        else if (accept_next_)
+        {
+            accept_next_ = false;
+            return true;
+        }
+        else
+        {
+            accept_next_ = false;
+            return false;
+        }
+    }
+};
+```
+
+#### Filtering the JSON stream
+
+```c++
+std::ifstream is("book_catalog.json");
+
+author_filter filter;
+json_stream_reader reader(is, filter);
+
+for (; !reader.done(); reader.next())
+{
+    const auto& event = reader.current();
+    switch (event.event_type())
+    {
+        case stream_event_type::string_value:
+            std::cout << event.as<jsoncons::string_view>() << "\n";
+            break;
+    }
+}
+```
+Output:
+```
+Haruki Murakami
+Graham Greene
+```
+
+See [json_stream_reader](doc/ref/json_stream_reader.md) 
+
+<div id="E4"/>
+
+### Dump json content into a larger document
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -488,93 +682,31 @@ Output:
 ]
 ```
 
-### Pull parser example
-
-A typical pull parsing application will repeatedly process the `current()` 
-event and call `next()` to advance to the next event, until `done()` 
-returns `true`.
-
-```c++
-#include <jsoncons/json_stream_reader.hpp>
-#include <string>
-#include <sstream>
-
-int main()
-{
-    std::string s = R"(
-    [
-        {
-            "enrollmentNo" : 100,
-            "firstName" : "Tom",
-            "lastName" : "Cochrane",
-            "mark" : 55              
-        },
-        {
-            "enrollmentNo" : 101,
-            "firstName" : "Catherine",
-            "lastName" : "Smith",
-            "mark" : 95              
-        },
-        {
-            "enrollmentNo" : 102,
-            "firstName" : "William",
-            "lastName" : "Skeleton",
-            "mark" : 60              
-        }
-    ]
-    )";
-
-    std::istringstream is(s);
-
-    json_stream_reader reader(is);
-
-    for (; !reader.done(); reader.next())
-    {
-        const auto& event = reader.current();
-        switch (event.event_type())
-        {
-            case stream_event_type::name:
-                // Returned data is string, so can use as<jsoncons::string_view>()>()
-                std::cout << event.as<jsoncons::string_view>() << ": ";
-                break;
-            case stream_event_type::string_value:
-                // Can use as<std::string_view>() if your compiler supports it
-                std::cout << event.as<jsoncons::string_view>() << "\n";
-                break;
-            case stream_event_type::int64_value:
-            case stream_event_type::uint64_value:
-                // Converts integer value to std::string
-                std::cout << event.as<std::string>() << "\n";
-                break;
-        }
-    }
-}
-```
-Output:
-```json
-enrollmentNo: 100
-firstName: Tom
-lastName: Cochrane
-mark: 55
-enrollmentNo: 101
-firstName: Catherine
-lastName: Smith
-mark: 95
-enrollmentNo: 102
-firstName: William
-lastName: Skeleton
-mark: 60
-```
-
-See [json_stream_reader](doc/ref/json_stream_reader.md) 
-
 ## Building the test suite and examples with CMake
 
 [CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
 ```
 sudo apt-get install cmake
 ```
-                                                       
+Once cmake is installed, you can build the tests:
+```
+mkdir build
+cd build
+cmake ../ -DBUILD_TESTS=ON
+cmake --build . --target test_jsoncons --config Release
+```
+Run from the jsoncons tests directory:
+
+On Windows:
+```
+..\build\tests\Release\test_jsoncons
+```
+
+On UNIX:
+```
+../build/tests/Release/test_jsoncons
+```
+
 ## Acknowledgements
 
 Special debt owed to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor), which this library draws on for platform dependent binary configuration.
