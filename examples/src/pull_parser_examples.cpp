@@ -7,32 +7,42 @@
 
 using namespace jsoncons;
 
-void json_stream_reader_example()
-{
-    std::string s = R"(
-    [
-        {
-            "enrollmentNo" : 100,
-            "firstName" : "Tom",
-            "lastName" : "Cochrane",
-            "mark" : 55              
-        },
-        {
-            "enrollmentNo" : 101,
-            "firstName" : "Catherine",
-            "lastName" : "Smith",
-            "mark" : 95              
-        },
-        {
-            "enrollmentNo" : 102,
-            "firstName" : "William",
-            "lastName" : "Skeleton",
-            "mark" : 60              
-        }
-    ]
-    )";
+// Example JSON text
+const std::string example = R"(
+[ 
+  { 
+      "author" : "Haruki Murakami",
+      "title" : "Hard-Boiled Wonderland and the End of the World",
+      "isbn" : "0679743464",
+      "publisher" : "Vintage",
+      "date" : "1993-03-02",
+      "price": 18.90
+  },
+  { 
+      "author" : "Graham Greene",
+      "title" : "The Comedians",
+      "isbn" : "0099478374",
+      "publisher" : "Vintage Classics",
+      "date" : "2005-09-21",
+      "price": 15.74
+  },
+  { 
+      "author" : "Charles Palliser",
+      "title" : "Betrayals",
+      "isbn" : "0345404351",
+      "publisher" : "Ballantine Books",
+      "date" : "2015-04-14",
+      "price": 28.13
+  }
+]
+)";
 
-    std::istringstream is(s);
+// In the example, the application pulls the next event in the 
+// JSON input stream by calling next().
+
+void reading_a_json_stream()
+{
+    std::istringstream is(example);
 
     json_stream_reader reader(is);
 
@@ -41,31 +51,58 @@ void json_stream_reader_example()
         const auto& event = reader.current();
         switch (event.event_type())
         {
+            case stream_event_type::begin_array:
+                std::cout << "begin_array\n";
+                break;
+            case stream_event_type::end_array:
+                std::cout << "end_array\n";
+                break;
+            case stream_event_type::begin_object:
+                std::cout << "begin_object\n";
+                break;
+            case stream_event_type::end_object:
+                std::cout << "end_object\n";
+                break;
             case stream_event_type::name:
-                // Returned data is string, so can use as<jsoncons::string_view>()>()
-                std::cout << event.as<jsoncons::string_view>() << ": ";
+                std::cout << "name: " << event.as<std::string>() << "\n";
                 break;
             case stream_event_type::string_value:
-                // Can use as<std::string_view>() if your compiler supports it
-                std::cout << event.as<jsoncons::string_view>() << "\n";
+                std::cout << "string_value: " << event.as<std::string>() << "\n";
+                break;
+            case stream_event_type::null_value:
+                std::cout << "null_value: " << event.as<std::string>() << "\n";
+                break;
+            case stream_event_type::bool_value:
+                std::cout << "bool_value: " << event.as<std::string>() << "\n";
                 break;
             case stream_event_type::int64_value:
+                std::cout << "int64_value: " << event.as<std::string>() << "\n";
+                break;
             case stream_event_type::uint64_value:
-                // Converts integer value to std::string
-                std::cout << event.as<std::string>() << "\n";
+                std::cout << "uint64_value: " << event.as<std::string>() << "\n";
+                break;
+            case stream_event_type::bignum_value:
+                // Returned if 64 bit integer overflow
+                std::cout << "bignum_value: " << event.as<std::string>() << "\n";
+                break;
+            case stream_event_type::double_value:
+                std::cout << "double_value: " << event.as<std::string>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type\n";
                 break;
         }
     }
 }
 
-class first_name_filter : public stream_filter
+class author_filter : public stream_filter
 {
     bool accept_next_ = false;
 public:
     bool accept(const stream_event& event) override
     {
         if (event.event_type()  == stream_event_type::name &&
-            event.as<jsoncons::string_view>() == "firstName")
+            event.as<jsoncons::string_view>() == "author")
         {
             accept_next_ = true;
             return false;
@@ -83,34 +120,12 @@ public:
     }
 };
 
-void stream_filter_example()
+// Filtering the stream
+void filtering_a_json_stream()
 {
-    std::string s = R"(
-    [
-        {
-            "enrollmentNo" : 100,
-            "firstName" : "Tom",
-            "lastName" : "Cochrane",
-            "mark" : 55              
-        },
-        {
-            "enrollmentNo" : 101,
-            "firstName" : "Catherine",
-            "lastName" : "Smith",
-            "mark" : 95              
-        },
-        {
-            "enrollmentNo" : 102,
-            "firstName" : "William",
-            "lastName" : "Skeleton",
-            "mark" : 60              
-        }
-    ]
-    )";
+    std::istringstream is(example);
 
-    std::istringstream is(s);
-
-    first_name_filter filter;
+    author_filter filter;
     json_stream_reader reader(is, filter);
 
     for (; !reader.done(); reader.next())
@@ -129,9 +144,9 @@ void pull_parser_examples()
 {
     std::cout << "\nPull parser examples\n\n";
 
-    json_stream_reader_example();
+    reading_a_json_stream();
     std::cout << "\n";
-    stream_filter_example();
+    filtering_a_json_stream();
 
     std::cout << "\n";
 }
