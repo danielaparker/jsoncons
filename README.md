@@ -165,6 +165,15 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
+[Playing around with CBOR, JSON, and CSV](#E1)
+
+[Convert JSON text to C++ objects, and back](#E2)
+
+[Pull parser example](#E3)
+
+[Dump json fragments into a larger document](#E4)
+
+<div id="E1"/>
 ### Playing around with CBOR, JSON, and CSV
 
 ```c++
@@ -353,6 +362,7 @@ See [json_type_traits](doc/ref/json_type_traits.md)
 
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
+<div id="E2"/>
 ### Convert JSON text to C++ objects, and back
 
 The functions `decode_json` and `encode_json` convert JSON 
@@ -409,85 +419,7 @@ John Smith: Software Engineer
 
 See [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
 
-### Dump json fragments into a larger document
-
-```c++
-#include <jsoncons/json.hpp>
-
-using namespace jsoncons;
-
-int main()
-{
-    const json some_books = json::parse(R"(
-    [
-        {
-            "title" : "Kafka on the Shore",
-            "author" : "Haruki Murakami",
-            "price" : 25.17
-        },
-        {
-            "title" : "Women: A Novel",
-            "author" : "Charles Bukowski",
-            "price" : 12.00
-        }
-    ]
-    )");
-
-    const json more_books = json::parse(R"(
-    [
-        {
-            "title" : "A Wild Sheep Chase: A Novel",
-            "author" : "Haruki Murakami",
-            "price" : 9.01
-        },
-        {
-            "title" : "Cutter's Way",
-            "author" : "Ivan Passer",
-            "price" : 8.00
-        }
-    ]
-    )");
-
-    json_serializer serializer(std::cout, jsoncons::indenting::indent); // pretty print
-    serializer.begin_array();
-    for (const auto& book : some_books.array_range())
-    {
-        book.dump(serializer);
-    }
-    for (const auto& book : more_books.array_range())
-    {
-        book.dump(serializer);
-    }
-    serializer.end_array();
-    serializer.flush();
-}
-```
-Output:
-```json
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 12.0,
-        "title": "Women: A Novel"
-    },
-    {
-        "author": "Haruki Murakami",
-        "price": 9.01,
-        "title": "A Wild Sheep Chase: A Novel"
-    },
-    {
-        "author": "Ivan Passer",
-        "price": 8.0,
-        "title": "Cutter's Way"
-    }
-]
-```
-
+<div id="E3"/>
 ### Pull parser example
 
 A typical pull parsing application will repeatedly process the `current()` 
@@ -666,13 +598,111 @@ Graham Greene
 
 See [json_stream_reader](doc/ref/json_stream_reader.md) 
 
+<div id="E4"/>
+### Dump json fragments into a larger document
+
+```c++
+#include <jsoncons/json.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    const json some_books = json::parse(R"(
+    [
+        {
+            "title" : "Kafka on the Shore",
+            "author" : "Haruki Murakami",
+            "price" : 25.17
+        },
+        {
+            "title" : "Women: A Novel",
+            "author" : "Charles Bukowski",
+            "price" : 12.00
+        }
+    ]
+    )");
+
+    const json more_books = json::parse(R"(
+    [
+        {
+            "title" : "A Wild Sheep Chase: A Novel",
+            "author" : "Haruki Murakami",
+            "price" : 9.01
+        },
+        {
+            "title" : "Cutter's Way",
+            "author" : "Ivan Passer",
+            "price" : 8.00
+        }
+    ]
+    )");
+
+    json_serializer serializer(std::cout, jsoncons::indenting::indent); // pretty print
+    serializer.begin_array();
+    for (const auto& book : some_books.array_range())
+    {
+        book.dump(serializer);
+    }
+    for (const auto& book : more_books.array_range())
+    {
+        book.dump(serializer);
+    }
+    serializer.end_array();
+    serializer.flush();
+}
+```
+Output:
+```json
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 12.0,
+        "title": "Women: A Novel"
+    },
+    {
+        "author": "Haruki Murakami",
+        "price": 9.01,
+        "title": "A Wild Sheep Chase: A Novel"
+    },
+    {
+        "author": "Ivan Passer",
+        "price": 8.0,
+        "title": "Cutter's Way"
+    }
+]
+```
+
 ## Building the test suite and examples with CMake
 
 [CMake](https://cmake.org/) is a cross-platform build tool that generates makefiles and solutions for the compiler environment of your choice. On Windows you can download a [Windows Installer package](https://cmake.org/download/). On Linux it is usually available as a package, e.g., on Ubuntu,
 ```
 sudo apt-get install cmake
 ```
-                                                       
+Once cmake is installed, you can build the tests:
+```
+mkdir build
+cd build
+cmake ../ -DBUILD_TESTS=ON
+cmake --build . --target test_jsoncons --config Release
+```
+Run from the jsoncons tests directory:
+
+On Windows:
+```
+..\build\tests\Release\test_jsoncons
+```
+
+On UNIX:
+```
+../build/tests/Release/test_jsoncons
+```
+
 ## Acknowledgements
 
 Special debt owed to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor), which this library draws on for platform dependent binary configuration.
