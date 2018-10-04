@@ -621,9 +621,9 @@ TEST_CASE("test_is")
     obj["field2"] = -10;
     obj["field3"] = 10U;
 
-    CHECK(obj["field1"].data_type() == jsoncons::data_type_tag::int64_tag);
-    CHECK(obj["field2"].data_type() == jsoncons::data_type_tag::int64_tag);
-    CHECK(obj["field3"].data_type() == jsoncons::data_type_tag::uint64_tag);
+    CHECK(obj["field1"].structure_tag() == jsoncons::structure_tag_type::int64_tag);
+    CHECK(obj["field2"].structure_tag() == jsoncons::structure_tag_type::int64_tag);
+    CHECK(obj["field3"].structure_tag() == jsoncons::structure_tag_type::uint64_tag);
 
     CHECK_FALSE(obj["field1"].is<std::string>());
     CHECK(obj["field1"].is<short>());
@@ -661,7 +661,7 @@ TEST_CASE("test_is2")
 {
     json obj = json::parse("{\"field1\":10}");
 
-    CHECK(obj["field1"].data_type() == jsoncons::data_type_tag::uint64_tag);
+    CHECK(obj["field1"].structure_tag() == jsoncons::structure_tag_type::uint64_tag);
 
     CHECK_FALSE(obj["field1"].is<std::string>());
     CHECK(obj["field1"].is<int>());
