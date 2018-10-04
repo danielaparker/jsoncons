@@ -31,12 +31,6 @@
 
 namespace jsoncons {
 
-// null_type
-
-struct null_type
-{
-};
-
 // json_type_traits
 
 template <class Json, class T, class Enable=void>

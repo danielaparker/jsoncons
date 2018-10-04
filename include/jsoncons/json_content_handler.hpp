@@ -12,11 +12,14 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/serializing_context.hpp>
 #include <jsoncons/json_serializing_options.hpp>
-#if !defined(JSONCONS_NO_DEPRECATED)
-#include <jsoncons/json_type_traits.hpp> // for null_type
-#endif
 
 namespace jsoncons {
+
+// null_type
+
+struct null_type
+{
+};
 
 enum class semantic_tag_type : uint8_t 
 {
@@ -415,14 +418,6 @@ private:
         return true;
     }
 
-    bool do_double_value(double, 
-                         const floating_point_options&, 
-                         semantic_tag_type,
-                         const serializing_context&) override
-    {
-        return true;
-    }
-
     bool do_int64_value(int64_t, 
                         semantic_tag_type, 
                         const serializing_context&) override
@@ -432,6 +427,14 @@ private:
 
     bool do_uint64_value(uint64_t, 
                          semantic_tag_type, 
+                         const serializing_context&) override
+    {
+        return true;
+    }
+
+    bool do_double_value(double, 
+                         const floating_point_options&, 
+                         semantic_tag_type,
                          const serializing_context&) override
     {
         return true;
