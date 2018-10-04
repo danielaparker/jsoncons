@@ -167,22 +167,14 @@ line and column information is provided in the [context](serializing_context.md)
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual bool do_string_value(const string_view_type& val, 
-                           const serializing_context& context) = 0;
+                                 semantic_tag_type tag,
+                                 const serializing_context& context) = 0;
 Handles a string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 Handles a byte string value. Contextual information including
-line and column information is provided in the [context](serializing_context.md) parameter. 
-Returns `true` if the producer should continue streaming events, `false` otherwise.
-
-    virtual bool do_bignum_value(const string_view_type& value, const serializing_context& context) = 0;
-Handles a bignum using the sign-magnitude representation. 
-The magnitude is an unsigned integer `n` encoded as a byte string data item in big-endian byte-order.
-If the value of signum is 1, the value of the bignum is `n`. 
-If the value of signum is -1, the value of the bignum is `-1 - n`. 
-An empty list means a zero value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 

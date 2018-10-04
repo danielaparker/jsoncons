@@ -214,7 +214,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    void write_string_value(const string_view_type& sv)
     {
         std::vector<uint8_t> v;
         std::basic_string<uint8_t> target;
@@ -261,57 +261,11 @@ private:
         {
             writer_.put(c);
         }
-
-        end_value();
-        return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
+    void write_bignum_value(const string_view_type& sv)
     {
-        std::vector<uint8_t> v;
-
-        if (length <= 0x17)
-        {
-            // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x40 + length), v);
-        }
-        else if (length <= 0xff)
-        {
-            binary::to_big_endian(static_cast<uint8_t>(0x58), v);
-            binary::to_big_endian(static_cast<uint8_t>(length), v);
-        }
-        else if (length <= 0xffff)
-        {
-            binary::to_big_endian(static_cast<uint8_t>(0x59), v);
-            binary::to_big_endian(static_cast<uint16_t>(length), v);
-        }
-        else if (length <= 0xffffffff)
-        {
-            binary::to_big_endian(static_cast<uint8_t>(0x5a), v);
-            binary::to_big_endian(static_cast<uint32_t>(length), v);
-        }
-        else if (length <= 0xffffffffffffffff)
-        {
-            binary::to_big_endian(static_cast<uint8_t>(0x5b), v);
-            binary::to_big_endian(static_cast<uint64_t>(length),v);
-        }
-
-        for (size_t i = 0; i < length; ++i)
-        {
-            binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
-        }
-        for (auto c : v)
-        {
-            writer_.put(c);
-        }
-
-        end_value();
-        return true;
-    }
-
-    bool do_bignum_value(const string_view_type& value, const serializing_context&) override
-    {
-        bignum n(value.data(), value.length());
+        bignum n(sv.data(), sv.length());
         int signum;
         std::vector<uint8_t> data;
         n.dump(signum, data);
@@ -359,6 +313,66 @@ private:
             //binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
         }
 
+        for (auto c : v)
+        {
+            writer_.put(c);
+        }
+    }
+
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    {
+        switch (tag)
+        {
+            case semantic_tag_type::bignum_tag:
+            {
+                write_bignum_value(sv);
+                break;
+            }
+            default:
+            {
+                write_string_value(sv);
+                break;
+            }
+        }
+
+        end_value();
+        return true;
+    }
+
+    bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
+    {
+        std::vector<uint8_t> v;
+
+        if (length <= 0x17)
+        {
+            // fixstr stores a byte array whose length is upto 31 bytes
+            binary::to_big_endian(static_cast<uint8_t>(0x40 + length), v);
+        }
+        else if (length <= 0xff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x58), v);
+            binary::to_big_endian(static_cast<uint8_t>(length), v);
+        }
+        else if (length <= 0xffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x59), v);
+            binary::to_big_endian(static_cast<uint16_t>(length), v);
+        }
+        else if (length <= 0xffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x5a), v);
+            binary::to_big_endian(static_cast<uint32_t>(length), v);
+        }
+        else if (length <= 0xffffffffffffffff)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0x5b), v);
+            binary::to_big_endian(static_cast<uint64_t>(length),v);
+        }
+
+        for (size_t i = 0; i < length; ++i)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
+        }
         for (auto c : v)
         {
             writer_.put(c);

@@ -102,7 +102,7 @@ private:
         {
             throw parse_error(result.ec,context.line_number(),context.column_number());
         }
-        return other_handler_.string_value(target, context);
+        return other_handler_.string_value(target, tag, context);
     }
 
     bool do_int64_value(int64_t value, const serializing_context& context) override

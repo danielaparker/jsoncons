@@ -150,7 +150,7 @@ public:
         bignum n(signum, data, length);
         std::basic_string<CharT> s;
         n.dump(s);
-        return do_bignum_value(s, null_serializing_context());
+        return do_string_value(s, semantic_tag_type::bignum_tag, null_serializing_context());
     }
 
     bool bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
@@ -158,17 +158,17 @@ public:
         bignum n(signum, data, length);
         std::basic_string<CharT> s;
         n.dump(s);
-        return do_bignum_value(s, context);
+        return do_string_value(s, semantic_tag_type::bignum_tag, context);
     }
 
     bool bignum_value(const string_view_type& s) 
     {
-        return do_bignum_value(s, null_serializing_context());
+        return do_string_value(s, semantic_tag_type::bignum_tag, null_serializing_context());
     }
 
     bool bignum_value(const string_view_type& s, const serializing_context& context) 
     {
-        return do_bignum_value(s, context);
+        return do_string_value(s, semantic_tag_type::bignum_tag, context);
     }
 
     bool int64_value(int64_t value)
@@ -384,8 +384,6 @@ private:
 
     virtual bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
-    virtual bool do_bignum_value(const string_view_type& value, const serializing_context& context) = 0;
-
     virtual bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
 
     virtual bool do_int64_value(int64_t value, const serializing_context& context) = 0;
@@ -441,11 +439,6 @@ private:
     }
 
     bool do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
-    {
-        return true;
-    }
-
-    bool do_bignum_value(const string_view_type&, const serializing_context&) override
     {
         return true;
     }

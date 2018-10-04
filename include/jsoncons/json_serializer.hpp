@@ -499,16 +499,84 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context&) override
+    void write_string_value(const string_view_type& sv)
+    {
+        writer_. put('\"');
+        escape_string(sv.data(), sv.length());
+        writer_. put('\"');
+    }
+
+    void write_bignum_value(const string_view_type& sv)
+    {
+        switch (bignum_format_)
+        {
+            case bignum_chars_format::integer:
+            {
+                writer_.write(sv.data(),sv.size());
+                break;
+            }
+            case bignum_chars_format::base64:
+            {
+                bignum n(sv.data(), sv.length());
+                int signum;
+                std::vector<uint8_t> v;
+                n.dump(signum, v);
+
+                std::basic_string<CharT> s;
+                encode_base64(v.data(), v.size(), s);
+                if (signum == -1)
+                {
+                    s.insert(s.begin(), '~');
+                }
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+                break;
+            }
+            case bignum_chars_format::base64url:
+            {
+                bignum n(sv.data(), sv.length());
+                int signum;
+                std::vector<uint8_t> v;
+                n.dump(signum, v);
+
+                std::basic_string<CharT> s;
+                encode_base64url(v.data(), v.size(), s);
+                if (signum == -1)
+                {
+                    s.insert(s.begin(), '~');
+                }
+                writer_. put('\"');
+                writer_.write(s.data(),s.size());
+                writer_. put('\"');
+                break;
+            }
+            default:
+            {
+                writer_. put('\"');
+                writer_.write(sv.data(),sv.size());
+                writer_. put('\"');
+                break;
+            }
+        }
+    }
+
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
         }
 
-        writer_. put('\"');
-        escape_string(value.data(), value.length());
-        writer_. put('\"');
+        switch (tag)
+        {
+            case semantic_tag_type::bignum_tag:
+                write_bignum_value(sv);
+                break;
+            default:
+                write_string_value(sv);
+                break;
+        }
 
         end_value();
         return true;
@@ -546,69 +614,6 @@ private:
                 encode_base64(data, length, s);
                 writer_. put('\"');
                 writer_.write(s.data(),s.size());
-                writer_. put('\"');
-                break;
-            }
-        }
-
-        end_value();
-        return true;
-    }
-
-    bool do_bignum_value(const string_view_type& value, const serializing_context&) override
-    {
-        if (!stack_.empty() && stack_.back().is_array())
-        {
-            begin_scalar_value();
-        }
-
-        switch (bignum_format_)
-        {
-            case bignum_chars_format::integer:
-            {
-                writer_.write(value.data(),value.size());
-                break;
-            }
-            case bignum_chars_format::base64:
-            {
-                bignum n(value.data(), value.length());
-                int signum;
-                std::vector<uint8_t> v;
-                n.dump(signum, v);
-
-                std::basic_string<CharT> s;
-                encode_base64(v.data(), v.size(), s);
-                if (signum == -1)
-                {
-                    s.insert(s.begin(), '~');
-                }
-                writer_. put('\"');
-                writer_.write(s.data(),s.size());
-                writer_. put('\"');
-                break;
-            }
-            case bignum_chars_format::base64url:
-            {
-                bignum n(value.data(), value.length());
-                int signum;
-                std::vector<uint8_t> v;
-                n.dump(signum, v);
-
-                std::basic_string<CharT> s;
-                encode_base64url(v.data(), v.size(), s);
-                if (signum == -1)
-                {
-                    s.insert(s.begin(), '~');
-                }
-                writer_. put('\"');
-                writer_.write(s.data(),s.size());
-                writer_. put('\"');
-                break;
-            }
-            default:
-            {
-                writer_. put('\"');
-                writer_.write(value.data(),value.size());
                 writer_. put('\"');
                 break;
             }

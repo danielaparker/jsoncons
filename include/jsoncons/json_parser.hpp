@@ -63,21 +63,24 @@ public:
 
     bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context& context) override
     {
-        if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
+        if (tag == semantic_tag_type::na)
         {
-            this->destination_handler().double_value(std::nan(""), context);
-        }
-        else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
-        {
-            this->destination_handler().double_value(std::numeric_limits<double>::infinity(), context);
-        }
-        else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
-        {
-            this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), context);
-        }
-        else
-        {
-            this->destination_handler().string_value(s, tag, context);
+            if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
+            {
+                this->destination_handler().double_value(std::nan(""), context);
+            }
+            else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
+            {
+                this->destination_handler().double_value(std::numeric_limits<double>::infinity(), context);
+            }
+            else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
+            {
+                this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), context);
+            }
+            else
+            {
+                this->destination_handler().string_value(s, tag, context);
+            }
         }
         return true;
     }

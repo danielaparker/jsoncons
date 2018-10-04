@@ -103,12 +103,6 @@ private:
         return destination_handler_.byte_string_value(data, length, context);
     }
 
-    bool do_bignum_value(const string_view_type& value,
-                         const serializing_context& context) override
-    {
-        return destination_handler_.bignum_value(value, context);
-    }
-
     bool do_double_value(double value, const floating_point_options& fmt,
                          const serializing_context& context) override
     {
@@ -277,18 +271,6 @@ private:
                               const serializing_context& context) override
     {
         return destination_handler_.byte_string_value(data, length, context);
-    }
-
-    bool do_bignum_value(const string_view_type& value,
-                         const serializing_context& context) override
-    {
-        std::basic_string<CharT> target;
-        auto result = unicons::convert(value.begin(),value.end(),std::back_inserter(target),unicons::conv_flags::strict);
-        if (result.ec != unicons::conv_errc())
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-        }
-        return destination_handler_.bignum_value(target, context);
     }
 
     bool do_double_value(double value, const floating_point_options& fmt,

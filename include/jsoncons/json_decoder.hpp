@@ -222,17 +222,40 @@ private:
 
     bool do_string_value(const string_view_type& val, semantic_tag_type tag, const serializing_context&) override
     {
-        switch (stack_offsets_.back().type_)
+        switch (tag)
         {
-            case structure_type::object_t:
-                stack_.back().value_ = Json(val.data(),val.length(),string_allocator_);
-                break;
-            case structure_type::array_t:
-                stack_.push_back(Json(val.data(),val.length(),string_allocator_));
-                break;
+            case semantic_tag_type::bignum_tag:
+            {
+                    basic_bignum<json_byte_allocator_type> n(val.data(), val.length());
+                    switch (stack_offsets_.back().type_)
+                    {
+                        case structure_type::object_t:
+                            stack_.back().value_ = Json(n);
+                            break;
+                        case structure_type::array_t:
+                            stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(val.data(), val.length())));
+                            break;
+                        default:
+                            result_ = Json(basic_bignum<json_byte_allocator_type>(val.data(), val.length()));
+                            is_valid_ = true;
+                            break;
+                    }
+                    break;
+            }
             default:
-                result_ = Json(val.data(),val.length(),string_allocator_);
-                is_valid_ = true;
+                switch (stack_offsets_.back().type_)
+                {
+                    case structure_type::object_t:
+                        stack_.back().value_ = Json(val.data(),val.length(),string_allocator_);
+                        break;
+                    case structure_type::array_t:
+                        stack_.push_back(Json(val.data(),val.length(),string_allocator_));
+                        break;
+                    default:
+                        result_ = Json(val.data(),val.length(),string_allocator_);
+                        is_valid_ = true;
+                        break;
+                }
                 break;
         }
         return true;
@@ -250,25 +273,6 @@ private:
                 break;
             default:
                 result_ = Json(byte_string_view(data,length),byte_allocator_);
-                is_valid_ = true;
-                break;
-        }
-        return true;
-    }
-
-    bool do_bignum_value(const string_view_type& value, const serializing_context&) override
-    {
-        basic_bignum<json_byte_allocator_type> n(value.data(), value.length());
-        switch (stack_offsets_.back().type_)
-        {
-            case structure_type::object_t:
-                stack_.back().value_ = Json(n);
-                break;
-            case structure_type::array_t:
-                stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(value.data(), value.length())));
-                break;
-            default:
-                result_ = Json(basic_bignum<json_byte_allocator_type>(value.data(), value.length()));
                 is_valid_ = true;
                 break;
         }

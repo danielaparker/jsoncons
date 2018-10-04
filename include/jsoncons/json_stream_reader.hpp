@@ -109,12 +109,6 @@ private:
         JSONCONS_UNREACHABLE();
     }
 
-    bool do_bignum_value(const string_view_type& value, const serializing_context&) override
-    {
-        event_ = basic_stream_event<CharT>(value.data(), value.length(), stream_event_type::bignum_value);
-        return false;
-    }
-
     bool do_int64_value(int64_t value, const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(value);
