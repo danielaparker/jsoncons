@@ -749,6 +749,20 @@ public:
         {
             new(reinterpret_cast<void*>(&data_))double_data(val, fmt);
         }
+
+        variant(const char_type* s)
+        {
+            size_t length = char_traits_type::length(s);
+            if (length <= short_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::na, s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, char_allocator_type());
+            }
+        }
+
         variant(const char_type* s, size_t length)
         {
             if (length <= short_string_data::max_length)
@@ -758,6 +772,44 @@ public:
             else
             {
                 new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, char_allocator_type());
+            }
+        }
+
+        variant(const char_type* s, size_t length, 
+                const Allocator& alloc)
+        {
+            if (length <= short_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::na, s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, char_allocator_type(alloc));
+            }
+        }
+
+        variant(const char_type* s, size_t length, semantic_tag_type tag)
+        {
+            if (length <= short_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))short_string_data(tag, s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))long_string_data(tag, s, length, char_allocator_type());
+            }
+        }
+
+        variant(const char_type* s, size_t length, 
+                semantic_tag_type tag, const Allocator& alloc)
+        {
+            if (length <= short_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))short_string_data(tag, s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))long_string_data(tag, s, length, char_allocator_type(alloc));
             }
         }
 
@@ -799,44 +851,6 @@ public:
             else
             {
                 new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum_tag, s.data(), s.length(), char_allocator_type(allocator));
-            }
-        }
-
-        variant(const char_type* s)
-        {
-            size_t length = char_traits_type::length(s);
-            if (length <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::na, s, static_cast<uint8_t>(length));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, char_allocator_type());
-            }
-        }
-
-        variant(const char_type* s, const Allocator& alloc)
-        {
-            size_t length = char_traits_type::length(s);
-            if (length <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::na, s, static_cast<uint8_t>(length));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, alloc);
-            }
-        }
-
-        variant(const char_type* s, size_t length, const Allocator& alloc)
-        {
-            if (length <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::na, s, static_cast<uint8_t>(length));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, alloc);
             }
         }
         variant(const object& val)
@@ -2560,12 +2574,12 @@ public:
     }
 
     basic_json(const char_type* s)
-        : var_(s)
+        : var_(s, char_traits_type::length(s), semantic_tag_type::na)
     {
     }
 
     basic_json(const char_type* s, const Allocator& allocator)
-        : var_(s,allocator)
+        : var_(s, char_traits_type::length(s), semantic_tag_type::na, allocator)
     {
     }
 
@@ -2579,13 +2593,24 @@ public:
     {
     }
 
-    basic_json(const char_type *s, size_t length)
-        : var_(s, length)
+    basic_json(const char_type *s, size_t length, semantic_tag_type tag = semantic_tag_type::na)
+        : var_(s, length, tag)
     {
     }
 
-    basic_json(const char_type *s, size_t length, const Allocator& allocator)
-        : var_(s, length, allocator)
+    basic_json(const string_view_type sv, semantic_tag_type tag)
+        : var_(sv.data(), sv.length(), tag)
+    {
+    }
+
+    basic_json(const string_view_type sv, semantic_tag_type tag, const Allocator& allocator)
+        : var_(sv.data(), sv.length(), tag, allocator)
+    {
+    }
+
+    basic_json(const char_type *s, size_t length, 
+               semantic_tag_type tag, const Allocator& allocator)
+        : var_(s, length, tag, allocator)
     {
     }
 
@@ -2649,7 +2674,7 @@ public:
 
     basic_json& operator=(const char_type* s)
     {
-        var_ = variant(s);
+        var_ = variant(s, char_traits_type::length(s), semantic_tag_type::na);
         return *this;
     }
 
@@ -4052,17 +4077,17 @@ public:
 
     static basic_json make_string(const string_view_type& s)
     {
-        return basic_json(variant(s.data(),s.length()));
+        return basic_json(s, semantic_tag_type::na);
     }
 
     static basic_json make_string(const char_type* rhs, size_t length)
     {
-        return basic_json(variant(rhs,length));
+        return basic_json(string_view_type(rhs, length), semantic_tag_type::na);
     }
 
     static basic_json make_string(const string_view_type& s, allocator_type allocator)
     {
-        return basic_json(variant(s.data(),s.length(),allocator));
+        return basic_json(s, semantic_tag_type::na, allocator);
     }
 
     static basic_json from_integer(int64_t val)

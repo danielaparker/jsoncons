@@ -648,12 +648,12 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        return Json(typename Json::variant(val.data(), val.size()));
+        return Json(val, semantic_tag_type::na);
     }
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json(typename Json::variant(val.data(),val.size(),allocator));
+        return Json(val, semantic_tag_type::na, allocator);
     }
 };
 
@@ -675,12 +675,12 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        return Json(typename Json::variant(val.data(), val.size()));
+        return Json(val, semantic_tag_type::na);
     }
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json(typename Json::variant(val.data(),val.size(),allocator));
+        return Json(val, semantic_tag_type::na, allocator);
     }
 };
 
@@ -933,7 +933,9 @@ public:
     
     static Json to_json(const basic_bignum<Allocator>& val)
     {
-        return Json(val);
+        std::basic_string<typename Json::char_type> s;
+        val.dump(s);
+        return Json(s,semantic_tag_type::bignum_tag);
     }
 };
 

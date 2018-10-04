@@ -220,42 +220,19 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& val, semantic_tag_type tag, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
     {
-        switch (tag)
+        switch (stack_offsets_.back().type_)
         {
-            case semantic_tag_type::bignum_tag:
-            {
-                    basic_bignum<json_byte_allocator_type> n(val.data(), val.length());
-                    switch (stack_offsets_.back().type_)
-                    {
-                        case structure_type::object_t:
-                            stack_.back().value_ = Json(n);
-                            break;
-                        case structure_type::array_t:
-                            stack_.push_back(Json(basic_bignum<json_byte_allocator_type>(val.data(), val.length())));
-                            break;
-                        default:
-                            result_ = Json(basic_bignum<json_byte_allocator_type>(val.data(), val.length()));
-                            is_valid_ = true;
-                            break;
-                    }
-                    break;
-            }
+            case structure_type::object_t:
+                stack_.back().value_ = Json(sv, tag, string_allocator_);
+                break;
+            case structure_type::array_t:
+                stack_.push_back(Json(sv, tag, string_allocator_));
+                break;
             default:
-                switch (stack_offsets_.back().type_)
-                {
-                    case structure_type::object_t:
-                        stack_.back().value_ = Json(val.data(),val.length(),string_allocator_);
-                        break;
-                    case structure_type::array_t:
-                        stack_.push_back(Json(val.data(),val.length(),string_allocator_));
-                        break;
-                    default:
-                        result_ = Json(val.data(),val.length(),string_allocator_);
-                        is_valid_ = true;
-                        break;
-                }
+                result_ = Json(sv, tag, string_allocator_);
+                is_valid_ = true;
                 break;
         }
         return true;

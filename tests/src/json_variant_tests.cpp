@@ -15,9 +15,9 @@ TEST_CASE("test_variant")
     CHECK(structure_tag_type::int64_tag == var1.structure_tag());
     json::variant var2(uint64_t(100));
     CHECK(structure_tag_type::uint64_tag == var2.structure_tag());
-    json::variant var3("Small string",12);
+    json::variant var3("Small string", 12, semantic_tag_type::na);
     CHECK(structure_tag_type::short_string_tag == var3.structure_tag());
-    json::variant var4("Too long to fit in small string",31);
+    json::variant var4("Too long to fit in small string", 31, semantic_tag_type::na);
     CHECK(structure_tag_type::long_string_tag == var4.structure_tag());
     json::variant var5(true);
     CHECK(structure_tag_type::bool_tag == var5.structure_tag());
@@ -55,7 +55,7 @@ TEST_CASE("test_move_constructor")
     CHECK(var6.double_data_cast()->value() == val5);
 
     std::string val7("Too long for small string");
-    json::variant var7(val7.data(),val7.length());
+    json::variant var7(val7.data(), val7.length(), semantic_tag_type::na);
     json::variant var8(std::move(var7));
     //CHECK(structure_tag_type::null_tag == var7.structure_tag());
     CHECK(structure_tag_type::long_string_tag == var8.structure_tag());
@@ -63,7 +63,7 @@ TEST_CASE("test_move_constructor")
     CHECK(val7.length() == var8.string_data_cast()->length());
 
     std::string val9("Small string");
-    json::variant var9(val9.data(), val9.length());
+    json::variant var9(val9.data(), val9.length(), semantic_tag_type::na);
     json::variant var10(std::move(var9));
     //CHECK(structure_tag_type::null_tag == var9.structure_tag());
     CHECK(structure_tag_type::short_string_tag == var10.structure_tag());
@@ -78,7 +78,7 @@ TEST_CASE("test_move_constructor")
     CHECK(var12.bool_data_cast()->value() == val11);
 
     std::string val13("Too long for small string");
-    json::variant var13(val13.data(), val13.length());
+    json::variant var13(val13.data(), val13.length(), semantic_tag_type::na);
     json::variant var14(std::move(var13));
     //CHECK(structure_tag_type::null_tag == var13.structure_tag());
     CHECK(structure_tag_type::long_string_tag == var14.structure_tag());
@@ -123,7 +123,7 @@ TEST_CASE("test_copy_constructor")
     CHECK(var6.double_data_cast()->value() == val5);
 
     std::string val9 = "Small string";
-    json::variant var9(val9.data(),val9.length());
+    json::variant var9(val9.data(), val9.length(), semantic_tag_type::na);
     json::variant var10(var9);
     CHECK(structure_tag_type::short_string_tag == var9.structure_tag());
     CHECK(structure_tag_type::short_string_tag == var10.structure_tag());
@@ -137,7 +137,7 @@ TEST_CASE("test_copy_constructor")
     CHECK(var12.bool_data_cast()->value() == val11);
 
     std::string val13 = "Too long for small string";
-    json::variant var13(val13.data(),val13.length());
+    json::variant var13(val13.data(), val13.length(), semantic_tag_type::na);
     json::variant var14(var13);
     CHECK(structure_tag_type::long_string_tag == var13.structure_tag());
     CHECK(structure_tag_type::long_string_tag == var14.structure_tag());
@@ -184,21 +184,21 @@ TEST_CASE("test_equals")
 
     std::string val9("small string");
     std::string val11("small string 2");
-    json::variant var9(val9.data(),val9.length());
-    json::variant var10(val9.data(),val9.length());
-    json::variant var11(val11.data(),val11.length());
+    json::variant var9(val9.data(), val9.length(), semantic_tag_type::na);
+    json::variant var10(val9.data(),val9.length(), semantic_tag_type::na);
+    json::variant var11(val11.data(),val11.length(), semantic_tag_type::na);
 
     std::string val12("too long for small string");
     std::string val14("too long for small string 2");
-    json::variant var12(val12.data(),val12.length());
-    json::variant var13(val12.data(),val12.length());
-    json::variant var14(val14.data(),val14.length());
+    json::variant var12(val12.data(),val12.length(), semantic_tag_type::na);
+    json::variant var13(val12.data(),val12.length(), semantic_tag_type::na);
+    json::variant var14(val14.data(),val14.length(), semantic_tag_type::na);
     CHECK((var9 == var10 && var10 == var9));
     CHECK((var9 != var11 && var11 != var9));
     CHECK((var12 == var13 && var13 == var12));
     CHECK((var12 != var14 && var14 != var12));
 
-    json::variant var15(val9.data(),val9.length(),std::allocator<char>());
+    json::variant var15(val9.data(),val9.length(), semantic_tag_type::na, std::allocator<char>());
     CHECK((var9 == var15 && var15 == var9));
 
     json::variant var16(static_cast<int64_t>(0));
