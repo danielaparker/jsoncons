@@ -1954,7 +1954,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.string_value(basic_string_view<char>(s.data(),s.length()), *this);
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::na, *this);
             }
             break;
 

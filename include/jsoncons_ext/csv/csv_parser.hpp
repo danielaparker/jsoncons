@@ -290,7 +290,7 @@ public:
                     continue_ = handler_.begin_array(*this);
                     for (const auto& name : column_names_)
                     {
-                        continue_ = handler_.string_value(name, *this);
+                        continue_ = handler_.string_value(name, semantic_tag_type::na, *this);
                     }
                     continue_ = handler_.end_array(*this);
                 }
@@ -977,7 +977,7 @@ private:
             default:
                 if (value.length() > 0)
                 {
-                    handler.string_value(value, *this);
+                    handler.string_value(value, semantic_tag_type::na, *this);
                 }
                 else
                 {
@@ -990,7 +990,7 @@ private:
                     }
                     else
                     {
-                        handler.string_value(string_view_type(), *this);
+                        handler.string_value(string_view_type(), semantic_tag_type::na, *this);
                     }
                 }
                 break;  
@@ -1004,7 +1004,7 @@ private:
             }
             else
             {
-                handler.string_value(value, *this);
+                handler.string_value(value, semantic_tag_type::na, *this);
             }
         }
     }
@@ -1258,7 +1258,7 @@ private:
                     }
                     else
                     {
-                        handler.string_value(value, *this);
+                        handler.string_value(value, semantic_tag_type::na, *this);
                     }
                 }
                 else
@@ -1270,7 +1270,7 @@ private:
                     }
                     else
                     {
-                        handler.string_value(value, *this);
+                        handler.string_value(value, semantic_tag_type::na, *this);
                     }
                 }
                 break;
@@ -1283,7 +1283,7 @@ private:
                 break;
             }
         default:
-            handler.string_value(value, *this);
+            handler.string_value(value, semantic_tag_type::na, *this);
         }
     }
 

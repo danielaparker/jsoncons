@@ -115,10 +115,10 @@ public:
         return do_string_value(value, semantic_tag_type::na, null_serializing_context());
     }
 
-    bool string_value(const string_view_type& value, const serializing_context& context) 
-    {
-        return do_string_value(value, semantic_tag_type::na, context);
-    }
+    //bool string_value(const string_view_type& value, const serializing_context& context) 
+    //{
+    //    return do_string_value(value, semantic_tag_type::na, context);
+    //}
 
     bool string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) 
     {

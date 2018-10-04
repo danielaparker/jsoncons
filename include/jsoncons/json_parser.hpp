@@ -77,7 +77,7 @@ public:
         }
         else
         {
-            this->destination_handler().string_value(s, context);
+            this->destination_handler().string_value(s, tag, context);
         }
         return true;
     }
@@ -2812,11 +2812,11 @@ private:
             break;
         case parse_state::object:
         case parse_state::array:
-            continue_ = handler_.string_value(string_view_type(s, length), *this);
+            continue_ = handler_.string_value(string_view_type(s, length), semantic_tag_type::na, *this);
             state_ = parse_state::expect_comma_or_end;
             break;
         case parse_state::root:
-            continue_ = handler_.string_value(string_view_type(s, length), *this);
+            continue_ = handler_.string_value(string_view_type(s, length), semantic_tag_type::na, *this);
             state_ = parse_state::before_done;
             break;
         default:
