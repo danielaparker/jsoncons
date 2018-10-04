@@ -54,20 +54,23 @@ Writes the name part of a name-value pair inside an object. Contextual informati
 line and column information is provided in the [context](serializing_context.md) parameter.  
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool string_value(const string_view_type& value) 
-    bool string_value(const string_view_type& value, const serializing_context& context) 
+    bool string_value(const string_view_type& value, 
+                      semantic_tag_type tag = semantic_tag_type::na, 
+                      const serializing_context& context=null_serializing_context());
 Writes a string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool byte_string_value(const uint8_t* data, size_t length) 
-    bool byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
+    bool byte_string_value(const uint8_t* data, size_t length, 
+                           semantic_tag_type tag=semantic_tag_type::na, 
+                           const serializing_context& context=null_serializing_context()); 
 Writes a byte string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool byte_string_value(const std::vector<uint8_t>& v) 
-    bool byte_string_value(const std::vector<uint8_t>& v, const serializing_context& context) 
+    bool byte_string_value(const std::vector<uint8_t>& v, 
+                           semantic_tag_type tag=semantic_tag_type::na, 
+                           const serializing_context& context=null_serializing_context());
 Writes a byte string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -88,20 +91,24 @@ Writes a bignum using the decimal string representation of a bignum. Contextual 
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool int64_value(int64_t value) 
-    bool int64_value(int64_t value, const serializing_context& context)
+    bool int64_value(int64_t value, 
+                     semantic_tag_type tag = semantic_tag_type::na, 
+                     const serializing_context& context=null_serializing_context());
 Writes a signed integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool uint64_value(uint64_t value) 
-    bool uint64_value(uint64_t value, const serializing_context& context)
+    bool uint64_value(uint64_t value, 
+                      semantic_tag_type tag = semantic_tag_type::na, 
+                      const serializing_context& context=null_serializing_context())
 Writes a non-negative integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool double_value(double value) 
-    bool double_value(double value, const serializing_context& context)
+    bool double_value(double value, 
+                      const floating_point_options& fmt = floating_point_options(), 
+                      semantic_tag_type tag = semantic_tag_type::na, 
+                      const serializing_context& context=null_serializing_context())
 Writes a floating point value with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -112,20 +119,13 @@ Writes a floating point value with specified precision. Contextual information i
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool double_value(double value, const floating_point_options& fmt) 
-    bool double_value(double value, const floating_point_options& fmt, const serializing_context& context)
-Writes a floating point value with specified precision. Contextual information including
-line and column information is provided in the [context](serializing_context.md) parameter. 
-Returns `true` if the producer should continue streaming events, `false` otherwise.
-
-    bool bool_value(bool value) 
-    bool bool_value(bool value, const serializing_context& context) 
+    bool bool_value(bool value, 
+                    const serializing_context& context=null_serializing_context());
 Writes a boolean value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool null_value() 
-    bool null_value(const serializing_context& context) 
+    bool null_value(const serializing_context& context=null_serializing_context());
 Writes a null value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -173,23 +173,30 @@ Handles a string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type tag,
+                                      const serializing_context& context) = 0;
 Handles a byte string value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_int64_value(int64_t value, const serializing_context& context) = 0;
+    virtual bool do_int64_value(int64_t value, 
+                                semantic_tag_type tag, 
+                                const serializing_context& context) = 0;
 Handles a signed integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual bool do_uint64_value(uint64_t value, 
+                                 semantic_tag_type tag, 
                              const serializing_context& context) = 0;
 Handles a non-negative integer value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
+    virtual bool do_double_value(double value, 
+                                 const floating_point_options& fmt, 
+                                 semantic_tag_type tag, 
+                                 const serializing_context& context) = 0;
 Handles a floating point value. Contextual information including
 line and column information is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

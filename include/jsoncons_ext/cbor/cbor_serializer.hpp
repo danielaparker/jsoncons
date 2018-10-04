@@ -339,7 +339,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type, const serializing_context&) override
     {
         std::vector<uint8_t> v;
 
@@ -382,7 +382,10 @@ private:
         return true;
     }
 
-    bool do_double_value(double value, const floating_point_options&, const serializing_context&) override
+    bool do_double_value(double value, 
+                         const floating_point_options&, 
+                         semantic_tag_type tag,
+                         const serializing_context&) override
     {
         std::vector<uint8_t> v;
         binary::to_big_endian(static_cast<uint8_t>(0xfb), v);
@@ -398,7 +401,9 @@ private:
         return true;
     }
 
-    bool do_int64_value(int64_t value, const serializing_context&) override
+    bool do_int64_value(int64_t value, 
+                        semantic_tag_type, 
+                        const serializing_context&) override
     {
         std::vector<uint8_t> v;
         if (value >= 0)
@@ -463,7 +468,9 @@ private:
         return true;
     }
 
-    bool do_uint64_value(uint64_t value, const serializing_context&) override
+    bool do_uint64_value(uint64_t value, 
+                         semantic_tag_type tag, 
+                         const serializing_context&) override
     {
         std::vector<uint8_t> v;
         if (value <= 0x17)

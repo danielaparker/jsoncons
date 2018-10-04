@@ -104,24 +104,33 @@ private:
         return false;
     }
 
-    bool do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t*, size_t, 
+                              semantic_tag_type,
+                              const serializing_context&) override
     {
         JSONCONS_UNREACHABLE();
     }
 
-    bool do_int64_value(int64_t value, const serializing_context&) override
+    bool do_int64_value(int64_t value, 
+                        semantic_tag_type,
+                        const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(value);
         return false;
     }
 
-    bool do_uint64_value(uint64_t value, const serializing_context&) override
+    bool do_uint64_value(uint64_t value, 
+                         semantic_tag_type, 
+                         const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(value);
         return false;
     }
 
-    bool do_double_value(double value, const floating_point_options& fmt, const serializing_context&) override
+    bool do_double_value(double value, 
+                         const floating_point_options& fmt, 
+                         semantic_tag_type tag, 
+                         const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(value, fmt);
         return false;

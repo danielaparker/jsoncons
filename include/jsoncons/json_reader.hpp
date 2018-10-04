@@ -105,19 +105,26 @@ private:
         return other_handler_.string_value(target, tag, context);
     }
 
-    bool do_int64_value(int64_t value, const serializing_context& context) override
+    bool do_int64_value(int64_t value, 
+                        semantic_tag_type tag, 
+                        const serializing_context& context) override
     {
-        return other_handler_.int64_value(value, context);
+        return other_handler_.int64_value(value, tag, context);
     }
 
-    bool do_uint64_value(uint64_t value, const serializing_context& context) override
+    bool do_uint64_value(uint64_t value, 
+                         semantic_tag_type tag, 
+                         const serializing_context& context) override
     {
-        return other_handler_.uint64_value(value, context);
+        return other_handler_.uint64_value(value, tag, context);
     }
 
-    bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) override
+    bool do_double_value(double value, 
+                         const floating_point_options& fmt, 
+                         semantic_tag_type tag,
+                         const serializing_context& context) override
     {
-        return other_handler_.double_value(value, fmt, context);
+        return other_handler_.double_value(value, fmt, tag, context);
     }
 
     bool do_bool(bool value, const serializing_context& context) override

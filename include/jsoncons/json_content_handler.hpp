@@ -110,39 +110,25 @@ public:
         return do_name(name, context);
     }
 
-    bool string_value(const string_view_type& value) 
-    {
-        return do_string_value(value, semantic_tag_type::na, null_serializing_context());
-    }
-
-    //bool string_value(const string_view_type& value, const serializing_context& context) 
-    //{
-    //    return do_string_value(value, semantic_tag_type::na, context);
-    //}
-
-    bool string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) 
+    bool string_value(const string_view_type& value, 
+                      semantic_tag_type tag = semantic_tag_type::na, 
+                      const serializing_context& context=null_serializing_context()) 
     {
         return do_string_value(value, tag, context);
     }
 
-    bool byte_string_value(const uint8_t* data, size_t length) 
+    bool byte_string_value(const uint8_t* data, size_t length, 
+                           semantic_tag_type tag=semantic_tag_type::na, 
+                           const serializing_context& context=null_serializing_context()) 
     {
-        return do_byte_string_value(data, length, null_serializing_context());
+        return do_byte_string_value(data, length, tag, context);
     }
 
-    bool byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) 
+    bool byte_string_value(const std::vector<uint8_t>& v, 
+                           semantic_tag_type tag=semantic_tag_type::na, 
+                           const serializing_context& context=null_serializing_context())
     {
-        return do_byte_string_value(data, length, context);
-    }
-
-    bool byte_string_value(const std::vector<uint8_t>& v) 
-    {
-        return do_byte_string_value(v.data(), v.size(), null_serializing_context());
-    }
-
-    bool byte_string_value(const std::vector<uint8_t>& v, const serializing_context& context) 
-    {
-        return do_byte_string_value(v.data(), v.size(), context);
+        return do_byte_string_value(v.data(), v.size(), tag, context);
     }
 
     bool bignum_value(int signum, const uint8_t* data, size_t length) 
@@ -171,72 +157,51 @@ public:
         return do_string_value(s, semantic_tag_type::bignum_tag, context);
     }
 
-    bool int64_value(int64_t value)
+    bool int64_value(int64_t value, 
+                     semantic_tag_type tag = semantic_tag_type::na, 
+                     const serializing_context& context=null_serializing_context())
     {
-        return do_int64_value(value,null_serializing_context());
+        return do_int64_value(value, tag, context);
     }
 
-    bool int64_value(int64_t value, const serializing_context& context)
+    bool uint64_value(uint64_t value, 
+                      semantic_tag_type tag = semantic_tag_type::na, 
+                      const serializing_context& context=null_serializing_context())
     {
-        return do_int64_value(value,context);
-    }
-
-    bool uint64_value(uint64_t value)
-    {
-        return do_uint64_value(value,null_serializing_context());
-    }
-
-    bool uint64_value(uint64_t value, const serializing_context& context)
-    {
-        return do_uint64_value(value,context);
-    }
-
-    bool double_value(double value)
-    {
-        return do_double_value(value, floating_point_options(), null_serializing_context());
+        return do_uint64_value(value, tag, context);
     }
 
     bool double_value(double value, uint8_t precision)
     {
-        return do_double_value(value, floating_point_options(chars_format::general, precision), null_serializing_context());
-    }
-
-    bool double_value(double value, const floating_point_options& fmt)
-    {
-        return do_double_value(value, fmt, null_serializing_context());
-    }
-
-    bool double_value(double value, const serializing_context& context)
-    {
-        return do_double_value(value, floating_point_options(), context);
+        return do_double_value(value, 
+                               floating_point_options(chars_format::general, precision), 
+                               semantic_tag_type::na,
+                               null_serializing_context());
     }
 
     bool double_value(double value, uint8_t precision, const serializing_context& context)
     {
-        return do_double_value(value, floating_point_options(chars_format::general, precision), context);
+        return do_double_value(value, 
+                               floating_point_options(chars_format::general, precision), 
+                               semantic_tag_type::na,
+                               context);
     }
 
-    bool double_value(double value, const floating_point_options& fmt, const serializing_context& context)
+    bool double_value(double value, 
+                      const floating_point_options& fmt = floating_point_options(), 
+                      semantic_tag_type tag = semantic_tag_type::na, 
+                      const serializing_context& context=null_serializing_context())
     {
-        return do_double_value(value, fmt, context);
+        return do_double_value(value, fmt, tag, context);
     }
 
-    bool bool_value(bool value) 
-    {
-        return do_bool(value,null_serializing_context());
-    }
-
-    bool bool_value(bool value, const serializing_context& context) 
+    bool bool_value(bool value, 
+                    const serializing_context& context=null_serializing_context()) 
     {
         return do_bool(value,context);
     }
 
-    bool null_value() 
-    {
-        return do_null_value(null_serializing_context());
-    }
-
-    bool null_value(const serializing_context& context) 
+    bool null_value(const serializing_context& context=null_serializing_context()) 
     {
         return do_null_value(context);
     }
@@ -382,13 +347,20 @@ private:
 
     virtual bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) = 0;
 
-    virtual bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
+    virtual bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type tag, const serializing_context& context) = 0;
 
-    virtual bool do_double_value(double value, const floating_point_options& fmt, const serializing_context& context) = 0;
+    virtual bool do_double_value(double value, 
+                                 const floating_point_options& fmt, 
+                                 semantic_tag_type tag,
+                                 const serializing_context& context) = 0;
 
-    virtual bool do_int64_value(int64_t value, const serializing_context& context) = 0;
+    virtual bool do_int64_value(int64_t value, 
+                                semantic_tag_type tag,
+                                const serializing_context& context) = 0;
 
-    virtual bool do_uint64_value(uint64_t value, const serializing_context& context) = 0;
+    virtual bool do_uint64_value(uint64_t value, 
+                                 semantic_tag_type tag, 
+                                 const serializing_context& context) = 0;
 
     virtual bool do_bool(bool value, const serializing_context& context) = 0;
 };
@@ -438,22 +410,29 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t*, size_t, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t*, size_t, semantic_tag_type, const serializing_context&) override
     {
         return true;
     }
 
-    bool do_double_value(double, const floating_point_options&, const serializing_context&) override
+    bool do_double_value(double, 
+                         const floating_point_options&, 
+                         semantic_tag_type,
+                         const serializing_context&) override
     {
         return true;
     }
 
-    bool do_int64_value(int64_t, const serializing_context&) override
+    bool do_int64_value(int64_t, 
+                        semantic_tag_type, 
+                        const serializing_context&) override
     {
         return true;
     }
 
-    bool do_uint64_value(uint64_t, const serializing_context&) override
+    bool do_uint64_value(uint64_t, 
+                         semantic_tag_type, 
+                         const serializing_context&) override
     {
         return true;
     }

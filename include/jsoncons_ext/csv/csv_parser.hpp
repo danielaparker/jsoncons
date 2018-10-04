@@ -897,7 +897,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler.int64_value(val, *this);
+                        handler.int64_value(val, semantic_tag_type::na, *this);
                     }
                     else
                     {
@@ -922,7 +922,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler.double_value(val, *this);
+                        handler.double_value(val, floating_point_options(), semantic_tag_type::na, *this);
                     }
                     else
                     {
@@ -1254,7 +1254,7 @@ private:
                     jsoncons::detail::to_int64_result result = jsoncons::detail::to_int64(value.data(), value.length());
                     if (!result.overflow)
                     {
-                        handler.int64_value(result.value,*this);
+                        handler.int64_value(result.value, semantic_tag_type::na, *this);
                     }
                     else
                     {
@@ -1266,7 +1266,7 @@ private:
                     jsoncons::detail::to_uint64_result result = jsoncons::detail::to_uint64(value.data(), value.length());
                     if (!result.overflow)
                     {
-                        handler.uint64_value(result.value,*this);
+                        handler.uint64_value(result.value, semantic_tag_type::na, *this);
                     }
                     else
                     {
@@ -1279,7 +1279,7 @@ private:
         case numeric_check_state::exp:
             {
                 double d = to_double_(buffer.data(), buffer.length());
-                handler.double_value(d, floating_point_options(format, precision, decimal_places), *this);
+                handler.double_value(d, floating_point_options(format, precision, decimal_places), semantic_tag_type::na, *this);
                 break;
             }
         default:

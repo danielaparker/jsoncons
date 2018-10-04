@@ -1830,7 +1830,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.uint64_value(val, *this);
+                handler_.uint64_value(val, semantic_tag_type::na, *this);
             }
             break;
         case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
@@ -1851,7 +1851,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.int64_value(val, *this);
+                handler_.int64_value(val, semantic_tag_type::na, *this);
             }
             break;
 
@@ -1914,7 +1914,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.double_value(val, *this);
+                handler_.double_value(val, floating_point_options(), semantic_tag_type::na, *this);
             }
             break;
             // byte string (0x00..0x17 bytes follow)
@@ -1934,7 +1934,7 @@ public:
                 }
                 input_ptr_ = endp;
 
-                handler_.byte_string_value(v.data(), v.size(), *this);
+                handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::na, *this);
             }
             break;
 

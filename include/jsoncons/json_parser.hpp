@@ -67,15 +67,15 @@ public:
         {
             if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
             {
-                this->destination_handler().double_value(std::nan(""), context);
+                this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context);
             }
             else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
             {
-                this->destination_handler().double_value(std::numeric_limits<double>::infinity(), context);
+                this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
             else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
             {
-                this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), context);
+                this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
             else
             {
@@ -2697,7 +2697,7 @@ private:
         jsoncons::detail::to_int64_result result = jsoncons::detail::to_int64(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler_.int64_value(result.value, *this);
+            continue_ = handler_.int64_value(result.value, semantic_tag_type::na, *this);
             after_value(ec);
         }
         else
@@ -2717,7 +2717,7 @@ private:
         jsoncons::detail::to_uint64_result result = jsoncons::detail::to_uint64(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler_.uint64_value(result.value, *this);
+            continue_ = handler_.uint64_value(result.value, semantic_tag_type::na, *this);
             after_value(ec);
         }
         else
@@ -2740,11 +2740,13 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                continue_ = handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
+                continue_ = handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), 
+                                                  semantic_tag_type::na, *this);
             }
             else
             {
-                continue_ = handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), *this);
+                continue_ = handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), 
+                                                  semantic_tag_type::na, *this);
             }
         }
         catch (...)
