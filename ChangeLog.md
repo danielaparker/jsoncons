@@ -1,3 +1,46 @@
+next: v0.111.0
+
+The next release will accomodate the additional semantics for the 
+CBOR data items data-time, a string, and time, a positive or
+negative integer or float.
+
+But first, some of the virtual functions in `json_content_handler` 
+have to be modified to preserve these semantics. Consequently, 
+the function signatures
+  
+    bool do_int64_value(int64_t, const serializing_context&)
+
+    bool do_uint64_value(uint64_t, const serializing_context&)
+
+    bool do_double_value(double, const floating_point_options&, semantic_tag_type, const serializing_context&)
+
+    bool do_string_value(const string_view_type&, const serializing_context&)
+  
+    bool do_byte_string_value(const uint8_t*, size_t, const serializing_context&)
+
+have been gifted an additonal parameter, a `semantic_tag_type`, 
+  
+    bool do_int64_value(int64_t, semantic_tag_type, const serializing_context&)
+
+    bool do_uint64_value(uint64_t, semantic_tag_type, const serializing_context&)
+
+    bool do_double_value(double, const floating_point_options&, semantic_tag_type, const serializing_context&)
+
+    bool do_string_value(const string_view_type&, semantic_tag_type, const serializing_context&)
+  
+    bool do_byte_string_value(const uint8_t*, size_t, semantic_tag_type, const serializing_context&)
+
+For consistency, the virtual function
+
+    bool do_bignum_value(const string_view_type&, const serializing_context&)
+
+has been removed, and in its place `do_string_value` will be called
+with semantic_tag_type::bignum_type.
+
+For users who have written classes that implement all or part of 
+`json_content_handler`, including extensions to `json_filter`, 
+these are breaking changes. But otherwise users should be unaffected.
+
 v0.110.2
 --------
 

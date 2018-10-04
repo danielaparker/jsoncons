@@ -21,6 +21,7 @@
 #include <type_traits>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/bignum.hpp>
+#include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
 
 #if defined(__GNUC__)
