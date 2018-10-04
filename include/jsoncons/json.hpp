@@ -100,12 +100,6 @@ enum class structure_tag_type : uint8_t
     empty_object_tag = 0x0a,
     object_tag = 0x09
 };
-
-enum class semantic_tag_type : uint8_t 
-{
-    na = 0x00,
-    bignum_tag = 0x01
-};
                       
 template <class CharT, class ImplementationPolicy, class Allocator>
 class basic_json

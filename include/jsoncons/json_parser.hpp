@@ -61,7 +61,7 @@ public:
     {
     }
 
-    bool do_string_value(const string_view_type& s, const serializing_context& context) override
+    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context& context) override
     {
         if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
         {

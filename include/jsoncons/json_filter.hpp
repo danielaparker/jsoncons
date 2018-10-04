@@ -91,9 +91,10 @@ private:
     }
 
     bool do_string_value(const string_view_type& value,
+                         semantic_tag_type tag,
                          const serializing_context& context) override
     {
-        return destination_handler_.string_value(value,context);
+        return destination_handler_.string_value(value, tag, context);
     }
 
     bool do_byte_string_value(const uint8_t* data, size_t length,
@@ -260,6 +261,7 @@ private:
     }
 
     bool do_string_value(const string_view_type& value,
+                         semantic_tag_type tag,
                          const serializing_context& context) override
     {
         std::basic_string<CharT> target;
@@ -268,7 +270,7 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        return destination_handler().string_value(target,context);
+        return destination_handler().string_value(target, tag, context);
     }
 
     bool do_byte_string_value(const uint8_t* data, size_t length,

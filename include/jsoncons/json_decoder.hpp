@@ -220,7 +220,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& val, const serializing_context&) override
+    bool do_string_value(const string_view_type& val, semantic_tag_type tag, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {

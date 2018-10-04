@@ -499,7 +499,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& value, const serializing_context&) override
+    bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {

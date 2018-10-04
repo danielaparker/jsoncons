@@ -202,7 +202,7 @@ private:
 
     bool do_name(const string_view_type& name, const serializing_context& context) override
     {
-        do_string_value(name,context);
+        do_string_value(name, semantic_tag_type::na, context);
         return true;
     }
 
@@ -214,7 +214,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
     {
         std::vector<uint8_t> v;
         std::basic_string<uint8_t> target;

@@ -18,6 +18,12 @@
 
 namespace jsoncons {
 
+enum class semantic_tag_type : uint8_t 
+{
+    na = 0x00,
+    bignum_tag = 0x01
+};
+
 template <class CharT>
 class basic_json_content_handler
 {
@@ -106,12 +112,17 @@ public:
 
     bool string_value(const string_view_type& value) 
     {
-        return do_string_value(value, null_serializing_context());
+        return do_string_value(value, semantic_tag_type::na, null_serializing_context());
     }
 
     bool string_value(const string_view_type& value, const serializing_context& context) 
     {
-        return do_string_value(value, context);
+        return do_string_value(value, semantic_tag_type::na, context);
+    }
+
+    bool string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) 
+    {
+        return do_string_value(value, tag, context);
     }
 
     bool byte_string_value(const uint8_t* data, size_t length) 
@@ -369,7 +380,7 @@ private:
 
     virtual bool do_null_value(const serializing_context& context) = 0;
 
-    virtual bool do_string_value(const string_view_type& value, const serializing_context& context) = 0;
+    virtual bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) = 0;
 
     virtual bool do_byte_string_value(const uint8_t* data, size_t length, const serializing_context& context) = 0;
 
@@ -424,7 +435,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type&, const serializing_context&) override
+    bool do_string_value(const string_view_type&, semantic_tag_type, const serializing_context&) override
     {
         return true;
     }

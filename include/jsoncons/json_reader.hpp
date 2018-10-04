@@ -92,7 +92,7 @@ private:
         return other_handler_.name(target, context);
     }
 
-    bool do_string_value(const string_view_type& value, const serializing_context& context) override
+    bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(

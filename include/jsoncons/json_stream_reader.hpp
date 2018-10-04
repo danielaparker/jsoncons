@@ -90,9 +90,17 @@ private:
         return false;
     }
 
-    bool do_string_value(const string_view_type& s, const serializing_context&) override
+    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::string_value);
+        switch (tag)
+        {
+            case semantic_tag_type::bignum_tag:
+                event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::bignum_value);
+                break;
+            default:
+                event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::string_value);
+                break;
+        }
         return false;
     }
 

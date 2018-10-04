@@ -275,7 +275,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& val, const serializing_context&) override
+    bool do_string_value(const string_view_type& val, semantic_tag_type tag, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -303,13 +303,13 @@ private:
     {
         std::basic_string<CharT> s;
         encode_base64url(data,length,s);
-        do_string_value(s,context);
+        do_string_value(s, semantic_tag_type::bignum_tag, context);
         return true;
     }
 
     bool do_bignum_value(const string_view_type& value, const serializing_context& context) override
     {
-        do_string_value(value, context);
+        do_string_value(value, semantic_tag_type::bignum_tag, context);
         return true;
     }
 

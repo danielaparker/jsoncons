@@ -45,6 +45,7 @@ private:
     }
 
     bool do_string_value(const string_view_type& s,
+                         semantic_tag_type tag,
                          const serializing_context& context) override
     {
         if (member_name_ == "name")
@@ -53,12 +54,12 @@ private:
             size_t start_last = s.find_first_not_of(" \t", end_first);
             this->destination_handler().name("first-name", context);
             string_view_type first = s.substr(0, end_first);
-            this->destination_handler().string_value(first, context);
+            this->destination_handler().string_value(first, tag, context);
             if (start_last != string_view_type::npos)
             {
                 this->destination_handler().name("last-name", context);
                 string_view_type last = s.substr(start_last);
-                this->destination_handler().string_value(last, context);
+                this->destination_handler().string_value(last, tag, context);
             }
             else
             {
@@ -69,7 +70,7 @@ private:
         }
         else
         {
-            this->destination_handler().string_value(s,context);
+            this->destination_handler().string_value(s, tag, context);
         }
         return true;
     }
