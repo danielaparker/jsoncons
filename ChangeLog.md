@@ -1,3 +1,12 @@
+v0.110.3
+--------
+
+Bug fix:
+
+This patch fixes a case where the json parser performed validation on a string 
+before all bytes of the string had been read, and failing if missing part of a 
+multi-byte byte sequence.
+
 v0.110.2
 --------
 
