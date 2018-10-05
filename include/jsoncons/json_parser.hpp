@@ -61,23 +61,26 @@ public:
     {
     }
 
-    bool do_string_value(const string_view_type& s, const serializing_context& context) override
+    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context& context) override
     {
-        if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
+        if (tag == semantic_tag_type::na)
         {
-            this->destination_handler().double_value(std::nan(""), context);
-        }
-        else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
-        {
-            this->destination_handler().double_value(std::numeric_limits<double>::infinity(), context);
-        }
-        else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
-        {
-            this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), context);
-        }
-        else
-        {
-            this->destination_handler().string_value(s, context);
+            if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
+            {
+                this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context);
+            }
+            else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
+            {
+                this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
+            }
+            else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
+            {
+                this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
+            }
+            else
+            {
+                this->destination_handler().string_value(s, tag, context);
+            }
         }
         return true;
     }
@@ -592,7 +595,6 @@ public:
                     state_ = pop_state();
                     break;
                 default:
-                    //std::cout << "state: " << (int) state_ << "\n";
                     err_handler_.fatal_error(json_parse_errc::unexpected_eof, *this);
                     ec = json_parse_errc::unexpected_eof;
                     continue_ = false;
@@ -2164,13 +2166,6 @@ string_u1:
                         return;
                     }
                     // recovery - skip
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb,input_ptr_-sb);
                     ++input_ptr_;
                     state_ = parse_state::string;
@@ -2187,13 +2182,6 @@ string_u1:
                         return;
                     }
                     // recovery - keep
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb, input_ptr_ - sb + 1);
                     ++input_ptr_;
                     push_state(state_);
@@ -2211,13 +2199,6 @@ string_u1:
                         return;
                     }
                     // recovery - keep
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb, input_ptr_ - sb + 1);
                     ++input_ptr_;
                     push_state(state_);
@@ -2235,13 +2216,6 @@ string_u1:
                         return;
                     }
                     // recovery - keep
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb, input_ptr_ - sb + 1);
                     ++input_ptr_;
                     state_ = parse_state::string;
@@ -2249,13 +2223,6 @@ string_u1:
                 }
                 case '\\': 
                 {
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb,input_ptr_-sb);
                     column_ += (input_ptr_ - sb + 1);
                     ++input_ptr_;
@@ -2263,13 +2230,6 @@ string_u1:
                 }
                 case '\"':
                 {
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     if (string_buffer_.length() == 0)
                     {
                         end_string_value(sb,input_ptr_-sb, ec);
@@ -2294,13 +2254,6 @@ string_u1:
 
         // Buffer exhausted               
         {
-            auto result = unicons::validate(sb,input_ptr_);
-            if (result.ec != unicons::conv_errc())
-            {
-                translate_conv_errc(result.ec,ec);
-                column_ += (result.it - sb);
-                return;
-            }
             string_buffer_.append(sb,input_ptr_-sb);
             column_ += (input_ptr_ - sb + 1);
             state_ = parse_state::string;
@@ -2694,7 +2647,7 @@ private:
         jsoncons::detail::to_int64_result result = jsoncons::detail::to_int64(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler_.int64_value(result.value, *this);
+            continue_ = handler_.int64_value(result.value, semantic_tag_type::na, *this);
             after_value(ec);
         }
         else
@@ -2714,7 +2667,7 @@ private:
         jsoncons::detail::to_uint64_result result = jsoncons::detail::to_uint64(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler_.uint64_value(result.value, *this);
+            continue_ = handler_.uint64_value(result.value, semantic_tag_type::na, *this);
             after_value(ec);
         }
         else
@@ -2737,11 +2690,13 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                continue_ = handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), *this);
+                continue_ = handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), 
+                                                  semantic_tag_type::na, *this);
             }
             else
             {
-                continue_ = handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), *this);
+                continue_ = handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), 
+                                                  semantic_tag_type::na, *this);
             }
         }
         catch (...)
@@ -2803,6 +2758,13 @@ private:
 
     void end_string_value(const CharT* s, size_t length, std::error_code& ec) 
     {
+        auto result = unicons::validate(s,s+length);
+        if (result.ec != unicons::conv_errc())
+        {
+            translate_conv_errc(result.ec,ec);
+            column_ += (result.it - s);
+            return;
+        }
         switch (parent())
         {
         case parse_state::member_name:
@@ -2812,11 +2774,11 @@ private:
             break;
         case parse_state::object:
         case parse_state::array:
-            continue_ = handler_.string_value(string_view_type(s, length), *this);
+            continue_ = handler_.string_value(string_view_type(s, length), semantic_tag_type::na, *this);
             state_ = parse_state::expect_comma_or_end;
             break;
         case parse_state::root:
-            continue_ = handler_.string_value(string_view_type(s, length), *this);
+            continue_ = handler_.string_value(string_view_type(s, length), semantic_tag_type::na, *this);
             state_ = parse_state::before_done;
             break;
         default:
