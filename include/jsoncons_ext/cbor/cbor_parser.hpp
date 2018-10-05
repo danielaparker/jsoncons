@@ -1809,18 +1809,10 @@ public:
     void parse_some(std::error_code& ec)
     {
         const uint8_t* pos = input_ptr_++;
-        switch (*pos)
-        {
 
-        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-            // FALLTHRU
-        case 0x18: // Unsigned integer (one-byte uint8_t follows)
-            // FALLTHRU
-        case 0x19: // Unsigned integer (two-byte uint16_t follows)
-            // FALLTHRU
-        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
-            // FALLTHRU
-        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+        switch (get_major_type(*pos))
+        {
+            case cbor_major_type::unsigned_integer:
             {
                 const uint8_t* endp;
                 uint64_t val = detail::get_uinteger(pos,end_input_,&endp);
@@ -1831,17 +1823,9 @@ public:
                 }
                 input_ptr_ = endp;
                 handler_.uint64_value(val, semantic_tag_type::na, *this);
+                break;
             }
-            break;
-        case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
-            // FALLTHRU
-        case 0x38: // Negative integer (one-byte uint8_t follows)
-            // FALLTHRU
-        case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
-            // FALLTHRU
-        case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
-            // FALLTHRU
-        case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
+            case cbor_major_type::negative_integer:
             {
                 const uint8_t* endp;
                 int64_t val = detail::get_integer(pos,end_input_,&endp);
@@ -1852,92 +1836,9 @@ public:
                 }
                 input_ptr_ = endp;
                 handler_.int64_value(val, semantic_tag_type::na, *this);
+                break;
             }
-            break;
-
-        case 0xC0:
-            {
-                const uint8_t* endp;
-                std::string s = detail::get_text_string(pos,end_input_,&endp);
-                if (endp == pos)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time_tag, *this);
-            }
-            break;
-
-        case 0xC2:
-            {
-                const uint8_t* endp;
-                std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-
-                handler_.bignum_value(1, v.data(), v.size(), *this);
-            }
-            break;
-
-        case 0xC3:
-            {
-                const uint8_t* endp;
-                std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-
-                handler_.bignum_value(-1, v.data(), v.size(), *this);
-            }
-            break;
-
-            // False
-        case 0xf4:
-            handler_.bool_value(false, *this);
-            break;
-
-            // True
-        case 0xf5:
-            handler_.bool_value(true, *this);
-            break;
-
-            // Null
-        case 0xf6:
-            handler_.null_value(*this);
-            break;
-
-        case 0xf9: // Half-Precision Float (two-byte IEEE 754)
-            // FALLTHRU
-        case 0xfa: // Single-Precision Float (four-byte IEEE 754)
-            // FALLTHRU
-        case 0xfb: // Double-Precision Float (eight-byte IEEE 754)
-            {
-                const uint8_t* endp;
-                double val = detail::get_double(pos,end_input_,&endp);
-                if (endp == pos)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                handler_.double_value(val, floating_point_options(), semantic_tag_type::na, *this);
-            }
-            break;
-            // byte string (0x00..0x17 bytes follow)
-        case JSONCONS_CBOR_0x40_0x57:
-        case 0x58:
-        case 0x59:
-        case 0x5a:
-        case 0x5b:
-        case 0x5f:
+            case cbor_major_type::byte_string:
             {
                 const uint8_t* endp;
                 std::vector<uint8_t> v = detail::get_byte_string(pos,end_input_,&endp);
@@ -1949,16 +1850,9 @@ public:
                 input_ptr_ = endp;
 
                 handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::na, *this);
+                break;
             }
-            break;
-
-            // UTF-8 string (0x00..0x17 bytes follow)
-        case JSONCONS_CBOR_0x60_0x77:
-        case 0x78:
-        case 0x79:
-        case 0x7a:
-        case 0x7b:
-        case 0x7f:
+            case cbor_major_type::text_string:
             {
                 const uint8_t* endp;
                 std::string s = detail::get_text_string(pos,end_input_,&endp);
@@ -1969,232 +1863,290 @@ public:
                 }
                 input_ptr_ = endp;
                 handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::na, *this);
+                break;
             }
-            break;
-
-            // array (0x00..0x17 data items follow)
-        case JSONCONS_CBOR_0x80_0x97:
+            case cbor_major_type::array:
             {
-                size_t len = (*pos & 0x1f);
-                parse_array(len, ec);
-                if (ec)
+                size_t info = get_additional_information_value(*pos);
+                switch (info)
                 {
-                    return;
-                }
-            }
-            break;
-
-            // array (one-byte uint8_t for n follows)
-        case 0x98:
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                parse_array(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // array (two-byte uint16_t for n follow)
-        case 0x99:
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                parse_array(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // array (four-byte uint32_t for n follow)
-        case 0x9a:
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                parse_array(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // array (eight-byte uint64_t for n follow)
-        case 0x9b:
-            {
-                const uint8_t* endp;
-                size_t len = (size_t)binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                parse_array(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // array (indefinite length)
-        case 0x9f:
-            {
-                ++nesting_depth_;
-                handler_.begin_array(*this);
-                while (*input_ptr_ != 0xff)
-                {
-                    parse_some(ec);
-                    if (ec)
+                    case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
                     {
-                        return;
+                        parse_array(info, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
                     }
-                    pos = input_ptr_;
-                }
-                handler_.end_array(*this);
-                --nesting_depth_;
-            }
-            break;
-
-            // map (0x00..0x17 pairs of data items follow)
-        case JSONCONS_CBOR_0xa0_0xb7:
-            {
-                size_t len = (*pos & 0x1f);
-                parse_object(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // map (one-byte uint8_t for n follows)
-        case 0xb8:
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                parse_object(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // map (two-byte uint16_t for n follow)
-        case 0xb9:
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                parse_object(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // map (four-byte uint32_t for n follow)
-        case 0xba:
-            {
-                const uint8_t* endp;
-                const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                parse_object(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // map (eight-byte uint64_t for n follow)
-        case 0xbb:
-            {
-                const uint8_t* endp;
-                size_t len = (size_t)binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                parse_object(len, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-
-            // map (indefinite length)
-        case 0xbf:
-            {
-                ++nesting_depth_;
-                handler_.begin_object(*this);
-                while (*input_ptr_ != 0xff)
-                {
-                    parse_name(ec);
-                    if (ec)
+                    case 0x18:
                     {
-                        return;
+                        const uint8_t* endp;
+                        const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_array(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
                     }
-                    parse_some(ec);
-                    if (ec)
+                    case 0x19:
                     {
-                        return;
+                        const uint8_t* endp;
+                        const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_array(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
                     }
-                    pos = input_ptr_;
+                    case 0x20:
+                    {
+                        const uint8_t* endp;
+                        const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_array(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+                    case 0x21:
+                    {
+                        const uint8_t* endp;
+                        size_t len = (size_t)binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_array(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+                    case 31:
+                    {
+                        ++nesting_depth_;
+                        handler_.begin_array(*this);
+                        while (*input_ptr_ != 0xff)
+                        {
+                            parse_some(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            pos = input_ptr_;
+                        }
+                        handler_.end_array(*this);
+                        --nesting_depth_;
+                        break;
+                    }
                 }
-                handler_.end_object(*this);
-                --nesting_depth_;
+                break;
             }
-            break;
-
-        default:
+            case cbor_major_type::map:
             {
-                ec = cbor_parse_errc::source_error;
-                return;
+                size_t info = get_additional_information_value(*pos);
+                switch (info)
+                {
+                    case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+                    {
+                        parse_object(info, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+                    case 0x18:
+                    {
+                        const uint8_t* endp;
+                        const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_object(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+                    case 0x19:
+                    {
+                        const uint8_t* endp;
+                        const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_object(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+                    case 0x20:
+                    {
+                        const uint8_t* endp;
+                        const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_object(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+                    case 0x21:
+                    {
+                        const uint8_t* endp;
+                        size_t len = (size_t)binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_object(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+                    case 31:
+                    {
+                        ++nesting_depth_;
+                        handler_.begin_object(*this);
+                        while (*input_ptr_ != 0xff)
+                        {
+                            parse_name(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            parse_some(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            pos = input_ptr_;
+                        }
+                        handler_.end_object(*this);
+                        --nesting_depth_;
+                        break;
+                    }
+                }
+                break;
+            }
+            case cbor_major_type::semantic_tag:
+            {
+                size_t info = get_additional_information_value(*pos);
+                switch (info)
+                {
+                    case 0:
+                        //tag_ = semantic_tag_type::date_time_tag;
+                        break;
+                    case 1:
+                        //tag_ = semantic_tag_type::time_tag;
+                        break;
+                    case 2:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+
+                        handler_.bignum_value(1, v.data(), v.size(), *this);
+                        break;
+                    }
+                    case 3:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
+                        if (endp == input_ptr_)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+
+                        handler_.bignum_value(-1, v.data(), v.size(), *this);
+                        break;
+                    }
+                }
+                break;
+            }
+            case cbor_major_type::simple:
+            {
+                size_t info = get_additional_information_value(*pos);
+                switch (info)
+                {
+                    case 20:
+                        handler_.bool_value(false, *this);
+                        break;
+                    case 21:
+                        handler_.bool_value(true, *this);
+                        break;
+                    case 22:
+                        handler_.null_value(*this);
+                        break;
+                    case 25: // Half-Precision Float (two-byte IEEE 754)
+                        // FALLTHRU
+                    case 26: // Single-Precision Float (four-byte IEEE 754)
+                        // FALLTHRU
+                    case 27: // Double-Precision Float (eight-byte IEEE 754)
+                        const uint8_t* endp;
+                        double val = detail::get_double(pos,end_input_,&endp);
+                        if (endp == pos)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        handler_.double_value(val, floating_point_options(), semantic_tag_type::na, *this);
+                        break;
+                }
+                break;
             }
         }
         if (nesting_depth_ == 0)

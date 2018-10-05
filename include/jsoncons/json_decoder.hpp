@@ -304,13 +304,13 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(value, fmt);
+                stack_.back().value_ = Json(value, fmt, tag);
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(value, fmt));
+                stack_.push_back(Json(value, fmt, tag));
                 break;
             default:
-                result_ = Json(value, fmt);
+                result_ = Json(value, fmt, tag);
                 is_valid_ = true;
                 break;
         }

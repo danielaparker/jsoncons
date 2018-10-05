@@ -237,8 +237,9 @@ public:
         {
             int64_t val_;
         public:
-            int64_data(int64_t val)
-                : data_base(structure_tag_type::int64_tag, semantic_tag_type::na),val_(val)
+            int64_data(int64_t val, 
+                       semantic_tag_type tag = semantic_tag_type::na)
+                : data_base(structure_tag_type::int64_tag, tag),val_(val)
             {
             }
 
@@ -257,8 +258,9 @@ public:
         {
             uint64_t val_;
         public:
-            uint64_data(uint64_t val)
-                : data_base(structure_tag_type::uint64_tag, semantic_tag_type::na),val_(val)
+            uint64_data(uint64_t val, 
+                        semantic_tag_type tag = semantic_tag_type::na)
+                : data_base(structure_tag_type::uint64_tag, tag),val_(val)
             {
             }
 
@@ -288,8 +290,11 @@ public:
                   val_(val)
             {
             }
-            double_data(double val, const floating_point_options& fmt)
-                : data_base(structure_tag_type::double_tag, semantic_tag_type::na), 
+
+            double_data(double val, 
+                        const floating_point_options& fmt,
+                        semantic_tag_type tag = semantic_tag_type::na)
+                : data_base(structure_tag_type::double_tag, tag), 
                   format_(static_cast<uint8_t>(fmt.format())), 
                   precision_(fmt.precision()), 
                   decimal_places_(fmt.decimal_places()), 
@@ -456,7 +461,8 @@ public:
                 }
             }
         public:
-            byte_string_data(semantic_tag_type semantic_type, const uint8_t* data, size_t length, const Allocator& a)
+            byte_string_data(semantic_tag_type semantic_type, 
+                             const uint8_t* data, size_t length, const Allocator& a)
                 : data_base(structure_tag_type::byte_string_tag, semantic_type)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
@@ -729,25 +735,30 @@ public:
         {
             new(reinterpret_cast<void*>(&data_))bool_data(val);
         }
-        explicit variant(int64_t val)
+        explicit variant(int64_t val,
+                         semantic_tag_type tag = semantic_tag_type::na)
         {
-            new(reinterpret_cast<void*>(&data_))int64_data(val);
+            new(reinterpret_cast<void*>(&data_))int64_data(val, tag);
         }
         explicit variant(uint64_t val, const Allocator&)
         {
             new(reinterpret_cast<void*>(&data_))uint64_data(val);
         }
-        explicit variant(uint64_t val)
+        explicit variant(uint64_t val,
+                semantic_tag_type tag = semantic_tag_type::na)
         {
-            new(reinterpret_cast<void*>(&data_))uint64_data(val);
+            new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
         }
-        variant(double val)
+        variant(double val,
+                semantic_tag_type tag = semantic_tag_type::na)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val);
+            new(reinterpret_cast<void*>(&data_))double_data(val, tag);
         }
-        variant(double val, const floating_point_options& fmt)
+
+        variant(double val, const floating_point_options& fmt,
+                semantic_tag_type tag = semantic_tag_type::na)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val, fmt);
+            new(reinterpret_cast<void*>(&data_))double_data(val, fmt, tag);
         }
 
         variant(const char_type* s)
@@ -1660,6 +1671,16 @@ public:
         bool is_bignum() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_bignum();
+        }
+
+        bool is_date_time() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_date_time();
+        }
+
+        bool is_epoch_time() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_epoch_time();
         }
 
         bool is_number() const JSONCONS_NOEXCEPT
@@ -2593,6 +2614,25 @@ public:
     {
     }
 
+    basic_json(double val, semantic_tag_type tag)
+        : var_(val, 
+               floating_point_options(chars_format::general, precision, 0),
+               tag)
+    {
+    }
+
+    basic_json(double val, 
+               const floating_point_options& fmt,
+               semantic_tag_type tag = semantic_tag_type::na)
+        : var_(val, fmt, tag)
+    {
+    }
+
+    basic_json(int64_t val, semantic_tag_type tag)
+        : var_(val, tag)
+    {
+    }
+
     basic_json(const char_type *s, size_t length, semantic_tag_type tag = semantic_tag_type::na)
         : var_(s, length, tag)
     {
@@ -3007,6 +3047,16 @@ public:
     bool is_bignum() const JSONCONS_NOEXCEPT
     {
         return var_.semantic_tag() == semantic_tag_type::bignum_tag;
+    }
+
+    bool is_date_time() const JSONCONS_NOEXCEPT
+    {
+        return var_.semantic_tag() == semantic_tag_type::date_time_tag;
+    }
+
+    bool is_epoch_time() const JSONCONS_NOEXCEPT
+    {
+        return var_.semantic_tag() == semantic_tag_type::epoch_time_tag;
     }
 
     bool is_bool() const JSONCONS_NOEXCEPT
