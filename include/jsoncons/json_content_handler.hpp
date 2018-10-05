@@ -24,7 +24,9 @@ struct null_type
 enum class semantic_tag_type : uint8_t 
 {
     na = 0x00,
-    bignum_tag = 0x01
+    bignum_tag = 0x01,
+    date_time_tag = 0x02,
+    time_tag = 0x03
 };
 
 template <class CharT>

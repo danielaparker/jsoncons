@@ -2775,30 +2775,23 @@ public:
         {
             case structure_tag_type::short_string_tag:
             case structure_tag_type::long_string_tag:
-                switch (var_.semantic_tag())
-                {
-                    case semantic_tag_type::bignum_tag:
-                        handler.bignum_value(as_string_view());
-                        break;
-                    default:
-                        handler.string_value(as_string_view());
-                        break;
-                }
+                handler.string_value(as_string_view(), var_.semantic_tag());
                 break;
             case structure_tag_type::byte_string_tag:
-                handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length());
+                handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), var_.semantic_tag());
                 break;
             case structure_tag_type::double_tag:
                 handler.double_value(var_.double_data_cast()->value(), 
                                      floating_point_options(var_.double_data_cast()->format(),
                                                             var_.double_data_cast()->precision(), 
-                                                            var_.double_data_cast()->decimal_places()));
+                                                            var_.double_data_cast()->decimal_places()), 
+                                     var_.semantic_tag());
                 break;
             case structure_tag_type::int64_tag:
-                handler.int64_value(var_.int64_data_cast()->value());
+                handler.int64_value(var_.int64_data_cast()->value(), var_.semantic_tag());
                 break;
             case structure_tag_type::uint64_tag:
-                handler.uint64_value(var_.uint64_data_cast()->value());
+                handler.uint64_value(var_.uint64_data_cast()->value(), var_.semantic_tag());
                 break;
             case structure_tag_type::bool_tag:
                 handler.bool_value(var_.bool_data_cast()->value());

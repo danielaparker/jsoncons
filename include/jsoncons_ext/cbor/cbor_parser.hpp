@@ -1855,6 +1855,20 @@ public:
             }
             break;
 
+        case 0xC0:
+            {
+                const uint8_t* endp;
+                std::string s = detail::get_text_string(pos,end_input_,&endp);
+                if (endp == pos)
+                {
+                    ec = cbor_parse_errc::unexpected_eof;
+                    return;
+                }
+                input_ptr_ = endp;
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time_tag, *this);
+            }
+            break;
+
         case 0xC2:
             {
                 const uint8_t* endp;
