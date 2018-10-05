@@ -12,7 +12,7 @@ the function signatures
 
     bool do_uint64_value(uint64_t, const serializing_context&)
 
-    bool do_double_value(double, const floating_point_options&, semantic_tag_type, const serializing_context&)
+    bool do_double_value(double, const floating_point_options&, const serializing_context&)
 
     bool do_string_value(const string_view_type&, const serializing_context&)
   
