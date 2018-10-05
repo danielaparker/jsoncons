@@ -1,5 +1,13 @@
 next: v0.111.0
 
+Bug fix:
+
+- This release fixes a case where the json parser performed 
+  validation on a string before all bytes of the string had been
+  read, and failing if missing part of a multi-byte byte sequence.  
+
+New feature:
+
 The next release will accomodate the additional semantics for the 
 CBOR data items data-time, a string, and time, a positive or
 negative integer or float.

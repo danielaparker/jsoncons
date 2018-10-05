@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parker
+﻿// Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
@@ -12,6 +12,18 @@
 #include <ctime>
 
 using namespace jsoncons;
+
+TEST_CASE("Test cyrillic.json")
+{
+    std::string path = "./input/cyrillic.json";
+    std::fstream is(path);
+    if (!is)
+    {
+        std::cout << "Cannot open " << path << std::endl;
+    }
+    REQUIRE(is);
+    json j = json::parse(is);
+}
 
 TEST_CASE("test_object2")
 {

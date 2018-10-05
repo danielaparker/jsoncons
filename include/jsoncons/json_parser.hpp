@@ -595,7 +595,6 @@ public:
                     state_ = pop_state();
                     break;
                 default:
-                    //std::cout << "state: " << (int) state_ << "\n";
                     err_handler_.fatal_error(json_parse_errc::unexpected_eof, *this);
                     ec = json_parse_errc::unexpected_eof;
                     continue_ = false;
@@ -2167,13 +2166,6 @@ string_u1:
                         return;
                     }
                     // recovery - skip
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb,input_ptr_-sb);
                     ++input_ptr_;
                     state_ = parse_state::string;
@@ -2190,13 +2182,6 @@ string_u1:
                         return;
                     }
                     // recovery - keep
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb, input_ptr_ - sb + 1);
                     ++input_ptr_;
                     push_state(state_);
@@ -2214,13 +2199,6 @@ string_u1:
                         return;
                     }
                     // recovery - keep
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb, input_ptr_ - sb + 1);
                     ++input_ptr_;
                     push_state(state_);
@@ -2238,13 +2216,6 @@ string_u1:
                         return;
                     }
                     // recovery - keep
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb, input_ptr_ - sb + 1);
                     ++input_ptr_;
                     state_ = parse_state::string;
@@ -2252,13 +2223,6 @@ string_u1:
                 }
                 case '\\': 
                 {
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     string_buffer_.append(sb,input_ptr_-sb);
                     column_ += (input_ptr_ - sb + 1);
                     ++input_ptr_;
@@ -2266,13 +2230,6 @@ string_u1:
                 }
                 case '\"':
                 {
-                    auto result = unicons::validate(sb,input_ptr_);
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        translate_conv_errc(result.ec,ec);
-                        column_ += (result.it - sb);
-                        return;
-                    }
                     if (string_buffer_.length() == 0)
                     {
                         end_string_value(sb,input_ptr_-sb, ec);
@@ -2297,13 +2254,6 @@ string_u1:
 
         // Buffer exhausted               
         {
-            auto result = unicons::validate(sb,input_ptr_);
-            if (result.ec != unicons::conv_errc())
-            {
-                translate_conv_errc(result.ec,ec);
-                column_ += (result.it - sb);
-                return;
-            }
             string_buffer_.append(sb,input_ptr_-sb);
             column_ += (input_ptr_ - sb + 1);
             state_ = parse_state::string;
@@ -2808,6 +2758,13 @@ private:
 
     void end_string_value(const CharT* s, size_t length, std::error_code& ec) 
     {
+        auto result = unicons::validate(s,s+length);
+        if (result.ec != unicons::conv_errc())
+        {
+            translate_conv_errc(result.ec,ec);
+            column_ += (result.it - s);
+            return;
+        }
         switch (parent())
         {
         case parse_state::member_name:
