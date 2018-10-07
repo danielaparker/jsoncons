@@ -22,6 +22,8 @@ built on top of its incremental parser.
 The jsoncons data model extends the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - to accomodate byte 
 strings, big numbers, date-time values, and epoch time values.
+This allows it to preserve type semantics when parsing
+JSON-like data formats that support similar types. 
 
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
