@@ -19,6 +19,7 @@
 #include <iterator>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/bignum.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/json_content_handler.hpp>
@@ -109,6 +110,7 @@ public:
         {
             case stream_event_type::name:
             case stream_event_type::string_value:
+            case stream_event_type::bignum_value:
                 s = T(value_.string_data_,length_);
                 break;
             case stream_event_type::int64_value:
@@ -167,6 +169,7 @@ public:
         {
             case stream_event_type::name:
             case stream_event_type::string_value:
+            case stream_event_type::bignum_value:
                 s = T(value_.string_data_,length_);
                 break;
             default:
@@ -196,11 +199,18 @@ public:
         return static_cast<T>(as_double());
     }
 
+    template<class T,class UserAllocator=std::allocator<uint8_t>>
+    typename std::enable_if<std::is_same<T,basic_bignum<UserAllocator>>::value,T>::type
+    as() const
+    {
+        return as_bignum<UserAllocator>();
+    }
+
     template<class T>
     typename std::enable_if<std::is_same<T,bool>::value,T>::type
     as() const
     {
-        return static_cast<T>(as_bool());
+        return as_bool();
     }
 
     stream_event_type event_type() const JSONCONS_NOEXCEPT {return event_type_;}
@@ -230,7 +240,7 @@ private:
             value = static_cast<int64_t>(value_.double_value_);
             break;
         case stream_event_type::int64_value:
-            value = static_cast<int64_t>(value_.int64_value_);
+            value = value_.int64_value_;
             break;
         case stream_event_type::uint64_value:
             value = static_cast<int64_t>(value_.uint64_value_);
@@ -271,7 +281,7 @@ private:
             value = static_cast<uint64_t>(value_.int64_value_);
             break;
         case stream_event_type::uint64_value:
-            value = static_cast<uint64_t>(value_.uint64_value_);
+            value = value_.uint64_value_;
             break;
         case stream_event_type::bool_value:
             value = value_.bool_value_ ? 1 : 0;
@@ -314,7 +324,7 @@ private:
 
     bool as_bool() const 
     {
-        switch (value_.data_type())
+        switch (event_type_)
         {
         case stream_event_type::bool_value:
             return value_.bool_value_;
@@ -328,6 +338,33 @@ private:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
         }
     }
+
+    template <class UserAllocator=std::allocator<uint8_t>>
+    basic_bignum<UserAllocator> as_bignum() const
+    {
+        switch (event_type_)
+        {
+            case stream_event_type::bignum_value:
+                // FALLTHRU
+            case stream_event_type::string_value:
+                if (!detail::is_integer(value_.string_data_,length_))
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+                }
+                return basic_bignum<UserAllocator>(value_.string_data_,length_);
+            case stream_event_type::double_value:
+                return basic_bignum<UserAllocator>(value_.double_value_);
+            case stream_event_type::int64_value:
+                return basic_bignum<UserAllocator>(value_.int64_value_);
+            case stream_event_type::uint64_value:
+                return basic_bignum<UserAllocator>(value_.uint64_value_);
+            case stream_event_type::bool_value:
+                return basic_bignum<UserAllocator>(value_.bool_value_ ? 1 : 0);
+            default:
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+        }
+    }
+
 };
 
 template<class CharT>

@@ -86,7 +86,7 @@ public:
         values_[1] = 0;
     }
 
-    basic_bignum(const Allocator& allocator)
+    explicit basic_bignum(const Allocator& allocator)
         : basic_bignum_base<Allocator>(allocator), data_(values_), neg_(false), dynamic_(false), length_(0)
     {
         values_[0] = 0;
@@ -136,6 +136,12 @@ public:
     explicit basic_bignum(const CharT* str)
     {
         initialize(str, strlen(str));
+    }
+
+    template <typename CharT, typename CharTraits, typename UserAllocator>
+    basic_bignum(const std::basic_string<CharT,CharTraits,UserAllocator>& s)
+    {
+        initialize(s.data(), s.length());
     }
 
     template <typename CharT>

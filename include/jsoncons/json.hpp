@@ -1098,16 +1098,28 @@ public:
             }
         }
 
-        basic_bignum<byte_allocator_type> as_bignum() const
+        template <class UserAllocator=std::allocator<uint8_t>>
+        basic_bignum<UserAllocator> as_bignum() const
         {
-            switch (semantic_tag())
+            switch (structure_tag())
             {
-                case semantic_tag_type::bignum:
-                    return bignum(as_string_view().data(), as_string_view().length());
-                    break;
+                case structure_tag_type::short_string_tag:
+                case structure_tag_type::long_string_tag:
+                    if (!detail::is_integer(as_string_view().data(), as_string_view().length()))
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                    }
+                    return basic_bignum<UserAllocator>(as_string_view().data(), as_string_view().length());
+                case structure_tag_type::double_tag:
+                    return basic_bignum<UserAllocator>(double_data_cast()->value());
+                case structure_tag_type::int64_tag:
+                    return basic_bignum<UserAllocator>(int64_data_cast()->value());
+                case structure_tag_type::uint64_tag:
+                    return basic_bignum<UserAllocator>(uint64_data_cast()->value());
+                case structure_tag_type::bool_tag:
+                    return basic_bignum<UserAllocator>(bool_data_cast()->value() ? 1 : 0);
                 default:
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
-                    break;
             }
         }
 

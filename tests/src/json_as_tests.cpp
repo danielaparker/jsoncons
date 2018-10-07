@@ -21,4 +21,29 @@ TEST_CASE("json::as<jsoncons::string_view>()")
     CHECK(j2.as<jsoncons::string_view>() == jsoncons::string_view(s2));
 }
 
+TEST_CASE("json::as<jsoncons::bignum>()")
+{
+    SECTION("from integer")
+    {
+        jsoncons::json j(-1000);
+        CHECK(j.as<jsoncons::bignum>() == jsoncons::bignum(-1000));
+    }
+    SECTION("from unsigned integer")
+    {
+        jsoncons::json j(1000u);
+        CHECK(j.as<jsoncons::bignum>() == jsoncons::bignum(1000u));
+    }
+    SECTION("from double")
+    {
+        jsoncons::json j(1000.0);
+        CHECK(j.as<jsoncons::bignum>() == jsoncons::bignum(1000.0));
+    }
+    SECTION("from bignum")
+    {
+        std::string s = "-18446744073709551617";
+        jsoncons::json j(s,  jsoncons::semantic_tag_type::bignum);
+        CHECK(j.as<jsoncons::bignum>() == jsoncons::bignum(s));
+    }
+}
+
 

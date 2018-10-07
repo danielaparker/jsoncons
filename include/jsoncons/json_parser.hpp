@@ -163,7 +163,6 @@ class basic_json_parser : private serializing_context
 
     std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
     std::basic_string<char,std::char_traits<char>,numeral_allocator_type> number_buffer_;
-    std::vector<uint8_t,byte_allocator_type> byte_buffer_;
 
     int initial_stack_capacity_;
     size_t max_nesting_depth_;
@@ -2652,12 +2651,13 @@ private:
         }
         else
         {
-            byte_buffer_.clear();
+            string_buffer_.clear();
+            for (auto c : number_buffer_)
+            {
+                string_buffer_.push_back(c);
+            }
 
-            int signum = 0;
-            bignum n(number_buffer_.c_str());
-            n.dump(signum, byte_buffer_);
-            continue_ = handler_.bignum_value(signum, byte_buffer_.data(), byte_buffer_.size(), *this);
+            continue_ = handler_.string_value(string_view_type(string_buffer_.data(), string_buffer_.length()), semantic_tag_type::bignum, *this);
             after_value(ec);
         }
     }
@@ -2672,13 +2672,13 @@ private:
         }
         else
         {
-            byte_buffer_.clear();
+            string_buffer_.clear();
+            for (auto c : number_buffer_)
+            {
+                string_buffer_.push_back(c);
+            }
 
-            int signum = 0;
-            bignum n(number_buffer_.c_str());
-            n.dump(signum, byte_buffer_);
-            continue_ = handler_.bignum_value(1, byte_buffer_.data(), byte_buffer_.size(), *this);
-            after_value(ec);
+            continue_ = handler_.string_value(string_view_type(string_buffer_.data(), string_buffer_.length()), semantic_tag_type::bignum, *this);
         }
     }
 

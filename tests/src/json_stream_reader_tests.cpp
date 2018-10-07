@@ -111,7 +111,23 @@ TEST_CASE("json_stream_reader uint64_value test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader bignum_value test")
+TEST_CASE("json_stream_reader string_value as bignum test")
+{
+    std::string s = "-18446744073709551617";
+    std::istringstream is("\""+s+"\"");
+
+    json_stream_reader reader(is);
+
+    REQUIRE_FALSE(reader.done());
+    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(s == reader.current().as<std::string>());
+    bignum c = reader.current().as<bignum>();
+    CHECK(bignum("-18446744073709551617") == c);
+    reader.next();
+    CHECK(reader.done());
+}
+
+TEST_CASE("json_stream_reader bignum_value as bignum")
 {
     std::string s = "-18446744073709551617";
     std::istringstream is(s);
@@ -120,6 +136,8 @@ TEST_CASE("json_stream_reader bignum_value test")
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == stream_event_type::bignum_value);
+    bignum c = reader.current().as<bignum>();
+    CHECK(bignum(s) == c);
     reader.next();
     CHECK(reader.done());
 }

@@ -33,6 +33,15 @@ TEST_CASE("test_positive_bignum")
     CHECK(expected == sz);
 }
 
+TEST_CASE("bignums are equal")
+{
+    std::string s = "18446744073709551616";
+    bignum x(s);
+    bignum y(s);
+
+    CHECK(x == y);
+}
+
 TEST_CASE("test_negative_bignum")
 {
     std::string expected = "-18446744073709551617";
