@@ -20,7 +20,7 @@ allocator. It also supports memory efficient parsing of very large JSON texts wi
 built on top of its incremental parser.  
 
 The jsoncons data model extends the familiar JSON types - nulls,
-booleans, numbers, strings, arrays, objects - to include byte 
+booleans, numbers, strings, arrays, objects - to support byte 
 strings, big numbers, date-time values, and epoch time values.
 
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
