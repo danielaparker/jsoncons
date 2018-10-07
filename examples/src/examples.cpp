@@ -548,8 +548,6 @@ int main()
 
         jsonpointer_examples();
 
-        readme_examples();
-
         serialization_examples();
 
         json_parser_examples();
@@ -558,6 +556,7 @@ int main()
 
         pull_parser_examples();
 
+        readme_examples();
     }
     catch (const std::exception& e)
     {

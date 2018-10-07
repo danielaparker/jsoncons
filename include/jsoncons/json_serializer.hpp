@@ -570,7 +570,7 @@ private:
 
         switch (tag)
         {
-            case semantic_tag_type::bignum_tag:
+            case semantic_tag_type::bignum:
                 write_bignum_value(sv);
                 break;
             default:

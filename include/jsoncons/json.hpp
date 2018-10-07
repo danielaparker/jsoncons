@@ -752,7 +752,7 @@ public:
         variant(double val,
                 semantic_tag_type tag = semantic_tag_type::na)
         {
-            new(reinterpret_cast<void*>(&data_))double_data(val, tag);
+            new(reinterpret_cast<void*>(&data_))double_data(val, floating_point_options(), tag);
         }
 
         variant(double val, const floating_point_options& fmt,
@@ -841,11 +841,11 @@ public:
 
             if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum_tag, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum_tag, s.data(), s.length(), char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum, s.data(), s.length(), char_allocator_type());
             }
         }
 
@@ -857,11 +857,11 @@ public:
 
             if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum_tag, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum_tag, s.data(), s.length(), char_allocator_type(allocator));
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum, s.data(), s.length(), char_allocator_type(allocator));
             }
         }
         variant(const object& val)
@@ -1102,7 +1102,7 @@ public:
         {
             switch (semantic_tag())
             {
-                case semantic_tag_type::bignum_tag:
+                case semantic_tag_type::bignum:
                     return bignum(as_string_view().data(), as_string_view().length());
                     break;
                 default:
@@ -2616,7 +2616,7 @@ public:
 
     basic_json(double val, semantic_tag_type tag)
         : var_(val, 
-               floating_point_options(chars_format::general, precision, 0),
+               floating_point_options(),
                tag)
     {
     }
@@ -2628,8 +2628,15 @@ public:
     {
     }
 
-    basic_json(int64_t val, semantic_tag_type tag)
-        : var_(val, tag)
+    template <class T>
+    basic_json(T val, semantic_tag_type tag, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value>::type* = 0)
+        : var_(static_cast<int64_t>(val), tag)
+    {
+    }
+
+    template <class T>
+    basic_json(T val, semantic_tag_type tag, typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type* = 0)
+        : var_(static_cast<uint64_t>(val), tag)
     {
     }
 
@@ -3046,17 +3053,17 @@ public:
 
     bool is_bignum() const JSONCONS_NOEXCEPT
     {
-        return var_.semantic_tag() == semantic_tag_type::bignum_tag;
+        return var_.semantic_tag() == semantic_tag_type::bignum;
     }
 
     bool is_date_time() const JSONCONS_NOEXCEPT
     {
-        return var_.semantic_tag() == semantic_tag_type::date_time_tag;
+        return var_.semantic_tag() == semantic_tag_type::date_time;
     }
 
     bool is_epoch_time() const JSONCONS_NOEXCEPT
     {
-        return var_.semantic_tag() == semantic_tag_type::epoch_time_tag;
+        return var_.semantic_tag() == semantic_tag_type::epoch_time;
     }
 
     bool is_bool() const JSONCONS_NOEXCEPT
@@ -3200,7 +3207,7 @@ public:
         {
         case structure_tag_type::short_string_tag:
         case structure_tag_type::long_string_tag:
-            if (var_.semantic_tag() == semantic_tag_type::bignum_tag)
+            if (var_.semantic_tag() == semantic_tag_type::bignum)
             {
                 return static_cast<bool>(var_.as_bignum());
             }
@@ -3234,7 +3241,7 @@ public:
         {
         case structure_tag_type::short_string_tag:
         case structure_tag_type::long_string_tag:
-            if (var_.semantic_tag() == semantic_tag_type::bignum_tag)
+            if (var_.semantic_tag() == semantic_tag_type::bignum)
             {
                 return static_cast<int64_t>(var_.as_bignum());
             }
@@ -3268,7 +3275,7 @@ public:
         {
         case structure_tag_type::short_string_tag:
         case structure_tag_type::long_string_tag:
-            if (var_.semantic_tag() == semantic_tag_type::bignum_tag)
+            if (var_.semantic_tag() == semantic_tag_type::bignum)
             {
                 return static_cast<uint64_t>(var_.as_bignum());
             }
@@ -3324,7 +3331,7 @@ public:
         {
         case structure_tag_type::short_string_tag:
         case structure_tag_type::long_string_tag:
-            if (var_.semantic_tag() == semantic_tag_type::bignum_tag)
+            if (var_.semantic_tag() == semantic_tag_type::bignum)
             {
                 return static_cast<double>(var_.as_bignum());
             }

@@ -278,9 +278,9 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
         return j.as_cstring();
     }
     template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(const char_type* s, Args&&... args)
     {
-        return Json(typename Json::variant(std::forward<Args>(args)...));
+        return Json(s, semantic_tag_type::na, std::forward<Args>(args)...);
     }
 };
 
@@ -295,9 +295,9 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
         return j.is_string();
     }
     template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(const char_type* s, Args&&... args)
     {
-        return Json(typename Json::variant(std::forward<Args>(args)...));
+        return Json(s, semantic_tag_type::na, std::forward<Args>(args)...);
     }
 };
 
@@ -930,7 +930,7 @@ public:
     {
         std::basic_string<typename Json::char_type> s;
         val.dump(s);
-        return Json(s,semantic_tag_type::bignum_tag);
+        return Json(s,semantic_tag_type::bignum);
     }
 };
 

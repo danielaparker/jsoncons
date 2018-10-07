@@ -94,7 +94,7 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag_type::bignum_tag:
+            case semantic_tag_type::bignum:
                 event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::bignum_value);
                 break;
             default:

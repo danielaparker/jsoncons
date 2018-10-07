@@ -158,9 +158,17 @@ TEST_CASE("test_cbor_parsing")
     // indefinite length maps
     check_parsing({0xbf,0xff},json::object());
     check_parsing({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
+
     // bignum
     check_parsing({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
                   json(bignum(1,{0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00})));
 
+    // date_time
+    check_parsing({0xc0,0x78,0x19,'2','0','1','5','-','0','5','-','0','7',' ','1','2',':','4','1',':','0','7','-','0','7',':','0','0'},
+                  json("2015-05-07 12:41:07-07:00", semantic_tag_type::date_time));
+
+    // epoch_time
+    check_parsing({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
+                  json(1431027667, semantic_tag_type::epoch_time));
 }
 

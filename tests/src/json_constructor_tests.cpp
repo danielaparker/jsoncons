@@ -26,19 +26,38 @@ TEST_CASE("json(string, semantic_tag_type::date_time)")
 {
     std::string s("2015-05-07 12:41:07-07:00");
 
-    json j(s, semantic_tag_type::date_time_tag);
+    json j(s, semantic_tag_type::date_time);
 
     CHECK(j.is_date_time());
     CHECK(j.as<std::string>() == s);
 }
 
-TEST_CASE("json(string, semantic_tag_type::time)")
+TEST_CASE("json(string, semantic_tag_type::epoch_time)")
 {
-    std::string s("2015-05-07 12:41:07-07:00");
+    SECTION("positive integer")
+    {
+        int t = 10000;
+        json j(t, semantic_tag_type::epoch_time);
 
-    json j(s, semantic_tag_type::date_time_tag);
+        CHECK(j.is_epoch_time());
+        CHECK(j.as<int>() == t);
+    }
+    SECTION("negative integer")
+    {
+        int t = -10000;
+        json j(t, semantic_tag_type::epoch_time);
 
-    CHECK(j.is_date_time());
-    CHECK(j.as<std::string>() == s);
+        CHECK(j.is_epoch_time());
+        CHECK(j.as<int>() == t);
+    }
+    SECTION("floating point")
+    {
+        double t = 10000.1;
+        json j(t, semantic_tag_type::epoch_time);
+
+        CHECK(j.is_epoch_time());
+        CHECK(j.as<double>() == t);
+    }
+
 }
 

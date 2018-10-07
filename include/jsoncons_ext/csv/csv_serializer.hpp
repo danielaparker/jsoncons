@@ -303,7 +303,7 @@ private:
     {
         std::basic_string<CharT> s;
         encode_base64url(data,length,s);
-        do_string_value(s, semantic_tag_type::bignum_tag, context);
+        do_string_value(s, semantic_tag_type::bignum, context);
         return true;
     }
 

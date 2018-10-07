@@ -32,11 +32,11 @@ Called for unrecoverable errors. Calls `do_fatal_error` and throws a [parse_erro
     virtual bool do_error(std::error_code ec,
                           const serializing_context& context) = 0
 Receive an error event, possibly recoverable. An [error_code](json_error_category.md) indicates the type of error. Contextual information including
-line and column information is provided in the [context](serializing_context.md) parameter. Returns `false` to fail, `true` to attempt recovery.
+line and column number is provided in the [context](serializing_context.md) parameter. Returns `false` to fail, `true` to attempt recovery.
 
     virtual void do_fatal_error(std::error_code ec,
                                 const serializing_context& context) = 0
 Receives a non recoverable error. An [error_code](json_error_category.md) indicates the type of error. Contextual information including
-line and column information is provided in the [context](serializing_context.md) parameter. 
+line and column number is provided in the [context](serializing_context.md) parameter. 
     
 

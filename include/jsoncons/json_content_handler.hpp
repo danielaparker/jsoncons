@@ -24,9 +24,9 @@ struct null_type
 enum class semantic_tag_type : uint8_t 
 {
     na = 0x00,
-    bignum_tag = 0x01,
-    date_time_tag = 0x02,
-    epoch_time_tag = 0x03
+    bignum = 0x01,
+    date_time = 0x02,
+    epoch_time = 0x03
 };
 
 template <class CharT>
@@ -141,7 +141,7 @@ public:
         bignum n(signum, data, length);
         std::basic_string<CharT> s;
         n.dump(s);
-        return do_string_value(s, semantic_tag_type::bignum_tag, null_serializing_context());
+        return do_string_value(s, semantic_tag_type::bignum, null_serializing_context());
     }
 
     bool bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
@@ -149,17 +149,17 @@ public:
         bignum n(signum, data, length);
         std::basic_string<CharT> s;
         n.dump(s);
-        return do_string_value(s, semantic_tag_type::bignum_tag, context);
+        return do_string_value(s, semantic_tag_type::bignum, context);
     }
 
     bool bignum_value(const string_view_type& s) 
     {
-        return do_string_value(s, semantic_tag_type::bignum_tag, null_serializing_context());
+        return do_string_value(s, semantic_tag_type::bignum, null_serializing_context());
     }
 
     bool bignum_value(const string_view_type& s, const serializing_context& context) 
     {
-        return do_string_value(s, semantic_tag_type::bignum_tag, context);
+        return do_string_value(s, semantic_tag_type::bignum, context);
     }
 
     bool int64_value(int64_t value, 

@@ -323,9 +323,15 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag_type::bignum_tag:
+            case semantic_tag_type::bignum:
             {
                 write_bignum_value(sv);
+                break;
+            }
+            case semantic_tag_type::date_time:
+            {
+                writer_.put(0x01);
+                write_string_value(sv);
                 break;
             }
             default:
@@ -387,6 +393,11 @@ private:
                          semantic_tag_type tag,
                          const serializing_context&) override
     {
+        if (tag == semantic_tag_type::epoch_time)
+        {
+            writer_.put(0x01);
+        }
+
         std::vector<uint8_t> v;
         binary::to_big_endian(static_cast<uint8_t>(0xfb), v);
         binary::to_big_endian(value,v);
@@ -402,9 +413,13 @@ private:
     }
 
     bool do_int64_value(int64_t value, 
-                        semantic_tag_type, 
+                        semantic_tag_type tag, 
                         const serializing_context&) override
     {
+        if (tag == semantic_tag_type::epoch_time)
+        {
+            writer_.put(0x01);
+        }
         std::vector<uint8_t> v;
         if (value >= 0)
         {
@@ -472,6 +487,11 @@ private:
                          semantic_tag_type tag, 
                          const serializing_context&) override
     {
+        if (tag == semantic_tag_type::epoch_time)
+        {
+            writer_.put(0x01);
+        }
+
         std::vector<uint8_t> v;
         if (value <= 0x17)
         {

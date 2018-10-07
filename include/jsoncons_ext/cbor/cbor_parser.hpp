@@ -1808,6 +1808,15 @@ public:
 
     void parse_some(std::error_code& ec)
     {
+        bool has_semantic_tag = false;
+        uint8_t semantic_tag = 0;
+
+        if (get_major_type(*input_ptr_) == cbor_major_type::semantic_tag)
+        {
+            has_semantic_tag = true;
+            semantic_tag = get_additional_information_value(*input_ptr_++);
+        }
+
         const uint8_t* pos = input_ptr_++;
 
         switch (get_major_type(*pos))
@@ -1822,7 +1831,15 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.uint64_value(val, semantic_tag_type::na, *this);
+
+                if (has_semantic_tag && semantic_tag == 1)
+                {
+                    handler_.uint64_value(val, semantic_tag_type::epoch_time, *this);
+                }
+                else
+                {
+                    handler_.uint64_value(val, semantic_tag_type::na, *this);
+                }
                 break;
             }
             case cbor_major_type::negative_integer:
@@ -1835,7 +1852,14 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.int64_value(val, semantic_tag_type::na, *this);
+                if (has_semantic_tag && semantic_tag == 1)
+                {
+                    handler_.int64_value(val, semantic_tag_type::epoch_time, *this);
+                }
+                else 
+                {
+                    handler_.int64_value(val, semantic_tag_type::na, *this);
+                }
                 break;
             }
             case cbor_major_type::byte_string:
@@ -1849,7 +1873,25 @@ public:
                 }
                 input_ptr_ = endp;
 
-                handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::na, *this);
+                if (has_semantic_tag)
+                {
+                    if (semantic_tag == 2)
+                    {
+                        handler_.bignum_value(1, v.data(), v.size(), *this);
+                    }
+                    else if (semantic_tag == 3)
+                    {
+                        handler_.bignum_value(-1, v.data(), v.size(), *this);
+                    }
+                    else
+                    {
+                        handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::na, *this);
+                    }
+                }
+                else
+                {
+                    handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::na, *this);
+                }
                 break;
             }
             case cbor_major_type::text_string:
@@ -1862,7 +1904,14 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::na, *this);
+                if (has_semantic_tag && semantic_tag == 0)
+                {
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time, *this);
+                }
+                else
+                {
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::na, *this);
+                }
                 break;
             }
             case cbor_major_type::array:
@@ -2080,7 +2129,7 @@ public:
                 switch (info)
                 {
                     case 0:
-                        //tag_ = semantic_tag_type::date_time_tag;
+                        //tag_ = semantic_tag_type::date_time;
                         break;
                     case 1:
                         //tag_ = semantic_tag_type::time_tag;
@@ -2143,7 +2192,14 @@ public:
                             return;
                         }
                         input_ptr_ = endp;
-                        handler_.double_value(val, floating_point_options(), semantic_tag_type::na, *this);
+                        if (has_semantic_tag && semantic_tag == 1)
+                        {
+                            handler_.double_value(val, floating_point_options(), semantic_tag_type::epoch_time, *this);
+                        }
+                        else
+                        {
+                            handler_.double_value(val, floating_point_options(), semantic_tag_type::na, *this);
+                        }
                         break;
                 }
                 break;
