@@ -235,13 +235,13 @@ public:
         return detail::is_double(type());
     }
 
-    bool is_integer() const
+    bool is_int64() const
     {
         JSONCONS_ASSERT(buflen() > 0);
         return detail::is_integer(first_,last_);
     }
 
-    bool is_uinteger() const
+    bool is_uint64() const
     {
         JSONCONS_ASSERT(buflen() > 0);
         return detail::is_uinteger(type());
@@ -368,7 +368,7 @@ public:
         return json_type_traits<cbor_view,T>::as(*this,std::forward<Args>(args)...);
     }
 
-    int64_t as_integer() const
+    int64_t as_int64() const
     {
         const uint8_t* endp;
         int64_t val = detail::get_integer(first_,last_,&endp);
@@ -395,7 +395,7 @@ public:
         }
     }
 
-    uint64_t as_uinteger() const
+    uint64_t as_uint64() const
     {
         const uint8_t* endp;
         uint64_t val = detail::get_uinteger(first_, last_, &endp);
@@ -419,13 +419,13 @@ public:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Invalid CBOR"));
             }
         }
-        else if (is_uinteger())
+        else if (is_uint64())
         {
-            val = static_cast<double>(as_uinteger());
+            val = static_cast<double>(as_uint64());
         }
-        else if (is_integer())
+        else if (is_int64())
         {
-            val = static_cast<double>(as_integer());
+            val = static_cast<double>(as_int64());
         }
         else
         {
@@ -633,13 +633,13 @@ public:
         {
             case cbor_major_type::unsigned_integer:
             {
-                uint64_t value = as_uinteger();
+                uint64_t value = as_uint64();
                 handler.uint64_value(value);
                 break;
             }
             case cbor_major_type::negative_integer:
             {
-                int64_t value = as_integer();
+                int64_t value = as_int64();
                 handler.int64_value(value);
                 break;
             }
@@ -773,6 +773,18 @@ public:
         return os;
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    bool is_integer() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_integer(first_,last_);
+    }
+
+    bool is_uinteger() const
+    {
+        JSONCONS_ASSERT(buflen() > 0);
+        return detail::is_uinteger(type());
+    }
 
     void dump_fragment(json_content_handler& handler) const
     {

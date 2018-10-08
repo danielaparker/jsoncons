@@ -8,9 +8,9 @@ bool is_null() const noexcept; // (2)
 
 bool is_string() const noexcept; // (3)
 
-bool is_integer() const noexcept; // (4)
+bool is_int64() const noexcept; // (4)
 
-bool is_uinteger() const noexcept; // (5)
+bool is_uint64() const noexcept; // (5)
 
 bool is_double() const noexcept; // (6)
 

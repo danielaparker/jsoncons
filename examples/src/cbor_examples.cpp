@@ -98,7 +98,7 @@ void cbor_view_object_range()
         std::cout << member.key() << ":" << std::endl;
         for (auto element : member.value().array_range())
         {
-            std::cout << element.as_integer() << std::endl;
+            std::cout << element.as_int64() << std::endl;
         }
     }
 }

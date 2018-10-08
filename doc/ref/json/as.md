@@ -6,9 +6,9 @@ T as(Args&&... args) const; // (1)
 
 bool as_bool() const; // (2)
 
-int64_t as_integer() const; // (3)
+int64_t as_int64() const; // (3)
 
-uint64_t as_uinteger() const; // (4)
+uint64_t as_uint64() const; // (4)
 
 double as_double() const; // (5)
 

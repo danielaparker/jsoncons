@@ -195,7 +195,7 @@ TEST_CASE("test_uinteger_overflow")
     
     json j1 =  json::parse(s1);
     CHECK(j1.is_uint64());
-    CHECK(m == j1.as_uinteger());
+    CHECK(m == j1.as_uint64());
 
     json j2 =  json::parse(s2);
     CHECK_FALSE(j2.is_uint64());
@@ -210,7 +210,7 @@ TEST_CASE("test_negative_integer_overflow")
     s2.push_back('0');
     
     json j1 =  json::parse(s1);
-    CHECK(m == j1.as_integer());
+    CHECK(m == j1.as_int64());
 
     json j2 =  json::parse(s2);
     CHECK_FALSE(j2.is_int64());
@@ -227,7 +227,7 @@ TEST_CASE("test_positive_integer_overflow")
     s2.push_back('0');
 
     json j1 =  json::parse(s1);
-    CHECK(m == j1.as_integer());
+    CHECK(m == j1.as_int64());
 
     json j2 =  json::parse(s2);
     CHECK_FALSE(j2.is_int64());

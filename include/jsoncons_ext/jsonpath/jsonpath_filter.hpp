@@ -451,17 +451,17 @@ template <class Json>
 Json plus(const Json& lhs, const Json& rhs)
 {
     Json result = Json(jsoncons::null_type());
-    if (lhs.is_integer() && rhs.is_integer())
+    if (lhs.is_int64() && rhs.is_int64())
     {
-        result = Json(((lhs.as_integer() + rhs.as_integer())));
+        result = Json(((lhs.as_int64() + rhs.as_int64())));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
         result = Json((lhs.as_double() + rhs.as_double()));
     }
-    else if (lhs.is_uinteger() && rhs.is_uinteger())
+    else if (lhs.is_uint64() && rhs.is_uint64())
     {
-        result = Json((lhs.as_uinteger() + rhs.as_uinteger()));
+        result = Json((lhs.as_uint64() + rhs.as_uint64()));
     }
     return result;
 }
@@ -470,17 +470,17 @@ template <class Json>
 Json mult(const Json& lhs, const Json& rhs)
 {
     Json result = Json(jsoncons::null_type());
-    if (lhs.is_integer() && rhs.is_integer())
+    if (lhs.is_int64() && rhs.is_int64())
     {
-        result = Json(((lhs.as_integer() * rhs.as_integer())));
+        result = Json(((lhs.as_int64() * rhs.as_int64())));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
         result = Json((lhs.as_double() * rhs.as_double()));
     }
-    else if (lhs.is_uinteger() && rhs.is_uinteger())
+    else if (lhs.is_uint64() && rhs.is_uint64())
     {
-        result = Json((lhs.as_uinteger() * rhs.as_uinteger()));
+        result = Json((lhs.as_uint64() * rhs.as_uint64()));
     }
     return result;
 }
@@ -489,17 +489,17 @@ template <class Json>
 Json div(const Json& lhs, const Json& rhs)
 {
     Json result = Json(jsoncons::null_type());
-    if (lhs.is_integer() && rhs.is_integer())
+    if (lhs.is_int64() && rhs.is_int64())
     {
-        result = Json((double)(lhs.as_integer() / (double)rhs.as_integer()));
+        result = Json((double)(lhs.as_int64() / (double)rhs.as_int64()));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
         result = Json((lhs.as_double() / rhs.as_double()));
     }
-    else if (lhs.is_uinteger() && rhs.is_uinteger())
+    else if (lhs.is_uint64() && rhs.is_uint64())
     {
-        result = Json((double)(lhs.as_uinteger() / (double)rhs.as_uinteger()));
+        result = Json((double)(lhs.as_uint64() / (double)rhs.as_uint64()));
     }
     return result;
 }
@@ -508,9 +508,9 @@ template <class Json>
 Json unary_minus(const Json& lhs)
 {
     Json result = Json::null();
-    if (lhs.is_integer())
+    if (lhs.is_int64())
     {
-        result = -lhs.as_integer();
+        result = -lhs.as_int64();
     }
     else if (lhs.is_double())
     {
@@ -523,17 +523,17 @@ template <class Json>
 Json minus(const Json& lhs, const Json& rhs)
 {
     Json result = Json::null();
-    if (lhs.is_integer() && rhs.is_integer())
+    if (lhs.is_int64() && rhs.is_int64())
     {
-        result = ((lhs.as_integer() - rhs.as_integer()));
+        result = ((lhs.as_int64() - rhs.as_int64()));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
         result = (lhs.as_double() - rhs.as_double());
     }
-    else if (lhs.is_uinteger() && rhs.is_uinteger() && lt(rhs,lhs))
+    else if (lhs.is_uint64() && rhs.is_uint64() && lt(rhs,lhs))
     {
-        result = (lhs.as_uinteger() - rhs.as_uinteger());
+        result = (lhs.as_uint64() - rhs.as_uint64());
     }
     return result;
 }

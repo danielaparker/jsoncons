@@ -10,9 +10,9 @@ bool is_string() const; // (3)
 
 bool is_byte_string() const; // (4)
 
-bool is_integer() const; // (5)
+bool is_int64() const; // (5)
 
-bool is_uinteger() const; // (6)
+bool is_uint64() const; // (6)
 
 bool is_double() const; // (7)
 

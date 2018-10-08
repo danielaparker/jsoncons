@@ -182,14 +182,14 @@ public:
     typename std::enable_if<detail::is_integer_like<T>::value,T>::type
     as() const
     {
-        return static_cast<T>(as_integer());
+        return static_cast<T>(as_int64());
     }
 
     template<class T>
     typename std::enable_if<detail::is_uinteger_like<T>::value,T>::type
     as() const
     {
-        return static_cast<T>(as_uinteger());
+        return static_cast<T>(as_uint64());
     }
 
     template<class T>
@@ -216,7 +216,7 @@ public:
     stream_event_type event_type() const JSONCONS_NOEXCEPT {return event_type_;}
 private:
 
-    int64_t as_integer() const
+    int64_t as_int64() const
     {
         int64_t value = 0;
         switch (event_type_)
@@ -254,7 +254,7 @@ private:
         return value;
     }
 
-    uint64_t as_uinteger() const
+    uint64_t as_uint64() const
     {
         uint64_t value = 0;
         switch (event_type_)
