@@ -10,6 +10,7 @@
 #include <string>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
+#include <jsoncons/bignum.hpp>
 #include <jsoncons/serializing_context.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 

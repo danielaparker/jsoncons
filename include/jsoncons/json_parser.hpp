@@ -2680,6 +2680,7 @@ private:
 
             continue_ = handler_.string_value(string_view_type(string_buffer_.data(), string_buffer_.length()), semantic_tag_type::bignum, *this);
         }
+        after_value(ec);
     }
 
     void end_fraction_value(chars_format format, std::error_code& ec)

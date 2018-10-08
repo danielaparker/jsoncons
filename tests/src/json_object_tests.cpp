@@ -693,27 +693,27 @@ TEST_CASE("test_is_type")
     CHECK(obj["double"].is<double>());
 
     obj["int"] = -10;
-    CHECK(obj["int"].is_integer());
+    CHECK(obj["int"].is_int64());
     CHECK(obj["int"].is<long long>());
 
     obj["uint"] = 10u;
-    CHECK(obj["uint"].is_uinteger());
+    CHECK(obj["uint"].is_uint64());
     CHECK(obj["uint"].is<unsigned long long>());
 
     obj["long"] = static_cast<long>(10);
-    CHECK(obj["long"].is_integer());
+    CHECK(obj["long"].is_int64());
     CHECK(obj["long"].is<long long>());
 
     obj["ulong"] = static_cast<unsigned long>(10);
-    CHECK(obj["ulong"].is_uinteger());
+    CHECK(obj["ulong"].is_uint64());
     CHECK(obj["ulong"].is<unsigned long long>());
 
     obj["longlong"] = static_cast<long long>(10);
-    CHECK(obj["longlong"].is_integer());
+    CHECK(obj["longlong"].is_int64());
     CHECK(obj["longlong"].is<long long>());
 
     obj["ulonglong"] = static_cast<unsigned long long>(10);
-    CHECK(obj["ulonglong"].is_uinteger());
+    CHECK(obj["ulonglong"].is_uint64());
     CHECK(obj["ulonglong"].is<unsigned long long>());
 
     obj["true"] = true;

@@ -312,11 +312,11 @@ struct json_type_traits<Json, T,
 
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
-        if (j.is_integer())
+        if (j.is_int64())
         {
             return j.as_integer() >= (std::numeric_limits<T>::min)() && j.as_integer() <= (std::numeric_limits<T>::max)();
         }
-        else if (j.is_uinteger())
+        else if (j.is_uint64())
         {
             return j.as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<T>::max)());
         }
@@ -345,11 +345,11 @@ struct json_type_traits<Json, T,
 
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
-        if (j.is_integer())
+        if (j.is_int64())
         {
             return j.as_integer() >= 0 && static_cast<uint64_t>(j.as_integer()) <= (std::numeric_limits<T>::max)();
         }
-        else if (j.is_uinteger())
+        else if (j.is_uint64())
         {
             return j.as_uinteger() <= (std::numeric_limits<T>::max)();
         }

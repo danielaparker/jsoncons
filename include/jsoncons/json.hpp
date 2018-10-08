@@ -1713,14 +1713,15 @@ public:
         {
             return evaluate().is_array();
         }
-        bool is_integer() const JSONCONS_NOEXCEPT
+
+        bool is_int64() const JSONCONS_NOEXCEPT
         {
-            return evaluate().is_integer();
+            return evaluate().is_int64();
         }
 
-        bool is_uinteger() const JSONCONS_NOEXCEPT
+        bool is_uint64() const JSONCONS_NOEXCEPT
         {
-            return evaluate().is_uinteger();
+            return evaluate().is_uint64();
         }
 
         bool is_double() const JSONCONS_NOEXCEPT
@@ -2127,7 +2128,17 @@ public:
             evaluate().dump(os,options,line_indent);
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
+/*
+        bool is_integer() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_integer();
+        }
 
+        bool is_uinteger() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_uinteger();
+        }
+*/
         void dump(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options, bool pprint) const
         {
             evaluate().dump(os,options,pprint);
@@ -3093,12 +3104,12 @@ public:
         return var_.structure_tag() == structure_tag_type::array_tag;
     }
 
-    bool is_integer() const JSONCONS_NOEXCEPT
+    bool is_int64() const JSONCONS_NOEXCEPT
     {
         return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
-    bool is_uinteger() const JSONCONS_NOEXCEPT
+    bool is_uint64() const JSONCONS_NOEXCEPT
     {
         return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_integer() >= 0);
     }
@@ -3438,6 +3449,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+/*
+    bool is_integer() const JSONCONS_NOEXCEPT
+    {
+        return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_uinteger() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
+    }
+
+    bool is_uinteger() const JSONCONS_NOEXCEPT
+    {
+        return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_integer() >= 0);
+    }
+*/
     const char_type* as_cstring() const
     {
         switch (var_.structure_tag())

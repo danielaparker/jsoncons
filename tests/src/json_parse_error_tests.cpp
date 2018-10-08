@@ -11,7 +11,7 @@
 #include <ctime>
 
 using namespace jsoncons;
-
+#if 0
 void test_parse_error(const std::string& text, std::error_code ec)
 {
     REQUIRE_THROWS(json::parse(text));
@@ -194,15 +194,14 @@ TEST_CASE("test_uinteger_overflow")
     s2.push_back('0');
     
     json j1 =  json::parse(s1);
-    CHECK(j1.is_uinteger());
+    CHECK(j1.is_uint64());
     CHECK(m == j1.as_uinteger());
 
     json j2 =  json::parse(s2);
-    CHECK_FALSE(j2.is_uinteger());
+    CHECK_FALSE(j2.is_uint64());
     CHECK(j2.is_bignum());
     CHECK(s2 == j2.as<std::string>());
 }
-
 TEST_CASE("test_negative_integer_overflow")
 {
     int64_t m = (std::numeric_limits<int64_t>::min)();
@@ -214,10 +213,11 @@ TEST_CASE("test_negative_integer_overflow")
     CHECK(m == j1.as_integer());
 
     json j2 =  json::parse(s2);
-    CHECK_FALSE(j2.is_integer());
+    CHECK_FALSE(j2.is_int64());
     CHECK(j2.is_bignum());
     CHECK(s2 == j2.as<std::string>());
 }
+#endif
 
 TEST_CASE("test_positive_integer_overflow")
 {
@@ -230,7 +230,7 @@ TEST_CASE("test_positive_integer_overflow")
     CHECK(m == j1.as_integer());
 
     json j2 =  json::parse(s2);
-    CHECK_FALSE(j2.is_integer());
+    CHECK_FALSE(j2.is_int64());
     CHECK(j2.is_bignum());
     CHECK(s2 == j2.as<std::string>());
 }

@@ -18,7 +18,7 @@ TEST_CASE("test_integer_limits")
 
         os << "{\"max int64_t\":" << (std::numeric_limits<int64_t>::max)() << "}";
         json val = json::parse(os.str());
-        REQUIRE(val["max int64_t"].is_integer());
+        REQUIRE(val["max int64_t"].is_int64());
         CHECK(val["max int64_t"].as<int64_t>() == (std::numeric_limits<int64_t>::max)());
     }
     {
@@ -26,7 +26,7 @@ TEST_CASE("test_integer_limits")
 
         os << "{\"min int64_t\":" << (std::numeric_limits<int64_t>::min)() << "}";
         json val = json::parse(os.str());
-        REQUIRE(val["min int64_t"].is_integer());
+        REQUIRE(val["min int64_t"].is_int64());
         CHECK(val["min int64_t"].as<int64_t>() == (std::numeric_limits<int64_t>::min)());
     }
 
@@ -43,7 +43,7 @@ TEST_CASE("test_integer_limits")
 
         os << "{\"max uint64_t\":" << (std::numeric_limits<uint64_t>::max)() << "}";
         json val = json::parse(os.str());
-        REQUIRE(val["max uint64_t"].is_uinteger());
+        REQUIRE(val["max uint64_t"].is_uint64());
         CHECK(val["max uint64_t"].as<uint64_t>() == (std::numeric_limits<uint64_t>::max)());
     }
     {

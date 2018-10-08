@@ -37,7 +37,7 @@ struct json_type_traits
 `null_type`|`true` if `j.is_null()`, otherwise `false`|`null_type()` value if j.is_null(), otherwise throws|<em>&#x2713;</em>
 `const char_type*`|`true` if string, otherwise `false`|as `const char_type*`|<em>&#x2713;</em>
 `char_type*`|`true` if `j.is_string()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`integral types`|`true` if `j.is_integer()` or `j.is_uinteger()` and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
+`integral types`|`true` if `j.is_int64()` or `j.is_uint64()` and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
 `floating point types`|`true` if j.is_double() and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
 `string`|`true` if j.is_string(), otherwise `false`|as string|<em>&#x2713;</em>
 STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
