@@ -2,9 +2,26 @@ next: v0.111.0
 
 Bug fix:
 
-- This release fixes a case where the json parser performed 
-  validation on a string before all bytes of the string had been
-  read, and failing if missing part of a multi-byte byte sequence.  
+- A case where the json parser performed validation on a string 
+  before all bytes of the string had been read, and failed if 
+  missing part of a multi-byte byte sequence, is fixed.  
+
+- An issue with reading a bignum  with the pull parser 
+`json_stream_reader` (in the case that an integer value 
+overflows) has been fixed.
+
+Non-breaking changes:
+
+- The json functions `is_integer()`, `is_uinteger()`, `as_integer()`
+and `as_uinteger()` have been deprecated and renamed to 
+`is_int64()`, `is_uint64()`, `as_int64()` and `as_uint64()`. 
+
+Enhancements:
+
+- j.as<bignum>() has been enhanced to return a bignum value
+if j is an integer, floating point value, or any string that
+contains an optional minus sign character followed by a sequence 
+of digits. 
 
 New feature:
 
