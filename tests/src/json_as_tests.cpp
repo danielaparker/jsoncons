@@ -52,7 +52,7 @@ TEST_CASE("json::as<__int128>()")
 
     std::string s = "-18446744073709551617";
 
-    __int128 val = detail::to_integer<__int128,char>(s.data(),s.size());
+    __int128 val = jsoncons::detail::to_integer<__int128,char>(s.data(),s.size());
 
 }
 #endif
