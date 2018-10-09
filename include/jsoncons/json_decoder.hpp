@@ -238,7 +238,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type tag, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {

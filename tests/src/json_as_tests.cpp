@@ -45,14 +45,16 @@ TEST_CASE("json::as<jsoncons::bignum>()")
         CHECK(j.as<jsoncons::bignum>() == jsoncons::bignum(s));
     }
 }
-
-#if defined(__GNUC__) || defined(__clang__)
+// __int128 is not supported before gcc 4.6
+#if defined(__clang__) || \
+  (defined(__GNUC__) && \
+  (__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40600)
 TEST_CASE("json::as<__int128>()")
 {
 
     std::string s = "-18446744073709551617";
 
-    jsoncons::detail::to_integer_result<__int128 val> val = = jsoncons::detail::to_integer<__int128,char>(s.data(),s.size());
+    jsoncons::detail::to_integer_result<__int128> val = = jsoncons::detail::to_integer<__int128,char>(s.data(),s.size());
 
 }
 #endif
