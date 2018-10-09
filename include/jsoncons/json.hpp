@@ -1800,7 +1800,7 @@ public:
         template <class T>
         T as_integer() const
         {
-            return evaluate().as_integer<T>();
+            return evaluate(). template as_integer<T>();
         }
 
 
