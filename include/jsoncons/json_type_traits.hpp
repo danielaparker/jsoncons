@@ -327,7 +327,7 @@ struct json_type_traits<Json, T,
     }
     static T as(const Json& j)
     {
-        return static_cast<T>(j.as_int64());
+        return j.template as_integer<T>();
     }
     template <class ... Args>
     static Json to_json(Args&&... args)

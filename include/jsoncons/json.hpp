@@ -1797,6 +1797,13 @@ public:
             return evaluate().as_double();
         }
 
+        template <class T>
+        T as_integer() const
+        {
+            return evaluate().as_integer<T>();
+        }
+
+
         int64_t as_int64() const
         {
             return evaluate().as_int64();
@@ -2132,11 +2139,6 @@ public:
         bool is_uinteger() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_uint64();
-        }
-
-        int64_t as_integer() const
-        {
-            return evaluate().as_int64();
         }
 
         unsigned long long as_ulonglong() const
@@ -3302,6 +3304,36 @@ public:
         }
     }
 
+    template <class T>
+    T as_integer() const
+    {
+        switch (var_.structure_tag())
+        {
+        case structure_tag_type::short_string_tag:
+        case structure_tag_type::long_string_tag:
+            if (!detail::is_integer(as_string_view().data(), as_string_view().length()))
+            {
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+            }
+            auto result = detail::to_integer<T>(as_string_view().data(), as_string_view().length());
+            if (result.overflow)
+            {
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Integer overflow"));
+            }
+            return result.value;
+        case structure_tag_type::double_tag:
+            return static_cast<T>(var_.double_data_cast()->value());
+        case structure_tag_type::int64_tag:
+            return static_cast<T>(var_.int64_data_cast()->value());
+        case structure_tag_type::uint64_tag:
+            return static_cast<T>(var_.uint64_data_cast()->value());
+        case structure_tag_type::bool_tag:
+            return static_cast<T>(var_.bool_data_cast()->value() ? 1 : 0);
+        default:
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+        }
+    }
+
     uint64_t as_uint64() const
     {
         switch (var_.structure_tag())
@@ -3459,7 +3491,7 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-/*
+
     bool is_integer() const JSONCONS_NOEXCEPT
     {
         return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_uint64() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
@@ -3470,16 +3502,10 @@ public:
         return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_int64() >= 0);
     }
 
-    int64_t as_integer() const
-    {
-        return as_int64();
-    }
-
     int64_t as_uinteger() const
     {
         return as_uint64();
     }
-*/
 
     const char_type* as_cstring() const
     {

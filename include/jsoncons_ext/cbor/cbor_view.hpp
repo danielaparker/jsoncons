@@ -368,6 +368,18 @@ public:
         return json_type_traits<cbor_view,T>::as(*this,std::forward<Args>(args)...);
     }
 
+    template <class T>
+    T as_integer() const
+    {
+        const uint8_t* endp;
+        int64_t val = detail::get_integer(first_,last_,&endp);
+        if (endp == first_)
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+        }
+        return (T)val;
+    }
+
     int64_t as_int64() const
     {
         const uint8_t* endp;

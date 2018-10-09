@@ -52,8 +52,12 @@ TEST_CASE("json::as<__int128>()")
 
     std::string s = "-18446744073709551617";
 
-    jsoncons::detail::to_integer_result<__int128> val = jsoncons::detail::to_integer<__int128,char>(s.data(),s.size());
-    std::cout << "SUCCESS\n";
+    jsoncons::detail::to_integer_result<__int128> val1 = jsoncons::detail::to_integer<__int128,char>(s.data(),s.size());
+
+    json j(s);
+
+    __int128 val2 = j.as<__int128>();
+    CHECK(val1 == val2);
 
 }
 #endif
