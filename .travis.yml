@@ -117,17 +117,6 @@ matrix:
             - g++-7
       env: COMPILER=clang VERSION=6.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
 
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-7.0
-          packages:
-            - clang-7.0
-            - g++-7
-      env: COMPILER=clang VERSION=7.0 SANITIZE=1
-
     - os: osx
       osx_image: xcode6.4
       compiler: clang
