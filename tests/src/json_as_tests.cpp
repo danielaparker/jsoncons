@@ -45,10 +45,8 @@ TEST_CASE("json::as<jsoncons::bignum>()")
         CHECK(j.as<jsoncons::bignum>() == jsoncons::bignum(s));
     }
 }
-// __int128 is not supported before gcc 4.6
-#if defined(__clang__) || \
-  (defined(__GNUC__) && \
-  (__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40600)
+
+#if defined(__apple_build_version__) && defined(__clang__)
 TEST_CASE("json::as<__int128>()")
 {
 
