@@ -3310,17 +3310,19 @@ public:
         switch (var_.structure_tag())
         {
         case structure_tag_type::short_string_tag:
-        case structure_tag_type::long_string_tag:
-            if (!detail::is_integer(as_string_view().data(), as_string_view().length()))
+            case structure_tag_type::long_string_tag:
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                if (!detail::is_integer(as_string_view().data(), as_string_view().length()))
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                }
+                auto result = detail::to_integer<T>(as_string_view().data(), as_string_view().length());
+                if (result.overflow)
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Integer overflow"));
+                }
+                return result.value;
             }
-            auto result = detail::to_integer<T>(as_string_view().data(), as_string_view().length());
-            if (result.overflow)
-            {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Integer overflow"));
-            }
-            return result.value;
         case structure_tag_type::double_tag:
             return static_cast<T>(var_.double_data_cast()->value());
         case structure_tag_type::int64_tag:
