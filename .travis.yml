@@ -11,7 +11,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.8
-      env: COMPILER=gcc VERSION=4.8 CXXFLAGS="-DCXXSTD=11" 
+      env: COMPILER=gcc VERSION=4.8 CXXFLAGS="-DCXXSTD=std=c++11" 
 
     - os: linux
       addons:
@@ -71,7 +71,7 @@ matrix:
             - gcc-4.8-multilib
             - qemu
             - qemu-system-arm
-      env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi"
+      env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi" CXXFLAGS="-DCXXSTD=std=c++11" 
 
     - os: linux
       addons:
