@@ -85,6 +85,7 @@ bool is_uinteger(const CharT* s, size_t length)
 template <class T, class CharT>
 to_integer_result<T> to_integer(const CharT* s, size_t length)
 {
+    static_assert(std::numeric_limits<T>::is_specialized());
     JSONCONS_ASSERT(length > 0);
 
     T n = 0;
