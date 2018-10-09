@@ -22,7 +22,7 @@ namespace readme
         bwriter.begin_array(3); // fixed length array
         bwriter.string_value("Toronto");
         bwriter.byte_string_value({'H','e','l','l','o'});
-        bwriter.string_value("-18446744073709551617", semantic_tag_type::bignum);
+        bwriter.bignum_value("-18446744073709551617");
         bwriter.end_array();
         bwriter.end_array();
         bwriter.flush();
