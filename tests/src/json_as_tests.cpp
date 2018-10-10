@@ -56,7 +56,9 @@ TEST_CASE("json::as<__int128>()")
     jsoncons::json j(s);
 
     __int128 val2 = j.as<__int128>();
-    CHECK(val1 == val2);
+    REQUIRE_FALSE(val1.overflow);
+    REQUIRE_FALSE(val2.overflow);
+    CHECK(val1.value == val2.value);
 
     std::cout << "json::as<__int128>()\n\n";
 }

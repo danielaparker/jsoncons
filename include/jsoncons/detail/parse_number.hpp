@@ -83,7 +83,8 @@ bool is_uinteger(const CharT* s, size_t length)
 }
 
 template <class T, class CharT>
-to_integer_result<T> to_integer(const CharT* s, size_t length)
+typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
+to_integer(const CharT* s, size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -135,6 +136,40 @@ to_integer_result<T> to_integer(const CharT* s, size_t length)
 
             n += x;
         }
+    }
+
+    return to_integer_result<T>({ n,overflow });
+}
+
+template <class T, class CharT>
+typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
+to_integer(const CharT* s, size_t length)
+{
+    static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
+    JSONCONS_ASSERT(length > 0);
+
+    T n = 0;
+    bool overflow = false;
+    const CharT* end = s + length; 
+
+    static const T max_value = (std::numeric_limits<T>::max)();
+    static const T max_value_div_10 = max_value / 10;
+    for (; s < end; ++s)
+    {
+        T x = *s - '0';
+        if (n > max_value_div_10)
+        {
+            overflow = true;
+            break;
+        }
+        n = n * 10;
+        if (n > max_value - x)
+        {
+            overflow = true;
+            break;
+        }
+
+        n += x;
     }
 
     return to_integer_result<T>({ n,overflow });
