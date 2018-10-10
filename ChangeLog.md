@@ -12,6 +12,11 @@ overflows) has been fixed.
 
 Non-breaking changes:
 
+- The functions `json::has_key` and `cbor::has_key` have been
+  deprecated (but still work) and renamed to `json::contains` 
+  and `cbor::contains`. Rationale: consistency with C++ 20
+  associative map `contains` function.  
+
 - The json function `as_integer()` is now a template function,
 
 ```c++

@@ -157,20 +157,23 @@ int main()
                 break;
             case stream_event_type::bool_value:
                 std::cout << "bool_value: " << event.as<std::string>() << "\n";
+                // or std::cout << "bool_value: " << event.as<bool>() << "\n";
                 break;
             case stream_event_type::int64_value:
                 std::cout << "int64_value: " << event.as<std::string>() << "\n";
+                // or std::cout << "int64_value: " << event.as<int64_t>() << "\n";
                 break;
             case stream_event_type::uint64_value:
                 std::cout << "uint64_value: " << event.as<std::string>() << "\n";
+                // or std::cout << "int64_value: " << event.as<uint64_t>() << "\n";
                 break;
             case stream_event_type::bignum_value:
                 // Returned if 64 bit integer overflow
                 std::cout << "bignum_value: " << event.as<std::string>() << "\n";
                 break;
             case stream_event_type::double_value:
-                // Return as string, could also use event.as<double>()
                 std::cout << "double_value: " << event.as<std::string>() << "\n";
+                // or std::cout << "double_value: " << event.as<double>() << "\n";
                 break;
             default:
                 std::cout << "Unhandled event type\n";

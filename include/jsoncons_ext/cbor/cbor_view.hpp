@@ -325,7 +325,7 @@ public:
         JSONCONS_THROW(json_exception_impl<std::runtime_error>("Key not found"));
     }
 
-    bool has_key(const string_view_type& key) const
+    bool contains(const string_view_type& key) const
     {
         if (!is_object())
         {
@@ -781,6 +781,11 @@ public:
         return os;
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    bool has_key(const string_view_type& key) const
+    {
+        return contains(key);
+    }
 
     bool is_integer() const
     {

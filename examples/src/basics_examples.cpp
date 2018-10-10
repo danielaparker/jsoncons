@@ -102,7 +102,7 @@ void basics_json_example1()
         // member "author" found
     }
 
-    if (book.has_key("author"))
+    if (book.contains("author"))
     {
         // book has member "author"
     }
@@ -255,7 +255,7 @@ void basics_wjson_example1()
         // book has member "author"
     }
 
-    if (book.has_key(L"author"))
+    if (book.contains(L"author"))
     {
         // book has member "author"
     }

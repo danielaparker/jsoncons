@@ -119,7 +119,7 @@ Member type                         |Definition
 
 <table border="0">
   <tr>
-    <td><code>bool has_key(const string_view_type& key) const</code></td>
+    <td><code>bool contains(const string_view_type& key) const</code></td>
     <td>Returns <code>true</code> if an object has a member with the given `key`, otherwise <code>false</code></td> 
   </tr>
   <tr>
@@ -299,8 +299,8 @@ json val;
 val["field1"] = 1;
 val["field3"] = "Toronto";
 
-double x1 = obj.has_key("field1") ? val["field1"].as<double>() : 10.0;
-double x2 = obj.has_key("field2") ? val["field2"].as<double>() : 20.0;
+double x1 = obj.contains("field1") ? val["field1"].as<double>() : 10.0;
+double x2 = obj.contains("field2") ? val["field2"].as<double>() : 20.0;
 
 std::string x3 = obj.get_with_default("field3","Montreal");
 std::string x4 = obj.get_with_default("field4","San Francisco");

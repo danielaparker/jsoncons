@@ -1628,9 +1628,9 @@ public:
             return evaluate().count(name);
         }
 
-        bool has_key(const string_view_type& name) const
+        bool contains(const string_view_type& name) const
         {
-            return evaluate().has_key(name);
+            return evaluate().contains(name);
         }
 
         bool is_null() const JSONCONS_NOEXCEPT
@@ -2123,6 +2123,11 @@ public:
             evaluate().dump(os,options,line_indent);
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+        bool has_key(const string_view_type& name) const
+        {
+            return evaluate().has_key(name);
+        }
 
         bool is_integer() const JSONCONS_NOEXCEPT
         {
@@ -3023,7 +3028,7 @@ public:
         return var_.structure_tag() == structure_tag_type::null_tag;
     }
 
-    bool has_key(const string_view_type& name) const
+    bool contains(const string_view_type& name) const
     {
         switch (var_.structure_tag())
         {
@@ -3422,6 +3427,11 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    bool has_key(const string_view_type& name) const
+    {
+        return contains(name);
+    }
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {

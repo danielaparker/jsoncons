@@ -109,7 +109,7 @@ expression     |return type                |effects
 is_array()     |`bool`                     |
 is_object()    |`bool`                     |
 size()         |`size_t`                   |
-has_key(key)   |`bool`                     |
+contains(key)   |`bool`                     |
 at(index)      |`reference` or `value_type`|
 at(key)        |`reference` or `value_type`|
 

@@ -166,7 +166,7 @@ So if you want to show "n/a" for the missing price, you can use this accessor
 ```c++
 std::string price = book.get_with_default("price","n/a");
 ```
-Or you can check if book has a member "price" with the method `has_key`, and output accordingly,
+Or you can check if book has a member "price" with the method `contains`, and output accordingly,
 ```c++
 if (book.has_key("price"))
 {

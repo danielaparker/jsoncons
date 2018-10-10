@@ -105,7 +105,7 @@ if (it != book.object_range().end())
     // member "author" found
 }
 
-if (book.has_key("author"))
+if (book.contains("author"))
 {
     // book has a member "author"
 }
@@ -352,7 +352,7 @@ if (it != book.object_range().end())
     // member "author" found
 }
 
-if (book.has_key(L"author"))
+if (book.contains(L"author"))
 {
     // book has a member "author"
 }

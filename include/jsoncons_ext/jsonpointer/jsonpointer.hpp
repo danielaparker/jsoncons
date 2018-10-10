@@ -156,7 +156,7 @@ struct path_resolver
     jsonpointer_errc operator()(std::vector<handle_type<J,JReference>>& current,
                                 const string_view_type& name) const
     {
-        if (!current.back().get().has_key(name))
+        if (!current.back().get().contains(name))
         {
             return jsonpointer_errc::name_not_found;
         }
@@ -185,7 +185,7 @@ struct path_setter
                                 const string_view_type& name) const
     {
         jsonpointer_errc ec = jsonpointer_errc();
-        if (!current.back().get().has_key(name))
+        if (!current.back().get().contains(name))
         {
             return jsonpointer_errc::name_not_found;
         }
@@ -348,7 +348,7 @@ public:
             current_.back().get().push_back(value);
             break;
         case jsonpointer::detail::pointer_state::object_reference_token: 
-            if (current_.back().get().has_key(buffer_))
+            if (current_.back().get().contains(buffer_))
             {
                 ec = jsonpointer_errc::key_already_exists;
             }
@@ -386,7 +386,7 @@ public:
         case jsonpointer::detail::pointer_state::after_last_array_reference_token:
             return jsonpointer_errc::index_exceeds_array_size;
         case jsonpointer::detail::pointer_state::object_reference_token: 
-            if (!current_.back().get().has_key(buffer_))
+            if (!current_.back().get().contains(buffer_))
             {
                 return jsonpointer_errc::name_not_found;
             }
@@ -421,7 +421,7 @@ public:
         case jsonpointer::detail::pointer_state::after_last_array_reference_token:
             return jsonpointer_errc::index_exceeds_array_size;
         case jsonpointer::detail::pointer_state::object_reference_token: 
-            if (!current_.back().get().has_key(buffer_))
+            if (!current_.back().get().contains(buffer_))
             {
                 return jsonpointer_errc::name_not_found;
             }
