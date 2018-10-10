@@ -1,9 +1,7 @@
 ### jsoncons::encode_json
 
-Serializes a C++ object to a JSON formatted string or stream. `encode_json` attempts to 
-perform the conversion by streaming using `json_convert_traits`, and if
-streaming is not supported, falls back to using `json_type_traits`. `encode_json` will work for all types that
-have `json_type_traits` defined.
+Serializes a C++ object to a JSON formatted string or stream. `encode_json` will work for all types that
+have [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) defined.
 
 #### Header
 ```c++
@@ -144,97 +142,6 @@ Output:
         "John Smith": ["Hourly","Software Engineer",10000.0]
     }
 }
-```
-    
-#### Extending `json_convert_traits`
-
-```c++
-#include <boost/numeric/ublas/matrix.hpp>
-#include <jsoncons/json.hpp>
-#include <sstream>
-
-using boost::numeric::ublas::matrix;
-
-namespace jsoncons
-{
-    template<>
-    struct json_convert_traits<matrix<double>>
-    {
-        template <class CharT>
-        static matrix<double> decode(std::basic_istringstream<CharT>& is,
-                                     const basic_json_serializing_options<CharT>& options)
-        {
-            basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-            if (j.is_array() && j.size() > 0)
-            {
-                size_t m = j.size();
-                size_t n = 0;
-                for (const auto& a : j.array_range())
-                {
-                    if (a.size() > n)
-                    {
-                        n = a.size();
-                    }
-                }
-
-                boost::numeric::ublas::matrix<double> A(m,n,double());
-                for (size_t i = 0; i < m; ++i)
-                {
-                    const auto& a = j[i];
-                    for (size_t j = 0; j < a.size(); ++j)
-                    {
-                        A(i,j) = a[j].template as<double>();
-                    }
-                }
-                return A;
-            }
-            else
-            {
-                boost::numeric::ublas::matrix<double> A;
-                return A;
-            }
-        }
-
-        static void encode(const matrix<double>& val, json_content_handler& handler)
-        {
-            handler.begin_array();
-            for (size_t i = 0; i < val.size1(); ++i)
-            {
-                handler.begin_array();
-                for (size_t j = 0; j < val.size2(); ++j)
-                {
-                    handler.double_value(val(i, j));
-                }
-                handler.end_array();
-            }
-            handler.end_array();
-        }
-    };
-};
-
-using namespace jsoncons;
-
-int main()
-{
-    std::ostringstream oss;
-
-    matrix<double> A(2, 2);
-    A(0, 0) = 1;
-    A(0, 1) = 2;
-    A(1, 0) = 3;
-    A(1, 1) = 4;
-
-    encode_json(A, oss, jsoncons::indenting::indent);
-
-    std::cout << oss.str() << std::endl;
-}
-```
-Output:
-```json
-[
-    [1.0,2.0],
-    [3.0,4.0]
-]
 ```
 
 #### See also

@@ -2125,44 +2125,6 @@ public:
             }
             case cbor_major_type::semantic_tag:
             {
-                size_t info = get_additional_information_value(*pos);
-                switch (info)
-                {
-                    case 0:
-                        //tag_ = semantic_tag_type::date_time;
-                        break;
-                    case 1:
-                        //tag_ = semantic_tag_type::time_tag;
-                        break;
-                    case 2:
-                    {
-                        const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-
-                        handler_.bignum_value(1, v.data(), v.size(), *this);
-                        break;
-                    }
-                    case 3:
-                    {
-                        const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-
-                        handler_.bignum_value(-1, v.data(), v.size(), *this);
-                        break;
-                    }
-                }
                 break;
             }
             case cbor_major_type::simple:
