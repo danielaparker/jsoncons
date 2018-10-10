@@ -453,7 +453,7 @@ Json plus(const Json& lhs, const Json& rhs)
     Json result = Json(jsoncons::null_type());
     if (lhs.is_int64() && rhs.is_int64())
     {
-        result = Json(((lhs.as_int64() + rhs.as_int64())));
+        result = Json(((lhs.as<int64_t>() + rhs.as<int64_t>())));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
@@ -461,7 +461,7 @@ Json plus(const Json& lhs, const Json& rhs)
     }
     else if (lhs.is_uint64() && rhs.is_uint64())
     {
-        result = Json((lhs.as_uint64() + rhs.as_uint64()));
+        result = Json((lhs.as<uint64_t>() + rhs.as<uint64_t>()));
     }
     return result;
 }
@@ -472,7 +472,7 @@ Json mult(const Json& lhs, const Json& rhs)
     Json result = Json(jsoncons::null_type());
     if (lhs.is_int64() && rhs.is_int64())
     {
-        result = Json(((lhs.as_int64() * rhs.as_int64())));
+        result = Json(((lhs.as<int64_t>() * rhs.as<int64_t>())));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
@@ -480,7 +480,7 @@ Json mult(const Json& lhs, const Json& rhs)
     }
     else if (lhs.is_uint64() && rhs.is_uint64())
     {
-        result = Json((lhs.as_uint64() * rhs.as_uint64()));
+        result = Json((lhs.as<uint64_t>() * rhs.as<uint64_t>()));
     }
     return result;
 }
@@ -491,7 +491,7 @@ Json div(const Json& lhs, const Json& rhs)
     Json result = Json(jsoncons::null_type());
     if (lhs.is_int64() && rhs.is_int64())
     {
-        result = Json((double)(lhs.as_int64() / (double)rhs.as_int64()));
+        result = Json((double)(lhs.as<int64_t>() / (double)rhs.as<int64_t>()));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
@@ -499,7 +499,7 @@ Json div(const Json& lhs, const Json& rhs)
     }
     else if (lhs.is_uint64() && rhs.is_uint64())
     {
-        result = Json((double)(lhs.as_uint64() / (double)rhs.as_uint64()));
+        result = Json((double)(lhs.as<uint64_t>() / (double)rhs.as<uint64_t>()));
     }
     return result;
 }
@@ -510,7 +510,7 @@ Json unary_minus(const Json& lhs)
     Json result = Json::null();
     if (lhs.is_int64())
     {
-        result = -lhs.as_int64();
+        result = -lhs.as<int64_t>();
     }
     else if (lhs.is_double())
     {
@@ -525,7 +525,7 @@ Json minus(const Json& lhs, const Json& rhs)
     Json result = Json::null();
     if (lhs.is_int64() && rhs.is_int64())
     {
-        result = ((lhs.as_int64() - rhs.as_int64()));
+        result = ((lhs.as<int64_t>() - rhs.as<int64_t>()));
     }
     else if ((lhs.is_number() && rhs.is_double()) || (lhs.is_double() && rhs.is_number()))
     {
@@ -533,7 +533,7 @@ Json minus(const Json& lhs, const Json& rhs)
     }
     else if (lhs.is_uint64() && rhs.is_uint64() && lt(rhs,lhs))
     {
-        result = (lhs.as_uint64() - rhs.as_uint64());
+        result = (lhs.as<uint64_t>() - rhs.as<uint64_t>());
     }
     return result;
 }

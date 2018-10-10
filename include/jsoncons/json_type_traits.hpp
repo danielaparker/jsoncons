@@ -314,11 +314,11 @@ struct json_type_traits<Json, T,
     {
         if (j.is_int64())
         {
-            return j.as_int64() >= (std::numeric_limits<T>::min)() && j.as_int64() <= (std::numeric_limits<T>::max)();
+            return (j. template as_integer<int64_t>()() >= (std::numeric_limits<T>::min)()) && (j. template as_integer<int64_t>() <= (std::numeric_limits<T>::max)());
         }
         else if (j.is_uint64())
         {
-            return j.as_uint64() <= static_cast<uint64_t>((std::numeric_limits<T>::max)());
+            return j. template as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<T>::max)());
         }
         else
         {
@@ -346,17 +346,18 @@ struct json_type_traits<Json, T,
     {
         if (j.is_int64())
         {
-            return j.as_int64() >= 0 && static_cast<uint64_t>(j.as_int64()) <= (std::numeric_limits<T>::max)();
+            return j. template as_integer<int64_t>() >= (std::numeric_limits<T>::min)() && static_cast<uint64_t>(j. template as_integer<int64_t>()) <= (std::numeric_limits<T>::max)();
         }
         else if (j.is_uint64())
         {
-            return j.as_uint64() <= (std::numeric_limits<T>::max)();
+            return j. template as_integer<uint64_t>() <= (std::numeric_limits<T>::max)();
         }
         else
         {
             return false;
         }
     }
+
     static T as(const Json& j)
     {
         return j.template as_integer<T>();

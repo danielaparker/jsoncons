@@ -3310,7 +3310,7 @@ public:
         switch (var_.structure_tag())
         {
         case structure_tag_type::short_string_tag:
-            case structure_tag_type::long_string_tag:
+        case structure_tag_type::long_string_tag:
             {
                 if (!detail::is_integer(as_string_view().data(), as_string_view().length()))
                 {
