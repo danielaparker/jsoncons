@@ -46,10 +46,9 @@ TEST_CASE("json::as<jsoncons::bignum>()")
     }
 }
 
-#if defined(__apple_build_version__) && defined(__clang__)
+#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
 TEST_CASE("json::as<__int128>()")
 {
-
     std::string s = "-18446744073709551617";
 
     jsoncons::detail::to_integer_result<__int128> val1 = jsoncons::detail::to_integer<__int128,char>(s.data(),s.size());
@@ -59,5 +58,6 @@ TEST_CASE("json::as<__int128>()")
     __int128 val2 = j.as<__int128>();
     CHECK(val1 == val2);
 
+    std::cout << "json::as<__int128>()\n\n";
 }
 #endif

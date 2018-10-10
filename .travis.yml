@@ -20,7 +20,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: COMPILER=gcc VERSION=4.9 SANITIZE=1
+      env: COMPILER=gcc VERSION=4.9 SANITIZE=1 CXXFLAGS="-DCXXSTD=std=c++11" 
 
     - os: linux
       addons:
@@ -29,7 +29,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc VERSION=5 SANITIZE=1
+      env: COMPILER=gcc VERSION=5 SANITIZE=1 CXXFLAGS="-DCXXSTD=std=gnu++11" 
 
     - os: linux
       addons:
@@ -82,7 +82,7 @@ matrix:
           packages:
             - clang-4.0
             - g++-7
-      env: COMPILER=clang VERSION=4.0
+      env: COMPILER=clang VERSION=4.0 CXXFLAGS="-DCXXSTD=std=c++11" 
 
     - os: linux
       addons:
@@ -93,7 +93,7 @@ matrix:
           packages:
             - clang-5.0
             - g++-7
-      env: COMPILER=clang VERSION=5.0 SANITIZE=1
+      env: COMPILER=clang VERSION=5.0 SANITIZE=1 CXXFLAGS="-DCXXSTD=std=gnu++11" 
 
     - os: linux
       addons:
