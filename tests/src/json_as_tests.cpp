@@ -57,7 +57,7 @@ TEST_CASE("json::as<__int128>()")
     jsoncons::json j(s);
 
     __int128 val = j.as<__int128>();
-    CHECK(result.value == val2);
+    CHECK(result.value == val);
 
     std::cout << "json::as<__int128>()\n\n";
 }
