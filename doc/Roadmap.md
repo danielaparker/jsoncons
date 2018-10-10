@@ -1,13 +1,19 @@
+# Targeting release 0.111.0
+
 - Add `semantic_tag_type::decimal`. Map cbor Decimal Fractions and 
   Bigfloats to string values with this tag.
 
 - Improve `cbor_view`
+
+# For later releases
 
 - Support pull parsing for cbor and CSV.
 
 - Support selecting CSV fields using `json_pointer`
 
 - Revist `encode_json` and `decode_json` now that we have pull parsing.
+
+- Support cbor keys implemented using SIDs
 
 - Support more error recovery and introduce optional `lenient_error_handler`.
 
