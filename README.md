@@ -25,6 +25,8 @@ strings, big numbers, date-time values, and epoch time values.
 This allows it to preserve these type semantics when parsing
 JSON-like data formats that support them. 
 
+Planned new features are listed on the [roadmap](doc/Roadmap.md)
+
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
 
 ## Supported compilers
@@ -74,8 +76,6 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 - [cbor](doc/ref/cbor/cbor.md) implements decode from and encode to the IETF standard [Concise Binary Object Representation (CBOR)](http://cbor.io/). It also supports a set of operations for iterating over and accessing the nested data items of a packed CBOR value.
 - [msgpack](doc/ref/msgpack/msgpack.md) implements decode from and encode to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
 - [csv](doc/ref/csv/csv.md) implements reading (writing) JSON values from (to) CSV files
-
-Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
 ### A simple example
 
