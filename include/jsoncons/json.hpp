@@ -1804,7 +1804,7 @@ public:
         >
         T as_integer() const
         {
-            return evaluate(). template as_integer<T>();
+            return evaluate().template as_integer<T>();
         }
 
         template <class T>

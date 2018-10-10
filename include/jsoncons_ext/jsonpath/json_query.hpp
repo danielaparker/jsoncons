@@ -189,7 +189,7 @@ private:
             auto index = result_.eval(val);
             if (index.template is<size_t>())
             {
-                size_t start = index. template as<size_t>();
+                size_t start = index.template as<size_t>();
                 if (val.is_array() && start < val.size())
                 {
                     nodes.emplace_back(PathCons()(path,start),std::addressof(val[start]));

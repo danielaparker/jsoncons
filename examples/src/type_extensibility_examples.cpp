@@ -30,9 +30,9 @@ namespace jsoncons
         static book as(const Json& j)
         {
             book val;
-            val.author = j["author"]. template as<std::string>();
-            val.title = j["title"]. template as<std::string>();
-            val.price = j["price"]. template as<double>();
+            val.author = j["author"].template as<std::string>();
+            val.title = j["title"].template as<std::string>();
+            val.price = j["price"].template as<double>();
             return val;
         }
         static Json to_json(const book& val)

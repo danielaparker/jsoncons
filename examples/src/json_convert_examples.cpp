@@ -62,7 +62,7 @@ namespace jsoncons
                     const json_serializing_options& options)
     {
         json j = json::parse(is, options);
-        return j. template as<T>();
+        return j.template as<T>();
     }
 
     template <>

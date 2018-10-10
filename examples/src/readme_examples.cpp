@@ -62,7 +62,7 @@ namespace readme
 
         // Unpack bytes into a json variant like structure, and add some more elements
         json j = cbor::decode_cbor<json>(bv);
-        j[0].push_back(bignum("18446744073709551616"));
+        j[0].emplace_back("18446744073709551616", semantic_tag_type::bignum);
         j[0].insert(j[0].array_range().begin(),10.5);
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";

@@ -314,11 +314,11 @@ struct json_type_traits<Json, T,
     {
         if (j.is_int64())
         {
-            return (j. template as_integer<int64_t>() >= (std::numeric_limits<T>::min)()) && (j. template as_integer<int64_t>() <= (std::numeric_limits<T>::max)());
+            return (j.template as_integer<int64_t>() >= (std::numeric_limits<T>::min)()) && (j.template as_integer<int64_t>() <= (std::numeric_limits<T>::max)());
         }
         else if (j.is_uint64())
         {
-            return j. template as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<T>::max)());
+            return j.template as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<T>::max)());
         }
         else
         {
@@ -346,11 +346,11 @@ struct json_type_traits<Json, T,
     {
         if (j.is_int64())
         {
-            return j. template as_integer<int64_t>() >= 0 && static_cast<uint64_t>(j. template as_integer<int64_t>()) <= (std::numeric_limits<T>::max)();
+            return j.template as_integer<int64_t>() >= 0 && static_cast<uint64_t>(j.template as_integer<int64_t>()) <= (std::numeric_limits<T>::max)();
         }
         else if (j.is_uint64())
         {
-            return j. template as_integer<uint64_t>() <= (std::numeric_limits<T>::max)();
+            return j.template as_integer<uint64_t>() <= (std::numeric_limits<T>::max)();
         }
         else
         {
@@ -881,7 +881,7 @@ public:
     
     static std::pair<T1,T2> as(const Json& j)
     {
-        return std::make_pair<T1,T2>(j[0]. template as<T1>(),j[1]. template as<T2>());
+        return std::make_pair<T1,T2>(j[0].template as<T1>(),j[1].template as<T2>());
     }
     
     static Json to_json(const std::pair<T1,T2>& val)

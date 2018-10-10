@@ -36,7 +36,7 @@ struct json_convert_traits
                     const basic_json_serializing_options<CharT>& options)
     {
         basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-        return j. template as<T>();
+        return j.template as<T>();
     }
 
     template <class CharT>
@@ -63,7 +63,7 @@ struct json_convert_traits<T,
                     const basic_json_serializing_options<CharT>& options)
     {
         basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-        return j. template as<T>();
+        return j.template as<T>();
     }
 
     template <class CharT>
@@ -91,7 +91,7 @@ struct json_convert_traits<std::array<T,N>>
                                    const basic_json_serializing_options<CharT>& options)
     {
         basic_json<CharT> j = basic_json<CharT>::parse(is,options);
-        return j. template as<std::array<T, N>>();
+        return j.template as<std::array<T, N>>();
     }
 
     template <class CharT>
@@ -129,7 +129,7 @@ struct json_convert_traits<T,
                     const basic_json_serializing_options<CharT>& options)
     {
         basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-        return j. template as<T>();
+        return j.template as<T>();
     }
 
     template <class CharT>
@@ -187,7 +187,7 @@ public:
                                    const basic_json_serializing_options<CharT>& options)
     {
         basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-        return j. template as<std::tuple<E...>>();
+        return j.template as<std::tuple<E...>>();
     }
 
     template <class CharT>
