@@ -374,10 +374,10 @@ See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 ### Convert JSON text to C++ objects, and back
 
 The functions `decode_json` and `encode_json` convert JSON 
-formatted strings to C++ objects and back. These functions attempt to 
-perform the conversion by streaming json read and write events with the help of 'json_convert_traits', and if
-that is not supported, fall back to using `json_type_traits`. `decode_json` 
-and `encode_json` will work for all C++ classes that have `json_type_traits` defined.
+formatted strings to C++ objects and back. `decode_json` 
+and `encode_json` will work for all C++ classes that have 
+[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
+defined.
 
 ```c++
 #include <iostream>
