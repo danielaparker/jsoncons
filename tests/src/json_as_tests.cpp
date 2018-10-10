@@ -53,7 +53,7 @@ TEST_CASE("json::as<__int128>()")
 
     jsoncons::detail::to_integer_result<__int128> val1 = jsoncons::detail::to_integer<__int128,char>(s.data(),s.size());
 
-    json j(s);
+    jsoncons::json j(s);
 
     __int128 val2 = j.as<__int128>();
     CHECK(val1 == val2);
