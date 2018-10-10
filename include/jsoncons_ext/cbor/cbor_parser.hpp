@@ -740,7 +740,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 }
 
 inline
-uint64_t get_uinteger(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+uint64_t get_uint64_value(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     uint64_t val = 0;
     if (JSONCONS_UNLIKELY(last <= first))
@@ -807,7 +807,7 @@ uint64_t get_uinteger(const uint8_t* first, const uint8_t* last, const uint8_t**
 }
 
 inline
-int64_t get_integer(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     int64_t val = 0;
     if (JSONCONS_UNLIKELY(last <= first))
@@ -890,7 +890,7 @@ int64_t get_integer(const uint8_t* first, const uint8_t* last, const uint8_t** e
             // FALLTHRU
         case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
             {
-                uint64_t x = detail::get_uinteger(first,last,endp);
+                uint64_t x = detail::get_uint64_value(first,last,endp);
                 if (*endp != first)
                 {
                     if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
@@ -1042,7 +1042,7 @@ bool is_integer(const uint8_t* first, const uint8_t* last)
     case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
         {
         const uint8_t* endp;
-            uint64_t x = detail::get_uinteger(first,last,&endp);
+            uint64_t x = detail::get_uint64_value(first,last,&endp);
             if (endp != first)
             {
                 if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
@@ -1824,7 +1824,7 @@ public:
             case cbor_major_type::unsigned_integer:
             {
                 const uint8_t* endp;
-                uint64_t val = detail::get_uinteger(pos,end_input_,&endp);
+                uint64_t val = detail::get_uint64_value(pos,end_input_,&endp);
                 if (endp == pos)
                 {
                     ec = cbor_parse_errc::unexpected_eof;
@@ -1845,7 +1845,7 @@ public:
             case cbor_major_type::negative_integer:
             {
                 const uint8_t* endp;
-                int64_t val = detail::get_integer(pos,end_input_,&endp);
+                int64_t val = detail::get_int64_value(pos,end_input_,&endp);
                 if (endp == pos)
                 {
                     ec = cbor_parse_errc::unexpected_eof;

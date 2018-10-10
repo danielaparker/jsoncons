@@ -58,7 +58,20 @@ TEST_CASE("json::as<__int128>()")
 
     __int128 val = j.as<__int128>();
     CHECK(result.value == val);
+}
 
-    std::cout << "json::as<__int128>()\n\n";
+TEST_CASE("json::as<unsigned __int128>()")
+{
+    std::string s = "18446744073709551616";
+
+    jsoncons::detail::to_integer_result<unsigned __int128> result = jsoncons::detail::to_integer<unsigned __int128>(s.data(),s.size());
+    REQUIRE_FALSE(result.overflow);
+
+    jsoncons::json j(s);
+
+    unsigned __int128 val = j.as<unsigned __int128>();
+    CHECK(result.value == val);
+
+    std::cout << "json::as<unsigned __int128>()\n\n";
 }
 #endif

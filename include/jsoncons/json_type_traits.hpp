@@ -338,8 +338,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, class T>
 struct json_type_traits<Json, T,
-                        typename std::enable_if<detail::is_uinteger_like<T>::value
->::type >
+                        typename std::enable_if<detail::is_uinteger_like<T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
@@ -360,7 +359,7 @@ struct json_type_traits<Json, T,
     }
     static T as(const Json& j)
     {
-        return static_cast<T>(j.as_uint64());
+        return j.template as_integer<T>();
     }
 
     template <class ... Args>

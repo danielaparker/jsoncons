@@ -369,10 +369,24 @@ public:
     }
 
     template <class T>
-    T as_integer() const
+    typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type
+    as_integer() const
     {
         const uint8_t* endp;
-        int64_t val = detail::get_integer(first_,last_,&endp);
+        int64_t val = detail::get_int64_value(first_,last_,&endp);
+        if (endp == first_)
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+        }
+        return (T)val;
+    }
+
+    template <class T>
+    typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,T>::type
+    as_integer() const
+    {
+        const uint8_t* endp;
+        uint64_t val = detail::get_uint64_value(first_,last_,&endp);
         if (endp == first_)
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
@@ -383,10 +397,21 @@ public:
     int64_t as_int64() const
     {
         const uint8_t* endp;
-        int64_t val = detail::get_integer(first_,last_,&endp);
+        int64_t val = detail::get_int64_value(first_,last_,&endp);
         if (endp == first_)
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+        }
+        return val;
+    }
+
+    uint64_t as_uint64() const
+    {
+        const uint8_t* endp;
+        uint64_t val = detail::get_uint64_value(first_, last_, &endp);
+        if (endp == first_)
+        {
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
         }
         return val;
     }
@@ -405,17 +430,6 @@ public:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
         }
-    }
-
-    uint64_t as_uint64() const
-    {
-        const uint8_t* endp;
-        uint64_t val = detail::get_uinteger(first_, last_, &endp);
-        if (endp == first_)
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
-        }
-        return val;
     }
 
     double as_double() const
