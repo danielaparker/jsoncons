@@ -72,7 +72,7 @@ TEST_CASE("test_assignment")
     CHECK(double_2.as<double>() == Approx(7.0).epsilon(0.000001));
     CHECK(double_2.as<int>() == 7);
     CHECK(root["myobject"]["bool_2"].as<bool>());
-    CHECK(root["myobject"]["int_2"].as_int64() == 0);
+    CHECK(root["myobject"]["int_2"].as<int64_t>() == 0);
     CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 
     CHECK(root["myobject"]["bool_2"].as<bool>());

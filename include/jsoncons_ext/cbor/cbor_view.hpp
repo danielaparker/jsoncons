@@ -381,7 +381,11 @@ public:
         return (T)val;
     }
 
-    template <class T>
+    template <class T
+#if !defined(JSONCONS_NO_DEPRECATED)
+         = int64_t
+#endif
+    >
     typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,T>::type
     as_integer() const
     {
@@ -392,28 +396,6 @@ public:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
         }
         return (T)val;
-    }
-
-    int64_t as_int64() const
-    {
-        const uint8_t* endp;
-        int64_t val = detail::get_int64_value(first_,last_,&endp);
-        if (endp == first_)
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
-        }
-        return val;
-    }
-
-    uint64_t as_uint64() const
-    {
-        const uint8_t* endp;
-        uint64_t val = detail::get_uint64_value(first_, last_, &endp);
-        if (endp == first_)
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
-        }
-        return val;
     }
 
     bool as_bool() const
@@ -447,11 +429,11 @@ public:
         }
         else if (is_uint64())
         {
-            val = static_cast<double>(as_uint64());
+            val = static_cast<double>(as_integer<uint64_t>());
         }
         else if (is_int64())
         {
-            val = static_cast<double>(as_int64());
+            val = static_cast<double>(as_integer<int64_t>());
         }
         else
         {
@@ -659,13 +641,13 @@ public:
         {
             case cbor_major_type::unsigned_integer:
             {
-                uint64_t value = as_uint64();
+                uint64_t value = as_integer<uint64_t>();
                 handler.uint64_value(value);
                 break;
             }
             case cbor_major_type::negative_integer:
             {
-                int64_t value = as_int64();
+                int64_t value = as_integer<int64_t>();
                 handler.int64_value(value);
                 break;
             }

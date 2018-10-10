@@ -1797,21 +1797,14 @@ public:
             return evaluate().as_double();
         }
 
-        template <class T>
+        template <class T
+#if !defined(JSONCONS_NO_DEPRECATED)
+             = int64_t
+#endif
+        >
         T as_integer() const
         {
             return evaluate(). template as_integer<T>();
-        }
-
-
-        int64_t as_int64() const
-        {
-            return evaluate().as_int64();
-        }
-
-        uint64_t as_uint64() const
-        {
-            return evaluate().as_uint64();
         }
 
         template <class T>
@@ -2143,12 +2136,12 @@ public:
 
         unsigned long long as_ulonglong() const
         {
-            return evaluate().as_uint64();
+            return evaluate().as_integer<uint64_t>();
         }
 
         uint64_t as_uinteger() const
         {
-            return evaluate().as_uint64();
+            return evaluate().as_integer<uint64_t>();
         }
 
         void dump(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options, bool pprint) const
@@ -3118,12 +3111,12 @@ public:
 
     bool is_int64() const JSONCONS_NOEXCEPT
     {
-        return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_uint64() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
+        return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
     bool is_uint64() const JSONCONS_NOEXCEPT
     {
-        return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_int64() >= 0);
+        return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_integer<int64_t>() >= 0);
     }
 
     bool is_double() const JSONCONS_NOEXCEPT
@@ -3270,41 +3263,11 @@ public:
         }
     }
 
-    int64_t as_int64() const
-    {
-        switch (var_.structure_tag())
-        {
-        case structure_tag_type::short_string_tag:
-        case structure_tag_type::long_string_tag:
-            if (var_.semantic_tag() == semantic_tag_type::bignum)
-            {
-                return static_cast<int64_t>(var_.as_bignum());
-            }
-
-            try
-            {
-                basic_json j = basic_json::parse(as_string_view());
-                return j.as<int64_t>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
-            }
-            break;
-        case structure_tag_type::double_tag:
-            return static_cast<int64_t>(var_.double_data_cast()->value());
-        case structure_tag_type::int64_tag:
-            return static_cast<int64_t>(var_.int64_data_cast()->value());
-        case structure_tag_type::uint64_tag:
-            return static_cast<int64_t>(var_.uint64_data_cast()->value());
-        case structure_tag_type::bool_tag:
-            return var_.bool_data_cast()->value() ? 1 : 0;
-        default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
-        }
-    }
-
-    template <class T>
+    template <class T
+#if !defined(JSONCONS_NO_DEPRECATED)
+         = int64_t
+#endif
+    >
     T as_integer() const
     {
         switch (var_.structure_tag())
@@ -3333,40 +3296,6 @@ public:
             return static_cast<T>(var_.bool_data_cast()->value() ? 1 : 0);
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
-        }
-    }
-
-    uint64_t as_uint64() const
-    {
-        switch (var_.structure_tag())
-        {
-        case structure_tag_type::short_string_tag:
-        case structure_tag_type::long_string_tag:
-            if (var_.semantic_tag() == semantic_tag_type::bignum)
-            {
-                return static_cast<uint64_t>(var_.as_bignum());
-            }
-
-            try
-            {
-                basic_json j = basic_json::parse(as_string_view());
-                return j.as<uint64_t>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
-            }
-            break;
-        case structure_tag_type::double_tag:
-            return static_cast<uint64_t>(var_.double_data_cast()->value());
-        case structure_tag_type::int64_tag:
-            return static_cast<uint64_t>(var_.int64_data_cast()->value());
-        case structure_tag_type::uint64_tag:
-            return static_cast<uint64_t>(var_.uint64_data_cast()->value());
-        case structure_tag_type::bool_tag:
-            return var_.bool_data_cast()->value() ? 1 : 0;
-        default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
         }
     }
 
@@ -3496,17 +3425,17 @@ public:
 
     bool is_integer() const JSONCONS_NOEXCEPT
     {
-        return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_uint64() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
+        return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
     bool is_uinteger() const JSONCONS_NOEXCEPT
     {
-        return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_int64() >= 0);
+        return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_integer<int64_t>() >= 0);
     }
 
     int64_t as_uinteger() const
     {
-        return as_uint64();
+        return as_integer<uint64_t>();
     }
 
     const char_type* as_cstring() const
@@ -4385,12 +4314,12 @@ public:
 
     long long as_longlong() const
     {
-        return as_int64();
+        return as_integer<int64_t>();
     }
 
     unsigned long long as_ulonglong() const
     {
-        return as_uint64();
+        return as_integer<uint64_t>();
     }
 
     int as_int() const

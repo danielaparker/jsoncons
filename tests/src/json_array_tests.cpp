@@ -219,12 +219,12 @@ TEST_CASE("test_one_dim_array")
 {
     basic_json<char,sorted_policy,std::allocator<char>> a = basic_json<char,sorted_policy,std::allocator<char>>::make_array<1>(10,0);
     CHECK(a.size() == 10);
-    CHECK(a[0].as_int64() == 0);
+    CHECK(a[0].as<int64_t>() == 0);
     a[1] = 1;
     a[2] = 2;
-    CHECK(a[1].as_int64() == 1);
-    CHECK(a[2].as_int64() == 2);
-    CHECK(a[9].as_int64() == 0);
+    CHECK(a[1].as<int64_t>() == 1);
+    CHECK(a[2].as<int64_t>() == 2);
+    CHECK(a[9].as<int64_t>() == 0);
 
     CHECK(a[1].as<long long>() == 1);
     CHECK(a[2].as<long long>() == 2);
@@ -262,9 +262,9 @@ TEST_CASE("test_three_dim_array")
     a[0][2][0] = 2;
     a[0][2][1] = 3;
 
-    CHECK(a[0][2][0].as_int64() == 2);
-    CHECK(a[0][2][1].as_int64() == 3);
-    CHECK(a[3][2][1].as_int64() == 0);
+    CHECK(a[0][2][0].as<int64_t>() == 2);
+    CHECK(a[0][2][1].as<int64_t>() == 3);
+    CHECK(a[3][2][1].as<int64_t>() == 0);
 
     CHECK(a[0][2][0].as<long long>() == 2);
     CHECK(a[0][2][1].as<long long>() == 3);

@@ -12,16 +12,41 @@ overflows) has been fixed.
 
 Non-breaking changes:
 
-- The json functions `is_integer()`, `is_uinteger()`, `as_integer()`
+- The json function `as_integer()` is now a template function,
+
+```c++
+template <class T = int64_t>
+T as_integer();
+```
+
+where T can be any integral type, signed or unsigned. The
+default parameter is for backwards compatability, but is
+a depreated feature, and may be removed in a future version.
+Prefer j.as<int64_t>().
+
+- The json functions `is_integer()` and `is_uinteger()`
+have been deprecated and renamed to `is_int64()`, `is_uint64()`.
+Prefer j.is<int64_t>() and j.is<uint64_t>().
+
+- The json function `as_uinteger()` has been deprecated.
+Prefer j.as<uint64_t>().
+
 and `as_uinteger()` have been deprecated and renamed to 
 `is_int64()`, `is_uint64()`, `as_int64()` and `as_uint64()`. 
 
 Enhancements:
 
-- j.as<bignum>() has been enhanced to return a bignum value
+- `j.as<bignum>()` has been enhanced to return a bignum value
 if j is an integer, floating point value, or any string that
 contains an optional minus sign character followed by a sequence 
 of digits. 
+
+- `j.as<T>()` has been enhanced to support extended integer
+types that have `std::numeric_limits` specializations. In particular,
+it supports GCC `__int128` when code is compiled with `std=gnu++NN`,
+allowing a `bignum` to be returned as an `__int128`. (when code 
+is compiled with `-std=c++NN`, `__int128` does not have a 
+`std::numeric_limits` specialization.)
 
 New feature:
 

@@ -71,7 +71,5 @@ TEST_CASE("json::as<unsigned __int128>()")
 
     unsigned __int128 val = j.as<unsigned __int128>();
     CHECK(result.value == val);
-
-    std::cout << "json::as<unsigned __int128>()\n\n";
 }
 #endif

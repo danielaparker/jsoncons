@@ -6,19 +6,18 @@ T as(Args&&... args) const; // (1)
 
 bool as_bool() const; // (2)
 
-int64_t as_int64() const; // (3)
+template <class T>
+T as_integer() const; // (3)
 
-uint64_t as_uint64() const; // (4)
+double as_double() const; // (4)
 
-double as_double() const; // (5)
+string_view_type as_string_view() const; // (5)
 
-string_view_type as_string_view() const; // (6)
+std::string as_string() const; // (6)
 
-std::string as_string() const; // (7)
+byte_string as_byte_string() const; // (7)
 
-byte_string as_byte_string() const; // (8)
-
-bignum as_bignum() const; // (9)
+bignum as_bignum() const; // (8)
 ```
 
 (1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../json_type_traits.md).
@@ -38,16 +37,11 @@ Returns `true` if value is `bool` and `true`, or if value is integral and non-ze
 Returns `false` if value is `bool` and `false`, or if value is integral and zero, or if value is floating point and zero, or if value is string and parsed value evaluates as `false`. 
 Otherwise throws `std::runtime_exception`
 
-(3) Same as `as<int64_t>()`.  
+(3) Same as `as<T>()` for integral type T.  
 Returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
 
-(4) Same as `as<uint64_t>()`.  
-Returns integer value if value is integral, performs cast if value has double type, returns 1 or 0 if value has bool type, attempts conversion if value is string, otherwise throws.
-
-(5) Same as `as<double>()`.  
+(4) Same as `as<double>()`.  
 Returns value cast to double if value is integral, returns `NaN` if value is `null`, attempts conversion if value is string, otherwise throws.
-
-(6) 
 
 ### Examples
 
