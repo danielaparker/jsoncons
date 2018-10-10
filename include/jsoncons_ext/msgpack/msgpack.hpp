@@ -116,7 +116,7 @@ public:
 
             case structure_tag_type::int64_tag:
             {
-                int64_t val = jval.as<int64_t>();
+                int64_t val = jval.template as<int64_t>();
                 if (val >= 0)
                 {
                     if (val <= (std::numeric_limits<int8_t>::max)())
@@ -186,7 +186,7 @@ public:
 
         case structure_tag_type::uint64_tag:
             {
-                uint64_t val = jval.as_integer<uint64_t>();
+                uint64_t val = jval.template as<uint64_t>();
                 if (val <= (std::numeric_limits<int8_t>::max)())
                 {
                     // positive fixnum stores 7-bit positive integer
