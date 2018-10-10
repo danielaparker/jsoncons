@@ -2643,7 +2643,7 @@ private:
 
     void end_negative_value(std::error_code& ec)
     {
-        jsoncons::detail::to_int64_result result = jsoncons::detail::to_int64(number_buffer_.data(), number_buffer_.length());
+        auto result = jsoncons::detail::to_integer<int64_t>(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
             continue_ = handler_.int64_value(result.value, semantic_tag_type::na, *this);
@@ -2664,7 +2664,7 @@ private:
 
     void end_positive_value(std::error_code& ec)
     {
-        jsoncons::detail::to_uint64_result result = jsoncons::detail::to_uint64(number_buffer_.data(), number_buffer_.length());
+        auto result = jsoncons::detail::to_integer<uint64_t>(number_buffer_.data(), number_buffer_.length());
         if (!result.overflow)
         {
             continue_ = handler_.uint64_value(result.value, semantic_tag_type::na, *this);

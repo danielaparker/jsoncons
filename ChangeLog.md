@@ -43,10 +43,11 @@ of digits.
 
 - `j.as<T>()` has been enhanced to support extended integer
 types that have `std::numeric_limits` specializations. In particular,
-it supports GCC `__int128` when code is compiled with `std=gnu++NN`,
-allowing a `bignum` to be returned as an `__int128`. (when code 
-is compiled with `-std=c++NN`, `__int128` does not have a 
-`std::numeric_limits` specialization.)
+it supports GCC `__int128` and `unsigned __int128` when code is 
+compiled with `std=gnu++NN`, allowing a `bignum` to be returned as 
+an `__int128` or `unsigned __int128`. (when code is compiled with 
+`-std=c++NN`, `__int128` and `unsigned __int128` do not have 
+`std::numeric_limits` specializations.)
 
 New feature:
 

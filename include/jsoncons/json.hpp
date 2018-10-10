@@ -2136,12 +2136,12 @@ public:
 
         unsigned long long as_ulonglong() const
         {
-            return evaluate().as_integer<uint64_t>();
+            return evaluate().as_ulonglong();
         }
 
         uint64_t as_uinteger() const
         {
-            return evaluate().as_integer<uint64_t>();
+            return evaluate().as_uinteger();
         }
 
         void dump(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options, bool pprint) const

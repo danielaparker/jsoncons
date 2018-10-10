@@ -25,12 +25,6 @@
 
 namespace jsoncons { namespace detail {
 
-struct to_int64_result
-{
-    int64_t value;
-    bool overflow;
-};
-
 template <class T>
 struct to_integer_result
 {
@@ -81,6 +75,13 @@ bool is_uinteger(const CharT* s, size_t length)
     }
     return true;
 }
+
+// Precondition: s satisfies
+
+// digit
+// digit1-digits 
+// - digit
+// - digit1-digits
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
@@ -141,6 +142,13 @@ to_integer(const CharT* s, size_t length)
     return to_integer_result<T>({ n,overflow });
 }
 
+// Precondition: s satisfies
+
+// digit
+// digit1-digits 
+// - digit
+// - digit1-digits
+
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
 to_integer(const CharT* s, size_t length)
@@ -173,114 +181,6 @@ to_integer(const CharT* s, size_t length)
     }
 
     return to_integer_result<T>({ n,overflow });
-}
-
-// Precondition: s satisfies
-
-// digit
-// digit1-digits 
-// - digit
-// - digit1-digits
-
-template <class CharT>
-to_int64_result to_int64(const CharT* s, size_t length)
-{
-    JSONCONS_ASSERT(length > 0);
-
-    int64_t n = 0;
-    bool overflow = false;
-    const CharT* end = s + length; 
-    if (*s == '-')
-    {
-        static const int64_t min_value = (std::numeric_limits<int64_t>::min)();
-        static const int64_t min_value_div_10 = min_value / 10;
-        ++s;
-        for (; s < end; ++s)
-        {
-            int64_t x = *s - '0';
-            if (n < min_value_div_10)
-            {
-                overflow = true;
-                break;
-            }
-            n = n * 10;
-            if (n < min_value + x)
-            {
-                overflow = true;
-                break;
-            }
-
-            n -= x;
-        }
-    }
-    else
-    {
-        static const int64_t max_value = (std::numeric_limits<int64_t>::max)();
-        static const int64_t max_value_div_10 = max_value / 10;
-        for (; s < end; ++s)
-        {
-            int64_t x = *s - '0';
-            if (n > max_value_div_10)
-            {
-                overflow = true;
-                break;
-            }
-            n = n * 10;
-            if (n > max_value - x)
-            {
-                overflow = true;
-                break;
-            }
-
-            n += x;
-        }
-    }
-
-    return to_int64_result({ n,overflow });
-}
-
-struct to_uint64_result
-{
-    uint64_t value;
-    bool overflow;
-};
-
-// Precondition: s satisfies
-
-// digit
-// digit1-digits 
-// - digit
-// - digit1-digits
-
-template <class CharT>
-to_uint64_result to_uint64(const CharT* s, size_t length)
-{
-    JSONCONS_ASSERT(length > 0);
-
-    static const uint64_t max_value = (std::numeric_limits<uint64_t>::max)();
-    static const uint64_t max_value_div_10 = max_value / 10;
-    uint64_t n = 0;
-    bool overflow = false;
-
-    const CharT* end = s + length; 
-    for (; s < end; ++s)
-    {
-        uint64_t x = *s - '0';
-        if (n > max_value_div_10)
-        {
-            overflow = true;
-            break;
-        }
-        n = n * 10;
-        if (n > max_value - x)
-        {
-            overflow = true;
-            break;
-        }
-
-        n += x;
-    }
-    return to_uint64_result{ n,overflow };
 }
 
 #if defined(JSONCONS_HAS_MSC__STRTOD_L)
