@@ -11,7 +11,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.8
-      env: COMPILER=gcc VERSION=4.8 CXXFLAGS="-DCXXSTD=std=c++11" 
+      env: COMPILER=gcc VERSION=4.8 CXXFLAGS="-Dstd=c++11" 
 
     - os: linux
       addons:
@@ -20,7 +20,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: COMPILER=gcc VERSION=4.9 SANITIZE=1 CXXFLAGS="-DCXXSTD=std=c++11" 
+      env: COMPILER=gcc VERSION=4.9 SANITIZE=1 CXXFLAGS="-Dstd=c++11" 
 
     - os: linux
       addons:
@@ -29,7 +29,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc VERSION=5 SANITIZE=1 CXXFLAGS="-DCXXSTD=std=gnu++11" 
+      env: COMPILER=gcc VERSION=5 SANITIZE=1 CXXFLAGS="-Dstd=gnu++11" 
 
     - os: linux
       addons:
@@ -71,7 +71,7 @@ matrix:
             - gcc-4.8-multilib
             - qemu
             - qemu-system-arm
-      env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi" CXXFLAGS="-DCXXSTD=std=c++11" 
+      env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi" CXXFLAGS="-Dstd=c++11" 
 
     - os: linux
       addons:
@@ -82,7 +82,7 @@ matrix:
           packages:
             - clang-4.0
             - g++-7
-      env: COMPILER=clang VERSION=4.0 CXXFLAGS="-DCXXSTD=std=c++11" 
+      env: COMPILER=clang VERSION=4.0 CXXFLAGS="-Dstd=c++11" 
 
     - os: linux
       addons:
@@ -93,7 +93,7 @@ matrix:
           packages:
             - clang-5.0
             - g++-7
-      env: COMPILER=clang VERSION=5.0 SANITIZE=1 CXXFLAGS="-DCXXSTD=std=gnu++11" 
+      env: COMPILER=clang VERSION=5.0 SANITIZE=1 CXXFLAGS="-Dstd=gnu++11" 
 
     - os: linux
       addons:
