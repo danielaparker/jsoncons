@@ -51,7 +51,7 @@ TEST_CASE("json::as<__int128>()")
 {
     std::string s = "-18446744073709551617";
 
-    jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::to_integer<__int128,char>(s.data(),s.size());
+    jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::to_integer<__int128>(s.data(),s.size());
     REQUIRE_FALSE(result.overflow);
 
     jsoncons::json j(s);
