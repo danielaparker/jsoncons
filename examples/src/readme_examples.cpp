@@ -18,7 +18,7 @@ namespace readme
         // Construct some CBOR using the streaming API
         std::vector<uint8_t> b;
         cbor::cbor_bytes_serializer writer(b);
-        writer.begin_array(); // indefinite length array
+        writer.begin_array(); // indefinite length array containing rows
         writer.begin_array(3); // fixed length array
         writer.string_value("foo");
         writer.byte_string_value({'b','a','r'});
@@ -37,7 +37,7 @@ namespace readme
 
         cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
 
-        // Loop over the outer array elements
+        // Loop over the rows
         std::cout << "(2)\n";
         for (cbor::cbor_view row : bv.array_range())
         {
