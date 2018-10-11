@@ -39,6 +39,11 @@ Prefer j.as<uint64_t>().
 and `as_uinteger()` have been deprecated and renamed to 
 `is_int64()`, `is_uint64()`, `as_int64()` and `as_uint64()`. 
 
+Change to pull parser API:
+
+- The `stream_filter` function `accept` has been changed to
+  take a `const stream_reader&` instead of a `const stream_event&`.   
+
 Enhancements:
 
 - `j.as<bignum>()` has been enhanced to return a bignum value
