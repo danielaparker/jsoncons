@@ -31,7 +31,6 @@ Returns the current [stream_event](stream_event.md).
     virtual void next() = 0;
 Get the next event. 
 
-    virtual size_t line_number() const = 0;
-
-    virtual size_t column_number() const = 0;
+    virtual const serializing_context& context() const = 0;
+Returns the current [context](serializing_context.md)
 

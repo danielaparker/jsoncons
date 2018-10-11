@@ -21,8 +21,7 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/parse_error_handler.hpp>
-#include <jsoncons/json_parser.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/serializing_context.hpp>
 #include <jsoncons/detail/writer.hpp>
 #include <jsoncons/detail/print_number.hpp>
 
@@ -380,9 +379,7 @@ public:
 
     virtual void next() = 0;
 
-    virtual size_t line_number() const = 0;
-
-    virtual size_t column_number() const = 0;
+    virtual const serializing_context& context() const = 0;
 };
 
 template<class CharT>
@@ -392,14 +389,14 @@ public:
 
     virtual ~basic_stream_filter() = default;
 
-    virtual bool accept(const basic_stream_event<CharT>& event) = 0;
+    virtual bool accept(const basic_stream_reader<CharT>& reader) = 0;
 };
 
 template<class CharT>
 class default_basic_stream_filter : public basic_stream_filter<CharT>
 {
 public:
-    bool accept(const basic_stream_event<CharT>&) override
+    bool accept(const basic_stream_reader<CharT>&) override
     {
         return true;
     }

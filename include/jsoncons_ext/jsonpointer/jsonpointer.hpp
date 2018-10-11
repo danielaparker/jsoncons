@@ -219,16 +219,6 @@ public:
         return current_.back().get();
     }
 
-    size_t line_number() const
-    {
-        return line_;
-    }
-
-    size_t column_number() const
-    {
-        return column_;
-    }
-
     jsonpointer_errc get(reference root, const string_view_type& path)
     {
         path_resolver<J,reference> op;
@@ -658,16 +648,14 @@ public:
         return ec;
     }
 
-private:
-
     // serializing_context
 
-    size_t do_line_number() const override
+    size_t line_number() const override
     {
         return line_;
     }
 
-    size_t do_column_number() const override
+    size_t column_number() const override
     {
         return column_;
     }

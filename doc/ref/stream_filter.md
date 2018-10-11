@@ -15,6 +15,6 @@ typedef basic_stream_filter<char> stream_filter
 
 #### Member functions
 
-    virtual bool accept(const basic_stream_event<CharT>& event) = 0;
+    virtual bool accept(const stream_reader& reader) = 0;
 Tests whether the [current event](stream_event.md) is part of the stream. Returns `true` if the filter accepts the event, `false` otherwise.
 

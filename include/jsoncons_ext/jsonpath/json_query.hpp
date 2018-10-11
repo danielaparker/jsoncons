@@ -1100,12 +1100,12 @@ public:
         recursive_descent_ = false;
     }
 
-    size_t do_line_number() const override
+    size_t line_number() const override
     {
         return line_;
     }
 
-    size_t do_column_number() const override
+    size_t column_number() const override
     {
         return column_;
     }

@@ -142,7 +142,7 @@ private:
 };
 
 template<class CharT,class Allocator>
-class basic_json_stream_reader : basic_stream_reader<CharT>
+class basic_json_stream_reader : public basic_stream_reader<CharT>, private virtual serializing_context
 {
     static const size_t default_max_buffer_length = 16384;
 
@@ -256,7 +256,7 @@ public:
             {
                 throw parse_error(ec,parser_.line_number(),parser_.column_number());
             }
-        } while (!done() && !filter_.accept(current()));
+        } while (!done() && !filter_.accept(*this));
     }
 
     void read_buffer(std::error_code& ec)
@@ -325,14 +325,9 @@ public:
         }
     }
 
-    size_t line_number() const override
+    const serializing_context& context() const override
     {
-        return parser_.line_number();
-    }
-
-    size_t column_number() const override
-    {
-        return parser_.column_number();
+        return *this;
     }
 
     void check_done(std::error_code& ec)
@@ -390,6 +385,16 @@ public:
         {
             check_done(ec);
         }
+    }
+
+    size_t line_number() const override
+    {
+        return parser_.line_number();
+    }
+
+    size_t column_number() const override
+    {
+        return parser_.column_number();
     }
 private:
 };

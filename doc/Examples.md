@@ -352,8 +352,10 @@ class author_filter : public stream_filter
 {
     bool accept_next_ = false;
 public:
-    bool accept(const stream_event& event) override
+    bool accept(const stream_reader& reader) override
     {
+        const stream_event& event = reader.current();
+
         if (event.event_type()  == stream_event_type::name &&
             event.as<jsoncons::string_view>() == "author")
         {
