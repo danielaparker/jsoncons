@@ -256,10 +256,8 @@ int main()
     json& ref = jsonpointer::get(j, "/1/1");
     std::cout << "(7) " << ref.as<std::string>() << "\n\n";
 
-#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
     // If code compiled with GCC and std=gnu++11 (rather than std=c++11)
     __int128 i = j[1][1].as<__int128>();
-#endif
 
     // Repack bytes
     std::vector<uint8_t> b2;
