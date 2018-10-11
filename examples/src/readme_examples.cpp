@@ -17,15 +17,14 @@ namespace readme
     {
         // Construct some CBOR using the streaming API
         std::vector<uint8_t> b;
-        cbor::cbor_bytes_serializer bwriter(b);
-        bwriter.begin_array(); // indefinite length array
-        bwriter.begin_array(3); // fixed length array
-        bwriter.string_value("Toronto");
-        bwriter.byte_string_value({'H','e','l','l','o'});
-        bwriter.bignum_value("-18446744073709551617");
-        bwriter.end_array();
-        bwriter.end_array();
-        bwriter.flush();
+        cbor::cbor_bytes_serializer writer(b);
+        writer.begin_array(); // indefinite length array
+        writer.begin_array(2); // fixed length array
+        writer.string_value("foo");
+        writer.bignum_value("-18446744073709551617");
+        writer.end_array();
+        writer.end_array();
+        writer.flush();
 
         // Print bytes
         std::cout << "(1)\n";
@@ -45,9 +44,9 @@ namespace readme
         }
         std::cout << "\n";
 
-        // Get element at position /0/1 using jsonpointer (must be by value)
-        cbor::cbor_view val = jsonpointer::get(bv, "/0/1");
-        std::cout << "(3) " << val.as<std::string>() << "\n\n";
+        // Get element at position 0/1 using jsonpointer (must be by value)
+        cbor::cbor_view v = jsonpointer::get(bv, "/0/1");
+        std::cout << "(3) " << v.as<std::string>() << "\n\n";
 
         // Print JSON representation with default options
         std::cout << "(4)\n";
@@ -60,37 +59,48 @@ namespace readme
         std::cout << "(5)\n";
         std::cout << pretty_print(bv, options) << "\n\n";
 
-        // Unpack bytes into a json variant like structure, and add some more elements
+        // Unpack bytes into a json variant value, and add some more elements
         json j = cbor::decode_cbor<json>(bv);
-        j[0].emplace_back("18446744073709551616", semantic_tag_type::bignum);
-        j[0].insert(j[0].array_range().begin(),10.5);
+
+        json new_row = json::array(); 
+        new_row.emplace_back("18446744073709551616", semantic_tag_type::bignum);
+        // or, new_row.push_back(json("18446744073709551616", semantic_tag_type::bignum));
+
+        new_row.emplace(new_row.array_range().begin(),"bar");
+
+        j.push_back(std::move(new_row));
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
-        // Get element at position /0/0 using jsonpointer (by reference)
-        json& ref = jsonpointer::get(j, "/0/0");
-        std::cout << "(7) " << ref.as<double>() << "\n\n";
+        // Get element at position /1/1 using jsonpointer (by reference)
+        json& ref = jsonpointer::get(j, "/1/1");
+        std::cout << "(7) " << ref.as<std::string>() << "\n\n";
+
+#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
+        // If code compiled with GCC and std=gnu++11 (rather than std=c++11)
+        __int128 i = j[1][1].as<__int128>();
+#endif
 
         // Repack bytes
         std::vector<uint8_t> b2;
         cbor::encode_cbor(j, b2);
         std::cout << "(8)\n";
-        cbor::cbor_view b2v = b2;
-        std::cout << pretty_print(b2v) << "\n\n";
+        cbor::cbor_view bv2 = b2;
+        std::cout << pretty_print(bv2) << "\n\n";
 
         // Serialize to CSV
         csv::csv_serializing_options csv_options;
-        csv_options.column_names("A,B,C,D,E");
+        csv_options.column_names("Column 1,Column 2");
 
-        std::string from_unpacked;
-        csv::encode_csv(j, from_unpacked, csv_options);
+        std::string csv_j;
+        csv::encode_csv(j, csv_j, csv_options);
         std::cout << "(9)\n";
-        std::cout << from_unpacked << "\n\n";
+        std::cout << csv_j << "\n\n";
 
-        std::string from_packed;
-        csv::encode_csv(b2v, from_packed, csv_options);
+        std::string csv_bv2;
+        csv::encode_csv(bv2, csv_bv2, csv_options);
         std::cout << "(10)\n";
-        std::cout << from_packed << "\n\n";
+        std::cout << csv_bv2 << "\n\n";
     }
 }
 
