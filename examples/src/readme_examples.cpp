@@ -19,8 +19,9 @@ namespace readme
         std::vector<uint8_t> b;
         cbor::cbor_bytes_serializer writer(b);
         writer.begin_array(); // indefinite length array
-        writer.begin_array(2); // fixed length array
+        writer.begin_array(3); // fixed length array
         writer.string_value("foo");
+        writer.byte_string_value({'b','a','r'});
         writer.bignum_value("-18446744073709551617");
         writer.end_array();
         writer.end_array();
@@ -44,8 +45,8 @@ namespace readme
         }
         std::cout << "\n";
 
-        // Get element at position 0/1 using jsonpointer (must be by value)
-        cbor::cbor_view v = jsonpointer::get(bv, "/0/1");
+        // Get element at position 0/2 using jsonpointer (must be by value)
+        cbor::cbor_view v = jsonpointer::get(bv, "/0/2");
         std::cout << "(3) " << v.as<std::string>() << "\n\n";
 
         // Print JSON representation with default options
@@ -62,23 +63,23 @@ namespace readme
         // Unpack bytes into a json variant value, and add some more elements
         json j = cbor::decode_cbor<json>(bv);
 
-        json new_row = json::array(); 
-        new_row.emplace_back("18446744073709551616", semantic_tag_type::bignum);
-        // or, new_row.push_back(json("18446744073709551616", semantic_tag_type::bignum));
+        json r = json::array(); 
+        r.emplace_back(byte_string({'q','u','x'}));
+        r.emplace_back(bignum("18446744073709551616"));
+        // or, r.emplace_back("18446744073709551616", semantic_tag_type::bignum);
+        r.emplace(r.array_range().begin(),"baz");
 
-        new_row.emplace(new_row.array_range().begin(),"bar");
-
-        j.push_back(std::move(new_row));
+        j.push_back(std::move(r));
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
-        // Get element at position /1/1 using jsonpointer (by reference)
-        json& ref = jsonpointer::get(j, "/1/1");
+        // Get element at position /1/2 using jsonpointer (by reference)
+        json& ref = jsonpointer::get(j, "/1/2");
         std::cout << "(7) " << ref.as<std::string>() << "\n\n";
 
 #if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
         // If code compiled with GCC and std=gnu++11 (rather than std=c++11)
-        __int128 i = j[1][1].as<__int128>();
+        __int128 i = j[1][2].as<__int128>();
 #endif
 
         // Repack bytes
@@ -90,7 +91,7 @@ namespace readme
 
         // Serialize to CSV
         csv::csv_serializing_options csv_options;
-        csv_options.column_names("Column 1,Column 2");
+        csv_options.column_names("Column 1,Column 2,Column 3");
 
         std::string csv_j;
         csv::encode_csv(j, csv_j, csv_options);
