@@ -14,7 +14,7 @@ The `stream_reader` interface supports forward, read-only, access to JSON and JS
 The `stream_reader` is designed to iterate over stream events until `done()` returns `true`.
 The `next()` function causes the reader to advance to the next stream event. The `current()` function
 returns the current stream event. The data can be accessed using the [stream_event](stream_event.md) 
-interface. When `next()` is called, copies of data accessed previously may be invalidated.
+interface. When `next()` is called, copies of data previously accessed may be invalidated.
 
 #### Destructor
 
