@@ -10,33 +10,6 @@
 #include <ctime>
 #include <map>
 
-class A
-{
-    int n;
-public:
-    A() = delete;
-    A(int n)
-        : n(n)
-    {
-    }
-};
-
-template <class T>
-class B
-{
-    T t;
-public:
-    B(T t = T())
-        : t(t)
-    {
-    }
-};
-
-TEST_CASE("no_default_constructor")
-{
-    B<A>(A(1));
-}
-
 TEST_CASE("json::as<jsoncons::string_view>()")
 {
     std::string s1("Short");
