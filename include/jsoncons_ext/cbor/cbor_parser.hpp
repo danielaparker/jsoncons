@@ -1775,6 +1775,62 @@ public:
     }
 };
 
+std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last, 
+                                  const uint8_t** endpp)
+{
+    std::string s;
+
+    JSONCONS_ASSERT(get_major_type(*first) == cbor_major_type::array);
+    JSONCONS_ASSERT(get_additional_information_value(*first) == 2);
+
+    const uint8_t* p = first;
+    uint8_t* pos = p++;
+    switch (get_major_type(*pos))
+    {
+        case cbor_major_type::unsigned_integer:
+        {
+            uint64_t val = detail::get_uint64_value(pos,last,endpp);
+            if (*endpp == pos)
+            {
+                ec = cbor_parse_errc::unexpected_eof;
+                return;
+            }
+            p = *endpp;
+
+            if (has_semantic_tag && semantic_tag == 1)
+            {
+                handler_.uint64_value(val, semantic_tag_type::epoch_time, *this);
+            }
+            else
+            {
+                handler_.uint64_value(val, semantic_tag_type::na, *this);
+            }
+            break;
+        }
+        case cbor_major_type::negative_integer:
+        {
+            int64_t val = detail::get_int64_value(pos,last,endpp);
+            if (*endpp == pos)
+            {
+                ec = cbor_parse_errc::unexpected_eof;
+                return;
+            }
+            p = *endpp;
+            if (has_semantic_tag && semantic_tag == 1)
+            {
+                handler_.int64_value(val, semantic_tag_type::epoch_time, *this);
+            }
+            else 
+            {
+                handler_.int64_value(val, semantic_tag_type::na, *this);
+            }
+            break;
+        }
+    }
+
+    return s;
+}
+
 } // namespace detail
 
 class cbor_parser : public serializing_context
