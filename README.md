@@ -253,7 +253,7 @@ int main()
     std::cout << "(6)\n";
     std::cout << pretty_print(j) << "\n\n";
 
-    // Get element at position /1/2 using jsonpointer (by reference)
+    // Get element at position /1/2 using jsonpointer (can be by reference)
     json& ref = jsonpointer::get(j, "/1/2");
     std::cout << "(7) " << ref.as<std::string>() << "\n\n";
 
