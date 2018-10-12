@@ -27,6 +27,7 @@ A JSON-like data event.
 | bool_value        | true                   | as<std::string>(), as<bool>() |
 | null_value        |                        | as<std::string>() |
 
+#### Member functions
 
     stream_event_type event_type();
 Returns a [stream_event_type](stream_event_type.md) for this event.
