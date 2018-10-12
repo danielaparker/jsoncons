@@ -15,6 +15,6 @@ typedef basic_stream_filter<char> stream_filter
 
 #### Member functions
 
-    virtual bool accept(const stream_reader& reader) = 0;
+    virtual bool accept(const stream_event& event, const serializing_context& context) = 0;
 Tests whether the [current event](stream_event.md) is part of the stream. Returns `true` if the filter accepts the event, `false` otherwise.
 

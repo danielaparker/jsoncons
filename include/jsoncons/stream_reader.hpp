@@ -389,14 +389,14 @@ public:
 
     virtual ~basic_stream_filter() = default;
 
-    virtual bool accept(const basic_stream_reader<CharT>& reader) = 0;
+    virtual bool accept(const basic_stream_event<CharT>& event, const serializing_context& context) = 0;
 };
 
 template<class CharT>
 class default_basic_stream_filter : public basic_stream_filter<CharT>
 {
 public:
-    bool accept(const basic_stream_reader<CharT>&) override
+    bool accept(const basic_stream_event<CharT>&, const serializing_context&) override
     {
         return true;
     }

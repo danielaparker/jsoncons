@@ -42,7 +42,7 @@ and `as_uinteger()` have been deprecated and renamed to
 Change to pull parser API:
 
 - The `stream_filter` function `accept` has been changed to
-  take a `const stream_reader&` instead of a `const stream_event&`.   
+  take a `const stream_event&` and a `const serializing_context&`.   
 
 Enhancements:
 

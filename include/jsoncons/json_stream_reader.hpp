@@ -256,7 +256,7 @@ public:
             {
                 throw parse_error(ec,parser_.line_number(),parser_.column_number());
             }
-        } while (!done() && !filter_.accept(*this));
+        } while (!done() && !filter_.accept(event_handler_.event(), *this));
     }
 
     void read_buffer(std::error_code& ec)
