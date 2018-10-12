@@ -2228,6 +2228,16 @@ public:
             handler_.flush();
         }
     }
+
+    size_t line_number() const override
+    {
+        return 1;
+    }
+
+    size_t column_number() const override
+    {
+        return column_;
+    }
 private:
     void parse_name(std::error_code& ec)
     {
@@ -2294,16 +2304,6 @@ private:
         }
         handler_.end_object(*this);
         --nesting_depth_;
-    }
-
-    size_t do_line_number() const override
-    {
-        return 1;
-    }
-
-    size_t do_column_number() const override
-    {
-        return column_;
     }
 };
 

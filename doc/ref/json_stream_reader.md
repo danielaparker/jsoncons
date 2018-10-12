@@ -88,6 +88,9 @@ Returns the current [stream_event](stream_event.md).
     void next() override;
 Advances to the next event. 
 
+    const serializing_context& context() const override;
+Returns the current [context](serializing_context.md)
+
 ### Examples
 
 The example JSON text, `book_catalog.json`, is used by the examples below.
@@ -229,7 +232,7 @@ class author_filter : public stream_filter
 {
     bool accept_next_ = false;
 public:
-    bool accept(const stream_event& event) override
+    bool accept(const stream_event& event, const serializing_context&) override
     {
         if (event.event_type()  == stream_event_type::name &&
             event.as<jsoncons::string_view>() == "author")

@@ -159,16 +159,6 @@ public:
         return input_ptr_ == input_end_;
     }
 
-    size_t line_number() const
-    {
-        return line_;
-    }
-
-    size_t column_number() const
-    {
-        return column_;
-    }
-
     const std::vector<std::basic_string<CharT>>& column_labels() const
     {
         return column_names_;
@@ -697,6 +687,16 @@ all_csv_states:
         begin_input_ = data;
         input_end_ = data + length;
         input_ptr_ = begin_input_;
+    }
+
+    size_t line_number() const override
+    {
+        return line_;
+    }
+
+    size_t column_number() const override
+    {
+        return column_;
     }
 private:
 
@@ -1285,16 +1285,6 @@ private:
         default:
             handler.string_value(value, semantic_tag_type::na, *this);
         }
-    }
-
-    size_t do_line_number() const override
-    {
-        return line_;
-    }
-
-    size_t do_column_number() const override
-    {
-        return column_;
     }
 
     void push_mode(csv_mode_type mode)

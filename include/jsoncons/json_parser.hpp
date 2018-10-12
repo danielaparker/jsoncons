@@ -257,16 +257,6 @@ public:
         push_state(parse_state::root);
     }
 
-    size_t line_number() const
-    {
-        return line_;
-    }
-
-    size_t column_number() const
-    {
-        return column_;
-    }
-
     void set_column_number(size_t column)
     {
         column_ = column;
@@ -2627,6 +2617,16 @@ escape_u9:
         input_ptr_ = begin_input_;
     }
 #endif
+
+    size_t line_number() const override
+    {
+        return line_;
+    }
+
+    size_t column_number() const override
+    {
+        return column_;
+    }
 private:
 
     void end_integer_value(std::error_code& ec)
@@ -2876,16 +2876,6 @@ private:
             }
         }
         return cp;
-    }
-
-    size_t do_line_number() const override
-    {
-        return line_;
-    }
-
-    size_t do_column_number() const override
-    {
-        return column_;
     }
 };
 
