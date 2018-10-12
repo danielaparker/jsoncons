@@ -23,8 +23,8 @@ A JSON-like data event.
 | bignum_value      | "18446744073709551616" | `as<std::string>()`, as<jsoncons::bignum>(), `as<__int128>()` |
 | int64_value       | -1000                  | `as<std::string>()`, `as<int>()`, `as<long>`, `as<int64_t>()` |
 | uint64_value      | 1000                   | `as<std::string>()`, `as<int>()`, `as<unsigned>()`, `as<int64_t>()`, `as<uint64_t>()` |
-| double_value      | 125.72                 | `as<std::string>()`, as<double>() |
-| bool_value        | true                   | `as<std::string>()`, as<bool>() |
+| double_value      | 125.72                 | `as<std::string>()`, `as<double>()` |
+| bool_value        | true                   | `as<std::string>()`, `as<bool>()` |
 | null_value        |                        | `as<std::string>()` |
 
 #### Member functions
