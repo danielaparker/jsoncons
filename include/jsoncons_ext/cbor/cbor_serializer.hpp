@@ -319,6 +319,10 @@ private:
         }
     }
 
+    void write_decimal_value(const string_view_type& sv)
+    {
+    }
+
     bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
     {
         switch (tag)
@@ -326,6 +330,11 @@ private:
             case semantic_tag_type::bignum:
             {
                 write_bignum_value(sv);
+                break;
+            }
+            case semantic_tag_type::decimal:
+            {
+                write_decimal_value(sv);
                 break;
             }
             case semantic_tag_type::date_time:

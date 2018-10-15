@@ -200,10 +200,6 @@ Throws `std::runtime_error` if not an object.
     <td>Inserts a value at the specified location in a json array</td> 
   </tr>
   <tr>
-    <td><a>add</a></td>
-    <td>Combines push_back and insert</td> 
-  </tr>
-  <tr>
     <td><a href="json/emplace_back.md">emplace_back</a></td>
     <td>Constructs a value in place at the end of a json array</td> 
   </tr>
@@ -218,10 +214,6 @@ Throws `std::runtime_error` if not an object.
   <tr>
     <td><a href="json/insert_or_assign.md">insert_or_assign</a></td>
     <td>Inserts a key-value pair in a json object if the key does not exist, or assigns a new value if the key already exists</td> 
-  </tr>
-  <tr>
-    <td><a>set</a></td>
-    <td>Same as <code>insert_or_assign</code></td> 
   </tr>
   <tr>
     <td><a href="json/merge.md">merge</a></td>

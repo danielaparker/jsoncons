@@ -1976,14 +1976,6 @@ public:
             return evaluate().merge_or_update(hint, std::forward<basic_json>(source));
         }
 
-       // set
-
-        template <class T>
-        std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
-        {
-            return evaluate().set(name,std::forward<T>(val));
-        }
-
         template <class T>
         std::pair<object_iterator,bool> insert_or_assign(const string_view_type& name, T&& val)
         {
@@ -2002,12 +1994,6 @@ public:
         std::pair<object_iterator,bool> try_emplace(const string_view_type& name, Args&&... args)
         {
             return evaluate().try_emplace(name,std::forward<Args>(args)...);
-        }
-
-        template <class T>
-        object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
-        {
-            return evaluate().set(hint, name, std::forward<T>(val));
         }
 
         template <class T>
@@ -2041,21 +2027,9 @@ public:
         }
 
         template <class T>
-        void add(T&& val)
-        {
-            evaluate_with_default().add(std::forward<T>(val));
-        }
-
-        template <class T>
         void push_back(T&& val)
         {
             evaluate_with_default().push_back(std::forward<T>(val));
-        }
-
-        template <class T>
-        array_iterator add(const_array_iterator pos, T&& val)
-        {
-            return evaluate_with_default().add(pos, std::forward<T>(val));
         }
 
         template <class T>
@@ -2123,6 +2097,32 @@ public:
             evaluate().dump(os,options,line_indent);
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+        template <class T>
+        void add(T&& val)
+        {
+            evaluate_with_default().add(std::forward<T>(val));
+        }
+
+        template <class T>
+        array_iterator add(const_array_iterator pos, T&& val)
+        {
+            return evaluate_with_default().add(pos, std::forward<T>(val));
+        }
+
+       // set
+
+        template <class T>
+        std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
+        {
+            return evaluate().set(name,std::forward<T>(val));
+        }
+
+        template <class T>
+        object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
+        {
+            return evaluate().set(hint, name, std::forward<T>(val));
+        }
 
         bool has_key(const string_view_type& name) const
         {
@@ -2331,16 +2331,6 @@ public:
             return evaluate().as_longlong();
         }
 
-        void add(size_t index, const basic_json& value)
-        {
-            evaluate_with_default().add(index, value);
-        }
-
-        void add(size_t index, basic_json&& value)
-        {
-            evaluate_with_default().add(index, std::forward<basic_json>(value));
-        }
-
         bool has_member(const key_storage_type& name) const
         {
             return evaluate().has_member(name);
@@ -2397,6 +2387,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    void add(size_t index, const basic_json& value)
+    {
+        evaluate_with_default().add(index, value);
+    }
+
+    void add(size_t index, basic_json&& value)
+    {
+        evaluate_with_default().add(index, std::forward<basic_json>(value));
+    }
+
     static basic_json parse(const char_type* s, size_t length)
     {
         parse_error_handler_type err_handler;
@@ -3797,12 +3798,6 @@ public:
     }
 
     template <class T>
-    std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
-    {
-        return insert_or_assign(name, std::forward<T>(val));
-    }
-
-    template <class T>
     std::pair<object_iterator,bool> insert_or_assign(const string_view_type& name, T&& val)
     {
         switch (var_.structure_tag())
@@ -3986,14 +3981,6 @@ public:
         }
     }
 
-    // set
-
-    template <class T>
-    object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
-    {
-        return insert_or_assign(hint, name, std::forward<T>(val));
-    }
-
     template <class T>
     object_iterator insert_or_assign(object_iterator hint, const string_view_type& name, T&& val)
     {
@@ -4044,33 +4031,6 @@ public:
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
             }
         }
-    }
-
-    template <class T>
-    void add(T&& val)
-    {
-        push_back(std::forward<T>(val));
-    }
-
-    template <class T>
-    void push_back(T&& val)
-    {
-        switch (var_.structure_tag())
-        {
-        case structure_tag_type::array_tag:
-            array_value().push_back(std::forward<T>(val));
-            break;
-        default:
-            {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Attempting to insert into a value that is not an array"));
-            }
-        }
-    }
-
-    template <class T>
-    array_iterator add(const_array_iterator pos, T&& val)
-    {
-        return insert(pos, std::forward<T>(val));
     }
 
     template <class T>
@@ -4208,6 +4168,47 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    template <class T>
+    void add(T&& val)
+    {
+        push_back(std::forward<T>(val));
+    }
+
+    template <class T>
+    void push_back(T&& val)
+    {
+        switch (var_.structure_tag())
+        {
+        case structure_tag_type::array_tag:
+            array_value().push_back(std::forward<T>(val));
+            break;
+        default:
+            {
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Attempting to insert into a value that is not an array"));
+            }
+        }
+    }
+
+    template <class T>
+    array_iterator add(const_array_iterator pos, T&& val)
+    {
+        return insert(pos, std::forward<T>(val));
+    }
+
+    template <class T>
+    std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
+    {
+        return insert_or_assign(name, std::forward<T>(val));
+    }
+
+    // set
+
+    template <class T>
+    object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
+    {
+        return insert_or_assign(hint, name, std::forward<T>(val));
+    }
 
     static basic_json parse_file(const std::basic_string<char_type,char_traits_type>& filename)
     {

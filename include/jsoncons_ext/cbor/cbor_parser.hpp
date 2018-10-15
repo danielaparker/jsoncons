@@ -1780,11 +1780,44 @@ std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last,
 {
     std::string s;
 
-    JSONCONS_ASSERT(get_major_type(*first) == cbor_major_type::array);
-    JSONCONS_ASSERT(get_additional_information_value(*first) == 2);
+    JSONCONS_ASSERT(get_major_type(*first) == cbor_major_type::semantic_tag);
+    JSONCONS_ASSERT(get_additional_information_value(*first) == 4);
 
-    const uint8_t* p = first;
-    uint8_t* pos = p++;
+    const uint8_t* p = first+1;
+    const uint8_t* pos = p++;
+
+    JSONCONS_ASSERT(get_major_type(*pos) == cbor_major_type::array);
+    JSONCONS_ASSERT(get_additional_information_value(*pos) == 2);
+
+    pos = p++;
+    int64_t exponent = 0;
+    switch (get_major_type(*pos))
+    {
+        case cbor_major_type::unsigned_integer:
+        {
+            exponent = detail::get_uint64_value(pos,last,endpp);
+            if (*endpp == pos)
+            {
+                return s;
+            }
+            p = *endpp;
+            break;
+        }
+        case cbor_major_type::negative_integer:
+        {
+            exponent = detail::get_int64_value(pos,last,endpp);
+            if (*endpp == pos)
+            {
+                return s;
+            }
+            p = *endpp;
+            break;
+        }
+        default:
+            throw std::invalid_argument("Invalid decimal, integer expected");
+    }
+
+    pos = p++;
     switch (get_major_type(*pos))
     {
         case cbor_major_type::unsigned_integer:
@@ -1792,19 +1825,11 @@ std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last,
             uint64_t val = detail::get_uint64_value(pos,last,endpp);
             if (*endpp == pos)
             {
-                ec = cbor_parse_errc::unexpected_eof;
-                return;
+                return s;
             }
+            jsoncons::detail::string_writer<std::string> writer(s);
+            jsoncons::detail::print_integer(val, writer);
             p = *endpp;
-
-            if (has_semantic_tag && semantic_tag == 1)
-            {
-                handler_.uint64_value(val, semantic_tag_type::epoch_time, *this);
-            }
-            else
-            {
-                handler_.uint64_value(val, semantic_tag_type::na, *this);
-            }
             break;
         }
         case cbor_major_type::negative_integer:
@@ -1812,22 +1837,69 @@ std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last,
             int64_t val = detail::get_int64_value(pos,last,endpp);
             if (*endpp == pos)
             {
-                ec = cbor_parse_errc::unexpected_eof;
-                return;
+                return s;
             }
+            jsoncons::detail::string_writer<std::string> writer(s);
+            jsoncons::detail::print_uinteger(val, writer);
             p = *endpp;
-            if (has_semantic_tag && semantic_tag == 1)
+            break;
+        }
+        case cbor_major_type::semantic_tag:
+        {
+            uint8_t tag = get_additional_information_value(*pos);
+            pos = p++;
+            if (get_major_type(*pos) == cbor_major_type::byte_string)
             {
-                handler_.int64_value(val, semantic_tag_type::epoch_time, *this);
-            }
-            else 
-            {
-                handler_.int64_value(val, semantic_tag_type::na, *this);
+                std::vector<uint8_t> v = detail::get_byte_string(pos,last,endpp);
+                if (*endpp == pos)
+                {
+                    return s;
+                }
+                p = *endpp;
+                if (tag == 2)
+                {
+                    bignum n(1, v.data(), v.size());
+                    n.dump(s);
+                }
+                else if (tag == 3)
+                {
+                    bignum n(-1, v.data(), v.size());
+                    n.dump(s);
+                }
             }
             break;
         }
+        default:
+            throw std::invalid_argument("Invalid decimal, integer or bignum expected");
     }
-
+    if (exponent < 0)
+    {
+        int64_t len = static_cast<int64_t >(s.length()) + exponent;
+        if (len > 0)
+        {
+            s.insert(len, ".");
+        }
+        else 
+        {
+            for (size_t i = 0; i < static_cast<size_t>(-len); ++i)
+            {
+                s.insert(0, "0");
+            }
+            s.insert(0, "0.");
+        }
+    }
+    else if (exponent == 0)
+    {
+        s.append(".0");
+    }
+    else if (exponent > 0)
+    {
+        for (size_t i = 0; i < static_cast<size_t>(exponent); ++i)
+        {
+            s.push_back('0');
+        }
+        s.append(".0");
+    }
     return s;
 }
 
@@ -1870,7 +1942,24 @@ public:
         if (get_major_type(*input_ptr_) == cbor_major_type::semantic_tag)
         {
             has_semantic_tag = true;
-            semantic_tag = get_additional_information_value(*input_ptr_++);
+            semantic_tag = get_additional_information_value(*input_ptr_);
+            if (semantic_tag == 4)
+            {
+                const uint8_t* endp;
+                std::string s = cbor::detail::get_decimal_as_string(input_ptr_,end_input_,&endp);
+                if (endp == input_ptr_)
+                {
+                    ec = cbor_parse_errc::unexpected_eof;
+                    return;
+                }
+                handler_.string_value(s, semantic_tag_type::decimal);
+                input_ptr_ = endp;
+                return;
+            }
+            else
+            {
+                input_ptr_++;
+            }
         }
 
         const uint8_t* pos = input_ptr_++;
