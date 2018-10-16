@@ -226,7 +226,7 @@ int main()
               626172 -- 'b''a''r'
             c3 -- Bignum
               49 -- Byte string value of length 9
-              010000000000000000 -- Bytes content
+                010000000000000000 -- Bytes content
           ff -- "break" 
 */
         cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
