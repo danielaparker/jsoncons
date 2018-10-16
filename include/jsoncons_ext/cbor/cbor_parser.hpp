@@ -992,36 +992,6 @@ double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** end
 }
 
 inline 
-bool is_array(uint8_t b) 
-{
-    return (b >= 0x80 && b <= 0x9b) || b == 0x9f; 
-}
-
-inline 
-bool is_object(uint8_t b) 
-{
-    return (b >= 0xa0 && b <= 0xbb) || b == 0xb8;
-}
-
-inline
-bool is_string(uint8_t b)
-{
-    return (b >= 0x60 && b <= 0x7b) || b == 0x7f;
-}
-
-inline
-bool is_bool(uint8_t b)
-{
-    return b == 0xf5 || b == 0xf4;
-}
-
-inline
-bool is_double(uint8_t b)
-{
-    return b == 0xf9 || b == 0xfa || b == 0xfb;
-}
-
-inline 
 void walk(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (first >= last)

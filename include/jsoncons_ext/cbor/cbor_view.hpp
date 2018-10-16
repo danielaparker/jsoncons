@@ -151,18 +151,20 @@ public:
 
     uint8_t type() const
     {
+        JSONCONS_ASSERT(buflen() > 0);
         return first_[0];
     }
 
     cbor_major_type major_type() const
     {
-        return get_major_type(type());
+        JSONCONS_ASSERT(buflen() > 0);
+        return get_major_type(first_[0]);
     }
 
-    bool is_null() const
+    uint8_t additional_information_value() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return type() == 0xf6;
+        return get_additional_information_value(first_[0]);
     }
 
     bool empty() const
@@ -192,53 +194,72 @@ public:
         return is_empty;
     }
 
+    bool is_null() const
+    {
+        return major_type() == cbor_major_type::simple && additional_information_value() == 22;
+    }
+
     bool is_array() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_array(type());
+        return major_type() == cbor_major_type::array;
     }
 
     bool is_object() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_object(type());
+        return major_type() == cbor_major_type::map;
     }
 
     bool is_string() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
-        return get_major_type(type()) == cbor_major_type::text_string;
+        return major_type() == cbor_major_type::text_string;
     }
 
     bool is_byte_string() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
-        return get_major_type(type()) == cbor_major_type::byte_string;
+        return major_type() == cbor_major_type::byte_string;
     }
 
     bool is_bignum() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
-        uint8_t info = get_additional_information_value(type());
-        return get_major_type(type()) == cbor_major_type::semantic_tag && (info == 2 || info == 3);
+        uint8_t info = additional_information_value();
+        return major_type() == cbor_major_type::semantic_tag && (info == 2 || info == 3);
     }
 
     bool is_bool() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_bool(type());
+        if (major_type() != cbor_major_type::simple)
+        {
+            return false;
+        }
+        switch (additional_information_value())
+        {
+            case 20:
+            case 21:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_double() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_double(type());
+        if (major_type() != cbor_major_type::simple)
+        {
+            return false;
+        }
+        switch (additional_information_value())
+        {
+            case 25:
+            case 26:
+            case 27:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_int64() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
-
         switch (major_type())
         {
             case cbor_major_type::negative_integer:
@@ -268,7 +289,6 @@ public:
 
     bool is_uint64() const
     {
-        JSONCONS_ASSERT(buflen() > 0);
         return major_type() == cbor_major_type::unsigned_integer;
     }
 
@@ -495,7 +515,7 @@ public:
             }
             case cbor_major_type::semantic_tag:
             {
-                uint8_t tag = get_additional_information_value(type());
+                uint8_t tag = additional_information_value();
                 switch (tag)
                 {
                     case 2:
@@ -564,7 +584,7 @@ public:
         {
             case cbor_major_type::semantic_tag:
             {
-                uint8_t tag = get_additional_information_value(type());
+                uint8_t tag = additional_information_value();
                 switch (tag)
                 {
                     case 2:
@@ -747,7 +767,7 @@ public:
             }
             case cbor_major_type::semantic_tag:
             {
-                uint8_t tag = get_additional_information_value(type());
+                uint8_t tag = additional_information_value();
                 if (tag == 2)
                 {
                     const uint8_t* endp;
