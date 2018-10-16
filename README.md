@@ -24,8 +24,8 @@ booleans, numbers, strings, arrays, objects - to accomodate byte
 strings, date-time values, epoch time values, big numbers, and 
 decimal fractions. This allows it to preserve these type semantics 
 when parsing JSON-like data formats such as CBOR that support them. 
-It also allows it to preserve the precision of JSON numbers that overflow
-the range for 64 bit integers or the precision of doubles.
+It also allows it to accurately represent JSON numbers that overflow
+the range for 64 bit integers or exceed the precision of doubles.
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 
