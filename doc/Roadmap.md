@@ -2,8 +2,8 @@
 
 ### Targeting release 0.111.0
 
-- Add `semantic_tag_type::decimal`. Map cbor Decimal Fractions and 
-  Bigfloats to string values with this tag.
+- Add `semantic_tag_type::decimal`. Map cbor Decimal Fractions 
+  to string values with this tag.
 
 - Improve `cbor_view`
 
