@@ -42,9 +42,9 @@ namespace readme
               666f6f -- "foo" 
             43 -- Byte string value of length 3
               626172 -- 'b''a''r'
-            c3 -- Bignum
+            c3 -- Tag 3 (negative bignum)
               49 -- Byte string value of length 9
-              010000000000000000 -- Bytes content
+                010000000000000000 -- Bytes content
           ff -- "break" 
 */
         cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
@@ -112,7 +112,7 @@ namespace readme
               666f6f -- "foo" 
             43 -- Byte string value of length 3
               626172 -- 'b''a''r'
-            c3 -- Bignum
+            c3 -- Tag 3 (negative bignum)
             49 -- Byte string value of length 9
               010000000000000000 -- Bytes content
           83 -- Another array of length 3
