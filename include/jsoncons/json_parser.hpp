@@ -2657,7 +2657,7 @@ private:
                 string_buffer_.push_back(c);
             }
 
-            continue_ = handler_.string_value(string_view_type(string_buffer_.data(), string_buffer_.length()), semantic_tag_type::bignum, *this);
+            continue_ = handler_.string_value(string_buffer_, semantic_tag_type::bignum, *this);
             after_value(ec);
         }
     }
@@ -2678,7 +2678,7 @@ private:
                 string_buffer_.push_back(c);
             }
 
-            continue_ = handler_.string_value(string_view_type(string_buffer_.data(), string_buffer_.length()), semantic_tag_type::bignum, *this);
+            continue_ = handler_.string_value(string_buffer_, semantic_tag_type::bignum, *this);
         }
         after_value(ec);
     }
