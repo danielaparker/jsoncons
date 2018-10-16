@@ -885,77 +885,57 @@ inline
 double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     double val = 0;
-    if (JSONCONS_UNLIKELY(last <= first))
+    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::simple))
     {
         *endp = first; 
+        return val;
     }
-    else
+
+    const uint8_t* p = first+1;
+
+    uint8_t info = get_additional_information_value(*first);
+    switch (info)
     {
-        const size_t length = last - first;
-        const uint8_t* p = first+1;
-        switch (*first)
+    case 0x19: // Half-Precision Float (two-byte IEEE 754)
         {
-        case 0xf9: // Half-Precision Float (two-byte IEEE 754)
+            uint16_t x = binary::from_big_endian<uint16_t>(p,last,endp);
+            if (*endp == p)
             {
-                if (JSONCONS_UNLIKELY(1+sizeof(uint16_t) > length))
-                {
-                    *endp = first; 
-                }
-                else
-                {
-                    uint16_t x = binary::from_big_endian<uint16_t>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                    else
-                    {
-                        val = binary::decode_half(x);
-                    }
-                }
+                *endp = first;
             }
-            break;
-
-
-        case 0xfa: // Single-Precision Float (four-byte IEEE 754)
+            else
             {
-                if (JSONCONS_UNLIKELY(1+sizeof(float) > length))
-                {
-                    *endp = first; 
-                }
-                else
-                {
-                    val = binary::from_big_endian<float>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                }
-            }
-            break;
-
-        case 0xfb: //  Double-Precision Float (eight-byte IEEE 754)
-            {
-                if (JSONCONS_UNLIKELY(1+sizeof(double) > length))
-                {
-                    *endp = first; 
-                }
-                else
-                {
-                    val = binary::from_big_endian<double>(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                    }
-                }
-            }
-            break;
-        default:
-            {
-                *endp = first; 
+                val = binary::decode_half(x);
             }
         }
+        break;
+
+
+    case 0x1a: // Single-Precision Float (four-byte IEEE 754)
+        {
+            val = binary::from_big_endian<float>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+        }
+        break;
+
+    case 0x1b: //  Double-Precision Float (eight-byte IEEE 754)
+        {
+            val = binary::from_big_endian<double>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+        }
+        break;
+    default:
+        {
+            *endp = first; 
+        }
     }
+    
     return val;
 }
 
