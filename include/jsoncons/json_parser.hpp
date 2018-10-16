@@ -145,7 +145,6 @@ template <class CharT, class Allocator = std::allocator<char>>
 class basic_json_parser : private serializing_context
 {
     static const size_t initial_string_buffer_capacity_ = 1024;
-    static const size_t initial_number_buffer_capacity_ = 64;
     static const int default_initial_stack_capacity_ = 100;
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
 
@@ -162,7 +161,6 @@ class basic_json_parser : private serializing_context
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
 
     std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
-    std::basic_string<char,std::char_traits<char>,numeral_allocator_type> number_buffer_;
 
     int initial_stack_capacity_;
     size_t max_nesting_depth_;
@@ -251,7 +249,6 @@ public:
          done_(false)
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
-        number_buffer_.reserve(initial_number_buffer_capacity_);
 
         state_stack_.reserve(initial_stack_capacity_);
         push_state(json_parse_state::root);
@@ -674,7 +671,8 @@ public:
                             if (ec) return;
                             break;
                         case '-':
-                            number_buffer_.push_back('-');
+                            string_buffer_.clear();
+                            string_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
                             ++column_;
@@ -683,8 +681,9 @@ public:
                             if (ec) {return;}
                             break;
                         case '0': 
+                            string_buffer_.clear();
                             precision_ = 1;
-                            number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                            string_buffer_.push_back(static_cast<char>(*input_ptr_));
                             state_ = json_parse_state::zero;
                             ++input_ptr_;
                             ++column_;
@@ -692,8 +691,9 @@ public:
                             if (ec) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            string_buffer_.clear();
                             precision_ = 1;
-                            number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                            string_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
                             ++column_;
                             state_ = json_parse_state::integer;
@@ -1071,7 +1071,8 @@ public:
                             if (ec) return;
                             break;
                         case '-':
-                            number_buffer_.push_back('-');
+                            string_buffer_.clear();
+                            string_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
                             ++column_;
@@ -1080,8 +1081,9 @@ public:
                             if (ec) {return;}
                             break;
                         case '0': 
+                            string_buffer_.clear();
                             precision_ = 1;
-                            number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                            string_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
                             ++column_;
                             state_ = json_parse_state::zero;
@@ -1089,8 +1091,9 @@ public:
                             if (ec) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            string_buffer_.clear();
                             precision_ = 1;
-                            number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                            string_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
                             ++column_;
                             state_ = json_parse_state::integer;
@@ -1218,7 +1221,8 @@ public:
                             if (ec) return;
                             break;
                         case '-':
-                            number_buffer_.push_back('-');
+                            string_buffer_.clear();
+                            string_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
                             ++column_;
@@ -1227,8 +1231,9 @@ public:
                             if (ec) {return;}
                             break;
                         case '0': 
+                            string_buffer_.clear();
                             precision_ = 1;
-                            number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                            string_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
                             ++column_;
                             state_ = json_parse_state::zero;
@@ -1236,8 +1241,9 @@ public:
                             if (ec) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            string_buffer_.clear();
                             precision_ = 1;
-                            number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                            string_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
                             ++column_;
                             state_ = json_parse_state::integer;
@@ -1708,13 +1714,13 @@ minus_sign:
         switch (*input_ptr_)
         {
             case '0': 
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++precision_;
                 ++input_ptr_;
                 ++column_;
                 goto zero;
             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++precision_;
                 ++input_ptr_;
                 ++column_;
@@ -1774,12 +1780,12 @@ zero:
                 return;
             case '.':
                 decimal_places_ = 0; 
-                number_buffer_.push_back(to_double_.get_decimal_point());
+                string_buffer_.push_back(to_double_.get_decimal_point());
                 ++input_ptr_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto exp1;
@@ -1852,19 +1858,19 @@ integer:
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++precision_;
                 ++input_ptr_;
                 ++column_;
                 goto integer;
             case '.':
                 decimal_places_ = 0; 
-                number_buffer_.push_back(to_double_.get_decimal_point());
+                string_buffer_.push_back(to_double_.get_decimal_point());
                 ++input_ptr_;
                 ++column_;
                 goto fraction1;
             case 'e':case 'E':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto exp1;
@@ -1894,7 +1900,7 @@ fraction1:
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 ++precision_;
                 ++decimal_places_;
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto fraction2;
@@ -1963,12 +1969,12 @@ fraction2:
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 ++precision_;
                 ++decimal_places_;
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto fraction2;
             case 'e':case 'E':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto exp1;
@@ -1992,12 +1998,12 @@ exp1:
                 ++column_;
                 goto exp2;
             case '-':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto exp2;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto exp3;
@@ -2017,7 +2023,7 @@ exp2:
         switch (*input_ptr_)
         {
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto exp3;
@@ -2085,7 +2091,7 @@ exp3:
                 ++column_;
                 return;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                number_buffer_.push_back(static_cast<char>(*input_ptr_));
+                string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
                 ++column_;
                 goto exp3;
@@ -2626,7 +2632,7 @@ private:
 
     void end_integer_value(std::error_code& ec)
     {
-        if (number_buffer_[0] == '-')
+        if (string_buffer_[0] == '-')
         {
             end_negative_value(ec);
         }
@@ -2634,12 +2640,11 @@ private:
         {
             end_positive_value(ec);
         }
-        number_buffer_.clear();
     }
 
     void end_negative_value(std::error_code& ec)
     {
-        auto result = jsoncons::detail::to_integer<int64_t>(number_buffer_.data(), number_buffer_.length());
+        auto result = jsoncons::detail::to_integer<int64_t>(string_buffer_.data(), string_buffer_.length());
         if (!result.overflow)
         {
             continue_ = handler_.int64_value(result.value, semantic_tag_type::na, *this);
@@ -2647,12 +2652,6 @@ private:
         }
         else
         {
-            string_buffer_.clear();
-            for (auto c : number_buffer_)
-            {
-                string_buffer_.push_back(c);
-            }
-
             continue_ = handler_.string_value(string_buffer_, semantic_tag_type::bignum, *this);
             after_value(ec);
         }
@@ -2660,7 +2659,7 @@ private:
 
     void end_positive_value(std::error_code& ec)
     {
-        auto result = jsoncons::detail::to_integer<uint64_t>(number_buffer_.data(), number_buffer_.length());
+        auto result = jsoncons::detail::to_integer<uint64_t>(string_buffer_.data(), string_buffer_.length());
         if (!result.overflow)
         {
             continue_ = handler_.uint64_value(result.value, semantic_tag_type::na, *this);
@@ -2668,12 +2667,6 @@ private:
         }
         else
         {
-            string_buffer_.clear();
-            for (auto c : number_buffer_)
-            {
-                string_buffer_.push_back(c);
-            }
-
             continue_ = handler_.string_value(string_buffer_, semantic_tag_type::bignum, *this);
         }
         after_value(ec);
@@ -2683,15 +2676,10 @@ private:
     {
         try
         {
-            double d = to_double_(number_buffer_.c_str(), number_buffer_.length());
+            double d = to_double_(string_buffer_.c_str(), string_buffer_.length());
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                string_buffer_.clear();
-                for (auto c : number_buffer_)
-                {
-                    string_buffer_.push_back(c);
-                }
                 continue_ = handler_.string_value(string_buffer_, semantic_tag_type::decimal, *this);
             }
             else
@@ -2712,7 +2700,6 @@ private:
         }
 
         after_value(ec);
-        number_buffer_.clear();
     }
 
     void append_codepoint(int c, std::error_code& ec)
