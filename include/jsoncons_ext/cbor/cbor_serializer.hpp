@@ -325,8 +325,8 @@ private:
     void write_decimal_value(const string_view_type& sv, const serializing_context& context)
     {
         decimal_parse_state state = decimal_parse_state::start;
-        std::string s;
-        std::string exponent;
+        std::basic_string<CharT> s;
+        std::basic_string<CharT> exponent;
         int64_t scale = 0;
         for (auto c : sv)
         {

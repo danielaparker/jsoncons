@@ -58,7 +58,7 @@ public:
         const uint8_t* endp;
         const uint8_t* begin;
 
-        if (data_type() == cbor_major_type::map)
+        if (major_type() == cbor_major_type::map)
         {
             detail::get_size(first_,last_,&begin);
             if (begin == first_)
@@ -80,7 +80,7 @@ public:
         const uint8_t* endp;
         const uint8_t* begin;
 
-        if (data_type() == cbor_major_type::array)
+        if (major_type() == cbor_major_type::array)
         {
             /*size_t n = */ detail::get_size(first_,last_,&begin);
             if (begin == first_)
@@ -154,7 +154,7 @@ public:
         return first_[0];
     }
 
-    cbor_major_type data_type() const
+    cbor_major_type major_type() const
     {
         return get_major_type(type());
     }
@@ -238,13 +238,38 @@ public:
     bool is_int64() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_integer(first_,last_);
+
+        switch (major_type())
+        {
+            case cbor_major_type::negative_integer:
+                return true;
+            case cbor_major_type::unsigned_integer:
+            {
+                const uint8_t* endp;
+                uint64_t x = detail::get_uint64_value(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    return false;
+                }
+                if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                break;
+            }
+            default:
+                return false;
+        }
     }
 
     bool is_uint64() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_uinteger(type());
+        return major_type() == cbor_major_type::unsigned_integer;
     }
 
     size_t size() const
@@ -444,7 +469,7 @@ public:
 
     std::string as_string() const
     {
-        switch (data_type())
+        switch (major_type())
         {
             case cbor_major_type::text_string:
             {
@@ -513,7 +538,7 @@ public:
     template <typename BAllocator=std::allocator<char>>
     basic_byte_string<BAllocator> as_byte_string() const
     {
-        switch (data_type())
+        switch (major_type())
         {
             case cbor_major_type::byte_string:
             {
@@ -535,7 +560,7 @@ public:
 
     bignum as_bignum() const
     {
-        switch (data_type())
+        switch (major_type())
         {
             case cbor_major_type::semantic_tag:
             {
@@ -637,7 +662,7 @@ public:
     {
         // If it's a non indefinite length string, dump view
         // If it's an indefinite length string, dump view
-        switch (data_type())
+        switch (major_type())
         {
             case cbor_major_type::unsigned_integer:
             {
@@ -800,13 +825,13 @@ public:
     bool is_integer() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_integer(first_,last_);
+        return is_int64();
     }
 
     bool is_uinteger() const
     {
         JSONCONS_ASSERT(buflen() > 0);
-        return detail::is_uinteger(type());
+        return is_uint64();
     }
 
     void dump_fragment(json_content_handler& handler) const
