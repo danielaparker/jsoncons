@@ -197,98 +197,139 @@ using namespace jsoncons;
 
 int main()
 {
-    // Construct some CBOR using the streaming API
-    std::vector<uint8_t> b;
-    cbor::cbor_bytes_serializer writer(b);
-    writer.begin_array(); // indefinite length array containing rows
-    writer.begin_array(3); // fixed length array
-    writer.string_value("foo");
-    writer.byte_string_value({'b','a','r'});
-    writer.bignum_value("-18446744073709551617");
-    writer.end_array();
-    writer.end_array();
-    writer.flush();
+        // Construct some CBOR using the streaming API
+        std::vector<uint8_t> b;
+        cbor::cbor_bytes_serializer writer(b);
+        writer.begin_array(); // indefinite length array containing rows
+        writer.begin_array(3); // a row, fixed length array
+        writer.string_value("foo");
+        writer.byte_string_value({'b','a','r'});
+        writer.bignum_value("-18446744073709551617");
+        writer.end_array();
+        writer.end_array();
+        writer.flush();
 
-    // Print bytes
-    std::cout << "(1)\n";
-    for (auto x : b)
-    {
-        std::cout << std::hex << (int)x;
+        // Print bytes
+        std::cout << "(1)\n";
+        for (auto c : b)
+        {
+            std::cout << std::hex << std::setprecision(2) << std::setw(2)
+                      << std::setfill('0') << static_cast<int>(c);
+        }
+        std::cout << "\n\n";
+/*
+        9f -- Start indefinte length array
+          83 -- Array of length 3
+            63 -- String value of length 3
+              666f6f -- "foo" 
+            43 -- Byte string value of length 3
+              626172 -- 'b''a''r'
+            c3 -- Bignum
+              49 -- Byte string value of length 9
+              010000000000000000 -- Bytes content
+          ff -- "break" 
+*/
+        cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
+
+        // Loop over the rows
+        std::cout << "(2)\n";
+        for (cbor::cbor_view row : bv.array_range())
+        {
+            std::cout << row << "\n";
+        }
+        std::cout << "\n";
+
+        // Get element at position 0/2 using jsonpointer (must be by value)
+        cbor::cbor_view v = jsonpointer::get(bv, "/0/2");
+        std::cout << "(3) " << v.as<std::string>() << "\n\n";
+
+        // Print JSON representation with default options
+        std::cout << "(4)\n";
+        std::cout << pretty_print(bv) << "\n\n";
+
+        // Print JSON representation with different options
+        json_serializing_options options;
+        options.byte_string_format(byte_string_chars_format::base64)
+               .bignum_format(bignum_chars_format::base64url);
+        std::cout << "(5)\n";
+        std::cout << pretty_print(bv, options) << "\n\n";
+
+        // Unpack bytes into a json variant value, and add some more elements
+        json j = cbor::decode_cbor<json>(bv);
+
+        json another_row = json::array(); 
+        another_row.emplace_back(byte_string({'q','u','x'}));
+        another_row.emplace_back("273.15", semantic_tag_type::decimal);
+        another_row.emplace(another_row.array_range().begin(),"baz");
+
+        j.push_back(std::move(another_row));
+        std::cout << "(6)\n";
+        std::cout << pretty_print(j) << "\n\n";
+
+        // Get element at position /1/2 using jsonpointer (can be by reference)
+        json& ref = jsonpointer::get(j, "/1/2");
+        std::cout << "(7) " << ref.as<std::string>() << "\n\n";
+
+        // If code compiled with GCC and std=gnu++11 (rather than std=c++11)
+        __int128 i = j[1][2].as<__int128>();
+
+        // Repack bytes
+        std::vector<uint8_t> b2;
+        cbor::encode_cbor(j, b2);
+
+        // Print the repacked bytes
+        std::cout << "(8)\n";
+        for (auto c : b2)
+        {
+            std::cout << std::hex << std::setprecision(2) << std::setw(2)
+                      << std::setfill('0') << static_cast<int>(c);
+        }
+        std::cout << "\n\n";
+/*
+        82 -- Array of length 2
+          83 -- Array of length 3
+            63 -- String value of length 3
+              666f6f -- "foo" 
+            43 -- Byte string value of length 3
+              626172 -- 'b''a''r'
+            c3 -- Bignum
+            49 -- Byte string value of length 9
+              010000000000000000 -- Bytes content
+          83 -- Another array of length 3
+          63 -- String value of length 3
+            62617a -- "baz" 
+          43 -- Byte string value of length 3
+            717578 -- 'q''u''x'
+          c4 - Tag 4 (decimal fraction)
+            82 - Array of length 2
+              21 -- -2
+              19 6ab3 -- 27315
+*/
+        std::cout << "(9)\n";
+        cbor::cbor_view bv2 = b2;
+        std::cout << pretty_print(bv2) << "\n\n";
+
+        // Serialize to CSV
+        csv::csv_serializing_options csv_options;
+        csv_options.column_names("Column 1,Column 2,Column 3");
+
+        std::string csv_j;
+        csv::encode_csv(j, csv_j, csv_options);
+        std::cout << "(10)\n";
+        std::cout << csv_j << "\n\n";
+
+        std::string csv_bv2;
+        csv::encode_csv(bv2, csv_bv2, csv_options);
+        std::cout << "(11)\n";
+        std::cout << csv_bv2 << "\n\n";
     }
-    std::cout << "\n\n";
-
-    cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
-
-    // Loop over the rows
-    std::cout << "(2)\n";
-    for (cbor::cbor_view row : bv.array_range())
-    {
-        std::cout << row << "\n";
-    }
-    std::cout << "\n";
-
-    // Get element at position 0/2 using jsonpointer (must be by value)
-    cbor::cbor_view v = jsonpointer::get(bv, "/0/2");
-    std::cout << "(3) " << v.as<std::string>() << "\n\n";
-
-    // Print JSON representation with default options
-    std::cout << "(4)\n";
-    std::cout << pretty_print(bv) << "\n\n";
-
-    // Print JSON representation with different options
-    json_serializing_options options;
-    options.byte_string_format(byte_string_chars_format::base64)
-           .bignum_format(bignum_chars_format::base64url);
-    std::cout << "(5)\n";
-    std::cout << pretty_print(bv, options) << "\n\n";
-
-    // Unpack bytes into a json variant value, and add some more elements
-    json j = cbor::decode_cbor<json>(bv);
-
-    json r = json::array(); 
-    r.emplace_back(byte_string({'q','u','x'}));
-    r.emplace_back(bignum("18446744073709551616"));
-    // or, r.emplace_back("18446744073709551616", semantic_tag_type::bignum);
-    r.emplace(r.array_range().begin(),"baz");
-
-    j.push_back(std::move(r));
-    std::cout << "(6)\n";
-    std::cout << pretty_print(j) << "\n\n";
-
-    // Get element at position /1/2 using jsonpointer (can be by reference)
-    json& ref = jsonpointer::get(j, "/1/2");
-    std::cout << "(7) " << ref.as<std::string>() << "\n\n";
-
-    // If code compiled with GCC and std=gnu++11 (rather than std=c++11)
-    __int128 i = j[1][2].as<__int128>();
-
-    // Repack bytes
-    std::vector<uint8_t> b2;
-    cbor::encode_cbor(j, b2);
-    std::cout << "(8)\n";
-    cbor::cbor_view bv2 = b2;
-    std::cout << pretty_print(bv2) << "\n\n";
-
-    // Serialize to CSV
-    csv::csv_serializing_options csv_options;
-    csv_options.column_names("Column 1,Column 2,Column 3");
-
-    std::string csv_j;
-    csv::encode_csv(j, csv_j, csv_options);
-    std::cout << "(9)\n";
-    std::cout << csv_j << "\n\n";
-
-    std::string csv_bv2;
-    csv::encode_csv(bv2, csv_bv2, csv_options);
-    std::cout << "(10)\n";
-    std::cout << csv_bv2 << "\n\n";
 }
 
 ```
 Output:
 ```
 (1)
-9f8363666f6f43626172c349100000000ff
+9f8363666f6f43626172c349010000000000000000ff
 
 (2)
 ["foo","YmFy","-18446744073709551617"]
@@ -308,30 +349,33 @@ Output:
 (6)
 [
     ["foo","YmFy","-18446744073709551617"],
-    ["baz","cXV4","18446744073709551616"]
+    ["baz","cXV4","273.15"]
 ]
 
-(7) 18446744073709551616
+(7) 273.15
 
 (8)
-[
-    ["foo","YmFy","-18446744073709551617"],
-    ["baz","cXV4","18446744073709551616"]
-]
+828363666f6f43626172c349010000000000000000836362617a43717578c48221196ab3
 
 (9)
-Column 1,Column 2,Column 3
-foo,YmFy,-18446744073709551617
-baz,cXV4,18446744073709551616
-
+[
+    ["foo","YmFy","-18446744073709551617"],
+    ["baz","cXV4","273.15"]
+]
 
 (10)
 Column 1,Column 2,Column 3
 foo,YmFy,-18446744073709551617
-baz,cXV4,18446744073709551616
+baz,cXV4,273.15
+
+
+(11)
+Column 1,Column 2,Column 3
+foo,YmFy,-18446744073709551617
+baz,cXV4,273.15
 ```
 
-### Convert unpacked json values to standard library types and back
+### Convert json values to standard library types and back
 
 ```c++
 std::vector<int> v{1, 2, 3, 4};

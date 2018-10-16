@@ -743,6 +743,16 @@ public:
                     }
                     handler.bignum_value(-1, v.data(), v.size());
                 }
+                else if (tag == 4)
+                {
+                    const uint8_t* endp;
+                    std::string s = cbor::detail::get_decimal_as_string(first_,last_,&endp);
+                    if (endp == first_)
+                    {
+                        JSONCONS_THROW(cbor_decode_error(0));
+                    }
+                    handler.string_value(s, semantic_tag_type::decimal);
+                }
                 break;
             }
             case cbor_major_type::simple:

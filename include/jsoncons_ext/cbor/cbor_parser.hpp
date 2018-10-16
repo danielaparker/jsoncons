@@ -1348,8 +1348,11 @@ void walk(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
                     walk_object(first,last,endp);
                     break;
                 }
+            case 0xC0:
+            case 0xC1:
             case 0xC2:
             case 0xC3:
+            case 0xC4:
                 walk(p, last, endp);
                 break;
 

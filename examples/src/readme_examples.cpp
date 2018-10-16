@@ -19,7 +19,7 @@ namespace readme
         std::vector<uint8_t> b;
         cbor::cbor_bytes_serializer writer(b);
         writer.begin_array(); // indefinite length array containing rows
-        writer.begin_array(3); // fixed length array
+        writer.begin_array(3); // a row, fixed length array
         writer.string_value("foo");
         writer.byte_string_value({'b','a','r'});
         writer.bignum_value("-18446744073709551617");
@@ -29,12 +29,24 @@ namespace readme
 
         // Print bytes
         std::cout << "(1)\n";
-        for (auto x : b)
+        for (auto c : b)
         {
-            std::cout << std::hex << (int)x;
+            std::cout << std::hex << std::setprecision(2) << std::setw(2)
+                      << std::setfill('0') << static_cast<int>(c);
         }
         std::cout << "\n\n";
-
+/*
+        9f -- Start indefinte length array
+          83 -- Array of length 3
+            63 -- String value of length 3
+              666f6f -- "foo" 
+            43 -- Byte string value of length 3
+              626172 -- 'b''a''r'
+            c3 -- Bignum
+              49 -- Byte string value of length 9
+              010000000000000000 -- Bytes content
+          ff -- "break" 
+*/
         cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
 
         // Loop over the rows
@@ -63,13 +75,12 @@ namespace readme
         // Unpack bytes into a json variant value, and add some more elements
         json j = cbor::decode_cbor<json>(bv);
 
-        json r = json::array(); 
-        r.emplace_back(byte_string({'q','u','x'}));
-        r.emplace_back(bignum("18446744073709551616"));
-        // or, r.emplace_back("18446744073709551616", semantic_tag_type::bignum);
-        r.emplace(r.array_range().begin(),"baz");
+        json another_row = json::array(); 
+        another_row.emplace_back(byte_string({'q','u','x'}));
+        another_row.emplace_back("273.15", semantic_tag_type::decimal);
+        another_row.emplace(another_row.array_range().begin(),"baz");
 
-        j.push_back(std::move(r));
+        j.push_back(std::move(another_row));
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
@@ -85,7 +96,36 @@ namespace readme
         // Repack bytes
         std::vector<uint8_t> b2;
         cbor::encode_cbor(j, b2);
+
+        // Print the repacked bytes
         std::cout << "(8)\n";
+        for (auto c : b2)
+        {
+            std::cout << std::hex << std::setprecision(2) << std::setw(2)
+                      << std::setfill('0') << static_cast<int>(c);
+        }
+        std::cout << "\n\n";
+/*
+        82 -- Array of length 2
+          83 -- Array of length 3
+            63 -- String value of length 3
+              666f6f -- "foo" 
+            43 -- Byte string value of length 3
+              626172 -- 'b''a''r'
+            c3 -- Bignum
+            49 -- Byte string value of length 9
+              010000000000000000 -- Bytes content
+          83 -- Another array of length 3
+          63 -- String value of length 3
+            62617a -- "baz" 
+          43 -- Byte string value of length 3
+            717578 -- 'q''u''x'
+          c4 - Tag 4 (decimal fraction)
+            82 - Array of length 2
+              21 -- -2
+              19 6ab3 -- 27315
+*/
+        std::cout << "(9)\n";
         cbor::cbor_view bv2 = b2;
         std::cout << pretty_print(bv2) << "\n\n";
 
@@ -95,12 +135,12 @@ namespace readme
 
         std::string csv_j;
         csv::encode_csv(j, csv_j, csv_options);
-        std::cout << "(9)\n";
+        std::cout << "(10)\n";
         std::cout << csv_j << "\n\n";
 
         std::string csv_bv2;
         csv::encode_csv(bv2, csv_bv2, csv_options);
-        std::cout << "(10)\n";
+        std::cout << "(11)\n";
         std::cout << csv_bv2 << "\n\n";
     }
 }

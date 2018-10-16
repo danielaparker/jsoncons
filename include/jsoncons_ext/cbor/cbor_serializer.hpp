@@ -407,7 +407,6 @@ private:
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             s.push_back(c);
                             --scale;
-                            state = decimal_parse_state::integer;
                             break;
                         default:
                             throw std::invalid_argument("Invalid decimal string");
