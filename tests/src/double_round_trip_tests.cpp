@@ -18,10 +18,9 @@ TEST_CASE("test_precision")
     CHECK(17 == val.precision());
 
     s = "0.42229999999999997";
-    val = json::parse(s); // max precision > std::numeric_limits<double>::max_digits10
-    REQUIRE(structure_tag_type::long_string_tag == val.structure_tag());
-    CHECK(semantic_tag_type::decimal == val.semantic_tag());
-    CHECK(s == val.as<std::string>());
+    val = json::parse(s);
+    REQUIRE(structure_tag_type::double_tag == val.structure_tag());
+    CHECK(17 == val.precision()); // max is std::numeric_limits<double>::max_digits10
 
     val = json::parse("1.2345e+30");
     CHECK(5 == val.precision());

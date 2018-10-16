@@ -63,7 +63,8 @@ New feature:
 
 This release accomodate the additional semantics for the 
 CBOR data items date-time (a string), and epoch time (a positive or
-negative integer or floating point value.)
+negative integer or floating point value), and decimal fraction
+(converted in the jsoncons data model to a string).
 
 But first, some of the virtual functions in `json_content_handler` 
 have to be modified to preserve these semantics. Consequently, 

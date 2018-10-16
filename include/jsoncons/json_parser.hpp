@@ -2680,8 +2680,8 @@ private:
 
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
-                continue_ = handler_.string_value(string_buffer_, semantic_tag_type::decimal, *this);
-            }
+                continue_ = handler_.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), 
+                                                  semantic_tag_type::none, *this);            }
             else
             {
                 continue_ = handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), 
