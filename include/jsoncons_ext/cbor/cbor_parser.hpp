@@ -59,10 +59,6 @@ uint8_t get_additional_information_value(uint8_t type)
 #define JSONCONS_CBOR_0x00_0x17 \
         0x00:case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:case 0x07:case 0x08:case 0x09:case 0x0a:case 0x0b:case 0x0c:case 0x0d:case 0x0e:case 0x0f:case 0x10:case 0x11:case 0x12:case 0x13:case 0x14:case 0x15:case 0x16:case 0x17
 
-// UTF-8 string (0x00..0x17 bytes follow)
-#define JSONCONS_CBOR_0x60_0x77 \
-        0x60:case 0x61:case 0x62:case 0x63:case 0x64:case 0x65:case 0x66:case 0x67:case 0x68:case 0x69:case 0x6a:case 0x6b:case 0x6c:case 0x6d:case 0x6e:case 0x6f:case 0x70:case 0x71:case 0x72:case 0x73:case 0x74:case 0x75:case 0x76:case 0x77
-
 // array (0x00..0x17 data items follow)
 #define JSONCONS_CBOR_0x80_0x97 \
         0x80:case 0x81:case 0x82:case 0x83:case 0x84:case 0x85:case 0x86:case 0x87:case 0x88:case 0x89:case 0x8a:case 0x8b:case 0x8c:case 0x8d:case 0x8e:case 0x8f:case 0x90:case 0x91:case 0x92:case 0x93:case 0x94:case 0x95:case 0x96:case 0x97
@@ -493,113 +489,112 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     if (JSONCONS_UNLIKELY(last <= first))
     {
         *endp = first; 
+        return;
     }
-    else
+    const uint8_t* p = first+1;
+    uint8_t info = get_additional_information_value(*first);
+    switch (info)
     {
-        const uint8_t* p = first+1;
-        switch (*first)
+        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
         {
-            case JSONCONS_CBOR_0x80_0x97: // array (0x00..0x17 data items follow)
+            size = info;
+            *endp = p;
+            for (size_t i = 0; i < size; ++i)
             {
-                size = *first & 0x1f;
-                *endp = p;
+                walk(*endp, last, endp);
+            }
+            break;
+        }
+
+        case 0x18: // array (one-byte uint8_t for n follows)
+        {
+            size = binary::from_big_endian<uint8_t>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+            else
+            {
                 for (size_t i = 0; i < size; ++i)
                 {
                     walk(*endp, last, endp);
                 }
-                break;
             }
+            break;
+        }
 
-            case 0x98: // array (one-byte uint8_t for n follows)
+        case 0x19: // array (two-byte uint16_t for n follow)
+        {
+            size = binary::from_big_endian<uint16_t>(p,last,endp);
+            if (*endp == p)
             {
-                size = binary::from_big_endian<uint8_t>(p,last,endp);
+                *endp = first;
+            }
+            else
+            {
+                for (size_t i = 0; i < size; ++i)
+                {
+                    walk(*endp, last, endp);
+                }
+            }
+            break;
+        }
+
+        case 0x1a: // array (four-byte uint32_t for n follow)
+        {
+            size = binary::from_big_endian<uint32_t>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+            else
+            {
+                for (size_t i = 0; i < size; ++i)
+                {
+                    walk(*endp, last, endp);
+                }
+            }
+            break;
+        }
+
+        case 0x1b: // array (eight-byte uint64_t for n follow)
+        {
+            size = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+            else
+            {
+                for (size_t i = 0; i < size; ++i)
+                {
+                    walk(*endp, last, endp);
+                }
+            }
+            break;
+        }
+
+        case 0x1f: // array (indefinite length)
+        {
+            while (*p != 0xff)
+            {
+                walk(p, last, endp);
                 if (*endp == p)
                 {
                     *endp = first;
+                    break;
                 }
                 else
                 {
-                    for (size_t i = 0; i < size; ++i)
-                    {
-                        walk(*endp, last, endp);
-                    }
+                    p = *endp;
                 }
-                break;
             }
-
-            case 0x99: // array (two-byte uint16_t for n follow)
-            {
-                size = binary::from_big_endian<uint16_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    for (size_t i = 0; i < size; ++i)
-                    {
-                        walk(*endp, last, endp);
-                    }
-                }
-                break;
-            }
-
-            case 0x9a: // array (four-byte uint32_t for n follow)
-            {
-                size = binary::from_big_endian<uint32_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    for (size_t i = 0; i < size; ++i)
-                    {
-                        walk(*endp, last, endp);
-                    }
-                }
-                break;
-            }
-
-            case 0x9b: // array (eight-byte uint64_t for n follow)
-            {
-                size = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    for (size_t i = 0; i < size; ++i)
-                    {
-                        walk(*endp, last, endp);
-                    }
-                }
-                break;
-            }
-
-            case 0x9f: // array (indefinite length)
-            {
-                while (*p != 0xff)
-                {
-                    walk(p, last, endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                        break;
-                    }
-                    else
-                    {
-                        p = *endp;
-                    }
-                }
-                *endp = p;
-                break;
-            }
-            default:
-            {
-                *endp = first; 
-            }
+            *endp = p;
+            break;
+        }
+        default:
+        {
+            *endp = first; 
         }
     }
 }
@@ -1900,28 +1895,20 @@ private:
     void parse_name(std::error_code& ec)
     {
         const uint8_t* pos = input_ptr_++;
-        switch (*pos)
+        if (get_major_type(*pos) == cbor_major_type::text_string)
         {
-            // UTF-8 string (0x00..0x17 bytes follow)
-        case JSONCONS_CBOR_0x60_0x77:
-        case 0x78:
-        case 0x79:
-        case 0x7a:
-        case 0x7b:
-        case 0x7f:
+            const uint8_t* endp;
+            std::string s = detail::get_text_string(pos,end_input_,&endp);
+            if (endp == pos)
             {
-                const uint8_t* endp;
-                std::string s = detail::get_text_string(pos,end_input_,&endp);
-                if (endp == pos)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                ec = cbor_parse_errc::unexpected_eof;
+                return;
             }
-            break;
-        default:
+            input_ptr_ = endp;
+            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+        }
+        else
+        {
             ec = cbor_parse_errc::source_error;
             return;
         }
