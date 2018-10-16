@@ -686,6 +686,102 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
     if (JSONCONS_UNLIKELY(last <= first))
     {
         *endp = first; 
+        return val;
+    }
+
+    uint8_t info = get_additional_information_value(*first);
+    const uint8_t* p = first + 1;
+    switch (get_major_type(*first))
+    {
+        case cbor_major_type::negative_integer:
+            switch (info)
+            {
+                case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
+                    val = static_cast<int8_t>(- 1 - info);
+                    *endp = p;
+                    break;
+                case 0x18: // Negative integer (one-byte uint8_t follows)
+                    {
+                        auto x = binary::from_big_endian<uint8_t>(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
+                        else
+                        {
+                            val = static_cast<int64_t>(-1)- x;
+                        }
+                        break;
+                    }
+
+                case 0x19: // Negative integer -1-n (two-byte uint16_t follows)
+                    {
+                        auto x = binary::from_big_endian<uint16_t>(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
+                        else
+                        {
+                            val = static_cast<int64_t>(-1)- x;
+                        }
+                        break;
+                    }
+
+                case 0x1a: // Negative integer -1-n (four-byte uint32_t follows)
+                    {
+                        auto x = binary::from_big_endian<uint32_t>(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
+                        else
+                        {                       
+                            val = static_cast<int64_t>(-1)- x;
+                        }
+                        break;
+                    }
+
+                case 0x1b: // Negative integer -1-n (eight-byte uint64_t follows)
+                    {
+                        auto x = binary::from_big_endian<uint64_t>(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                        }
+                        else
+                        {
+                            val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
+                        }
+                        break;
+                    }
+                    break;
+            }
+        case cbor_major_type::unsigned_integer:
+            {
+                uint64_t x = detail::get_uint64_value(first,last,endp);
+                if (*endp != first)
+                {
+                    if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                    {
+                        val = x;
+                    }
+                    else
+                    {
+                        *endp = first;
+                    }
+                }
+                break;
+            }
+        default:
+            *endp = first; 
+            break;
+    }
+
+
+    if (JSONCONS_UNLIKELY(last <= first))
+    {
+        *endp = first; 
     }
     else
     {
