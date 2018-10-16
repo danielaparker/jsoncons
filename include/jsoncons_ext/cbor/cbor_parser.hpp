@@ -297,78 +297,78 @@ inline
 size_t get_text_string_length(const uint8_t* first, const uint8_t* last, 
                               const uint8_t** endp)
 {
-    size_t length = 0;
-    if (JSONCONS_UNLIKELY(last <= first))
+    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::text_string))
     {
         *endp = first; 
+        return 0;
     }
-    else
+
+    size_t length = 0;
+    const uint8_t* p = first+1;
+    switch (get_additional_information_value(*first))
     {
-        const uint8_t* p = first+1;
-        switch (*first)
+        case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
         {
-        case JSONCONS_CBOR_0x60_0x77: // UTF-8 string (0x00..0x17 bytes follow)
-            {
-                length = *first & 0x1f;
-                *endp = p;
-                break;
-            }
-        case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
-            {
-                length = binary::from_big_endian<uint8_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-        case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
-            {
-                length = binary::from_big_endian<uint16_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-        case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
-            {
-                length = binary::from_big_endian<uint32_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-        case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
-            {
-                length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-        case 0x7f: // UTF-8 string, text strings follow, terminated by "break"
-            {
-                length = 0;
-                while (*p != 0xff)
-                {
-                    size_t len = detail::get_text_string_length(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                        break;
-                    }
-                    length += len;
-                }
-                break;
-            }
-        default: 
-            *endp = first;
+            length = *first & 0x1f;
+            *endp = p;
             break;
         }
+        case 0x18: // one-byte uint8_t for n follows
+        {
+            length = binary::from_big_endian<uint8_t>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+            break;
+        }
+        case 0x19: // two-byte uint16_t for n follow
+        {
+            length = binary::from_big_endian<uint16_t>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+            break;
+        }
+        case 0x1a: // four-byte uint32_t for n follow
+        {
+            length = binary::from_big_endian<uint32_t>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+            break;
+        }
+        case 0x1b: // eight-byte uint64_t for n follow
+        {
+            length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
+            break;
+        }
+        case 0x1f: // terminated by "break"
+        {
+            length = 0;
+            while (*p != 0xff)
+            {
+                size_t len = detail::get_text_string_length(p,last,endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                    break;
+                }
+                length += len;
+            }
+            break;
+        }
+    default: 
+        *endp = first;
+        break;
     }
+    
     return length;
 }
 
