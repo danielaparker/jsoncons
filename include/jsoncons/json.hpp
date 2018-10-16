@@ -4167,14 +4167,6 @@ public:
         return basic_json(variant(o,allocator));
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    template <class T>
-    void add(T&& val)
-    {
-        push_back(std::forward<T>(val));
-    }
-
     template <class T>
     void push_back(T&& val)
     {
@@ -4188,6 +4180,14 @@ public:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Attempting to insert into a value that is not an array"));
             }
         }
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    template <class T>
+    void add(T&& val)
+    {
+        push_back(std::forward<T>(val));
     }
 
     template <class T>
