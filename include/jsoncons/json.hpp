@@ -3340,6 +3340,7 @@ public:
         case structure_tag_type::long_string_tag:
         {
             jsoncons::detail::string_to_double to_double;
+            // to_double() throws std::invalid_argument if conversion fails
             return to_double(as_string_view().data(), as_string_view().length());
         }
         case structure_tag_type::double_tag:
@@ -3349,7 +3350,7 @@ public:
         case structure_tag_type::uint64_tag:
             return static_cast<double>(var_.uint64_data_cast()->value());
         default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not a double"));
         }
     }
 
