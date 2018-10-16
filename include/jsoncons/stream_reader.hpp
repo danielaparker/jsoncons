@@ -41,6 +41,7 @@ enum class stream_event_type
     int64_value,
     uint64_value ,
     bignum_value,
+    decimal_value,
     double_value
 };
 

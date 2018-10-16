@@ -3341,7 +3341,7 @@ public:
         {
             jsoncons::detail::string_to_double to_double;
             // to_double() throws std::invalid_argument if conversion fails
-            return to_double(as_string_view().data(), as_string_view().length());
+            return to_double(as_cstring(), as_string_view().length());
         }
         case structure_tag_type::double_tag:
             return var_.double_data_cast()->value();
@@ -3422,6 +3422,19 @@ public:
         }
     }
 
+    const char_type* as_cstring() const
+    {
+        switch (var_.structure_tag())
+        {
+        case structure_tag_type::short_string_tag:
+            return var_.short_string_data_cast()->c_str();
+        case structure_tag_type::long_string_tag:
+            return var_.string_data_cast()->c_str();
+        default:
+            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a cstring"));
+        }
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     bool has_key(const string_view_type& name) const
@@ -3442,19 +3455,6 @@ public:
     int64_t as_uinteger() const
     {
         return as_integer<uint64_t>();
-    }
-
-    const char_type* as_cstring() const
-    {
-        switch (var_.structure_tag())
-        {
-        case structure_tag_type::short_string_tag:
-            return var_.short_string_data_cast()->c_str();
-        case structure_tag_type::long_string_tag:
-            return var_.string_data_cast()->c_str();
-        default:
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a cstring"));
-        }
     }
 
     size_t double_precision() const

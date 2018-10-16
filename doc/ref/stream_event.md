@@ -20,7 +20,8 @@ A JSON-like data event.
 | name              | "foo"                  | `as<std::string>()`, `as<jsoncons::string_view>`, `as<std::string_view>()` |
 | string_value      | "1000"                 | `as<std::string>()`, `as<jsoncons::string_view>`, `as<std::string_view>()`, `as<int>()`, `as<unsigned>()` |
 | byte_string_value | 0x660x6F0x6F           | `as<std::string>()`, `as<jsoncons::byte_string>()` |
-| bignum_value      | "18446744073709551616" | `as<std::string>()`, as<jsoncons::bignum>(), `as<__int128>()` |
+| bignum_value      | "18446744073709551616" | `as<std::string>()`, `as<jsoncons::bignum>()`, `as<__int128>()` |
+| decimal_value     | "273.15"               | `as<std::string>()`, `as<double>()` |
 | int64_value       | -1000                  | `as<std::string>()`, `as<int>()`, `as<long>`, `as<int64_t>()` |
 | uint64_value      | 1000                   | `as<std::string>()`, `as<int>()`, `as<unsigned>()`, `as<int64_t>()`, `as<uint64_t>()` |
 | double_value      | 125.72                 | `as<std::string>()`, `as<double>()` |

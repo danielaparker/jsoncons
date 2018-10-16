@@ -97,6 +97,9 @@ private:
             case semantic_tag_type::bignum:
                 event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::bignum_value);
                 break;
+            case semantic_tag_type::decimal:
+                event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::decimal_value);
+                break;
             default:
                 event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::string_value);
                 break;

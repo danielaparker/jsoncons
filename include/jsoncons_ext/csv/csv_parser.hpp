@@ -917,7 +917,7 @@ private:
                 break;
             case csv_column_type::float_t:
                 {
-                std::istringstream iss{ std::string(value) };
+                    std::istringstream iss{ std::string(value) };
                     double val;
                     iss >> val;
                     if (!iss.fail())
@@ -1278,7 +1278,7 @@ private:
         case numeric_check_state::fraction:
         case numeric_check_state::exp:
             {
-                double d = to_double_(buffer.data(), buffer.length());
+                double d = to_double_(buffer.c_str(), buffer.length());
                 handler.double_value(d, floating_point_options(format, precision, decimal_places), semantic_tag_type::none, *this);
                 break;
             }
