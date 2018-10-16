@@ -673,7 +673,6 @@ public:
                             if (ec) return;
                             break;
                         case '-':
-                            number_buffer_.clear();
                             number_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
@@ -683,7 +682,6 @@ public:
                             if (ec) {return;}
                             break;
                         case '0': 
-                            number_buffer_.clear();
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             state_ = json_parse_state::zero;
@@ -693,7 +691,6 @@ public:
                             if (ec) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            number_buffer_.clear();
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1070,7 +1067,6 @@ public:
                             if (ec) return;
                             break;
                         case '-':
-                            number_buffer_.clear();
                             number_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
@@ -1080,7 +1076,6 @@ public:
                             if (ec) {return;}
                             break;
                         case '0': 
-                            number_buffer_.clear();
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1090,7 +1085,6 @@ public:
                             if (ec) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            number_buffer_.clear();
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1219,7 +1213,6 @@ public:
                             if (ec) return;
                             break;
                         case '-':
-                            number_buffer_.clear();
                             number_buffer_.push_back('-');
                             precision_ = 0;
                             ++input_ptr_;
@@ -1229,7 +1222,6 @@ public:
                             if (ec) {return;}
                             break;
                         case '0': 
-                            number_buffer_.clear();
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -1239,7 +1231,6 @@ public:
                             if (ec) {return;}
                             break;
                         case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                            number_buffer_.clear();
                             precision_ = 1;
                             number_buffer_.push_back(static_cast<char>(*input_ptr_));
                             ++input_ptr_;
@@ -2639,6 +2630,7 @@ private:
         {
             end_positive_value(ec);
         }
+        number_buffer_.clear();
     }
 
     void end_negative_value(std::error_code& ec)
@@ -2716,6 +2708,7 @@ private:
         }
 
         after_value(ec);
+        number_buffer_.clear();
     }
 
     void append_codepoint(int c, std::error_code& ec)
