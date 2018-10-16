@@ -24,7 +24,7 @@ struct null_type
 
 enum class semantic_tag_type : uint8_t 
 {
-    na = 0x00,
+    none = 0x00,
     bignum = 0x01,
     decimal = 0x02,
     date_time = 0x03,
@@ -119,21 +119,21 @@ public:
     }
 
     bool string_value(const string_view_type& value, 
-                      semantic_tag_type tag = semantic_tag_type::na, 
+                      semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context()) 
     {
         return do_string_value(value, tag, context);
     }
 
     bool byte_string_value(const uint8_t* data, size_t length, 
-                           semantic_tag_type tag=semantic_tag_type::na, 
+                           semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()) 
     {
         return do_byte_string_value(data, length, tag, context);
     }
 
     bool byte_string_value(const std::vector<uint8_t>& v, 
-                           semantic_tag_type tag=semantic_tag_type::na, 
+                           semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
         return do_byte_string_value(v.data(), v.size(), tag, context);
@@ -166,14 +166,14 @@ public:
     }
 
     bool int64_value(int64_t value, 
-                     semantic_tag_type tag = semantic_tag_type::na, 
+                     semantic_tag_type tag = semantic_tag_type::none, 
                      const serializing_context& context=null_serializing_context())
     {
         return do_int64_value(value, tag, context);
     }
 
     bool uint64_value(uint64_t value, 
-                      semantic_tag_type tag = semantic_tag_type::na, 
+                      semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context())
     {
         return do_uint64_value(value, tag, context);
@@ -183,7 +183,7 @@ public:
     {
         return do_double_value(value, 
                                floating_point_options(chars_format::general, precision), 
-                               semantic_tag_type::na,
+                               semantic_tag_type::none,
                                null_serializing_context());
     }
 
@@ -191,13 +191,13 @@ public:
     {
         return do_double_value(value, 
                                floating_point_options(chars_format::general, precision), 
-                               semantic_tag_type::na,
+                               semantic_tag_type::none,
                                context);
     }
 
     bool double_value(double value, 
                       const floating_point_options& fmt = floating_point_options(), 
-                      semantic_tag_type tag = semantic_tag_type::na, 
+                      semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context())
     {
         return do_double_value(value, fmt, tag, context);

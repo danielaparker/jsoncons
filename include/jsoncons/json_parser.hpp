@@ -63,7 +63,7 @@ public:
 
     bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context& context) override
     {
-        if (tag == semantic_tag_type::na)
+        if (tag == semantic_tag_type::none)
         {
             if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
             {
@@ -2647,7 +2647,7 @@ private:
         auto result = jsoncons::detail::to_integer<int64_t>(string_buffer_.data(), string_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler_.int64_value(result.value, semantic_tag_type::na, *this);
+            continue_ = handler_.int64_value(result.value, semantic_tag_type::none, *this);
             after_value(ec);
         }
         else
@@ -2662,7 +2662,7 @@ private:
         auto result = jsoncons::detail::to_integer<uint64_t>(string_buffer_.data(), string_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler_.uint64_value(result.value, semantic_tag_type::na, *this);
+            continue_ = handler_.uint64_value(result.value, semantic_tag_type::none, *this);
             after_value(ec);
         }
         else
@@ -2685,7 +2685,7 @@ private:
             else
             {
                 continue_ = handler_.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), 
-                                                  semantic_tag_type::na, *this);
+                                                  semantic_tag_type::none, *this);
             }
         }
         catch (...)
@@ -2763,11 +2763,11 @@ private:
             break;
         case json_parse_state::object:
         case json_parse_state::array:
-            continue_ = handler_.string_value(string_view_type(s, length), semantic_tag_type::na, *this);
+            continue_ = handler_.string_value(string_view_type(s, length), semantic_tag_type::none, *this);
             state_ = json_parse_state::expect_comma_or_end;
             break;
         case json_parse_state::root:
-            continue_ = handler_.string_value(string_view_type(s, length), semantic_tag_type::na, *this);
+            continue_ = handler_.string_value(string_view_type(s, length), semantic_tag_type::none, *this);
             state_ = json_parse_state::before_done;
             break;
         default:

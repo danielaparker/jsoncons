@@ -198,7 +198,7 @@ public:
         {
         public:
             null_data()
-                : data_base(structure_tag_type::null_tag, semantic_tag_type::na)
+                : data_base(structure_tag_type::null_tag, semantic_tag_type::none)
             {
             }
         };
@@ -207,7 +207,7 @@ public:
         {
         public:
             empty_object_data()
-                : data_base(structure_tag_type::empty_object_tag, semantic_tag_type::na)
+                : data_base(structure_tag_type::empty_object_tag, semantic_tag_type::none)
             {
             }
         };
@@ -217,7 +217,7 @@ public:
             bool val_;
         public:
             bool_data(bool val)
-                : data_base(structure_tag_type::bool_tag, semantic_tag_type::na),val_(val)
+                : data_base(structure_tag_type::bool_tag, semantic_tag_type::none),val_(val)
             {
             }
 
@@ -238,7 +238,7 @@ public:
             int64_t val_;
         public:
             int64_data(int64_t val, 
-                       semantic_tag_type tag = semantic_tag_type::na)
+                       semantic_tag_type tag = semantic_tag_type::none)
                 : data_base(structure_tag_type::int64_tag, tag),val_(val)
             {
             }
@@ -259,7 +259,7 @@ public:
             uint64_t val_;
         public:
             uint64_data(uint64_t val, 
-                        semantic_tag_type tag = semantic_tag_type::na)
+                        semantic_tag_type tag = semantic_tag_type::none)
                 : data_base(structure_tag_type::uint64_tag, tag),val_(val)
             {
             }
@@ -283,7 +283,7 @@ public:
             double val_;
         public:
             double_data(double val)
-                : data_base(structure_tag_type::double_tag, semantic_tag_type::na), 
+                : data_base(structure_tag_type::double_tag, semantic_tag_type::none), 
                   format_(static_cast<uint8_t>(chars_format::general)),
                   precision_(0), 
                   decimal_places_(0), 
@@ -293,7 +293,7 @@ public:
 
             double_data(double val, 
                         const floating_point_options& fmt,
-                        semantic_tag_type tag = semantic_tag_type::na)
+                        semantic_tag_type tag = semantic_tag_type::none)
                 : data_base(structure_tag_type::double_tag, tag), 
                   format_(static_cast<uint8_t>(fmt.format())), 
                   precision_(fmt.precision()), 
@@ -386,7 +386,7 @@ public:
             }
 
             long_string_data(const long_string_data& val)
-                : data_base(structure_tag_type::long_string_tag, semantic_tag_type::na)
+                : data_base(structure_tag_type::long_string_tag, semantic_tag_type::none)
             {
                 ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
@@ -540,13 +540,13 @@ public:
             }
         public:
             array_data(const array& val)
-                : data_base(structure_tag_type::array_tag, semantic_tag_type::na)
+                : data_base(structure_tag_type::array_tag, semantic_tag_type::none)
             {
                 create(val.get_allocator(), val);
             }
 
             array_data(const array& val, const Allocator& a)
-                : data_base(structure_tag_type::array_tag, semantic_tag_type::na)
+                : data_base(structure_tag_type::array_tag, semantic_tag_type::none)
             {
                 create(array_allocator(a), val, a);
             }
@@ -622,19 +622,19 @@ public:
             }
         public:
             explicit object_data(const Allocator& a)
-                : data_base(structure_tag_type::object_tag, semantic_tag_type::na)
+                : data_base(structure_tag_type::object_tag, semantic_tag_type::none)
             {
                 create(a,a);
             }
 
             explicit object_data(const object& val)
-                : data_base(structure_tag_type::object_tag, semantic_tag_type::na)
+                : data_base(structure_tag_type::object_tag, semantic_tag_type::none)
             {
                 create(val.get_allocator(), val);
             }
 
             explicit object_data(const object& val, const Allocator& a)
-                : data_base(structure_tag_type::object_tag, semantic_tag_type::na)
+                : data_base(structure_tag_type::object_tag, semantic_tag_type::none)
             {
                 create(object_allocator(a), val, a);
             }
@@ -736,7 +736,7 @@ public:
             new(reinterpret_cast<void*>(&data_))bool_data(val);
         }
         explicit variant(int64_t val,
-                         semantic_tag_type tag = semantic_tag_type::na)
+                         semantic_tag_type tag = semantic_tag_type::none)
         {
             new(reinterpret_cast<void*>(&data_))int64_data(val, tag);
         }
@@ -745,18 +745,18 @@ public:
             new(reinterpret_cast<void*>(&data_))uint64_data(val);
         }
         explicit variant(uint64_t val,
-                semantic_tag_type tag = semantic_tag_type::na)
+                semantic_tag_type tag = semantic_tag_type::none)
         {
             new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
         }
         variant(double val,
-                semantic_tag_type tag = semantic_tag_type::na)
+                semantic_tag_type tag = semantic_tag_type::none)
         {
             new(reinterpret_cast<void*>(&data_))double_data(val, floating_point_options(), tag);
         }
 
         variant(double val, const floating_point_options& fmt,
-                semantic_tag_type tag = semantic_tag_type::na)
+                semantic_tag_type tag = semantic_tag_type::none)
         {
             new(reinterpret_cast<void*>(&data_))double_data(val, fmt, tag);
         }
@@ -766,11 +766,11 @@ public:
             size_t length = char_traits_type::length(s);
             if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::na, s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::none, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::none, s, length, char_allocator_type());
             }
         }
 
@@ -778,11 +778,11 @@ public:
         {
             if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::na, s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::none, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::none, s, length, char_allocator_type());
             }
         }
 
@@ -791,11 +791,11 @@ public:
         {
             if (length <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::na, s, static_cast<uint8_t>(length));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::none, s, static_cast<uint8_t>(length));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::na, s, length, char_allocator_type(alloc));
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::none, s, length, char_allocator_type(alloc));
             }
         }
 
@@ -826,12 +826,12 @@ public:
 
         variant(const byte_string_view& bs)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_tag_type::na, bs.data(), bs.length(), byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_tag_type::none, bs.data(), bs.length(), byte_allocator_type());
         }
 
         variant(const byte_string_view& bs, const Allocator& allocator)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_tag_type::na, bs.data(), bs.length(), allocator);
+            new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_tag_type::none, bs.data(), bs.length(), allocator);
         }
 
         variant(const basic_bignum<byte_allocator_type>& n)
@@ -2634,12 +2634,12 @@ public:
     }
 
     basic_json(const char_type* s)
-        : var_(s, char_traits_type::length(s), semantic_tag_type::na)
+        : var_(s, char_traits_type::length(s), semantic_tag_type::none)
     {
     }
 
     basic_json(const char_type* s, const Allocator& allocator)
-        : var_(s, char_traits_type::length(s), semantic_tag_type::na, allocator)
+        : var_(s, char_traits_type::length(s), semantic_tag_type::none, allocator)
     {
     }
 
@@ -2662,7 +2662,7 @@ public:
 
     basic_json(double val, 
                const floating_point_options& fmt,
-               semantic_tag_type tag = semantic_tag_type::na)
+               semantic_tag_type tag = semantic_tag_type::none)
         : var_(val, fmt, tag)
     {
     }
@@ -2679,7 +2679,7 @@ public:
     {
     }
 
-    basic_json(const char_type *s, size_t length, semantic_tag_type tag = semantic_tag_type::na)
+    basic_json(const char_type *s, size_t length, semantic_tag_type tag = semantic_tag_type::none)
         : var_(s, length, tag)
     {
     }
@@ -2760,7 +2760,7 @@ public:
 
     basic_json& operator=(const char_type* s)
     {
-        var_ = variant(s, char_traits_type::length(s), semantic_tag_type::na);
+        var_ = variant(s, char_traits_type::length(s), semantic_tag_type::none);
         return *this;
     }
 
@@ -4109,17 +4109,17 @@ public:
 
     static basic_json make_string(const string_view_type& s)
     {
-        return basic_json(s, semantic_tag_type::na);
+        return basic_json(s, semantic_tag_type::none);
     }
 
     static basic_json make_string(const char_type* rhs, size_t length)
     {
-        return basic_json(string_view_type(rhs, length), semantic_tag_type::na);
+        return basic_json(string_view_type(rhs, length), semantic_tag_type::none);
     }
 
     static basic_json make_string(const string_view_type& s, allocator_type allocator)
     {
-        return basic_json(s, semantic_tag_type::na, allocator);
+        return basic_json(s, semantic_tag_type::none, allocator);
     }
 
     static basic_json from_integer(int64_t val)

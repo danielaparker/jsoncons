@@ -1984,7 +1984,7 @@ public:
                 }
                 else
                 {
-                    handler_.uint64_value(val, semantic_tag_type::na, *this);
+                    handler_.uint64_value(val, semantic_tag_type::none, *this);
                 }
                 break;
             }
@@ -2004,7 +2004,7 @@ public:
                 }
                 else 
                 {
-                    handler_.int64_value(val, semantic_tag_type::na, *this);
+                    handler_.int64_value(val, semantic_tag_type::none, *this);
                 }
                 break;
             }
@@ -2031,12 +2031,12 @@ public:
                     }
                     else
                     {
-                        handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::na, *this);
+                        handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::none, *this);
                     }
                 }
                 else
                 {
-                    handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::na, *this);
+                    handler_.byte_string_value(v.data(), v.size(), semantic_tag_type::none, *this);
                 }
                 break;
             }
@@ -2056,7 +2056,7 @@ public:
                 }
                 else
                 {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::na, *this);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
                 }
                 break;
             }
@@ -2306,7 +2306,7 @@ public:
                         }
                         else
                         {
-                            handler_.double_value(val, floating_point_options(), semantic_tag_type::na, *this);
+                            handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
                         }
                         break;
                 }

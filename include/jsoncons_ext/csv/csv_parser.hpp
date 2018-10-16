@@ -280,7 +280,7 @@ public:
                     continue_ = handler_.begin_array(*this);
                     for (const auto& name : column_names_)
                     {
-                        continue_ = handler_.string_value(name, semantic_tag_type::na, *this);
+                        continue_ = handler_.string_value(name, semantic_tag_type::none, *this);
                     }
                     continue_ = handler_.end_array(*this);
                 }
@@ -897,7 +897,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler.int64_value(val, semantic_tag_type::na, *this);
+                        handler.int64_value(val, semantic_tag_type::none, *this);
                     }
                     else
                     {
@@ -922,7 +922,7 @@ private:
                     iss >> val;
                     if (!iss.fail())
                     {
-                        handler.double_value(val, floating_point_options(), semantic_tag_type::na, *this);
+                        handler.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
                     }
                     else
                     {
@@ -977,7 +977,7 @@ private:
             default:
                 if (value.length() > 0)
                 {
-                    handler.string_value(value, semantic_tag_type::na, *this);
+                    handler.string_value(value, semantic_tag_type::none, *this);
                 }
                 else
                 {
@@ -990,7 +990,7 @@ private:
                     }
                     else
                     {
-                        handler.string_value(string_view_type(), semantic_tag_type::na, *this);
+                        handler.string_value(string_view_type(), semantic_tag_type::none, *this);
                     }
                 }
                 break;  
@@ -1004,7 +1004,7 @@ private:
             }
             else
             {
-                handler.string_value(value, semantic_tag_type::na, *this);
+                handler.string_value(value, semantic_tag_type::none, *this);
             }
         }
     }
@@ -1254,11 +1254,11 @@ private:
                     auto result = jsoncons::detail::to_integer<int64_t>(value.data(), value.length());
                     if (!result.overflow)
                     {
-                        handler.int64_value(result.value, semantic_tag_type::na, *this);
+                        handler.int64_value(result.value, semantic_tag_type::none, *this);
                     }
                     else
                     {
-                        handler.string_value(value, semantic_tag_type::na, *this);
+                        handler.string_value(value, semantic_tag_type::none, *this);
                     }
                 }
                 else
@@ -1266,11 +1266,11 @@ private:
                     auto result = jsoncons::detail::to_integer<uint64_t>(value.data(), value.length());
                     if (!result.overflow)
                     {
-                        handler.uint64_value(result.value, semantic_tag_type::na, *this);
+                        handler.uint64_value(result.value, semantic_tag_type::none, *this);
                     }
                     else
                     {
-                        handler.string_value(value, semantic_tag_type::na, *this);
+                        handler.string_value(value, semantic_tag_type::none, *this);
                     }
                 }
                 break;
@@ -1279,11 +1279,11 @@ private:
         case numeric_check_state::exp:
             {
                 double d = to_double_(buffer.data(), buffer.length());
-                handler.double_value(d, floating_point_options(format, precision, decimal_places), semantic_tag_type::na, *this);
+                handler.double_value(d, floating_point_options(format, precision, decimal_places), semantic_tag_type::none, *this);
                 break;
             }
         default:
-            handler.string_value(value, semantic_tag_type::na, *this);
+            handler.string_value(value, semantic_tag_type::none, *this);
         }
     }
 

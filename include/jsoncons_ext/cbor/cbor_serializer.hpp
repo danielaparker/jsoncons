@@ -205,7 +205,7 @@ private:
 
     bool do_name(const string_view_type& name, const serializing_context& context) override
     {
-        do_string_value(name, semantic_tag_type::na, context);
+        do_string_value(name, semantic_tag_type::none, context);
         return true;
     }
 
@@ -428,12 +428,12 @@ private:
             }
             scale += result.value;
         }
-        do_int64_value(scale, semantic_tag_type::na, context);
+        do_int64_value(scale, semantic_tag_type::none, context);
 
         auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
         if (!result.overflow)
         {
-            do_int64_value(result.value, semantic_tag_type::na, context);
+            do_int64_value(result.value, semantic_tag_type::none, context);
         }
         else
         {

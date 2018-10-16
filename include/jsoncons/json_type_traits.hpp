@@ -280,7 +280,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     template <class ... Args>
     static Json to_json(const char_type* s, Args&&... args)
     {
-        return Json(s, semantic_tag_type::na, std::forward<Args>(args)...);
+        return Json(s, semantic_tag_type::none, std::forward<Args>(args)...);
     }
 };
 
@@ -297,7 +297,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     template <class ... Args>
     static Json to_json(const char_type* s, Args&&... args)
     {
-        return Json(s, semantic_tag_type::na, std::forward<Args>(args)...);
+        return Json(s, semantic_tag_type::none, std::forward<Args>(args)...);
     }
 };
 
@@ -643,12 +643,12 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        return Json(val, semantic_tag_type::na);
+        return Json(val, semantic_tag_type::none);
     }
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json(val, semantic_tag_type::na, allocator);
+        return Json(val, semantic_tag_type::none, allocator);
     }
 };
 
@@ -670,12 +670,12 @@ struct json_type_traits<Json, T,
 
     static Json to_json(const T& val)
     {
-        return Json(val, semantic_tag_type::na);
+        return Json(val, semantic_tag_type::none);
     }
 
     static Json to_json(const T& val, const allocator_type& allocator)
     {
-        return Json(val, semantic_tag_type::na, allocator);
+        return Json(val, semantic_tag_type::none, allocator);
     }
 };
 
