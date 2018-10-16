@@ -754,8 +754,9 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
                         }
                         break;
                     }
-                    break;
             }
+            break;
+
             case cbor_major_type::unsigned_integer:
             {
                 uint64_t x = detail::get_uint64_value(first,last,endp);
@@ -772,112 +773,12 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
                 }
                 break;
             }
+            break;
         default:
             *endp = first; 
             break;
     }
 
-
-    if (JSONCONS_UNLIKELY(last <= first))
-    {
-        *endp = first; 
-    }
-    else
-    {
-        const size_t length = last - first;
-        const uint8_t* p = first+1;
-        switch (*first)
-        {
-        case JSONCONS_CBOR_0x20_0x37: // Negative integer -1-0x00..-1-0x17 (-1..-24)
-            val = static_cast<int8_t>(0x20 - 1 - *first);
-            *endp = p;
-            break;
-
-        case 0x38: // Negative integer (one-byte uint8_t follows)
-            {
-                auto x = binary::from_big_endian<uint8_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    val = static_cast<int64_t>(-1)- x;
-                }
-                break;
-            }
-
-        case 0x39: // Negative integer -1-n (two-byte uint16_t follows)
-            {
-                auto x = binary::from_big_endian<uint16_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    val = static_cast<int64_t>(-1)- x;
-                }
-                break;
-            }
-
-        case 0x3a: // Negative integer -1-n (four-byte uint32_t follows)
-            {
-                auto x = binary::from_big_endian<uint32_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {                       
-                    val = static_cast<int64_t>(-1)- x;
-                }
-                break;
-            }
-
-        case 0x3b: // Negative integer -1-n (eight-byte uint64_t follows)
-            {
-                auto x = binary::from_big_endian<uint64_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
-                }
-                break;
-            }
-        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-            // FALLTHRU
-        case 0x18: // Unsigned integer (one-byte uint8_t follows)
-            // FALLTHRU
-        case 0x19: // Unsigned integer (two-byte uint16_t follows)
-            // FALLTHRU
-        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
-            // FALLTHRU
-        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
-            {
-                uint64_t x = detail::get_uint64_value(first,last,endp);
-                if (*endp != first)
-                {
-                    if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
-                    {
-                        val = x;
-                    }
-                    else
-                    {
-                        *endp = first;
-                    }
-                }
-                break;
-            }
-        default:
-            {
-                *endp = first; 
-            }
-        }
-    }
     return val;
 }
 
