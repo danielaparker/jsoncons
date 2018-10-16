@@ -190,106 +190,44 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                                      const uint8_t** endp)
 {
     std::vector<uint8_t> v;
-    if (JSONCONS_UNLIKELY(last <= first))
+    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::byte_string))
     {
         *endp = first; 
+        return v;
     }
-    else
+
+    switch (get_additional_information_value(*first))
     {
-        const uint8_t* p = first+1;
-        switch (*first)
+        case 0x1f: // terminated by "break"
         {
-        case JSONCONS_CBOR_0x40_0x57: // byte string (0x00..0x17 bytes follow)
+            const uint8_t* p = first+1;
+            while (*p != 0xff)
             {
-                size_t length = *first & 0x1f;
-                *endp = p + length;
-                v = std::vector<uint8_t>(p, *endp);
-            }
-            break;
-        case 0x58: // byte string (one-byte uint8_t for n follows)
-            {
-                size_t length = (size_t)binary::from_big_endian<uint8_t>(p,last,endp);
+                std::vector<uint8_t> ss = detail::get_byte_string(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
+                    return v;
                 }
-                else
-                {
-                    p = *endp;
-                    *endp = p + length;
-                    v = std::vector<uint8_t>(p, *endp);
-                }
+                p = *endp;
+                v.insert(v.end(),ss.begin(),ss.end());
             }
             break;
-        case 0x59: // byte string (two-byte uint16_t for n follow)
+        }
+    default: 
+        {
+            size_t length = get_byte_string_length(first, last, endp);
+            if (*endp == first)
             {
-                size_t length = (size_t)binary::from_big_endian<uint16_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    p = *endp;
-                    *endp = p + length;
-                    v = std::vector<uint8_t>(p, *endp);
-                }
+                return v;
             }
+            const uint8_t* p = *endp;
+            *endp = p + length;
+            v = std::vector<uint8_t>(p, *endp);
             break;
-        case 0x5a: // byte string (four-byte uint32_t for n follow)
-            {
-                size_t length = (size_t)binary::from_big_endian<uint32_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    p = *endp;
-                    *endp = p + length;
-                    v = std::vector<uint8_t>(p, *endp);
-                }
-            }
-            break;
-        case 0x5b: // byte string (eight-byte uint64_t for n follow)
-            {
-                size_t length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    p = *endp;
-                    *endp = p + length;
-                    v = std::vector<uint8_t>(p, *endp);
-                }
-            }
-            break;
-        case 0x5f: // byte string, byte strings follow, terminated by "break"
-            {
-                while (*p != 0xff)
-                {
-                    std::vector<uint8_t> ss = detail::get_byte_string(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                        break;
-                    }
-                    else
-                    {
-                        p = *endp;
-                        v.insert(v.end(),ss.begin(),ss.end());
-                    }
-                }
-            }
-            break;
-        default: 
-            {
-                *endp = first;
-            }
         }
     }
+    
     return v;
 }
 
@@ -377,113 +315,48 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
                             const uint8_t** endp)
 {
     std::string s;
-    if (JSONCONS_UNLIKELY(last <= first))
+    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::text_string))
     {
         *endp = first; 
+        return s;
     }
-    else
+
+    switch (get_additional_information_value(*first))
     {
-        const uint8_t* p = first+1;
-        switch (*first)
+    case 0x1f: // UTF-8 string, text strings follow, terminated by "break"
         {
-        case JSONCONS_CBOR_0x60_0x77: // UTF-8 string (0x00..0x17 bytes follow)
+            const uint8_t* p = first+1;
+            while (*p != 0xff)
             {
-                size_t length = *first & 0x1f;
-                *endp = p + length;
-                //s = std::string(p, *endp);
-                s.resize(length);
-                std::copy(p,*endp,s.begin());
-                break;
-            }
-        case 0x78: // UTF-8 string (one-byte uint8_t for n follows)
-            {
-                size_t length = (size_t)binary::from_big_endian<uint8_t>(p,last,endp);
+                std::string ss = detail::get_text_string(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
+                    break;
                 }
                 else
                 {
                     p = *endp;
-                    *endp = p + length;
-                    //s = std::string(p, *endp);
-                    s.resize(length);
-                    std::copy(p,*endp,s.begin());
+                    s.append(std::move(ss));
                 }
-                break;
             }
-        case 0x79: // UTF-8 string (two-byte uint16_t for n follow)
+            break;
+        }
+    default: 
+        {
+            size_t length = get_text_string_length(first, last, endp);
+            if (*endp == first)
             {
-                size_t length = (size_t)binary::from_big_endian<uint16_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    p = *endp;
-                    *endp = p + length;
-                    //s = std::string(p, *endp);
-                    s.resize(length);
-                    std::copy(p,*endp,s.begin());
-                }
-                break;
+                return s;
             }
-        case 0x7a: // UTF-8 string (four-byte uint32_t for n follow)
-            {
-                size_t length = (size_t)binary::from_big_endian<uint32_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    p = *endp;
-                    *endp = p + length;
-                    s = std::string(p, *endp);
-                }
-                break;
-            }
-        case 0x7b: // UTF-8 string (eight-byte uint64_t for n follow)
-            {
-                size_t length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                else
-                {
-                    p = *endp;
-                    *endp = p + length;
-                    //s = std::string(p, *endp);
-                    s.resize(length);
-                    std::copy(p,*endp,s.begin());
-                }
-                break;
-            }
-        case 0x7f: // UTF-8 string, text strings follow, terminated by "break"
-            {
-                while (*p != 0xff)
-                {
-                    std::string ss = detail::get_text_string(p,last,endp);
-                    if (*endp == p)
-                    {
-                        *endp = first;
-                        break;
-                    }
-                    else
-                    {
-                        p = *endp;
-                        s.append(std::move(ss));
-                    }
-                }
-                break;
-            }
-        default: 
-            *endp = first;
+            const uint8_t* p = *endp;
+            *endp = p + length;
+            s.resize(length);
+            std::copy(p,*endp,s.begin());
             break;
         }
     }
+    
     return s;
 }
 
