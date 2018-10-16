@@ -616,64 +616,63 @@ inline
 uint64_t get_uint64_value(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     uint64_t val = 0;
-    if (JSONCONS_UNLIKELY(last <= first))
+    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::unsigned_integer))
     {
         *endp = first; 
+        return val;
     }
-    else
+
+    const uint8_t* p = first+1;
+    uint8_t info = get_additional_information_value(*first);
+    switch (info)
     {
-        const size_t length = last - first;
-        const uint8_t* p = first+1;
-        switch (*first)
+    case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+        val = info;
+        *endp = p;
+        break;
+
+    case 0x18: // Unsigned integer (one-byte uint8_t follows)
         {
-        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-            val = *first;
-            *endp = p;
+            val = binary::from_big_endian<uint8_t>(p,last,endp);
+            if (*endp == p)
+            {
+                *endp = first;
+            }
             break;
+        }
 
-        case 0x18: // Unsigned integer (one-byte uint8_t follows)
+    case 0x19: // Unsigned integer (two-byte uint16_t follows)
+        {
+            val = binary::from_big_endian<uint16_t>(p,last,endp);
+            if (*endp == p)
             {
-                val = binary::from_big_endian<uint8_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
+                *endp = first;
             }
+            break;
+        }
 
-        case 0x19: // Unsigned integer (two-byte uint16_t follows)
+    case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+        {
+            val = binary::from_big_endian<uint32_t>(p,last,endp);
+            if (*endp == p)
             {
-                val = binary::from_big_endian<uint16_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
+                *endp = first;
             }
+            break;
+        }
 
-        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+    case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+        {
+            val = binary::from_big_endian<uint64_t>(p,last,endp);
+            if (*endp == p)
             {
-                val = binary::from_big_endian<uint32_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
+                *endp = first;
             }
-
-        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
-            {
-                val = binary::from_big_endian<uint64_t>(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                }
-                break;
-            }
-        default:
-            {
-                *endp = first; 
-            }
+            break;
+        }
+    default:
+        {
+            *endp = first; 
         }
     }
     return val;
@@ -689,8 +688,8 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
         return val;
     }
 
-    uint8_t info = get_additional_information_value(*first);
     const uint8_t* p = first + 1;
+    uint8_t info = get_additional_information_value(*first);
     switch (get_major_type(*first))
     {
         case cbor_major_type::negative_integer:
@@ -757,7 +756,7 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
                     }
                     break;
             }
-        case cbor_major_type::unsigned_integer:
+            case cbor_major_type::unsigned_integer:
             {
                 uint64_t x = detail::get_uint64_value(first,last,endp);
                 if (*endp != first)
