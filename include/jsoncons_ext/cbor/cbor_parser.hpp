@@ -1775,6 +1775,7 @@ public:
     }
 };
 
+inline
 std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last, 
                                   const uint8_t** endpp)
 {

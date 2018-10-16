@@ -21,6 +21,7 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_utilities.hpp>
 #include <jsoncons/detail/writer.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -29,6 +30,8 @@ enum class cbor_structure_type {object, indefinite_length_object, array, indefin
 template<class CharT,class Writer=jsoncons::detail::stream_byte_writer>
 class basic_cbor_serializer final : public basic_json_content_handler<CharT>
 {
+
+    enum class decimal_parse_state { start, integer, minus, exp1, exp2, fraction1 };
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Writer writer_type;
@@ -319,11 +322,127 @@ private:
         }
     }
 
-    void write_decimal_value(const string_view_type& sv)
+    void write_decimal_value(const string_view_type& sv, const serializing_context& context)
     {
+        decimal_parse_state state = decimal_parse_state::start;
+        std::string s;
+        std::string exponent;
+        int64_t scale = 0;
+        for (auto c : sv)
+        {
+            switch (state)
+            {
+                case decimal_parse_state::start:
+                {
+                    switch (c)
+                    {
+                        case '-':
+                            s.push_back(c);
+                            state = decimal_parse_state::integer;
+                            break;
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            s.push_back(c);
+                            state = decimal_parse_state::integer;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid decimal string");
+                    }
+                    break;
+                }
+                case decimal_parse_state::integer:
+                {
+                    switch (c)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            s.push_back(c);
+                            state = decimal_parse_state::integer;
+                            break;
+                        case 'e': case 'E':
+                            state = decimal_parse_state::exp1;
+                            break;
+                        case '.':
+                            state = decimal_parse_state::fraction1;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid decimal string");
+                    }
+                    break;
+                }
+                case decimal_parse_state::exp1:
+                {
+                    switch (c)
+                    {
+                        case '+':
+                            state = decimal_parse_state::exp2;
+                            break;
+                        case '-':
+                            exponent.push_back(c);
+                            state = decimal_parse_state::exp2;
+                            break;
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            exponent.push_back(c);
+                            state = decimal_parse_state::exp2;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid decimal string");
+                    }
+                    break;
+                }
+                case decimal_parse_state::exp2:
+                {
+                    switch (c)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            exponent.push_back(c);
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid decimal string");
+                    }
+                    break;
+                }
+                case decimal_parse_state::fraction1:
+                {
+                    switch (c)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            s.push_back(c);
+                            --scale;
+                            state = decimal_parse_state::integer;
+                            break;
+                        default:
+                            throw std::invalid_argument("Invalid decimal string");
+                    }
+                    break;
+                }
+            }
+        }
+
+        writer_.put(0xc4);
+        do_begin_array((size_t)2, context);
+        if (exponent.length() > 0)
+        {
+            auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
+            if (result.overflow)
+            {
+                throw std::invalid_argument("Invalid decimal string");
+            }
+            scale += result.value;
+        }
+        do_int64_value(scale, semantic_tag_type::na, context);
+
+        auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
+        if (!result.overflow)
+        {
+            do_int64_value(result.value, semantic_tag_type::na, context);
+        }
+        else
+        {
+            write_bignum_value(s);
+        }
+        do_end_array(context);
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context& context) override
     {
         switch (tag)
         {
@@ -334,7 +453,7 @@ private:
             }
             case semantic_tag_type::decimal:
             {
-                write_decimal_value(sv);
+                write_decimal_value(sv, context);
                 break;
             }
             case semantic_tag_type::date_time:

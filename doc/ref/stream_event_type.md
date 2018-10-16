@@ -16,6 +16,7 @@ enum class stream_event_type
     string_value,
     byte_string_value,
     bignum_value,
+    decimal_value,
     int64_value,
     uint64_value,
     double_value,

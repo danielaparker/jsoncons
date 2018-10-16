@@ -21,9 +21,11 @@ built on top of its incremental parser.
 
 The jsoncons data model extends the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - to accomodate byte 
-strings, big numbers, date-time values, and epoch time values.
-This allows it to preserve these type semantics when parsing
-JSON-like data formats that support them. 
+strings, date-time values, epoch time values, big numbers, and 
+decimal fractions. This allows it to preserve these type semantics 
+when parsing JSON-like data formats such as CBOR that support them. 
+It also allows it to preserve the precision of JSON numbers that overflow
+the range for 64 bit integers or the precision of doubles.
 
 Planned new features are listed on the [roadmap](doc/Roadmap.md)
 

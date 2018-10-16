@@ -1623,6 +1623,11 @@ public:
             return evaluate().structure_tag();
         }
 
+        semantic_tag_type semantic_tag() const
+        {
+            return evaluate().semantic_tag();
+        }
+
         size_t count(const string_view_type& name) const
         {
             return evaluate().count(name);
@@ -3333,21 +3338,10 @@ public:
         {
         case structure_tag_type::short_string_tag:
         case structure_tag_type::long_string_tag:
-            if (var_.semantic_tag() == semantic_tag_type::bignum)
-            {
-                return static_cast<double>(var_.as_bignum());
-            }
-
-            try
-            {
-                basic_json j = basic_json::parse(as_string_view());
-                return j.as<double>();
-            }
-            catch (...)
-            {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
-            }
-            break;
+        {
+            jsoncons::detail::string_to_double to_double;
+            return to_double(as_string_view().data(), as_string_view().length());
+        }
         case structure_tag_type::double_tag:
             return var_.double_data_cast()->value();
         case structure_tag_type::int64_tag:
@@ -4095,6 +4089,11 @@ public:
     structure_tag_type structure_tag() const
     {
         return var_.structure_tag();
+    }
+
+    semantic_tag_type semantic_tag() const
+    {
+        return var_.semantic_tag();
     }
 
     void swap(basic_json& b)

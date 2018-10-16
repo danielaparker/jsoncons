@@ -204,12 +204,26 @@ public:
         return '.';
     }
 
-    double operator()(const char* s, size_t) const
+    template <class CharT>
+    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
+    operator()(const CharT* s, size_t) const
     {
-        const char *begin = s;
-        char *end = nullptr;
-        double val = _strtod_l(begin, &end, locale_);
-        if (begin == end)
+        CharT *end = nullptr;
+        double val = _strtod_l(s, &end, locale_);
+        if (s == end)
+        {
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid float value"));
+        }
+        return val;
+    }
+
+    template <class CharT>
+    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
+    operator()(const CharT* s, size_t) const
+    {
+        CharT *end = nullptr;
+        double val = _wcstod_l(s, &end, locale_);
+        if (s == end)
         {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid float value"));
         }
@@ -242,12 +256,26 @@ public:
         return '.';
     }
 
-    double operator()(const char* s, size_t length) const
+    template <class CharT>
+    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
+    operator()(const CharT* s, size_t length) const
     {
-        const char *begin = s;
         char *end = nullptr;
-        double val = strtold_l(begin, &end, locale_);
-        if (begin == end)
+        double val = strtold_l(s, &end, locale_);
+        if (s == end)
+        {
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid float value"));
+        }
+        return val;
+    }
+
+    template <class CharT>
+    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
+    operator()(const CharT* s, size_t length) const
+    {
+        CharT *end = nullptr;
+        double val = wcstold_l(s, &end, locale_);
+        if (s == end)
         {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid float value"));
         }
@@ -287,10 +315,25 @@ public:
         return decimal_point_;
     }
 
-    double operator()(const char* s, size_t /*length*/) const
+    template <class CharT>
+    typename std::enable_if<std::is_same<CharT,char>::value,double>::type
+    operator()(const CharT* s, size_t /*length*/) const
     {
-        char *end = nullptr;
+        CharT *end = nullptr;
         double val = strtod(s, &end);
+        if (s == end)
+        {
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("string_to_double failed"));
+        }
+        return val;
+    }
+
+    template <class CharT>
+    typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
+    operator()(const CharT* s, size_t /*length*/) const
+    {
+        CharT *end = nullptr;
+        double val = wcstod(s, &end);
         if (s == end)
         {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("string_to_double failed"));

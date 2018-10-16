@@ -13,11 +13,15 @@ using namespace jsoncons;
 
 TEST_CASE("test_precision")
 {
-    json val = json::parse("42.229999999999997");
+    std::string s = "42.229999999999997";
+    json val = json::parse(s);
     CHECK(17 == val.precision());
 
-    val = json::parse("0.42229999999999997");
-    CHECK(17 == val.precision()); // max is std::numeric_limits<double>::max_digits10
+    s = "0.42229999999999997";
+    val = json::parse(s); // max precision > std::numeric_limits<double>::max_digits10
+    REQUIRE(structure_tag_type::long_string_tag == val.structure_tag());
+    CHECK(semantic_tag_type::decimal == val.semantic_tag());
+    CHECK(s == val.as<std::string>());
 
     val = json::parse("1.2345e+30");
     CHECK(5 == val.precision());
