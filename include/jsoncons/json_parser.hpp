@@ -669,6 +669,7 @@ public:
                             state_ = json_parse_state::string;
                             ++input_ptr_;
                             ++column_;
+                            string_buffer_.clear();
                             parse_string(ec);
                             if (ec) return;
                             break;
@@ -854,6 +855,7 @@ public:
                             ++column_;
                             push_state(json_parse_state::member_name);
                             state_ = json_parse_state::string;
+                            string_buffer_.clear();
                             parse_string(ec);
                             if (ec) return;
                             break;
@@ -920,6 +922,7 @@ public:
                             ++column_;
                             push_state(json_parse_state::member_name);
                             state_ = json_parse_state::string;
+                            string_buffer_.clear();
                             parse_string(ec);
                             if (ec) return;
                             break;
@@ -1063,6 +1066,7 @@ public:
                             ++input_ptr_;
                             ++column_;
                             state_ = json_parse_state::string;
+                            string_buffer_.clear();
                             parse_string(ec);
                             if (ec) return;
                             break;
@@ -1209,6 +1213,7 @@ public:
                             ++input_ptr_;
                             ++column_;
                             state_ = json_parse_state::string;
+                            string_buffer_.clear();
                             parse_string(ec);
                             if (ec) return;
                             break;
@@ -2219,7 +2224,6 @@ string_u1:
                     {
                         string_buffer_.append(sb,input_ptr_-sb);
                         end_string_value(string_buffer_.data(),string_buffer_.length(), ec);
-                        string_buffer_.clear();
                         if (ec) {return;}
                     }
                     column_ += (input_ptr_ - sb + 1);

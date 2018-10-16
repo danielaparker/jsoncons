@@ -55,21 +55,21 @@ line and column number is provided in the [context](serializing_context.md) para
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     bool string_value(const string_view_type& value, 
-                      semantic_tag_type tag = semantic_tag_type::na, 
+                      semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context());
 Writes a string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     bool byte_string_value(const uint8_t* data, size_t length, 
-                           semantic_tag_type tag=semantic_tag_type::na, 
+                           semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()); 
 Writes a byte string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     bool byte_string_value(const std::vector<uint8_t>& v, 
-                           semantic_tag_type tag=semantic_tag_type::na, 
+                           semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context());
 Writes a byte string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
@@ -92,14 +92,14 @@ line and column number is provided in the [context](serializing_context.md) para
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     bool int64_value(int64_t value, 
-                     semantic_tag_type tag = semantic_tag_type::na, 
+                     semantic_tag_type tag = semantic_tag_type::none, 
                      const serializing_context& context=null_serializing_context());
 Writes a signed integer value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     bool uint64_value(uint64_t value, 
-                      semantic_tag_type tag = semantic_tag_type::na, 
+                      semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context())
 Writes a non-negative integer value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
@@ -107,7 +107,7 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
 
     bool double_value(double value, 
                       const floating_point_options& fmt = floating_point_options(), 
-                      semantic_tag_type tag = semantic_tag_type::na, 
+                      semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context())
 Writes a floating point value with default precision (`std::numeric_limits<double>::digits10`.) Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
