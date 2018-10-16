@@ -234,6 +234,7 @@ public:
         switch (additional_information_value())
         {
             case 20:
+                return false;
             case 21:
                 return true;
             default:
