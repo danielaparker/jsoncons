@@ -31,7 +31,7 @@
 #elif defined (__GNUC__)
 #  define JSONCONS_FALLTHROUGH // FALLTHRU
 #elif defined(__clang__) 
-#  define JSONCONS_FALLTHROUGH __attribute__((clang::fallthrough))
+#  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
 #else
 #  define JSONCONS_FALLTHROUGH
 #endif
