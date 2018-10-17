@@ -7,11 +7,6 @@
 #ifndef JSONCONS_SERIALIZATION_TRAITS_HPP
 #define JSONCONS_SERIALIZATION_TRAITS_HPP
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#endif
-
 #include <iostream>
 #include <string>
 #include <tuple>
@@ -305,10 +300,6 @@ public:
 #endif
 
 }
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 #endif
 

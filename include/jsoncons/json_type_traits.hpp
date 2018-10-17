@@ -24,11 +24,6 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#endif
-
 namespace jsoncons {
 
 // json_type_traits
@@ -1005,10 +1000,6 @@ struct json_type_traits<Json, std::valarray<T>>
 };
 
 }
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 #endif
 

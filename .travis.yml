@@ -56,7 +56,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-8
-      env: COMPILER=gcc VERSION=8 SANITIZE=1
+      env: COMPILER=gcc VERSION=8 SANITIZE=1 CXXFLAGS="-std=c++11 -Wall -Wextra -Werror -Wimplicit-fallthrough" 
 
     - os: linux
       addons:

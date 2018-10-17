@@ -33,11 +33,6 @@
 #include <jsoncons/json_error_category.hpp>
 #include <jsoncons/detail/heap_only_string.hpp>
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#endif
-
 namespace jsoncons {
 
 struct sorted_policy
@@ -4698,9 +4693,5 @@ jsoncons::wojson operator "" _ojson(const wchar_t* s, std::size_t n)
 }
 
 #include <jsoncons/json_convert_traits.hpp>
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 #endif

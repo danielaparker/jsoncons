@@ -24,11 +24,6 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_error_category.hpp>
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#endif
-
 namespace jsoncons {
 
 template<class Json>
@@ -94,9 +89,5 @@ json_printable<Json> pretty_print(const Json& val,
 }
 
 }
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 #endif

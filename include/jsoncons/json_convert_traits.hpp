@@ -7,11 +7,6 @@
 #ifndef JSONCONS_JSONCONVERTTRAITS_HPP
 #define JSONCONS_JSONCONVERTTRAITS_HPP
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#endif
-
 #include <iostream>
 #include <string>
 #include <tuple>
@@ -307,9 +302,6 @@ void encode_json(const T& val, const basic_json_serializing_options<CharT>& opti
 }
 
 }
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 #endif
 

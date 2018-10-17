@@ -9,11 +9,6 @@
 
 #include <memory>
 
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#endif
-
 namespace jsoncons {
 
 struct sorted_policy;
@@ -24,9 +19,5 @@ template <class CharT,
 class basic_json;
 
 }
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 #endif
