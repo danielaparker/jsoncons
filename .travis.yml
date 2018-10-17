@@ -95,16 +95,16 @@ matrix:
 #            - g++-7
 #      env: COMPILER=clang VERSION=5.0 SANITIZE=1 CXXFLAGS="-std=gnu++11" 
 #
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#            - llvm-toolchain-trusty-6.0
-#          packages:
-#            - clang-6.0
-#            - g++-7
-#      env: COMPILER=clang VERSION=6.0 SANITIZE=1
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+            - g++-7
+      env: COMPILER=clang VERSION=6.0 SANITIZE=1  CXXFLAGS="-std=c++11 -Wall -Wextra -Wimplicit-fallthrough"
 #
 #    - os: linux
 #      addons:
