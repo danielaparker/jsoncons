@@ -120,8 +120,8 @@ namespace readme
             62617a -- "baz" 
           43 -- Byte string value of length 3
             717578 -- 'q''u''x'
-          c4 - Tag 4 (decimal fraction)
-            82 - Array of length 2
+          c4 -- Tag 4 (decimal fraction)
+            82 -- Array of length 2
               21 -- -2
               19 6ab3 -- 27315
 */

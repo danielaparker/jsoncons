@@ -160,6 +160,21 @@ public:
         return do_string_value(s, semantic_tag_type::bignum, null_serializing_context());
     }
 
+    bool decimal_value(const string_view_type& s) 
+    {
+        return do_string_value(s, semantic_tag_type::decimal, null_serializing_context());
+    }
+
+    bool date_time_value(const string_view_type& s) 
+    {
+        return do_string_value(s, semantic_tag_type::date_time, null_serializing_context());
+    }
+
+    bool epoch_time_value(int64_t val) 
+    {
+        return do_int64_value(val, semantic_tag_type::epoch_time, null_serializing_context());
+    }
+
     bool bignum_value(const string_view_type& s, const serializing_context& context) 
     {
         return do_string_value(s, semantic_tag_type::bignum, context);

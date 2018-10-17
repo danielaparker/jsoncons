@@ -457,7 +457,7 @@ private:
             }
             case semantic_tag_type::date_time:
             {
-                writer_.put(0x01);
+                writer_.put(0xc0);
                 write_string_value(sv);
                 break;
             }
@@ -522,7 +522,7 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.put(0x01);
+            writer_.put(0xc1);
         }
 
         std::vector<uint8_t> v;
@@ -545,7 +545,7 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.put(0x01);
+            writer_.put(0xc1);
         }
         std::vector<uint8_t> v;
         if (value >= 0)
@@ -616,7 +616,7 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.put(0x01);
+            writer_.put(0xc1);
         }
 
         std::vector<uint8_t> v;

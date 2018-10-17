@@ -75,19 +75,27 @@ Writes a byte string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool bignum_value(int signum, const uint8_t* data, size_t length) 
-    bool bignum_value(int signum, const uint8_t* data, size_t length, const serializing_context& context) 
-Writes a bignum using the sign-magnitude representation. 
-The magnitude is an unsigned integer `n` encoded as a byte string data item in big-endian byte-order.
-If the value of signum is 1, the value of the bignum is `n`. 
-If the value of signum is -1, the value of the bignum is `-1 - n`. 
-An empty list means a zero value. Contextual information including
-line and column number is provided in the [context](serializing_context.md) parameter. 
-Returns `true` if the producer should continue streaming events, `false` otherwise.
-
     bool bignum_value(const string_view_type& s) 
     bool bignum_value(const string_view_type& s, const serializing_context& context) 
 Writes a bignum using the decimal string representation of a bignum. Contextual information including
+line and column number is provided in the [context](serializing_context.md) parameter. 
+Returns `true` if the producer should continue streaming events, `false` otherwise.
+
+    bool decimal_value(const string_view_type& s) 
+    bool decimal_value(const string_view_type& s, const serializing_context& context) 
+Writes a decimal value using the decimal string representation. Contextual information including
+line and column number is provided in the [context](serializing_context.md) parameter. 
+Returns `true` if the producer should continue streaming events, `false` otherwise.
+
+    bool date_time_value(const string_view_type& s) 
+    bool date_time_value(const string_view_type& s, const serializing_context& context) 
+Writes a date-time value using the string representation. Contextual information including
+line and column number is provided in the [context](serializing_context.md) parameter. 
+Returns `true` if the producer should continue streaming events, `false` otherwise.
+
+    bool epoch_time_value(int64_t val) 
+    bool epoch_time_value(int64_t val, const serializing_context& context) 
+Writes an epoch time value using the integer representation. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
