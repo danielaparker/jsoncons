@@ -441,6 +441,7 @@ private:
                     state = input_state::character;
                     break;
                 }
+                break;
             default:
                 break;
             }

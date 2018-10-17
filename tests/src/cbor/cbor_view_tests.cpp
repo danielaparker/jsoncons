@@ -46,6 +46,7 @@ TEST_CASE("cbor_view_test")
     cbor_view reputons_0 = reputons.at(0);
 
     cbor_view reputons_0_rated = reputons_0.at("rated");
+    (void)reputons_0_rated;
 
     cbor_view rating = reputons_0.at("rating");
     CHECK(rating.as_double() == 0.90);
@@ -54,6 +55,8 @@ TEST_CASE("cbor_view_test")
     {
         const auto& key = member.key();
         const auto& val = member.value();
+
+        (void)key;
         json jval = decode_cbor<json>(val);
 
         //std::cout << key << ": " << jval << std::endl;
