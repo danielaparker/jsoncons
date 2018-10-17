@@ -210,8 +210,8 @@ int main()
         // Construct some CBOR using the streaming API
         std::vector<uint8_t> b;
         cbor::cbor_bytes_serializer writer(b);
-        writer.begin_array(); // indefinite length array containing rows
-        writer.begin_array(3); // a row, fixed length array
+        writer.begin_array(); // indefinite length outer array
+        writer.begin_array(3); // a fixed length array
         writer.string_value("foo");
         writer.byte_string_value({'b','a','r'});
         writer.bignum_value("-18446744073709551617");
@@ -234,9 +234,9 @@ int main()
               666f6f -- "foo" 
             43 -- Byte string value of length 3
               626172 -- 'b''a''r'
-            c3 -- Bignum
+            c3 -- Tag 3 (negative bignum)
               49 -- Byte string value of length 9
-              010000000000000000 -- Bytes content
+                010000000000000000 -- Bytes content
           ff -- "break" 
 */
         cbor::cbor_view bv = b; // a non-owning view of the CBOR bytes
@@ -267,12 +267,12 @@ int main()
         // Unpack bytes into a json variant value, and add some more elements
         json j = cbor::decode_cbor<json>(bv);
 
-        json another_row = json::array(); 
-        another_row.emplace_back(byte_string({'q','u','x'}));
-        another_row.emplace_back("273.15", semantic_tag_type::decimal);
-        another_row.emplace(another_row.array_range().begin(),"baz");
+        json another_array = json::array(); 
+        another_array.emplace_back(byte_string({'q','u','x'}));
+        another_array.emplace_back("273.15", semantic_tag_type::decimal);
+        another_array.emplace(another_array.array_range().begin(),"baz"); // place at front
 
-        j.push_back(std::move(another_row));
+        j.push_back(std::move(another_array));
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
@@ -302,7 +302,7 @@ int main()
               666f6f -- "foo" 
             43 -- Byte string value of length 3
               626172 -- 'b''a''r'
-            c3 -- Bignum
+            c3 -- Tag 3 (negative bignum)
             49 -- Byte string value of length 9
               010000000000000000 -- Bytes content
           83 -- Another array of length 3
@@ -332,7 +332,6 @@ int main()
         csv::encode_csv(bv2, csv_bv2, csv_options);
         std::cout << "(11)\n";
         std::cout << csv_bv2 << "\n\n";
-    }
 }
 
 ```

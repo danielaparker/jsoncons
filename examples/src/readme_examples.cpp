@@ -13,13 +13,13 @@ namespace readme
 {
     using namespace jsoncons;    
 
-    void example1()
+    void playing_around()
     {
         // Construct some CBOR using the streaming API
         std::vector<uint8_t> b;
         cbor::cbor_bytes_serializer writer(b);
-        writer.begin_array(); // indefinite length array containing rows
-        writer.begin_array(3); // a row, fixed length array
+        writer.begin_array(); // indefinite length outer array
+        writer.begin_array(3); // a fixed length array
         writer.string_value("foo");
         writer.byte_string_value({'b','a','r'});
         writer.bignum_value("-18446744073709551617");
@@ -75,12 +75,12 @@ namespace readme
         // Unpack bytes into a json variant value, and add some more elements
         json j = cbor::decode_cbor<json>(bv);
 
-        json another_row = json::array(); 
-        another_row.emplace_back(byte_string({'q','u','x'}));
-        another_row.emplace_back("273.15", semantic_tag_type::decimal);
-        another_row.emplace(another_row.array_range().begin(),"baz");
+        json another_array = json::array(); 
+        another_array.emplace_back(byte_string({'q','u','x'}));
+        another_array.emplace_back("273.15", semantic_tag_type::decimal);
+        another_array.emplace(another_array.array_range().begin(),"baz"); // place at front
 
-        j.push_back(std::move(another_row));
+        j.push_back(std::move(another_array));
         std::cout << "(6)\n";
         std::cout << pretty_print(j) << "\n\n";
 
@@ -149,7 +149,7 @@ void readme_examples()
 {
     std::cout << "\nReadme examples\n\n";
 
-    readme::example1();
+    readme::playing_around();
 
     std::cout << std::endl;
 }
