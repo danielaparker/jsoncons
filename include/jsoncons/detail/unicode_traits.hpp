@@ -293,7 +293,7 @@ is_legal_utf8(Iterator first, size_t length)
     case 1:
         if (static_cast<uint8_t>(*first) >= 0x80 && static_cast<uint8_t>(*first) < 0xC2)
             return conv_errc::source_illegal;
-        UNICONS_FALLTHROUGH;
+        break;
     }
     if (static_cast<uint8_t>(*first) > 0xF4) 
         return conv_errc::source_illegal;
