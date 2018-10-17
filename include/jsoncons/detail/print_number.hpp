@@ -99,8 +99,6 @@ public:
     template <class Writer>
     void operator()(double val, const floating_point_options& fmt, Writer& writer)
     {
-        typedef typename Writer::char_type char_type;
-
         chars_format format;
         if (override_.format() != chars_format::hex)
         {

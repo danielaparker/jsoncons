@@ -26,6 +26,12 @@
 // The definitions below follow the definitions in compiler_support_p.h, https://github.com/01org/tinycbor
 // MIT license
 
+#if defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7))) || defined(__clang__)
+#  define JSONCONS_ATTRIBUTE_UNUSED __attribute__((unused))
+#else
+#  define JSONCONS_ATTRIBUTE_UNUSED
+#endif
+
 #if defined(__GNUC__) || defined(__clang__)
 #define JSONCONS_LIKELY(x) __builtin_expect(!!(x), 1)
 #define JSONCONS_UNLIKELY(x) __builtin_expect(!!(x), 0)
