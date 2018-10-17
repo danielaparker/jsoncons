@@ -94,12 +94,16 @@ public:
     }
 
     basic_bignum(const basic_bignum<Allocator>& n)
-        : basic_bignum_base<Allocator>(n.allocator()), data_(values_), neg_(n.neg_), dynamic_(false), length_(n.length_)
+        : basic_bignum_base<Allocator>(n.allocator()), neg_(n.neg_), length_(n.length_)
     {
-        if ( n.length() <= 2 )
+        values_[0] = 0;
+        values_[1] = 0;
+        if (!n.dynamic_)
         {
-            values_ [0] = n.data_ [0];
-            values_ [1] = n.data_ [1];
+            values_[0] = n.values_[0];
+            values_[1] = n.values_[1];
+            data_ = values_;
+            dynamic_ = false;
         }
         else
         {
