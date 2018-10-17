@@ -381,7 +381,7 @@ public:
                 for (size_t i = 0; i < len; ++i)
                 {
                     auto j = decode();
-                    result.set(j.as_string_view(),decode());
+                    result.insert_or_assign(j.as_string_view(),decode());
                 }
                 return result;
             }
@@ -726,7 +726,7 @@ public:
                     for (size_t i = 0; i < len; ++i)
                     {
                         auto j = decode();
-                        result.set(j.as_string_view(),decode());
+                        result.insert_or_assign(j.as_string_view(),decode());
                     }
                     return result;
                 }
@@ -748,7 +748,7 @@ public:
                     for (size_t i = 0; i < len; ++i)
                     {
                         auto key = decode().as_string_view();
-                        result.set(key,decode());
+                        result.insert_or_assign(key,decode());
                     }
                     return result;
                 }
