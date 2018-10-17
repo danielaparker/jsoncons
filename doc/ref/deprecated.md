@@ -4,67 +4,67 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
 
 In the table, <em>&#x2713;</em> indicates that the old name is still supported.
 
-Category|Old name, now deprecated|<em>&#x2713;</em>|Recommendation
+Component or location|Old name, now deprecated|<em>&#x2713;</em>|New name
 --------|-----------|--------------|------------------------
-json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator pos, const json& val)
-&#160;|add(size_t index, json&& val)|<em>&#x2713;</em>|Use add(array_iterator pos, json&& val)
-&#160;|dump_body|<em>&#x2713;</em>|dump_fragment
-&#160;|remove_range(size_t from_index, size_t to_index)|<em>&#x2713;</em>|erase(array_iterator first, array_iterator last)
-&#160;|remove(const std::string& name)|<em>&#x2713;</em>|Use erase(const std::string& name)
-&#160;|parse_stream(std::istream& is)|<em>&#x2713;</em>|Use parse(std::istream& is)
-&#160;|parse_stream(std::istream& is, parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse(std::istream& is, parse_error_handler& err_handler)
-&#160;|as_int() const|<em>&#x2713;</em>|Use `as<int>`
-&#160;|as_uint() const|<em>&#x2713;</em>|Use `as<unsigned int>`
-&#160;|as_long() const|<em>&#x2713;</em>|Use `as<long>`
-&#160;|as_ulong() const|<em>&#x2713;</em>|Use `as<unsigned long>`
-&#160;|as_longlong() const|<em>&#x2713;</em>|Use as_integer or `as<long long>`
-&#160;|as_ulonglong() const|<em>&#x2713;</em>|Use as_uinteger or `as<unsigned long long>`
-&#160;|is_longlong() const|<em>&#x2713;</em>|Use is_integer() or is<long long>()
-&#160;|is_ulonglong() const|<em>&#x2713;</em>|Use is_uinteger() or is<unsigned long long>()
-&#160;|is_numeric() const|<em>&#x2713;</em>|Use `is_number()`
-&#160;|remove_member(const std::string& name)|<em>&#x2713;</em>|Use erase(const std::string& name)
-&#160;|const json& get(const std::string& name) const|<em>&#x2713;</em>|Use const json get(const std::string& name, T default_val) const with default `json::null_type()`
-&#160;|has_member(const std::string& name) const|<em>&#x2713;</em>|Use `contains(const string_view_type& name)`
-&#160;|has_key(const std::string& name) const|<em>&#x2713;</em>|Use `contains(const string_view_type& name)`
-&#160;|add|<em>&#x2713;</em>|Use `push_back`
-&#160;|set|<em>&#x2713;</em>|Use `insert_or_assign`
-&#160;|members()|<em>&#x2713;</em>|Use object_range()
-&#160;|elements()|<em>&#x2713;</em>|Use array_range()
-&#160;|begin_members()|<em>&#x2713;</em>|Use object_range().begin()
-&#160;|end_members()|<em>&#x2713;</em>|Use object_range().end()
-&#160;|begin_elements()|<em>&#x2713;</em>|Use array_range().begin()
-&#160;|end_elements()|<em>&#x2713;</em>|Use array_range().end()
-&#160;|is_empty() const|<em>&#x2713;</em>|Use `empty()`
-&#160;|parse_string(const std::string& s)|<em>&#x2713;</em>|parse(const std::string& s)
-&#160;|parse_string(const std::string& s,parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse(const std::string& s,parse_error_handler& err_handler)
-&#160;|resize_array(size_t n)|<em>&#x2713;</em>|resize(size_t n)
-&#160;|resize_array(size_t n, const json& val)|<em>&#x2713;</em>|Use resize(size_t n, const json& val)
-&#160;|to_stream|<em>&#x2713;</em>|Use dump
-&#160;|write|<em>&#x2713;</em>|Use dump
-&#160;|`json` initializer-list constructor||Construct from `json::array` with initializer-list
-&#160;|json_deserializer|<em>&#x2713;</em>|Use json_decoder<json>`
-&#160;|wjson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wjson>`
-&#160;|ojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<ojson>`
-&#160;|wojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wojson>`
-&#160;|owjson|<em>&#x2713;</em>|Use wojson`
-&#160;|member_type name()|<em>&#x2713;</em>|Use key()
-&#160;|rename_name_filter|<em>&#x2713;</em>|Use rename_object_member_filter`
-json member types|any||
-&#160;|member_type|<em>&#x2713;</em>|Use key_value_pair_type
-&#160;|kvp_type|<em>&#x2713;</em>|Use key_value_pair_type
-json member constants|null||Use static member function `json::null()`
-&#160;|an_object||Use the default constructor `json()` instead.
-&#160;|an_array||Use assignment to `json::array()` or `json::make_array()` instead.
-json_decoder|json& root()|<em>&#x2713;</em>|json get_result()
-json_content_handler|begin_json|<em>&#x2713;</em>|Remove
-&#160;|end_json|<em>&#x2713;</em>|`flush`
-&#160;|begin_document|<em>&#x2713;</em>|Remove
-&#160;|end_document|<em>&#x2713;</em>|`flush`
-&#160;|do_begin_json||Remove
-&#160;|do_end_json||Remove
-&#160;|do_begin_document||Remove
-&#160;|do_end_document||Remove
-serialization|`output_format`|<em>&#x2713;</em>|Use `json_serializing_options`
+class basic_json|add(size_t index, const json& val)|<em>&#x2713;</em>|`push_back(array_iterator pos, const json& val)`
+class basic_json|add(size_t index, json&& val)|<em>&#x2713;</em>|`push_back(array_iterator pos, json&& val)`
+class basic_json|dump_body|<em>&#x2713;</em>|`dump`
+class basic_json|remove_range(size_t from_index, size_t to_index)|<em>&#x2713;</em>|`erase(array_iterator first, array_iterator last)`
+class basic_json|remove(const std::string& name)|<em>&#x2713;</em>|`erase(const string_view_type& name)`
+class basic_json|parse_stream(std::istream& is)|<em>&#x2713;</em>|`parse(std::istream& is)`
+class basic_json|parse_stream(std::istream& is, parse_error_handler& err_handler)|<em>&#x2713;</em>|`parse(std::istream& is, parse_error_handler& err_handler)`
+class basic_json|as_int() const|<em>&#x2713;</em>|`as<int>`
+class basic_json|as_uint() const|<em>&#x2713;</em>|`as<unsigned int>`
+class basic_json|as_long() const|<em>&#x2713;</em>|`as<long>`
+class basic_json|as_ulong() const|<em>&#x2713;</em>|`as<unsigned long>`
+class basic_json|as_longlong() const|<em>&#x2713;</em>|`as<long long>`
+class basic_json|as_ulonglong() const|<em>&#x2713;</em>|`as<unsigned long long>`
+class basic_json|is_longlong() const|<em>&#x2713;</em>|is<long long>()
+class basic_json|is_ulonglong() const|<em>&#x2713;</em>|is<unsigned long long>()
+class basic_json|is_numeric() const|<em>&#x2713;</em>|`is_number()`
+class basic_json|remove_member(const std::string& name)|<em>&#x2713;</em>|erase(const string_view_type& name)
+class basic_json|const json& get(const std::string& name) const|<em>&#x2713;</em>|Use const json get(const std::string& name, T default_val) const with default `json::null_type()`
+class basic_json|has_member(const std::string& name) const|<em>&#x2713;</em>|Use `contains(const string_view_type& name)`
+class basic_json|has_key(const std::string& name) const|<em>&#x2713;</em>|Use `contains(const string_view_type& name)`
+class basic_json|add|<em>&#x2713;</em>|Use `push_back`
+class basic_json|set|<em>&#x2713;</em>|Use `insert_or_assign`
+class basic_json|members()|<em>&#x2713;</em>|Use object_range()
+class basic_json|elements()|<em>&#x2713;</em>|Use array_range()
+class basic_json|begin_members()|<em>&#x2713;</em>|Use object_range().begin()
+class basic_json|end_members()|<em>&#x2713;</em>|Use object_range().end()
+class basic_json|begin_elements()|<em>&#x2713;</em>|Use array_range().begin()
+class basic_json|end_elements()|<em>&#x2713;</em>|Use array_range().end()
+class basic_json|is_empty() const|<em>&#x2713;</em>|Use `empty()`
+class basic_json|parse_string(const std::string& s)|<em>&#x2713;</em>|parse(const std::string& s)
+class basic_json|parse_string(const std::string& s,parse_error_handler& err_handler)|<em>&#x2713;</em>|Use parse(const std::string& s,parse_error_handler& err_handler)
+class basic_json|resize_array(size_t n)|<em>&#x2713;</em>|resize(size_t n)
+class basic_json|resize_array(size_t n, const json& val)|<em>&#x2713;</em>|Use resize(size_t n, const json& val)
+class basic_json|to_stream|<em>&#x2713;</em>|Use dump
+class basic_json|write|<em>&#x2713;</em>|Use dump
+class basic_json|`json` initializer-list constructor||Construct from `json::array` with initializer-list
+class basic_json|json_deserializer|<em>&#x2713;</em>|Use json_decoder<json>`
+class basic_json|wjson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wjson>`
+class basic_json|ojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<ojson>`
+class basic_json|wojson_deserializer|<em>&#x2713;</em>|Use `json_decoder<wojson>`
+class basic_json|owjson|<em>&#x2713;</em>|Use wojson`
+class basic_json|member_type name()|<em>&#x2713;</em>|Use key()
+class basic_json|rename_name_filter|<em>&#x2713;</em>|Use rename_object_member_filter`
+class basic_json|any||typdef removed
+class basic_json|member_type|<em>&#x2713;</em>|Use key_value_pair_type
+class basic_json|kvp_type|<em>&#x2713;</em>|Use key_value_pair_type
+class basic_json|null||Constant removed. Use static member function `json::null()`
+class basic_json|an_object||Constant removed. Use the default constructor `json()` instead.
+class basic_json|an_array||Constant removed. Use assignment to `json::array()` or `json::make_array()` instead.
+class json_decoder|json& root()|<em>&#x2713;</em>|json get_result()
+class json_content_handler|begin_json|<em>&#x2713;</em>|Remove
+class json_content_handler|end_json|<em>&#x2713;</em>|`flush`
+class json_content_handler|begin_document|<em>&#x2713;</em>|Remove
+class json_content_handler|end_document|<em>&#x2713;</em>|`flush`
+class json_content_handler|do_begin_json||Remove
+class json_content_handler|do_end_json||Remove
+class json_content_handler|do_begin_document||Remove
+class json_content_handler|do_end_document||Remove
+class output_format|`output_format`|<em>&#x2713;</em>|`json_serializing_options`
 &#160;|`serialization_options`|<em>&#x2713;</em>|Use `json_serializing_options`
 json_reader|max_depth(),max_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
 &#160;|max_nesting_depth(),max_nesting_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
