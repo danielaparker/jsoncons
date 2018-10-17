@@ -11,7 +11,7 @@
 #include <ctime>
 
 using namespace jsoncons;
-#if 0
+
 void test_parse_error(const std::string& text, std::error_code ec)
 {
     REQUIRE_THROWS(json::parse(text));
@@ -217,7 +217,6 @@ TEST_CASE("test_negative_integer_overflow")
     CHECK(j2.is_bignum());
     CHECK(s2 == j2.as<std::string>());
 }
-#endif
 
 TEST_CASE("test_positive_integer_overflow")
 {
