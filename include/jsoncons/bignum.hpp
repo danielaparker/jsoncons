@@ -80,24 +80,18 @@ private:
 public:
 //  Constructors and Destructor
     basic_bignum()
-        : data_(values_), neg_(false), dynamic_(false), length_(0)
+        : values_{0,0}, data_(values_), neg_(false), dynamic_(false), length_(0)
     {
-        values_[0] = 0;
-        values_[1] = 0;
     }
 
     explicit basic_bignum(const Allocator& allocator)
-        : basic_bignum_base<Allocator>(allocator), data_(values_), neg_(false), dynamic_(false), length_(0)
+        : basic_bignum_base<Allocator>(allocator), values_{0,0}, data_(values_), neg_(false), dynamic_(false), length_(0)
     {
-        values_[0] = 0;
-        values_[1] = 0;
     }
 
     basic_bignum(const basic_bignum<Allocator>& n)
-        : basic_bignum_base<Allocator>(n.allocator()), neg_(n.neg_), length_(n.length_)
+        : basic_bignum_base<Allocator>(n.allocator()), values_{0,0}, neg_(n.neg_), length_(n.length_)
     {
-        values_[0] = 0;
-        values_[1] = 0;
         if (!n.dynamic_)
         {
             values_[0] = n.values_[0];
@@ -115,10 +109,8 @@ public:
     }
 
     basic_bignum(basic_bignum<Allocator>&& n)
-        : data_(values_), neg_(n.neg_), dynamic_(false), length_(n.length_)
+        : values_{0,0}, data_(values_), neg_(n.neg_), dynamic_(false), length_(n.length_)
     {
-        values_[0] = 0;
-        values_[1] = 0;
         if (n.dynamic_)
         {
             data_ = n.data_;
@@ -140,55 +132,27 @@ public:
 
     template <typename CharT>
     explicit basic_bignum(const CharT* str)
+        : values_{0,0}
     {
         initialize(str, strlen(str));
     }
 
     template <typename CharT, typename CharTraits, typename UserAllocator>
     basic_bignum(const std::basic_string<CharT,CharTraits,UserAllocator>& s)
+        : values_{0,0}
     {
         initialize(s.data(), s.length());
     }
 
     template <typename CharT>
     basic_bignum(const CharT* data, size_t length)
+        : values_{0,0}
     {
         initialize(data, length);
     }
 
-    template <typename CharT>
-    void initialize(const CharT* data, size_t length)
-    {
-        bool neg = false;
-
-        const CharT* end = data+length;
-        while (data != end && isspace(*data))
-        {
-            ++data;
-            --length;
-        }
-
-        if ( *data == '-' )
-        {
-            neg = true;
-            data++;
-            --length;
-        }
-
-        basic_bignum<Allocator> v = 0;
-        for (size_t i = 0; i < length; i++)
-        {
-            v = (v * 10) + (uint64_t)(data[i] - '0');
-        }
-
-        if ( neg )
-        {
-            v.neg_ = true;
-        }
-        initialize( v );
-    }
-
     basic_bignum(int signum, std::initializer_list<uint8_t> l)
+        : values_{0,0}
     {
         if (l.size() > 0)
         {
@@ -213,6 +177,7 @@ public:
     }
 
     basic_bignum(int signum, const uint8_t* str, size_t n)
+        : values_{0,0}
     {
         if (n > 0)
         {
@@ -237,6 +202,7 @@ public:
     }
 
     basic_bignum(short i)
+        : values_{0,0}
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
@@ -244,12 +210,14 @@ public:
     }
 
     basic_bignum(unsigned short u)
+        : values_{0,0}
     {
         neg_ = false;
         initialize_from_integer( u );
     }
 
     basic_bignum(int i)
+        : values_{0,0}
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
@@ -257,12 +225,14 @@ public:
     }
 
     basic_bignum(unsigned int u)
+        : values_{0,0}
     {
         neg_ = false;
         initialize_from_integer( u );
     }
 
     basic_bignum(long i)
+        : values_{0,0}
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
@@ -270,12 +240,14 @@ public:
     }
 
     basic_bignum(unsigned long u)
+        : values_{0,0}
     {
         neg_ = false;
         initialize_from_integer( u );
     }
 
     basic_bignum(long long i)
+        : values_{0,0}
     {
         neg_ = i < 0;
         uint64_t u = neg_ ? -i : i;
@@ -283,12 +255,14 @@ public:
     }
 
     basic_bignum(unsigned long long u)
+        : values_{0,0}
     {
         neg_ = false;
         initialize_from_integer( u );
     }
 
     explicit basic_bignum( double x )
+        : values_{0,0}
     {
         bool neg = false;
 
@@ -318,6 +292,7 @@ public:
     }
 
     explicit basic_bignum(long double x)
+        : values_{0,0}
     {
         bool neg = false;
 
@@ -353,6 +328,38 @@ public:
         {
             allocator().deallocate(data_, capacity_);
         }
+    }
+
+    template <typename CharT>
+    void initialize(const CharT* data, size_t length)
+    {
+        bool neg = false;
+
+        const CharT* end = data+length;
+        while (data != end && isspace(*data))
+        {
+            ++data;
+            --length;
+        }
+
+        if ( *data == '-' )
+        {
+            neg = true;
+            data++;
+            --length;
+        }
+
+        basic_bignum<Allocator> v = 0;
+        for (size_t i = 0; i < length; i++)
+        {
+            v = (v * 10) + (uint64_t)(data[i] - '0');
+        }
+
+        if ( neg )
+        {
+            v.neg_ = true;
+        }
+        initialize( v );
     }
 
     size_t capacity() const { return dynamic_ ? capacity_ : 2; }
