@@ -117,6 +117,8 @@ public:
     basic_bignum(basic_bignum<Allocator>&& n)
         : data_(values_), neg_(n.neg_), dynamic_(false), length_(n.length_)
     {
+        values_[0] = 0;
+        values_[1] = 0;
         if (n.dynamic_)
         {
             data_ = n.data_;

@@ -555,7 +555,8 @@ public:
                         return s;
                     }
                     default:
-                        break;
+                        std::string s;
+                        return s;
                 }
                 break;
             }
