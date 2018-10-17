@@ -24,7 +24,10 @@ json|add(size_t index, const json& val)|<em>&#x2713;</em>|Use add(array_iterator
 &#160;|is_numeric() const|<em>&#x2713;</em>|Use `is_number()`
 &#160;|remove_member(const std::string& name)|<em>&#x2713;</em>|Use erase(const std::string& name)
 &#160;|const json& get(const std::string& name) const|<em>&#x2713;</em>|Use const json get(const std::string& name, T default_val) const with default `json::null_type()`
-&#160;|has_member(const std::string& name) const|<em>&#x2713;</em>|Use has_name(const std::string& name)
+&#160;|has_member(const std::string& name) const|<em>&#x2713;</em>|Use `contains(const string_view_type& name)`
+&#160;|has_key(const std::string& name) const|<em>&#x2713;</em>|Use `contains(const string_view_type& name)`
+&#160;|add|<em>&#x2713;</em>|Use `push_back`
+&#160;|set|<em>&#x2713;</em>|Use `insert_or_assign`
 &#160;|members()|<em>&#x2713;</em>|Use object_range()
 &#160;|elements()|<em>&#x2713;</em>|Use array_range()
 &#160;|begin_members()|<em>&#x2713;</em>|Use object_range().begin()
