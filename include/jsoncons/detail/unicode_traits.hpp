@@ -373,8 +373,11 @@ convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flag
 
         switch (length) {
             case 4: *target++ = (static_cast<uint8_t>(*first++));
+                // FALLTHRU
             case 3: *target++ = (static_cast<uint8_t>(*first++));
+                // FALLTHRU
             case 2: *target++ = (static_cast<uint8_t>(*first++));
+                // FALLTHRU
             case 1: *target++ = (static_cast<uint8_t>(*first++));
         }
     }

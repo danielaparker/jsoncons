@@ -31,7 +31,7 @@ template<class CharT,class Writer=jsoncons::detail::stream_byte_writer>
 class basic_cbor_serializer final : public basic_json_content_handler<CharT>
 {
 
-    enum class decimal_parse_state { start, integer, minus, exp1, exp2, fraction1 };
+    enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Writer writer_type;
