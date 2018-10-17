@@ -118,14 +118,17 @@ int main()
     // Pretty print
     std::cout << "(1)\n" << pretty_print(j) << "\n\n";
 
+    // Does object member exist?
+    std::cout << "(2) " << std::boolalpha << j.contains("Image Sizing") << "\n\n";
+
     // Get reference to object member
     const json& val = j["Image Sizing"];
 
     // Access member as double
-    std::cout << "(2) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
+    std::cout << "(3) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
 
     // Try access member with default
-    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n";
+    std::cout << "(4) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n";
 }
 ```
 Output:
@@ -133,7 +136,14 @@ Output:
 (1)
 {
     "File Format Options": {
-        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"]
+        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"],
+        "Image Formats": ["JPEG","PSD","TIFF","DNG"]
+    },
+    "File Settings": {
+        "Color Space": "sRGB",
+        "Image Format": "JPEG",
+        "Limit File Size": true,
+        "Limit File Size To": 10000
     },
     "Image Sizing": {
         "Dimension 1": 9.84,
@@ -143,9 +153,11 @@ Output:
     }
 }
 
-(2) Dimension 1 = 9.84
+(2) true
 
-(3) Dimension 2 = 0.0
+(3) Dimension 1 = 9.8
+
+(4) Dimension 2 = 0
 ```
 
 ## About jsoncons::basic_json

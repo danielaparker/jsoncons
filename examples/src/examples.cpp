@@ -378,14 +378,17 @@ void more_examples()
     // Pretty print
     std::cout << "(1)\n" << pretty_print(j) << "\n\n";
 
+    // Does object member exist?
+    std::cout << "(2) " << std::boolalpha << j.contains("Image Sizing") << "\n\n";
+
     // Get reference to object member
     const json& val = j["Image Sizing"];
 
     // Access member as double
-    std::cout << "(2) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
+    std::cout << "(3) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
 
     // Try access member with default
-    std::cout << "(3) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n\n";
+    std::cout << "(4) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n\n";
 
 }
 
@@ -504,8 +507,6 @@ int main()
 
         csv_examples();
 
-        more_examples();
-
         mulitple_json_objects();
 
         wjson_examples();
@@ -557,6 +558,8 @@ int main()
         pull_parser_examples();
 
         readme_examples();
+
+        more_examples();
     }
     catch (const std::exception& e)
     {
