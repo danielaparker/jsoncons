@@ -21,7 +21,7 @@
 #elif defined (__GNUC__)
 #  define UNICONS_FALLTHROUGH // FALLTHRU
 #elif defined(__clang__) 
-#  define UNICONS_FALLTHROUGH __attribute__((clang::fallthrough))
+#  define UNICONS_FALLTHROUGH [[clang::fallthrough]]
 #else
 #  define UNICONS_FALLTHROUGH
 #endif
