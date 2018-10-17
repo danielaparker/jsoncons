@@ -259,7 +259,7 @@ private:
                     node_set& nodes,
                     std::vector<std::shared_ptr<Json>>& temp_json_values) override
         {
-            if (val.is_object() && val.count(name_) > 0)
+            if (val.is_object() && val.contains(name_))
             {
                 nodes.emplace_back(PathCons()(path,name_),std::addressof(val.at(name_)));
             }
@@ -981,7 +981,7 @@ public:
     {
         if (val.is_object())
         {
-            if (val.count(name) > 0)
+            if (val.contains(name))
             {
                 nodes_.emplace_back(PathCons()(path,name),std::addressof(val.at(name)));
             }

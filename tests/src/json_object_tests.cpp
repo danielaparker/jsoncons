@@ -749,8 +749,8 @@ TEST_CASE("test_object_get_defaults")
     obj["field1"] = 1;
     obj["field3"] = "Toronto";
 
-    double x1 = obj.count("field1") ? obj["field1"].as<double>() : 10.0;
-    double x2 = obj.count("field2") ? obj["field2"].as<double>() : 20.0;
+    double x1 = obj.contains("field1") ? obj["field1"].as<double>() : 10.0;
+    double x2 = obj.contains("field2") ? obj["field2"].as<double>() : 20.0;
 
 
     CHECK(x1 == 1.0);
@@ -796,7 +796,7 @@ TEST_CASE("test_value_not_found_and_defaults")
     //REQUIRE_THROWS_AS((obj["outdoor_experience"].as<std::string>()),jsoncons::key_not_found);
     //REQUIRE_THROWS_WITH((obj["outdoor_experience"].as<std::string>()),"Key 'outdoor_experience' not found");
 
-    std::string experience = obj.count("outdoor_experience") > 0 ? obj["outdoor_experience"].as<std::string>() : "";
+    std::string experience = obj.contains("outdoor_experience") ? obj["outdoor_experience"].as<std::string>() : "";
 
     CHECK(experience == "");
 

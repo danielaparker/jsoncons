@@ -449,7 +449,7 @@ TEST_CASE("test_jsonpath_book_isbn")
     json books = fixture.book();
     for (size_t i = 0; i < books.size(); ++i)
     {
-        bool has_isbn = books[i].count("isbn") > 0;
+        bool has_isbn = books[i].contains("isbn");
         if (has_isbn)
         {
             json result = json_query(books[i],"@.isbn");
@@ -470,7 +470,7 @@ TEST_CASE("test_jsonpath_book_empty_isbn")
     json books = fixture.book();
     for (size_t i = 0; i < books.size(); ++i)
     {
-        bool has_isbn = books[i].count("isbn") > 0;
+        bool has_isbn = books[i].contains("isbn");
         if (has_isbn)
         {
             json result = json_query(books[i],"@.isbn");
@@ -495,7 +495,7 @@ TEST_CASE("test_jsonpath_filter4")
     json expected = json::array();
     for (size_t i = 0; i < books.size(); ++i)
     {
-        if (books[i].count("isbn") > 0)
+        if (books[i].contains("isbn"))
         {
             expected.push_back(books[i]);
         }
