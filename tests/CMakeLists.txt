@@ -63,12 +63,12 @@ set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
-#file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
+file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
 
- set(JSONCONS_TESTS_SOURCES
-     src/tests_main.cpp
-     src/json_as_tests.cpp
-)
+# set(JSONCONS_TESTS_SOURCES
+#     src/tests_main.cpp
+#     src/json_as_tests.cpp
+#)
 set(JSONCONS_TARGET test_jsoncons)
 add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS_SOURCES} ${JSONCONS_HEADERS})
 target_include_directories (${JSONCONS_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
