@@ -16,12 +16,12 @@
 #ifndef UNICONS_UNICODE_TRAITS_HPP
 #define UNICONS_UNICODE_TRAITS_HPP
 
-#if defined(__GNUC__) && ((__GNUC__ >= 7))
+#if defined(__clang__) 
+#  define UNICONS_FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__GNUC__) && ((__GNUC__ >= 7))
 #  define UNICONS_FALLTHROUGH __attribute__((fallthrough))
 #elif defined (__GNUC__)
 #  define UNICONS_FALLTHROUGH // FALLTHRU
-#elif defined(__clang__) 
-#  define UNICONS_FALLTHROUGH [[clang::fallthrough]]
 #else
 #  define UNICONS_FALLTHROUGH
 #endif

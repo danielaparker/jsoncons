@@ -26,12 +26,12 @@
 // The definitions below follow the definitions in compiler_support_p.h, https://github.com/01org/tinycbor
 // MIT license
 
-#if defined(__GNUC__) && ((__GNUC__ >= 7))
+#if defined(__clang__) 
+#  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__GNUC__) && ((__GNUC__ >= 7))
 #  define JSONCONS_FALLTHROUGH __attribute__((fallthrough))
 #elif defined (__GNUC__)
 #  define JSONCONS_FALLTHROUGH // FALLTHRU
-#elif defined(__clang__) 
-#  define JSONCONS_FALLTHROUGH [[clang::fallthrough]]
 #else
 #  define JSONCONS_FALLTHROUGH
 #endif
