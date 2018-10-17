@@ -133,7 +133,7 @@ private:
 
     bool do_double_value(double value, 
                          const floating_point_options& fmt, 
-                         semantic_tag_type tag, 
+                         semantic_tag_type, 
                          const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(value, fmt);

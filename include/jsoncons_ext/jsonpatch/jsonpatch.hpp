@@ -137,8 +137,6 @@ namespace detail {
     Json from_diff(const Json& source, const Json& target, const typename Json::string_type& path)
     {
         typedef typename Json::char_type char_type;
-        typedef typename Json::string_type string_type;
-        typedef typename Json::string_view_type string_view_type;
 
         Json result = typename Json::array();
 

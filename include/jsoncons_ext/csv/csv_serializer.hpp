@@ -275,7 +275,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -299,17 +299,17 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type tag, const serializing_context& context) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type, const serializing_context& context) override
     {
         std::basic_string<CharT> s;
         encode_base64url(data,length,s);
-        do_string_value(s, semantic_tag_type::bignum, context);
+        do_string_value(s, semantic_tag_type::none, context);
         return true;
     }
 
     bool do_double_value(double val, 
                          const floating_point_options& fmt, 
-                         semantic_tag_type tag, 
+                         semantic_tag_type, 
                          const serializing_context&) override
     {
         if (stack_.size() == 2)

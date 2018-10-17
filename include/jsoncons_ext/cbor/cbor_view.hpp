@@ -554,7 +554,10 @@ public:
                         n.dump(s);
                         return s;
                     }
+                    default:
+                        break;
                 }
+                break;
             }
             default:
             {
