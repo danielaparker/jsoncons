@@ -103,8 +103,6 @@ public:
         }
         else
         {
-            values_ [0] = 0;
-            values_ [1] = 0;
             capacity_ = n.capacity_;
             data_ = allocator().allocate(capacity_);
             dynamic_ = true;
