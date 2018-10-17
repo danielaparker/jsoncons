@@ -477,13 +477,42 @@ public:
     typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,T>::type
     as_integer() const
     {
-        const uint8_t* endp;
-        uint64_t val = detail::get_uint64_value(first_,last_,&endp);
-        if (endp == first_)
+        switch (major_type())
         {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+            case cbor_major_type::unsigned_integer:
+            case cbor_major_type::negative_integer:
+            {
+                const uint8_t* endp;
+                uint64_t val = detail::get_uint64_value(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                }
+                return (T)val;
+            }
+            case cbor_major_type::semantic_tag:
+            {
+                uint8_t tag = additional_information_value();
+                switch (tag)
+                {
+                    case 1: // epoch time
+                    {
+                        const uint8_t* endp;
+                        uint64_t val = detail::get_uint64_value(first_,last_,&endp);
+                        if (endp == first_ + 1)
+                        {
+                            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                        }
+                        return (T)val;
+                    }
+                    default:
+                        return 0;
+                        break;
+                }
+            }
+            default:
+                return 0;
         }
-        return (T)val;
     }
 
     bool as_bool() const
