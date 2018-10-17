@@ -709,7 +709,7 @@ struct json_type_traits<Json, T,
         j.reserve(val.size());
         for (auto p: val)
         {
-            j.set(p.first, p.second);
+            j.insert_or_assign(p.first, p.second);
         }
         return j;
     }
@@ -720,7 +720,7 @@ struct json_type_traits<Json, T,
         j.reserve(val.size());
         for (auto p: val)
         {
-            j.set(p.first, p.second);
+            j.insert_or_assign(p.first, p.second);
         }
         return j;
     }
