@@ -407,6 +407,8 @@ TEST_CASE("test_jsonpath_filter_category_eq_reference")
     for (size_t i = 0; i < books.size(); ++i)
     {
         double price = books[i]["price"].as<double>();
+        (void)price;
+
         if (books[i]["category"].as<std::string>() == "reference")
         {
             expected.push_back(books[i]);

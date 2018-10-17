@@ -4,51 +4,51 @@ sudo: required
 
 matrix:
   include:
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-4.8
-#      env: COMPILER=gcc VERSION=4.8 CXXFLAGS="-std=c++11" 
-#
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-4.9
-#      env: COMPILER=gcc VERSION=4.9 SANITIZE=1 CXXFLAGS="-std=c++11" 
-#
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-5
-#      env: COMPILER=gcc VERSION=5 SANITIZE=1 CXXFLAGS="-std=gnu++11" 
-#
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-6
-#      env: COMPILER=gcc VERSION=6 SANITIZE=1
-#
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-7
-#      env: COMPILER=gcc VERSION=7 SANITIZE=1
-#
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.8
+      env: COMPILER=gcc VERSION=4.8 CXXFLAGS="-std=c++11" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env: COMPILER=gcc VERSION=4.9 SANITIZE=1 CXXFLAGS="-std=c++11" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: COMPILER=gcc VERSION=5 SANITIZE=1 CXXFLAGS="-std=gnu++11" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env: COMPILER=gcc VERSION=6 SANITIZE=1
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env: COMPILER=gcc VERSION=7 SANITIZE=1
+
     - os: linux
       addons:
         apt:
@@ -58,43 +58,43 @@ matrix:
             - g++-8
       env: COMPILER=gcc VERSION=8 SANITIZE=1 CXXFLAGS="-std=c++11 -Wall -Wextra -Wimplicit-fallthrough" 
 
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - clang-3.9
-#            - g++-4.8-aarch64-linux-gnu
-#            - gcc-4.8-aarch64-linux-gnu
-#            - g++-4.8-multilib
-#            - gcc-4.8-multilib
-#            - qemu
-#            - qemu-system-arm
-#      env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi" CXXFLAGS="-std=c++11" 
-#
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#            - llvm-toolchain-trusty-4.0
-#          packages:
-#            - clang-4.0
-#            - g++-7
-#      env: COMPILER=clang VERSION=4.0 CXXFLAGS="-std=c++11" 
-#
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#            - llvm-toolchain-trusty-5.0
-#          packages:
-#            - clang-5.0
-#            - g++-7
-#      env: COMPILER=clang VERSION=5.0 SANITIZE=1 CXXFLAGS="-std=gnu++11" 
-#
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-3.9
+            - g++-4.8-aarch64-linux-gnu
+            - gcc-4.8-aarch64-linux-gnu
+            - g++-4.8-multilib
+            - gcc-4.8-multilib
+            - qemu
+            - qemu-system-arm
+      env: COMPILER=clang VERSION=3.9 CROSS_COMPILE=1 ARM_ARCH_DIR=aarch64-linux-gnu GCC_VER=4.8.4 ARM_SETTINGS="armv8-a -target aarch64-linux-gnueabi" CXXFLAGS="-std=c++11" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
+            - g++-7
+      env: COMPILER=clang VERSION=4.0 CXXFLAGS="-std=c++11" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - g++-7
+      env: COMPILER=clang VERSION=5.0 SANITIZE=1 CXXFLAGS="-std=gnu++11" 
+
     - os: linux
       addons:
         apt:
@@ -105,72 +105,72 @@ matrix:
             - clang-6.0
             - g++-7
       env: COMPILER=clang VERSION=6.0 SANITIZE=1  CXXFLAGS="-std=c++11 -Wall -Wextra -Wimplicit-fallthrough"
-#
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#            - llvm-toolchain-trusty-6.0
-#          packages:
-#            - clang-6.0
-#            - g++-7
-#      env: COMPILER=clang VERSION=6.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
-#
-#    - os: osx
-#      osx_image: xcode6.4
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode7.3
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode8
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode8.1
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode8.2
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode8.3
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode9
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode9.1
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode9.2
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode9.3
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
-#
-#    - os: osx
-#      osx_image: xcode9.4
-#      compiler: clang
-#      env: CXXFLAGS="-std=c++11"
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+            - g++-7
+      env: COMPILER=clang VERSION=6.0 CXXFLAGS="-DJSONCONS_NO_DEPRECATED" 
+
+    - os: osx
+      osx_image: xcode6.4
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode8.1
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode8.2
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode9
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode9.1
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode9.2
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode9.3
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
+      env: CXXFLAGS="-std=c++11"
 
 before_install:
     - |
