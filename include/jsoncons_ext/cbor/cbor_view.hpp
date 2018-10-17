@@ -60,7 +60,7 @@ public:
 
         if (major_type() == cbor_major_type::map)
         {
-            detail::get_size(first_,last_,&begin);
+            detail::get_map_size(first_,last_,&begin);
             if (begin == first_)
             {
                 JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Failed finding size"));
@@ -80,20 +80,11 @@ public:
         const uint8_t* endp;
         const uint8_t* begin;
 
-        if (major_type() == cbor_major_type::array)
+        detail::get_array_size(first_, last_, &begin);
+        if (begin == first_)
         {
-            /*size_t n = */ detail::get_size(first_,last_,&begin);
-            if (begin == first_)
-            {
-                JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
-            }
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
         }
-        else
-        {
-            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an array"));
-        }
-        
-
         detail::walk_array(first_,last_,&endp);
         if (endp == first_)
         {
@@ -295,8 +286,26 @@ public:
 
     size_t size() const
     {
-        const uint8_t* it;
-        size_t len = detail::get_size(first_,last_,&it);
+        size_t len = 0;
+        switch (major_type())
+        {
+            case cbor_major_type::array:
+            {
+                    const uint8_t* endp;
+                    len = detail::get_array_size(first_,last_,&endp);
+                    break;
+            }
+            case cbor_major_type::map:
+            {
+                    const uint8_t* endp;
+                    len = detail::get_map_size(first_,last_,&endp);
+                    break;
+            }
+            default:
+                len = 0;
+                break;
+
+        }
         return len;
     }
 
@@ -315,7 +324,7 @@ public:
         JSONCONS_ASSERT(is_array());
         const uint8_t* it = first_;
 
-        /*size_t len = */ detail::get_size(it, last_, &it);
+        detail::get_array_size(it, last_, &it);
 
         for (size_t i = 0; i < index; ++i)
         {
@@ -343,7 +352,7 @@ public:
         JSONCONS_ASSERT(is_object());
         const uint8_t* it = first_;
 
-        size_t len = detail::get_size(first_, last_, &it);
+        size_t len = detail::get_map_size(first_, last_, &it);
 
         for (size_t i = 0; i < len; ++i)
         {
@@ -379,7 +388,7 @@ public:
         }
         const uint8_t* it = first_;
 
-        size_t len = detail::get_size(it, last_, &it);
+        size_t len = detail::get_map_size(it, last_, &it);
 
         for (size_t i = 0; i < len; ++i)
         {
@@ -722,7 +731,7 @@ public:
             case cbor_major_type::array:
             {
                 const uint8_t* it;
-                size_t len = detail::get_size(first_,last_,&it);
+                size_t len = detail::get_array_size(first_,last_,&it);
                 handler.begin_array(len);
                 for (size_t i = 0; i < len; ++i)
                 {
@@ -742,7 +751,7 @@ public:
             case cbor_major_type::map:
             {
                 const uint8_t* it;
-                size_t len = detail::get_size(first_,last_,&it);
+                size_t len = detail::get_map_size(first_,last_,&it);
                 handler.begin_object(len);
                 for (size_t i = 0; i < len; ++i)
                 {
