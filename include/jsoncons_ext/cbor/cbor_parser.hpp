@@ -1858,9 +1858,9 @@ public:
                         handler_.null_value(*this);
                         break;
                     case 25: // Half-Precision Float (two-byte IEEE 754)
-                        // FALLTHRU
+                        JSONCONS_FALLTHROUGH;
                     case 26: // Single-Precision Float (four-byte IEEE 754)
-                        // FALLTHRU
+                        JSONCONS_FALLTHROUGH;
                     case 27: // Double-Precision Float (eight-byte IEEE 754)
                         const uint8_t* endp;
                         double val = detail::get_double(pos,end_input_,&endp);

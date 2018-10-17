@@ -2800,7 +2800,7 @@ public:
         {
         case structure_tag_type::empty_object_tag: 
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return json_proxy<basic_json>(*this, key_storage_type(name.begin(),name.end(),char_allocator_type(object_value().get_allocator())));
             break;
@@ -3794,7 +3794,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().insert_or_assign(name, std::forward<T>(val));
         default:
@@ -3811,7 +3811,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().try_emplace(name, std::forward<Args>(args)...);
         default:
@@ -3828,7 +3828,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             object_value().set_(std::forward<key_storage_type>(name), std::forward<T>(val));
             break;
@@ -3847,7 +3847,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().merge(source.object_value());
         default:
@@ -3863,7 +3863,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().merge(std::move(source.object_value()));
         default:
@@ -3879,7 +3879,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().merge(hint, source.object_value());
         default:
@@ -3895,7 +3895,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().merge(hint, std::move(source.object_value()));
         default:
@@ -3913,7 +3913,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().merge_or_update(source.object_value());
         default:
@@ -3929,7 +3929,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().merge_or_update(std::move(source.object_value()));
         default:
@@ -3945,7 +3945,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().merge_or_update(hint, source.object_value());
         default:
@@ -3961,7 +3961,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().merge_or_update(hint, std::move(source.object_value()));
         default:
@@ -3978,7 +3978,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().insert_or_assign(hint, name, std::forward<T>(val));
         default:
@@ -3995,7 +3995,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().try_emplace(hint, name, std::forward<Args>(args)...);
         default:
@@ -4012,7 +4012,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(val));
             break;
@@ -4579,7 +4579,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             create_object_implicitly();
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return var_.object_data_cast()->value();
         default:
@@ -4594,7 +4594,7 @@ public:
         {
         case structure_tag_type::empty_object_tag:
             const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
-            // FALLTHRU
+            JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return var_.object_data_cast()->value();
         default:
