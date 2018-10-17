@@ -423,17 +423,50 @@ public:
         return json_type_traits<cbor_view,T>::as(*this,std::forward<Args>(args)...);
     }
 
-    template <class T>
+    template <class T
+#if !defined(JSONCONS_NO_DEPRECATED)
+         = int64_t
+#endif
+        >
     typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type
     as_integer() const
     {
-        const uint8_t* endp;
-        int64_t val = detail::get_int64_value(first_,last_,&endp);
-        if (endp == first_)
+        switch (major_type())
         {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+            case cbor_major_type::unsigned_integer:
+            case cbor_major_type::negative_integer:
+            {
+                const uint8_t* endp;
+                int64_t val = detail::get_int64_value(first_,last_,&endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                }
+                return (T)val;
+            }
+            case cbor_major_type::semantic_tag:
+            {
+                uint8_t tag = additional_information_value();
+                switch (tag)
+                {
+                    case 1: // epoch time
+                    {
+                        const uint8_t* endp;
+                        int64_t val = detail::get_int64_value(first_ + 1, last_, &endp);
+                        if (endp == first_ + 1)
+                        {
+                            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                        }
+                        return (T)val;
+                    }
+                    default:
+                        return 0;
+                        break;
+                }
+            }
+            default:
+                return 0;
         }
-        return (T)val;
     }
 
     template <class T
@@ -528,6 +561,16 @@ public:
                 uint8_t tag = additional_information_value();
                 switch (tag)
                 {
+                    case 0:
+                    {
+                        const uint8_t* endp;
+                        std::string s = detail::get_text_string(first_+1,last_,&endp);
+                        if (endp == first_+1)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        return s;
+                    }
                     case 2:
                     {
                         const uint8_t* endp;
@@ -552,6 +595,16 @@ public:
                         bignum n = bignum(-1, v.data(), v.size());
                         std::string s;
                         n.dump(s);
+                        return s;
+                    }
+                    case 4:
+                    {
+                        const uint8_t* endp;
+                        std::string s = cbor::detail::get_decimal_as_string(first_,last_,&endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
                         return s;
                     }
                     default:

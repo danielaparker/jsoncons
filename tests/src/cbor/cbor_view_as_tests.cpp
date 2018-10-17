@@ -68,9 +68,9 @@ TEST_CASE("cbor_view array as<> test")
         CHECK(v[1].as<jsoncons::byte_string>() == jsoncons::byte_string({'b','a','r'}));
         CHECK(v[2].as<std::string>() == std::string("-18446744073709551617"));
         //CHECK(v[2].as<jsoncons::bignum>() == jsoncons::bignum("-18446744073709551617"));
-        //CHECK(v[3].as<std::string>() == std::string("273.15"));
-        //CHECK(v[4].as<std::string>() == std::string("2015-05-07 12:41:07-07:00"));
-        //CHECK(v[5].as<uint64_t>() == 1431027667);
+        CHECK(v[3].as<std::string>() == std::string("273.15"));
+        CHECK(v[4].as<std::string>() == std::string("2015-05-07 12:41:07-07:00"));
+        CHECK(v[5].as<int64_t>() == 1431027667);
     }
 }
 
