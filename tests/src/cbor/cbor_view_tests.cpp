@@ -323,7 +323,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
     CHECK(++it2 == bv2.array_range().end());
 }
 
-TEST_CASE("cbor_view comparison test")
+TEST_CASE("cbor_view array comparison test")
 {
     std::vector<uint8_t> buf1;
     cbor::cbor_bytes_serializer serializer1(buf1);
@@ -368,6 +368,54 @@ TEST_CASE("cbor_view comparison test")
         REQUIRE(v1.size() == v3.size());
         CHECK(v1[0] == v3[0]);
         CHECK_FALSE(v1[1] == v3[1]);
+    }
+}
+
+TEST_CASE("cbor_view object comparison")
+{
+    std::vector<uint8_t> buf1;
+    cbor::cbor_bytes_serializer serializer1(buf1);
+    serializer1.begin_object(); // indefinite length array
+    serializer1.name("City");
+    serializer1.string_value("Montreal");
+    serializer1.name("Amount");
+    serializer1.decimal_value("273.15");
+    serializer1.name("Date");
+    serializer1.date_time_value("2018-05-07 12:41:07-07:00");
+    serializer1.end_object(); 
+    serializer1.flush();
+    cbor_view v1 = buf1;
+
+    std::vector<uint8_t> buf2;
+    cbor::cbor_bytes_serializer serializer2(buf2);
+    serializer2.begin_object(); // indefinite length array
+    serializer2.name("City");
+    serializer2.string_value("Toronto");
+    serializer2.name("Amount");
+    serializer2.decimal_value("273.15");
+    serializer2.name("Date");
+    serializer2.date_time_value("2018-10-18 12:41:07-07:00");
+    serializer2.end_object(); 
+    serializer2.flush();
+    cbor_view v2 = buf2;
+
+    REQUIRE(v1.size() == 3);
+    REQUIRE(v2.size() == v1.size());
+
+    SECTION("contains")
+    {
+        CHECK(v1.contains("City"));
+        CHECK(v1.contains("Amount"));
+        CHECK(v1.contains("Date"));
+        CHECK_FALSE(v1.contains("Country"));
+    }
+
+    SECTION("operator==")
+    {
+        CHECK_FALSE(v1 == v2);
+        CHECK_FALSE(v1["City"] == v2["City"]);
+        CHECK(v1["Amount"] == v2["Amount"]);
+        CHECK_FALSE(v1["Date"] == v2["Date"]);
     }
 }
 
