@@ -122,7 +122,9 @@ public:
 
     friend bool operator==(const cbor_view& lhs, const cbor_view& rhs) 
     {
-        return lhs.first_ == rhs.first_ && lhs.last_ == rhs.last_; 
+        size_t n = lhs.last_ - lhs.first_;
+        size_t m = rhs.last_ - rhs.first_;
+        return (n != m) ? false : memcmp(lhs.first_,rhs.first_,n) == 0; 
     }
 
     friend bool operator!=(const cbor_view& lhs, const cbor_view& rhs) 
@@ -451,21 +453,16 @@ public:
                 {
                     case 1: // epoch time
                     {
-                        const uint8_t* endp;
-                        int64_t val = detail::get_int64_value(first_ + 1, last_, &endp);
-                        if (endp == first_ + 1)
-                        {
-                            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
-                        }
-                        return (T)val;
+                        cbor_view v(first_ + 1, last_-(first_+1));
+                        return v.as_integer<T>();
                     }
                     default:
-                        return 0;
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
                         break;
                 }
             }
             default:
-                return 0;
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
         }
     }
 
@@ -497,21 +494,16 @@ public:
                 {
                     case 1: // epoch time
                     {
-                        const uint8_t* endp;
-                        uint64_t val = detail::get_uint64_value(first_,last_,&endp);
-                        if (endp == first_ + 1)
-                        {
-                            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
-                        }
-                        return (T)val;
+                        cbor_view v(first_ + 1, last_-(first_+1));
+                        return v.as_integer<T>();
                     }
                     default:
-                        return 0;
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
                         break;
                 }
             }
             default:
-                return 0;
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
         }
     }
 
@@ -533,30 +525,67 @@ public:
 
     double as_double() const
     {
-        double val;
-
-        if (is_double())
+        switch (major_type())
         {
-            const uint8_t* endp;
-            val = detail::get_double(first_,last_,&endp);
-            if (endp == first_)
+            case cbor_major_type::unsigned_integer:
             {
-                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Invalid CBOR"));
+                const uint8_t* endp;
+                uint64_t val = detail::get_uint64_value(first_, last_, &endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+                }
+                return static_cast<double>(val);
             }
+            case cbor_major_type::negative_integer:
+            {
+                const uint8_t* endp;
+                int64_t val = detail::get_int64_value(first_, last_, &endp);
+                if (endp == first_)
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+                }
+                return static_cast<double>(val);
+            }
+            case cbor_major_type::simple:
+            {
+                switch (additional_information_value())
+                {
+                    case 0x19:
+                    case 0x1a:
+                    case 0x1b:
+                    {
+                        const uint8_t* endp;
+                        double val = detail::get_double(first_, last_, &endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+                        }
+                        return val;
+                    }
+                    default:
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+                        break;
+                }
+            }
+            case cbor_major_type::semantic_tag:
+            {
+                uint8_t tag = additional_information_value();
+                switch (tag)
+                {
+                    case 1: // epoch time
+                    {
+                        cbor_view v(first_ + 1, last_-(first_+1));
+                        return v.as_double();
+                    }
+                    default:
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
+                        break;
+                }
+            }
+            default:
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
-        else if (is_uint64())
-        {
-            val = static_cast<double>(as_integer<uint64_t>());
-        }
-        else if (is_int64())
-        {
-            val = static_cast<double>(as_integer<int64_t>());
-        }
-        else
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
-        }
-        return val;
     }
 
     std::string as_string() const

@@ -25,6 +25,8 @@ TEST_CASE("cbor_view array as<> test")
     writer.decimal_value("273.15");
     writer.date_time_value("2015-05-07 12:41:07-07:00");
     writer.epoch_time_value(1431027667);
+    writer.int64_value(-1431027667, semantic_tag_type::epoch_time);
+    writer.double_value(1431027667.5, jsoncons::floating_point_options(), semantic_tag_type::epoch_time);
     writer.end_array();
     writer.flush();
 
@@ -60,17 +62,20 @@ TEST_CASE("cbor_view array as<> test")
 
     cbor::cbor_view v = bytes; // a non-owning view of the CBOR bytes
 
-    CHECK(v.size() == 6);
+    CHECK(v.size() == 8);
 
     SECTION("v[0].as<std::string>()")
     {
         CHECK(v[0].as<std::string>() == std::string("foo"));
         CHECK(v[1].as<jsoncons::byte_string>() == jsoncons::byte_string({'b','a','r'}));
         CHECK(v[2].as<std::string>() == std::string("-18446744073709551617"));
-        //CHECK(v[2].as<jsoncons::bignum>() == jsoncons::bignum("-18446744073709551617"));
+        CHECK(v[2].as<jsoncons::bignum>() == jsoncons::bignum("-18446744073709551617"));
         CHECK(v[3].as<std::string>() == std::string("273.15"));
         CHECK(v[4].as<std::string>() == std::string("2015-05-07 12:41:07-07:00"));
         CHECK(v[5].as<int64_t>() == 1431027667);
+        CHECK(v[5].as<uint64_t>() == 1431027667U);
+        CHECK(v[6].as<int64_t>() == -1431027667);
+        CHECK(v[7].as<double>() == 1431027667.5);
     }
 }
 

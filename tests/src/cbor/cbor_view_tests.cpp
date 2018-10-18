@@ -321,3 +321,33 @@ TEST_CASE("test_indefinite_length_array_iterator")
     CHECK(++it2 == bv2.array_range().end());
 }
 
+TEST_CASE("cbor_view comparison test")
+{
+    std::vector<uint8_t> buf1;
+    cbor::cbor_bytes_serializer serializer1(buf1);
+    serializer1.begin_array(); // indefinite length array
+    serializer1.string_value("Toronto");
+    serializer1.string_value("Vancouver");
+    serializer1.end_array(); 
+    serializer1.flush();
+    cbor_view v1 = buf1;
+
+    std::vector<uint8_t> buf2;
+    cbor::cbor_bytes_serializer serializer2(buf2);
+    serializer2.begin_array(); // indefinite length array
+    serializer2.string_value("Toronto");
+    serializer2.string_value("Vancouver");
+    serializer2.end_array(); 
+    serializer2.flush();
+    cbor_view v2 = buf2;
+
+    SECTION("operator== test")
+    {
+        CHECK(v1 == v2);
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v2.size() == 2);
+        CHECK(v1[0] == v2[0]);
+        CHECK(v1[1] == v2[1]);
+    }
+}
+
