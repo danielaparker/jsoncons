@@ -194,7 +194,7 @@ public:
             case cbor_major_type::simple:
                 switch (additional_information_value())
                 {
-                    case 0xf6:
+                    case 0x16:
                         return true;
                     default:
                         return false;
@@ -286,8 +286,8 @@ public:
             case cbor_major_type::simple:
                 switch (additional_information_value())
                 {
-                    case 0xf4:
-                    case 0xf5:
+                    case 0x14:
+                    case 0x15:
                         return true;
                     default:
                         return false;
@@ -585,9 +585,9 @@ public:
             case cbor_major_type::simple:
                 switch (additional_information_value())
                 {
-                    case 0xf4:
+                    case 0x14:
                         return false;
-                    case 0xf5:
+                    case 0x15:
                         return true;
                     default:
                         JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));

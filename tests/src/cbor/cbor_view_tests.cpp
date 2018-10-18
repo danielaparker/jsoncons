@@ -138,12 +138,14 @@ TEST_CASE("as_string_test")
     CHECK(std::string("true") == s0);
     CHECK(std::string("true") == bv[0].as_string());
     CHECK(true == bv[0].as<bool>());
+    CHECK(bv[0].is<bool>());
 
     std::string s1;
     bv[1].dump(s1);
     CHECK(std::string("false") == s1);
     CHECK(std::string("false") == bv[1].as_string());
     CHECK(false == bv[1].as<bool>());
+    CHECK(bv[1].is<bool>());
 
     std::string s2;
     bv[2].dump(s2);
