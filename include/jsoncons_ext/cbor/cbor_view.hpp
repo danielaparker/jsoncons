@@ -257,12 +257,44 @@ public:
         }
     }
 
+    bool is_string_view() const
+    {
+        switch (major_type())
+        {
+            case cbor_major_type::text_string:
+                return additional_information_value() != 0x1f;
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_string_view();
+            }
+            default:
+                return false;
+        }
+    }
+
     bool is_byte_string() const
     {
         switch (major_type())
         {
             case cbor_major_type::byte_string:
                 return true;
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_byte_string();
+            }
+            default:
+                return false;
+        }
+    }
+
+    bool is_byte_string_view() const
+    {
+        switch (major_type())
+        {
+            case cbor_major_type::byte_string:
+                return additional_information_value() != 0x1f;
             case cbor_major_type::semantic_tag:
             {
                 cbor_view v(first_ + 1, last_ - (first_ + 1));

@@ -70,11 +70,13 @@ TEST_CASE("cbor_view array as<> test")
 
     CHECK(v.size() == 8);
 
-    SECTION("v[0].as<T>()")
+    SECTION("v[0].is<T>()")
     {
         CHECK(v[0].is<std::string>());
         CHECK(v[1].is<byte_string>());
+        CHECK(v[1].is<byte_string_view>());
         CHECK(v[2].is<byte_string>());
+        CHECK(v[2].is<byte_string_view>());
         CHECK(v[3].is_array());
         CHECK(v[4].is<std::string>());
         CHECK(v[5].is<int>());

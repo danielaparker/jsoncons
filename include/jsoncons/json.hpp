@@ -1675,9 +1675,19 @@ public:
             return evaluate().is_string();
         }
 
+        bool is_string_view() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_string_view();
+        }
+
         bool is_byte_string() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_byte_string();
+        }
+
+        bool is_byte_string_view() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_byte_string_view();
         }
 
         bool is_bignum() const JSONCONS_NOEXCEPT
@@ -3080,9 +3090,19 @@ public:
         return (var_.structure_tag() == structure_tag_type::long_string_tag) || (var_.structure_tag() == structure_tag_type::short_string_tag);
     }
 
+    bool is_string_view() const JSONCONS_NOEXCEPT
+    {
+        return is_string();
+    }
+
     bool is_byte_string() const JSONCONS_NOEXCEPT
     {
         return var_.structure_tag() == structure_tag_type::byte_string_tag;
+    }
+
+    bool is_byte_string_view() const JSONCONS_NOEXCEPT
+    {
+        return is_byte_string();
     }
 
     bool is_bignum() const JSONCONS_NOEXCEPT

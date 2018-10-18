@@ -580,9 +580,14 @@ struct json_type_traits<Json, T,
                 detail::json_array_input_iterator<Json, element_type>(j.array_range().end()));
             return v;
         }
-        else if (j.is_byte_string())
+        else if (j.is_byte_string_view())
         {
             T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
+            return v;
+        }
+        else if (j.is_byte_string())
+        {
+            T v(j.as_byte_string());
             return v;
         }
         else
@@ -655,7 +660,7 @@ struct json_type_traits<Json, T,
 
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
-        return j.is_string();
+        return j.is_string_view();
     }
 
     static T as(const Json& j)
@@ -902,6 +907,26 @@ public:
     static Json to_json(const basic_byte_string<Allocator>& val)
     {
         return Json(byte_string_view(val.data(),val.length()));
+    }
+};
+
+template<class Json>
+struct json_type_traits<Json, byte_string_view>
+{
+public:
+    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    {
+        return j.is_byte_string_view();
+    }
+    
+    static byte_string_view as(const Json& j)
+    {
+        return j.template as_byte_string_view();
+    }
+    
+    static Json to_json(const byte_string_view& val)
+    {
+        return Json(val);
     }
 };
 
