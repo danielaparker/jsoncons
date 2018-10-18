@@ -587,7 +587,8 @@ struct json_type_traits<Json, T,
         }
         else if (j.is_byte_string())
         {
-            T v(j.as_byte_string());
+            auto s = j.as_byte_string();
+            T v(s.begin(),s.end());
             return v;
         }
         else
