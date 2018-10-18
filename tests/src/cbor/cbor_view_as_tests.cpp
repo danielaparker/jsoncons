@@ -97,5 +97,18 @@ TEST_CASE("cbor_view array as<> test")
         CHECK(v[6].as<int64_t>() == -1431027667);
         CHECK(v[7].as<double>() == 1431027667.5);
     }
+
+    SECTION("array_iterator is<T> test")
+    {
+        auto it = v.array_range().begin();
+        CHECK(it++->is<std::string>());
+        CHECK(it++->is<byte_string>());
+        CHECK(it++->is<byte_string>());
+        CHECK(it++->is_array());
+        CHECK(it++->is<std::string>());
+        CHECK(it++->is<int>());
+        CHECK(it++->is<int>());
+        CHECK(it++->is<double>());
+    }
 }
 

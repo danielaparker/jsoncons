@@ -1205,6 +1205,13 @@ public:
         return *this;
     }
 
+    const_array_iterator operator++(int) // postfix increment
+    {
+        const_array_iterator temp(*this);
+        detail::walk(p_, last_, &p_);
+        return temp;
+    }
+
     reference operator*() const
     {
         const uint8_t* endp;
@@ -1312,6 +1319,14 @@ public:
         detail::walk(p_, last_, &p_);
         detail::walk(p_, last_, &p_);
         return *this;
+    }
+
+    const_object_iterator operator++(int) // postfix increment
+    {
+        const_object_iterator temp(*this);
+        detail::walk(p_, last_, &p_);
+        detail::walk(p_, last_, &p_);
+        return temp;
     }
 
     reference operator*() const
