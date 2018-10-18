@@ -341,6 +341,15 @@ TEST_CASE("cbor_view comparison test")
     serializer2.flush();
     cbor_view v2 = buf2;
 
+    std::vector<uint8_t> buf3;
+    cbor::cbor_bytes_serializer serializer3(buf3);
+    serializer3.begin_array(); // indefinite length array
+    serializer3.string_value("Toronto");
+    serializer3.string_value("Montreal");
+    serializer3.end_array(); 
+    serializer3.flush();
+    cbor_view v3 = buf3;
+
     SECTION("operator== test")
     {
         CHECK(v1 == v2);
@@ -348,6 +357,15 @@ TEST_CASE("cbor_view comparison test")
         REQUIRE(v2.size() == 2);
         CHECK(v1[0] == v2[0]);
         CHECK(v1[1] == v2[1]);
+    }
+
+    SECTION("element operator== test")
+    {
+        CHECK_FALSE(v1 == v3);
+        REQUIRE(v1.size() == 2);
+        REQUIRE(v1.size() == v3.size());
+        CHECK(v1[0] == v3[0]);
+        CHECK_FALSE(v1[1] == v3[1]);
     }
 }
 

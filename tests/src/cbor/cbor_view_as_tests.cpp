@@ -49,6 +49,12 @@ TEST_CASE("cbor_view array as<> test")
   c1 -- Tag 1 (epoch time)
     1a -- uint32_t
       554bbfd3 -- 1431027667 
+  c1
+    3a
+      554bbfd2
+  c1
+    fb
+      41d552eff4e00000
   ff -- "break" 
 */
 
@@ -64,7 +70,21 @@ TEST_CASE("cbor_view array as<> test")
 
     CHECK(v.size() == 8);
 
-    SECTION("v[0].as<std::string>()")
+    SECTION("v[0].as<T>()")
+    {
+        CHECK(v[0].is<std::string>());
+        CHECK(v[1].is<byte_string>());
+        CHECK(v[2].is<byte_string>());
+        CHECK(v[3].is_array());
+        CHECK(v[4].is<std::string>());
+        CHECK(v[5].is<int>());
+        CHECK(v[5].is<unsigned int>());
+        CHECK(v[6].is<int>());
+        CHECK_FALSE(v[6].is<unsigned int>());
+        CHECK(v[7].is<double>());
+    }
+
+    SECTION("v[0].as<T>()")
     {
         CHECK(v[0].as<std::string>() == std::string("foo"));
         CHECK(v[1].as<jsoncons::byte_string>() == jsoncons::byte_string({'b','a','r'}));

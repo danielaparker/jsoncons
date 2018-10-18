@@ -189,27 +189,88 @@ public:
 
     bool is_null() const
     {
-        return major_type() == cbor_major_type::simple && additional_information_value() == 22;
+        switch (major_type())
+        {
+            case cbor_major_type::simple:
+                switch (additional_information_value())
+                {
+                    case 0xf6:
+                        return true;
+                    default:
+                        return false;
+                }
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_null();
+            }
+            default:
+                return false;
+        }
     }
 
     bool is_array() const
     {
-        return major_type() == cbor_major_type::array;
+        switch (major_type())
+        {
+            case cbor_major_type::array:
+                return true;
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_array();
+            }
+            default:
+                return false;
+        }
     }
 
     bool is_object() const
     {
-        return major_type() == cbor_major_type::map;
+        switch (major_type())
+        {
+            case cbor_major_type::map:
+                return true;
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_object();
+            }
+            default:
+                return false;
+        }
     }
 
     bool is_string() const
     {
-        return major_type() == cbor_major_type::text_string;
+        switch (major_type())
+        {
+            case cbor_major_type::text_string:
+                return true;
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_string();
+            }
+            default:
+                return false;
+        }
     }
 
     bool is_byte_string() const
     {
-        return major_type() == cbor_major_type::byte_string;
+        switch (major_type())
+        {
+            case cbor_major_type::byte_string:
+                return true;
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_byte_string();
+            }
+            default:
+                return false;
+        }
     }
 
     bool is_bignum() const
@@ -220,16 +281,22 @@ public:
 
     bool is_bool() const
     {
-        if (major_type() != cbor_major_type::simple)
+        switch (major_type())
         {
-            return false;
-        }
-        switch (additional_information_value())
-        {
-            case 20:
-                return false;
-            case 21:
-                return true;
+            case cbor_major_type::simple:
+                switch (additional_information_value())
+                {
+                    case 0xf4:
+                    case 0xf5:
+                        return true;
+                    default:
+                        return false;
+                }
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_bool();
+            }
             default:
                 return false;
         }
@@ -237,16 +304,23 @@ public:
 
     bool is_double() const
     {
-        if (major_type() != cbor_major_type::simple)
+        switch (major_type())
         {
-            return false;
-        }
-        switch (additional_information_value())
-        {
-            case 25:
-            case 26:
-            case 27:
-                return true;
+            case cbor_major_type::simple:
+                switch (additional_information_value())
+                {
+                    case 25:
+                    case 26:
+                    case 27:
+                        return true;
+                    default:
+                        return false;
+                }
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_double();
+            }
             default:
                 return false;
         }
@@ -276,6 +350,11 @@ public:
                 }
                 break;
             }
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_int64();
+            }
             default:
                 return false;
         }
@@ -283,7 +362,18 @@ public:
 
     bool is_uint64() const
     {
-        return major_type() == cbor_major_type::unsigned_integer;
+        switch (major_type())
+        {
+            case cbor_major_type::unsigned_integer:
+                return true;
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.is_uint64();
+            }
+            default:
+                return false;
+        }
     }
 
     size_t size() const
@@ -302,6 +392,11 @@ public:
                     const uint8_t* endp;
                     len = detail::get_map_size(first_,last_,&endp);
                     break;
+            }
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.size();
             }
             default:
                 len = 0;
@@ -448,29 +543,15 @@ public:
             }
             case cbor_major_type::semantic_tag:
             {
-                uint8_t tag = additional_information_value();
-                switch (tag)
-                {
-                    case 1: // epoch time
-                    {
-                        cbor_view v(first_ + 1, last_-(first_+1));
-                        return v.as_integer<T>();
-                    }
-                    default:
-                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
-                        break;
-                }
+                cbor_view v(first_ + 1, last_-(first_+1));
+                return v.as_integer<T>();
             }
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
         }
     }
 
-    template <class T
-#if !defined(JSONCONS_NO_DEPRECATED)
-         = int64_t
-#endif
-    >
+    template <class T>
     typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,T>::type
     as_integer() const
     {
@@ -489,18 +570,8 @@ public:
             }
             case cbor_major_type::semantic_tag:
             {
-                uint8_t tag = additional_information_value();
-                switch (tag)
-                {
-                    case 1: // epoch time
-                    {
-                        cbor_view v(first_ + 1, last_-(first_+1));
-                        return v.as_integer<T>();
-                    }
-                    default:
-                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
-                        break;
-                }
+                cbor_view v(first_ + 1, last_-(first_+1));
+                return v.as_integer<T>();
             }
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
@@ -509,17 +580,25 @@ public:
 
     bool as_bool() const
     {
-        if (type() == 0xf5)
+        switch (major_type())
         {
-            return true;
-        }
-        else if (type() == 0xf4)
-        {
-            return false;
-        }
-        else
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
+            case cbor_major_type::simple:
+                switch (additional_information_value())
+                {
+                    case 0xf4:
+                        return false;
+                    case 0xf5:
+                        return true;
+                    default:
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
+                }
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_ - (first_ + 1));
+                return v.as_bool();
+            }
+            default:
+                JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bool"));
         }
     }
 
@@ -570,18 +649,8 @@ public:
             }
             case cbor_major_type::semantic_tag:
             {
-                uint8_t tag = additional_information_value();
-                switch (tag)
-                {
-                    case 1: // epoch time
-                    {
-                        cbor_view v(first_ + 1, last_-(first_+1));
-                        return v.as_double();
-                    }
-                    default:
-                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
-                        break;
-                }
+                cbor_view v(first_ + 1, last_-(first_+1));
+                return v.as_double();
             }
             default:
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -616,19 +685,8 @@ public:
             }
             case cbor_major_type::semantic_tag:
             {
-                uint8_t tag = additional_information_value();
-                switch (tag)
+                switch (additional_information_value())
                 {
-                    case 0:
-                    {
-                        const uint8_t* endp;
-                        std::string s = detail::get_text_string(first_+1,last_,&endp);
-                        if (endp == first_+1)
-                        {
-                            JSONCONS_THROW(cbor_decode_error(0));
-                        }
-                        return s;
-                    }
                     case 2:
                     {
                         const uint8_t* endp;
@@ -666,8 +724,8 @@ public:
                         return s;
                     }
                     default:
-                        std::string s;
-                        return s;
+                        cbor_view v(first_ + 1, last_ - (first_ + 1));
+                        return v.as_string();
                 }
                 break;
             }
@@ -694,6 +752,11 @@ public:
                     JSONCONS_THROW(cbor_decode_error(0));
                 }
                 return basic_byte_string<BAllocator>(v.data(),v.size());
+            }
+            case cbor_major_type::semantic_tag:
+            {
+                cbor_view v(first_ + 1, last_-(first_+1));
+                return v.as_byte_string<BAllocator>();
             }
             default:
             {
