@@ -1,6 +1,6 @@
 next: v0.111.0
 
-Bug fix:
+Bug and warning fixes:
 
 - A case where the json parser performed validation on a string 
   before all bytes of the string had been read, and failed if 
@@ -9,6 +9,9 @@ Bug fix:
 - An issue with reading a bignum  with the pull parser 
 `json_stream_reader` (in the case that an integer value 
 overflows) has been fixed.
+
+- GCC and clang warnings about switch fall through have 
+  been fixed
 
 Non-breaking changes:
 
@@ -43,6 +46,10 @@ Change to pull parser API:
 
 - The `stream_filter` function `accept` has been changed to
   take a `const stream_event&` and a `const serializing_context&`.   
+
+- `stream_event_type::bignum_value` has been removed. `stream_event`
+  now exposes information about optional semantic tagging through
+  the `semantic_tag()` function.
 
 Enhancements:
 

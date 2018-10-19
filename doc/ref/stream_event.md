@@ -29,10 +29,10 @@ A JSON-like data event.
 
 #### Member functions
 
-    stream_event_type event_type() const;
+    stream_event_type event_type() const noexcept;
 Returns a [stream_event_type](stream_event_type.md) for this event.
 
-    semantic_tag_type semantic_tag() const;
+    semantic_tag_type semantic_tag() const noexcept;
 Returns a [semantic_tag_type](semantic_tag_type.md) for this event.
 
     template <class T, class... Args>
