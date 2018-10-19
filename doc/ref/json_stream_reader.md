@@ -170,10 +170,6 @@ int main()
                 std::cout << "uint64_value: " << event.as<std::string>() << "\n";
                 // or std::cout << "int64_value: " << event.as<uint64_t>() << "\n";
                 break;
-            case stream_event_type::bignum_value:
-                // Returned if 64 bit integer overflow
-                std::cout << "bignum_value: " << event.as<std::string>() << "\n";
-                break;
             case stream_event_type::double_value:
                 std::cout << "double_value: " << event.as<std::string>() << "\n";
                 // or std::cout << "double_value: " << event.as<double>() << "\n";

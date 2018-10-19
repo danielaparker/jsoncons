@@ -294,10 +294,6 @@ for (; !reader.done(); reader.next())
         case stream_event_type::uint64_value:
             std::cout << "uint64_value: " << event.as<std::string>() << "\n";
             break;
-        case stream_event_type::bignum_value:
-            // Returned if 64 bit integer overflow
-            std::cout << "bignum_value: " << event.as<std::string>() << "\n";
-            break;
         case stream_event_type::double_value:
             // Return as string, could also use event.as<double>()
             std::cout << "double_value: " << event.as<std::string>() << "\n";

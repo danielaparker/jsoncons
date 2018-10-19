@@ -93,18 +93,7 @@ private:
 
     bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context&) override
     {
-        switch (tag)
-        {
-            case semantic_tag_type::bignum:
-                event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::bignum_value);
-                break;
-            case semantic_tag_type::decimal:
-                event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::decimal_value);
-                break;
-            default:
-                event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::string_value);
-                break;
-        }
+        event_ = basic_stream_event<CharT>(s.data(), s.length(), stream_event_type::string_value, tag);
         return false;
     }
 
@@ -116,27 +105,27 @@ private:
     }
 
     bool do_int64_value(int64_t value, 
-                        semantic_tag_type,
+                        semantic_tag_type tag,
                         const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT>(value);
+        event_ = basic_stream_event<CharT>(value, tag);
         return false;
     }
 
     bool do_uint64_value(uint64_t value, 
-                         semantic_tag_type, 
+                         semantic_tag_type tag, 
                          const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT>(value);
+        event_ = basic_stream_event<CharT>(value, tag);
         return false;
     }
 
     bool do_double_value(double value, 
                          const floating_point_options& fmt, 
-                         semantic_tag_type, 
+                         semantic_tag_type tag, 
                          const serializing_context&) override
     {
-        event_ = basic_stream_event<CharT>(value, fmt);
+        event_ = basic_stream_event<CharT>(value, fmt, tag);
         return false;
     }
 

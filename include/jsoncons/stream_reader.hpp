@@ -40,8 +40,6 @@ enum class stream_event_type
     bool_value,
     int64_value,
     uint64_value,
-    bignum_value,
-    decimal_value,
     double_value
 };
 
@@ -49,6 +47,7 @@ template<class CharT>
 class basic_stream_event
 {
     stream_event_type event_type_;
+    semantic_tag_type semantic_tag_;
     union
     {
         bool bool_value_;
@@ -61,42 +60,44 @@ class basic_stream_event
     size_t length_;
     floating_point_options fmt_;
 public:
-    basic_stream_event(stream_event_type event_type)
-        : event_type_(event_type), length_(0)
+    basic_stream_event(stream_event_type event_type, semantic_tag_type semantic_tag = semantic_tag_type::none)
+        : event_type_(event_type), semantic_tag_(semantic_tag), length_(0)
     {
     }
 
     basic_stream_event(null_type)
-        : event_type_(stream_event_type::null_value), length_(0)
+        : event_type_(stream_event_type::null_value), semantic_tag_(semantic_tag_type::none), length_(0)
     {
     }
 
     basic_stream_event(bool value)
-        : event_type_(stream_event_type::bool_value), length_(0)
+        : event_type_(stream_event_type::bool_value), semantic_tag_(semantic_tag_type::none), length_(0)
     {
         value_.bool_value_ = value;
     }
 
-    basic_stream_event(int64_t value)
-        : event_type_(stream_event_type::int64_value), length_(0)
+    basic_stream_event(int64_t value, semantic_tag_type semantic_tag)
+        : event_type_(stream_event_type::int64_value), semantic_tag_(semantic_tag), length_(0)
     {
         value_.int64_value_ = value;
     }
 
-    basic_stream_event(uint64_t value)
-        : event_type_(stream_event_type::uint64_value), length_(0)
+    basic_stream_event(uint64_t value, semantic_tag_type semantic_tag)
+        : event_type_(stream_event_type::uint64_value), semantic_tag_(semantic_tag), length_(0)
     {
         value_.uint64_value_ = value;
     }
 
-    basic_stream_event(double value, const floating_point_options& fmt)
-        : event_type_(stream_event_type::double_value), length_(0), fmt_(fmt)
+    basic_stream_event(double value, const floating_point_options& fmt, semantic_tag_type semantic_tag)
+        : event_type_(stream_event_type::double_value), semantic_tag_(semantic_tag), length_(0), fmt_(fmt)
     {
         value_.double_value_ = value;
     }
 
-    basic_stream_event(const CharT* data, size_t length, stream_event_type type = stream_event_type::string_value)
-        : event_type_(type), length_(length)
+    basic_stream_event(const CharT* data, size_t length, 
+                       stream_event_type event_type, 
+                       semantic_tag_type semantic_tag = semantic_tag_type::none)
+        : event_type_(event_type), semantic_tag_(semantic_tag), length_(length)
     {
         value_.string_data_ = data;
     }
@@ -110,7 +111,6 @@ public:
         {
             case stream_event_type::name:
             case stream_event_type::string_value:
-            case stream_event_type::bignum_value:
                 s = T(value_.string_data_,length_);
                 break;
             case stream_event_type::int64_value:
@@ -169,7 +169,6 @@ public:
         {
             case stream_event_type::name:
             case stream_event_type::string_value:
-            case stream_event_type::bignum_value:
                 s = T(value_.string_data_,length_);
                 break;
             default:
@@ -214,6 +213,8 @@ public:
     }
 
     stream_event_type event_type() const JSONCONS_NOEXCEPT {return event_type_;}
+
+    semantic_tag_type semantic_tag() const JSONCONS_NOEXCEPT {return semantic_tag_;}
 private:
 
     int64_t as_int64() const
@@ -344,7 +345,6 @@ private:
     {
         switch (event_type_)
         {
-            case stream_event_type::bignum_value:
             case stream_event_type::string_value:
                 if (!detail::is_integer(value_.string_data_,length_))
                 {

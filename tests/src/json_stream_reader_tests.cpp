@@ -135,7 +135,8 @@ TEST_CASE("json_stream_reader bignum_value as bignum")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::bignum_value);
+    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().semantic_tag() == semantic_tag_type::bignum);
     bignum c = reader.current().as<bignum>();
     CHECK(bignum(s) == c);
     reader.next();
