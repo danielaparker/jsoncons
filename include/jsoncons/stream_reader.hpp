@@ -345,7 +345,6 @@ private:
         switch (event_type_)
         {
             case stream_event_type::bignum_value:
-                JSONCONS_FALLTHROUGH;
             case stream_event_type::string_value:
                 if (!detail::is_integer(value_.string_data_,length_))
                 {
