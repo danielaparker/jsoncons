@@ -1,4 +1,5 @@
-next: v0.111.0
+v0.111.0
+--------
 
 Bug and warning fixes:
 
