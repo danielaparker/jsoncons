@@ -829,6 +829,9 @@ public:
                         bignum n = bignum(-1, v.data(), v.size());
                         return n;
                     }
+                    default:
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
+                        break;
                 }
                 break;
             }
