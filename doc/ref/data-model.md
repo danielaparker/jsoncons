@@ -20,7 +20,7 @@ It also allows optional semantic tagging of the major types:
  uint64     | epoch_time          | Maps to CBOR epoch time (unsigned integer)
  double     | epoch_time          | Maps to CBOR epoch time (double)
  string     | bignum              | Maps to JSON integers that overflow int64 and uint64, CBOR bignum 
-            | decimal             | Maps to CBOR decimal fraction 
-            | date_time           | Maps to CBOR date/time
+ &#160;     | decimal             | Maps to CBOR decimal fraction 
+ &#160;     | date_time           | Maps to CBOR date/time
 
 
