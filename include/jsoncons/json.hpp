@@ -1210,7 +1210,7 @@ public:
                 {
                 case structure_tag_type::byte_string_tag:
                     {
-                        return semantic_tag() == rhs.semantic_tag() && as_byte_string_view() == rhs.as_byte_string_view();
+                        return as_byte_string_view() == rhs.as_byte_string_view();
                     }
                 default:
                     return false;

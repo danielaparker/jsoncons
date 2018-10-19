@@ -257,19 +257,19 @@ private:
     }
 
     bool do_int64_value(int64_t value, 
-                        semantic_tag_type, 
+                        semantic_tag_type tag, 
                         const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = value;
+                stack_.back().value_ = Json(value,tag);
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(value));
+                stack_.push_back(Json(value,tag));
                 break;
             default:
-                result_ = Json(value);
+                result_ = Json(value,tag);
                 is_valid_ = true;
                 break;
         }
@@ -277,19 +277,19 @@ private:
     }
 
     bool do_uint64_value(uint64_t value, 
-                         semantic_tag_type, 
+                         semantic_tag_type tag, 
                          const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = value;
+                stack_.back().value_ = Json(value,tag);
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(value));
+                stack_.push_back(Json(value,tag));
                 break;
             default:
-                result_ = Json(value);
+                result_ = Json(value,tag);
                 is_valid_ = true;
                 break;
         }

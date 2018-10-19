@@ -1,39 +1,12 @@
-## jsoncons data model
+// Copyright 2017 Daniel Parker
+// Distributed under Boost license
 
-The jsoncons data model consists of the following major types:
-
-- null
-- bool
-- int64
-- uint64
-- double
-- string
-- byte_string
-- array
-- object
-
-It also allows optional semantic tagging of the major types:
-
- Type       | Valid semantic tags | Notes
-------------|---------------------|---------------
- int64      | epoch_time          | Maps to CBOR epoch time (unsigned or negative integer)
- uint64     | epoch_time          | Maps to CBOR epoch time (unsigned integer)
- double     | epoch_time          | Maps to CBOR epoch time (double)
- string     | bignum              | Maps to JSON integers that overflow int64 and uint64, CBOR bignum 
- &#160;     | decimal             | Maps to CBOR decimal fraction 
- &#160;     | date_time           | Maps to CBOR date/time
-
-### Examples
-
-#### json value to CBOR item
-
-```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 using namespace jsoncons;
 
-int main()
+void data_model_example1()
 {
     json j = json::array();
 
@@ -84,34 +57,8 @@ int main()
       41d552eff4e00000
 */
 }
-```
-Output
-```
-(1)
-[
-    "foo",
-    "YmFy",
-    "-18446744073709551617",
-    "273.15",
-    "2018-10-19 12:41:07-07:00",
-    1431027667,
-    -1431027667,
-    1431027667.5
-]
 
-(2)
-8863666f6f43626172c349010000000000000000c48221196ab3c07819323031382d31302d31392031323a34313a30372d30373a3030c11a554bbfd3c13a554bbfd2c1fb41d552eff4e00000
-```
-
-#### CBOR item to json value
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/cbor/cbor.hpp>
-
-using namespace jsoncons;
-
-void main()
+void data_model_example2()
 {
     std::vector<uint8_t> bytes;
     cbor::cbor_bytes_serializer writer(bytes);
@@ -167,22 +114,12 @@ void main()
 
     std::cout << "(2)\n" << pretty_print(j) << "\n\n";
 }
-```
-Output:
-```
-(1)
-9f63666f6f43626172c349010000000000000000c48221196ab3c07819323031382d31302d31392031323a34313a30372d30373a3030c11a554bbfd3c13a554bbfd2c1fb41d552eff4e00000ff
 
-(2)
-[
-    "foo",
-    "YmFy",
-    "-18446744073709551617",
-    "273.15",
-    "2018-10-19 12:41:07-07:00",
-    1431027667,
-    -1431027667,
-    1431027667.5
-]
-```
+void data_model_examples()
+{
+    std::cout << "\ndata model examples\n\n";
+    data_model_example1();
+    data_model_example2();
+    std::cout << std::endl;
+}
 

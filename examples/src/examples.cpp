@@ -33,6 +33,7 @@ void json_convert_examples();
 void json_parser_examples();
 void byte_string_examples();
 void pull_parser_examples();
+void data_model_examples();
 
 void comment_example()
 {
@@ -560,6 +561,8 @@ int main()
         readme_examples();
 
         more_examples();
+
+        data_model_examples();
     }
     catch (const std::exception& e)
     {

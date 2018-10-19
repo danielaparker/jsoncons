@@ -211,7 +211,14 @@ public:
     }
 
     bool double_value(double value, 
-                      const floating_point_options& fmt = floating_point_options(), 
+                      semantic_tag_type tag = semantic_tag_type::none, 
+                      const serializing_context& context=null_serializing_context())
+    {
+        return do_double_value(value, floating_point_options(), tag, context);
+    }
+
+    bool double_value(double value, 
+                      const floating_point_options& fmt, 
                       semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context())
     {
