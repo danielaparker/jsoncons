@@ -1,17 +1,5 @@
 # Roadmap
 
-### Targeting release 0.111.0
-
-- Add `semantic_tag_type::decimal`. Map cbor Decimal Fractions 
-  to string values with this tag.
-
-- Improve `cbor_view`
-
-- Document jsoncons data model.
-
-- Review names with eye to consistency with C++ standard names.
-  `has_key()` will be deprecated and renamed to `contains()`.
-
 ### For later releases
 
 - Support pull parsing for cbor and CSV.
