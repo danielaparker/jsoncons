@@ -19,7 +19,7 @@ Its unpacked in-memory representation of JSON is more compact than most, and can
 allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md),
 built on top of its incremental parser.  
 
-The jsoncons data model extends the familiar JSON types - nulls,
+The jsoncons [data model](doc/ref/data-model.md) extends the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - to accomodate byte 
 strings, date-time values, epoch time values, big numbers, and 
 decimal fractions. This allows it to preserve these type semantics 
