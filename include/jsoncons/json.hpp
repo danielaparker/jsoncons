@@ -1070,7 +1070,7 @@ public:
             }
         }
 
-        template <typename BAllocator=std::allocator<char>>
+        template <typename BAllocator=std::allocator<uint8_t>>
         basic_byte_string<BAllocator> as_byte_string() const
         {
             switch (structure_tag())

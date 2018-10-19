@@ -830,6 +830,7 @@ public:
                         return n;
                     }
                 }
+                break;
             }
             default:
             {
