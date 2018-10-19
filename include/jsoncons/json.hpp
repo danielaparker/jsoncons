@@ -1766,7 +1766,7 @@ public:
             return evaluate().as_string(allocator);
         }
 
-        template <typename BAllocator=std::allocator<char>>
+        template <typename BAllocator=std::allocator<uint8_t>>
         basic_byte_string<BAllocator> as_byte_string() const
         {
             return evaluate().template as_byte_string<BAllocator>();
@@ -3379,7 +3379,7 @@ public:
         return var_.as_byte_string_view();
     }
 
-    template <typename BAllocator=std::allocator<char>>
+    template <typename BAllocator=std::allocator<uint8_t>>
     basic_byte_string<BAllocator> as_byte_string() const
     {
         return var_.template as_byte_string<BAllocator>();
