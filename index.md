@@ -31,7 +31,7 @@ jsoncons is a C++, header-only library for constructing [JSON](http://www.json.o
 data formats such as [CBOR](http://cbor.io/). It supports 
 
 - Parsing JSON-like text or binary data into an unpacked representation
-  (`jsoncons::basic_json`) that defines an interface for accessing and modifying that data (covers bignum and byte string values.)
+  of variant type that defines an interface for accessing and modifying that data (covers bignum and byte string values.)
 
 - Serializing the unpacked representation into different JSON-like text or binary data.
 
@@ -88,8 +88,7 @@ It consists of an array of book elements, each element is an object with members
 Read the JSON text into a `json` value,
 ```c++
 std::ifstream is("books.json");
-json books;
-is >> books;
+json books = json::parse(is);
 ```
 Loop through the book array elements, using a range-based for loop
 ```c++
@@ -167,9 +166,9 @@ So if you want to show "n/a" for the missing price, you can use this accessor
 ```c++
 std::string price = book.get_with_default("price","n/a");
 ```
-Or you can check if book has a member "price" with the method `has_key`, and output accordingly,
+Or you can check if book has a member "price" with the method `contains`, and output accordingly,
 ```c++
-if (book.has_key("price"))
+if (book.contains("price"))
 {
     double price = book["price"].as<double>();
     std::cout << price;
