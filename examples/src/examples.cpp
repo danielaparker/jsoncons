@@ -148,7 +148,7 @@ void first_example_c()
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             std::string price;
-            book.get_with_default<json>("price", "N/A").dump(price,options);
+            coalese(book["price"], "N/A").dump(price,options);
             std::cout << author << ", " << title << ", " << price << std::endl;
         }
         catch (const parse_error& e)
@@ -389,7 +389,7 @@ void more_examples()
     std::cout << "(3) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
 
     // Try access member with default
-    std::cout << "(4) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n\n";
+    std::cout << "(4) " << "Dimension 2 = " << coalese(val["Dimension 2"],0.0).as<std::string>() << "\n\n";
 
 }
 
@@ -560,9 +560,9 @@ int main()
 
         readme_examples();
 
-        more_examples();
-
         data_model_examples();
+
+        more_examples();
     }
     catch (const std::exception& e)
     {

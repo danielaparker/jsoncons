@@ -1587,6 +1587,15 @@ public:
     public:
 
         friend class basic_json<CharT,ImplementationPolicy,Allocator>;
+        typedef basic_json<CharT,ImplementationPolicy,Allocator> value_type;
+        typedef CharT char_type;
+        typedef ImplementationPolicy implementation_policy;
+        typedef Allocator allocator_type;
+
+        bool is_defined() const
+        {
+            return parent_.contains(string_view_type(key_.data(), key_.size()));
+        }
 
         range<object_iterator> object_range()
         {
@@ -4645,6 +4654,26 @@ private:
         return is;
     }
 };
+
+template<class Json, class T> 
+typename Json::value_type coalese(const T& j)
+{
+    return j;
+}
+
+template <class Json, class... Args>
+typename std::enable_if<std::is_same<Json,typename Json::json_proxy>::value, typename Json::value_type>::type
+coalese(const Json& j, Args... args)
+{
+    return j.is_defined() && !j.is_null() ? j : coalese<Json>(args...);
+}
+
+template <class Json, class... Args>
+typename std::enable_if<std::is_same<Json, typename Json::value_type>::value, typename Json::value_type>::type
+coalese(const Json& j, Args... args)
+{
+    return !j.is_null() ? j : coalese<Json>(args...);
+}
 
 template <class Json>
 void swap(typename Json::key_value_pair_type& a, typename Json::key_value_pair_type& b)

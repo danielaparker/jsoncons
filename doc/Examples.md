@@ -719,9 +719,9 @@ json j = json::object{
     {"price", "25.17"}
 };
 
-double price = j.get_with_default("price", 25.00); // returns 25.17
+double price = coalese(j["price"], 25.00).as<double>(); // returns 25.17
 
-double sale_price = j.get_with_default("sale_price", 22.0); // returns 22.0
+double sale_price = coalese(j["sale_price"], 22.0).as<double>(); // returns 22.0
 ```
 
 <div id="E4"/>
