@@ -286,16 +286,16 @@ As the `jsoncons` library has evolved, names have sometimes changed. To ease tra
   
 #### Accessors and defaults
 ```c++
-json j;
+json val;
 
-j["field1"] = 1;
-j["field3"] = "Toronto";
+val["field1"] = 1;
+val["field3"] = "Toronto";
 
-double x1 = j.contains("field1") ? j["field1"].as<double>() : 10.0;
-double x2 = j.contains("field2") ? j["field2"].as<double>() : 20.0;
+double x1 = obj.contains("field1") ? val["field1"].as<double>() : 10.0;
+double x2 = obj.contains("field2") ? val["field2"].as<double>() : 20.0;
 
-std::string x3 = coalese(j["field3"],"Montreal").as<std::string>();
-std::string x4 = coalese(j["field4"],"San Francisco").as<std::string>();
+std::string x3 = obj.get_with_default("field3","Montreal");
+std::string x4 = obj.get_with_default("field4","San Francisco");
 
 std::cout << "x1=" << x1 << '\n';
 std::cout << "x2=" << x2 << '\n';

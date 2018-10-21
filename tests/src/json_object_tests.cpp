@@ -272,7 +272,7 @@ TEST_CASE("test_get")
 
     std::string s1 = a.at("field1").as<std::string>();
     std::string s1a = a.at("field1").as<std::string>();
-    std::string s2 = coalese(a["field2"],"null").as<std::string>();
+    std::string s2 = a.get_with_default("field2","null");
     REQUIRE_THROWS_AS(a.at("field2"), std::out_of_range);
 
     CHECK(s1 == std::string("value1"));
@@ -309,14 +309,14 @@ TEST_CASE("test_proxy_get_with_default")
     a["object1"]["field1"] = "3.7";
     a["object1"]["field2"] = 1.5;
 
-    std::string s1 = coalese(a["object1"]["field1"],"default").as<std::string>();
-    std::string s2 = coalese(a["object1"]["field2"],"1.0").as<std::string>();
-    std::string s3 = coalese(a["object1"]["field3"],"1.0").as<std::string>();
-    std::string s4 = coalese(a["object1"]["field2"],"1.0").as<std::string>();
-    std::string s5 = coalese(a["object1"]["field3"],"1.0").as<std::string>();
-    double d1 = coalese(a["object1"]["field1"],1.0).as<double>();
-    double d2 = coalese(a["object1"]["field2"],1.0).as<double>();
-    double d3 = coalese(a["object1"]["field3"],1.0).as<double>();
+    std::string s1 = a["object1"].get_with_default("field1","default");
+    std::string s2 = a["object1"].get_with_default("field2","1.0");
+    std::string s3 = a["object1"].get_with_default("field3","1.0");
+    std::string s4 = a["object1"].get_with_default<std::string>("field2","1.0");
+    std::string s5 = a["object1"].get_with_default<std::string>("field3","1.0");
+    double d1 = a["object1"].get_with_default("field1",1.0);
+    double d2 = a["object1"].get_with_default("field2",1.0);
+    double d3 = a["object1"].get_with_default("field3",1.0);
 
     CHECK(std::string("3.7") == s1);
     CHECK(std::string("1.5") == s2);
@@ -509,7 +509,7 @@ TEST_CASE("test_get_with_string_default")
     json example;
 
     std::string s("too long string for short string");
-    std::string result = coalese(example["test"], s).as<std::string>();
+    std::string result = example.get_with_default("test", s);
     CHECK(s == result);
 }
 
@@ -756,8 +756,8 @@ TEST_CASE("test_object_get_defaults")
     CHECK(x1 == 1.0);
     CHECK(x2 == 20.0);
 
-    std::string s1 = coalese(obj["field3"], "Montreal").as<std::string>();
-    std::string s2 = coalese(obj["field4"], "San Francisco").as<std::string>();
+    std::string s1 = obj.get_with_default("field3", "Montreal");
+    std::string s2 = obj.get_with_default("field4", "San Francisco");
 
     CHECK(s1 =="Toronto");
     CHECK(s2 == "San Francisco");

@@ -10,8 +10,6 @@
 #include <ctime>
 #include <map>
 
-using jsoncons::json;
-
 TEST_CASE("json::as<jsoncons::string_view>()")
 {
     std::string s1("Short");
@@ -74,53 +72,4 @@ TEST_CASE("json::as<unsigned __int128>()")
     unsigned __int128 val = j.as<unsigned __int128>();
     CHECK(result.value == val);
 }
-
 #endif
-
-TEST_CASE("json coalese function")
-{
-    SECTION("value")
-    {
-        json j = json::null();
-
-        std::string s2 = coalese(j, "value3").as<std::string>();
-        CHECK(s2 == std::string("value3"));
-
-        std::string s3 = coalese(j, "value3").as<std::string>();
-        CHECK(s3 == std::string("value3"));
-
-        std::string s4 = coalese(j, j, "value3").as<std::string>();
-        CHECK(s4 == std::string("value3"));
-    }
-    SECTION("object member")
-    {
-        json j;
-        j["field1"] = "value1";
-        j["field2"] = json::null();
-
-        std::string s1 = coalese(j["field1"],"value3").as<std::string>(); 
-        CHECK(s1 == std::string("value1"));
-
-        std::string s2 = coalese(j["field2"],"value3").as<std::string>(); 
-        CHECK(s2 == std::string("value3"));
-
-        std::string s3 = coalese(j["field3"],"value3").as<std::string>(); 
-        CHECK(s3 == std::string("value3"));
-
-        std::string s4 = coalese(j["field2"], j["field3"], "value3").as<std::string>();
-        CHECK(s4 == std::string("value3"));
-    }
-    SECTION("array of object")
-    {
-        json j = json::array();
-        json o;
-        o["field1"] = "value1";
-        j.push_back(o);
-
-        std::string s1 = coalese(j[0]["field1"], "value3").as<std::string>();
-        CHECK(s1 == std::string("value1"));
-
-        std::string s3 = coalese(j[0]["field3"],"value3").as<std::string>(); 
-        CHECK(s3 == std::string("value3"));
-    }
-}

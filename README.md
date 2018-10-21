@@ -128,7 +128,7 @@ int main()
     std::cout << "(3) " << "Dimension 1 = " << val["Dimension 1"].as<double>() << "\n\n";
 
     // Try access member with default
-    std::cout << "(4) " << "Dimension 2 = " << coalese(val["Dimension 2],0.0).as<double>() << "\n";
+    std::cout << "(4) " << "Dimension 2 = " << val.get_with_default("Dimension 2",0.0) << "\n";
 }
 ```
 Output:
