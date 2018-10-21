@@ -253,10 +253,6 @@ Throws `std::runtime_error` if not an object.
 
 #### Non member functions
 
-    template <class Json, class... Args>
-    coalese(const Json& j, Args... args);
-Returns the first non-null or non-undefined value in a list.
-
     std::istream& operator>> (std::istream& os, json& val)
 Reads a `json` value from a stream.
 

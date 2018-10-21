@@ -1,11 +1,3 @@
-master
-------
-
-Enhancements
-
-- A coalese function that returns the first non-null or non-undefined 
-  json value in a list
-
 v0.111.0
 --------
 
