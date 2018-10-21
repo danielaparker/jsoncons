@@ -1531,7 +1531,6 @@ public:
     class json_proxy 
     {
     private:
-        typedef json_proxy<ParentT> proxy_type;
 
         ParentT& parent_;
         key_storage_type key_;
@@ -1587,6 +1586,7 @@ public:
     public:
 
         friend class basic_json<CharT,ImplementationPolicy,Allocator>;
+        typedef json_proxy<ParentT> proxy_type;
         typedef basic_json<CharT,ImplementationPolicy,Allocator> value_type;
         typedef CharT char_type;
         typedef ImplementationPolicy implementation_policy;
@@ -4662,7 +4662,7 @@ typename Json::value_type coalese(const T& j)
 }
 
 template <class Json, class... Args>
-typename std::enable_if<std::is_same<Json,typename Json::value_type::json_proxy>::value, typename Json::value_type>::type
+typename std::enable_if<std::is_same<Json,typename Json::proxy_type>::value, typename Json::value_type>::type
 coalese(const Json& j, Args... args)
 {
     return j.is_defined() && !j.is_null() ? j : coalese<Json>(args...);
