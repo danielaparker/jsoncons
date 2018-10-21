@@ -4656,7 +4656,7 @@ private:
 };
 
 template<class Json, class T> 
-typename Json::value_type coalese(const T& j)
+typename Json::value_type ee(const T& j)
 {
     return j;
 }
