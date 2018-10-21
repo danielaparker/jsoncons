@@ -4662,7 +4662,7 @@ typename Json::value_type coalese(const T& j)
 }
 
 template <class Json, class... Args>
-typename std::enable_if<std::is_same<Json,typename Json::json_proxy>::value, typename Json::value_type>::type
+typename std::enable_if<std::is_same<Json,typename Json::value_type::json_proxy>::value, typename Json::value_type>::type
 coalese(const Json& j, Args... args)
 {
     return j.is_defined() && !j.is_null() ? j : coalese<Json>(args...);
