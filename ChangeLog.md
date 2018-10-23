@@ -1,3 +1,10 @@
+master
+------
+
+Enhancements
+
+- Improved efficiency of json_decoder
+
 v0.111.0
 --------
 
