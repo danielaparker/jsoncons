@@ -1886,12 +1886,6 @@ public:
         }
 
         template <class T>
-        basic_json get(const string_view_type& name, T&& default_val) const
-        {
-            return evaluate().get(name,std::forward<T>(default_val));
-        }
-
-        template <class T>
         T get_with_default(const string_view_type& name, const T& default_val) const
         {
             return evaluate().template get_with_default<T>(name,default_val);
@@ -2288,6 +2282,12 @@ public:
         const_array_iterator end_elements() const
         {
             return evaluate().end_elements();
+        }
+
+        template <class T>
+        basic_json get(const string_view_type& name, T&& default_val) const
+        {
+            return evaluate().get(name,std::forward<T>(default_val));
         }
 
         const basic_json& get(const string_view_type& name) const
@@ -3608,34 +3608,6 @@ public:
     }
 
     template<class T>
-    basic_json get(const string_view_type& name, T&& default_val) const
-    {
-        switch (var_.structure_tag())
-        {
-        case structure_tag_type::empty_object_tag:
-            {
-                return basic_json(std::forward<T>(default_val));
-            }
-        case structure_tag_type::object_tag:
-            {
-                const_object_iterator it = object_value().find(name);
-                if (it != object_range().end())
-                {
-                    return it->value();
-                }
-                else
-                {
-                    return basic_json(std::forward<T>(default_val));
-                }
-            }
-        default:
-            {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
-            }
-        }
-    }
-
-    template<class T>
     T get_with_default(const string_view_type& name, const T& default_val) const
     {
         switch (var_.structure_tag())
@@ -4259,6 +4231,34 @@ public:
     const_array_iterator end_elements() const
     {
         return array_range().end();
+    }
+
+    template<class T>
+    basic_json get(const string_view_type& name, T&& default_val) const
+    {
+        switch (var_.structure_tag())
+        {
+        case structure_tag_type::empty_object_tag:
+            {
+                return basic_json(std::forward<T>(default_val));
+            }
+        case structure_tag_type::object_tag:
+            {
+                const_object_iterator it = object_value().find(name);
+                if (it != object_range().end())
+                {
+                    return it->value();
+                }
+                else
+                {
+                    return basic_json(std::forward<T>(default_val));
+                }
+            }
+        default:
+            {
+                JSONCONS_THROW(not_an_object(name.data(),name.length()));
+            }
+        }
     }
 
     const basic_json& get(const string_view_type& name) const
