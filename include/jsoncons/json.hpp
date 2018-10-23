@@ -1993,12 +1993,6 @@ public:
             return evaluate().insert_or_assign(name,std::forward<T>(val));
         }
 
-        template <class T>
-        void set_(key_storage_type&& name, T&& val)
-        {
-            evaluate().set_(std::forward<key_storage_type>(name),std::forward<T>(val));
-        }
-
        // emplace
 
         template <class ... Args>
@@ -2017,12 +2011,6 @@ public:
         object_iterator try_emplace(object_iterator hint, const string_view_type& name, Args&&... args)
         {
             return evaluate().try_emplace(hint, name, std::forward<Args>(args)...);
-        }
-
-        template <class T>
-        object_iterator set_(object_iterator hint, key_storage_type&& name, T&& val)
-        {
-            return evaluate().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(val));
         }
 
         template <class... Args> 
@@ -3842,24 +3830,6 @@ public:
         }
     }
 
-    template <class T>
-    void set_(key_storage_type&& name, T&& val)
-    {
-        switch (var_.structure_tag())
-        {
-        case structure_tag_type::empty_object_tag:
-            create_object_implicitly();
-            JSONCONS_FALLTHROUGH;
-        case structure_tag_type::object_tag:
-            object_value().set_(std::forward<key_storage_type>(name), std::forward<T>(val));
-            break;
-        default:
-            {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
-            }
-        }
-    }
-
     // merge
 
     void merge(const basic_json& source)
@@ -4019,24 +3989,6 @@ public:
             JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
             return object_value().try_emplace(hint, name, std::forward<Args>(args)...);
-        default:
-            {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
-            }
-        }
-    }
-
-    template <class T>
-    object_iterator set_(object_iterator hint, key_storage_type&& name, T&& val)
-    {
-        switch (var_.structure_tag())
-        {
-        case structure_tag_type::empty_object_tag:
-            create_object_implicitly();
-            JSONCONS_FALLTHROUGH;
-        case structure_tag_type::object_tag:
-            return object_value().set_(hint, std::forward<key_storage_type>(name), std::forward<T>(val));
-            break;
         default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
