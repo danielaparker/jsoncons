@@ -1533,33 +1533,34 @@ public:
     private:
 
         ParentT& parent_;
-        key_storage_type key_;
+        const char_type* data_;
+        size_t length_;
 
         json_proxy() = delete;
         json_proxy& operator = (const json_proxy& other) = delete; 
 
-        json_proxy(ParentT& parent, key_storage_type&& name)
-            : parent_(parent), key_(std::forward<key_storage_type>(name))
+        json_proxy(ParentT& parent, const char_type* data, size_t length)
+            : parent_(parent), data_(data), length_(length)
         {
         }
 
         basic_json& evaluate() 
         {
-            return parent_.evaluate(string_view_type(key_.data(),key_.size()));
+            return parent_.evaluate(string_view_type(data_,length_));
         }
 
         const basic_json& evaluate() const
         {
-            return parent_.evaluate(string_view_type(key_.data(),key_.size()));
+            return parent_.evaluate(string_view_type(data_,length_));
         }
 
         basic_json& evaluate_with_default()
         {
             basic_json& val = parent_.evaluate_with_default();
-            auto it = val.find(string_view_type(key_.data(),key_.size()));
+            auto it = val.find(string_view_type(data_,length_));
             if (it == val.object_range().end())
             {
-                it = val.set_(val.object_range().begin(),std::move(key_),object(val.object_value().get_allocator()));            
+                it = val.insert_or_assign(val.object_range().begin(),string_view_type(data_,length_),object(val.object_value().get_allocator()));            
             }
             return it->value();
         }
@@ -1820,7 +1821,7 @@ public:
         template <class T>
         json_proxy& operator=(T&& val) 
         {
-            parent_.evaluate_with_default().set_(std::move(key_), std::forward<T>(val));
+            parent_.evaluate_with_default().insert_or_assign(string_view_type(data_,length_), std::forward<T>(val));
             return *this;
         }
 
@@ -1844,9 +1845,9 @@ public:
             return evaluate().at(i);
         }
 
-        json_proxy<proxy_type> operator[](const string_view_type& name)
+        json_proxy<proxy_type> operator[](const string_view_type& key)
         {
-            return json_proxy<proxy_type>(*this,key_storage_type(name.begin(),name.end(),key_.get_allocator()));
+            return json_proxy<proxy_type>(*this,key.data(),key.length());
         }
 
         const basic_json& operator[](const string_view_type& name) const
@@ -2812,7 +2813,7 @@ public:
             create_object_implicitly();
             JSONCONS_FALLTHROUGH;
         case structure_tag_type::object_tag:
-            return json_proxy<basic_json>(*this, key_storage_type(name.begin(),name.end(),char_allocator_type(object_value().get_allocator())));
+            return json_proxy<basic_json>(*this, name.data(),name.length());
             break;
         default:
             JSONCONS_THROW(not_an_object(name.data(),name.length()));
