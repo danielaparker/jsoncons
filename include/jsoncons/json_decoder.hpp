@@ -77,7 +77,8 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<structure_offset> size_t_allocator_type;
 
 
-    std::vector<stack_item,stack_item_allocator_type> stack_;
+    std::vector<stack_item,stack_item_allocator_type> array_stack_;
+    std::vector<stack_item,stack_item_allocator_type> object_stack_;
     std::vector<structure_offset,size_t_allocator_type> stack_offsets_;
     bool is_valid_;
 
@@ -89,7 +90,8 @@ public:
           is_valid_(false) 
 
     {
-        stack_.reserve(1000);
+        array_stack_.reserve(1000);
+        object_stack_.reserve(1000);
         stack_offsets_.reserve(100);
         stack_offsets_.push_back({0,structure_type::root_t});
     }
@@ -123,25 +125,42 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(object(object_allocator_));
+                object_stack_.back().value_ = Json(object(object_allocator_));
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(object(object_allocator_)));
+                object_stack_.push_back(Json(object(object_allocator_)));
                 break;
-            default:
-                stack_.clear();
+            case structure_type::root_t:
+                object_stack_.clear();
                 is_valid_ = false;
-                stack_.push_back(Json(object(object_allocator_)));
-                result_ = Json(object(object_allocator_));
+                object_stack_.push_back(Json(object(object_allocator_)));
                 break;
         }
-        stack_offsets_.push_back({stack_.size()-1,structure_type::object_t});
+        stack_offsets_.push_back({object_stack_.size()-1,structure_type::object_t});
         return true;
     }
 
     bool do_end_object(const serializing_context&) override
     {
-        end_structure();
+        JSONCONS_ASSERT(stack_offsets_.size() > 0);
+        JSONCONS_ASSERT(stack_offsets_.back().type_ == structure_type::object_t);
+        const size_t structure_index = stack_offsets_.back().offset_;
+        JSONCONS_ASSERT(object_stack_.size() > structure_index);
+        const size_t count = object_stack_.size() - (structure_index + 1);
+        auto first = object_stack_.begin() + (structure_index+1);
+        auto last = first + count;
+        object_stack_[structure_index].value_.object_value().insert(
+            std::make_move_iterator(first),
+            std::make_move_iterator(last),
+            [](stack_item&& val){return key_value_pair_type(std::move(val.name_),std::move(val.value_));});
+        object_stack_.erase(object_stack_.begin()+stack_offsets_.back().offset_+1, object_stack_.end());
+        stack_offsets_.pop_back();
+        if (stack_offsets_.back().type_ == structure_type::root_t)
+        {
+            result_.swap(object_stack_.front().value_);
+            object_stack_.pop_back();
+            is_valid_ = true;
+        }
         return true;
     }
 
@@ -150,73 +169,51 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(array(array_allocator_));
+                object_stack_.back().value_ = Json(array(array_allocator_));
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(array(array_allocator_)));
+                object_stack_.push_back(Json(array(array_allocator_)));
                 break;
-            default:
-                stack_.clear();
+            case structure_type::root_t:
+                object_stack_.clear();
                 is_valid_ = false;
-                stack_.push_back(Json(array(array_allocator_)));
-                result_ = Json(array(array_allocator_));
+                object_stack_.push_back(Json(array(array_allocator_)));
                 break;
         }
-        stack_offsets_.push_back({stack_.size()-1,structure_type::array_t});
+        stack_offsets_.push_back({object_stack_.size()-1,structure_type::array_t});
         return true;
     }
 
     bool do_end_array(const serializing_context&) override
     {
-        end_structure();
-        return true;
-    }
-
-    void end_structure() 
-    {
         JSONCONS_ASSERT(stack_offsets_.size() > 0);
+        JSONCONS_ASSERT(stack_offsets_.back().type_ == structure_type::array_t);
         const size_t structure_index = stack_offsets_.back().offset_;
-        JSONCONS_ASSERT(stack_.size() > structure_index);
-        const size_t count = stack_.size() - (structure_index + 1);
-
-        auto first = stack_.begin() + (structure_index+1);
+        JSONCONS_ASSERT(object_stack_.size() > structure_index);
+        const size_t count = object_stack_.size() - (structure_index + 1);
+        auto first = object_stack_.begin() + (structure_index+1);
         auto last = first + count;
-
-        switch (stack_offsets_.back().type_)
+        auto& j = object_stack_[structure_index].value_;
+        j.reserve(count);
+        while (first != last)
         {
-            case structure_type::object_t:
-                {
-                    stack_[structure_index].value_.object_value().insert(
-                        std::make_move_iterator(first),
-                        std::make_move_iterator(last),
-                        [](stack_item&& val){return key_value_pair_type(std::move(val.name_),std::move(val.value_));});
-                }
-                break;
-            default:
-                {
-                    auto& j = stack_[structure_index].value_;
-                    j.reserve(count);
-                    while (first != last)
-                    {
-                        j.push_back(std::move(first->value_));
-                        ++first;
-                    }
-                }
-                break;
+            j.push_back(std::move(first->value_));
+            ++first;
         }
-        stack_.erase(stack_.begin()+stack_offsets_.back().offset_+1, stack_.end());
+        object_stack_.erase(object_stack_.begin()+stack_offsets_.back().offset_+1, object_stack_.end());
         stack_offsets_.pop_back();
         if (stack_offsets_.back().type_ == structure_type::root_t)
         {
-            result_.swap(stack_.front().value_);
-            stack_.pop_back();
+            result_.swap(object_stack_.front().value_);
+            object_stack_.pop_back();
             is_valid_ = true;
         }
+        return true;
     }
 
     bool do_name(const string_view_type& name, const serializing_context&) override
     {
-        stack_.push_back(key_storage_type(name.begin(),name.end(),string_allocator_));
+        object_stack_.push_back(key_storage_type(name.begin(),name.end(),string_allocator_));
         return true;
     }
 
@@ -225,12 +222,12 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(sv, tag, string_allocator_);
+                object_stack_.back().value_ = Json(sv, tag, string_allocator_);
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(sv, tag, string_allocator_));
+                object_stack_.push_back(Json(sv, tag, string_allocator_));
                 break;
-            default:
+            case structure_type::root_t:
                 result_ = Json(sv, tag, string_allocator_);
                 is_valid_ = true;
                 break;
@@ -243,12 +240,12 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(byte_string_view(data,length),byte_allocator_);
+                object_stack_.back().value_ = Json(byte_string_view(data,length),byte_allocator_);
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(byte_string_view(data,length),byte_allocator_));
+                object_stack_.push_back(Json(byte_string_view(data,length),byte_allocator_));
                 break;
-            default:
+            case structure_type::root_t:
                 result_ = Json(byte_string_view(data,length),byte_allocator_);
                 is_valid_ = true;
                 break;
@@ -263,12 +260,12 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(value,tag);
+                object_stack_.back().value_ = Json(value,tag);
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(value,tag));
+                object_stack_.push_back(Json(value,tag));
                 break;
-            default:
+            case structure_type::root_t:
                 result_ = Json(value,tag);
                 is_valid_ = true;
                 break;
@@ -283,12 +280,12 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(value,tag);
+                object_stack_.back().value_ = Json(value,tag);
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(value,tag));
+                object_stack_.push_back(Json(value,tag));
                 break;
-            default:
+            case structure_type::root_t:
                 result_ = Json(value,tag);
                 is_valid_ = true;
                 break;
@@ -304,12 +301,12 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(value, fmt, tag);
+                object_stack_.back().value_ = Json(value, fmt, tag);
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(value, fmt, tag));
+                object_stack_.push_back(Json(value, fmt, tag));
                 break;
-            default:
+            case structure_type::root_t:
                 result_ = Json(value, fmt, tag);
                 is_valid_ = true;
                 break;
@@ -322,12 +319,12 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = value;
+                object_stack_.back().value_ = value;
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(value));
+                object_stack_.push_back(Json(value));
                 break;
-            default:
+            case structure_type::root_t:
                 result_ = Json(value);
                 is_valid_ = true;
                 break;
@@ -340,12 +337,12 @@ private:
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json::null();
+                object_stack_.back().value_ = Json::null();
                 break;
             case structure_type::array_t:
-                stack_.push_back(Json(Json::null()));
+                object_stack_.push_back(Json(Json::null()));
                 break;
-            default:
+            case structure_type::root_t:
                 result_ = Json(Json::null());
                 is_valid_ = true;
                 break;
