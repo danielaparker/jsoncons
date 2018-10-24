@@ -107,7 +107,7 @@ void basics_json_example1()
         // book has member "author"
     }
 
-    book.get("author", "author unknown").as<std::string>();
+    std::string s = book.get_with_default("author", "author unknown");
     // Returns author if found, otherwise "author unknown"
 
     try
@@ -260,7 +260,7 @@ void basics_wjson_example1()
         // book has member "author"
     }
 
-    book.get(L"author", L"author unknown").as<std::wstring>();
+    std::wstring s = book.get_with_default(L"author", L"author unknown");
     // Returns author if found, otherwise "author unknown"
 
     try
