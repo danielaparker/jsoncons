@@ -136,6 +136,9 @@ Member type                         |Definition
   </tr>
 </table>
 
+    semantic_tag_type semantic_tag() const
+Returns the [semantic_tag_type](semantic_tag_type.md) associated with this value
+
     json& operator[](size_t i)
     const json& operator[](size_t i) const
 Returns a reference to the value at position i in a json object or array.

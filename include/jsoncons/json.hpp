@@ -92,8 +92,8 @@ enum class structure_tag_type : uint8_t
     long_string_tag = 0x06,
     byte_string_tag = 0x07,
     array_tag = 0x08,
-    empty_object_tag = 0x0a,
-    object_tag = 0x09
+    empty_object_tag = 0x09,
+    object_tag = 0x0a
 };
                       
 template <class CharT, class ImplementationPolicy, class Allocator>
@@ -299,9 +299,9 @@ public:
 
             double_data(const double_data& val)
                 : data_base(val.type()),
-                  format_(static_cast<uint8_t>(val.format())),
-                  precision_(val.precision()), 
-                  decimal_places_(val.decimal_places()), 
+                  format_(static_cast<uint8_t>(val.format_)),
+                  precision_(val.precision_), 
+                  decimal_places_(val.decimal_places_), 
                   val_(val.val_)
             {
             }
@@ -311,19 +311,11 @@ public:
                 return val_;
             }
 
-            chars_format format() const
+            floating_point_options options() const
             {
-                return static_cast<chars_format>(format_);
-            }
-
-            uint8_t precision() const
-            {
-                return precision_;
-            }
-
-            uint8_t decimal_places() const
-            {
-                return decimal_places_;
+                return floating_point_options(static_cast<chars_format>(format_),
+                                              precision_,
+                                              decimal_places_);
             }
         };
 
@@ -1696,16 +1688,6 @@ public:
             return evaluate().is_bignum();
         }
 
-        bool is_date_time() const JSONCONS_NOEXCEPT
-        {
-            return evaluate().is_date_time();
-        }
-
-        bool is_epoch_time() const JSONCONS_NOEXCEPT
-        {
-            return evaluate().is_epoch_time();
-        }
-
         bool is_number() const JSONCONS_NOEXCEPT
         {
             return evaluate().is_number();
@@ -2090,6 +2072,16 @@ public:
             evaluate().dump(os,options,line_indent);
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+        bool is_date_time() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_date_time();
+        }
+
+        bool is_epoch_time() const JSONCONS_NOEXCEPT
+        {
+            return evaluate().is_epoch_time();
+        }
 
         template <class T>
         void add(T&& val)
@@ -2857,9 +2849,7 @@ public:
                 break;
             case structure_tag_type::double_tag:
                 handler.double_value(var_.double_data_cast()->value(), 
-                                     floating_point_options(var_.double_data_cast()->format(),
-                                                            var_.double_data_cast()->precision(), 
-                                                            var_.double_data_cast()->decimal_places()), 
+                                     var_.double_data_cast()->options(), 
                                      var_.semantic_tag());
                 break;
             case structure_tag_type::int64_tag:
@@ -3089,19 +3079,19 @@ public:
         return is_byte_string();
     }
 
-    bool is_bignum() const JSONCONS_NOEXCEPT
+    bool is_bignum() const
     {
-        return var_.semantic_tag() == semantic_tag_type::bignum;
-    }
-
-    bool is_date_time() const JSONCONS_NOEXCEPT
-    {
-        return var_.semantic_tag() == semantic_tag_type::date_time;
-    }
-
-    bool is_epoch_time() const JSONCONS_NOEXCEPT
-    {
-        return var_.semantic_tag() == semantic_tag_type::epoch_time;
+        switch (structure_tag())
+        {
+            case structure_tag_type::short_string_tag:
+            case structure_tag_type::long_string_tag:
+                return detail::is_integer(as_string_view().data(), as_string_view().length());
+            case structure_tag_type::int64_tag:
+            case structure_tag_type::uint64_tag:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_bool() const JSONCONS_NOEXCEPT
@@ -3314,7 +3304,7 @@ public:
         switch (var_.structure_tag())
         {
         case structure_tag_type::double_tag:
-            return var_.double_data_cast()->precision();
+            return var_.double_data_cast()->options().precision();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
@@ -3325,7 +3315,7 @@ public:
         switch (var_.structure_tag())
         {
         case structure_tag_type::double_tag:
-            return var_.double_data_cast()->decimal_places();
+            return var_.double_data_cast()->options().decimal_places();
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
         }
@@ -3435,6 +3425,16 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    bool is_date_time() const JSONCONS_NOEXCEPT
+    {
+        return var_.semantic_tag() == semantic_tag_type::date_time;
+    }
+
+    bool is_epoch_time() const JSONCONS_NOEXCEPT
+    {
+        return var_.semantic_tag() == semantic_tag_type::epoch_time;
+    }
 
     bool has_key(const string_view_type& name) const
     {
