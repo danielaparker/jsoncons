@@ -324,10 +324,10 @@ struct json_type_traits<Json, T,
     {
         return j.template as_integer<T>();
     }
-    template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(T val, allocator_type allocator = allocator_type())
     {
-        return Json::from_integer(std::forward<Args>(args)...);
+        (void)allocator;
+        return Json(val, semantic_tag_type::none);
     }
 };
 
@@ -358,10 +358,10 @@ struct json_type_traits<Json, T,
         return j.template as_integer<T>();
     }
 
-    template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(T val, allocator_type allocator = allocator_type())
     {
-        return Json::from_uinteger(std::forward<Args>(args)...);
+        (void)allocator;
+        return Json(val, semantic_tag_type::none);
     }
 };
 
@@ -380,10 +380,10 @@ struct json_type_traits<Json, T,
     {
         return static_cast<T>(j.as_double());
     }
-    template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(T val, allocator_type allocator = allocator_type())
     {
-        return Json::from_floating_point(std::forward<Args>(args)...);
+        (void)allocator;
+        return Json(val, semantic_tag_type::none);
     }
 };
 

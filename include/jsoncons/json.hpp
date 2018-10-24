@@ -2642,11 +2642,6 @@ public:
     {
     }
 
-    basic_json(double val, const floating_point_options& fmt)
-        : var_(val, fmt)
-    {
-    }
-
     basic_json(double val, semantic_tag_type tag)
         : var_(val, 
                floating_point_options(),
@@ -4047,64 +4042,9 @@ public:
         a.swap(b);
     }
 
-    static basic_json make_string(const string_view_type& s)
-    {
-        return basic_json(s, semantic_tag_type::none);
-    }
-
-    static basic_json make_string(const char_type* rhs, size_t length)
-    {
-        return basic_json(string_view_type(rhs, length), semantic_tag_type::none);
-    }
-
-    static basic_json make_string(const string_view_type& s, allocator_type allocator)
-    {
-        return basic_json(s, semantic_tag_type::none, allocator);
-    }
-
-    static basic_json from_integer(int64_t val)
-    {
-        return basic_json(variant(val));
-    }
-
-    static basic_json from_integer(int64_t val, allocator_type)
-    {
-        return basic_json(variant(val));
-    }
-
-    static basic_json from_uinteger(uint64_t val)
-    {
-        return basic_json(variant(val));
-    }
-
-    static basic_json from_uinteger(uint64_t val, allocator_type)
-    {
-        return basic_json(variant(val));
-    }
-
-    static basic_json from_floating_point(double val)
-    {
-        return basic_json(variant(val));
-    }
-
-    static basic_json from_floating_point(double val, allocator_type)
-    {
-        return basic_json(variant(val));
-    }
-
     static basic_json from_bool(bool val)
     {
         return basic_json(variant(val));
-    }
-
-    static basic_json make_object(const object& o)
-    {
-        return basic_json(variant(o));
-    }
-
-    static basic_json make_object(const object& o, allocator_type allocator)
-    {
-        return basic_json(variant(o,allocator));
     }
 
     template <class T>
