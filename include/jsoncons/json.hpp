@@ -4042,11 +4042,6 @@ public:
         a.swap(b);
     }
 
-    static basic_json from_bool(bool val)
-    {
-        return basic_json(variant(val));
-    }
-
     template <class T>
     void push_back(T&& val)
     {
