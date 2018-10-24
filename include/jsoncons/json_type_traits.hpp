@@ -434,7 +434,7 @@ struct json_type_traits<Json, Json>
     }
     static Json to_json(const Json& val, allocator_type = allocator_type())
     {
-        (void)allocator_type;
+        (void)allocator;
         return val;
     }
 };
