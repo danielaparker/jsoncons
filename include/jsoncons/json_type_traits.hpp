@@ -432,7 +432,7 @@ struct json_type_traits<Json, Json>
     {
         return j;
     }
-    static Json to_json(const Json& val, allocator_type = allocator_type())
+    static Json to_json(const Json& val, allocator_type allocator = allocator_type())
     {
         (void)allocator;
         return val;
@@ -453,8 +453,9 @@ struct json_type_traits<Json, jsoncons::null_type>
         JSONCONS_ASSERT(j.is_null());
         return jsoncons::null_type();
     }
-    static Json to_json(jsoncons::null_type, allocator_type = allocator_type())
+    static Json to_json(jsoncons::null_type, allocator_type allocator = allocator_type())
     {
+        (void)allocator;
         return Json::null();
     }
 };
