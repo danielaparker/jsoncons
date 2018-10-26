@@ -99,7 +99,7 @@ public:
     template <class Writer>
     void operator()(double val, const floating_point_options& fmt, Writer& writer)
     {
-        chars_format format = override_.format() != chars_format::hex ? override_.format() : fmt.format();
+        chars_format format = override_.format() != chars_format() ? override_.format() : fmt.format();
 
         int decimal_places;
         if (override_.decimal_places() != 0)

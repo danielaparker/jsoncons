@@ -190,7 +190,7 @@ public:
 
     basic_json_serializing_options()
         : indent_(default_indent),
-          floating_point_format_(chars_format::hex),
+          floating_point_format_(chars_format()),
           precision_(0),
           can_read_nan_replacement_(false),
           can_read_pos_inf_replacement_(false),

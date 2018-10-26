@@ -108,7 +108,7 @@ public:
 
     basic_csv_serializing_options()
         :
-        floating_point_format_(chars_format::hex),
+        floating_point_format_(chars_format()),
         precision_(0),
         assume_header_(false),
         ignore_empty_values_(false),
