@@ -99,31 +99,7 @@ public:
     template <class Writer>
     void operator()(double val, const floating_point_options& fmt, Writer& writer)
     {
-        chars_format format;
-        if (override_.format() != chars_format::hex)
-        {
-            format = override_.format();
-        }
-        else 
-        {
-            format = fmt.format();
-        }
-
-        int precision;
-        int precision2 = 0;
-        if (override_.precision() != 0)
-        {
-            precision = override_.precision();
-        }
-        else if (fmt.precision() != 0)
-        {
-            precision = fmt.precision();
-        }
-        else
-        {
-            precision = std::numeric_limits<double>::digits10;
-            precision2 = std::numeric_limits<double>::max_digits10;
-        }             
+        chars_format format = override_.format() != chars_format::hex ? override_.format() : fmt.format();
 
         int decimal_places;
         if (override_.decimal_places() != 0)
@@ -141,8 +117,8 @@ public:
         }             
 
         char number_buffer[200]; 
-
         int length = 0;
+
         switch (format)
         {
         case chars_format::fixed:
@@ -163,15 +139,35 @@ public:
                 }
             }
             break;
-        default:
+        case chars_format::general:
             {
-                length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision, val);
-                if (length < 0)
+                if (override_.precision() != 0)
                 {
-                    JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                    int precision = override_.precision();
+                    length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision, val);
+                    if (length < 0)
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                    }
                 }
-                if (precision2 > 0)
+                else if (fmt.precision() != 0)
                 {
+                    int precision = fmt.precision();
+                    length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision, val);
+                    if (length < 0)
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                    }
+                }
+                else
+                {
+                    int precision = std::numeric_limits<double>::digits10;
+                    length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision, val);
+                    if (length < 0)
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                    }
+                    int precision2 = std::numeric_limits<double>::max_digits10;
                     if (to_double_(number_buffer,sizeof(number_buffer)) != val)
                     {
                         length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision2, val);
@@ -180,9 +176,12 @@ public:
                             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
                         }
                     }
-                }
+                }             
+                break;
             }
-            break;
+            default:
+                JSONCONS_THROW(json_exception_impl<std::invalid_argument>("print_double failed."));
+                break;
         }
 
         const char* sbeg = number_buffer;
