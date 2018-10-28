@@ -788,7 +788,10 @@ private:
             case mapping_type::m_columns:
                 if (column_index_ < decoders_.size())
                 {
-                    end_value(value_buffer_,column_index_,parameters_.infer_types(),decoders_[column_index_]);
+                    if (!(parameters_.ignore_empty_values() && value_buffer_.size() == 0))
+                    {
+                        end_value(value_buffer_,column_index_,parameters_.infer_types(),decoders_[column_index_]);
+                    }
                 }
                 break;
             }

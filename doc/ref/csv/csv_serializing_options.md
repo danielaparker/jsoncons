@@ -29,7 +29,7 @@ column_types      | A comma separated list of data types corresponding to the co
 column_defaults      | A comma separated list of strings containing default json values corresponding to the columns in the file. | "false,0.0,"\"\""
 comment_starter|Character to comment out a line, must be at column 1.|None
 field_delimiter    | A delimiter character that indicates the end of a field        | ,             
-ignore_empty_values      | Do not output name-value pairs with empty values| false         
+ignore_empty_values      | Do not read CSV fields that have empty values| false         
 ignore_empty_lines      | If set to true, all lines in the file that are empty (apart from record delimiter characters) are ignored. To ignore lines with only spaces or tabs, set trim to true.| true         
 line_delimiter|String to write between records|\n  
 mapping|mapping_type::n_rows, mapping_type::n_objects, mapping_type::m_columns|If assume_header is true or column_names is not empty, mapping_type::n_rows, mapping_type::n_columns otherwise

@@ -54,11 +54,37 @@ TEST_CASE("m_columns_test")
 2017-01-08,"Bond",0.0063,0.0076,0.0084,0.0112
 2017-01-08,"Bond",0.0063,0.0076,0.0084,0.0112
 )";
+
+    json_decoder<ojson> decoder;
+    csv_serializing_options options;
+    options.assume_header(true)
+           .mapping(mapping_type::m_columns);
+
+    std::istringstream is(bond_yields);
+    csv_reader reader(is, decoder, options);
+    reader.read();
+    ojson j = decoder.get_result();
+    CHECK(6 == j.size());
+    CHECK(3 == j["Date"].size());
+    CHECK(3 == j["1Y"].size());
+    CHECK(3 == j["2Y"].size());
+    CHECK(3 == j["3Y"].size());
+    CHECK(3 == j["5Y"].size());
+}
+
+TEST_CASE("m_columns with ignore_empty_value")
+{
+    const std::string bond_yields = R"(Date,ProductType,1Y,2Y,3Y,5Y
+2017-01-09,"Bond",0.0062,0.0075,0.0083,0.011
+2017-01-08,"Bond",0.0063,0.0076,,0.0112
+2017-01-08,"Bond",0.0063,0.0076,0.0084,
+)";
     //std::cout << bond_yields << std::endl <<std::endl;
 
     json_decoder<ojson> decoder;
     csv_serializing_options options;
     options.assume_header(true)
+           .ignore_empty_values(true)
            .mapping(mapping_type::m_columns);
 
     std::istringstream is(bond_yields);
@@ -70,8 +96,8 @@ TEST_CASE("m_columns_test")
     CHECK(3 == j["Date"].size());
     CHECK(3 == j["1Y"].size());
     CHECK(3 == j["2Y"].size());
-    CHECK(3 == j["3Y"].size());
-    CHECK(3 == j["5Y"].size());
+    CHECK(2 == j["3Y"].size());
+    CHECK(2 == j["5Y"].size());
 }
 
 TEST_CASE("csv_test_empty_values")

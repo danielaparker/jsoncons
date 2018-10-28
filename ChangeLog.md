@@ -1,8 +1,13 @@
 master
 ------
 
-Conversion from json double values to cbor uses CBOR float if
-double to float round trips.
+Enhancements
+
+- json double values convert to CBOR float if double to float 
+  round trips.
+
+- csv_parser `ignore_empty_values` option now applies to
+  `m_columns` json output.
 
 v0.111.1
 --------
