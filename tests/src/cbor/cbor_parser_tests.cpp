@@ -100,6 +100,7 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0xfb,0,0,0,0,0,0,0,0},json(0.0));
     check_parsing({0xfb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
     check_parsing({0xfb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
+    check_parsing({0xfa,0xcb,0x7f,0xff,0xff},json(-16777215.0));
 
     // byte string
     std::vector<uint8_t> v;

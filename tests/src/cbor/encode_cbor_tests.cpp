@@ -75,9 +75,24 @@ TEST_CASE("cbor_encoder_test")
     check_encode_cbor({0xf4},json(false));
 
     // floating point
-    check_encode_cbor({0xfb,0,0,0,0,0,0,0,0},json(0.0));
-    check_encode_cbor({0xfb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
-    check_encode_cbor({0xfb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
+    check_encode_cbor({0xfa,0,0,0,0},json(0.0));
+    check_encode_cbor({0xfa,0xbf,0x80,0,0},json(-1.0));
+
+    SECTION("-16777215.0")
+    {
+        double val = -16777215.0;
+        float valf = (float)val;
+        CHECK((double)valf == val);
+        check_encode_cbor({0xfa,0xcb,0x7f,0xff,0xff},json(val));
+    }
+    // From https://en.wikipedia.org/wiki/Double-precision_floating-point_format
+    SECTION("0.333333333333333314829616256247390992939472198486328125")
+    {
+        double val = 0.333333333333333314829616256247390992939472198486328125;
+        float valf = (float)val;
+        CHECK((double)valf != val);
+        check_encode_cbor({0xfb,0x3F,0xD5,0x55,0x55,0x55,0x55,0x55,0x55},json(val));
+    }
 
     // byte string
     check_encode_cbor({0x40},json(byte_string()));
@@ -93,9 +108,7 @@ TEST_CASE("cbor_encoder_test")
     check_encode_cbor({0x78,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
                  json("123456789012345678901234"));
 
-
 }
-
 TEST_CASE("cbor_arrays_and_maps")
 {
     check_encode_cbor({0x80},json::array());

@@ -1,3 +1,9 @@
+master
+------
+
+Conversion from json double values to cbor uses CBOR float if
+double to float round trips.
+
 v0.111.1
 --------
 
