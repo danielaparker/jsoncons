@@ -515,7 +515,7 @@ private:
         return true;
     }
 
-    bool do_double_value(double value, 
+    bool do_double_value(double val, 
                          const floating_point_options&, 
                          semantic_tag_type tag,
                          const serializing_context&) override
@@ -526,8 +526,18 @@ private:
         }
 
         std::vector<uint8_t> v;
-        binary::to_big_endian(static_cast<uint8_t>(0xfb), v);
-        binary::to_big_endian(value,v);
+        float valf = (float)val;
+        if ((double)valf == val)
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0xfa), v);
+            binary::to_big_endian(valf,v);
+        }
+        else
+        {
+            binary::to_big_endian(static_cast<uint8_t>(0xfb), v);
+            binary::to_big_endian(val,v);
+        }
+
         for (auto c : v)
         {
             writer_.put(c);

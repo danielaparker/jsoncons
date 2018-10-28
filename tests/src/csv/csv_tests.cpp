@@ -54,7 +54,7 @@ TEST_CASE("m_columns_test")
 2017-01-08,"Bond",0.0063,0.0076,0.0084,0.0112
 2017-01-08,"Bond",0.0063,0.0076,0.0084,0.0112
 )";
-    std::cout << bond_yields << std::endl <<std::endl;
+    //std::cout << bond_yields << std::endl <<std::endl;
 
     json_decoder<ojson> decoder;
     csv_serializing_options options;
@@ -65,7 +65,7 @@ TEST_CASE("m_columns_test")
     csv_reader reader(is, decoder, options);
     reader.read();
     ojson j = decoder.get_result();
-    std::cout << "\n(1)\n"<< pretty_print(j) << "\n";
+    //std::cout << "\n(1)\n"<< pretty_print(j) << "\n";
     CHECK(6 == j.size());
     CHECK(3 == j["Date"].size());
     CHECK(3 == j["1Y"].size());

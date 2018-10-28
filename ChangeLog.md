@@ -11,6 +11,8 @@ Enhancements
   notation if exponent is positive or if the exponent plus the 
   number of digits in the mantissa is negative.
 
+- Encodes json double to CBOR float if conversion round trips.
+
 Bug fix
 
 - Fixed issue with conversion of CBOR decimal fraction to string 
