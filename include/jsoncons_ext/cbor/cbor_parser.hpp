@@ -1414,7 +1414,7 @@ std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last,
                 return s;
             }
             jsoncons::detail::string_writer<std::string> writer(s);
-            jsoncons::detail::print_integer(val, writer);
+            jsoncons::detail::print_uinteger(val, writer);
             p = *endpp;
             break;
         }
@@ -1426,7 +1426,7 @@ std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last,
                 return s;
             }
             jsoncons::detail::string_writer<std::string> writer(s);
-            jsoncons::detail::print_uinteger(val, writer);
+            jsoncons::detail::print_integer(val, writer);
             p = *endpp;
             break;
         }
@@ -1460,20 +1460,30 @@ std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last,
     }
     if (exponent < 0)
     {
-        int64_t len = static_cast<int64_t >(s.length()) + exponent;
-        if (len > 0)
+        int64_t digits_length = static_cast<int64_t >(s.length()) + exponent;
+        bool is_negative = false;
+        if (s[0] == '-')
         {
-            s.insert(len, ".");
+            --digits_length;
+            is_negative = true;
         }
-        else if (len == 0)
+
+        if (digits_length > 0)
         {
-            s.insert(0, "0.");
+            size_t pos = is_negative ? digits_length+1 : digits_length; 
+            s.insert(pos, ".");
+        }
+        else if (digits_length == 0)
+        {
+            size_t pos = is_negative ? 1 : 0; 
+            s.insert(pos, "0.");
         }
         else 
         {
-            s.insert(0, "0.");
+            size_t pos = is_negative ? 1 : 0; 
+            s.insert(pos, "0.");
             s.append("e-");
-            uint64_t u = static_cast<uint64_t>(-len);
+            uint64_t u = static_cast<uint64_t>(-digits_length);
             do 
             {
                 s.push_back(static_cast<char>(48+u%10));

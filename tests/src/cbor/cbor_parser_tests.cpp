@@ -299,6 +299,48 @@ TEST_CASE("test_decimal_as_string")
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(std::string("184467440737095516.16") == s);
     }
+    SECTION("-2 -65537")
+    {
+        std::vector<uint8_t> v = {0xc4, // Tag 4
+                                  0x82, // Array of length 2
+                                  0x21, // -2
+                                  0x3a,0,1,0x00,0x00 // -65537
+                                  };
+
+        const uint8_t* endp = nullptr;
+        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        REQUIRE_FALSE(endp == v.data());
+        REQUIRE(endp == (v.data()+v.size()));
+        CHECK(s == std::string("-655.37"));
+    }
+    SECTION("-5 -65537")
+    {
+        std::vector<uint8_t> v = {0xc4, // Tag 4
+                                  0x82, // Array of length 2
+                                  0x24, // -5
+                                  0x3a,0,1,0x00,0x00 // -65537
+                                  };
+
+        const uint8_t* endp = nullptr;
+        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        REQUIRE_FALSE(endp == v.data());
+        REQUIRE(endp == (v.data()+v.size()));
+        CHECK(s == std::string("-0.65537"));
+    }
+    SECTION("-6 -65537")
+    {
+        std::vector<uint8_t> v = {0xc4, // Tag 4
+                                  0x82, // Array of length 2
+                                  0x25, // -6
+                                  0x3a,0,1,0x00,0x00 // -65537
+                                  };
+
+        const uint8_t* endp = nullptr;
+        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        REQUIRE_FALSE(endp == v.data());
+        REQUIRE(endp == (v.data()+v.size()));
+        CHECK(s == std::string("-0.65537e-1"));
+    }
 }
 
 TEST_CASE("Compare CBOR packed item and jsoncons item")

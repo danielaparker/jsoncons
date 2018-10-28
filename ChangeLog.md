@@ -5,6 +5,13 @@ Enhancements
 
 - Improved efficiency of json_decoder
 
+- Conversion of CBOR decimal fraction to string uses exponential notation if exponent is
+  positive or if the exponent plus the number of digits in the mantissa is negative.
+
+Bug fix
+
+- Fixed issue with conversion of CBOR decimal fraction to string when mantissa is negative
+
 v0.111.0
 --------
 
