@@ -225,5 +225,37 @@ TEST_CASE("test_serialize_decimal")
             std::cout << e.what() << std::endl;
         }
     }
+    SECTION("-18446744073709551616e-5")
+    {
+        std::vector<uint8_t> v;
+        cbor_bytes_serializer serializer(v);
+        serializer.string_value("-18446744073709551616e-5", semantic_tag_type::decimal);
+        serializer.flush();
+        try
+        {
+            json result = decode_cbor<json>(v);
+            CHECK(std::string("-184467440737095.51616") == result.as<std::string>());
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
+    SECTION("-18446744073709551616e5")
+    {
+        std::vector<uint8_t> v;
+        cbor_bytes_serializer serializer(v);
+        serializer.string_value("-18446744073709551616e5", semantic_tag_type::decimal);
+        serializer.flush();
+        try
+        {
+            json result = decode_cbor<json>(v);
+            CHECK(std::string("-18446744073709551616e5") == result.as<std::string>());
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
 } 
 
