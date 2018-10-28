@@ -1465,13 +1465,20 @@ std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last,
         {
             s.insert(len, ".");
         }
+        else if (len == 0)
+        {
+            s.insert(0, "0.");
+        }
         else 
         {
-            for (size_t i = 0; i < static_cast<size_t>(-len); ++i)
-            {
-                s.insert(0, "0");
-            }
             s.insert(0, "0.");
+            s.append("e-");
+            uint64_t u = static_cast<uint64_t>(-len);
+            do 
+            {
+                s.push_back(static_cast<char>(48+u%10));
+            }
+            while (u /= 10);
         }
     }
     else if (exponent == 0)
@@ -1480,11 +1487,12 @@ std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last,
     }
     else if (exponent > 0)
     {
-        for (size_t i = 0; i < static_cast<size_t>(exponent); ++i)
+        s.append("e");
+        do 
         {
-            s.push_back('0');
+            s.push_back(static_cast<char>(48+exponent%10));
         }
-        s.append(".0");
+        while (exponent /= 10);
     }
     return s;
 }

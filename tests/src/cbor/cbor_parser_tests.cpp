@@ -170,14 +170,47 @@ TEST_CASE("test_cbor_parsing")
     // epoch_time
     check_parsing({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
                   json(1431027667, semantic_tag_type::epoch_time));
+}
 
-    // decimal fraction
+TEST_CASE("cbor decimal fraction")
+{
     check_parsing({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x21, // -2
                    0x19,0x6a,0xb3 // 27315
                    },
                   json("273.15", semantic_tag_type::decimal));
+    check_parsing({0xc4, // Tag 4
+                   0x82, // Array of length 2
+                   0x22, // -3
+                   0x19,0x6a,0xb3 // 27315
+                   },
+                  json("27.315", semantic_tag_type::decimal));
+    check_parsing({0xc4, // Tag 4
+                   0x82, // Array of length 2
+                   0x23, // -4
+                   0x19,0x6a,0xb3 // 27315
+                   },
+                  json("2.7315", semantic_tag_type::decimal));
+    check_parsing({0xc4, // Tag 4
+                   0x82, // Array of length 2
+                   0x24, // -5
+                   0x19,0x6a,0xb3 // 27315
+                   },
+                  json("0.27315", semantic_tag_type::decimal));
+    check_parsing({0xc4, // Tag 4
+                   0x82, // Array of length 2
+                   0x25, // -6
+                   0x19,0x6a,0xb3 // 27315
+                   },
+                  json("0.27315e-1", semantic_tag_type::decimal));
+
+    check_parsing({0xc4, // Tag 4
+                   0x82, // Array of length 2
+                   0x04, // 4
+                   0x19,0x6a,0xb3 // 27315
+                   },
+                  json("27315e4", semantic_tag_type::decimal));
 }
 
 TEST_CASE("test_decimal_as_string")
@@ -208,7 +241,7 @@ TEST_CASE("test_decimal_as_string")
         std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
-        CHECK(std::string("0.027315") == s);
+        CHECK(std::string("0.27315e-1") == s);
     }
     SECTION("-5 27315")
     {
@@ -250,7 +283,7 @@ TEST_CASE("test_decimal_as_string")
         std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
-        CHECK(std::string("2731500.0") == s);
+        CHECK(s == std::string("27315e2"));
     }
     SECTION("-2 18446744073709551616")
     {
