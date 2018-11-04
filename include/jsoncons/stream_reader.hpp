@@ -370,12 +370,13 @@ template<class CharT>
 class basic_stream_reader 
 {
 public:
+    typedef typename basic_stream_event<CharT> stream_event_type;
 
     virtual ~basic_stream_reader() = default;
 
     virtual bool done() const = 0;
 
-    virtual const basic_stream_event<CharT>& current() const = 0;
+    virtual const stream_event_type& current() const = 0;
 
     virtual void next() = 0;
 

@@ -607,11 +607,11 @@ public:
                     if (ec) return;
                     break;
                 case json_parse_state::fraction2:
-                    end_fraction_value(handler, chars_format::fixed,ec);
+                    end_fraction_value(chars_format::fixed, handler, ec);
                     if (ec) return;
                     break;
                 case json_parse_state::exp3:
-                    end_fraction_value(handler, chars_format::scientific,ec);
+                    end_fraction_value(chars_format::scientific, handler, ec);
                     if (ec) return;
                     break;
                 case json_parse_state::before_done:
@@ -1970,7 +1970,7 @@ fraction2:
         switch (*input_ptr_)
         {
             case '\r': 
-                end_fraction_value(handler, chars_format::fixed,ec);
+                end_fraction_value(chars_format::fixed, handler, ec);
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
@@ -1978,7 +1978,7 @@ fraction2:
                 state_ = json_parse_state::cr;
                 return; 
             case '\n': 
-                end_fraction_value(handler, chars_format::fixed,ec);
+                end_fraction_value(chars_format::fixed, handler, ec);
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
@@ -1986,12 +1986,12 @@ fraction2:
                 state_ = json_parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_fraction_value(handler, chars_format::fixed,ec);
+                end_fraction_value(chars_format::fixed, handler, ec);
                 if (ec) return;
                 skip_space();
                 return;
             case '/': 
-                end_fraction_value(handler, chars_format::fixed,ec);
+                end_fraction_value(chars_format::fixed, handler, ec);
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
@@ -1999,17 +1999,17 @@ fraction2:
                 state_ = json_parse_state::slash;
                 return;
             case '}':
-                end_fraction_value(handler, chars_format::fixed,ec);
+                end_fraction_value(chars_format::fixed, handler, ec);
                 if (ec) return;
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case ']':
-                end_fraction_value(handler, chars_format::fixed,ec);
+                end_fraction_value(chars_format::fixed, handler, ec);
                 if (ec) return;
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case ',':
-                end_fraction_value(handler, chars_format::fixed,ec);
+                end_fraction_value(chars_format::fixed, handler, ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -2094,7 +2094,7 @@ exp3:
         switch (*input_ptr_)
         {
             case '\r': 
-                end_fraction_value(handler, chars_format::scientific,ec);
+                end_fraction_value(chars_format::scientific, handler, ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -2102,7 +2102,7 @@ exp3:
                 state_ = json_parse_state::cr;
                 return; 
             case '\n': 
-                end_fraction_value(handler, chars_format::scientific,ec);
+                end_fraction_value(chars_format::scientific, handler, ec);
                 if (ec) return;
                 ++input_ptr_;
                 ++column_;
@@ -2110,12 +2110,12 @@ exp3:
                 state_ = json_parse_state::lf;
                 return;   
             case ' ':case '\t':
-                end_fraction_value(handler, chars_format::scientific,ec);
+                end_fraction_value(chars_format::scientific, handler, ec);
                 if (ec) return;
                 skip_space();
                 return;
             case '/': 
-                end_fraction_value(handler, chars_format::scientific,ec);
+                end_fraction_value(chars_format::scientific, handler, ec);
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
@@ -2123,17 +2123,17 @@ exp3:
                 state_ = json_parse_state::slash;
                 return;
             case '}':
-                end_fraction_value(handler, chars_format::scientific,ec);
+                end_fraction_value(chars_format::scientific, handler, ec);
                 if (ec) return;
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case ']':
-                end_fraction_value(handler, chars_format::scientific,ec);
+                end_fraction_value(chars_format::scientific, handler, ec);
                 if (ec) return;
                 state_ = json_parse_state::expect_comma_or_end;
                 return;
             case ',':
-                end_fraction_value(handler, chars_format::scientific,ec);
+                end_fraction_value(chars_format::scientific, handler, ec);
                 if (ec) return;
                 begin_member_or_element(ec);
                 if (ec) return;
@@ -2677,7 +2677,7 @@ private:
         after_value(ec);
     }
 
-    void end_fraction_value(basic_json_content_handler<CharT>& handler, chars_format format, std::error_code& ec)
+    void end_fraction_value(chars_format format, basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
         try
         {

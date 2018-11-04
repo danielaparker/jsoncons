@@ -148,6 +148,7 @@ class basic_json_stream_reader : public basic_stream_reader<CharT>, private virt
     typedef CharT char_type;
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    using basic_stream_reader<CharT>::stream_event_type;
 
     basic_json_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
@@ -234,7 +235,7 @@ public:
         return parser_.done();
     }
 
-    const basic_stream_event<CharT>& current() const override
+    const stream_event_type& current() const override
     {
         return event_handler_.event();
     }

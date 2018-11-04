@@ -388,6 +388,10 @@ public:
     typedef typename KeyT::value_type char_type;
     typedef typename KeyT::allocator_type allocator_type;
     typedef typename ValueT::string_view_type string_view_type;
+private:
+    key_storage_type key_;
+    ValueT value_;
+public:
 
     key_value()
     {
@@ -486,9 +490,6 @@ public:
         return key_;
     }
 #endif
-private:
-    key_storage_type key_;
-    ValueT value_;
 };
 
 template <class KeyT,class Json>
