@@ -370,7 +370,7 @@ template<class CharT>
 class basic_stream_reader 
 {
 public:
-    typedef typename basic_stream_event<CharT> stream_event_type;
+    typedef basic_stream_event<CharT> stream_event_type;
 
     virtual ~basic_stream_reader() = default;
 
