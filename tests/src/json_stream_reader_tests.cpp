@@ -291,17 +291,6 @@ TEST_CASE("json_stream_reader object_value test")
             "firstName" : "Tom",
             "lastName" : "Cochrane",
             "mark" : 55              
-        },
-        {
-            "enrollmentNo" : 101,
-            "firstName" : "Catherine",
-            "lastName" : "Smith",
-            "mark" : 95},
-        {
-            "enrollmentNo" : 102,
-            "firstName" : "William",
-            "lastName" : "Skeleton",
-            "mark" : 60              
         }
     )";
 

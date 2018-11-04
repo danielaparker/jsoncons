@@ -48,7 +48,7 @@ public:
     typedef detail::const_object_iterator<cbor_view> const_object_iterator;
     typedef detail::const_array_iterator<cbor_view> array_iterator;
     typedef detail::const_array_iterator<cbor_view> const_array_iterator;
-    typedef detail::key_value_pair_view<cbor_view> key_value_pair_type;
+    typedef detail::key_value_pair_view<cbor_view> key_value_type;
 
     friend class detail::const_array_iterator<cbor_view>;
     friend class detail::const_object_iterator<cbor_view>;

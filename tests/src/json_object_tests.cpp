@@ -421,7 +421,7 @@ TEST_CASE("test_json_object_iterator_1")
     CHECK((*it).value() == json("value2"));
     CHECK((*(--it)).value() == json("value1"));
 
-    json::key_value_pair_type member = *it;
+    json::key_value_type member = *it;
     CHECK(member.key() == "name1");
     CHECK(member.value() == json("value1"));
 }
@@ -449,7 +449,7 @@ TEST_CASE("test_json_object_iterator_2")
 
     CHECK((*(--it)).value() == json("value1"));
 
-    json::key_value_pair_type member = *it;
+    json::key_value_type member = *it;
     CHECK(member.key() == "name1");
     CHECK(member.value() == json("value1"));
 }
@@ -482,7 +482,7 @@ TEST_CASE("test_json_object_iterator_3")
     CHECK((*(--it)).value() == json("value1"));
     CHECK((it == a.object_range().begin()));
 
-    json::key_value_pair_type member = *it;
+    json::key_value_type member = *it;
     CHECK(member.key() == "name1");
     CHECK(member.value() == json("value1"));
 

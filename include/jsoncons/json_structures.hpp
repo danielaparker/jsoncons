@@ -381,7 +381,7 @@ BidirectionalIt last_wins_unique_sequence(BidirectionalIt first, BidirectionalIt
 }
 
 template <class KeyT, class ValueT>
-class key_value_pair
+class key_value
 {
 public:
     typedef KeyT key_storage_type;
@@ -389,36 +389,41 @@ public:
     typedef typename KeyT::allocator_type allocator_type;
     typedef typename ValueT::string_view_type string_view_type;
 
-    key_value_pair()
+    key_value()
     {
     }
 
-    key_value_pair(const key_storage_type& name, const ValueT& val)
+    key_value(const key_storage_type& name, const ValueT& val)
         : key_(name), value_(val)
     {
     }
 
+    key_value(const string_view_type& name)
+        : key_(name)
+    {
+    }
+
     template <class T>
-    key_value_pair(key_storage_type&& name, T&& val)
+    key_value(key_storage_type&& name, T&& val)
         : key_(std::forward<key_storage_type>(name)), 
           value_(std::forward<T>(val))
     {
     }
 
     template <class T>
-    key_value_pair(key_storage_type&& name, 
+    key_value(key_storage_type&& name, 
                    T&& val, 
                    const allocator_type& allocator)
         : key_(std::forward<key_storage_type>(name)), value_(std::forward<T>(val), allocator)
     {
     }
 
-    key_value_pair(const key_value_pair& member)
+    key_value(const key_value& member)
         : key_(member.key_), value_(member.value_)
     {
     }
 
-    key_value_pair(key_value_pair&& member)
+    key_value(key_value&& member)
         : key_(std::move(member.key_)), value_(std::move(member.value_))
     {
     }
@@ -444,13 +449,13 @@ public:
         value_ = std::forward<T>(value);
     }
 
-    void swap(key_value_pair& member)
+    void swap(key_value& member)
     {
         key_.swap(member.key_);
         value_.swap(member.value_);
     }
 
-    key_value_pair& operator=(const key_value_pair& member)
+    key_value& operator=(const key_value& member)
     {
         if (this != & member)
         {
@@ -460,7 +465,7 @@ public:
         return *this;
     }
 
-    key_value_pair& operator=(key_value_pair&& member)
+    key_value& operator=(key_value&& member)
     {
         if (this != &member)
         {
@@ -495,7 +500,7 @@ public:
     typedef typename Json::char_allocator_type char_allocator_type;
     typedef KeyT key_storage_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef key_value_pair<KeyT,Json> value_type;
+    typedef key_value<KeyT,Json> value_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> kvp_allocator_type;
     typedef typename Json::object_storage_type object_storage_type;

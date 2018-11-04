@@ -116,6 +116,7 @@ private:
                          semantic_tag_type tag, 
                          const serializing_context&) override
     {
+        std::cout << "basic_stream_event_handler do_uint64_value\n";
         event_ = basic_stream_event<CharT>(value, tag);
         return false;
     }
