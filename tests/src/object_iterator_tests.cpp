@@ -49,7 +49,7 @@ public:
             return *this;  // end
         }
         JSONCONS_ASSERT(reader_.current().event_type() == stream_event_type::name);
-        kv_ = key_value_type(reader_.current().as<jsoncons::basic_string_view<CharT>>());
+        kv_ = key_value_type(reader_.current(). template as<jsoncons::basic_string_view<CharT>>());
 
         json_decoder<json_type> decoder;
         //auto& old = reader_.handler(decoder);
