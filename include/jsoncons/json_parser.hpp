@@ -148,29 +148,25 @@ enum class json_parse_state : uint8_t
 template <class CharT, class Allocator = std::allocator<char>>
 class basic_json_parser : private serializing_context
 {
-    static const size_t initial_string_buffer_capacity_ = 1024;
-    static const int default_initial_stack_capacity_ = 100;
     typedef std::basic_string<CharT> string_type;
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char> numeral_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+
+    static const size_t initial_string_buffer_capacity_ = 1024;
+    static const int default_initial_stack_capacity_ = 100;
 
     default_parse_error_handler default_err_handler_;
 
+    parse_error_handler& err_handler_;
     bool can_read_nan_replacement_;
     string_type nan_replacement_;
     bool can_read_pos_inf_replacement_;
     string_type pos_inf_replacement_;
     bool can_read_neg_inf_replacement_;
     string_type neg_inf_replacement_;
-
-    parse_error_handler& err_handler_;
-
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char> numeral_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-
-    std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
-
     int initial_stack_capacity_;
     size_t max_nesting_depth_;
     size_t nesting_depth_;
@@ -187,6 +183,7 @@ class basic_json_parser : private serializing_context
     bool continue_;
     bool done_;
 
+    std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
     detail::string_to_double to_double_;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_parse_state> parse_state_allocator_type;
