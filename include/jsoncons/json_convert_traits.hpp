@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONCONVERTTRAITS_HPP
-#define JSONCONS_JSONCONVERTTRAITS_HPP
+#ifndef JSONCONS_JSON_CONVERT_TRAITS_HPP
+#define JSONCONS_JSON_CONVERT_TRAITS_HPP
 
 #include <iostream>
 #include <string>

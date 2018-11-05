@@ -28,6 +28,12 @@ Check if there are no more events.
     virtual const stream_event& current() const = 0;
 Returns the current [stream_event](stream_event.md).
 
+    virtual void accept(json_content_handler& handler) = 0;
+Sends the parse events from the current event to the
+matching completion event to the supplied [handler](json_content_handler.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+
     virtual void next() = 0;
 Get the next event. 
 

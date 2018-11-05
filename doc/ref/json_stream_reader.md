@@ -85,6 +85,12 @@ Checks if there are no more events.
     const stream_event& current() const override;
 Returns the current [stream_event](stream_event.md).
 
+    void accept(json_content_handler& handler) override
+Sends the parse events from the current event to the
+matching completion event to the supplied [handler](json_content_handler.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+
     void next() override;
 Advances to the next event. 
 

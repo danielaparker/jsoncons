@@ -45,20 +45,6 @@ and by the pull parser [json_stream_reader](json_stream_reader.md).
     json_parser(const json_read_options& options, 
                 parse_error_handler& err_handler); // (4)
 
-    json_parser(json_content_handler& handler); // (5)
-
-    json_parser(json_content_handler& handler,
-                const json_read_options& options); // (6)
-
-    json_parser(json_content_handler& handler,
-                parse_error_handler& err_handler); // (7)
-
-    json_parser(json_content_handler& handler, 
-                const json_read_options& options,
-                parse_error_handler& err_handler); // (8)
-
-Constructors (1)-(4) use a default [json_content_handler](json_content_handler.md) that discards the JSON parse events, and are for validation only.
-
 (1) Constructs a `json_parser` that uses default [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
@@ -71,25 +57,7 @@ and a specified [parse_error_handler](parse_error_handler.md).
 (4) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-Constructors (5)-(8) take a user supplied [json_content_handler](json_content_handler.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
-
-(5) Constructs a `json_parser` that emits JSON parse events to the specified 
-[json_content_handler](json_content_handler.md), and uses default [json_read_options](json_read_options)
-and a default [parse_error_handler](parse_error_handler.md).
-
-(6) Constructs a `json_parser` that emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
-and uses the specified [json_read_options](json_read_options)
-and a default [parse_error_handler](parse_error_handler.md).
-
-(7) Constructs a `json_parser` that emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
-and uses default [json_read_options](json_read_options)
-and a specified [parse_error_handler](parse_error_handler.md).
-
-(8) Constructs a `json_parser` that emits JSON parse events to the specified [json_content_handler](json_content_handler.md) and
-uses the specified [json_read_options](json_read_options)
-and a specified [parse_error_handler](parse_error_handler.md).
-
-Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any content handler and error handler passed in the constuctor.
+Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any error handler passed in the constuctor.
 
 #### Member functions
 
@@ -106,25 +74,32 @@ The parser may enter a stopped state as a result of a content handler
 function returning `false`, an error occurred,
 or after having consumed a complete JSON text.
 
+    bool finished() const
+Returns `true` if the parser is finished parsing, `false` otherwise.
+
     bool source_exhausted() const
 Returns `true` if the input in the source buffer has been exhausted, `false` otherwise
 
-    void parse_some()
+    void parse_some(json_content_handler& handler)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
+Parse events are sent to the supplied `handler`.
 Throws [parse_error](parse_error.md) if parsing fails.
 
-    void parse_some(std::error_code& ec)
+    void parse_some(json_content_handler<CharT>& handler,
+                    std::error_code& ec)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
+Parse events are sent to the supplied `handler`.
 Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
-    void end_parse()
+    void end_parse(json_content_handler<CharT>& handler)
 Called after `source_exhausted()` is `true` and there is no more input. 
-Repeatedly calls `parse_some()` until `finished()` returns `true`
+Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
 Throws [parse_error](parse_error.md) if parsing fails.
 
-    void end_parse(std::error_code& ec)
+    void end_parse(json_content_handler<CharT>& handler,
+                   std::error_code& ec)
 Called after `source_exhausted()` is `true` and there is no more input. 
-Repeatedly calls `parse_some()` until `stopped()` returns `true`
+Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
 Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
     void skip_bom()
@@ -153,19 +128,19 @@ to continue.
 ```c++
 int main()
 {
+    json_parser parser;
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
     try
     {
         parser.update("10");
-        parser.parse_some();
+        parser.parse_some(decoder);
         std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.update(".5");
-        parser.parse_some(); // This is the end, but the parser can't tell
+        parser.parse_some(decoder); // This is the end, but the parser can't tell
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(); // Indicates that this is the end
+        parser.end_parse(decoder); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done(); // Checks if there are any unconsumed 
@@ -201,19 +176,19 @@ Output:
 ```c++
 int main()
 {
+    json_parser parser;
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
     try
     {
         parser.update("[10");
-        parser.parse_some();
+        parser.parse_some(decoder);
         std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.update(".5]{}");
-        parser.parse_some(); // The parser reaches the end at ']'
+        parser.parse_some(decoder); // The parser reaches the end at ']'
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(); // Indicates that this is the end
+        parser.end_parse(decoder); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done(); // Checks if there are any unconsumed 
@@ -257,13 +232,13 @@ int main()
            .pos_inf_replacement("\"Infinity\"")
            .neg_inf_replacement("\"-Infinity\"");
 
+    json_parser parser(options);
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder, options);
     try
     {
         parser.update(s);
-        parser.parse_some();
-        parser.end_parse();
+        parser.parse_some(decoder);
+        parser.end_parse(decoder);
         parser.check_done();
     }
     catch (const parse_error& e)

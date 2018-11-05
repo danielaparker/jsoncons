@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_KEYVALUE_HPP
-#define JSONCONS_JSON_KEYVALUE_HPP
+#ifndef JSONCONS_JSON_KEY_VALUE_HPP
+#define JSONCONS_JSON_KEY_VALUE_HPP
 
 #include <string>
 #include <vector>

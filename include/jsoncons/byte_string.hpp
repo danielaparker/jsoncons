@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BYTESTRING_HPP
-#define JSONCONS_BYTESTRING_HPP
+#ifndef JSONCONS_BYTE_STRING_HPP
+#define JSONCONS_BYTE_STRING_HPP
 
 #include <stdexcept>
 #include <string>

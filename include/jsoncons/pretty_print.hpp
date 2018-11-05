@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_PRETTYPRINT_HPP
-#define JSONCONS_PRETTYPRINT_HPP
+#ifndef JSONCONS_PRETTY_PRINT_HPP
+#define JSONCONS_PRETTY_PRINT_HPP
 
 #include <limits>
 #include <string>

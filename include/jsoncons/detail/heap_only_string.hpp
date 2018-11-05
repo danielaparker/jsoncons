@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_HEAPONLYSTRING_HPP
-#define JSONCONS_DETAIL_HEAPONLYSTRING_HPP
+#ifndef JSONCONS_DETAIL_HEAP_ONLY_STRING_HPP
+#define JSONCONS_DETAIL_HEAP_ONLY_STRING_HPP
 
 #include <stdexcept>
 #include <string>

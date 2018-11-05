@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBORERRORCATEGORY_HPP
-#define JSONCONS_CBOR_CBORERRORCATEGORY_HPP
+#ifndef JSONCONS_CBOR_CBOR_ERROR_CATEGORY_HPP
+#define JSONCONS_CBOR_CBOR_ERROR_CATEGORY_HPP
 
 #include <system_error>
 #include <jsoncons/config/jsoncons_config.hpp>

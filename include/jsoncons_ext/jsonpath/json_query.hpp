@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSONQUERY_HPP
-#define JSONCONS_JSONPATH_JSONQUERY_HPP
+#ifndef JSONCONS_JSONPATH_JSON_QUERY_HPP
+#define JSONCONS_JSONPATH_JSON_QUERY_HPP
 
 #include <string>
 #include <sstream>

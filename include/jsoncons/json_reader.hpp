@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONREADER_HPP
-#define JSONCONS_JSONREADER_HPP
+#ifndef JSONCONS_JSON_READER_HPP
+#define JSONCONS_JSON_READER_HPP
 
 #include <memory>
 #include <string>

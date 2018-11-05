@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_PRINTNUMBER_HPP
-#define JSONCONS_DETAIL_PRINTNUMBER_HPP
+#ifndef JSONCONS_DETAIL_PRINT_NUMBER_HPP
+#define JSONCONS_DETAIL_PRINT_NUMBER_HPP
 
 #include <stdexcept>
 #include <string>

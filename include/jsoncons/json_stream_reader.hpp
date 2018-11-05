@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONSTREAMREADER_HPP
-#define JSONCONS_JSONSTREAMREADER_HPP
+#ifndef JSONCONS_JSON_STREAM_READER_HPP
+#define JSONCONS_JSON_STREAM_READER_HPP
 
 #include <memory>
 #include <string>
@@ -269,13 +269,13 @@ public:
                 }
                 break;
             case stream_event_type::name:
-                if (!handler.name(event_handler_.event().as<jsoncons::basic_string_view<CharT>>(), *this))
+                if (!handler.name(event_handler_.event().template as<jsoncons::basic_string_view<CharT>>(), *this))
                 {
                     return;
                 }
                 break;
             case stream_event_type::string_value:
-                if (!handler.string_value(event_handler_.event().as<jsoncons::basic_string_view<CharT>>(), semantic_tag_type::none, *this))
+                if (!handler.string_value(event_handler_.event().template as<jsoncons::basic_string_view<CharT>>(), semantic_tag_type::none, *this))
                 {
                     return;
                 }
@@ -287,25 +287,25 @@ public:
                 }
                 break;
             case stream_event_type::bool_value:
-                if (!handler.bool_value(event_handler_.event().as<bool>(), *this))
+                if (!handler.bool_value(event_handler_.event().template as<bool>(), *this))
                 {
                     return;
                 }
                 break;
             case stream_event_type::int64_value:
-                if (!handler.int64_value(event_handler_.event().as<int64_t>(), semantic_tag_type::none, *this))
+                if (!handler.int64_value(event_handler_.event().template as<int64_t>(), semantic_tag_type::none, *this))
                 {
                     return;
                 }
                 break;
             case stream_event_type::uint64_value:
-                if (!handler.uint64_value(event_handler_.event().as<uint64_t>(), semantic_tag_type::none, *this))
+                if (!handler.uint64_value(event_handler_.event().template as<uint64_t>(), semantic_tag_type::none, *this))
                 {
                     return;
                 }
                 break;
             case stream_event_type::double_value:
-                if (!handler.double_value(event_handler_.event().as<double>(), semantic_tag_type::none, *this))
+                if (!handler.double_value(event_handler_.event().template as<double>(), semantic_tag_type::none, *this))
                 {
                     return;
                 }

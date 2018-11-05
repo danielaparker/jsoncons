@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONFWD_HPP
-#define JSONCONS_JSONFWD_HPP
+#ifndef JSONCONS_JSON_FWD_HPP
+#define JSONCONS_JSON_FWD_HPP
 
 #include <memory>
 
