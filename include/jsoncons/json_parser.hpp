@@ -38,26 +38,30 @@ class replacement_filter : public basic_json_filter<CharT>
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
     typedef typename basic_json_serializing_options<CharT>::string_type string_type;
 
-    basic_null_json_content_handler<CharT> default_content_handler_;
-
     bool can_read_nan_replacement_;
-    bool can_read_pos_inf_replacement_;
-    bool can_read_neg_inf_replacement_;
     string_type nan_replacement_;
+    bool can_read_pos_inf_replacement_;
     string_type pos_inf_replacement_;
+    bool can_read_neg_inf_replacement_;
     string_type neg_inf_replacement_;
 
 public:
     replacement_filter() = delete;
 
-    replacement_filter(basic_json_content_handler<CharT>& handler, const basic_json_read_options<CharT>& options)
+    replacement_filter(basic_json_content_handler<CharT>& handler,     
+                       bool can_read_nan_replacement,
+                       const string_type& nan_replacement,
+                       bool can_read_pos_inf_replacement,
+                       const string_type& pos_inf_replacement,
+                       bool can_read_neg_inf_replacement,
+                       const string_type& neg_inf_replacement)
         : basic_json_filter<CharT>(handler), 
-          can_read_nan_replacement_(options.can_read_nan_replacement()),
-          can_read_pos_inf_replacement_(options.can_read_pos_inf_replacement()),
-          can_read_neg_inf_replacement_(options.can_read_neg_inf_replacement()),
-          nan_replacement_(options.nan_replacement()),
-          pos_inf_replacement_(options.pos_inf_replacement()),
-          neg_inf_replacement_(options.neg_inf_replacement())
+          can_read_nan_replacement_(can_read_nan_replacement),
+          nan_replacement_(nan_replacement),
+          can_read_pos_inf_replacement_(can_read_pos_inf_replacement),
+          pos_inf_replacement_(pos_inf_replacement),
+          can_read_neg_inf_replacement_(can_read_neg_inf_replacement),
+          neg_inf_replacement_(neg_inf_replacement)
     {
     }
 
@@ -146,13 +150,18 @@ class basic_json_parser : private serializing_context
 {
     static const size_t initial_string_buffer_capacity_ = 1024;
     static const int default_initial_stack_capacity_ = 100;
+    typedef std::basic_string<CharT> string_type;
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
 
-    detail::replacement_filter<CharT> replacement_filter_;
-    basic_null_json_content_handler<CharT> default_content_handler_;
     default_parse_error_handler default_err_handler_;
 
-    basic_json_content_handler<CharT>& handler_;
+    bool can_read_nan_replacement_;
+    string_type nan_replacement_;
+    bool can_read_pos_inf_replacement_;
+    string_type pos_inf_replacement_;
+    bool can_read_neg_inf_replacement_;
+    string_type neg_inf_replacement_;
+
     parse_error_handler& err_handler_;
 
     typedef Allocator allocator_type;
@@ -189,49 +198,29 @@ class basic_json_parser : private serializing_context
 
 public:
     basic_json_parser()
-        : basic_json_parser(default_content_handler_, basic_json_serializing_options<CharT>(), default_err_handler_)
+        : basic_json_parser(basic_json_serializing_options<CharT>(), default_err_handler_)
     {
     }
 
     basic_json_parser(parse_error_handler& err_handler)
-        : basic_json_parser(default_content_handler_, basic_json_serializing_options<CharT>(), err_handler)
-    {
-    }
-
-    basic_json_parser(basic_json_content_handler<CharT>& handler)
-        : basic_json_parser(handler, basic_json_serializing_options<CharT>(), default_err_handler_)
-    {
-    }
-
-    basic_json_parser(basic_json_content_handler<CharT>& handler,
-                      parse_error_handler& err_handler)
-        : basic_json_parser(handler, basic_json_serializing_options<CharT>(), err_handler)
+        : basic_json_parser(basic_json_serializing_options<CharT>(), err_handler)
     {
     }
 
     basic_json_parser(const basic_json_read_options<CharT>& options)
-        : basic_json_parser(default_content_handler_, options, default_err_handler_)
+        : basic_json_parser(options, default_err_handler_)
     {
     }
 
-    basic_json_parser(const basic_json_read_options<CharT>& options, 
+    basic_json_parser(const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
-        : basic_json_parser(default_content_handler_, options, err_handler)
-    {
-    }
-
-    basic_json_parser(basic_json_content_handler<CharT>& handler,
-                      const basic_json_read_options<CharT>& options)
-        : basic_json_parser(handler, options, default_err_handler_)
-    {
-    }
-
-    basic_json_parser(basic_json_content_handler<CharT>& handler, 
-                      const basic_json_read_options<CharT>& options,
-                      parse_error_handler& err_handler)
-       : replacement_filter_(handler,options),
-         handler_((options.can_read_nan_replacement() || options.can_read_pos_inf_replacement() || options.can_read_neg_inf_replacement()) ? replacement_filter_ : handler),
-         err_handler_(err_handler),
+       : err_handler_(err_handler),
+         can_read_nan_replacement_(options.can_read_nan_replacement()),
+         nan_replacement_(options.nan_replacement()),
+         can_read_pos_inf_replacement_(options.can_read_pos_inf_replacement()),
+         pos_inf_replacement_(options.pos_inf_replacement()),
+         can_read_neg_inf_replacement_(options.can_read_neg_inf_replacement()),
+         neg_inf_replacement_(options.neg_inf_replacement()),
          initial_stack_capacity_(default_initial_stack_capacity_),
          max_nesting_depth_(options.max_nesting_depth()),
          nesting_depth_(0), 
@@ -293,6 +282,11 @@ public:
     bool stopped() const
     {
         return !continue_;
+    }
+
+    bool finished() const
+    {
+        return !continue_ && state_ != json_parse_state::before_done;
     }
 
     void skip_space()
@@ -512,15 +506,6 @@ public:
 
     void check_done(std::error_code& ec)
     {
-        if (!done_)
-        {
-            continue_ = err_handler_.error(json_parse_errc::unexpected_eof, *this);
-            if (!continue_)
-            {
-                ec = json_parse_errc::unexpected_eof;
-                return;
-            }
-        }
         for (; input_ptr_ != input_end_; ++input_ptr_)
         {
             CharT curr_char_ = *input_ptr_;
@@ -542,7 +527,7 @@ public:
             }
         }
     }
-
+/*
     void parse_some()
     {
         std::error_code ec;
@@ -570,6 +555,7 @@ public:
             parse_some(ec);
         }
     }
+*/
 
     json_parse_state state() const
     {
@@ -588,13 +574,62 @@ public:
         input_ptr_ = begin_input_;
     }
 
-    void parse_some(std::error_code& ec)
+    void parse_some(basic_json_content_handler<CharT>& handler)
     {
-        parse_some(handler_, ec);
+        std::error_code ec;
+        parse_some(handler, ec);
+        if (ec)
+        {
+            throw parse_error(ec,line_,column_);
+        }
     }
 
     void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
+        if (can_read_nan_replacement_ || can_read_pos_inf_replacement_ || can_read_neg_inf_replacement_)
+        {
+            detail::replacement_filter<CharT> h(handler,
+                can_read_nan_replacement_,
+                nan_replacement_,
+                can_read_pos_inf_replacement_,
+                pos_inf_replacement_,
+                can_read_neg_inf_replacement_,
+                neg_inf_replacement_);
+            parse_some_(h, ec);
+        }
+        else
+        {
+            parse_some_(handler, ec);
+        }
+    }
+    void end_parse(basic_json_content_handler<CharT>& handler)
+    {
+        std::error_code ec;
+        end_parse(handler, ec);
+        if (ec)
+        {
+            throw parse_error(ec,line_,column_);
+        }
+    }
+
+    void end_parse(basic_json_content_handler<CharT>& handler, std::error_code& ec)
+    {
+        while (!finished())
+        {
+            parse_some(handler, ec);
+        }
+    }
+
+    void parse_some_(basic_json_content_handler<CharT>& handler, std::error_code& ec)
+    {
+        if (state_ == json_parse_state::before_done)
+        {
+            handler.flush();
+            done_ = true;
+            state_ = json_parse_state::done;
+            continue_ = false;
+            return;
+        }
         const CharT* local_input_end = input_end_;
 
         if (input_ptr_ == local_input_end && continue_)
@@ -623,9 +658,6 @@ public:
                 case json_parse_state::done:
                     continue_ = false;
                     break;
-                //case json_parse_state::start:
-                //    continue_ = false;
-                //    break;
                 case json_parse_state::cr:
                 case json_parse_state::lf:
                     state_ = pop_state();
@@ -2653,13 +2685,12 @@ private:
         if (!result.overflow)
         {
             continue_ = handler.int64_value(result.value, semantic_tag_type::none, *this);
-            after_value(ec);
         }
         else
         {
             continue_ = handler.string_value(string_buffer_, semantic_tag_type::bignum, *this);
-            after_value(ec);
         }
+        after_value(ec);
     }
 
     void end_positive_value(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -2668,7 +2699,6 @@ private:
         if (!result.overflow)
         {
             continue_ = handler.uint64_value(result.value, semantic_tag_type::none, *this);
-            after_value(ec);
         }
         else
         {

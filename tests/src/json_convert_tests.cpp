@@ -67,7 +67,8 @@ TEST_CASE("convert_array_test")
     }
 }
 
-#if !defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9
+
+#if !(defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ < 9)
 TEST_CASE("convert_tuple_test")
 {
     typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
@@ -92,21 +93,5 @@ TEST_CASE("convert_tuple_test")
 }
 #endif
 
-/*
-TEST_CASE("test_encode_boost_matrix_to_json")
-{
-    matrix<double> A(2, 2);
-    A(0, 0) = 1.1;
-    A(0, 1) = 2.1;
-    A(1, 0) = 3.1;
-    A(1, 1) = 4.1;
-
-    std::string s;
-    jsoncons::encode_json(A,s,indenting::indent);
-    std::cout << "(1) " << s << std::endl;
-    auto A2 = jsoncons::decode_json<matrix<double>>(s);
-
-}
-*/
 
 

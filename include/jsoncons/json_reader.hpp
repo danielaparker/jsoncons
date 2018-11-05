@@ -141,14 +141,16 @@ private:
 template<class CharT,class Allocator=std::allocator<char>>
 class basic_json_reader 
 {
+    typedef CharT char_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+
     static const size_t default_max_buffer_length = 16384;
 
     basic_null_json_content_handler<CharT> default_content_handler_;
     default_parse_error_handler default_err_handler_;
 
-    typedef CharT char_type;
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    basic_json_content_handler<CharT>& handler_;
 
     basic_json_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
@@ -211,7 +213,8 @@ public:
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
-       : parser_(handler,options,err_handler),
+       : handler_(handler),
+         parser_(options,err_handler),
          is_(is),
          eof_(false),
          buffer_length_(default_max_buffer_length),
@@ -282,7 +285,7 @@ public:
     void read_next(std::error_code& ec)
     {
         parser_.reset();
-        while (!parser_.stopped())
+        while (!parser_.finished())
         {
             if (parser_.source_exhausted())
             {
@@ -301,7 +304,7 @@ public:
                     eof_ = true;
                 }
             }
-            parser_.parse_some(ec);
+            parser_.parse_some(handler_, ec);
             if (ec) return;
         }
         

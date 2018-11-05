@@ -11,18 +11,18 @@ using namespace jsoncons;
 void incremental_parsing_example1()
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
     try
     {
         parser.update("[fal");
-        parser.parse_some();
+        parser.parse_some(decoder);
         std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.update("se]");
-        parser.parse_some();
+        parser.parse_some(decoder);
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse();
+        parser.end_parse(decoder);
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done();
@@ -40,18 +40,18 @@ void incremental_parsing_example1()
 void incremental_parsing_example2()
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
     try
     {
         parser.update("10");
-        parser.parse_some();
+        parser.parse_some(decoder);
         std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.update(".5");
-        parser.parse_some(); // This is the end, but the parser can't tell
+        parser.parse_some(decoder); // This is the end, but the parser can't tell
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(); // Indicates that this is the end
+        parser.end_parse(decoder); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done(); // Checks if there are any unconsumed 
@@ -70,18 +70,18 @@ void incremental_parsing_example2()
 void incremental_parsing_example3()
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
     try
     {
         parser.update("[10");
-        parser.parse_some();
+        parser.parse_some(decoder);
         std::cout << "(1) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.update(".5]{}");
-        parser.parse_some(); // The parser reaches the end at ']'
+        parser.parse_some(decoder); // The parser reaches the end at ']'
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(); // Indicates that this is the end
+        parser.end_parse(decoder); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done(); // Checks if there are any unconsumed 
@@ -110,12 +110,12 @@ void parse_nan_replacement_example()
            .neg_inf_replacement("\"-Infinity\"");
 
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder, options);
+    json_parser parser(options);
     try
     {
         parser.update(s);
-        parser.parse_some();
-        parser.end_parse();
+        parser.parse_some(decoder);
+        parser.end_parse(decoder);
         parser.check_done();
     }
     catch (const parse_error& e)

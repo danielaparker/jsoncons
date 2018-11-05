@@ -119,7 +119,7 @@ Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
     void end_parse()
 Called after `source_exhausted()` is `true` and there is no more input. 
-Repeatedly calls `parse_some()` until `stopped()` returns `true`
+Repeatedly calls `parse_some()` until `finished()` returns `true`
 Throws [parse_error](parse_error.md) if parsing fails.
 
     void end_parse(std::error_code& ec)

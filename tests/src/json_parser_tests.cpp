@@ -81,18 +81,16 @@ TEST_CASE("test_skip_bom")
 TEST_CASE("test_parse_empty_object")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("{}");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
-
-    parser.end_parse();
 
     json j = decoder.get_result();
 }
@@ -100,18 +98,16 @@ TEST_CASE("test_parse_empty_object")
 TEST_CASE("test_parse_array")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("[]");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
-
-    parser.end_parse();
 
     json j = decoder.get_result();
 }
@@ -119,18 +115,16 @@ TEST_CASE("test_parse_array")
 TEST_CASE("test_parse_string")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("\"\"");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
-
-    parser.end_parse();
 
     json j = decoder.get_result();
 }
@@ -138,15 +132,15 @@ TEST_CASE("test_parse_string")
 TEST_CASE("test_parse_integer")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("10");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
 
     json j = decoder.get_result();
@@ -155,15 +149,15 @@ TEST_CASE("test_parse_integer")
 TEST_CASE("test_parse_integer_space")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("10 ");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
 
     json j = decoder.get_result();
@@ -172,15 +166,15 @@ TEST_CASE("test_parse_integer_space")
 TEST_CASE("test_parse_double_space")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("10.0 ");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
 
     json j = decoder.get_result();
@@ -189,15 +183,15 @@ TEST_CASE("test_parse_double_space")
 TEST_CASE("test_parse_false")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("false");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
 
     json j = decoder.get_result();
@@ -206,15 +200,15 @@ TEST_CASE("test_parse_false")
 TEST_CASE("test_parse_true")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("true");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
 
     json j = decoder.get_result();
@@ -223,15 +217,15 @@ TEST_CASE("test_parse_true")
 TEST_CASE("test_parse_null")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s("null");
 
     parser.update(s.data(),s.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
 
     json j = decoder.get_result();
@@ -240,19 +234,19 @@ TEST_CASE("test_parse_null")
 TEST_CASE("test_parse_array_string")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     static std::string s1("[\"\"");
 
     parser.update(s1.data(),s1.length());
-    parser.parse_some();
+    parser.parse_some(decoder);
     CHECK_FALSE(parser.done());
     static std::string s2("]");
     parser.update(s2.data(), s2.length());
-    parser.parse_some();
-    parser.end_parse();
+    parser.parse_some(decoder);
+    parser.end_parse(decoder);
     CHECK(parser.done());
 
     json j = decoder.get_result();
@@ -261,18 +255,18 @@ TEST_CASE("test_parse_array_string")
 TEST_CASE("test_incremental_parsing")
 {
     jsoncons::json_decoder<json> decoder;
-    json_parser parser(decoder);
+    json_parser parser;
 
     parser.reset();
 
     parser.update("[fal",4);
-    parser.parse_some();
+    parser.parse_some(decoder);
     CHECK_FALSE(parser.done());
     CHECK(parser.source_exhausted());
     parser.update("se]",3);
-    parser.parse_some();
+    parser.parse_some(decoder);
 
-    parser.end_parse();
+    parser.end_parse(decoder);
     CHECK(parser.done());
 
     json j = decoder.get_result();

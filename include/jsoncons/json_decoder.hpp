@@ -160,6 +160,7 @@ private:
             result_.swap(stack_.front().value_);
             stack_.pop_back();
             is_valid_ = true;
+            return false;
         }
         return true;
     }
@@ -207,6 +208,7 @@ private:
             result_.swap(stack_.front().value_);
             stack_.pop_back();
             is_valid_ = true;
+            return false;
         }
         return true;
     }
@@ -230,7 +232,7 @@ private:
             case structure_type::root_t:
                 result_ = Json(sv, tag, string_allocator_);
                 is_valid_ = true;
-                break;
+                return false;
         }
         return true;
     }
@@ -248,7 +250,7 @@ private:
             case structure_type::root_t:
                 result_ = Json(byte_string_view(data,length),byte_allocator_);
                 is_valid_ = true;
-                break;
+                return false;
         }
         return true;
     }
@@ -268,7 +270,7 @@ private:
             case structure_type::root_t:
                 result_ = Json(value,tag);
                 is_valid_ = true;
-                break;
+                return false;
         }
         return true;
     }
@@ -288,7 +290,7 @@ private:
             case structure_type::root_t:
                 result_ = Json(value,tag);
                 is_valid_ = true;
-                break;
+                return false;
         }
         return true;
     }
@@ -309,7 +311,7 @@ private:
             case structure_type::root_t:
                 result_ = Json(value, fmt, tag);
                 is_valid_ = true;
-                break;
+                return false;
         }
         return true;
     }
@@ -327,7 +329,7 @@ private:
             case structure_type::root_t:
                 result_ = Json(value);
                 is_valid_ = true;
-                break;
+                return false;
         }
         return true;
     }
@@ -345,7 +347,7 @@ private:
             case structure_type::root_t:
                 result_ = Json(Json::null());
                 is_valid_ = true;
-                break;
+                return false;
         }
         return true;
     }

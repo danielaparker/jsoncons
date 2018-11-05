@@ -24,6 +24,7 @@
 #include <jsoncons/serializing_context.hpp>
 #include <jsoncons/detail/writer.hpp>
 #include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/key_value.hpp>
 
 namespace jsoncons {
 
@@ -309,8 +310,7 @@ private:
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
                 }
                 detail::string_to_double f;
-                value = f(target.data(),target.length());
-                break;
+                return f(target.data(),target.length());
             }
         case stream_event_type::double_value:
             return value_.double_value_;
@@ -370,13 +370,13 @@ template<class CharT>
 class basic_stream_reader 
 {
 public:
-    typedef basic_stream_event<CharT> stream_event_type;
-
     virtual ~basic_stream_reader() = default;
 
     virtual bool done() const = 0;
 
-    virtual const stream_event_type& current() const = 0;
+    virtual const basic_stream_event<CharT>& current() const = 0;
+
+    virtual void accept(basic_json_content_handler<CharT>& handler)= 0;
 
     virtual void next() = 0;
 

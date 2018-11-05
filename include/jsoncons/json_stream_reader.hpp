@@ -116,7 +116,6 @@ private:
                          semantic_tag_type tag, 
                          const serializing_context&) override
     {
-        std::cout << "basic_stream_event_handler do_uint64_value\n";
         event_ = basic_stream_event<CharT>(value, tag);
         return false;
     }
@@ -135,7 +134,7 @@ private:
     }
 };
 
-template<class CharT,class Allocator>
+template<class CharT,class Allocator=std::allocator<CharT>>
 class basic_json_stream_reader : public basic_stream_reader<CharT>, private virtual serializing_context
 {
     static const size_t default_max_buffer_length = 16384;
@@ -148,7 +147,6 @@ class basic_json_stream_reader : public basic_stream_reader<CharT>, private virt
     typedef CharT char_type;
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    using typename basic_stream_reader<CharT>::stream_event_type;
 
     basic_json_parser<CharT,Allocator> parser_;
     std::basic_istream<CharT>& is_;
@@ -205,7 +203,7 @@ public:
                              basic_stream_filter<CharT>& filter,
                              const basic_json_read_options<CharT>& options,
                              parse_error_handler& err_handler)
-       : parser_(event_handler_,options,err_handler),
+       : parser_(options,err_handler),
          is_(is),
          filter_(filter),
          eof_(false),
@@ -235,9 +233,94 @@ public:
         return parser_.done();
     }
 
-    const stream_event_type& current() const override
+    const basic_stream_event<CharT>& current() const override
     {
         return event_handler_.event();
+    }
+
+    void accept(basic_json_content_handler<CharT>& handler) override
+    {
+        std::error_code ec;
+
+        switch (event_handler_.event().event_type())
+        {
+            case stream_event_type::begin_array:
+                if (!handler.begin_array(*this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::end_array:
+                if (!handler.end_array(*this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::begin_object:
+                if (!handler.begin_object(*this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::end_object:
+                if (!handler.end_object(*this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::name:
+                if (!handler.name(event_handler_.event().as<jsoncons::basic_string_view<CharT>>(), *this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::string_value:
+                if (!handler.string_value(event_handler_.event().as<jsoncons::basic_string_view<CharT>>(), semantic_tag_type::none, *this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::null_value:
+                if (!handler.null_value(*this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::bool_value:
+                if (!handler.bool_value(event_handler_.event().as<bool>(), *this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::int64_value:
+                if (!handler.int64_value(event_handler_.event().as<int64_t>(), semantic_tag_type::none, *this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::uint64_value:
+                if (!handler.uint64_value(event_handler_.event().as<uint64_t>(), semantic_tag_type::none, *this))
+                {
+                    return;
+                }
+                break;
+            case stream_event_type::double_value:
+                if (!handler.double_value(event_handler_.event().as<double>(), semantic_tag_type::none, *this))
+                {
+                    return;
+                }
+                break;
+            default:
+                break;
+        }
+        do
+        {
+            read_next(handler, ec);
+            if (ec)
+            {
+                throw parse_error(ec,parser_.line_number(),parser_.column_number());
+            }
+        } while (!done() && !filter_.accept(event_handler_.event(), *this));
     }
 
     void next() override
@@ -284,6 +367,11 @@ public:
 
     void read_next(std::error_code& ec)
     {
+        read_next(event_handler_, ec);
+    }
+
+    void read_next(basic_json_content_handler<CharT>& handler, std::error_code& ec)
+    {
         parser_.restart();
         while (!parser_.stopped())
         {
@@ -305,7 +393,7 @@ public:
                     eof_ = true;
                 }
             }
-            parser_.parse_some(ec);
+            parser_.parse_some(handler, ec);
             if (ec) return;
         }
     }

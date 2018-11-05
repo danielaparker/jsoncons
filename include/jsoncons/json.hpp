@@ -2404,7 +2404,7 @@ public:
     static basic_json parse(const string_view_type& s, parse_error_handler& err_handler)
     {
         json_decoder<basic_json> decoder;
-        basic_json_parser<char_type> parser(decoder,err_handler);
+        basic_json_parser<char_type> parser(err_handler);
 
         auto result = unicons::skip_bom(s.begin(), s.end());
         if (result.ec != unicons::encoding_errc())
@@ -2413,8 +2413,8 @@ public:
         }
         size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
-        parser.parse_some();
-        parser.end_parse();
+        parser.parse_some(decoder);
+        parser.end_parse(decoder);
         parser.check_done();
         if (!decoder.is_valid())
         {
@@ -2451,7 +2451,7 @@ public:
     static basic_json parse(const string_view_type& s, const basic_json_serializing_options<CharT>& options, parse_error_handler& err_handler)
     {
         json_decoder<basic_json> decoder;
-        basic_json_parser<char_type> parser(decoder,options,err_handler);
+        basic_json_parser<char_type> parser(options,err_handler);
 
         auto result = unicons::skip_bom(s.begin(), s.end());
         if (result.ec != unicons::encoding_errc())
@@ -2460,8 +2460,8 @@ public:
         }
         size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
-        parser.parse_some();
-        parser.end_parse();
+        parser.parse_some(decoder);
+        parser.end_parse(decoder);
         parser.check_done();
         if (!decoder.is_valid())
         {

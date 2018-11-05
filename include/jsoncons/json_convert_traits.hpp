@@ -18,8 +18,105 @@
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/json_stream_reader.hpp>
 
 namespace jsoncons {
+
+template<class CharT>
+class basic_object_stream_reader
+{
+    typedef basic_json<CharT> json_type;
+    typedef key_value<std::basic_string<CharT>,json_type> key_value_type;
+    typedef key_value_type& reference;
+    basic_stream_reader<CharT>& reader_;
+    key_value_type kv_;
+public:
+    basic_object_stream_reader(basic_stream_reader<CharT>& reader)
+      : reader_(reader)
+    {
+        if (reader_.current().event_type() != stream_event_type::begin_object)
+        {
+            throw std::invalid_argument("Not an object");
+        }
+        next();
+    }
+
+    basic_object_stream_reader(const basic_object_stream_reader&) = delete;
+    basic_object_stream_reader(basic_object_stream_reader&&) = delete;
+
+    bool done() const
+    {
+        return reader_.done() || reader_.current().event_type() == stream_event_type::end_object;
+    }
+
+    const key_value_type& current() const
+    {
+        return kv_;
+    }
+
+    void next()
+    {
+        reader_.next();
+        if (!done())
+        {
+            JSONCONS_ASSERT(reader_.current().event_type() == stream_event_type::name);
+            kv_ = key_value_type(reader_.current(). template as<jsoncons::basic_string_view<CharT>>());
+            reader_.next();
+            if (!done())
+            {
+                json_decoder<json_type> decoder;
+                reader_.accept(decoder);
+                kv_.value(decoder.get_result());
+            }
+        }
+    }
+};
+
+template<class CharT>
+class basic_array_stream_reader
+{
+    typedef basic_json<CharT> json_type;
+    typedef json_type& reference;
+    basic_stream_reader<CharT>& reader_;
+    json_type value_;
+public:
+    basic_array_stream_reader(basic_stream_reader<CharT>& reader)
+      : reader_(reader)
+    {
+        if (reader_.current().event_type() != stream_event_type::begin_array)
+        {
+            throw std::invalid_argument("Not an array");
+        }
+        next();
+    }
+
+    basic_array_stream_reader(const basic_array_stream_reader&) = delete;
+    basic_array_stream_reader(basic_array_stream_reader&&) = delete;
+
+    bool done() const
+    {
+        return reader_.done() || reader_.current().event_type() == stream_event_type::end_array;
+    }
+
+    const json_type& current() const
+    {
+        return value_;
+    }
+
+    void next()
+    {
+        if (!done())
+        {
+            reader_.next();
+            if (!done())
+            {
+                json_decoder<json_type> decoder;
+                reader_.accept(decoder);
+                value_ = decoder.get_result();
+            }
+        }
+    }
+};
 
 // json_convert_traits
 
@@ -57,8 +154,16 @@ struct json_convert_traits<T,
     static T decode(std::basic_istringstream<CharT>& is,
                     const basic_json_serializing_options<CharT>& options)
     {
-        basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-        return j.template as<T>();
+        T v;
+        basic_json_stream_reader<CharT> reader(is, options);
+        basic_array_stream_reader<CharT> array_reader(reader);
+
+        while (!array_reader.done())
+        {
+            v.push_back(array_reader.current().template as<value_type>());
+            array_reader.next();
+        }
+        return v;
     }
 
     template <class CharT>
@@ -118,13 +223,23 @@ struct json_convert_traits<T,
 {
     typedef typename T::mapped_type mapped_type;
     typedef typename T::value_type value_type;
+    typedef typename T::key_type key_type;
 
     template <class CharT>
     static T decode(std::basic_istringstream<CharT>& is,
                     const basic_json_serializing_options<CharT>& options)
     {
-        basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-        return j.template as<T>();
+        T m;
+        basic_json_stream_reader<CharT> reader(is, options);
+        basic_object_stream_reader<CharT> object_reader(reader);
+
+        while (!object_reader.done())
+        {
+            m.emplace(key_type(object_reader.current().key().data(),object_reader.current().key().length()),
+                      object_reader.current().value().template as<mapped_type>());
+            object_reader.next();
+        }
+        return m;
     }
 
     template <class CharT>
