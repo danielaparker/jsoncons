@@ -296,7 +296,6 @@ private:
 
     double as_double() const
     {
-        double value = 0;
         switch (event_type_)
         {
             case stream_event_type::name:
