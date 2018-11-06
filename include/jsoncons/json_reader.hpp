@@ -59,9 +59,9 @@ private:
         other_handler_.flush();
     }
 
-    bool do_begin_object(const serializing_context& context) override
+    bool do_begin_object(semantic_tag_type tag, const serializing_context& context) override
     {
-        return other_handler_.begin_object(context);
+        return other_handler_.begin_object(tag, context);
     }
 
     bool do_end_object(const serializing_context& context) override
@@ -69,9 +69,9 @@ private:
         return other_handler_.end_object(context);
     }
 
-    bool do_begin_array(const serializing_context& context) override
+    bool do_begin_array(semantic_tag_type tag, const serializing_context& context) override
     {
-        return other_handler_.begin_array(context);
+        return other_handler_.begin_array(tag, context);
     }
 
     bool do_end_array(const serializing_context& context) override
@@ -127,14 +127,14 @@ private:
         return other_handler_.double_value(value, fmt, tag, context);
     }
 
-    bool do_bool(bool value, const serializing_context& context) override
+    bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context) override
     {
-        return other_handler_.bool_value(value, context);
+        return other_handler_.bool_value(value, tag, context);
     }
 
-    bool do_null_value(const serializing_context& context) override
+    bool do_null_value(semantic_tag_type tag, const serializing_context& context) override
     {
-        return other_handler_.null_value(context);
+        return other_handler_.null_value(tag, context);
     }
 };
 

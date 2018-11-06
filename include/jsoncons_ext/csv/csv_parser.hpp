@@ -203,10 +203,10 @@ public:
         {
         case mapping_type::n_rows:
         case mapping_type::n_objects:
-            continue_ = handler_.begin_array(*this);
+            continue_ = handler_.begin_array(semantic_tag_type::none, *this);
             break;
         case mapping_type::m_columns:
-            decoders_[column_index_].begin_array(*this);
+            decoders_[column_index_].begin_array(semantic_tag_type::none, *this);
             break;
         default:
             break;
@@ -242,10 +242,10 @@ public:
             switch (parameters_.mapping())
             {
             case mapping_type::n_rows:
-                continue_ = handler_.begin_array(*this);
+                continue_ = handler_.begin_array(semantic_tag_type::none, *this);
                 break;
             case mapping_type::n_objects:
-                continue_ = handler_.begin_object(*this);
+                continue_ = handler_.begin_object(semantic_tag_type::none, *this);
                 break;
             case mapping_type::m_columns:
                 break;
@@ -277,7 +277,7 @@ public:
             case mapping_type::n_rows:
                 if (column_names_.size() > 0)
                 {
-                    continue_ = handler_.begin_array(*this);
+                    continue_ = handler_.begin_array(semantic_tag_type::none, *this);
                     for (const auto& name : column_names_)
                     {
                         continue_ = handler_.string_value(name, semantic_tag_type::none, *this);
@@ -289,7 +289,7 @@ public:
                 for (size_t i = 0; i < column_names_.size(); ++i)
                 {
                     decoders_.push_back(json_decoder<json_type>());
-                    decoders_.back().begin_array(*this);
+                    decoders_.back().begin_array(semantic_tag_type::none, *this);
                 }
                 break;
             default:
@@ -339,7 +339,7 @@ public:
         }
         if (parameters_.mapping() != mapping_type::m_columns)
         {
-            continue_ = handler_.begin_array(*this);
+            continue_ = handler_.begin_array(semantic_tag_type::none, *this);
         }
         state_ = csv_state_type::expect_value;
         column_index_ = 0;
@@ -422,7 +422,7 @@ public:
             if (parameters_.mapping() == mapping_type::m_columns)
             {
                 basic_json_fragment_filter<CharT> fragment_filter(handler_);
-                continue_ = handler_.begin_object(*this);
+                continue_ = handler_.begin_object(semantic_tag_type::none, *this);
                 for (size_t i = 0; i < column_names_.size(); ++i)
                 {
                     continue_ = handler_.name(column_names_[i],*this);
@@ -751,7 +751,7 @@ private:
             case mapping_type::n_rows:
                 if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                 {
-                    continue_ = handler_.null_value(*this);
+                    continue_ = handler_.null_value(semantic_tag_type::none, *this);
                 }
                 else
                 {
@@ -765,7 +765,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            continue_ = handler_.null_value(*this);
+                            continue_ = handler_.null_value(semantic_tag_type::none, *this);
                         }
                         else
                         {
@@ -776,7 +776,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            continue_ = handler_.null_value(*this);
+                            continue_ = handler_.null_value(semantic_tag_type::none, *this);
                         }
                         else
                         {
@@ -827,7 +827,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            continue_ = handler_.null_value(*this);
+                            continue_ = handler_.null_value(semantic_tag_type::none, *this);
                         }
                         else
                         {
@@ -838,7 +838,7 @@ private:
                     {
                         if (parameters_.unquoted_empty_value_is_null() && value_buffer_.length() == 0)
                         {
-                            continue_ = handler_.null_value(*this);
+                            continue_ = handler_.null_value(semantic_tag_type::none, *this);
                         }
                         else
                         {
@@ -883,7 +883,7 @@ private:
             }
             if (level_ < column_types_[column_index - offset_].level)
             {
-                handler.begin_array(*this);
+                handler.begin_array(semantic_tag_type::none, *this);
                 level_ = column_types_[column_index - offset_].level;
             }
             else if (level_ > column_types_[column_index - offset_].level)
@@ -913,7 +913,7 @@ private:
                         }
                         else
                         {
-                            handler.null_value(*this);
+                            handler.null_value(semantic_tag_type::none, *this);
                         }
                     }
                 }
@@ -938,7 +938,7 @@ private:
                         }
                         else
                         {
-                            handler.null_value(*this);
+                            handler.null_value(semantic_tag_type::none, *this);
                         }
                     }
                 }
@@ -947,19 +947,19 @@ private:
                 {
                     if (value.length() == 1 && value[0] == '0')
                     {
-                        handler.bool_value(false, *this);
+                        handler.bool_value(false, semantic_tag_type::none, *this);
                     }
                     else if (value.length() == 1 && value[0] == '1')
                     {
-                        handler.bool_value(true, *this);
+                        handler.bool_value(true, semantic_tag_type::none, *this);
                     }
                     else if (value.length() == 5 && ((value[0] == 'f' || value[0] == 'F') && (value[1] == 'a' || value[1] == 'A') && (value[2] == 'l' || value[2] == 'L') && (value[3] == 's' || value[3] == 'S') && (value[4] == 'e' || value[4] == 'E')))
                     {
-                        handler.bool_value(false, *this);
+                        handler.bool_value(false, semantic_tag_type::none, *this);
                     }
                     else if (value.length() == 4 && ((value[0] == 't' || value[0] == 'T') && (value[1] == 'r' || value[1] == 'R') && (value[2] == 'u' || value[2] == 'U') && (value[3] == 'e' || value[3] == 'E')))
                     {
-                        handler.bool_value(true, *this);
+                        handler.bool_value(true, semantic_tag_type::none, *this);
                     }
                     else
                     {
@@ -972,7 +972,7 @@ private:
                         }
                         else
                         {
-                            handler.null_value(*this);
+                            handler.null_value(semantic_tag_type::none, *this);
                         }
                     }
                 }
@@ -1241,13 +1241,13 @@ private:
         switch (state)
         {
         case numeric_check_state::null:
-            handler.null_value(*this);
+            handler.null_value(semantic_tag_type::none, *this);
             break;
         case numeric_check_state::boolean_true:
-            handler.bool_value(true,*this);
+            handler.bool_value(true, semantic_tag_type::none, *this);
             break;
         case numeric_check_state::boolean_false:
-            handler.bool_value(false,*this);
+            handler.bool_value(false, semantic_tag_type::none, *this);
             break;
         case numeric_check_state::zero:
         case numeric_check_state::integer:

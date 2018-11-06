@@ -95,7 +95,7 @@ private:
         writer_.flush();
     }
 
-    bool do_begin_object(const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_object));
         
@@ -103,7 +103,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, const serializing_context&) override
+    bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::object));
 
@@ -149,14 +149,14 @@ private:
         return true;
     }
 
-    bool do_begin_array(const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
         writer_.put(0x9f);
         return true;
     }
 
-    bool do_begin_array(size_t length, const serializing_context&) override
+    bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
     {
         std::vector<uint8_t> v;
         stack_.push_back(stack_item(cbor_structure_type::array));
@@ -209,7 +209,7 @@ private:
         return true;
     }
 
-    bool do_null_value(const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         writer_.put(0xf6);
 
@@ -417,7 +417,7 @@ private:
         }
 
         writer_.put(0xc4);
-        do_begin_array((size_t)2, context);
+        do_begin_array((size_t)2, semantic_tag_type::none, context);
         if (exponent.length() > 0)
         {
             auto result = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
@@ -658,7 +658,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool value, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
     {
         if (value)
         {

@@ -54,14 +54,14 @@ private:
         destination_handler_.flush();
     }
 
-    bool do_begin_object(const serializing_context& context) override
+    bool do_begin_object(semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.begin_object(context);
+        return destination_handler_.begin_object(tag, context);
     }
 
-    bool do_begin_object(size_t length, const serializing_context& context) override
+    bool do_begin_object(size_t length, semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.begin_object(length, context);
+        return destination_handler_.begin_object(length, tag, context);
     }
 
     bool do_end_object(const serializing_context& context) override
@@ -69,14 +69,14 @@ private:
         return destination_handler_.end_object(context);
     }
 
-    bool do_begin_array(const serializing_context& context) override
+    bool do_begin_array(semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.begin_array(context);
+        return destination_handler_.begin_array(tag, context);
     }
 
-    bool do_begin_array(size_t length, const serializing_context& context) override
+    bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.begin_array(length, context);
+        return destination_handler_.begin_array(length, tag, context);
     }
 
     bool do_end_array(const serializing_context& context) override
@@ -125,15 +125,14 @@ private:
         return destination_handler_.uint64_value(value, tag, context);
     }
 
-    bool do_bool(bool value,
-                       const serializing_context& context) override
+    bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.bool_value(value,context);
+        return destination_handler_.bool_value(value, tag, context);
     }
 
-    bool do_null_value(const serializing_context& context) override
+    bool do_null_value(semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.null_value(context);
+        return destination_handler_.null_value(tag, context);
     }
 
 };
@@ -216,14 +215,14 @@ private:
         destination_handler_.flush();
     }
 
-    bool do_begin_object(const serializing_context& context) override
+    bool do_begin_object(semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.begin_object(context);
+        return destination_handler_.begin_object(tag, context);
     }
 
-    bool do_begin_object(size_t length, const serializing_context& context) override
+    bool do_begin_object(size_t length, semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.begin_object(length, context);
+        return destination_handler_.begin_object(length, tag, context);
     }
 
     bool do_end_object(const serializing_context& context) override
@@ -231,14 +230,14 @@ private:
         return destination_handler_.end_object(context);
     }
 
-    bool do_begin_array(const serializing_context& context) override
+    bool do_begin_array(semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.begin_array(context);
+        return destination_handler_.begin_array(tag, context);
     }
 
-    bool do_begin_array(size_t length, const serializing_context& context) override
+    bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.begin_array(length, context);
+        return destination_handler_.begin_array(length, tag, context);
     }
 
     bool do_end_array(const serializing_context& context) override
@@ -299,15 +298,14 @@ private:
         return destination_handler_.uint64_value(value, tag, context);
     }
 
-    bool do_bool(bool value,
-                       const serializing_context& context) override
+    bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.bool_value(value,context);
+        return destination_handler_.bool_value(value, tag, context);
     }
 
-    bool do_null_value(const serializing_context& context) override
+    bool do_null_value(semantic_tag_type tag, const serializing_context& context) override
     {
-        return destination_handler_.null_value(context);
+        return destination_handler_.null_value(tag, context);
     }
 
 };

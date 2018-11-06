@@ -143,7 +143,7 @@ Flushes whatever is buffered to the destination.
 
 #### Private virtual consumer interface
 
-    virtual bool do_begin_object(const serializing_context& context) = 0;
+    virtual bool do_begin_object(semantic_tag_type tag, const serializing_context& context) = 0;
 Handles the beginning of an object. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -153,13 +153,13 @@ Handles the end of an object. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_begin_array(const serializing_context& context) = 0;
+    virtual bool do_begin_array(semantic_tag_type tag, const serializing_context& context) = 0;
 Handles the beginning of an array. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual bool do_begin_array(size_t length, const serializing_context& context);
-Handles the beginning of an array of known length. Defaults to calling `do_begin_array(const serializing_context& context)`. Contextual information including
+Handles the beginning of an array of known length. Defaults to calling `do_begin_array(semantic_tag_type, const serializing_context& context)`. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
@@ -209,12 +209,12 @@ Handles a floating point value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_bool(bool value, const serializing_context& context) = 0;
+    virtual bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context) = 0;
 Handles a boolean value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_null_value(const serializing_context& context) = 0;
+    virtual bool do_null_value(semantic_tag_type tag, const serializing_context& context) = 0;
 Handles a null value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.

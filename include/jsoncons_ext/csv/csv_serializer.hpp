@@ -134,7 +134,7 @@ private:
         writer_.flush();
     }
 
-    bool do_begin_object(const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(true));
         return true;
@@ -179,7 +179,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(false));
         if (stack_.size() == 2)
@@ -251,7 +251,7 @@ private:
         return true;
     }
 
-    bool do_null_value(const serializing_context&) override
+    bool do_null_value(semantic_tag_type tag, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -262,14 +262,14 @@ private:
                 {
                     std::basic_string<CharT> s;
                     jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
-                    do_null_value(bo);
+                    accept_null_value(bo);
                     bo.flush();
                     it->second = s;
                 }
             }
             else
             {
-                do_null_value(writer_);
+                accept_null_value(writer_);
             }
         }
         return true;
@@ -386,7 +386,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool val, const serializing_context&) override
+    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
@@ -491,7 +491,7 @@ private:
     }
 
     template <class AnyWriter>
-    bool do_null_value(AnyWriter& writer) 
+    bool accept_null_value(AnyWriter& writer) 
     {
         begin_value(writer);
         writer.write(jsoncons::detail::null_literal<CharT>().data(), 

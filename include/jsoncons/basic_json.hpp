@@ -196,13 +196,17 @@ public:
                 : data_base(structure_tag_type::null_tag, semantic_tag_type::none)
             {
             }
+            null_data(semantic_tag_type tag)
+                : data_base(structure_tag_type::null_tag, tag)
+            {
+            }
         };
 
         class empty_object_data final : public data_base
         {
         public:
-            empty_object_data()
-                : data_base(structure_tag_type::empty_object_tag, semantic_tag_type::none)
+            empty_object_data(semantic_tag_type tag)
+                : data_base(structure_tag_type::empty_object_tag, tag)
             {
             }
         };
@@ -211,8 +215,8 @@ public:
         {
             bool val_;
         public:
-            bool_data(bool val)
-                : data_base(structure_tag_type::bool_tag, semantic_tag_type::none),val_(val)
+            bool_data(bool val, semantic_tag_type tag)
+                : data_base(structure_tag_type::bool_tag, tag),val_(val)
             {
             }
 
@@ -526,13 +530,13 @@ public:
                 }
             }
         public:
-            array_data(const array& val)
-                : data_base(structure_tag_type::array_tag, semantic_tag_type::none)
+            array_data(const array& val, semantic_tag_type tag)
+                : data_base(structure_tag_type::array_tag, tag)
             {
                 create(val.get_allocator(), val);
             }
 
-            array_data(const array& val, const Allocator& a)
+            array_data(const array& val, semantic_tag_type tag, const Allocator& a)
                 : data_base(structure_tag_type::array_tag, semantic_tag_type::none)
             {
                 create(array_allocator(a), val, a);
@@ -608,20 +612,14 @@ public:
                 }
             }
         public:
-            explicit object_data(const Allocator& a)
-                : data_base(structure_tag_type::object_tag, semantic_tag_type::none)
-            {
-                create(a,a);
-            }
-
-            explicit object_data(const object& val)
-                : data_base(structure_tag_type::object_tag, semantic_tag_type::none)
+            explicit object_data(const object& val, semantic_tag_type tag)
+                : data_base(structure_tag_type::object_tag, tag)
             {
                 create(val.get_allocator(), val);
             }
 
-            explicit object_data(const object& val, const Allocator& a)
-                : data_base(structure_tag_type::object_tag, semantic_tag_type::none)
+            explicit object_data(const object& val, semantic_tag_type tag, const Allocator& a)
+                : data_base(structure_tag_type::object_tag, tag)
             {
                 create(object_allocator(a), val, a);
             }
@@ -683,14 +681,112 @@ public:
 
         data_t data_;
     public:
-        variant()
+        variant(semantic_tag_type tag)
         {
-            new(reinterpret_cast<void*>(&data_))empty_object_data();
+            new(reinterpret_cast<void*>(&data_))empty_object_data(tag);
         }
 
-        variant(const Allocator& a)
+        explicit variant(null_type, semantic_tag_type tag)
         {
-            new(reinterpret_cast<void*>(&data_))object_data(a);
+            new(reinterpret_cast<void*>(&data_))null_data(tag);
+        }
+
+        explicit variant(bool val, semantic_tag_type tag)
+        {
+            new(reinterpret_cast<void*>(&data_))bool_data(val,tag);
+        }
+        explicit variant(int64_t val, semantic_tag_type tag)
+        {
+            new(reinterpret_cast<void*>(&data_))int64_data(val, tag);
+        }
+        explicit variant(uint64_t val, semantic_tag_type tag)
+        {
+            new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
+        }
+
+        variant(double val, const floating_point_options& fmt, semantic_tag_type tag)
+        {
+            new(reinterpret_cast<void*>(&data_))double_data(val, fmt, tag);
+        }
+
+        variant(const char_type* s, size_t length, semantic_tag_type tag)
+        {
+            if (length <= short_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))short_string_data(tag, s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))long_string_data(tag, s, length, char_allocator_type());
+            }
+        }
+
+        variant(const char_type* s, size_t length, semantic_tag_type tag, const Allocator& alloc)
+        {
+            if (length <= short_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))short_string_data(tag, s, static_cast<uint8_t>(length));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))long_string_data(tag, s, length, char_allocator_type(alloc));
+            }
+        }
+
+        variant(const byte_string_view& bs, semantic_tag_type tag)
+        {
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), byte_allocator_type());
+        }
+
+        variant(const byte_string_view& bs, semantic_tag_type tag, const Allocator& allocator)
+        {
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), allocator);
+        }
+
+        variant(const basic_bignum<byte_allocator_type>& n)
+        {
+            std::basic_string<CharT> s;
+            n.dump(s);
+
+            if (s.length() <= short_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum, s.data(), static_cast<uint8_t>(s.length()));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum, s.data(), s.length(), char_allocator_type());
+            }
+        }
+
+        variant(const basic_bignum<byte_allocator_type>& n, const Allocator& allocator)
+        {
+            std::basic_string<CharT> s;
+            n.dump(s);
+
+            if (s.length() <= short_string_data::max_length)
+            {
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum, s.data(), static_cast<uint8_t>(s.length()));
+            }
+            else
+            {
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum, s.data(), s.length(), char_allocator_type(allocator));
+            }
+        }
+        variant(const object& val, semantic_tag_type tag)
+        {
+            new(reinterpret_cast<void*>(&data_))object_data(val, tag);
+        }
+        variant(const object& val, semantic_tag_type tag, const Allocator& alloc)
+        {
+            new(reinterpret_cast<void*>(&data_))object_data(val, tag, alloc);
+        }
+        variant(const array& val, semantic_tag_type tag)
+        {
+            new(reinterpret_cast<void*>(&data_))array_data(val, tag);
+        }
+        variant(const array& val, semantic_tag_type tag, const Allocator& alloc)
+        {
+            new(reinterpret_cast<void*>(&data_))array_data(val, tag, alloc);
         }
 
         variant(const variant& val)
@@ -712,160 +808,6 @@ public:
         {
             Init_rv_(std::forward<variant>(val), allocator,
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
-        }
-
-        explicit variant(null_type)
-        {
-            new(reinterpret_cast<void*>(&data_))null_data();
-        }
-        explicit variant(bool val)
-        {
-            new(reinterpret_cast<void*>(&data_))bool_data(val);
-        }
-        explicit variant(int64_t val,
-                         semantic_tag_type tag = semantic_tag_type::none)
-        {
-            new(reinterpret_cast<void*>(&data_))int64_data(val, tag);
-        }
-        explicit variant(uint64_t val, const Allocator&)
-        {
-            new(reinterpret_cast<void*>(&data_))uint64_data(val);
-        }
-        explicit variant(uint64_t val,
-                semantic_tag_type tag = semantic_tag_type::none)
-        {
-            new(reinterpret_cast<void*>(&data_))uint64_data(val, tag);
-        }
-        variant(double val,
-                semantic_tag_type tag = semantic_tag_type::none)
-        {
-            new(reinterpret_cast<void*>(&data_))double_data(val, floating_point_options(), tag);
-        }
-
-        variant(double val, const floating_point_options& fmt,
-                semantic_tag_type tag = semantic_tag_type::none)
-        {
-            new(reinterpret_cast<void*>(&data_))double_data(val, fmt, tag);
-        }
-
-        variant(const char_type* s)
-        {
-            size_t length = char_traits_type::length(s);
-            if (length <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::none, s, static_cast<uint8_t>(length));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::none, s, length, char_allocator_type());
-            }
-        }
-
-        variant(const char_type* s, size_t length)
-        {
-            if (length <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::none, s, static_cast<uint8_t>(length));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::none, s, length, char_allocator_type());
-            }
-        }
-
-        variant(const char_type* s, size_t length, 
-                const Allocator& alloc)
-        {
-            if (length <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::none, s, static_cast<uint8_t>(length));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::none, s, length, char_allocator_type(alloc));
-            }
-        }
-
-        variant(const char_type* s, size_t length, semantic_tag_type tag)
-        {
-            if (length <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(tag, s, static_cast<uint8_t>(length));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(tag, s, length, char_allocator_type());
-            }
-        }
-
-        variant(const char_type* s, size_t length, 
-                semantic_tag_type tag, const Allocator& alloc)
-        {
-            if (length <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(tag, s, static_cast<uint8_t>(length));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(tag, s, length, char_allocator_type(alloc));
-            }
-        }
-
-        variant(const byte_string_view& bs)
-        {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_tag_type::none, bs.data(), bs.length(), byte_allocator_type());
-        }
-
-        variant(const byte_string_view& bs, const Allocator& allocator)
-        {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(semantic_tag_type::none, bs.data(), bs.length(), allocator);
-        }
-
-        variant(const basic_bignum<byte_allocator_type>& n)
-        {
-            std::basic_string<CharT> s;
-            n.dump(s);
-
-            if (s.length() <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum, s.data(), static_cast<uint8_t>(s.length()));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum, s.data(), s.length(), char_allocator_type());
-            }
-        }
-
-        variant(const basic_bignum<byte_allocator_type>& n, 
-                const Allocator& allocator)
-        {
-            std::basic_string<CharT> s;
-            n.dump(s);
-
-            if (s.length() <= short_string_data::max_length)
-            {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum, s.data(), static_cast<uint8_t>(s.length()));
-            }
-            else
-            {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum, s.data(), s.length(), char_allocator_type(allocator));
-            }
-        }
-        variant(const object& val)
-        {
-            new(reinterpret_cast<void*>(&data_))object_data(val);
-        }
-        variant(const object& val, const Allocator& alloc)
-        {
-            new(reinterpret_cast<void*>(&data_))object_data(val, alloc);
-        }
-        variant(const array& val)
-        {
-            new(reinterpret_cast<void*>(&data_))array_data(val);
-        }
-        variant(const array& val, const Allocator& alloc)
-        {
-            new(reinterpret_cast<void*>(&data_))array_data(val,alloc);
         }
 
         ~variant()
@@ -902,10 +844,10 @@ public:
                 switch (val.structure_tag())
                 {
                 case structure_tag_type::null_tag:
-                    new(reinterpret_cast<void*>(&data_))null_data();
+                    new(reinterpret_cast<void*>(&data_))null_data(*(val.null_data_cast()));
                     break;
                 case structure_tag_type::empty_object_tag:
-                    new(reinterpret_cast<void*>(&data_))empty_object_data();
+                    new(reinterpret_cast<void*>(&data_))empty_object_data(*(val.empty_object_data_cast()));
                     break;
                 case structure_tag_type::bool_tag:
                     new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
@@ -1275,10 +1217,10 @@ public:
             switch (structure_tag())
             {
             case structure_tag_type::null_tag:
-                new(reinterpret_cast<void*>(&(other.data_)))null_data();
+                new(reinterpret_cast<void*>(&(other.data_)))null_data(*null_data_cast());
                 break;
             case structure_tag_type::empty_object_tag:
-                new(reinterpret_cast<void*>(&(other.data_)))empty_object_data();
+                new(reinterpret_cast<void*>(&(other.data_)))empty_object_data(*empty_object_data_cast());
                 break;
             case structure_tag_type::bool_tag:
                 new(reinterpret_cast<void*>(&(other.data_)))bool_data(*bool_data_cast());
@@ -1337,10 +1279,10 @@ public:
             switch (val.structure_tag())
             {
             case structure_tag_type::null_tag:
-                new(reinterpret_cast<void*>(&data_))null_data();
+                new(reinterpret_cast<void*>(&data_))null_data(*(val.null_data_cast()));
                 break;
             case structure_tag_type::empty_object_tag:
-                new(reinterpret_cast<void*>(&data_))empty_object_data();
+                new(reinterpret_cast<void*>(&data_))empty_object_data(*(val.empty_object_data_cast()));
                 break;
             case structure_tag_type::bool_tag:
                 new(reinterpret_cast<void*>(&data_))bool_data(*(val.bool_data_cast()));
@@ -2529,19 +2471,19 @@ public:
 
     static const basic_json& null()
     {
-        static basic_json a_null = basic_json(variant(null_type()));
+        static basic_json a_null = basic_json(null_type(), semantic_tag_type::none);
         return a_null;
     }
 
     variant var_;
 
-    basic_json() 
-        : var_()
+    basic_json(semantic_tag_type tag = semantic_tag_type::none) 
+        : var_(tag)
     {
     }
 
-    explicit basic_json(const Allocator& allocator) 
-        : var_(allocator)
+    explicit basic_json(const Allocator& allocator, semantic_tag_type tag = semantic_tag_type::none) 
+        : var_(object(allocator),tag)
     {
     }
 
@@ -2575,23 +2517,23 @@ public:
     {
     }
 
-    basic_json(const array& val)
-        : var_(val)
+    basic_json(const array& val, semantic_tag_type tag = semantic_tag_type::none)
+        : var_(val, tag)
     {
     }
 
-    basic_json(array&& other)
-        : var_(std::forward<array>(other))
+    basic_json(array&& other, semantic_tag_type tag = semantic_tag_type::none)
+        : var_(std::forward<array>(other), tag)
     {
     }
 
-    basic_json(const object& other)
-        : var_(other)
+    basic_json(const object& other, semantic_tag_type tag = semantic_tag_type::none)
+        : var_(other, tag)
     {
     }
 
-    basic_json(object&& other)
-        : var_(std::forward<object>(other))
+    basic_json(object&& other, semantic_tag_type tag = semantic_tag_type::none)
+        : var_(std::forward<object>(other), tag)
     {
     }
 
@@ -2619,8 +2561,8 @@ public:
     {
     }
 
-    basic_json(const char_type* s)
-        : var_(s, char_traits_type::length(s), semantic_tag_type::none)
+    basic_json(const char_type* s, semantic_tag_type tag = semantic_tag_type::none)
+        : var_(s, char_traits_type::length(s), tag)
     {
     }
 
@@ -2630,7 +2572,7 @@ public:
     }
 
     basic_json(double val, uint8_t precision)
-        : var_(val, floating_point_options(chars_format::general, precision, 0))
+        : var_(val, floating_point_options(chars_format::general, precision, 0), semantic_tag_type::none)
     {
     }
 
@@ -2670,6 +2612,16 @@ public:
     {
     }
 
+    basic_json(null_type val, semantic_tag_type tag)
+        : var_(val, tag)
+    {
+    }
+
+    basic_json(bool val, semantic_tag_type tag)
+        : var_(val, tag)
+    {
+    }
+
     basic_json(const string_view_type sv, semantic_tag_type tag, const Allocator& allocator)
         : var_(sv.data(), sv.length(), tag, allocator)
     {
@@ -2681,13 +2633,13 @@ public:
     {
     }
 
-    explicit basic_json(const byte_string_view& bs)
-        : var_(bs)
+    explicit basic_json(const byte_string_view& bs, semantic_tag_type tag = semantic_tag_type::none)
+        : var_(bs, tag)
     {
     }
 
-    basic_json(const byte_string_view& bs, const Allocator& allocator)
-        : var_(bs, allocator)
+    basic_json(const byte_string_view& bs, semantic_tag_type tag, const Allocator& allocator)
+        : var_(bs, tag, allocator)
     {
     }
 
@@ -3165,7 +3117,7 @@ public:
     void create_object_implicitly()
     {
         static_assert(is_stateless<U>::value, "Cannot create object implicitly - allocator is stateful.");
-        var_ = variant(Allocator());
+        var_ = variant(object(Allocator()), semantic_tag_type::none);
     }
 
     void reserve(size_t n)

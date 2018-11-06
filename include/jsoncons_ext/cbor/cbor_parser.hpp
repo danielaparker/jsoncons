@@ -1748,7 +1748,7 @@ public:
                     case 31:
                     {
                         ++nesting_depth_;
-                        handler_.begin_array(*this);
+                        handler_.begin_array(semantic_tag_type::none, *this);
                         while (*input_ptr_ != 0xff)
                         {
                             parse_some(ec);
@@ -1850,7 +1850,7 @@ public:
                     case 31:
                     {
                         ++nesting_depth_;
-                        handler_.begin_object(*this);
+                        handler_.begin_object(semantic_tag_type::none, *this);
                         while (*input_ptr_ != 0xff)
                         {
                             parse_name(ec);
@@ -1882,13 +1882,13 @@ public:
                 switch (info)
                 {
                     case 20:
-                        handler_.bool_value(false, *this);
+                        handler_.bool_value(false, semantic_tag_type::none, *this);
                         break;
                     case 21:
-                        handler_.bool_value(true, *this);
+                        handler_.bool_value(true, semantic_tag_type::none, *this);
                         break;
                     case 22:
-                        handler_.null_value(*this);
+                        handler_.null_value(semantic_tag_type::none, *this);
                         break;
                     case 25: // Half-Precision Float (two-byte IEEE 754)
                     case 26: // Single-Precision Float (four-byte IEEE 754)
@@ -1955,7 +1955,7 @@ private:
     void parse_array(size_t len, std::error_code& ec)
     {
         ++nesting_depth_;
-        handler_.begin_array(len, *this);
+        handler_.begin_array(len, semantic_tag_type::none, *this);
         for (size_t i = 0; i < len; ++i)
         {
             parse_some(ec);
@@ -1971,7 +1971,7 @@ private:
     void parse_object(size_t len, std::error_code& ec)
     {
         ++nesting_depth_;
-        handler_.begin_object(len, *this);
+        handler_.begin_object(len, semantic_tag_type::none, *this);
         for (size_t i = 0; i < len; ++i)
         {
             parse_name(ec);

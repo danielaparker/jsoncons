@@ -120,20 +120,20 @@ private:
     {
     }
 
-    bool do_begin_object(const serializing_context&) override
+    bool do_begin_object(semantic_tag_type tag, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(object(object_allocator_));
+                stack_.back().value_ = Json(object(object_allocator_), tag);
                 break;
             case structure_type::array_t:
-                stack_.emplace_back(std::false_type(), object(object_allocator_));
+                stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
                 break;
             case structure_type::root_t:
                 stack_.clear();
                 is_valid_ = false;
-                stack_.emplace_back(std::false_type(), object(object_allocator_));
+                stack_.emplace_back(std::false_type(), object(object_allocator_), tag);
                 break;
         }
         stack_offsets_.push_back({stack_.size()-1,structure_type::object_t});
@@ -165,20 +165,20 @@ private:
         return true;
     }
 
-    bool do_begin_array(const serializing_context&) override
+    bool do_begin_array(semantic_tag_type tag, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(array(array_allocator_));
+                stack_.back().value_ = Json(array(array_allocator_), tag);
                 break;
             case structure_type::array_t:
-                stack_.emplace_back(std::false_type(), array(array_allocator_));
+                stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
                 break;
             case structure_type::root_t:
                 stack_.clear();
                 is_valid_ = false;
-                stack_.emplace_back(std::false_type(), array(array_allocator_));
+                stack_.emplace_back(std::false_type(), array(array_allocator_), tag);
                 break;
         }
         stack_offsets_.push_back({stack_.size()-1,structure_type::array_t});
@@ -237,18 +237,18 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type tag, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json(byte_string_view(data,length),byte_allocator_);
+                stack_.back().value_ = Json(byte_string_view(data,length), tag, byte_allocator_);
                 break;
             case structure_type::array_t:
-                stack_.emplace_back(std::false_type(), byte_string_view(data,length),byte_allocator_);
+                stack_.emplace_back(std::false_type(), byte_string_view(data,length), tag, byte_allocator_);
                 break;
             case structure_type::root_t:
-                result_ = Json(byte_string_view(data,length),byte_allocator_);
+                result_ = Json(byte_string_view(data,length), tag, byte_allocator_);
                 is_valid_ = true;
                 return false;
         }
@@ -316,36 +316,36 @@ private:
         return true;
     }
 
-    bool do_bool(bool value, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = value;
+                stack_.back().value_ = Json(value, tag);
                 break;
             case structure_type::array_t:
-                stack_.emplace_back(std::false_type(), value);
+                stack_.emplace_back(std::false_type(), value, tag);
                 break;
             case structure_type::root_t:
-                result_ = Json(value);
+                result_ = Json(value, tag);
                 is_valid_ = true;
                 return false;
         }
         return true;
     }
 
-    bool do_null_value(const serializing_context&) override
+    bool do_null_value(semantic_tag_type tag, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {
             case structure_type::object_t:
-                stack_.back().value_ = Json::null();
+                stack_.back().value_ = Json(null_type(),tag);
                 break;
             case structure_type::array_t:
-                stack_.emplace_back(std::false_type(), Json::null());
+                stack_.emplace_back(std::false_type(), null_type(), tag);
                 break;
             case structure_type::root_t:
-                result_ = Json(Json::null());
+                result_ = Json(null_type(), tag);
                 is_valid_ = true;
                 return false;
         }

@@ -48,24 +48,17 @@ public:
         do_flush();
     }
 
-    bool begin_object()
+    bool begin_object(semantic_tag_type tag=semantic_tag_type::none,
+                      const serializing_context& context=null_serializing_context())
     {
-        return do_begin_object(null_serializing_context());
+        return do_begin_object(tag, context);
     }
 
-    bool begin_object(const serializing_context& context)
+    bool begin_object(size_t length, 
+                      semantic_tag_type tag=semantic_tag_type::none, 
+                      const serializing_context& context = null_serializing_context())
     {
-        return do_begin_object(context);
-    }
-
-    bool begin_object(size_t length)
-    {
-        return do_begin_object(length, null_serializing_context());
-    }
-
-    bool begin_object(size_t length, const serializing_context& context)
-    {
-        return do_begin_object(length, context);
+        return do_begin_object(length, tag, context);
     }
 
     bool end_object()
@@ -78,24 +71,17 @@ public:
         return do_end_object(context);
     }
 
-    bool begin_array()
+    bool begin_array(semantic_tag_type tag=semantic_tag_type::none,
+                     const serializing_context& context=null_serializing_context())
     {
-        return do_begin_array(null_serializing_context());
+        return do_begin_array(tag, context);
     }
 
-    bool begin_array(size_t length)
+    bool begin_array(size_t length, 
+                     semantic_tag_type tag=semantic_tag_type::none,
+                     const serializing_context& context=null_serializing_context())
     {
-        return do_begin_array(length, null_serializing_context());
-    }
-
-    bool begin_array(const serializing_context& context)
-    {
-        return do_begin_array(context);
-    }
-
-    bool begin_array(size_t length, const serializing_context& context)
-    {
-        return do_begin_array(length, context);
+        return do_begin_array(length, tag, context);
     }
 
     bool end_array()
@@ -226,14 +212,16 @@ public:
     }
 
     bool bool_value(bool value, 
+                    semantic_tag_type tag = semantic_tag_type::none,
                     const serializing_context& context=null_serializing_context()) 
     {
-        return do_bool(value,context);
+        return do_bool_value(value, tag, context);
     }
 
-    bool null_value(const serializing_context& context=null_serializing_context()) 
+    bool null_value(semantic_tag_type tag = semantic_tag_type::none,
+                    const serializing_context& context=null_serializing_context()) 
     {
-        return do_null_value(context);
+        return do_null_value(tag, context);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -320,12 +308,12 @@ public:
 
     void value(bool value, const serializing_context& context) 
     {
-        bool_value(value,context);
+        bool_value(value, semantic_tag_type::none, context);
     }
 
     bool value(null_type, const serializing_context& context)
     {
-        return null_value(context);
+        return null_value(semantic_tag_type::none, context);
     }
 
     void integer_value(int64_t value)
@@ -353,27 +341,27 @@ public:
 private:
     virtual void do_flush() = 0;
 
-    virtual bool do_begin_object(const serializing_context& context) = 0;
+    virtual bool do_begin_object(semantic_tag_type, const serializing_context& context) = 0;
 
-    virtual bool do_begin_object(size_t, const serializing_context& context) 
+    virtual bool do_begin_object(size_t, semantic_tag_type tag, const serializing_context& context)
     {
-        return do_begin_object(context);
+        return do_begin_object(tag, context);
     }
 
     virtual bool do_end_object(const serializing_context& context) = 0;
 
-    virtual bool do_begin_array(const serializing_context& context) = 0;
+    virtual bool do_begin_array(semantic_tag_type, const serializing_context& context) = 0;
 
-    virtual bool do_begin_array(size_t, const serializing_context& context) 
+    virtual bool do_begin_array(size_t, semantic_tag_type tag, const serializing_context& context)
     {
-        return do_begin_array(context);
+        return do_begin_array(tag, context);
     }
 
     virtual bool do_end_array(const serializing_context& context) = 0;
 
     virtual bool do_name(const string_view_type& name, const serializing_context& context) = 0;
 
-    virtual bool do_null_value(const serializing_context& context) = 0;
+    virtual bool do_null_value(semantic_tag_type, const serializing_context& context) = 0;
 
     virtual bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) = 0;
 
@@ -392,7 +380,7 @@ private:
                                  semantic_tag_type tag, 
                                  const serializing_context& context) = 0;
 
-    virtual bool do_bool(bool value, const serializing_context& context) = 0;
+    virtual bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context) = 0;
 };
 
 template <class CharT>
@@ -405,7 +393,7 @@ private:
     {
     }
 
-    bool do_begin_object(const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         return true;
     }
@@ -415,7 +403,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         return true;
     }
@@ -430,7 +418,7 @@ private:
         return true;
     }
 
-    bool do_null_value(const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         return true;
     }
@@ -467,7 +455,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool, const serializing_context&) override
+    bool do_bool_value(bool, semantic_tag_type, const serializing_context&) override
     {
         return true;
     }

@@ -305,7 +305,7 @@ private:
         writer_.flush();
     }
 
-    bool do_begin_object(const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -370,7 +370,7 @@ private:
     }
 
 
-    bool do_begin_array(const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -485,7 +485,7 @@ private:
         return true;
     }
 
-    bool do_null_value(const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {
@@ -709,7 +709,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool value, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
     {
         if (!stack_.empty() && stack_.back().is_array())
         {

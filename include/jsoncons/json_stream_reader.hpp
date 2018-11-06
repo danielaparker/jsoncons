@@ -49,7 +49,7 @@ public:
     }
 private:
 
-    bool do_begin_object(const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(stream_event_type::begin_object);
         return false;
@@ -61,7 +61,7 @@ private:
         return false;
     }
 
-    bool do_begin_array(const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(stream_event_type::begin_array);
         return false;
@@ -79,13 +79,13 @@ private:
         return false;
     }
 
-    bool do_null_value(const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(stream_event_type::null_value);
         return false;
     }
 
-    bool do_bool(bool value, const serializing_context&) override
+    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
     {
         event_ = basic_stream_event<CharT>(value);
         return false;
@@ -245,7 +245,7 @@ public:
         switch (event_handler_.event().event_type())
         {
             case stream_event_type::begin_array:
-                if (!handler.begin_array(*this))
+                if (!handler.begin_array(semantic_tag_type::none, *this))
                 {
                     return;
                 }
@@ -257,7 +257,7 @@ public:
                 }
                 break;
             case stream_event_type::begin_object:
-                if (!handler.begin_object(*this))
+                if (!handler.begin_object(semantic_tag_type::none, *this))
                 {
                     return;
                 }
@@ -281,13 +281,13 @@ public:
                 }
                 break;
             case stream_event_type::null_value:
-                if (!handler.null_value(*this))
+                if (!handler.null_value(semantic_tag_type::none, *this))
                 {
                     return;
                 }
                 break;
             case stream_event_type::bool_value:
-                if (!handler.bool_value(event_handler_.event().template as<bool>(), *this))
+                if (!handler.bool_value(event_handler_.event().template as<bool>(), semantic_tag_type::none, *this))
                 {
                     return;
                 }

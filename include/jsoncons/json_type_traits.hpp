@@ -390,32 +390,32 @@ struct json_type_traits<Json, T,
 template<class Json>
 struct json_type_traits<Json, typename Json::object>
 {
+    typedef typename Json::object json_object;
     typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
         return j.is_object();
     }
-    template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(const json_object& o)
     {
-        return Json(typename Json::variant(std::forward<Args>(args)...));
+        return Json(o,semantic_tag_type::none);
     }
 };
 
 template<class Json>
 struct json_type_traits<Json, typename Json::array>
 {
+    typedef typename Json::array json_array;
     typedef typename Json::allocator_type allocator_type;
 
     static bool is(const Json& j) JSONCONS_NOEXCEPT
     {
         return j.is_array();
     }
-    template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(const json_array& a)
     {
-        return Json(typename Json::variant(std::forward<Args>(args)...));
+        return Json(a, semantic_tag_type::none);
     }
 };
 
@@ -473,10 +473,9 @@ struct json_type_traits<Json, bool>
     {
         return j.as_bool();
     }
-    template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(bool val, allocator_type allocator = allocator_type())
     {
-        return Json(typename Json::variant(std::forward<Args>(args)...));
+        return Json(val, semantic_tag_type::none);
     }
 };
 
