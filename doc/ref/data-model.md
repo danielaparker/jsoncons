@@ -1,6 +1,6 @@
 ## jsoncons data model
 
-The jsoncons data model consists of the following major types:
+The jsoncons data model consists of the following fundumental types:
 
 - null
 - bool
@@ -16,6 +16,7 @@ It also allows optional semantic tagging of the major types:
 
  Type       | Valid semantic tags | Notes
 ------------|---------------------|---------------
+ null       | undefined           | Maps to CBOR undefined
  int64      | epoch_time          | Maps to CBOR epoch time (unsigned or negative integer)
  uint64     | epoch_time          | Maps to CBOR epoch time (unsigned integer)
  double     | epoch_time          | Maps to CBOR epoch time (double)
