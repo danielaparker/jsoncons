@@ -324,9 +324,8 @@ struct json_type_traits<Json, T,
     {
         return j.template as_integer<T>();
     }
-    static Json to_json(T val, allocator_type allocator = allocator_type())
+    static Json to_json(T val, allocator_type = allocator_type())
     {
-        (void)allocator;
         return Json(val, semantic_tag_type::none);
     }
 };
@@ -358,9 +357,8 @@ struct json_type_traits<Json, T,
         return j.template as_integer<T>();
     }
 
-    static Json to_json(T val, allocator_type allocator = allocator_type())
+    static Json to_json(T val, allocator_type = allocator_type())
     {
-        (void)allocator;
         return Json(val, semantic_tag_type::none);
     }
 };
@@ -380,9 +378,8 @@ struct json_type_traits<Json, T,
     {
         return static_cast<T>(j.as_double());
     }
-    static Json to_json(T val, allocator_type allocator = allocator_type())
+    static Json to_json(T val, allocator_type = allocator_type())
     {
-        (void)allocator;
         return Json(val, semantic_tag_type::none);
     }
 };
@@ -432,9 +429,8 @@ struct json_type_traits<Json, Json>
     {
         return j;
     }
-    static Json to_json(const Json& val, allocator_type allocator = allocator_type())
+    static Json to_json(const Json& val, allocator_type = allocator_type())
     {
-        (void)allocator;
         return val;
     }
 };
@@ -453,9 +449,8 @@ struct json_type_traits<Json, jsoncons::null_type>
         JSONCONS_ASSERT(j.is_null());
         return jsoncons::null_type();
     }
-    static Json to_json(jsoncons::null_type, allocator_type allocator = allocator_type())
+    static Json to_json(jsoncons::null_type, allocator_type = allocator_type())
     {
-        (void)allocator;
         return Json::null();
     }
 };
@@ -473,7 +468,7 @@ struct json_type_traits<Json, bool>
     {
         return j.as_bool();
     }
-    static Json to_json(bool val, allocator_type allocator = allocator_type())
+    static Json to_json(bool val, allocator_type = allocator_type())
     {
         return Json(val, semantic_tag_type::none);
     }
@@ -495,7 +490,7 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     {
         return j.as_bool();
     }
-    static Json to_json(bool val, allocator_type allocator = allocator_type())
+    static Json to_json(bool val, allocator_type = allocator_type())
     {
         return Json(val, semantic_tag_type::none);
     }
@@ -514,7 +509,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     {
         return j.as_bool();
     }
-    static Json to_json(bool val, allocator_type allocator = allocator_type())
+    static Json to_json(bool val, allocator_type = allocator_type())
     {
         return Json(val, semantic_tag_type::none);
     }
