@@ -484,7 +484,7 @@ private:
             {
                 json_decoder<json_type> decoder;
                 reader_->accept(decoder);
-                value_ = decoder.get_result().as<T>();
+                value_ = decoder.get_result().template as<T>();
             }
         }
     }
@@ -588,7 +588,7 @@ private:
             {
                 json_decoder<json_type> decoder;
                 reader_->accept(decoder);
-                kv_.second = decoder.get_result().as<T>();
+                kv_.second = decoder.get_result().template as<T>();
             }
         }
     }
