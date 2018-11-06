@@ -497,7 +497,7 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     }
     static Json to_json(bool val, allocator_type allocator = allocator_type())
     {
-        return Json(val, semantic_type_tag::none);
+        return Json(val, semantic_tag_type::none);
     }
 };
 
@@ -516,7 +516,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     }
     static Json to_json(bool val, allocator_type allocator = allocator_type())
     {
-        return Json(val, semantic_type_tag::none);
+        return Json(val, semantic_tag_type::none);
     }
 };
 
