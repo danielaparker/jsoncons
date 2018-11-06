@@ -251,7 +251,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type tag, const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         if (stack_.size() == 2)
         {
