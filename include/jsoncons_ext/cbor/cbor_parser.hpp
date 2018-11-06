@@ -913,16 +913,9 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
             switch (info)
             {
                 case 20: // False
-                {
-                    *endp = p;
-                    break;
-                }
                 case 21: // True
-                {
-                    *endp = p;
-                    break;
-                }
                 case 22: // Null
+                case 23: // Undefined
                 {
                     *endp = p;
                     break;
@@ -1889,6 +1882,9 @@ public:
                         break;
                     case 22:
                         handler_.null_value(semantic_tag_type::none, *this);
+                        break;
+                    case 23:
+                        handler_.null_value(semantic_tag_type::undefined, *this);
                         break;
                     case 25: // Half-Precision Float (two-byte IEEE 754)
                     case 26: // Single-Precision Float (four-byte IEEE 754)

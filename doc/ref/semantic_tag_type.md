@@ -7,7 +7,8 @@ enum class semantic_tag_type : uint8_t
     bignum,
     decimal,
     date_time,
-    epoch_time
+    epoch_time,
+    undefined
 };
 ```
 

@@ -90,9 +90,9 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x3a,0xff,0xff,0xff,0xff},json(-4294967296));
     check_parsing({0x3b,0,0,0,1,0,0,0,0},json(-4294967297));
 
-    // null, true, false
+    // null, undefined, true, false
     check_parsing({0xf6},json::null());
-
+    check_parsing({0xf7},json{null_type(),semantic_tag_type::undefined});
     check_parsing({0xf5},json(true));
     check_parsing({0xf4},json(false));
 

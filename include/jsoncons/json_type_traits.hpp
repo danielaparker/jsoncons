@@ -495,10 +495,9 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
     {
         return j.as_bool();
     }
-    template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(bool val, allocator_type allocator = allocator_type())
     {
-        return Json(typename Json::variant(std::forward<Args>(args)...));
+        return Json(val, semantic_type_tag::none);
     }
 };
 
@@ -515,10 +514,9 @@ struct json_type_traits<Json, std::vector<bool>::reference>
     {
         return j.as_bool();
     }
-    template <class ... Args>
-    static Json to_json(Args&&... args)
+    static Json to_json(bool val, allocator_type allocator = allocator_type())
     {
-        return Json(typename Json::variant(std::forward<Args>(args)...));
+        return Json(val, semantic_type_tag::none);
     }
 };
 

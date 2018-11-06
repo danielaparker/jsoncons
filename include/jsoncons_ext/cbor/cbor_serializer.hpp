@@ -209,9 +209,16 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&) override
+    bool do_null_value(semantic_tag_type tag, const serializing_context&) override
     {
-        writer_.put(0xf6);
+        if (tag == semantic_tag_type::undefined)
+        {
+            writer_.put(0xf7);
+        }
+        else
+        {
+            writer_.put(0xf6);
+        }
 
         end_value();
         return true;

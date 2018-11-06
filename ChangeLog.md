@@ -7,7 +7,19 @@ Enhancements
   round trips.
 
 - csv_parser `ignore_empty_values` option now applies to
-  `m_columns` json output.
+  `m_columns` style json output.
+
+Extension of semantic tags to other values
+
+    - The `json_content_handler` functions `do_null_value`, `do_bool_value`,
+      `do_begin_array` and `do_begin_object` have been given the
+      semantic_tag_type parameter.  
+
+    - New tag type `semantic_tag_type::undefined` has been added
+    
+    - The `cbor_parser` encodes a CBOR undefined tag to a json null
+      value with a `semantic_tag_type::undefined` tag, and the 
+      `cbor_serializer` maps that combination back to a CBOR undefined tag. 
 
 v0.111.1
 --------
@@ -117,7 +129,7 @@ the function signatures
   
     bool do_byte_string_value(const uint8_t*, size_t, const serializing_context&)
 
-have been gifted an additonal parameter, a `semantic_tag_type`, 
+have been given an additonal parameter, a `semantic_tag_type`, 
   
     bool do_int64_value(int64_t, semantic_tag_type, const serializing_context&)
 
