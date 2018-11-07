@@ -1,12 +1,12 @@
-### jsoncons::stream_event
+### jsoncons::staj_event
 
 ```c++
-typedef basic_stream_event<char> stream_event;
+typedef basic_staj_event<char> staj_event;
 ```
 
 #### Header
 ```c++
-#include <jsoncons/stream_reader.hpp>
+#include <jsoncons/staj_reader.hpp>
 
 A JSON-like data event.
 ```
@@ -28,8 +28,8 @@ A JSON-like data event.
 
 #### Member functions
 
-    stream_event_type event_type() const noexcept;
-Returns a [stream_event_type](stream_event_type.md) for this event.
+    staj_event_type event_type() const noexcept;
+Returns a [staj_event_type](staj_event_type.md) for this event.
 
     semantic_tag_type semantic_tag() const noexcept;
 Returns a [semantic_tag_type](semantic_tag_type.md) for this event.

@@ -18,7 +18,7 @@
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 
 namespace jsoncons {
 
@@ -60,7 +60,7 @@ struct json_convert_traits<T,
     {
         T v;
         basic_json_stream_reader<CharT> reader(is, options);
-        array_iterator<basic_json<CharT>,value_type> it(reader);
+        staj_array_iterator<basic_json<CharT>,value_type> it(reader);
 
         for (const auto& item : it)
         {
@@ -134,7 +134,7 @@ struct json_convert_traits<T,
     {
         T m;
         basic_json_stream_reader<CharT> reader(is, options);
-        object_iterator<basic_json<CharT>,mapped_type> it(reader);
+        staj_object_iterator<basic_json<CharT>,mapped_type> it(reader);
 
         for (const auto& kv : it)
         {

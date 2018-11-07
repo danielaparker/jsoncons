@@ -537,38 +537,38 @@ for (; !reader.done(); reader.next())
     const auto& event = reader.current();
     switch (event.event_type())
     {
-        case stream_event_type::begin_array:
+        case staj_event_type::begin_array:
             std::cout << "begin_array\n";
             break;
-        case stream_event_type::end_array:
+        case staj_event_type::end_array:
             std::cout << "end_array\n";
             break;
-        case stream_event_type::begin_object:
+        case staj_event_type::begin_object:
             std::cout << "begin_object\n";
             break;
-        case stream_event_type::end_object:
+        case staj_event_type::end_object:
             std::cout << "end_object\n";
             break;
-        case stream_event_type::name:
+        case staj_event_type::name:
             // If underlying type is string, can return as string_view
             std::cout << "name: " << event.as<jsoncons::string_view>() << "\n";
             break;
-        case stream_event_type::string_value:
+        case staj_event_type::string_value:
             std::cout << "string_value: " << event.as<jsoncons::string_view>() << "\n";
             break;
-        case stream_event_type::null_value:
+        case staj_event_type::null_value:
             std::cout << "null_value: " << event.as<std::string>() << "\n";
             break;
-        case stream_event_type::bool_value:
+        case staj_event_type::bool_value:
             std::cout << "bool_value: " << event.as<std::string>() << "\n";
             break;
-        case stream_event_type::int64_value:
+        case staj_event_type::int64_value:
             std::cout << "int64_value: " << event.as<std::string>() << "\n";
             break;
-        case stream_event_type::uint64_value:
+        case staj_event_type::uint64_value:
             std::cout << "uint64_value: " << event.as<std::string>() << "\n";
             break;
-        case stream_event_type::double_value:
+        case staj_event_type::double_value:
             // Return as string, could also use event.as<double>()
             std::cout << "double_value: " << event.as<std::string>() << "\n";
             break;
@@ -612,19 +612,19 @@ end_object
 end_array
 ```
 
-#### Implementing a stream_filter
+#### Implementing a staj_filter
 
 ```c++
 // A stream filter to filter out all events except name 
 // and restrict name to "author"
 
-class author_filter : public stream_filter
+class author_filter : public staj_filter
 {
     bool accept_next_ = false;
 public:
-    bool accept(const stream_event& event, const serializing_context&) override
+    bool accept(const staj_event& event, const serializing_context&) override
     {
-        if (event.event_type()  == stream_event_type::name &&
+        if (event.event_type()  == staj_event_type::name &&
             event.as<jsoncons::string_view>() == "author")
         {
             accept_next_ = true;
@@ -657,7 +657,7 @@ for (; !reader.done(); reader.next())
     const auto& event = reader.current();
     switch (event.event_type())
     {
-        case stream_event_type::string_value:
+        case staj_event_type::string_value:
             std::cout << event.as<jsoncons::string_view>() << "\n";
             break;
     }

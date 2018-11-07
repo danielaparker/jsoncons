@@ -1,12 +1,12 @@
-### jsoncons::stream_event_type
+### jsoncons::staj_event_type
 
 #### Header
 ```c++
-#include <jsoncons/stream_reader.hpp>
+#include <jsoncons/staj_reader.hpp>
 ```
 
 ```c++
-enum class stream_event_type
+enum class staj_event_type
 {
     begin_object,
     end_object,

@@ -1,32 +1,32 @@
-### jsoncons::stream_reader
+### jsoncons::staj_reader
 
 ```c++
-typedef basic_stream_reader<char> stream_reader
+typedef basic_staj_reader<char> staj_reader
 ```
 
 #### Header
 ```c++
-#include <jsoncons/stream_reader.hpp>
+#include <jsoncons/staj_reader.hpp>
 ```
 
-The `stream_reader` interface supports forward, read-only, access to JSON and JSON-like data formats.
+The `staj_reader` interface supports forward, read-only, access to JSON and JSON-like data formats.
 
-The `stream_reader` is designed to iterate over stream events until `done()` returns `true`.
+The `staj_reader` is designed to iterate over stream events until `done()` returns `true`.
 The `next()` function causes the reader to advance to the next stream event. The `current()` function
-returns the current stream event. The data can be accessed using the [stream_event](stream_event.md) 
+returns the current stream event. The data can be accessed using the [staj_event](staj_event.md) 
 interface. When `next()` is called, copies of data previously accessed may be invalidated.
 
 #### Destructor
 
-    virtual ~basic_stream_reader() = default;
+    virtual ~basic_staj_reader() = default;
 
 #### Member functions
 
     virtual bool done() const = 0;
 Check if there are no more events.
 
-    virtual const stream_event& current() const = 0;
-Returns the current [stream_event](stream_event.md).
+    virtual const staj_event& current() const = 0;
+Returns the current [staj_event](staj_event.md).
 
     virtual void accept(json_content_handler& handler) = 0;
 Sends the parse events from the current event to the

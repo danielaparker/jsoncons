@@ -4,7 +4,7 @@
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -20,7 +20,7 @@ TEST_CASE("json_stream_reader string_value test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     CHECK(reader.current().as<std::string>() == std::string("Tom"));
     CHECK(reader.current().as<jsoncons::string_view>() == jsoncons::string_view("Tom"));
     reader.next();
@@ -35,7 +35,7 @@ TEST_CASE("json_stream_reader string_value as<int> test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     CHECK(reader.current().as<int>() == -100);
     reader.next();
     CHECK(reader.done());
@@ -49,7 +49,7 @@ TEST_CASE("json_stream_reader string_value as<unsigned> test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     CHECK(reader.current().as<int>() == 100);
     CHECK(reader.current().as<unsigned>() == 100);
     reader.next();
@@ -64,7 +64,7 @@ TEST_CASE("json_stream_reader null_value test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::null_value);
+    CHECK(reader.current().event_type() == staj_event_type::null_value);
     reader.next();
     CHECK(reader.done());
 }
@@ -77,7 +77,7 @@ TEST_CASE("json_stream_reader bool_value test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::bool_value);
+    CHECK(reader.current().event_type() == staj_event_type::bool_value);
     reader.next();
     CHECK(reader.done());
 }
@@ -90,7 +90,7 @@ TEST_CASE("json_stream_reader int64_value test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::int64_value);
+    CHECK(reader.current().event_type() == staj_event_type::int64_value);
     CHECK(reader.current().as<int>() == -100);
     reader.next();
     CHECK(reader.done());
@@ -104,7 +104,7 @@ TEST_CASE("json_stream_reader uint64_value test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     CHECK(reader.current().as<int>() == 100);
     CHECK(reader.current().as<unsigned>() == 100);
     reader.next();
@@ -119,7 +119,7 @@ TEST_CASE("json_stream_reader string_value as bignum test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     CHECK(s == reader.current().as<std::string>());
     bignum c = reader.current().as<bignum>();
     CHECK(bignum("-18446744073709551617") == c);
@@ -135,7 +135,7 @@ TEST_CASE("json_stream_reader bignum_value as bignum")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     CHECK(reader.current().semantic_tag() == semantic_tag_type::bignum);
     bignum c = reader.current().as<bignum>();
     CHECK(bignum(s) == c);
@@ -151,7 +151,7 @@ TEST_CASE("json_stream_reader double_value test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::double_value);
+    CHECK(reader.current().event_type() == staj_event_type::double_value);
     reader.next();
     CHECK(reader.done());
 }
@@ -185,100 +185,100 @@ TEST_CASE("json_stream_reader array_value test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::begin_array);
+    CHECK(reader.current().event_type() == staj_event_type::begin_array);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::begin_object);
+    CHECK(reader.current().event_type() == staj_event_type::begin_object);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::end_object);
+    CHECK(reader.current().event_type() == staj_event_type::end_object);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::begin_object);
+    CHECK(reader.current().event_type() == staj_event_type::begin_object);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::end_object);
+    CHECK(reader.current().event_type() == staj_event_type::end_object);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::begin_object);
+    CHECK(reader.current().event_type() == staj_event_type::begin_object);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::end_object);
+    CHECK(reader.current().event_type() == staj_event_type::end_object);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::end_array);
+    CHECK(reader.current().event_type() == staj_event_type::end_array);
     reader.next();
     CHECK(reader.done());
 }
@@ -299,34 +299,34 @@ TEST_CASE("json_stream_reader object_value test")
     json_stream_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::begin_object);
+    CHECK(reader.current().event_type() == staj_event_type::begin_object);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::string_value);
+    CHECK(reader.current().event_type() == staj_event_type::string_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::name);
+    CHECK(reader.current().event_type() == staj_event_type::name);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::uint64_value);
+    CHECK(reader.current().event_type() == staj_event_type::uint64_value);
     reader.next();
     REQUIRE_FALSE(reader.done());
-    CHECK(reader.current().event_type() == stream_event_type::end_object);
+    CHECK(reader.current().event_type() == staj_event_type::end_object);
     reader.next();
     CHECK(reader.done());
 }

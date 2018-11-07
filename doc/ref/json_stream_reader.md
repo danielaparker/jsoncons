@@ -12,32 +12,32 @@ function to advance to the next event, until `done()` returns `true`.
 
 #### Header
 ```c++
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 ```
 
 ### Implemented interfaces
 
-[stream_reader](stream_reader.md)
+[staj_reader](staj_reader.md)
 
 #### Constructors
 
     basic_json_stream_reader(std::istream& is); // (1)
 
     basic_json_stream_reader(std::istream& is,
-                             stream_filter& filter); // (2)
+                             staj_filter& filter); // (2)
 
     basic_json_stream_reader(std::istream& is, 
                              const json_read_options& options); // (3)
 
     basic_json_stream_reader(std::istream& is,
-                             stream_filter& filter, 
+                             staj_filter& filter, 
                              const json_read_options& options); // (4)
 
     json_stream_reader(std::istream& is, 
                        parse_error_handler& err_handler); // (5)
 
     json_stream_reader(std::istream& is,
-                       stream_filter& filter, 
+                       staj_filter& filter, 
                        parse_error_handler& err_handler); // (6)
 
     json_stream_reader(std::istream& is, 
@@ -49,7 +49,7 @@ JSON text, uses default [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (2) Constructs a `json_reader` that reads from an input stream `is` of 
-JSON text, applies a [stream_filter](stream_filter.md) to the events, uses default [json_read_options](json_read_options)
+JSON text, applies a [staj_filter](staj_filter.md) to the events, uses default [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (3) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
@@ -57,7 +57,7 @@ uses the specified [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (4) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
-applies a [stream_filter](stream_filter.md) to the events, 
+applies a [staj_filter](staj_filter.md) to the events, 
 uses the specified [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
@@ -66,12 +66,12 @@ uses default [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 (6) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
-applies a [stream_filter](stream_filter.md) to the events, 
+applies a [staj_filter](staj_filter.md) to the events, 
 uses default [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 (7) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
-applies a [stream_filter](stream_filter.md), 
+applies a [staj_filter](staj_filter.md), 
 uses the specified [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
 
@@ -82,8 +82,8 @@ Note: It is the programmer's responsibility to ensure that `json_stream_reader` 
     bool done() const override;
 Checks if there are no more events.
 
-    const stream_event& current() const override;
-Returns the current [stream_event](stream_event.md).
+    const staj_event& current() const override;
+Returns the current [staj_event](staj_event.md).
 
     void accept(json_content_handler& handler) override
 Sends the parse events from the current event to the
@@ -125,7 +125,7 @@ The example JSON text, `book_catalog.json`, is used by the examples below.
 #### Reading a JSON stream
 
 ```c++
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 #include <string>
 #include <fstream>
 
@@ -142,41 +142,41 @@ int main()
         const auto& event = reader.current();
         switch (event.event_type())
         {
-            case stream_event_type::begin_array:
+            case staj_event_type::begin_array:
                 std::cout << "begin_array\n";
                 break;
-            case stream_event_type::end_array:
+            case staj_event_type::end_array:
                 std::cout << "end_array\n";
                 break;
-            case stream_event_type::begin_object:
+            case staj_event_type::begin_object:
                 std::cout << "begin_object\n";
                 break;
-            case stream_event_type::end_object:
+            case staj_event_type::end_object:
                 std::cout << "end_object\n";
                 break;
-            case stream_event_type::name:
+            case staj_event_type::name:
                 // If underlying type is string, can return as string_view
                 std::cout << "name: " << event.as<jsoncons::string_view>() << "\n";
                 break;
-            case stream_event_type::string_value:
+            case staj_event_type::string_value:
                 std::cout << "string_value: " << event.as<jsoncons::string_view>() << "\n";
                 break;
-            case stream_event_type::null_value:
+            case staj_event_type::null_value:
                 std::cout << "null_value: " << event.as<std::string>() << "\n";
                 break;
-            case stream_event_type::bool_value:
+            case staj_event_type::bool_value:
                 std::cout << "bool_value: " << event.as<std::string>() << "\n";
                 // or std::cout << "bool_value: " << event.as<bool>() << "\n";
                 break;
-            case stream_event_type::int64_value:
+            case staj_event_type::int64_value:
                 std::cout << "int64_value: " << event.as<std::string>() << "\n";
                 // or std::cout << "int64_value: " << event.as<int64_t>() << "\n";
                 break;
-            case stream_event_type::uint64_value:
+            case staj_event_type::uint64_value:
                 std::cout << "uint64_value: " << event.as<std::string>() << "\n";
                 // or std::cout << "int64_value: " << event.as<uint64_t>() << "\n";
                 break;
-            case stream_event_type::double_value:
+            case staj_event_type::double_value:
                 std::cout << "double_value: " << event.as<std::string>() << "\n";
                 // or std::cout << "double_value: " << event.as<double>() << "\n";
                 break;
@@ -224,19 +224,19 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 #include <string>
 #include <fstream>
 
 using namespace jsoncons;
 
-class author_filter : public stream_filter
+class author_filter : public staj_filter
 {
     bool accept_next_ = false;
 public:
-    bool accept(const stream_event& event, const serializing_context&) override
+    bool accept(const staj_event& event, const serializing_context&) override
     {
-        if (event.event_type()  == stream_event_type::name &&
+        if (event.event_type()  == staj_event_type::name &&
             event.as<jsoncons::string_view>() == "author")
         {
             accept_next_ = true;
@@ -267,7 +267,7 @@ int main()
         const auto& event = reader.current();
         switch (event.event_type())
         {
-            case stream_event_type::string_value:
+            case staj_event_type::string_value:
                 std::cout << event.as<jsoncons::string_view>() << "\n";
                 break;
         }
