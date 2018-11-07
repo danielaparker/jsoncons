@@ -626,7 +626,7 @@ template<class CharT>
 using basic_stream_reader = basic_staj_reader<CharT>;
 
 template<class CharT>
-class basic_stream_filter = basic_staj_filter<CharT>;
+using basic_stream_filter = basic_staj_filter<CharT>;
 
 #endif
 
