@@ -44,36 +44,75 @@ function to advance to the next event, until `done()` returns `true`.
                        const json_read_options& options,
                        parse_error_handler& err_handler); // (7)
 
+    json_stream_reader(std::istream& is,
+                       std::error_code& ec); // (8)
+
+    json_stream_reader(std::istream& is,
+                       staj_filter& filter,
+                       std::error_code& ec); // (9)
+
+    json_stream_reader(std::istream& is, 
+                       const json_read_options& options,
+                       std::error_code& ec); // (10)
+
+    json_stream_reader(std::istream& is,
+                       staj_filter& filter, 
+                       const json_read_options& options,
+                       std::error_code& ec); // (11)
+
+    json_stream_reader(std::istream& is, 
+                       parse_error_handler& err_handler,
+                       std::error_code& ec); // (12)
+
+    json_stream_reader(std::istream& is,
+                       staj_filter& filter, 
+                       parse_error_handler& err_handler,
+                       std::error_code& ec); // (13)
+
+    json_stream_reader(std::istream& is, 
+                       const json_read_options& options,
+                       parse_error_handler& err_handler,
+                       std::error_code& ec); // (14)
+
 (1) Constructs a `json_stream_reader` that reads from an input stream `is` of 
 JSON text, uses default [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
+If while accessing the initial event a parsing error is encountered, throws a [parse_error](parse_error.md).
 
 (2) Constructs a `json_stream_reader` that reads from an input stream `is` of 
 JSON text, applies a [staj_filter](staj_filter.md) to the events, uses default [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
+If while accessing the initial event a parsing error is encountered, throws a [parse_error](parse_error.md).
 
 (3) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 uses the specified [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
+If while accessing the initial event a parsing error is encountered, throws a [parse_error](parse_error.md).
 
 (4) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md) to the events, 
 uses the specified [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
+If while accessing the initial event a parsing error is encountered, throws a [parse_error](parse_error.md).
 
 (5) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 uses default [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
+If while accessing the initial event a parsing error is encountered, throws a [parse_error](parse_error.md).
 
 (6) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md) to the events, 
 uses default [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
+If while accessing the initial event a parsing error is encountered, throws a [parse_error](parse_error.md).
 
 (7) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md), 
 uses the specified [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
+If while accessing the initial event a parsing error is encountered, throws a [parse_error](parse_error.md).
+
+(8)-(14) are the same except that if a parsing error is encountered, sets `ec`.
 
 Note: It is the programmer's responsibility to ensure that `json_stream_reader` does not outlive any input stream, and error handler passed in the constuctor.
 
@@ -92,7 +131,11 @@ E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 
     void next() override;
-Advances to the next event. 
+Advances to the next event. If a parsing error is encountered, throws a 
+[parse_error](parse_error.md).
+
+    void next(std::error_code& ec) override;
+Advances to the next event. If a parsing error is encountered, sets `ec`.
 
     const serializing_context& context() const override;
 Returns the current [context](serializing_context.md)

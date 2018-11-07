@@ -381,6 +381,8 @@ public:
 
     virtual void next() = 0;
 
+    virtual void next(std::error_code& ec) = 0;
+
     virtual const serializing_context& context() const = 0;
 };
 
@@ -419,7 +421,7 @@ public:
     typedef T& reference;
     typedef std::input_iterator_tag iterator_category;
 
-    staj_array_iterator()
+    staj_array_iterator() noexcept
         : reader_(nullptr)
     {
     }
@@ -430,6 +432,20 @@ public:
         if (reader_->current().event_type() == staj_event_type::begin_array)
         {
             next();
+        }
+        else
+        {
+            reader_ = nullptr;
+        }
+    }
+
+    staj_array_iterator(basic_staj_reader<char_type>& reader,
+                        std::error_code& ec)
+        : reader_(std::addressof(reader))
+    {
+        if (reader_->current().event_type() == staj_event_type::begin_array)
+        {
+            next(ec);
         }
         else
         {
@@ -450,6 +466,12 @@ public:
     staj_array_iterator& operator++()
     {
         next();
+        return *this;
+    }
+
+    staj_array_iterator& increment(std::error_code& ec)
+    {
+        next(ec);
         return *this;
     }
 
@@ -524,7 +546,7 @@ private:
     value_type kv_;
 public:
 
-    staj_object_iterator()
+    staj_object_iterator() noexcept
         : reader_(nullptr)
     {
     }
@@ -535,6 +557,20 @@ public:
         if (reader_->current().event_type() == staj_event_type::begin_object)
         {
             next();
+        }
+        else
+        {
+            reader_ = nullptr;
+        }
+    }
+
+    staj_object_iterator(basic_staj_reader<char_type>& reader, 
+                         std::error_code& ec)
+        : reader_(std::addressof(reader))
+    {
+        if (reader_->current().event_type() == staj_event_type::begin_object)
+        {
+            next(ec);
         }
         else
         {
@@ -555,6 +591,12 @@ public:
     staj_object_iterator& operator++()
     {
         next();
+        return *this;
+    }
+
+    staj_object_iterator& increment(std::error_code& ec)
+    {
+        next(ec);
         return *this;
     }
 

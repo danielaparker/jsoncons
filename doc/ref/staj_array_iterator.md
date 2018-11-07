@@ -29,9 +29,24 @@ Member type                         |Definition
 
 #### Constructors
 
-    staj_array_iterator()
+    staj_array_iterator() noexcept; // (1)
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader)
+    staj_array_iterator(basic_staj_reader<char_type>& reader); // (2)
+
+    staj_array_iterator(basic_staj_reader<char_type>& reader,
+                        std::error_code& ec); // (3)
+
+(1) Constructs the end iterator
+
+(2) Constructs a `staj_array_iterator` that refers to the first element of the array
+    following the current stream event `begin_array`. If there is no such element,
+    returns the end iterator. If a parsing error is encountered, throws a 
+    [parse_error](parse_error.md).
+
+(3) Constructs a `staj_array_iterator` that refers to the first member of the array
+    following the current stream event `begin_array`. If there is no such element,
+    returns the end iterator. If a parsing error is encountered, returns the end iterator 
+    and sets `ec`.
 
 #### Member functions
 
@@ -40,8 +55,9 @@ Member type                         |Definition
     const T* operator->() const
 
     staj_array_iterator& operator++()
-
+    staj_array_iterator& increment(std::error_code& ec)
     staj_array_iterator operator++(int) 
+Advances the iterator to the next array element.
 
 #### Non-member functions
 

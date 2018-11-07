@@ -217,6 +217,68 @@ public:
         }
     }
 
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
+                             std::error_code& ec)
+        : basic_json_stream_reader(is,default_filter_,basic_json_serializing_options<CharT>(),default_err_handler_,ec)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
+                             basic_staj_filter<CharT>& filter,
+                             std::error_code& ec)
+        : basic_json_stream_reader(is,filter,basic_json_serializing_options<CharT>(),default_err_handler_,ec)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
+                             parse_error_handler& err_handler,
+                             std::error_code& ec)
+        : basic_json_stream_reader(is,default_filter_,basic_json_serializing_options<CharT>(),err_handler,ec)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
+                             basic_staj_filter<CharT>& filter,
+                             parse_error_handler& err_handler,
+                             std::error_code& ec)
+        : basic_json_stream_reader(is,filter,basic_json_serializing_options<CharT>(),err_handler,ec)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is, 
+                             const basic_json_read_options<CharT>& options,
+                             std::error_code& ec)
+        : basic_json_stream_reader(is,default_filter_,options,default_err_handler_,ec)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is,
+                             basic_staj_filter<CharT>& filter, 
+                             const basic_json_read_options<CharT>& options,
+                             std::error_code& ec)
+        : basic_json_stream_reader(is,filter,options,default_err_handler_,ec)
+    {
+    }
+
+    basic_json_stream_reader(std::basic_istream<CharT>& is, 
+                             basic_staj_filter<CharT>& filter,
+                             const basic_json_read_options<CharT>& options,
+                             parse_error_handler& err_handler,
+                             std::error_code& ec)
+       : parser_(options,err_handler),
+         is_(is),
+         filter_(filter),
+         eof_(false),
+         buffer_length_(default_max_buffer_length),
+         begin_(true)
+    {
+        buffer_.reserve(buffer_length_);
+        if (!done())
+        {
+            next(ec);
+        }
+    }
+
     size_t buffer_length() const
     {
         return buffer_length_;
@@ -335,6 +397,15 @@ public:
                 throw parse_error(ec,parser_.line_number(),parser_.column_number());
             }
         } while (!done() && !filter_.accept(event_handler_.event(), *this));
+    }
+
+    void next(std::error_code& ec) override
+    {
+        do
+        {
+            read_next(ec);
+        } 
+        while (!ec && !done() && !filter_.accept(event_handler_.event(), *this));
     }
 
     void read_buffer(std::error_code& ec)
