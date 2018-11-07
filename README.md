@@ -185,7 +185,7 @@ The library includes four instantiations of `basic_json`:
 
 [Playing around with CBOR, JSON, and CSV](#Playing-around-with-CBOR,-JSON,-and-CSV)
 
-[Convert JSON text to C++ objects and back](#Convert-JSON-text-to-C++-objects-and-back)
+[Convert JSON text to C++ objects and back](#Convert-JSON-text-to)
 
 [Pull parser example](#pull-parser-example)
 
