@@ -34,6 +34,7 @@ void json_parser_examples();
 void byte_string_examples();
 void pull_parser_examples();
 void data_model_examples();
+void staj_iterator_examples();
 
 void comment_example()
 {
@@ -556,13 +557,15 @@ int main()
 
         byte_string_examples();
 
-        pull_parser_examples();
-
         readme_examples();
 
         more_examples();
 
         data_model_examples();
+
+        pull_parser_examples();
+
+        staj_iterator_examples();
     }
     catch (const std::exception& e)
     {

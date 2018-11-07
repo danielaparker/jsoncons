@@ -189,7 +189,9 @@ The library includes four instantiations of `basic_json`:
 
 [Pull parser example](#E3)
 
-[Dump json content into a larger document](#E4)
+[Iterate over a json stream with staj iterators](#E4)
+
+[Dump json content into a larger document](#E5)
 
 <div id="E1"/>
 
@@ -409,30 +411,30 @@ See [json_type_traits](doc/ref/json_type_traits.md)
 ### Convert `json` values to user defined types and back (also standard library containers of user defined types)
 
 ```c++
-    struct book
+struct book
+{
+    std::string author;
+    std::string title;
+    double price;
+};
+
+namespace jsoncons
+{
+    template<class Json>
+    struct json_type_traits<Json, book>
     {
-        std::string author;
-        std::string title;
-        double price;
+        // Implement static functions is, as and to_json 
     };
+}        
 
-    namespace jsoncons
-    {
-        template<class Json>
-        struct json_type_traits<Json, book>
-        {
-            // Implement static functions is, as and to_json 
-        };
-    }        
+book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
+book book2{"Charles Bukowski", "Women: A Novel", 12.0};
 
-    book book1{"Haruki Murakami", "Kafka on the Shore", 25.17};
-    book book2{"Charles Bukowski", "Women: A Novel", 12.0};
+std::vector<book> v{book1, book2};
 
-    std::vector<book> v{book1, book2};
+json j = v;
 
-    json j = v;
-
-    std::list<book> l = j.as<std::list<book>>();
+std::list<book> l = j.as<std::list<book>>();
 ```
 
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
@@ -672,6 +674,95 @@ Graham Greene
 See [json_stream_reader](doc/ref/json_stream_reader.md) 
 
 <div id="E4"/>
+
+### Iterate over a json stream with staj iterators
+
+```c++
+const std::string example = R"(
+[ 
+  { 
+      "employeeNo" : "101",
+      "name" : "Tommy Cochrane",
+      "title" : "Supervisor"
+  },
+  { 
+      "employeeNo" : "102",
+      "name" : "Bill Skeleton",
+      "title" : "Line manager"
+  }
+]
+)";
+
+int main()
+{
+    std::istringstream is(example);
+
+    json_stream_reader reader(is);
+
+    staj_array_iterator<json> it(reader);
+
+    for (const auto& j : it)
+    {
+        std::cout << pretty_print(j) << "\n";
+    }
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+{
+    "employeeNo": "101",
+    "name": "Tommy Cochrane",
+    "title": "Supervisor"
+}
+{
+    "employeeNo": "102",
+    "name": "Bill Skeleton",
+    "title": "Line manager"
+}
+```
+
+Or,
+
+```c++
+struct employee
+{
+    std::string employeeNo;
+    std::string name;
+    std::string title;
+};
+
+
+namespace jsoncons
+{
+    template<class Json>
+    struct json_type_traits<Json, employee>
+    {
+        // Implement static functions is, as and to_json 
+    };
+}  
+      
+int main()
+{
+    std::istringstream is(example);
+
+    json_stream_reader reader(is);
+
+    staj_array_iterator<json,employee> it(reader);
+
+    for (const auto& val : it)
+    {
+        std::cout << val.employeeNo << ", " << val.name << ", " << val.title << "\n";
+    }
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+101, Tommy Cochrane, Supervisor
+102, Bill Skeleton, Line manager
+```
+<div id="E5"/>
 
 ### Dump json content into a larger document
 
