@@ -282,6 +282,6 @@ Graham Greene
 
 #### See also
 
-- [stax_array_iterator](stax_array_iterator.md) 
-- [stax_object_iterator](stax_object_iterator.md)
+- [staj_array_iterator](staj_array_iterator.md) 
+- [staj_object_iterator](staj_object_iterator.md)
 

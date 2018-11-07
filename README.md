@@ -719,7 +719,7 @@ Output:
     "title": "Line manager"
 }
 ```
-See [stax_array_iterator](stax_array_iterator.md) and [stax_object_iterator](stax_object_iterator.md)
+See [staj_array_iterator](staj_array_iterator.md) and [staj_object_iterator](staj_object_iterator.md)
 
 ### Dump json content into a larger document
 
