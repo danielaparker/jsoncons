@@ -8,5 +8,6 @@
 #define JSONCONS_STREAM_READER_HPP
 
 #include <jsoncons/staj_reader.hpp>
+
 #endif
 

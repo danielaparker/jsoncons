@@ -628,6 +628,15 @@ using basic_stream_reader = basic_staj_reader<CharT>;
 template<class CharT>
 using basic_stream_filter = basic_staj_filter<CharT>;
 
+typedef basic_staj_event<char> stream_event;
+typedef basic_staj_event<wchar_t> wstream_event;
+
+typedef basic_staj_reader<char> stream_reader;
+typedef basic_staj_reader<wchar_t> wstream_reader;
+
+typedef basic_staj_filter<char> stream_filter;
+typedef basic_staj_filter<wchar_t> wstream_filter;
+
 #endif
 
 }

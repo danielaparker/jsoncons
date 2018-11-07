@@ -1,6 +1,13 @@
 master
 ------
 
+Name changes (non breaking)
+
+- The name stream_event_type has been deprecated and replaced with staj_event_type
+- The names basic_stream_event (stream_event) have been deprecated and replaced with basic_staj_event (staj_event)
+- The names basic_stream_filter (stream_filter) have been deprecated and replaced with basic_staj_filter (staj_filter)
+(staj stands for "streaming API for JSON, analagous to StAX in XML)
+
 Enhancements
 
 - json double values convert to CBOR float if double to float 

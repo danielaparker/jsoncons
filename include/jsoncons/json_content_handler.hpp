@@ -429,7 +429,9 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t*, size_t, semantic_tag_type, const serializing_context&) override
+    bool do_byte_string_value(const uint8_t*, size_t, 
+                              semantic_tag_type, 
+                              const serializing_context&) override
     {
         return true;
     }
