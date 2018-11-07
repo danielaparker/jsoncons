@@ -51,7 +51,7 @@ Member type                         |Definition
 
 ### Examples
 
-#### Iterate over a JSON array, , returning `json` values  
+#### Iterate over a JSON array, returning json values  
 
 ```c++
 const std::string example = R"(
@@ -98,8 +98,7 @@ Output:
 }
 ```
 
-
-#### Iterate over the JSON array, returning `employee` values 
+#### Iterate over the JSON array, returning employee values 
 
 ```c++
 struct employee
@@ -138,7 +137,7 @@ namespace jsoncons
             return j;
         }
     };
-}  
+}
       
 int main()
 {
