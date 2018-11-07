@@ -80,3 +80,52 @@ Advances the iterator to the next object member.
 
 The `begin` and `end` non-member functions enable the use of `stax_array_iterators` with range-based for loops.
 
+### Examples
+
+#### Iterate over a JSON object, returning key-json value pairs
+
+```c++
+const std::string example = R"(
+{
+   "application": "hiking",
+   "reputons": [
+   {
+       "rater": "HikingAsylum.array_example.com",
+       "assertion": "is-good",
+       "rated": "sk",
+       "rating": 0.90
+     }
+   ]
+}
+)";
+
+int main()
+{
+    std::istringstream is(object_example);
+
+    json_stream_reader reader(is);
+
+    staj_object_iterator<json> it(reader);
+
+    for (const auto& kv : it)
+    {
+        std::cout << kv.first << ":\n" << pretty_print(kv.second) << "\n";
+    }
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+application:
+"hiking"
+reputons:
+[
+    {
+        "assertion": "is-good",
+        "rated": "sk",
+        "rater": "HikingAsylum.array_example.com",
+        "rating": 0.90
+    }
+]
+```
+

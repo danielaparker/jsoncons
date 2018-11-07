@@ -9,7 +9,7 @@
 using namespace jsoncons;
 
 // Example JSON text
-const std::string example = R"(
+const std::string array_example = R"(
 [ 
   { 
       "employeeNo" : "101",
@@ -24,9 +24,23 @@ const std::string example = R"(
 ]
 )";
 
+const std::string object_example = R"(
+{
+   "application": "hiking",
+   "reputons": [
+   {
+       "rater": "HikingAsylum.array_example.com",
+       "assertion": "is-good",
+       "rated": "sk",
+       "rating": 0.90
+     }
+   ]
+}
+)";
+
 void staj_array_iterator_example()
 {
-    std::istringstream is(example);
+    std::istringstream is(array_example);
 
     json_stream_reader reader(is);
 
@@ -76,7 +90,7 @@ namespace jsoncons
 
 void staj_array_iterator_example2()
 {
-    std::istringstream is(example);
+    std::istringstream is(array_example);
 
     json_stream_reader reader(is);
 
@@ -89,6 +103,22 @@ void staj_array_iterator_example2()
     std::cout << "\n\n";
 }
 
+void staj_object_iterator_example()
+{
+
+    std::istringstream is(object_example);
+
+    json_stream_reader reader(is);
+
+    staj_object_iterator<json> it(reader);
+
+    for (const auto& kv : it)
+    {
+        std::cout << kv.first << ":\n" << pretty_print(kv.second) << "\n";
+    }
+    std::cout << "\n\n";
+}
+
 void staj_iterator_examples()
 {
     std::cout << "\nstaj_iterator examples\n\n";
@@ -96,6 +126,8 @@ void staj_iterator_examples()
     staj_array_iterator_example();
 
     staj_array_iterator_example2();
+
+    staj_object_iterator_example();
 
     std::cout << "\n";
 }

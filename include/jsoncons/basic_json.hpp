@@ -537,7 +537,7 @@ public:
             }
 
             array_data(const array& val, semantic_tag_type tag, const Allocator& a)
-                : data_base(structure_tag_type::array_tag, semantic_tag_type::none)
+                : data_base(structure_tag_type::array_tag, tag)
             {
                 create(array_allocator(a), val, a);
             }

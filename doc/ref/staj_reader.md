@@ -33,9 +33,21 @@ Sends the parse events from the current event to the
 matching completion event to the supplied [handler](json_content_handler.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, throws a [parse_error](parse_error.md).
+
+    virtual void accept(json_content_handler& handler,
+                        std::error_code& ec) = 0;
+Sends the parse events from the current event to the
+matching completion event to the supplied [handler](json_content_handler.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, sets `ec`.
 
     virtual void next() = 0;
-Get the next event. 
+Get the next event. If a parsing error is encountered, throws a [parse_error](parse_error.md).
+
+    virtual void next(std::error_code& ec) = 0;
+Get the next event. If a parsing error is encountered, sets `ec`.
 
     virtual const serializing_context& context() const = 0;
 Returns the current [context](serializing_context.md)

@@ -496,7 +496,7 @@ public:
 
     friend bool operator==(const basic_staj_array_iterator<CharT, T>& a, const basic_staj_array_iterator<CharT, T>& b)
     {
-        return !a.reader_ && !b.reader_
+        return (!a.reader_ && !b.reader_)
             || (!a.reader_ && b.done())
             || (!b.reader_ && a.done());
     }
@@ -651,7 +651,7 @@ public:
 
     friend bool operator==(const basic_staj_object_iterator<CharT,T>& a, const basic_staj_object_iterator<CharT,T>& b)
     {
-        return !a.reader_ && !b.reader_
+        return (!a.reader_ && !b.reader_)
                || (!a.reader_ && b.done())
                || (!b.reader_ && a.done());
     }

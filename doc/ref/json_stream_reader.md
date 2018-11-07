@@ -129,6 +129,15 @@ Sends the parse events from the current event to the
 matching completion event to the supplied [handler](json_content_handler.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, throws a [parse_error](parse_error.md).
+
+    void accept(json_content_handler& handler,
+                std::error_code& ec) override
+Sends the parse events from the current event to the
+matching completion event to the supplied [handler](json_content_handler.md)
+E.g., if the current event is `begin_object`, sends the `begin_object`
+event and all inbetween events until the matching `end_object` event.
+If a parsing error is encountered, sets `ec`.
 
     void next() override;
 Advances to the next event. If a parsing error is encountered, throws a 
