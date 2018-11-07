@@ -194,7 +194,6 @@ The library includes four instantiations of `basic_json`:
 [Dump json content into a larger document](#E5)
 
 <div id="E1"/>
-
 ### Playing around with CBOR, JSON, and CSV
 
 ```c++
@@ -440,7 +439,6 @@ std::list<book> l = j.as<std::list<book>>();
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
 <div id="E2"/>
-
 ### Convert JSON text to C++ objects, and back
 
 The functions `decode_json` and `encode_json` convert JSON 
@@ -498,7 +496,6 @@ John Smith: Software Engineer
 See [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
 
 <div id="E3"/>
-
 ### Pull parser example
 
 A typical pull parsing application will repeatedly process the `current()` 
@@ -674,7 +671,6 @@ Graham Greene
 See [json_stream_reader](doc/ref/json_stream_reader.md) 
 
 <div id="E4"/>
-
 ### Iterate over a json stream with staj iterators
 
 ```c++
@@ -724,7 +720,6 @@ Output:
 See [stax_array_iterator](stax_array_iterator.md) and [stax_object_iterator](stax_object_iterator.md)
 
 <div id="E5"/>
-
 ### Dump json content into a larger document
 
 ```c++
