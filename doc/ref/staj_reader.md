@@ -40,3 +40,8 @@ Get the next event.
     virtual const serializing_context& context() const = 0;
 Returns the current [context](serializing_context.md)
 
+#### See also
+
+- [staj_array_iterator](staj_array_iterator.md) 
+- [staj_object_iterator](staj_object_iterator.md)
+
