@@ -18,7 +18,7 @@
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_stream_reader.hpp>
 
 namespace jsoncons {
 

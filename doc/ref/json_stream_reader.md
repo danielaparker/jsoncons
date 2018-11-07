@@ -12,7 +12,7 @@ function to advance to the next event, until `done()` returns `true`.
 
 #### Header
 ```c++
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_stream_reader.hpp>
 ```
 
 ### Implemented interfaces
@@ -21,17 +21,17 @@ function to advance to the next event, until `done()` returns `true`.
 
 #### Constructors
 
-    basic_json_stream_reader(std::istream& is); // (1)
+    json_stream_reader(std::istream& is); // (1)
 
-    basic_json_stream_reader(std::istream& is,
-                             staj_filter& filter); // (2)
+    json_stream_reader(std::istream& is,
+                       staj_filter& filter); // (2)
 
-    basic_json_stream_reader(std::istream& is, 
-                             const json_read_options& options); // (3)
+    json_stream_reader(std::istream& is, 
+                       const json_read_options& options); // (3)
 
-    basic_json_stream_reader(std::istream& is,
-                             staj_filter& filter, 
-                             const json_read_options& options); // (4)
+    json_stream_reader(std::istream& is,
+                       staj_filter& filter, 
+                       const json_read_options& options); // (4)
 
     json_stream_reader(std::istream& is, 
                        parse_error_handler& err_handler); // (5)
@@ -44,33 +44,33 @@ function to advance to the next event, until `done()` returns `true`.
                        const json_read_options& options,
                        parse_error_handler& err_handler); // (7)
 
-(1) Constructs a `json_reader` that reads from an input stream `is` of 
+(1) Constructs a `json_stream_reader` that reads from an input stream `is` of 
 JSON text, uses default [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(2) Constructs a `json_reader` that reads from an input stream `is` of 
+(2) Constructs a `json_stream_reader` that reads from an input stream `is` of 
 JSON text, applies a [staj_filter](staj_filter.md) to the events, uses default [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(3) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
+(3) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 uses the specified [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(4) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
+(4) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md) to the events, 
 uses the specified [json_read_options](json_read_options)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(5) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
+(5) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 uses default [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(6) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
+(6) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md) to the events, 
 uses default [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(7) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
+(7) Constructs a `json_stream_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md), 
 uses the specified [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
@@ -125,7 +125,7 @@ The example JSON text, `book_catalog.json`, is used by the examples below.
 #### Reading a JSON stream
 
 ```c++
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_stream_reader.hpp>
 #include <string>
 #include <fstream>
 
@@ -224,7 +224,7 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_stream_reader.hpp>
 #include <string>
 #include <fstream>
 

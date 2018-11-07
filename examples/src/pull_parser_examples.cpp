@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json_staj_reader.hpp>
+#include <jsoncons/json_stream_reader.hpp>
 #include <string>
 #include <sstream>
 
