@@ -732,7 +732,6 @@ struct employee
     std::string title;
 };
 
-
 namespace jsoncons
 {
     template<class Json>
