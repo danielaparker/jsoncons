@@ -506,17 +506,18 @@ template<class Json, class T = Json>
 class staj_object_iterator
 {
     typedef Json json_type;
-    typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
-    typedef std::pair<string_type,T> key_value_type;
-
-    basic_staj_reader<char_type>* reader_;
-    key_value_type kv_;
 public:
-    typedef T value_type;
+    typedef typename Json::char_type char_type;
+    typedef std::basic_string<char_type> key_type;
+    typedef std::pair<key_type,T> value_type;
     typedef std::ptrdiff_t difference_type;
-    typedef T* pointer;
-    typedef T& reference;
+    typedef value_type* pointer;
+    typedef value_type& reference;
+
+private:
+    basic_staj_reader<char_type>* reader_;
+    value_type kv_;
+public:
 
     staj_object_iterator()
         : reader_(nullptr)
@@ -534,12 +535,12 @@ public:
         next();
     }
 
-    const key_value_type& operator*() const
+    const value_type& operator*() const
     {
         return kv_;
     }
 
-    const key_value_type* operator->() const
+    const value_type* operator->() const
     {
         return &kv_;
     }
@@ -582,7 +583,7 @@ private:
         if (!done())
         {
             JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
-            kv_.first =reader_->current(). template as<string_type>();
+            kv_.first =reader_->current(). template as<key_type>();
             reader_->next();
             if (!done())
             {

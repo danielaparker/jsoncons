@@ -721,46 +721,8 @@ Output:
     "title": "Line manager"
 }
 ```
+See [stax_array_iterator](stax_array_iterator.md) and [stax_object_iterator](stax_object_iterator.md)
 
-Or,
-
-```c++
-struct employee
-{
-    std::string employeeNo;
-    std::string name;
-    std::string title;
-};
-
-namespace jsoncons
-{
-    template<class Json>
-    struct json_type_traits<Json, employee>
-    {
-        // Implement static functions is, as and to_json 
-    };
-}  
-      
-int main()
-{
-    std::istringstream is(example);
-
-    json_stream_reader reader(is);
-
-    staj_array_iterator<json,employee> it(reader);
-
-    for (const auto& val : it)
-    {
-        std::cout << val.employeeNo << ", " << val.name << ", " << val.title << "\n";
-    }
-    std::cout << "\n\n";
-}
-```
-Output:
-```
-101, Tommy Cochrane, Supervisor
-102, Bill Skeleton, Line manager
-```
 <div id="E5"/>
 
 ### Dump json content into a larger document

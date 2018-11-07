@@ -32,7 +32,6 @@ void staj_array_iterator_example()
 
     staj_array_iterator<json> it(reader);
 
-    std::cout << "(1)\n";
     for (const auto& j : it)
     {
         std::cout << pretty_print(j) << "\n";
@@ -73,7 +72,7 @@ namespace jsoncons
             return j;
         }
     };
-};
+}
 
 void staj_array_iterator_example2()
 {
@@ -83,7 +82,6 @@ void staj_array_iterator_example2()
 
     staj_array_iterator<json,employee> it(reader);
 
-    std::cout << "(1)\n";
     for (const auto& val : it)
     {
         std::cout << val.employeeNo << ", " << val.name << ", " << val.title << "\n";
