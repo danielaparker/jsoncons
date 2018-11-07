@@ -188,7 +188,7 @@ Json decode_csv(typename Json::string_view_type s)
     basic_csv_parser<typename Json::char_type> parser(decoder);
     parser.reset();
     parser.parse(s.data(), 0, s.size());
-    parser.end_parse();
+    parser.finish_parse();
     return decoder.get_result();
 }
 
@@ -201,7 +201,7 @@ Json decode_csv(typename Json::string_view_type s, const basic_csv_serializing_o
     parser.reset();
     parser.update(s.data(), s.size());
     parser.parse_some();
-    parser.end_parse();
+    parser.finish_parse();
     return decoder.get_result();
 }
 

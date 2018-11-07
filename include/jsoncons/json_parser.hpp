@@ -524,35 +524,6 @@ public:
             }
         }
     }
-/*
-    void parse_some()
-    {
-        std::error_code ec;
-        parse_some(ec);
-        if (ec)
-        {
-            throw parse_error(ec,line_,column_);
-        }
-    }
-
-    void end_parse()
-    {
-        std::error_code ec;
-        end_parse(ec);
-        if (ec)
-        {
-            throw parse_error(ec,line_,column_);
-        }
-    }
-
-    void end_parse(std::error_code& ec)
-    {
-        while (continue_)
-        {
-            parse_some(ec);
-        }
-    }
-*/
 
     json_parse_state state() const
     {
@@ -599,17 +570,18 @@ public:
             parse_some_(handler, ec);
         }
     }
-    void end_parse(basic_json_content_handler<CharT>& handler)
+
+    void finish_parse(basic_json_content_handler<CharT>& handler)
     {
         std::error_code ec;
-        end_parse(handler, ec);
+        finish_parse(handler, ec);
         if (ec)
         {
             throw parse_error(ec,line_,column_);
         }
     }
 
-    void end_parse(basic_json_content_handler<CharT>& handler, std::error_code& ec)
+    void finish_parse(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
         while (!finished())
         {
@@ -2645,6 +2617,25 @@ escape_u9:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    void end_parse(basic_json_content_handler<CharT>& handler)
+    {
+        std::error_code ec;
+        finish_parse(handler, ec);
+        if (ec)
+        {
+            throw parse_error(ec,line_,column_);
+        }
+    }
+
+    void end_parse(basic_json_content_handler<CharT>& handler, std::error_code& ec)
+    {
+        while (!finished())
+        {
+            parse_some(handler, ec);
+        }
+    }
+
     void set_source(const CharT* data, size_t length)
     {
         begin_input_ = data;

@@ -2356,7 +2356,7 @@ public:
         size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
         parser.parse_some(decoder);
-        parser.end_parse(decoder);
+        parser.finish_parse(decoder);
         parser.check_done();
         if (!decoder.is_valid())
         {
@@ -2403,7 +2403,7 @@ public:
         size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
         parser.parse_some(decoder);
-        parser.end_parse(decoder);
+        parser.finish_parse(decoder);
         parser.check_done();
         if (!decoder.is_valid())
         {

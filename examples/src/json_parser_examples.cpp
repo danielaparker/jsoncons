@@ -22,7 +22,7 @@ void incremental_parsing_example1()
         parser.parse_some(decoder);
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(decoder);
+        parser.finish_parse(decoder);
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done();
@@ -51,7 +51,7 @@ void incremental_parsing_example2()
         parser.parse_some(decoder); // This is the end, but the parser can't tell
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(decoder); // Indicates that this is the end
+        parser.finish_parse(decoder); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done(); // Checks if there are any unconsumed 
@@ -81,7 +81,7 @@ void incremental_parsing_example3()
         parser.parse_some(decoder); // The parser reaches the end at ']'
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(decoder); // Indicates that this is the end
+        parser.finish_parse(decoder); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done(); // Checks if there are any unconsumed 
@@ -115,7 +115,7 @@ void parse_nan_replacement_example()
     {
         parser.update(s);
         parser.parse_some(decoder);
-        parser.end_parse(decoder);
+        parser.finish_parse(decoder);
         parser.check_done();
     }
     catch (const parse_error& e)

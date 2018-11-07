@@ -654,17 +654,17 @@ all_csv_states:
         }
     }
 
-    void end_parse()
+    void finish_parse()
     {
         std::error_code ec;
-        end_parse(ec);
+        finish_parse(ec);
         if (ec)
         {
             throw parse_error(ec,line_,column_);
         }
     }
 
-    void end_parse(std::error_code& ec)
+    void finish_parse(std::error_code& ec)
     {
         while (continue_)
         {
@@ -909,7 +909,7 @@ private:
                             basic_json_parser<CharT> parser(err_handler_);
                             parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
                             parser.parse_some(filter_);
-                            parser.end_parse(filter_);
+                            parser.finish_parse(filter_);
                         }
                         else
                         {
@@ -934,7 +934,7 @@ private:
                             basic_json_parser<CharT> parser(err_handler_);
                             parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
                             parser.parse_some(filter_);
-                            parser.end_parse(filter_);
+                            parser.finish_parse(filter_);
                         }
                         else
                         {
@@ -968,7 +968,7 @@ private:
                             basic_json_parser<CharT> parser(err_handler_);
                             parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
                             parser.parse_some(filter_);
-                            parser.end_parse(filter_);
+                            parser.finish_parse(filter_);
                         }
                         else
                         {
@@ -989,7 +989,7 @@ private:
                         basic_json_parser<CharT> parser(err_handler_);
                         parser.update(column_defaults_[column_index - offset_].data(),column_defaults_[column_index - offset_].length());
                         parser.parse_some(filter_);
-                        parser.end_parse(filter_);
+                        parser.finish_parse(filter_);
                     }
                     else
                     {

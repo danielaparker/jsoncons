@@ -20,7 +20,7 @@ text has been consumed. If the latter, `done() `will return `true`.
   
 As an alternative to repeatedly calling `parse_some()` until `stopped()`
 returns `true`, when `source_exhausted()` is `true` and there is
-no more input, `end_parse` may be called.  
+no more input, `finish_parse` may be called.  
  
 `check_done` can be called to check if the input has any unconsumed 
 non-whitespace characters, which would normally be considered an error.  
@@ -91,12 +91,12 @@ Parses the source until a complete json text has been consumed or the source has
 Parse events are sent to the supplied `handler`.
 Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
 
-    void end_parse(json_content_handler<CharT>& handler)
+    void finish_parse(json_content_handler<CharT>& handler)
 Called after `source_exhausted()` is `true` and there is no more input. 
 Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
 Throws [parse_error](parse_error.md) if parsing fails.
 
-    void end_parse(json_content_handler<CharT>& handler,
+    void finish_parse(json_content_handler<CharT>& handler,
                    std::error_code& ec)
 Called after `source_exhausted()` is `true` and there is no more input. 
 Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
@@ -140,7 +140,7 @@ int main()
         parser.parse_some(decoder); // This is the end, but the parser can't tell
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(decoder); // Indicates that this is the end
+        parser.finish_parse(decoder); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done(); // Checks if there are any unconsumed 
@@ -188,7 +188,7 @@ int main()
         parser.parse_some(decoder); // The parser reaches the end at ']'
         std::cout << "(2) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
-        parser.end_parse(decoder); // Indicates that this is the end
+        parser.finish_parse(decoder); // Indicates that this is the end
         std::cout << "(3) done: " << std::boolalpha << parser.done() << ", source_exhausted: " << parser.source_exhausted() << "\n\n";
 
         parser.check_done(); // Checks if there are any unconsumed 
@@ -238,7 +238,7 @@ int main()
     {
         parser.update(s);
         parser.parse_some(decoder);
-        parser.end_parse(decoder);
+        parser.finish_parse(decoder);
         parser.check_done();
     }
     catch (const parse_error& e)
