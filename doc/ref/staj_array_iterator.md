@@ -11,9 +11,9 @@ class staj_array_iterator
 ```
 
 A `staj_array_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that
-accesses the individual stream events from a [staj_reader](staj_reader.md) and, provided that when it is constructed 
-the current stream event has type `staj_event_type::begin_array`, it retrieves the elements 
-of the JSON array as items of type `T`. If when it is constructed the current stream event does not have type 
+accesses the individual stream events from a [staj_reader](staj_reader.md) and, provided that when it is constructed
+the current stream event has type `staj_event_type::begin_array`, it retrieves the elements
+of the JSON array as items of type `T`. If when it is constructed the current stream event does not have type
 `staj_event_type::begin_array`, it becomes equal to the default-constructed iterator.
 
 #### Member types
