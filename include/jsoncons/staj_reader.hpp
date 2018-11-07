@@ -417,6 +417,7 @@ public:
     typedef std::ptrdiff_t difference_type;
     typedef T* pointer;
     typedef T& reference;
+    typedef std::input_iterator_tag iterator_category;
 
     staj_array_iterator()
         : reader_(nullptr)
@@ -426,11 +427,14 @@ public:
     staj_array_iterator(basic_staj_reader<char_type>& reader)
         : reader_(std::addressof(reader))
     {
-        if (reader_->current().event_type() != staj_event_type::begin_array)
+        if (reader_->current().event_type() == staj_event_type::begin_array)
         {
-            throw std::invalid_argument("Not an array");
+            next();
         }
-        next();
+        else
+        {
+            reader_ = nullptr;
+        }
     }
 
     const T& operator*() const
@@ -513,6 +517,7 @@ public:
     typedef std::ptrdiff_t difference_type;
     typedef value_type* pointer;
     typedef value_type& reference;
+    typedef std::input_iterator_tag iterator_category;
 
 private:
     basic_staj_reader<char_type>* reader_;
@@ -527,12 +532,14 @@ public:
     staj_object_iterator(basic_staj_reader<char_type>& reader)
         : reader_(std::addressof(reader))
     {
-        std::cout << "event_type: " << (int)reader_->current().event_type() << "\n";
-        if (reader_->current().event_type() != staj_event_type::begin_object)
+        if (reader_->current().event_type() == staj_event_type::begin_object)
         {
-            throw std::invalid_argument("Not an object");
+            next();
         }
-        next();
+        else
+        {
+            reader_ = nullptr;
+        }
     }
 
     const value_type& operator*() const
