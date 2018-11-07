@@ -183,17 +183,16 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
-[Playing around with CBOR, JSON, and CSV](Playing-around-with-CBOR,-JSON,-and-CSV)
+[Playing around with CBOR, JSON, and CSV](#Playing-around-with-CBOR,-JSON,-and-CSV)
 
 [Convert JSON text to C++ objects, and back](#E2)
 
-[Pull parser example](pull-parser-example)
+[Pull parser example](#pull-parser-example)
 
 [Iterate over a json stream with staj iterators](#E4)
 
 [Dump json content into a larger document](#E5)
 
-<div id="E1"/>
 ### Playing around with CBOR, JSON, and CSV
 
 ```c++
