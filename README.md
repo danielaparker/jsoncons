@@ -189,7 +189,7 @@ The library includes four instantiations of `basic_json`:
 
 [Convert json values to user defined types and back](#Convert-json-values-to-user-defined-types-and-back)
 
-[Convert JSON text to C++ objects and back](#Convert-JSON-text-to-C++-objects-and-back)
+[Convert JSON text to C++ objects and back](#Convert-JSON-text-to-C---objects-and-back)
 
 [Pull parser example](#pull-parser-example)
 
