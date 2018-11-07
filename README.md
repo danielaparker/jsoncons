@@ -185,7 +185,11 @@ The library includes four instantiations of `basic_json`:
 
 [Playing around with CBOR, JSON, and CSV](#Playing-around-with-CBOR,-JSON,-and-CSV)
 
-[Convert JSON text to C++ objects and back](#Convert-JSON-text-to)
+[Convert json values to standard library types and back](#Convert-json-values-to-standard-library-types-and-back)
+
+[Convert json values to user defined types and back](#Convert-json-values-to-user-defined-types-and-back)
+
+[Convert JSON text to C++ objects and back](#Convert-JSON-text-to-C++-objects-and-back)
 
 [Pull parser example](#pull-parser-example)
 
@@ -384,7 +388,7 @@ foo,YmFy,-18446744073709551617
 baz,cXV4,273.15
 ```
 
-### Convert `json` values to standard library types and back
+### Convert json values to standard library types and back
 
 ```c++
 std::vector<int> v{1, 2, 3, 4};
@@ -406,7 +410,9 @@ Output:
 
 See [json_type_traits](doc/ref/json_type_traits.md)
 
-### Convert `json` values to user defined types and back (also standard library containers of user defined types)
+### Convert json values to user defined types and back
+
+(also standard library containers of user defined types)
 
 ```c++
 struct book
