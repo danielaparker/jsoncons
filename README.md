@@ -189,7 +189,7 @@ The library includes four instantiations of `basic_json`:
 
 [Convert json values to user defined types and back](#Convert-json-values-to-user-defined-types-and-back)
 
-[Convert JSON text to C++ objects and back](#Convert-JSON-text-to-C---objects-and-back)
+[Convert JSON text to standard library or user defined types and back](#Convert-JSON-text-to-standard-library-or-user-defined-types-and-back)
 
 [Pull parser example](#pull-parser-example)
 
@@ -443,7 +443,7 @@ std::list<book> l = j.as<std::list<book>>();
 
 See [Type Extensibility](doc/Tutorials/Type%20Extensibility.md) for details.
 
-### Convert JSON text to C++ objects and back
+### Convert JSON text to standard library or user defined types and back
 
 The functions `decode_json` and `encode_json` convert JSON 
 formatted strings to C++ objects and back. `decode_json` 
