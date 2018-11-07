@@ -1,8 +1,8 @@
 ### jsoncons::staj_object_iterator
 
 ```c++
-template<class Json, class T = Json>
-class staj_object_iterator
+template <class T>
+using staj_object_iterator = basic_staj_object_iterator<char,T>;
 ```
 
 #### Header
@@ -20,7 +20,7 @@ does not have type `begin_object`, it becomes equal to the default-constructed i
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`char_type`|`Json::char_type char_type`
+`char_type`|`char`
 `key_type`|`std::basic_string<char_type>`
 `value_type`|`std::pair<string_type,T>`
 `difference_type`|`std::ptrdiff_t`
@@ -62,17 +62,17 @@ Advances the iterator to the next object member.
 
 #### Non-member functions
 
-    template <class Json, class T>
-    bool operator==(const staj_object_iterator<Json, T>& a, const staj_object_iterator<Json, T>& b)
+    template <class T>
+    bool operator==(const staj_object_iterator<T>& a, const staj_object_iterator<T>& b)
 
-    template <class Json, class T>
-    bool operator!=(const staj_object_iterator<Json, T>& a, const staj_object_iterator<Json, T>& b)
+    template <class T>
+    bool operator!=(const staj_object_iterator<T>& a, const staj_object_iterator<T>& b)
 
-    template <class Json, class T>
-    staj_object_iterator<Json, T> begin(staj_object_iterator<Json, T> iter) noexcept; // (1)
+    template <class T>
+    staj_object_iterator<T> begin(staj_object_iterator<T> iter) noexcept; // (1)
 
-    template <class Json, class T>
-    staj_object_iterator<Json, T> end(const staj_object_iterator<Json, T>&) noexcept; // (2)
+    template <class T>
+    staj_object_iterator<T> end(const staj_object_iterator<T>&) noexcept; // (2)
 
 (1) Returns iter unchanged
 

@@ -80,7 +80,7 @@ void staj_array_iterator_example2()
 
     json_stream_reader reader(is);
 
-    staj_array_iterator<json,employee> it(reader);
+    staj_array_iterator<employee> it(reader);
 
     for (const auto& val : it)
     {

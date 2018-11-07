@@ -27,6 +27,7 @@
 #include <jsoncons/key_value.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/basic_json.hpp>
 
 namespace jsoncons {
 
@@ -379,6 +380,9 @@ public:
 
     virtual void accept(basic_json_content_handler<CharT>& handler) = 0;
 
+    virtual void accept(basic_json_content_handler<CharT>& handler,
+                        std::error_code& ec) = 0;
+
     virtual void next() = 0;
 
     virtual void next(std::error_code& ec) = 0;
@@ -406,11 +410,11 @@ public:
     }
 };
 
-template<class Json, class T = Json>
-class staj_array_iterator
+template<class CharT, class T>
+class basic_staj_array_iterator
 {
-    typedef Json json_type;
-    typedef typename Json::char_type char_type;
+    typedef basic_json<CharT> json_type;
+    typedef CharT char_type;
 
     basic_staj_reader<char_type>* reader_;
     T value_;
@@ -421,12 +425,12 @@ public:
     typedef T& reference;
     typedef std::input_iterator_tag iterator_category;
 
-    staj_array_iterator() noexcept
+    basic_staj_array_iterator() noexcept
         : reader_(nullptr)
     {
     }
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader)
+    basic_staj_array_iterator(basic_staj_reader<char_type>& reader)
         : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
@@ -439,13 +443,17 @@ public:
         }
     }
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader,
+    basic_staj_array_iterator(basic_staj_reader<char_type>& reader,
                         std::error_code& ec)
         : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
         {
             next(ec);
+            if (ec)
+            {
+                reader_ = nullptr;
+            }
         }
         else
         {
@@ -463,33 +471,37 @@ public:
         return &value_;
     }
 
-    staj_array_iterator& operator++()
+    basic_staj_array_iterator& operator++()
     {
         next();
         return *this;
     }
 
-    staj_array_iterator& increment(std::error_code& ec)
+    basic_staj_array_iterator& increment(std::error_code& ec)
     {
         next(ec);
+        if (ec)
+        {
+            reader_ = nullptr;
+        }
         return *this;
     }
 
-    staj_array_iterator operator++(int) // postfix increment
+    basic_staj_array_iterator operator++(int) // postfix increment
     {
-        staj_array_iterator temp(*this);
+        basic_staj_array_iterator temp(*this);
         next();
         return temp;
     }
 
-    friend bool operator==(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
+    friend bool operator==(const basic_staj_array_iterator<CharT, T>& a, const basic_staj_array_iterator<CharT, T>& b)
     {
         return !a.reader_ && !b.reader_
             || (!a.reader_ && b.done())
             || (!b.reader_ && a.done());
     }
 
-    friend bool operator!=(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
+    friend bool operator!=(const basic_staj_array_iterator<CharT, T>& a, const basic_staj_array_iterator<CharT, T>& b)
     {
         return !(a == b);
     }
@@ -514,26 +526,48 @@ private:
             }
         }
     }
+
+    void next(std::error_code& ec)
+    {
+        if (!done())
+        {
+            reader_->next(ec);
+            if (ec)
+            {
+                return;
+            }
+            if (!done())
+            {
+                json_decoder<json_type> decoder;
+                reader_->accept(decoder, ec);
+                if (ec)
+                {
+                    return;
+                }
+                value_ = decoder.get_result().template as<T>();
+            }
+        }
+    }
 };
 
-template <class Json, class T>
-staj_array_iterator<Json, T> begin(staj_array_iterator<Json, T> iter) noexcept
+template <class CharT, class T>
+basic_staj_array_iterator<CharT, T> begin(basic_staj_array_iterator<CharT, T> iter) noexcept
 {
     return iter;
 }
 
-template <class Json, class T>
-staj_array_iterator<Json, T> end(const staj_array_iterator<Json, T>&) noexcept
+template <class CharT, class T>
+basic_staj_array_iterator<CharT, T> end(const basic_staj_array_iterator<CharT, T>&) noexcept
 {
-    return staj_array_iterator<Json, T>();
+    return basic_staj_array_iterator<CharT, T>();
 }
 
-template<class Json, class T = Json>
-class staj_object_iterator
+template<class CharT, class T>
+class basic_staj_object_iterator
 {
-    typedef Json json_type;
+    typedef basic_json<CharT> json_type;
 public:
-    typedef typename Json::char_type char_type;
+    typedef CharT char_type;
     typedef std::basic_string<char_type> key_type;
     typedef std::pair<key_type,T> value_type;
     typedef std::ptrdiff_t difference_type;
@@ -546,12 +580,12 @@ private:
     value_type kv_;
 public:
 
-    staj_object_iterator() noexcept
+    basic_staj_object_iterator() noexcept
         : reader_(nullptr)
     {
     }
 
-    staj_object_iterator(basic_staj_reader<char_type>& reader)
+    basic_staj_object_iterator(basic_staj_reader<char_type>& reader)
         : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_object)
@@ -564,13 +598,17 @@ public:
         }
     }
 
-    staj_object_iterator(basic_staj_reader<char_type>& reader, 
+    basic_staj_object_iterator(basic_staj_reader<char_type>& reader, 
                          std::error_code& ec)
         : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_object)
         {
             next(ec);
+            if (ec)
+            {
+                reader_ = nullptr;
+            }
         }
         else
         {
@@ -588,33 +626,37 @@ public:
         return &kv_;
     }
 
-    staj_object_iterator& operator++()
+    basic_staj_object_iterator& operator++()
     {
         next();
         return *this;
     }
 
-    staj_object_iterator& increment(std::error_code& ec)
+    basic_staj_object_iterator& increment(std::error_code& ec)
     {
         next(ec);
+        if (ec)
+        {
+            reader_ = nullptr;
+        }
         return *this;
     }
 
-    staj_object_iterator operator++(int) // postfix increment
+    basic_staj_object_iterator operator++(int) // postfix increment
     {
-        staj_object_iterator temp(*this);
+        basic_staj_object_iterator temp(*this);
         next();
         return temp;
     }
 
-    friend bool operator==(const staj_object_iterator<Json,T>& a, const staj_object_iterator<Json,T>& b)
+    friend bool operator==(const basic_staj_object_iterator<CharT,T>& a, const basic_staj_object_iterator<CharT,T>& b)
     {
         return !a.reader_ && !b.reader_
                || (!a.reader_ && b.done())
                || (!b.reader_ && a.done());
     }
 
-    friend bool operator!=(const staj_object_iterator<Json,T>& a, const staj_object_iterator<Json,T>& b)
+    friend bool operator!=(const basic_staj_object_iterator<CharT,T>& a, const basic_staj_object_iterator<CharT,T>& b)
     {
         return !(a == b);
     }
@@ -642,18 +684,47 @@ private:
             }
         }
     }
+
+    void next(std::error_code& ec)
+    {
+        reader_->next(ec);
+        if (ec)
+        {
+            return;
+        }
+        if (!done())
+        {
+            JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
+            kv_.first =reader_->current(). template as<key_type>();
+            reader_->next(ec);
+            if (ec)
+            {
+                return;
+            }
+            if (!done())
+            {
+                json_decoder<json_type> decoder;
+                reader_->accept(decoder, ec);
+                if (ec)
+                {
+                    return;
+                }
+                kv_.second = decoder.get_result().template as<T>();
+            }
+        }
+    }
 };
 
-template <class Json,class T>
-staj_object_iterator<Json,T> begin(staj_object_iterator<Json,T> iter) noexcept
+template <class CharT,class T>
+basic_staj_object_iterator<CharT,T> begin(basic_staj_object_iterator<CharT,T> iter) noexcept
 {
     return iter;
 }
 
-template <class Json,class T>
-staj_object_iterator<Json,T> end(const staj_object_iterator<Json,T>&) noexcept
+template <class CharT,class T>
+basic_staj_object_iterator<CharT,T> end(const basic_staj_object_iterator<CharT,T>&) noexcept
 {
-    return staj_object_iterator<Json,T>();
+    return basic_staj_object_iterator<CharT,T>();
 }
 
 typedef basic_staj_event<char> staj_event;
@@ -664,6 +735,18 @@ typedef basic_staj_reader<wchar_t> wstaj_reader;
 
 typedef basic_staj_filter<char> staj_filter;
 typedef basic_staj_filter<wchar_t> wstaj_filter;
+
+template <class T>
+using staj_array_iterator = basic_staj_array_iterator<char,T>;
+
+template <class T>
+using wstaj_array_iterator = basic_staj_array_iterator<wchar_t,T>;
+
+template <class T>
+using staj_object_iterator = basic_staj_object_iterator<char,T>;
+
+template <class T>
+using wstaj_object_iterator = basic_staj_object_iterator<wchar_t,T>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 

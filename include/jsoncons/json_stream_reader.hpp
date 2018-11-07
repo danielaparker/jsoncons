@@ -303,7 +303,16 @@ public:
     void accept(basic_json_content_handler<CharT>& handler) override
     {
         std::error_code ec;
+        accept(handler, ec);
+        if (ec)
+        {
+            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+        }
+    }
 
+    void accept(basic_json_content_handler<CharT>& handler,
+                std::error_code& ec) override
+    {
         switch (event_handler_.event().event_type())
         {
             case staj_event_type::begin_array:
@@ -378,25 +387,18 @@ public:
         do
         {
             read_next(handler, ec);
-            if (ec)
-            {
-                throw parse_error(ec,parser_.line_number(),parser_.column_number());
-            }
-        } while (!done() && !filter_.accept(event_handler_.event(), *this));
+        } 
+        while (!ec && !done() && !filter_.accept(event_handler_.event(), *this));
     }
 
     void next() override
     {
         std::error_code ec;
-
-        do
+        next(ec);
+        if (ec)
         {
-            read_next(ec);
-            if (ec)
-            {
-                throw parse_error(ec,parser_.line_number(),parser_.column_number());
-            }
-        } while (!done() && !filter_.accept(event_handler_.event(), *this));
+            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+        }
     }
 
     void next(std::error_code& ec) override
@@ -524,21 +526,6 @@ public:
     bool eof() const
     {
         return eof_;
-    }
-
-    void read()
-    {
-        read_next();
-        check_done();
-    }
-
-    void read(std::error_code& ec)
-    {
-        read_next(ec);
-        if (!ec)
-        {
-            check_done(ec);
-        }
     }
 
     size_t line_number() const override

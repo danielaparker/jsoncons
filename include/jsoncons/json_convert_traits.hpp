@@ -60,7 +60,7 @@ struct json_convert_traits<T,
     {
         T v;
         basic_json_stream_reader<CharT> reader(is, options);
-        staj_array_iterator<basic_json<CharT>,value_type> it(reader);
+        basic_staj_array_iterator<CharT,value_type> it(reader);
 
         for (const auto& item : it)
         {
@@ -134,7 +134,7 @@ struct json_convert_traits<T,
     {
         T m;
         basic_json_stream_reader<CharT> reader(is, options);
-        staj_object_iterator<basic_json<CharT>,mapped_type> it(reader);
+        basic_staj_object_iterator<CharT,mapped_type> it(reader);
 
         for (const auto& kv : it)
         {

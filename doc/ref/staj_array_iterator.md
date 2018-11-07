@@ -1,8 +1,8 @@
 ### jsoncons::staj_array_iterator
 
 ```c++
-template<class Json, class T = Json>
-class staj_array_iterator
+template <class T>
+using staj_array_iterator = basic_staj_array_iterator<char,T>;
 ```
 
 #### Header
@@ -20,7 +20,7 @@ it becomes equal to the default-constructed iterator.
 
 Member type                         |Definition
 ------------------------------------|------------------------------
-`char_type`|`Json::char_type char_type`
+`char_type`|char
 `value_type`|`T`
 `difference_type`|`std::ptrdiff_t`
 `pointer`|`value_type*`
@@ -61,17 +61,17 @@ Advances the iterator to the next array element.
 
 #### Non-member functions
 
-    template <class Json, class T>
-    bool operator==(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
+    template <class T>
+    bool operator==(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
 
-    template <class Json, class T>
-    bool operator!=(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
+    template <class T>
+    bool operator!=(const staj_array_iterator<T>& a, const staj_array_iterator<T>& b)
 
-    template <class Json, class T>
-    staj_array_iterator<Json, T> begin(staj_array_iterator<Json, T> iter) noexcept; // (1)
+    template <class T>
+    staj_array_iterator<T> begin(staj_array_iterator<T> iter) noexcept; // (1)
 
-    template <class Json, class T>
-    staj_array_iterator<Json, T> end(const staj_array_iterator<Json, T>&) noexcept; // (2)
+    template <class T>
+    staj_array_iterator<T> end(const staj_array_iterator<T>&) noexcept; // (2)
 
 (1) Returns iter unchanged
 
@@ -175,7 +175,7 @@ int main()
 
     json_stream_reader reader(is);
 
-    staj_array_iterator<json,employee> it(reader);
+    staj_array_iterator<employee> it(reader);
 
     for (const auto& val : it)
     {
