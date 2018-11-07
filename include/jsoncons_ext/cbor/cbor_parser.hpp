@@ -64,16 +64,16 @@ namespace jsoncons { namespace cbor {
 class cbor_decode_error : public std::invalid_argument, public virtual json_exception
 {
 public:
-    explicit cbor_decode_error(size_t pos) JSONCONS_NOEXCEPT
+    explicit cbor_decode_error(size_t pos) noexcept
         : std::invalid_argument("")
     {
         buffer_.append("Error decoding a cbor at position ");
         buffer_.append(std::to_string(pos));
     }
-    ~cbor_decode_error() JSONCONS_NOEXCEPT
+    ~cbor_decode_error() noexcept
     {
     }
-    const char* what() const JSONCONS_NOEXCEPT override
+    const char* what() const noexcept override
     {
         return buffer_.c_str();
     }

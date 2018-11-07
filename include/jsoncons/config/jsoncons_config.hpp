@@ -36,12 +36,6 @@
 #  define JSONCONS_FALLTHROUGH
 #endif
 
-#if defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7))) || defined(__clang__)
-#  define JSONCONS_ATTRIBUTE_UNUSED __attribute__((unused))
-#else
-#  define JSONCONS_ATTRIBUTE_UNUSED
-#endif
-
 #if defined(__GNUC__) || defined(__clang__)
 #define JSONCONS_LIKELY(x) __builtin_expect(!!(x), 1)
 #define JSONCONS_UNLIKELY(x) __builtin_expect(!!(x), 0)
@@ -82,24 +76,6 @@ namespace jsoncons
 #else
 #define JSONCONS_NO_LOCALECONV
 #endif
-#endif
-
-#if defined (__clang__)
-#if defined(_GLIBCXX_USE_NOEXCEPT)
-#define JSONCONS_NOEXCEPT _GLIBCXX_USE_NOEXCEPT
-#else
-#define JSONCONS_NOEXCEPT noexcept
-#endif
-#elif defined(__GNUC__)
-#define JSONCONS_NOEXCEPT _GLIBCXX_USE_NOEXCEPT
-#elif defined(_MSC_VER)
-#if _MSC_VER >= 1900
-#define JSONCONS_NOEXCEPT noexcept
-#else
-#define JSONCONS_NOEXCEPT
-#endif
-#else
-#define JSONCONS_NOEXCEPT
 #endif
 
 #if defined(_MSC_VER)

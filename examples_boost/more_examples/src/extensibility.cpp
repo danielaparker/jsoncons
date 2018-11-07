@@ -16,7 +16,7 @@ namespace jsoncons
     template <class Json>
     struct json_type_traits<Json,boost::gregorian::date>
     {
-        static bool is(const Json& val) JSONCONS_NOEXCEPT
+        static bool is(const Json& val) noexcept
         {
             if (!val.is_string())
             {
@@ -49,7 +49,7 @@ namespace jsoncons
     template <class Json,class T>
     struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
     {
-        static bool is(const Json& val) JSONCONS_NOEXCEPT
+        static bool is(const Json& val) noexcept
         {
             if (!val.is_array())
             {

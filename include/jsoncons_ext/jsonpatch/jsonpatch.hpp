@@ -30,7 +30,7 @@ public:
 
     jsonpatch_error(jsonpatch_error&& other) = default;
 
-    const char* what() const JSONCONS_NOEXCEPT override
+    const char* what() const noexcept override
     {
         try
         {

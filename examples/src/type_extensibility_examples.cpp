@@ -20,7 +20,7 @@ namespace jsoncons
     template<class Json>
     struct json_type_traits<Json, book>
     {
-        static bool is(const Json& j) JSONCONS_NOEXCEPT
+        static bool is(const Json& j) noexcept
         {
             return j.is_object() &&
                    j.contains("author") && 

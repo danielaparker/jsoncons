@@ -39,7 +39,7 @@ public:
 
 public:
 
-    explicit basic_ovectorbuf() JSONCONS_NOEXCEPT
+    explicit basic_ovectorbuf() noexcept
         : mode_(std::ios_base::out | std::ios_base::binary), 
           buf_(100u)
     {  
@@ -48,7 +48,7 @@ public:
         this->setg(buf_.data(), 0, buf_.data());
     }
 
-    explicit basic_ovectorbuf(std::size_t length) JSONCONS_NOEXCEPT
+    explicit basic_ovectorbuf(std::size_t length) noexcept
         : mode_(std::ios_base::out | std::ios_base::binary), 
           buf_(length)
     {  
@@ -57,7 +57,7 @@ public:
         this->setg(buf_.data(), 0, buf_.data());
     }
 
-    virtual ~basic_ovectorbuf() JSONCONS_NOEXCEPT {}
+    virtual ~basic_ovectorbuf() noexcept {}
 
     basic_ovectorbuf(const basic_ovectorbuf<CharT,Traits>&) = delete;
 
@@ -215,11 +215,11 @@ private:
     basic_ovectorbuf<CharT, Traits> buf_;
 
 public:
-    basic_obufferedstream() JSONCONS_NOEXCEPT
+    basic_obufferedstream() noexcept
         : std::basic_ostream<CharT, Traits>( (std::basic_streambuf<CharT, Traits>*)(&buf_)),
           buf_()
     {}
-    basic_obufferedstream(std::size_t length) JSONCONS_NOEXCEPT
+    basic_obufferedstream(std::size_t length) noexcept
         : std::basic_ostream<CharT, Traits>( (std::basic_streambuf<CharT, Traits>*)(&buf_)),
           buf_(length)
     {}
@@ -228,7 +228,7 @@ public:
 
     //basic_obufferedstream(basic_obufferedstream<CharT,Traits>&&) = default;
 
-    virtual ~basic_obufferedstream() JSONCONS_NOEXCEPT 
+    virtual ~basic_obufferedstream() noexcept 
     { 
     }
 

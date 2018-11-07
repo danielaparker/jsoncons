@@ -215,9 +215,9 @@ public:
         return as_bool();
     }
 
-    stream_event_type event_type() const JSONCONS_NOEXCEPT { return event_type_; }
+    stream_event_type event_type() const noexcept { return event_type_; }
 
-    semantic_tag_type semantic_tag() const JSONCONS_NOEXCEPT { return semantic_tag_; }
+    semantic_tag_type semantic_tag() const noexcept { return semantic_tag_; }
 private:
 
     int64_t as_int64() const

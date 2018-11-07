@@ -29,7 +29,7 @@ public:
 
     jsonpointer_error(jsonpointer_error&& other) = default;
 
-    const char* what() const JSONCONS_NOEXCEPT override
+    const char* what() const noexcept override
     {
         try
         {
@@ -86,24 +86,24 @@ public:
     using value_type = typename J::value_type;
     using type = value_type;
 
-    handle_type(const value_type& val) JSONCONS_NOEXCEPT
+    handle_type(const value_type& val) noexcept
         : val_(val)
     {
     }
 
-    handle_type(value_type&& val) JSONCONS_NOEXCEPT
+    handle_type(value_type&& val) noexcept
         : val_(std::move(val))
     {
     }
 
-    handle_type(const handle_type& w) JSONCONS_NOEXCEPT
+    handle_type(const handle_type& w) noexcept
         : val_(w.val_)
     {
     }
 
-    handle_type& operator=(const handle_type&) JSONCONS_NOEXCEPT = default;
+    handle_type& operator=(const handle_type&) noexcept = default;
 
-    type get() const JSONCONS_NOEXCEPT
+    type get() const noexcept
     {
         return val_;
     }
@@ -120,16 +120,16 @@ public:
     using type = reference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
 
-    handle_type(reference ref) JSONCONS_NOEXCEPT
+    handle_type(reference ref) noexcept
         : ptr_(std::addressof(ref))
     {
     }
 
-    handle_type(const handle_type&) JSONCONS_NOEXCEPT = default;
+    handle_type(const handle_type&) noexcept = default;
 
-    handle_type& operator=(const handle_type&) JSONCONS_NOEXCEPT = default;
+    handle_type& operator=(const handle_type&) noexcept = default;
 
-    type get() const JSONCONS_NOEXCEPT
+    type get() const noexcept
     {
         return *ptr_;
     }

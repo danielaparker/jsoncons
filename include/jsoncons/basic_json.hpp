@@ -799,12 +799,12 @@ public:
             Init_(val,allocator);
         }
 
-        variant(variant&& val) JSONCONS_NOEXCEPT
+        variant(variant&& val) noexcept
         {
             Init_rv_(std::forward<variant>(val));
         }
 
-        variant(variant&& val, const Allocator& allocator) JSONCONS_NOEXCEPT
+        variant(variant&& val, const Allocator& allocator) noexcept
         {
             Init_rv_(std::forward<variant>(val), allocator,
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
@@ -884,7 +884,7 @@ public:
             return *this;
         }
 
-        variant& operator=(variant&& val) JSONCONS_NOEXCEPT
+        variant& operator=(variant&& val) noexcept
         {
             if (this !=&val)
             {
@@ -1194,7 +1194,7 @@ public:
 
         template <class Alloc = allocator_type>
         typename std::enable_if<std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value,void>::type
-        swap(variant& other) JSONCONS_NOEXCEPT
+        swap(variant& other) noexcept
         {
             if (this ==&other)
             {
@@ -1206,7 +1206,7 @@ public:
 
         template <class Alloc = allocator_type>
         typename std::enable_if<!std::is_pod<typename std::allocator_traits<Alloc>::pointer>::value, void>::type
-        swap(variant& other) JSONCONS_NOEXCEPT
+        swap(variant& other) noexcept
         {
             if (this ==&other)
             {
@@ -1346,7 +1346,7 @@ public:
             }
         }
 
-        void Init_rv_(variant&& val) JSONCONS_NOEXCEPT
+        void Init_rv_(variant&& val) noexcept
         {
             switch (val.structure_tag())
             {
@@ -1389,12 +1389,12 @@ public:
             }
         }
 
-        void Init_rv_(variant&& val, const Allocator&, std::true_type) JSONCONS_NOEXCEPT
+        void Init_rv_(variant&& val, const Allocator&, std::true_type) noexcept
         {
             Init_rv_(std::forward<variant>(val));
         }
 
-        void Init_rv_(variant&& val, const Allocator& a, std::false_type) JSONCONS_NOEXCEPT
+        void Init_rv_(variant&& val, const Allocator& a, std::false_type) noexcept
         {
             switch (val.structure_tag())
             {
@@ -1543,7 +1543,7 @@ public:
             return evaluate().array_range();
         }
 
-        size_t size() const JSONCONS_NOEXCEPT
+        size_t size() const noexcept
         {
             return evaluate().size();
         }
@@ -1568,7 +1568,7 @@ public:
             return evaluate().contains(name);
         }
 
-        bool is_null() const JSONCONS_NOEXCEPT
+        bool is_null() const noexcept
         {
             return evaluate().is_null();
         }
@@ -1605,61 +1605,61 @@ public:
             return evaluate().template is<T>(std::forward<Args>(args)...);
         }
 
-        bool is_string() const JSONCONS_NOEXCEPT
+        bool is_string() const noexcept
         {
             return evaluate().is_string();
         }
 
-        bool is_string_view() const JSONCONS_NOEXCEPT
+        bool is_string_view() const noexcept
         {
             return evaluate().is_string_view();
         }
 
-        bool is_byte_string() const JSONCONS_NOEXCEPT
+        bool is_byte_string() const noexcept
         {
             return evaluate().is_byte_string();
         }
 
-        bool is_byte_string_view() const JSONCONS_NOEXCEPT
+        bool is_byte_string_view() const noexcept
         {
             return evaluate().is_byte_string_view();
         }
 
-        bool is_bignum() const JSONCONS_NOEXCEPT
+        bool is_bignum() const noexcept
         {
             return evaluate().is_bignum();
         }
 
-        bool is_number() const JSONCONS_NOEXCEPT
+        bool is_number() const noexcept
         {
             return evaluate().is_number();
         }
-        bool is_bool() const JSONCONS_NOEXCEPT
+        bool is_bool() const noexcept
         {
             return evaluate().is_bool();
         }
 
-        bool is_object() const JSONCONS_NOEXCEPT
+        bool is_object() const noexcept
         {
             return evaluate().is_object();
         }
 
-        bool is_array() const JSONCONS_NOEXCEPT
+        bool is_array() const noexcept
         {
             return evaluate().is_array();
         }
 
-        bool is_int64() const JSONCONS_NOEXCEPT
+        bool is_int64() const noexcept
         {
             return evaluate().is_int64();
         }
 
-        bool is_uint64() const JSONCONS_NOEXCEPT
+        bool is_uint64() const noexcept
         {
             return evaluate().is_uint64();
         }
 
-        bool is_double() const JSONCONS_NOEXCEPT
+        bool is_double() const noexcept
         {
             return evaluate().is_double();
         }
@@ -2015,12 +2015,12 @@ public:
         }
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-        bool is_date_time() const JSONCONS_NOEXCEPT
+        bool is_date_time() const noexcept
         {
             return evaluate().is_date_time();
         }
 
-        bool is_epoch_time() const JSONCONS_NOEXCEPT
+        bool is_epoch_time() const noexcept
         {
             return evaluate().is_epoch_time();
         }
@@ -2056,12 +2056,12 @@ public:
             return evaluate().has_key(name);
         }
 
-        bool is_integer() const JSONCONS_NOEXCEPT
+        bool is_integer() const noexcept
         {
             return evaluate().is_int64();
         }
 
-        bool is_uinteger() const JSONCONS_NOEXCEPT
+        bool is_uinteger() const noexcept
         {
             return evaluate().is_uint64();
         }
@@ -2086,7 +2086,7 @@ public:
             evaluate().dump(os, pprint);
         }
 
-        string_type to_string(const char_allocator_type& allocator = char_allocator_type()) const JSONCONS_NOEXCEPT
+        string_type to_string(const char_allocator_type& allocator = char_allocator_type()) const noexcept
         {
             return evaluate().to_string(allocator);
         }
@@ -2229,12 +2229,12 @@ public:
             return evaluate().get(name);
         }
 
-        bool is_ulonglong() const JSONCONS_NOEXCEPT
+        bool is_ulonglong() const noexcept
         {
             return evaluate().is_ulonglong();
         }
 
-        bool is_longlong() const JSONCONS_NOEXCEPT
+        bool is_longlong() const noexcept
         {
             return evaluate().is_longlong();
         }
@@ -2283,11 +2283,11 @@ public:
         {
             evaluate().remove(name);
         }
-        bool is_empty() const JSONCONS_NOEXCEPT
+        bool is_empty() const noexcept
         {
             return empty();
         }
-        bool is_numeric() const JSONCONS_NOEXCEPT
+        bool is_numeric() const noexcept
         {
             return is_number();
         }
@@ -2497,12 +2497,12 @@ public:
     {
     }
 
-    basic_json(basic_json&& other) JSONCONS_NOEXCEPT
+    basic_json(basic_json&& other) noexcept
         : var_(std::move(other.var_))
     {
     }
 
-    basic_json(basic_json&& other, const Allocator&) JSONCONS_NOEXCEPT
+    basic_json(basic_json&& other, const Allocator&) noexcept
         : var_(std::move(other.var_) /*,allocator*/ )
     {
     }
@@ -2675,7 +2675,7 @@ public:
         return *this;
     }
 
-    basic_json& operator=(basic_json&& rhs) JSONCONS_NOEXCEPT
+    basic_json& operator=(basic_json&& rhs) noexcept
     {
         if (this !=&rhs)
         {
@@ -2707,7 +2707,7 @@ public:
         return var_ == rhs.var_;
     }
 
-    size_t size() const JSONCONS_NOEXCEPT
+    size_t size() const noexcept
     {
         switch (var_.structure_tag())
         {
@@ -2873,7 +2873,7 @@ public:
         dump(serializer);
     }
 
-    string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const JSONCONS_NOEXCEPT
+    string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const noexcept
     {
         string_type s(allocator);
         basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s);
@@ -2960,7 +2960,7 @@ public:
         to_stream(serializer);
     }
 #endif
-    bool is_null() const JSONCONS_NOEXCEPT
+    bool is_null() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::null_tag;
     }
@@ -3011,22 +3011,22 @@ public:
         return json_type_traits<basic_json,T>::is(*this,std::forward<Args>(args)...);
     }
 
-    bool is_string() const JSONCONS_NOEXCEPT
+    bool is_string() const noexcept
     {
         return (var_.structure_tag() == structure_tag_type::long_string_tag) || (var_.structure_tag() == structure_tag_type::short_string_tag);
     }
 
-    bool is_string_view() const JSONCONS_NOEXCEPT
+    bool is_string_view() const noexcept
     {
         return is_string();
     }
 
-    bool is_byte_string() const JSONCONS_NOEXCEPT
+    bool is_byte_string() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::byte_string_tag;
     }
 
-    bool is_byte_string_view() const JSONCONS_NOEXCEPT
+    bool is_byte_string_view() const noexcept
     {
         return is_byte_string();
     }
@@ -3046,42 +3046,42 @@ public:
         }
     }
 
-    bool is_bool() const JSONCONS_NOEXCEPT
+    bool is_bool() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::bool_tag;
     }
 
-    bool is_object() const JSONCONS_NOEXCEPT
+    bool is_object() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::object_tag || var_.structure_tag() == structure_tag_type::empty_object_tag;
     }
 
-    bool is_array() const JSONCONS_NOEXCEPT
+    bool is_array() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::array_tag;
     }
 
-    bool is_int64() const JSONCONS_NOEXCEPT
+    bool is_int64() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
-    bool is_uint64() const JSONCONS_NOEXCEPT
+    bool is_uint64() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_integer<int64_t>() >= 0);
     }
 
-    bool is_double() const JSONCONS_NOEXCEPT
+    bool is_double() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::double_tag;
     }
 
-    bool is_number() const JSONCONS_NOEXCEPT
+    bool is_number() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::int64_tag || var_.structure_tag() == structure_tag_type::uint64_tag || var_.structure_tag() == structure_tag_type::double_tag;
     }
 
-    bool empty() const JSONCONS_NOEXCEPT
+    bool empty() const noexcept
     {
         switch (var_.structure_tag())
         {
@@ -3378,12 +3378,12 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    bool is_date_time() const JSONCONS_NOEXCEPT
+    bool is_date_time() const noexcept
     {
         return var_.semantic_tag() == semantic_tag_type::date_time;
     }
 
-    bool is_epoch_time() const JSONCONS_NOEXCEPT
+    bool is_epoch_time() const noexcept
     {
         return var_.semantic_tag() == semantic_tag_type::epoch_time;
     }
@@ -3393,12 +3393,12 @@ public:
         return contains(name);
     }
 
-    bool is_integer() const JSONCONS_NOEXCEPT
+    bool is_integer() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::int64_tag || (var_.structure_tag() == structure_tag_type::uint64_tag&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
     }
 
-    bool is_uinteger() const JSONCONS_NOEXCEPT
+    bool is_uinteger() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::uint64_tag || (var_.structure_tag() == structure_tag_type::int64_tag&& as_integer<int64_t>() >= 0);
     }
@@ -4168,12 +4168,12 @@ public:
         }
     }
 
-    bool is_longlong() const JSONCONS_NOEXCEPT
+    bool is_longlong() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::int64_tag;
     }
 
-    bool is_ulonglong() const JSONCONS_NOEXCEPT
+    bool is_ulonglong() const noexcept
     {
         return var_.structure_tag() == structure_tag_type::uint64_tag;
     }
@@ -4294,11 +4294,11 @@ public:
     }
     // Removes a member from an object value
 
-    bool is_empty() const JSONCONS_NOEXCEPT
+    bool is_empty() const noexcept
     {
         return empty();
     }
-    bool is_numeric() const JSONCONS_NOEXCEPT
+    bool is_numeric() const noexcept
     {
         return is_number();
     }

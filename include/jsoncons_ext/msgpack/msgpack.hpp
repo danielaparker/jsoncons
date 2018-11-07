@@ -23,16 +23,16 @@ namespace jsoncons { namespace msgpack {
 class msgpack_decode_error : public std::invalid_argument, public virtual json_exception
 {
 public:
-    explicit msgpack_decode_error(size_t pos) JSONCONS_NOEXCEPT
+    explicit msgpack_decode_error(size_t pos) noexcept
         : std::invalid_argument("")
     {
         buffer_.append("Error decoding a message pack at position ");
         buffer_.append(std::to_string(pos));
     }
-    ~msgpack_decode_error() JSONCONS_NOEXCEPT
+    ~msgpack_decode_error() noexcept
     {
     }
-    const char* what() const JSONCONS_NOEXCEPT override
+    const char* what() const noexcept override
     {
         return buffer_.c_str();
     }

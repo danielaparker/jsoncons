@@ -80,11 +80,11 @@ public:
     }
 
     // iterator support 
-    const_iterator begin() const JSONCONS_NOEXCEPT
+    const_iterator begin() const noexcept
     {
         return data_;
     }
-    const_iterator end() const JSONCONS_NOEXCEPT
+    const_iterator end() const noexcept
     {
         return data_ + length_;
     }
@@ -193,7 +193,7 @@ public:
 
     basic_byte_string& operator=(basic_byte_string&& s) = default;
 
-    operator byte_string_view() const JSONCONS_NOEXCEPT
+    operator byte_string_view() const noexcept
     {
         return byte_string_view(data(),length());
     }
@@ -225,11 +225,11 @@ public:
     }
 
     // iterator support 
-    const_iterator begin() const JSONCONS_NOEXCEPT
+    const_iterator begin() const noexcept
     {
         return data_.begin();
     }
-    const_iterator end() const JSONCONS_NOEXCEPT
+    const_iterator end() const noexcept
     {
         return data_.end();
     }

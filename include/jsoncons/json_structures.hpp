@@ -116,7 +116,7 @@ public:
     {
     }
 
-    json_array(json_array&& val) JSONCONS_NOEXCEPT
+    json_array(json_array&& val) noexcept
         : Json_array_base_<Json>(val.get_allocator()), 
           elements_(std::move(val.elements_))
     {

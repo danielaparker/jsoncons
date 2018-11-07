@@ -264,7 +264,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::c
     typedef typename Json::char_type char_type;
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_string();
     }
@@ -285,7 +285,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
     typedef typename Json::char_type char_type;
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_string();
     }
@@ -305,7 +305,7 @@ struct json_type_traits<Json, T,
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         if (j.is_int64())
         {
@@ -336,7 +336,7 @@ struct json_type_traits<Json, T,
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         if (j.is_int64())
         {
@@ -370,7 +370,7 @@ struct json_type_traits<Json, T,
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_double();
     }
@@ -390,7 +390,7 @@ struct json_type_traits<Json, typename Json::object>
     typedef typename Json::object json_object;
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_object();
     }
@@ -406,7 +406,7 @@ struct json_type_traits<Json, typename Json::array>
     typedef typename Json::array json_array;
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_array();
     }
@@ -421,7 +421,7 @@ struct json_type_traits<Json, Json>
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json&) JSONCONS_NOEXCEPT
+    static bool is(const Json&) noexcept
     {
         return true;
     }
@@ -440,7 +440,7 @@ struct json_type_traits<Json, jsoncons::null_type>
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_null();
     }
@@ -460,7 +460,7 @@ struct json_type_traits<Json, bool>
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_bool();
     }
@@ -482,7 +482,7 @@ struct json_type_traits<Json, T, typename std::enable_if<std::is_same<T,
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_bool();
     }
@@ -501,7 +501,7 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_bool();
     }
@@ -523,7 +523,7 @@ struct json_type_traits<Json, T,
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         bool result = j.is_array();
         if (result)
@@ -618,7 +618,7 @@ struct json_type_traits<Json, T,
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_string();
     }
@@ -645,7 +645,7 @@ struct json_type_traits<Json, T,
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_string_view();
     }
@@ -675,7 +675,7 @@ struct json_type_traits<Json, T,
     typedef typename T::value_type value_type;
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         bool result = j.is_object();
         for (auto member : j.object_range())
@@ -725,7 +725,7 @@ struct json_type_traits<Json, std::array<E, N>>
 
     typedef E element_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         bool result = j.is_array() && j.size() == N;
         if (result)
@@ -786,7 +786,7 @@ struct json_tuple_helper
     using element_type = typename std::tuple_element<Pos - 1, Tuple>::type;
     using next = json_tuple_helper<Pos - 1, Json, Tuple>;
     
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         if(j[Pos - 1].template is<element_type>())
         {
@@ -814,7 +814,7 @@ struct json_tuple_helper
 template<class Json, class Tuple>
 struct json_tuple_helper<0, Json, Tuple>
 {
-    static bool is(const Json&) JSONCONS_NOEXCEPT
+    static bool is(const Json&) noexcept
     {
         return true;
     }
@@ -837,7 +837,7 @@ private:
     using helper = detail::json_tuple_helper<sizeof...(E), Json, std::tuple<E...>>;
 
 public:
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return helper::is(j);
     }
@@ -861,7 +861,7 @@ template<class Json, class T1, class T2>
 struct json_type_traits<Json, std::pair<T1,T2>>
 {
 public:
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_array() && j.size() == 2;
     }
@@ -881,7 +881,7 @@ template<class Json, class Allocator>
 struct json_type_traits<Json, basic_byte_string<Allocator>>
 {
 public:
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_byte_string();
     }
@@ -901,7 +901,7 @@ template<class Json>
 struct json_type_traits<Json, byte_string_view>
 {
 public:
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_byte_string_view();
     }
@@ -923,7 +923,7 @@ template<class Json, class Allocator>
 struct json_type_traits<Json, basic_bignum<Allocator>>
 {
 public:
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         return j.is_bignum();
     }
@@ -948,7 +948,7 @@ struct json_type_traits<Json, std::valarray<T>>
 {
     typedef typename Json::allocator_type allocator_type;
 
-    static bool is(const Json& j) JSONCONS_NOEXCEPT
+    static bool is(const Json& j) noexcept
     {
         bool result = j.is_array();
         if (result)

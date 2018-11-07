@@ -102,17 +102,17 @@ namespace jsoncons { namespace binary {
 class read_nbytes_failed : public std::invalid_argument, public virtual json_exception
 {
 public:
-    explicit read_nbytes_failed(size_t count) JSONCONS_NOEXCEPT
+    explicit read_nbytes_failed(size_t count) noexcept
         : std::invalid_argument("")
     {
         buffer_.append("Failed attempting to read ");
         buffer_.append(std::to_string(count));
         buffer_.append(" bytes from vector");
     }
-    ~read_nbytes_failed() JSONCONS_NOEXCEPT
+    ~read_nbytes_failed() noexcept
     {
     }
-    const char* what() const JSONCONS_NOEXCEPT override
+    const char* what() const noexcept override
     {
         return buffer_.c_str();
     }

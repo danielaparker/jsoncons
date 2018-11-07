@@ -26,21 +26,21 @@ namespace jsoncons {
 class json_exception 
 {
 public:
-    virtual const char* what() const JSONCONS_NOEXCEPT = 0;
+    virtual const char* what() const noexcept = 0;
 };
 
 template <class Base>
 class json_exception_impl : public Base, public virtual json_exception
 {
 public:
-    json_exception_impl(const std::string& s) JSONCONS_NOEXCEPT
+    json_exception_impl(const std::string& s) noexcept
         : Base(""), message_(s)
     {
     }
-    ~json_exception_impl() JSONCONS_NOEXCEPT
+    ~json_exception_impl() noexcept
     {
     }
-    const char* what() const JSONCONS_NOEXCEPT override
+    const char* what() const noexcept override
     {
         return message_.c_str();
     }
@@ -52,7 +52,7 @@ class key_not_found : public std::out_of_range, public virtual json_exception
 {
 public:
     template <class CharT>
-    explicit key_not_found(const CharT* key, size_t length) JSONCONS_NOEXCEPT
+    explicit key_not_found(const CharT* key, size_t length) noexcept
         : std::out_of_range("")
     {
         buffer_.append("Key '");
@@ -60,10 +60,10 @@ public:
                          unicons::conv_flags::strict);
         buffer_.append("' not found");
     }
-    ~key_not_found() JSONCONS_NOEXCEPT
+    ~key_not_found() noexcept
     {
     }
-    const char* what() const JSONCONS_NOEXCEPT override
+    const char* what() const noexcept override
     {
         return buffer_.c_str();
     }
@@ -75,7 +75,7 @@ class not_an_object : public std::runtime_error, public virtual json_exception
 {
 public:
     template <class CharT>
-    explicit not_an_object(const CharT* key, size_t length) JSONCONS_NOEXCEPT
+    explicit not_an_object(const CharT* key, size_t length) noexcept
         : std::runtime_error("")
     {
         buffer_.append("Attempting to access or modify '");
@@ -83,10 +83,10 @@ public:
                          unicons::conv_flags::strict);
         buffer_.append("' on a value that is not an object");
     }
-    ~not_an_object() JSONCONS_NOEXCEPT
+    ~not_an_object() noexcept
     {
     }
-    const char* what() const JSONCONS_NOEXCEPT override
+    const char* what() const noexcept override
     {
         return buffer_.c_str();
     }

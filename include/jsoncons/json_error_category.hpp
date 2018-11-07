@@ -54,7 +54,7 @@ class json_error_category_impl
    : public std::error_category
 {
 public:
-    virtual const char* name() const JSONCONS_NOEXCEPT
+    virtual const char* name() const noexcept
     {
         return "jsoncons";
     }

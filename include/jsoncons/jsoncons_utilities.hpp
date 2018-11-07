@@ -81,35 +81,35 @@ public:
     }
 
     // iterator support 
-    const_iterator begin() const JSONCONS_NOEXCEPT
+    const_iterator begin() const noexcept
     {
         return data_;
     }
-    const_iterator end() const JSONCONS_NOEXCEPT
+    const_iterator end() const noexcept
     {
         return data_ + length_;
     }
-    const_iterator cbegin() const JSONCONS_NOEXCEPT 
+    const_iterator cbegin() const noexcept 
     { 
         return data_; 
     }
-    const_iterator cend() const JSONCONS_NOEXCEPT 
+    const_iterator cend() const noexcept 
     { 
         return data_ + length_; 
     }
-    const_reverse_iterator rbegin() const JSONCONS_NOEXCEPT 
+    const_reverse_iterator rbegin() const noexcept 
     { 
         return const_reverse_iterator(end()); 
     }
-    const_reverse_iterator rend() const JSONCONS_NOEXCEPT 
+    const_reverse_iterator rend() const noexcept 
     { 
         return const_reverse_iterator(begin()); 
     }
-    const_reverse_iterator crbegin() const JSONCONS_NOEXCEPT 
+    const_reverse_iterator crbegin() const noexcept 
     { 
         return const_reverse_iterator(end()); 
     }
-    const_reverse_iterator crend() const JSONCONS_NOEXCEPT 
+    const_reverse_iterator crend() const noexcept 
     { 
         return const_reverse_iterator(begin()); 
     }
@@ -125,11 +125,11 @@ public:
     {
         return length_;
     }
-    size_type max_size() const JSONCONS_NOEXCEPT 
+    size_type max_size() const noexcept 
     { 
         return length_; 
     }
-    bool empty() const JSONCONS_NOEXCEPT 
+    bool empty() const noexcept 
     { 
         return length_ == 0; 
     }
@@ -199,7 +199,7 @@ public:
         return rc != 0 ? rc : (length_ == s.length() ? 0 : length_ < s.length() ? -1 : 1);
     }
 
-    size_type find(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
+    size_type find(Basic_string_view_ s, size_type pos = 0) const noexcept 
     {
         if (pos > length_)
         {
@@ -213,20 +213,20 @@ public:
                                         s.cbegin(), s.cend(), Traits::eq);
         return it == cend() ? npos : std::distance(cbegin(), it);
     }
-    size_type find(CharT ch, size_type pos = 0) const JSONCONS_NOEXCEPT
+    size_type find(CharT ch, size_type pos = 0) const noexcept
     { 
         return find(Basic_string_view_(&ch, 1), pos); 
     }
-    size_type find(const CharT* s, size_type pos, size_type n) const JSONCONS_NOEXCEPT
+    size_type find(const CharT* s, size_type pos, size_type n) const noexcept
     { 
         return find(Basic_string_view_(s, n), pos); 
     }
-    size_type find(const CharT* s, size_type pos = 0) const JSONCONS_NOEXCEPT
+    size_type find(const CharT* s, size_type pos = 0) const noexcept
     { 
         return find(Basic_string_view_(s), pos); 
     }
 
-    size_type rfind(Basic_string_view_ s, size_type pos = npos) const JSONCONS_NOEXCEPT 
+    size_type rfind(Basic_string_view_ s, size_type pos = npos) const noexcept 
     {
         if (length_ < s.length_)
         {
@@ -252,20 +252,20 @@ public:
             }
          };
     }
-    size_type rfind(CharT ch, size_type pos = npos) const JSONCONS_NOEXCEPT
+    size_type rfind(CharT ch, size_type pos = npos) const noexcept
     { 
         return rfind(Basic_string_view_(&ch, 1), pos); 
     }
-    size_type rfind(const CharT* s, size_type pos, size_type n) const JSONCONS_NOEXCEPT
+    size_type rfind(const CharT* s, size_type pos, size_type n) const noexcept
     { 
         return rfind(Basic_string_view_(s, n), pos); 
     }
-    size_type rfind(const CharT* s, size_type pos = npos) const JSONCONS_NOEXCEPT
+    size_type rfind(const CharT* s, size_type pos = npos) const noexcept
     { 
         return rfind(Basic_string_view_(s), pos); 
     }
 
-    size_type find_first_of(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
+    size_type find_first_of(Basic_string_view_ s, size_type pos = 0) const noexcept 
     {
         if (pos >= length_ || s.length_ == 0)
         {
@@ -275,20 +275,20 @@ public:
             (cbegin() + pos, cend(), s.cbegin(), s.cend(), Traits::eq);
         return it == cend() ? npos : std::distance (cbegin(), it);
     }
-    size_type find_first_of(CharT ch, size_type pos = 0) const JSONCONS_NOEXCEPT
+    size_type find_first_of(CharT ch, size_type pos = 0) const noexcept
     {
          return find_first_of(Basic_string_view_(&ch, 1), pos); 
     }
-    size_type find_first_of(const CharT* s, size_type pos, size_type n) const JSONCONS_NOEXCEPT
+    size_type find_first_of(const CharT* s, size_type pos, size_type n) const noexcept
     { 
         return find_first_of(Basic_string_view_(s, n), pos); 
     }
-    size_type find_first_of(const CharT* s, size_type pos = 0) const JSONCONS_NOEXCEPT
+    size_type find_first_of(const CharT* s, size_type pos = 0) const noexcept
     { 
         return find_first_of(Basic_string_view_(s), pos); 
     }
 
-    size_type find_last_of(Basic_string_view_ s, size_type pos = npos) const JSONCONS_NOEXCEPT 
+    size_type find_last_of(Basic_string_view_ s, size_type pos = npos) const noexcept 
     {
         if (s.length_ == 0)
         {
@@ -306,20 +306,20 @@ public:
             (crbegin() + pos, crend(), s.cbegin(), s.cend(), Traits::eq);
         return it == crend() ? npos : (length_ - 1 - std::distance(crbegin(), it));
     }
-    size_type find_last_of(CharT ch, size_type pos = npos) const JSONCONS_NOEXCEPT
+    size_type find_last_of(CharT ch, size_type pos = npos) const noexcept
     { 
         return find_last_of(Basic_string_view_(&ch, 1), pos); 
     }
-    size_type find_last_of(const CharT* s, size_type pos, size_type n) const JSONCONS_NOEXCEPT
+    size_type find_last_of(const CharT* s, size_type pos, size_type n) const noexcept
     { 
         return find_last_of(Basic_string_view_(s, n), pos); 
     }
-    size_type find_last_of(const CharT* s, size_type pos = npos) const JSONCONS_NOEXCEPT
+    size_type find_last_of(const CharT* s, size_type pos = npos) const noexcept
     { 
         return find_last_of(Basic_string_view_(s), pos); 
     }
 
-    size_type find_first_not_of(Basic_string_view_ s, size_type pos = 0) const JSONCONS_NOEXCEPT 
+    size_type find_first_not_of(Basic_string_view_ s, size_type pos = 0) const noexcept 
     {
         if (pos >= length_)
             return npos;
@@ -337,20 +337,20 @@ public:
         }
         return it == cend() ? npos : std::distance (cbegin(), it);
     }
-    size_type find_first_not_of(CharT ch, size_type pos = 0) const JSONCONS_NOEXCEPT
+    size_type find_first_not_of(CharT ch, size_type pos = 0) const noexcept
     { 
         return find_first_not_of(Basic_string_view_(&ch, 1), pos); 
     }
-    size_type find_first_not_of(const CharT* s, size_type pos, size_type n) const JSONCONS_NOEXCEPT
+    size_type find_first_not_of(const CharT* s, size_type pos, size_type n) const noexcept
     { 
         return find_first_not_of(Basic_string_view_(s, n), pos); 
     }
-    size_type find_first_not_of(const CharT* s, size_type pos = 0) const JSONCONS_NOEXCEPT
+    size_type find_first_not_of(const CharT* s, size_type pos = 0) const noexcept
     { 
         return find_first_not_of(Basic_string_view_(s), pos); 
     }
 
-    size_type find_last_not_of(Basic_string_view_ s, size_type pos = npos) const JSONCONS_NOEXCEPT 
+    size_type find_last_not_of(Basic_string_view_ s, size_type pos = npos) const noexcept 
     {
         if (pos >= length_)
         {
@@ -373,15 +373,15 @@ public:
         }
         return it == crend() ? npos : (length_ - 1 - std::distance(crbegin(), it));
     }
-    size_type find_last_not_of(CharT ch, size_type pos = npos) const JSONCONS_NOEXCEPT
+    size_type find_last_not_of(CharT ch, size_type pos = npos) const noexcept
     { 
         return find_last_not_of(Basic_string_view_(&ch, 1), pos); 
     }
-    size_type find_last_not_of(const CharT* s, size_type pos, size_type n) const JSONCONS_NOEXCEPT
+    size_type find_last_not_of(const CharT* s, size_type pos, size_type n) const noexcept
     { 
         return find_last_not_of(Basic_string_view_(s, n), pos); 
     }
-    size_type find_last_not_of(const CharT* s, size_type pos = npos) const JSONCONS_NOEXCEPT
+    size_type find_last_not_of(const CharT* s, size_type pos = npos) const noexcept
     { 
         return find_last_not_of(Basic_string_view_(s), pos); 
     }
