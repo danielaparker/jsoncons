@@ -183,11 +183,11 @@ The library includes four instantiations of `basic_json`:
 
 ## More examples
 
-[Playing around with CBOR, JSON, and CSV](#E1)
+[Playing around with CBOR, JSON, and CSV](Playing-around-with-CBOR,-JSON,-and-CSV)
 
 [Convert JSON text to C++ objects, and back](#E2)
 
-[Pull parser example](#E3)
+[Pull parser example](pull-parser-example)
 
 [Iterate over a json stream with staj iterators](#E4)
 
@@ -495,7 +495,6 @@ John Smith: Software Engineer
 
 See [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
 
-<div id="E3"/>
 ### Pull parser example
 
 A typical pull parsing application will repeatedly process the `current()` 
