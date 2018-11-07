@@ -53,20 +53,7 @@
 namespace jsoncons
 {
 
-#if _MSC_VER > 1800 // _MSC_VER == 1800 -> MS Visual Studio 2013
-#else
-#define JSONCONS_NO_CONSTEXPR
-#endif
-
 #define JSONCONS_NO_TO_CHARS
-
-#if defined(_MSC_VER)
-#if _MSC_VER >= 1900
-#define JSONCONS_HAS_USER_DEFINED_LITERALS
-#endif
-#else
-#define JSONCONS_HAS_USER_DEFINED_LITERALS
-#endif
 
 //#define JSONCONS_HAS_STRING_VIEW
 
@@ -80,15 +67,7 @@ namespace jsoncons
 
 #if defined(_MSC_VER)
 #define JSONCONS_HAS_MSC__STRTOD_L
-#define JSONCONS_HAS__ECVT_S
 #define JSONCONS_HAS_FOPEN_S
-#if _MSC_VER >= 1900
-#define JSONCONS_ALIGNOF alignof
-#else
-#define JSONCONS_ALIGNOF __alignof
-#endif
-#else
-#define JSONCONS_ALIGNOF alignof
 #endif
 
 #define JSONCONS_DEFINE_LITERAL( name, lit ) \

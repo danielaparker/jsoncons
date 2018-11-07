@@ -10,8 +10,6 @@
 #include <ctime>
 #include <map>
 
-#if defined(JSONCONS_HAS_USER_DEFINED_LITERALS)
-
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
@@ -90,6 +88,4 @@ TEST_CASE("ojson_literal_operator_test2")
     CHECK(j[L"Currency"] == L"USD");
 
 }
-
-#endif
 

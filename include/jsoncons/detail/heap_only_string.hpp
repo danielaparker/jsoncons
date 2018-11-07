@@ -109,7 +109,7 @@ public:
         heap_only_string<CharT,Allocator> data;
         char_type c[1];
     };
-    typedef typename std::aligned_storage<sizeof(string_storage), JSONCONS_ALIGNOF(string_storage)>::type storage_type;
+    typedef typename std::aligned_storage<sizeof(string_storage), alignof(string_storage)>::type storage_type;
 
     static size_t aligned_size(size_t n)
     {

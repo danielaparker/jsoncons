@@ -675,7 +675,7 @@ public:
 
     private:
         static const size_t data_size = static_max<sizeof(uint64_data),sizeof(double_data),sizeof(short_string_data), sizeof(long_string_data), sizeof(array_data), sizeof(object_data)>::value;
-        static const size_t data_align = static_max<JSONCONS_ALIGNOF(uint64_data),JSONCONS_ALIGNOF(double_data),JSONCONS_ALIGNOF(short_string_data),JSONCONS_ALIGNOF(long_string_data),JSONCONS_ALIGNOF(array_data),JSONCONS_ALIGNOF(object_data)>::value;
+        static const size_t data_align = static_max<alignof(uint64_data),alignof(double_data),alignof(short_string_data),alignof(long_string_data),alignof(array_data),alignof(object_data)>::value;
 
         typedef typename std::aligned_storage<data_size,data_align>::type data_t;
 
@@ -4520,7 +4520,6 @@ typedef json_decoder<ojson> ojson_deserializer;
 typedef json_decoder<wojson> wojson_deserializer;
 #endif
 
-#if defined(JSONCONS_HAS_USER_DEFINED_LITERALS)
 namespace literals {
 
 inline 
@@ -4548,7 +4547,6 @@ jsoncons::wojson operator "" _ojson(const wchar_t* s, std::size_t n)
 }
 
 }
-#endif
 
 }
 
