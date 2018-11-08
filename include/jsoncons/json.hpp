@@ -8,7 +8,7 @@
 #define JSONCONS_JSON_HPP
 
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/json_convert_traits.hpp>
+#include <jsoncons/conversion.hpp>
 
 #endif
 

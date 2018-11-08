@@ -226,6 +226,7 @@ struct is_vector_like : std::false_type {};
 template <class T>
 struct is_vector_like<T, 
                       typename std::enable_if<!std::is_void<typename T::value_type>::value &&
+                                              !std::is_void<typename std::iterator_traits<typename T::iterator>::value_type>::value &&
                                               !is_array_like<T>::value && 
                                               !has_char_traits_member_type<T>::value && 
                                               !is_map_like<T>::value 

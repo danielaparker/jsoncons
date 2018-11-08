@@ -2,6 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/staj_iterator.hpp>
 #include <jsoncons/json.hpp>
 #include <string>
 #include <sstream>

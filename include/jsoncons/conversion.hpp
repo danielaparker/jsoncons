@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_CONVERT_TRAITS_HPP
-#define JSONCONS_JSON_CONVERT_TRAITS_HPP
+#ifndef JSONCONS_CONVERSION_HPP
+#define JSONCONS_CONVERSION_HPP
 
 #include <iostream>
 #include <string>
@@ -14,11 +14,13 @@
 #include <type_traits>
 #include <memory>
 #include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_decoder.hpp>
+#include <jsoncons/basic_json.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/staj_reader.hpp>
 
 namespace jsoncons {
 
@@ -28,21 +30,11 @@ template <class T, class Enable = void>
 struct json_convert_traits
 {
     template <class CharT>
-    static T decode(basic_staj_reader<CharT>& reader)
-    {
-        json_decoder<basic_json<CharT>> decoder;
-        reader.accept(decoder);
-        return decoder.get_result().template as<T>();
-    }
+    static T decode(basic_staj_reader<CharT>& reader);
 
     template <class CharT>
-    static void encode(const T& val, basic_json_content_handler<CharT>& serializer)
-    {
-        auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
-        j.dump(serializer);
-    }
+    static void encode(const T& val, basic_json_content_handler<CharT>& serializer);
 };
-
 // json_convert_traits specializations
 
 // vector like
@@ -52,34 +44,15 @@ struct json_convert_traits<T,
     typename std::enable_if<detail::is_vector_like<T>::value
 >::type>
 {
-    typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
+    //typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
+    typedef typename T::value_type value_type;
 
     template <class CharT>
-    static T decode(basic_staj_reader<CharT>& reader)
-    {
-        T v;
-        basic_staj_array_iterator<CharT,value_type> it(reader);
-
-        for (const auto& item : it)
-        {
-            v.push_back(item);
-        }
-        return v;
-    }
+    static T decode(basic_staj_reader<CharT>& reader);
 
     template <class CharT>
-    static void encode(const T& val, basic_json_content_handler<CharT>& serializer)
-    {
-        serializer.begin_array();
-        for (auto it = std::begin(val); it != std::end(val); ++it)
-        {
-            json_convert_traits<value_type>::encode(*it,serializer);
-        }
-        serializer.end_array();
-        serializer.flush();
-    }
+    static void encode(const T& val, basic_json_content_handler<CharT>& serializer);
 };
-
 // std::array
 
 template <class T, size_t N>
@@ -88,40 +61,13 @@ struct json_convert_traits<std::array<T,N>>
     typedef typename std::array<T,N>::value_type value_type;
 
     template <class CharT>
-    static std::array<T, N> decode(basic_staj_reader<CharT>& reader)
-    {
-        std::array<T,N> v;
-        basic_staj_array_iterator<CharT,value_type> it(reader);
-
-        size_t i = 0;
-        for (const auto& item : it)
-        {
-            if (i < N)
-            {
-                v[i++] = item;
-            }
-        }
-        return v;
-    }
+    static std::array<T, N> decode(basic_staj_reader<CharT>& reader);
 
     template <class CharT>
-    static void encode(const std::array<T, N>& val, std::basic_string<CharT>& s)
-    {
-        basic_json_serializer<CharT,detail::string_writer<std::basic_string<CharT>>> serializer(s);
-        encode(val,serializer);
-    }
+    static void encode(const std::array<T, N>& val, std::basic_string<CharT>& s);
 
     template <class CharT>
-    static void encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& serializer)
-    {
-        serializer.begin_array();
-        for (auto it = std::begin(val); it != std::end(val); ++it)
-        {
-            json_convert_traits<value_type>::encode(*it,serializer);
-        }
-        serializer.end_array();
-        serializer.flush();
-    }
+    static void encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& serializer);
 };
 
 // map like
@@ -136,32 +82,11 @@ struct json_convert_traits<T,
     typedef typename T::key_type key_type;
 
     template <class CharT>
-    static T decode(basic_staj_reader<CharT>& reader)
-    {
-        T m;
-        basic_staj_object_iterator<CharT,mapped_type> it(reader);
-
-        for (const auto& kv : it)
-        {
-            m.emplace(kv.first,kv.second);
-        }
-        return m;
-    }
+    static T decode(basic_staj_reader<CharT>& reader);
 
     template <class CharT>
-    static void encode(const T& val, basic_json_content_handler<CharT>& serializer)
-    {
-        serializer.begin_object();
-        for (auto it = std::begin(val); it != std::end(val); ++it)
-        {
-            serializer.name(it->first);
-            json_convert_traits<mapped_type>::encode(it->second,serializer);
-        }
-        serializer.end_object();
-        serializer.flush();
-    }
+    static void encode(const T& val, basic_json_content_handler<CharT>& serializer);
 };
-
 // std::tuple
 
 namespace detail { namespace streaming {
@@ -199,21 +124,160 @@ private:
 public:
 
     template <class CharT>
-    static std::tuple<E...> decode(basic_staj_reader<CharT>& reader)
-    {
-        json_decoder<basic_json<CharT>> decoder;
-        reader.accept(decoder);
-        return decoder.get_result().template as<std::tuple<E...>>();
-    }
+    static std::tuple<E...> decode(basic_staj_reader<CharT>& reader);
 
     template <class CharT>
-    static void encode(const std::tuple<E...>& val, basic_json_content_handler<CharT>& serializer)
-    {
-        serializer.begin_array();
-        helper::encode(val, serializer);
-        serializer.end_array();
-    }
+    static void encode(const std::tuple<E...>& val, basic_json_content_handler<CharT>& serializer);
 };
+
+}
+
+#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/staj_iterator.hpp>
+
+namespace jsoncons {
+
+
+// Implementation
+
+template <class T, class Enable>
+template <class CharT>
+static T json_convert_traits<T,Enable>::decode(basic_staj_reader<CharT>& reader)
+{
+    json_decoder<basic_json<CharT>> decoder;
+    reader.accept(decoder);
+    return decoder.get_result().template as<T>();
+}
+
+template <class T, class Enable>
+template <class CharT>
+static void json_convert_traits<T,Enable>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
+{
+    auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
+    j.dump(serializer);
+}
+
+// json_convert_traits specializations
+
+// vector like
+
+template <class T>
+template <class CharT>
+static T json_convert_traits<T,typename std::enable_if<detail::is_vector_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader)
+{
+    T v;
+    basic_staj_array_iterator<CharT,value_type> it(reader);
+
+    for (const auto& item : it)
+    {
+        v.push_back(item);
+    }
+    return v;
+}
+
+template <class T>
+template <class CharT>
+static void json_convert_traits<T,typename std::enable_if<detail::is_vector_like<T>::value>::type>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
+{
+    serializer.begin_array();
+    for (auto it = std::begin(val); it != std::end(val); ++it)
+    {
+        json_convert_traits<value_type>::encode(*it,serializer);
+    }
+    serializer.end_array();
+    serializer.flush();
+}
+
+// std::array
+
+template <class T, size_t N>
+template <class CharT>
+static std::array<T, N> json_convert_traits<std::array<T,N>>::decode(basic_staj_reader<CharT>& reader)
+{
+    std::array<T,N> v;
+    basic_staj_array_iterator<CharT,value_type> it(reader);
+
+    size_t i = 0;
+    for (const auto& item : it)
+    {
+        if (i < N)
+        {
+            v[i++] = item;
+        }
+    }
+    return v;
+}
+
+template <class T, size_t N>
+template <class CharT>
+static void json_convert_traits<std::array<T,N>>::encode(const std::array<T, N>& val, std::basic_string<CharT>& s)
+{
+    basic_json_serializer<CharT,detail::string_writer<std::basic_string<CharT>>> serializer(s);
+    encode(val,serializer);
+}
+
+template <class T, size_t N>
+template <class CharT>
+static void json_convert_traits<std::array<T,N>>::encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& serializer)
+{
+    serializer.begin_array();
+    for (auto it = std::begin(val); it != std::end(val); ++it)
+    {
+        json_convert_traits<value_type>::encode(*it,serializer);
+    }
+    serializer.end_array();
+    serializer.flush();
+}
+
+
+
+// map like
+
+template <class T>
+template <class CharT>
+static T json_convert_traits<T,typename std::enable_if<detail::is_map_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader)
+{
+    T m;
+    basic_staj_object_iterator<CharT,mapped_type> it(reader);
+
+    for (const auto& kv : it)
+    {
+        m.emplace(kv.first,kv.second);
+    }
+    return m;
+}
+
+template <class T>
+template <class CharT>
+static void json_convert_traits<T,typename std::enable_if<detail::is_map_like<T>::value>::type>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
+{
+    serializer.begin_object();
+    for (auto it = std::begin(val); it != std::end(val); ++it)
+    {
+        serializer.name(it->first);
+        json_convert_traits<mapped_type>::encode(it->second,serializer);
+    }
+    serializer.end_object();
+    serializer.flush();
+}
+
+template<typename... E>
+template <class CharT>
+static std::tuple<E...> json_convert_traits<std::tuple<E...>>::decode(basic_staj_reader<CharT>& reader)
+{
+    json_decoder<basic_json<CharT>> decoder;
+    reader.accept(decoder);
+    return decoder.get_result().template as<std::tuple<E...>>();
+}
+
+template<typename... E>
+template <class CharT>
+static void json_convert_traits<std::tuple<E...>>::encode(const std::tuple<E...>& val, basic_json_content_handler<CharT>& serializer)
+{
+    serializer.begin_array();
+    helper::encode(val, serializer);
+    serializer.end_array();
+}
 
 // decode_json
 
