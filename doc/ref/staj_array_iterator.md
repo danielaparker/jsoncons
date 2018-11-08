@@ -7,7 +7,7 @@ using staj_array_iterator = basic_staj_array_iterator<char,T>;
 
 #### Header
 ```c++
-#include <jsoncons/staj_reader.hpp>
+#include <jsoncons/staj_iterator.hpp>
 ```
 
 A `staj_array_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that
