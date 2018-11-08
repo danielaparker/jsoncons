@@ -314,7 +314,7 @@ void basic_staj_array_iterator<CharT,T>::next()
         reader_->next();
         if (!done())
         {
-            value_ = json_convert_traits<T>::decode(*reader_);
+            value_ = conversion_traits<T>::decode(*reader_);
         }
     }
 }
@@ -331,7 +331,7 @@ void basic_staj_array_iterator<CharT,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            value_ = json_convert_traits<T>::decode(*reader_);
+            value_ = conversion_traits<T>::decode(*reader_,ec);
         }
     }
 }
@@ -347,7 +347,7 @@ void basic_staj_object_iterator<CharT,T>::next()
         reader_->next();
         if (!done())
         {
-            kv_.second = json_convert_traits<T>::decode(*reader_);
+            kv_.second = conversion_traits<T>::decode(*reader_);
         }
     }
 }
@@ -371,7 +371,7 @@ void basic_staj_object_iterator<CharT,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            kv_.second = json_convert_traits<T>::decode(*reader_);
+            kv_.second = conversion_traits<T>::decode(*reader_,ec);
         }
     }
 }

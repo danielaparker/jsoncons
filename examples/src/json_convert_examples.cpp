@@ -66,7 +66,7 @@ namespace jsoncons
     }
 
     template <>
-    struct json_convert_traits<std::shared_ptr<Employee>>
+    struct conversion_traits<std::shared_ptr<Employee>>
     {
         static void encode(const std::shared_ptr<Employee>& val, json_content_handler& handler)
         {
