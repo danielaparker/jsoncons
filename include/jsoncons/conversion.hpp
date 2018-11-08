@@ -153,7 +153,7 @@ namespace jsoncons {
 
 template <class T, class Enable>
 template <class CharT>
-static T conversion_traits<T,Enable>::decode(basic_staj_reader<CharT>& reader)
+T conversion_traits<T,Enable>::decode(basic_staj_reader<CharT>& reader)
 {
     json_decoder<basic_json<CharT>> decoder;
     reader.accept(decoder);
@@ -162,7 +162,7 @@ static T conversion_traits<T,Enable>::decode(basic_staj_reader<CharT>& reader)
 
 template <class T, class Enable>
 template <class CharT>
-static T conversion_traits<T,Enable>::decode(basic_staj_reader<CharT>& reader,
+T conversion_traits<T,Enable>::decode(basic_staj_reader<CharT>& reader,
                                                std::error_code& ec)
 {
     json_decoder<basic_json<CharT>> decoder;
@@ -172,7 +172,7 @@ static T conversion_traits<T,Enable>::decode(basic_staj_reader<CharT>& reader,
 
 template <class T, class Enable>
 template <class CharT>
-static void conversion_traits<T,Enable>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
+void conversion_traits<T,Enable>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
 {
     auto j = json_type_traits<basic_json<CharT>, T>::to_json(val);
     j.dump(serializer);
@@ -184,7 +184,7 @@ static void conversion_traits<T,Enable>::encode(const T& val, basic_json_content
 
 template <class T>
 template <class CharT>
-static T conversion_traits<T,typename std::enable_if<detail::is_vector_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader)
+T conversion_traits<T,typename std::enable_if<detail::is_vector_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader)
 {
     T v;
     basic_staj_array_iterator<CharT,value_type> it(reader);
@@ -198,7 +198,7 @@ static T conversion_traits<T,typename std::enable_if<detail::is_vector_like<T>::
 
 template <class T>
 template <class CharT>
-static T conversion_traits<T,typename std::enable_if<detail::is_vector_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader,
+T conversion_traits<T,typename std::enable_if<detail::is_vector_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader,
                                                                                                         std::error_code& ec)
 {
     T v;
@@ -215,7 +215,7 @@ static T conversion_traits<T,typename std::enable_if<detail::is_vector_like<T>::
 
 template <class T>
 template <class CharT>
-static void conversion_traits<T,typename std::enable_if<detail::is_vector_like<T>::value>::type>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
+void conversion_traits<T,typename std::enable_if<detail::is_vector_like<T>::value>::type>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
 {
     serializer.begin_array();
     for (auto it = std::begin(val); it != std::end(val); ++it)
@@ -230,7 +230,7 @@ static void conversion_traits<T,typename std::enable_if<detail::is_vector_like<T
 
 template <class T, size_t N>
 template <class CharT>
-static std::array<T, N> conversion_traits<std::array<T,N>>::decode(basic_staj_reader<CharT>& reader)
+std::array<T, N> conversion_traits<std::array<T,N>>::decode(basic_staj_reader<CharT>& reader)
 {
     std::array<T,N> v;
     basic_staj_array_iterator<CharT,value_type> it(reader);
@@ -248,7 +248,7 @@ static std::array<T, N> conversion_traits<std::array<T,N>>::decode(basic_staj_re
 
 template <class T, size_t N>
 template <class CharT>
-static std::array<T, N> conversion_traits<std::array<T,N>>::decode(basic_staj_reader<CharT>& reader,
+std::array<T, N> conversion_traits<std::array<T,N>>::decode(basic_staj_reader<CharT>& reader,
                                                                      std::error_code& ec)
 {
     std::array<T,N> v;
@@ -265,7 +265,7 @@ static std::array<T, N> conversion_traits<std::array<T,N>>::decode(basic_staj_re
 
 template <class T, size_t N>
 template <class CharT>
-static void conversion_traits<std::array<T,N>>::encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& serializer)
+void conversion_traits<std::array<T,N>>::encode(const std::array<T, N>& val, basic_json_content_handler<CharT>& serializer)
 {
     serializer.begin_array();
     for (auto it = std::begin(val); it != std::end(val); ++it)
@@ -282,7 +282,7 @@ static void conversion_traits<std::array<T,N>>::encode(const std::array<T, N>& v
 
 template <class T>
 template <class CharT>
-static T conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader)
+T conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader)
 {
     T m;
     basic_staj_object_iterator<CharT,mapped_type> it(reader);
@@ -296,7 +296,7 @@ static T conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::val
 
 template <class T>
 template <class CharT>
-static T conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader,
+T conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::value>::type>::decode(basic_staj_reader<CharT>& reader,
                                                                                                      std::error_code& ec)
 {
     T m;
@@ -313,7 +313,7 @@ static T conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::val
 
 template <class T>
 template <class CharT>
-static void conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::value>::type>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
+void conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::value>::type>::encode(const T& val, basic_json_content_handler<CharT>& serializer)
 {
     serializer.begin_object();
     for (auto it = std::begin(val); it != std::end(val); ++it)
@@ -327,7 +327,7 @@ static void conversion_traits<T,typename std::enable_if<detail::is_map_like<T>::
 
 template<typename... E>
 template <class CharT>
-static std::tuple<E...> conversion_traits<std::tuple<E...>>::decode(basic_staj_reader<CharT>& reader)
+std::tuple<E...> conversion_traits<std::tuple<E...>>::decode(basic_staj_reader<CharT>& reader)
 {
     json_decoder<basic_json<CharT>> decoder;
     reader.accept(decoder);
@@ -336,7 +336,7 @@ static std::tuple<E...> conversion_traits<std::tuple<E...>>::decode(basic_staj_r
 
 template<typename... E>
 template <class CharT>
-static std::tuple<E...> conversion_traits<std::tuple<E...>>::decode(basic_staj_reader<CharT>& reader,
+std::tuple<E...> conversion_traits<std::tuple<E...>>::decode(basic_staj_reader<CharT>& reader,
                                                                       std::error_code& ec)
 {
     json_decoder<basic_json<CharT>> decoder;
@@ -346,7 +346,7 @@ static std::tuple<E...> conversion_traits<std::tuple<E...>>::decode(basic_staj_r
 
 template<typename... E>
 template <class CharT>
-static void conversion_traits<std::tuple<E...>>::encode(const std::tuple<E...>& val, basic_json_content_handler<CharT>& serializer)
+void conversion_traits<std::tuple<E...>>::encode(const std::tuple<E...>& val, basic_json_content_handler<CharT>& serializer)
 {
     serializer.begin_array();
     helper::encode(val, serializer);
