@@ -28,11 +28,11 @@ template <class T, class Enable = void>
 struct json_convert_traits
 {
     template <class CharT>
-    static T decode(std::basic_istringstream<CharT>& is,
-                    const basic_json_serializing_options<CharT>& options)
+    static T decode(basic_staj_reader<CharT>& reader)
     {
-        basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-        return j.template as<T>();
+        json_decoder<basic_json<CharT>> decoder;
+        reader.accept(decoder);
+        return decoder.get_result().template as<T>();
     }
 
     template <class CharT>
@@ -55,11 +55,9 @@ struct json_convert_traits<T,
     typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
 
     template <class CharT>
-    static T decode(std::basic_istringstream<CharT>& is,
-                    const basic_json_serializing_options<CharT>& options)
+    static T decode(basic_staj_reader<CharT>& reader)
     {
         T v;
-        basic_json_stream_reader<CharT> reader(is, options);
         basic_staj_array_iterator<CharT,value_type> it(reader);
 
         for (const auto& item : it)
@@ -90,11 +88,20 @@ struct json_convert_traits<std::array<T,N>>
     typedef typename std::array<T,N>::value_type value_type;
 
     template <class CharT>
-    static std::array<T, N> decode(std::basic_istringstream<CharT>& is,
-                                   const basic_json_serializing_options<CharT>& options)
+    static std::array<T, N> decode(basic_staj_reader<CharT>& reader)
     {
-        basic_json<CharT> j = basic_json<CharT>::parse(is,options);
-        return j.template as<std::array<T, N>>();
+        std::array<T,N> v;
+        basic_staj_array_iterator<CharT,value_type> it(reader);
+
+        size_t i = 0;
+        for (const auto& item : it)
+        {
+            if (i < N)
+            {
+                v[i++] = item;
+            }
+        }
+        return v;
     }
 
     template <class CharT>
@@ -129,11 +136,9 @@ struct json_convert_traits<T,
     typedef typename T::key_type key_type;
 
     template <class CharT>
-    static T decode(std::basic_istringstream<CharT>& is,
-                    const basic_json_serializing_options<CharT>& options)
+    static T decode(basic_staj_reader<CharT>& reader)
     {
         T m;
-        basic_json_stream_reader<CharT> reader(is, options);
         basic_staj_object_iterator<CharT,mapped_type> it(reader);
 
         for (const auto& kv : it)
@@ -194,11 +199,11 @@ private:
 public:
 
     template <class CharT>
-    static std::tuple<E...> decode(std::basic_istringstream<CharT>& is,
-                                   const basic_json_serializing_options<CharT>& options)
+    static std::tuple<E...> decode(basic_staj_reader<CharT>& reader)
     {
-        basic_json<CharT> j = basic_json<CharT>::parse(is, options);
-        return j.template as<std::tuple<E...>>();
+        json_decoder<basic_json<CharT>> decoder;
+        reader.accept(decoder);
+        return decoder.get_result().template as<std::tuple<E...>>();
     }
 
     template <class CharT>
@@ -216,7 +221,8 @@ template <class T, class CharT>
 T decode_json(const std::basic_string<CharT>& s)
 {
     std::basic_istringstream<CharT> is(s);
-    return json_convert_traits<T>::decode(is, basic_json_serializing_options<CharT>());
+    basic_json_stream_reader<CharT> reader(is);
+    return json_convert_traits<T>::decode(reader);
 }
 
 template <class T, class CharT>
@@ -224,20 +230,23 @@ T decode_json(const std::basic_string<CharT>& s,
               const basic_json_serializing_options<CharT>& options)
 {
     std::basic_istringstream<CharT> is(s);
-    return json_convert_traits<T>::decode(is, options);
+    basic_json_stream_reader<CharT> reader(is, options);
+    return json_convert_traits<T>::decode(reader);
 }
 
 template <class T, class CharT>
 T decode_json(std::basic_istringstream<CharT>& is)
 {
-    return json_convert_traits<T>::decode(is, basic_json_serializing_options<CharT>());
+    basic_json_stream_reader<CharT> reader(is);
+    return json_convert_traits<T>::decode(reader);
 }
 
 template <class T, class CharT>
 T decode_json(std::basic_istringstream<CharT>& is,
               const basic_json_serializing_options<CharT>& options)
 {
-    return json_convert_traits<T>::decode(is, options);
+    basic_json_stream_reader<CharT> reader(is, options);
+    return json_convert_traits<T>::decode(reader);
 }
 
 // encode_json
