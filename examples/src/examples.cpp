@@ -29,7 +29,6 @@ void msgpack_examples();
 void jsonpointer_examples();
 void jsonpatch_examples();
 void cbor_examples();
-void json_convert_examples();
 void json_parser_examples();
 void byte_string_examples();
 void pull_parser_examples();
@@ -542,8 +541,6 @@ int main()
         cbor_examples();
 
         csv_examples();
-
-        json_convert_examples();
 
         max_nesting_path_example();
 

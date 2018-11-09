@@ -302,7 +302,7 @@ typedef basic_staj_filter<wchar_t> wstream_filter;
 
 }
 
-#include <jsoncons/conversion.hpp>
+#include <jsoncons/conversion_traits.hpp>
 
 namespace jsoncons {
 
@@ -314,7 +314,7 @@ void basic_staj_array_iterator<CharT,T>::next()
         reader_->next();
         if (!done())
         {
-            value_ = conversion_traits<T>::decode(*reader_);
+            decode_stream(*reader_, value_);
         }
     }
 }
@@ -331,7 +331,7 @@ void basic_staj_array_iterator<CharT,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            value_ = conversion_traits<T>::decode(*reader_,ec);
+            decode_stream(*reader_, value_, ec);
         }
     }
 }
@@ -347,7 +347,7 @@ void basic_staj_object_iterator<CharT,T>::next()
         reader_->next();
         if (!done())
         {
-            kv_.second = conversion_traits<T>::decode(*reader_);
+            decode_stream(*reader_, kv_.second);
         }
     }
 }
@@ -371,7 +371,7 @@ void basic_staj_object_iterator<CharT,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            kv_.second = conversion_traits<T>::decode(*reader_,ec);
+             decode_stream(*reader_, kv_.second, ec);
         }
     }
 }
