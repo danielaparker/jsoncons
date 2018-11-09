@@ -19,6 +19,9 @@ Enhancements
 - csv_parser `ignore_empty_values` option now applies to
   `m_columns` style json output.
 
+- json_reader and json_staj_reader can be initialized with strings 
+  in addition to streams.
+
 Extension of semantic tags to other values
 
     - The `json_content_handler` functions `do_null_value`, `do_bool_value`,

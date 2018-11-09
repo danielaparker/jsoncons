@@ -43,7 +43,12 @@ class basic_null_istream : public std::basic_istream<CharT>
     class null_buffer : public std::basic_streambuf<CharT>
     {
     public:
-        int overflow(int c) {return c;}
+        using typename std::basic_streambuf<CharT>::int_type;
+        using typename std::basic_streambuf<CharT>::traits_type;
+        int_type overflow( int_type ch = Traits::eof() ) override
+        {
+            return ch;
+        }
     } nb_;
 public:
     basic_null_istream()
