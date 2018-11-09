@@ -52,14 +52,6 @@ template <class T, class Enable = void>
 struct conversion_traits
 {
     template <class CharT>
-    static T decode(basic_staj_reader<CharT>& reader)
-    {
-        json_decoder<basic_json<CharT>> decoder;
-        reader.accept(decoder);
-        return decoder.get_result().template as<T>();
-    }
-
-    template <class CharT>
     static T decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
     {
         json_decoder<basic_json<CharT>> decoder;
@@ -85,19 +77,6 @@ struct conversion_traits<T,
 >::type>
 {
     typedef typename T::value_type value_type;
-
-    template <class CharT>
-    static T decode(basic_staj_reader<CharT>& reader)
-    {
-        T v;
-        basic_staj_array_iterator<CharT,value_type> it(reader);
-
-        for (const auto& item : it)
-        {
-            v.push_back(item);
-        }
-        return v;
-    }
 
     template <class CharT>
     static T decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
@@ -132,23 +111,6 @@ template <class T, size_t N>
 struct conversion_traits<std::array<T,N>>
 {
     typedef typename std::array<T,N>::value_type value_type;
-
-    template <class CharT>
-    static std::array<T, N> decode(basic_staj_reader<CharT>& reader)
-    {
-        std::array<T,N> v;
-        basic_staj_array_iterator<CharT,value_type> it(reader);
-
-        size_t i = 0;
-        for (const auto& item : it)
-        {
-            if (i < N)
-            {
-                v[i++] = item;
-            }
-        }
-        return v;
-    }
 
     template <class CharT>
     static std::array<T, N> decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
@@ -191,19 +153,6 @@ struct conversion_traits<T,
     typedef typename T::key_type key_type;
 
     template <class CharT>
-    static T decode(basic_staj_reader<CharT>& reader)
-    {
-        T m;
-        basic_staj_object_iterator<CharT,mapped_type> it(reader);
-
-        for (const auto& kv : it)
-        {
-            m.emplace(kv.first,kv.second);
-        }
-        return m;
-    }
-
-    template <class CharT>
     static T decode(basic_staj_reader<CharT>& reader, std::error_code& ec)
     {
         
@@ -242,7 +191,7 @@ void decode_stream(basic_staj_reader<CharT>& reader, T& val, std::error_code& ec
 template <class CharT, class T>
 void encode_stream(const T&val, basic_json_content_handler<CharT>& writer)
 {
-    conversion_traits<T>::encode(writer);
+    conversion_traits<T>::encode(val, writer);
 }
 
 }
