@@ -162,7 +162,7 @@ class basic_json_staj_reader : public basic_staj_reader<CharT>, private virtual 
     basic_json_staj_reader& operator=(const basic_json_staj_reader&) = delete;
 
 public:
-    using json_content_handler::string_view_type;
+    typedef basic_string_view<CharT> string_view_type;
 
     // Constructors with stream input that throw parse exceptions
     basic_json_staj_reader(std::basic_istream<CharT>& is)
