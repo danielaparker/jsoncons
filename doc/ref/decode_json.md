@@ -16,10 +16,10 @@ T decode_json(const std::basic_string<CharT>& s,
               const basic_json_serializing_options<CharT>& options); // (2)
 
 template <class T, class CharT>
-T decode_json(std::basic_istringstream<CharT>& is); // (3)
+T decode_json(std::basic_istream<CharT>& is); // (3)
 
 template <class T, class CharT>
-T decode_json(std::basic_istringstream<CharT>& is,
+T decode_json(std::basic_istream<CharT>& is,
               const basic_json_serializing_options<CharT>& options); // (4)
 ```
 
