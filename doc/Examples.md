@@ -395,7 +395,7 @@ Haruki Murakami
 Graham Greene
 ```
 
-See [json_staj_reader](doc/ref/json_stream_reader.md) 
+See [json_staj_reader](doc/ref/json_staj_reader.md) 
 
 ### Serializing
 

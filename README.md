@@ -16,7 +16,7 @@ Compared to other JSON libraries, jsoncons has been designed to handle very larg
 SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
 Its unpacked in-memory representation of JSON is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md),
+allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_staj_reader.md),
 built on top of its incremental parser.  
 
 The jsoncons [data model](doc/ref/data-model.md) extends the familiar JSON types - nulls,
@@ -671,7 +671,7 @@ Haruki Murakami
 Graham Greene
 ```
 
-See [json_staj_reader](doc/ref/json_stream_reader.md) 
+See [json_staj_reader](doc/ref/json_staj_reader.md) 
 
 ### Iterate over a json stream with staj iterators
 

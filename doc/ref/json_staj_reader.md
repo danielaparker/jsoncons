@@ -12,7 +12,7 @@ function to advance to the next event, until `done()` returns `true`.
 
 #### Header
 ```c++
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 ```
 
 ### Implemented interfaces
@@ -235,7 +235,7 @@ The example JSON text, `book_catalog.json`, is used by the examples below.
 #### Reading a JSON stream
 
 ```c++
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 #include <string>
 #include <fstream>
 
@@ -334,7 +334,7 @@ end_array
 #### Filtering a JSON stream
 
 ```c++
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 #include <string>
 #include <fstream>
 
