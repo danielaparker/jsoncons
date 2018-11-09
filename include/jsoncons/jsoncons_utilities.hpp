@@ -45,7 +45,7 @@ class basic_null_istream : public std::basic_istream<CharT>
     public:
         using typename std::basic_streambuf<CharT>::int_type;
         using typename std::basic_streambuf<CharT>::traits_type;
-        int_type overflow( int_type ch = Traits::eof() ) override
+        int_type overflow( int_type ch = traits_type::eof() ) override
         {
             return ch;
         }
