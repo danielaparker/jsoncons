@@ -40,7 +40,7 @@ namespace jsoncons
 template <class CharT>
 class basic_null_istream : public std::basic_istream<CharT>
 {
-    class null_buffer : public std::streambuf
+    class null_buffer : public std::basic_streambuf<CharT>
     {
     public:
         int overflow(int c) {return c;}
