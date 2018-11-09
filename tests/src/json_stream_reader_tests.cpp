@@ -4,7 +4,7 @@
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -12,12 +12,12 @@
 
 using namespace jsoncons;
 
-TEST_CASE("json_stream_reader string_value test")
+TEST_CASE("json_staj_reader string_value test")
 {
     std::string s = R"("Tom")";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::string_value);
@@ -27,12 +27,12 @@ TEST_CASE("json_stream_reader string_value test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader string_value as<int> test")
+TEST_CASE("json_staj_reader string_value as<int> test")
 {
     std::string s = R"("-100")";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::string_value);
@@ -41,12 +41,12 @@ TEST_CASE("json_stream_reader string_value as<int> test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader string_value as<unsigned> test")
+TEST_CASE("json_staj_reader string_value as<unsigned> test")
 {
     std::string s = R"("100")";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::string_value);
@@ -56,12 +56,12 @@ TEST_CASE("json_stream_reader string_value as<unsigned> test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader null_value test")
+TEST_CASE("json_staj_reader null_value test")
 {
     std::string s = "null";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::null_value);
@@ -69,12 +69,12 @@ TEST_CASE("json_stream_reader null_value test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader bool_value test")
+TEST_CASE("json_staj_reader bool_value test")
 {
     std::string s = "false";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::bool_value);
@@ -82,12 +82,12 @@ TEST_CASE("json_stream_reader bool_value test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader int64_value test")
+TEST_CASE("json_staj_reader int64_value test")
 {
     std::string s = "-100";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::int64_value);
@@ -96,12 +96,12 @@ TEST_CASE("json_stream_reader int64_value test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader uint64_value test")
+TEST_CASE("json_staj_reader uint64_value test")
 {
     std::string s = "100";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::uint64_value);
@@ -111,12 +111,12 @@ TEST_CASE("json_stream_reader uint64_value test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader string_value as bignum test")
+TEST_CASE("json_staj_reader string_value as bignum test")
 {
     std::string s = "-18446744073709551617";
     std::istringstream is("\""+s+"\"");
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::string_value);
@@ -127,12 +127,12 @@ TEST_CASE("json_stream_reader string_value as bignum test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader bignum_value as bignum")
+TEST_CASE("json_staj_reader bignum_value as bignum")
 {
     std::string s = "-18446744073709551617";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::string_value);
@@ -143,12 +143,12 @@ TEST_CASE("json_stream_reader bignum_value as bignum")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader double_value test")
+TEST_CASE("json_staj_reader double_value test")
 {
     std::string s = "100.0";
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::double_value);
@@ -156,7 +156,7 @@ TEST_CASE("json_stream_reader double_value test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader array_value test")
+TEST_CASE("json_staj_reader array_value test")
 {
     std::string s = R"(
     [
@@ -182,7 +182,7 @@ TEST_CASE("json_stream_reader array_value test")
 
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::begin_array);
@@ -283,7 +283,7 @@ TEST_CASE("json_stream_reader array_value test")
     CHECK(reader.done());
 }
 
-TEST_CASE("json_stream_reader object_value test")
+TEST_CASE("json_staj_reader object_value test")
 {
     std::string s = R"(
         {
@@ -296,7 +296,7 @@ TEST_CASE("json_stream_reader object_value test")
 
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     REQUIRE_FALSE(reader.done());
     CHECK(reader.current().event_type() == staj_event_type::begin_object);

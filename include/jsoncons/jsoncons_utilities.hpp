@@ -37,6 +37,21 @@
 namespace jsoncons
 {
 
+template <class CharT>
+class basic_null_istream : public std::basic_istream<CharT>
+{
+    class null_buffer : public std::streambuf
+    {
+    public:
+        int overflow(int c) {return c;}
+    } nb_;
+public:
+    basic_null_istream()
+      : std::basic_istream<CharT>(&nb_)
+    {
+    }
+};
+
 #if !defined(JSONCONS_HAS_STRING_VIEW)
 template <class CharT, class Traits = std::char_traits<CharT>>
 class Basic_string_view_

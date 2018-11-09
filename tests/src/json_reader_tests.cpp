@@ -184,6 +184,43 @@ TEST_CASE("test_read_multiple")
     CHECK(reader.eof());
 }
 
+TEST_CASE("json_reader read from string test")
+{
+    std::string s = R"(
+{
+  "store": {
+    "book": [
+      {
+        "category": "reference",
+        "author": "Margaret Weis",
+        "title": "Dragonlance Series",
+        "price": 31.96
+      },
+      {
+        "category": "reference",
+        "author": "Brent Weeks",
+        "title": "Night Angel Trilogy",
+        "price": 14.70
+      }
+    ]
+  }
+}
+)";
+
+    json_decoder<json> decoder;
+    json_reader reader(s, decoder);
+    reader.read();
+    json j = decoder.get_result();
+
+    REQUIRE(j.is_object());
+    REQUIRE(j.size() == 1);
+    REQUIRE(j[0].is_object());
+    REQUIRE(j[0].size() == 1);
+    REQUIRE(j[0][0].is_array());
+    REQUIRE(j[0][0].size() == 2);
+    CHECK(j[0][0][0]["category"].as<std::string>() == std::string("reference"));
+    CHECK(j[0][0][1]["author"].as<std::string>() == std::string("Brent Weeks"));
+}
 
 
 

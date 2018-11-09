@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 #include <jsoncons/staj_iterator.hpp>
 #include <jsoncons/json.hpp>
 #include <string>
@@ -43,7 +43,7 @@ void staj_array_iterator_example()
 {
     std::istringstream is(array_example);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     staj_array_iterator<json> it(reader);
 
@@ -93,7 +93,7 @@ void staj_array_iterator_example2()
 {
     std::istringstream is(array_example);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     staj_array_iterator<employee> it(reader);
 
@@ -109,7 +109,7 @@ void staj_object_iterator_example()
 
     std::istringstream is(object_example);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     staj_object_iterator<json> it(reader);
 

@@ -44,7 +44,6 @@ which omits the check for unconsumed non-whitespace characters.
                 const json_read_options& options,
                 parse_error_handler& err_handler); // (8)
 
-
 Constructors (1)-(4) use a default [json_content_handler](json_content_handler.md) that discards the JSON parse events, and are for validation only.
 
 (1) Constructs a `json_reader` that reads from an input stream `is` of 
@@ -84,6 +83,36 @@ and a specified [parse_error_handler](parse_error_handler.md).
 emits JSON parse events to the specified [json_content_handler](json_content_handler.md) and
 uses the specified [json_read_options](json_read_options)
 and a specified [parse_error_handler](parse_error_handler.md).
+
+    json_reader(string_view_type& is); // (9)
+
+    json_reader(string_view_type& is, 
+                const json_read_options& options); // (10)
+
+    json_reader(string_view_type& is, 
+                parse_error_handler& err_handler); // (11)
+
+    json_reader(string_view_type& is, 
+                const json_read_options& options,
+                parse_error_handler& err_handler); // (12)
+
+    json_reader(string_view_type& is, 
+                basic_json_content_handler<CharT>& handler); // (13)
+
+    json_reader(string_view_type& is, 
+                json_content_handler& handler,
+                const json_read_options& options); // (14)
+
+    json_reader(string_view_type& is,
+                json_content_handler& handler,
+                parse_error_handler& err_handler); // (15)
+
+    json_reader(string_view_type& is,
+                json_content_handler& handler, 
+                const json_read_options& options,
+                parse_error_handler& err_handler); // (16)
+
+(9)-(16) Same as (8)-(16), except read from a string view instead of a stream.
 
 Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any input stream, content handler, and error handler passed in the constuctor.
 

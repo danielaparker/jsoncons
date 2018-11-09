@@ -532,7 +532,7 @@ The example JSON text, `book_catalog.json`, is used by the examples below.
 ```c++
 std::ifstream is("book_catalog.json");
 
-json_stream_reader reader(is);
+json_staj_reader reader(is);
 
 for (; !reader.done(); reader.next())
 {
@@ -652,7 +652,7 @@ public:
 std::ifstream is("book_catalog.json");
 
 author_filter filter;
-json_stream_reader reader(is, filter);
+json_staj_reader reader(is, filter);
 
 for (; !reader.done(); reader.next())
 {
@@ -671,7 +671,7 @@ Haruki Murakami
 Graham Greene
 ```
 
-See [json_stream_reader](doc/ref/json_stream_reader.md) 
+See [json_staj_reader](doc/ref/json_stream_reader.md) 
 
 ### Iterate over a json stream with staj iterators
 
@@ -695,7 +695,7 @@ int main()
 {
     std::istringstream is(example);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     staj_array_iterator<json> it(reader);
 

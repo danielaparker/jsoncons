@@ -4,7 +4,7 @@
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_stream_reader.hpp>
+#include <jsoncons/json_staj_reader.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <sstream>
 #include <vector>
@@ -40,7 +40,7 @@ TEST_CASE("array_iterator test")
 
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     staj_array_iterator<json> it(reader);
 
@@ -64,7 +64,7 @@ TEST_CASE("object_iterator test")
 
     std::istringstream is(s);
 
-    json_stream_reader reader(is);
+    json_staj_reader reader(is);
 
     staj_object_iterator<json> it(reader);
 
