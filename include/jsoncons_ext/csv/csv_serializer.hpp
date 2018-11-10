@@ -19,7 +19,6 @@
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/print_number.hpp>
-#include <jsoncons/detail/obufferedstream.hpp>
 #include <jsoncons_ext/csv/csv_serializing_options.hpp>
 #include <jsoncons/detail/writer.hpp>
 
@@ -299,10 +298,10 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type, const serializing_context& context) override
+    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type, const serializing_context& context) override
     {
         std::basic_string<CharT> s;
-        encode_base64url(data,length,s);
+        encode_base64url(b.data(),b.length(),s);
         do_string_value(s, semantic_tag_type::none, context);
         return true;
     }

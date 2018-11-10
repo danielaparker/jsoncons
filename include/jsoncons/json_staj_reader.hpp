@@ -97,7 +97,7 @@ private:
         return false;
     }
 
-    bool do_byte_string_value(const uint8_t*, size_t, 
+    bool do_byte_string_value(const byte_string_view&, 
                               semantic_tag_type,
                               const serializing_context&) override
     {

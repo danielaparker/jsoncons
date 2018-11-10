@@ -479,39 +479,39 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type, const serializing_context&) override
+    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type, const serializing_context&) override
     {
         std::vector<uint8_t> v;
 
-        if (length <= 0x17)
+        if (b.length() <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x40 + length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x40 + b.length()), v);
         }
-        else if (length <= 0xff)
+        else if (b.length() <= 0xff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0x58), v);
-            binary::to_big_endian(static_cast<uint8_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(b.length()), v);
         }
-        else if (length <= 0xffff)
+        else if (b.length() <= 0xffff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0x59), v);
-            binary::to_big_endian(static_cast<uint16_t>(length), v);
+            binary::to_big_endian(static_cast<uint16_t>(b.length()), v);
         }
-        else if (length <= 0xffffffff)
+        else if (b.length() <= 0xffffffff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0x5a), v);
-            binary::to_big_endian(static_cast<uint32_t>(length), v);
+            binary::to_big_endian(static_cast<uint32_t>(b.length()), v);
         }
-        else if (length <= 0xffffffffffffffff)
+        else if (b.length() <= 0xffffffffffffffff)
         {
             binary::to_big_endian(static_cast<uint8_t>(0x5b), v);
-            binary::to_big_endian(static_cast<uint64_t>(length),v);
+            binary::to_big_endian(static_cast<uint64_t>(b.length()),v);
         }
 
-        for (size_t i = 0; i < length; ++i)
+        for (size_t i = 0; i < b.length(); ++i)
         {
-            binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
+            v.push_back(b.data()[i]);
         }
         for (auto c : v)
         {

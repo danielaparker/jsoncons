@@ -122,7 +122,7 @@ TEST_CASE("as_string_test")
     serializer.bool_value(false);
     serializer.null_value();
     serializer.string_value("Toronto");
-    serializer.byte_string_value({'H','e','l','l','o'});
+    serializer.byte_string_value(byte_string{'H','e','l','l','o'});
     serializer.int64_value(-100);
     serializer.uint64_value(100);
     serializer.bignum_value("18446744073709551616");

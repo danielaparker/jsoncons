@@ -116,14 +116,14 @@ public:
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()) 
     {
-        return do_byte_string_value(data, length, tag, context);
+        return do_byte_string_value(byte_string_view(data, length), tag, context);
     }
 
-    bool byte_string_value(const std::vector<uint8_t>& v, 
+    bool byte_string_value(const byte_string_view& b, 
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
-        return do_byte_string_value(v.data(), v.size(), tag, context);
+        return do_byte_string_value(b, tag, context);
     }
 
     bool bignum_value(int signum, const uint8_t* data, size_t length) 
@@ -366,7 +366,7 @@ private:
 
     virtual bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) = 0;
 
-    virtual bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type tag, const serializing_context& context) = 0;
+    virtual bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag, const serializing_context& context) = 0;
 
     virtual bool do_double_value(double value, 
                                  const floating_point_options& fmt, 
@@ -429,7 +429,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t*, size_t, 
+    bool do_byte_string_value(const byte_string_view&, 
                               semantic_tag_type, 
                               const serializing_context&) override
     {

@@ -21,7 +21,7 @@ namespace readme
         writer.begin_array(); // indefinite length outer array
         writer.begin_array(3); // a fixed length array
         writer.string_value("foo");
-        writer.byte_string_value({'b','a','r'});
+        writer.byte_string_value(byte_string{'b','a','r'});
         writer.bignum_value("-18446744073709551617");
         writer.end_array();
         writer.end_array();

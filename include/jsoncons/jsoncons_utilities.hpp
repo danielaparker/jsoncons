@@ -32,7 +32,6 @@
 #if !defined(JSONCONS_NO_TO_CHARS)
 #include <charconv>
 #endif
-#include <jsoncons/detail/obufferedstream.hpp>
 
 namespace jsoncons
 {

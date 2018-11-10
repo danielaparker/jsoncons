@@ -97,10 +97,10 @@ private:
         return destination_handler_.string_value(value, tag, context);
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type tag,
+    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag,
                               const serializing_context& context) override
     {
-        return destination_handler_.byte_string_value(data, length, tag, context);
+        return destination_handler_.byte_string_value(b, tag, context);
     }
 
     bool do_double_value(double value, 
@@ -270,10 +270,10 @@ private:
         return destination_handler().string_value(target, tag, context);
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, semantic_tag_type tag,
+    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag,
                               const serializing_context& context) override
     {
-        return destination_handler_.byte_string_value(data, length, tag, context);
+        return destination_handler_.byte_string_value(b, tag, context);
     }
 
     bool do_double_value(double value, 

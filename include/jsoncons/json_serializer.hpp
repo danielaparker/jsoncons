@@ -582,7 +582,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const uint8_t* data, size_t length, 
+    bool do_byte_string_value(const byte_string_view& b, 
                               semantic_tag_type,
                               const serializing_context&) override
     {
@@ -595,7 +595,7 @@ private:
             case byte_string_chars_format::base16:
             {
                 std::basic_string<CharT> s;
-                encode_base16(data,length,s);
+                encode_base16(b.data(),b.length(),s);
                 writer_. put('\"');
                 writer_.write(s.data(),s.size());
                 writer_. put('\"');
@@ -604,7 +604,7 @@ private:
             case byte_string_chars_format::base64url:
             {
                 std::basic_string<CharT> s;
-                encode_base64url(data,length,s);
+                encode_base64url(b.data(),b.length(),s);
                 writer_. put('\"');
                 writer_.write(s.data(),s.size());
                 writer_. put('\"');
@@ -613,7 +613,7 @@ private:
             default:
             {
                 std::basic_string<CharT> s;
-                encode_base64(data, length, s);
+                encode_base64(b.data(), b.length(), s);
                 writer_. put('\"');
                 writer_.write(s.data(),s.size());
                 writer_. put('\"');
