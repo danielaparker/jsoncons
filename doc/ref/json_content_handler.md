@@ -68,7 +68,7 @@ Writes a byte string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool byte_string_value(const std::vector<uint8_t>& v, 
+    bool byte_string_value(const byte_string_view& v, 
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context());
 Writes a byte string value. Contextual information including
