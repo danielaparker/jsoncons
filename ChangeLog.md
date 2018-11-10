@@ -1,6 +1,23 @@
 master
 ------
 
+Changes to `json_content_handler`
+
+- The function `byte_string_value` no longer supports passing a byte string as
+
+    handler.byte_string_value({'b','a','r'});
+
+(shown in some of the examples.) Instead use
+
+    handler.byte_string_value(byte_string({'b','a','r'}));
+
+(or a pointer to utf8_t data and a size.)
+
+- The function `bignum_value` no longer supports passing a CBOR signum and
+  byte string, `bignum_value` now accepts only a string view. If you
+  have a CBOR signum and byte string, you can use the bignum class to 
+  convert it into a string. 
+
 Name changes (non breaking)
 
 - The name `json_stream_reader` has been deprecated and replaced with `json_staj_reader`.
