@@ -1000,7 +1000,10 @@ public:
                     {
                         JSONCONS_THROW(cbor_decode_error(0));
                     }
-                    handler.bignum_value(1, v.data(), v.size());
+                    bignum n(1, v.data(), v.size());
+                    std::string s;
+                    n.dump(s);
+                    handler.bignum_value(s);
                 }
                 else if (tag == 3)
                 {
@@ -1010,7 +1013,10 @@ public:
                     {
                         JSONCONS_THROW(cbor_decode_error(0));
                     }
-                    handler.bignum_value(-1, v.data(), v.size());
+                    bignum n(-1, v.data(), v.size());
+                    std::string s;
+                    n.dump(s);
+                    handler.bignum_value(s);
                 }
                 else if (tag == 4)
                 {

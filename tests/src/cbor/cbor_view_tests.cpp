@@ -197,7 +197,10 @@ TEST_CASE("test_dump_to_string")
     cbor_bytes_serializer serializer(b);
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    bignum n(-1, bytes.data(), bytes.size());
+    std::string s;
+    n.dump(s);
+    serializer.bignum_value(s);
     serializer.end_array();
     serializer.flush();
 
@@ -236,7 +239,10 @@ TEST_CASE("test_dump_to_stream")
     cbor_bytes_serializer serializer(b);
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    bignum n(-1, bytes.data(), bytes.size());
+    std::string s;
+    n.dump(s);
+    serializer.bignum_value(s);
     serializer.end_array();
     serializer.flush();
 

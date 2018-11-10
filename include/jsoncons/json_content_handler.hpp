@@ -35,7 +35,9 @@ enum class semantic_tag_type : uint8_t
 template <class CharT>
 class basic_json_content_handler
 {
+#if !defined(JSONCONS_NO_DEPRECATED)
     std::basic_string<CharT> buffer_;
+#endif
 public:
     typedef CharT char_type;
     typedef std::char_traits<char_type> char_traits_type;
@@ -126,6 +128,8 @@ public:
         return do_byte_string_value(b, tag, context);
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
     bool bignum_value(int signum, const uint8_t* data, size_t length) 
     {
         bignum n(signum, data, length);
@@ -141,7 +145,7 @@ public:
         n.dump(buffer_);
         return do_string_value(buffer_, semantic_tag_type::bignum, context);
     }
-
+#endif
     bool bignum_value(const string_view_type& s) 
     {
         return do_string_value(s, semantic_tag_type::bignum, null_serializing_context());

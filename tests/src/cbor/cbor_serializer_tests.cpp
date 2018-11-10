@@ -101,7 +101,10 @@ TEST_CASE("test_serialize_bignum")
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    serializer.bignum_value(1, bytes.data(), bytes.size());
+    bignum n(1, bytes.data(), bytes.size());
+    std::string s;
+    n.dump(s);
+    serializer.bignum_value(s);
     serializer.end_array();
     serializer.flush();
 
@@ -123,7 +126,10 @@ TEST_CASE("test_serialize_negative_bignum1")
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    bignum n(-1, bytes.data(), bytes.size());
+    std::string s;
+    n.dump(s);
+    serializer.bignum_value(s);
     serializer.end_array();
     serializer.flush();
 
@@ -145,7 +151,10 @@ TEST_CASE("test_serialize_negative_bignum2")
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    bignum n(-1, bytes.data(), bytes.size());
+    std::string s;
+    n.dump(s);
+    serializer.bignum_value(s);
     serializer.end_array();
     serializer.flush();
 
@@ -172,7 +181,10 @@ TEST_CASE("test_serialize_negative_bignum3")
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-    serializer.bignum_value(-1, bytes.data(), bytes.size());
+    bignum n(-1, bytes.data(), bytes.size());
+    std::string s;
+    n.dump(s);
+    serializer.bignum_value(s);
     serializer.end_array();
     serializer.flush();
 

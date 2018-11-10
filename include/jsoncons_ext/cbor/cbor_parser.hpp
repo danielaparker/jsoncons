@@ -1510,6 +1510,7 @@ class cbor_parser : public serializing_context
     json_content_handler& handler_;
     size_t column_;
     size_t nesting_depth_;
+    std::string buffer_;
 public:
     cbor_parser(json_content_handler& handler)
        : handler_(handler), 
@@ -1619,11 +1620,17 @@ public:
                 {
                     if (semantic_tag == 2)
                     {
-                        handler_.bignum_value(1, v.data(), v.size(), *this);
+                        bignum n(1, v.data(), v.size());
+                        buffer_.clear();
+                        n.dump(buffer_);
+                        handler_.bignum_value(buffer_, *this);
                     }
                     else if (semantic_tag == 3)
                     {
-                        handler_.bignum_value(-1, v.data(), v.size(), *this);
+                        bignum n(-1, v.data(), v.size());
+                        buffer_.clear();
+                        n.dump(buffer_);
+                        handler_.bignum_value(buffer_, *this);
                     }
                     else
                     {
