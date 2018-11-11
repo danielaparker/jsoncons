@@ -137,12 +137,12 @@ public:
             detail::string_writer<T> writer(s);
             if (value_.bool_value_)
             {
-                writer.write(detail::true_literal<CharT>().data(),
+                writer.insert(detail::true_literal<CharT>().data(),
                     detail::true_literal<CharT>().length());
             }
             else
             {
-                writer.write(detail::false_literal<CharT>().data(),
+                writer.insert(detail::false_literal<CharT>().data(),
                     detail::false_literal<CharT>().length());
             }
             break;
@@ -150,7 +150,7 @@ public:
         case staj_event_type::null_value:
         {
             detail::string_writer<T> writer(s);
-            writer.write(detail::null_literal<CharT>().data(),
+            writer.insert(detail::null_literal<CharT>().data(),
                 detail::null_literal<CharT>().size());
             break;
         }

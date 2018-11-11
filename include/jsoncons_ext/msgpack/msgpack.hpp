@@ -69,7 +69,7 @@ struct Encode_msgpack_
     template <typename T>
     void operator()(T val, std::vector<uint8_t>& v)
     {
-        binary::to_big_endian(val,v);
+        binary::to_big_endian(val, std::back_inserter(v));
     }
 };
 

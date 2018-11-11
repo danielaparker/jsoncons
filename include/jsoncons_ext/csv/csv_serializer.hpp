@@ -118,12 +118,12 @@ private:
             CharT c = *it;
             if (c == quote_char)
             {
-                writer.put(quote_escape_char); 
-                writer.put(quote_char);
+                writer.push_back(quote_escape_char); 
+                writer.push_back(quote_char);
             }
             else
             {
-                writer.put(c);
+                writer.push_back(c);
             }
         }
     }
@@ -149,28 +149,28 @@ private:
                 {
                     if (i > 0)
                     {
-                        writer_.put(parameters_.field_delimiter());
+                        writer_.push_back(parameters_.field_delimiter());
                     }
-                    writer_.write(column_names_[i].data(),
+                    writer_.insert(column_names_[i].data(),
                                   column_names_[i].length());
                 }
-                writer_.write(parameters_.line_delimiter().data(),
+                writer_.insert(parameters_.line_delimiter().data(),
                               parameters_.line_delimiter().length());
             }
             for (size_t i = 0; i < column_names_.size(); ++i)
             {
                 if (i > 0)
                 {
-                    writer_.put(parameters_.field_delimiter());
+                    writer_.push_back(parameters_.field_delimiter());
                 }
                 auto it = buffered_line_.find(column_names_[i]);
                 if (it != buffered_line_.end())
                 {
-                    writer_.write(it->second.data(),it->second.length());
+                    writer_.insert(it->second.data(),it->second.length());
                     it->second.clear();
                 }
             }
-            writer_.write(parameters_.line_delimiter().data(), parameters_.line_delimiter().length());
+            writer_.insert(parameters_.line_delimiter().data(), parameters_.line_delimiter().length());
         }
         stack_.pop_back();
 
@@ -189,13 +189,13 @@ private:
                 {
                     if (i > 0)
                     {
-                        writer_.put(parameters_.field_delimiter());
+                        writer_.push_back(parameters_.field_delimiter());
                     }
-                    writer_.write(column_names_[i].data(),column_names_[i].length());
+                    writer_.insert(column_names_[i].data(),column_names_[i].length());
                 }
                 if (column_names_.size() > 0)
                 {
-                    writer_.write(parameters_.line_delimiter().data(),
+                    writer_.insert(parameters_.line_delimiter().data(),
                                   parameters_.line_delimiter().length());
                 }
             }
@@ -207,7 +207,7 @@ private:
     {
         if (stack_.size() == 2)
         {
-            writer_.write(parameters_.line_delimiter().data(),
+            writer_.insert(parameters_.line_delimiter().data(),
                           parameters_.line_delimiter().length());
         }
         stack_.pop_back();
@@ -239,12 +239,12 @@ private:
             (std::char_traits<CharT>::find(s, length, parameters_.field_delimiter()) != nullptr || std::char_traits<CharT>::find(s, length, parameters_.quote_char()) != nullptr)))
         {
             quote = true;
-            writer.put(parameters_.quote_char());
+            writer.push_back(parameters_.quote_char());
         }
         escape_string(s, length, parameters_.quote_char(), parameters_.quote_escape_char(), writer);
         if (quote)
         {
-            writer.put(parameters_.quote_char());
+            writer.push_back(parameters_.quote_char());
         }
 
         return true;
@@ -424,17 +424,17 @@ private:
 
         if ((std::isnan)(val))
         {
-            writer.write(options_.nan_replacement().data(),
+            writer.insert(options_.nan_replacement().data(),
                          options_.nan_replacement().length());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            writer.write(options_.pos_inf_replacement().data(),
+            writer.insert(options_.pos_inf_replacement().data(),
                          options_.pos_inf_replacement().length());
         }
         else if (!(std::isfinite)(val))
         {
-            writer.write(options_.neg_inf_replacement().data(),
+            writer.insert(options_.neg_inf_replacement().data(),
                          options_.neg_inf_replacement().length());
         }
         else
@@ -453,7 +453,7 @@ private:
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        writer.write(ss.str().data(),ss.str().length());
+        writer.insert(ss.str().data(),ss.str().length());
 
         end_value();
     }
@@ -465,7 +465,7 @@ private:
 
         std::basic_ostringstream<CharT> ss;
         ss << val;
-        writer.write(ss.str().data(),ss.str().length());
+        writer.insert(ss.str().data(),ss.str().length());
 
         end_value();
     }
@@ -477,12 +477,12 @@ private:
 
         if (val)
         {
-            writer.write(jsoncons::detail::true_literal<CharT>().data(),
+            writer.insert(jsoncons::detail::true_literal<CharT>().data(),
                          jsoncons::detail::true_literal<CharT>().length());
         }
         else
         {
-            writer.write(jsoncons::detail::false_literal<CharT>().data(),
+            writer.insert(jsoncons::detail::false_literal<CharT>().data(),
                          jsoncons::detail::false_literal<CharT>().length());
         }
 
@@ -493,7 +493,7 @@ private:
     bool accept_null_value(AnyWriter& writer) 
     {
         begin_value(writer);
-        writer.write(jsoncons::detail::null_literal<CharT>().data(), 
+        writer.insert(jsoncons::detail::null_literal<CharT>().data(), 
                      jsoncons::detail::null_literal<CharT>().length());
         end_value();
         return true;
@@ -506,7 +506,7 @@ private:
         {
             if (!stack_.back().is_object_ && stack_.back().count_ > 0)
             {
-                writer.put(parameters_.field_delimiter());
+                writer.push_back(parameters_.field_delimiter());
             }
         }
     }

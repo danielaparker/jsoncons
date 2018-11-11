@@ -99,7 +99,7 @@ private:
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_object));
         
-        writer_.put(0xbf);
+        writer_.push_back(0xbf);
         return true;
     }
 
@@ -149,7 +149,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
-            writer_.put(0xff);
+            writer_.push_back(0xff);
         }
         stack_.pop_back();
 
@@ -160,7 +160,7 @@ private:
     bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
-        writer_.put(0x9f);
+        writer_.push_back(0x9f);
         return true;
     }
 
@@ -208,7 +208,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
-            writer_.put(0xff);
+            writer_.push_back(0xff);
         }
         stack_.pop_back();
         end_value();
@@ -225,11 +225,11 @@ private:
     {
         if (tag == semantic_tag_type::undefined)
         {
-            writer_.put(0xf7);
+            writer_.push_back(0xf7);
         }
         else
         {
-            writer_.put(0xf6);
+            writer_.push_back(0xf6);
         }
 
         end_value();
@@ -442,7 +442,7 @@ private:
             }
         }
 
-        writer_.put(0xc4);
+        writer_.push_back(0xc4);
         do_begin_array((size_t)2, semantic_tag_type::none, context);
         if (exponent.length() > 0)
         {
@@ -483,7 +483,7 @@ private:
             }
             case semantic_tag_type::date_time:
             {
-                writer_.put(0xc0);
+                writer_.push_back(0xc0);
                 write_string_value(sv);
                 break;
             }
@@ -551,7 +551,7 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.put(0xc1);
+            writer_.push_back(0xc1);
         }
 
         float valf = (float)val;
@@ -580,7 +580,7 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.put(0xc1);
+            writer_.push_back(0xc1);
         }
         if (value >= 0)
         {
@@ -664,7 +664,7 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.put(0xc1);
+            writer_.push_back(0xc1);
         }
 
         if (value <= 0x17)
@@ -708,11 +708,11 @@ private:
     {
         if (value)
         {
-            writer_.put(0xf5);
+            writer_.push_back(0xf5);
         }
         else
         {
-            writer_.put(0xf4);
+            writer_.push_back(0xf4);
         }
 
         end_value();

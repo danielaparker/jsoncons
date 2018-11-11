@@ -29,9 +29,9 @@ namespace jsoncons { namespace detail {
 // print_integer
 
 template<class Writer> 
-void print_integer(int64_t value, Writer& os)
+void print_integer(int64_t value, Writer& writer)
 {
-    typedef typename Writer::char_type char_type;
+    typedef typename Writer::value_type char_type;
 
     char_type buf[255];
     uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
@@ -43,20 +43,20 @@ void print_integer(int64_t value, Writer& os)
     while (u /= 10);
     if (value < 0)
     {
-        os.put('-');
+        writer.push_back('-');
     }
     while (--p >= buf)
     {
-        os.put(*p);
+        writer.push_back(*p);
     }
 }
 
 // print_uinteger
 
 template<class Writer>
-void print_uinteger(uint64_t value, Writer& os)
+void print_uinteger(uint64_t value, Writer& writer)
 {
-    typedef typename Writer::char_type char_type;
+    typedef typename Writer::value_type char_type;
 
     char_type buf[255];
     char_type* p = buf;
@@ -66,7 +66,7 @@ void print_uinteger(uint64_t value, Writer& os)
     } while (value /= 10);
     while (--p >= buf)
     {
-        os.put(*p);
+        writer.push_back(*p);
     }
 }
 
@@ -199,26 +199,26 @@ public:
                 switch (*q)
                 {
                 case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                    writer.put(*q);
+                    writer.push_back(*q);
                     break;
                 default:
                     if (*q == decimal_point_)
                     {
                         dot = true;
-                        writer.put('.');
+                        writer.push_back('.');
                     }
                     break;
                 }
             }
             if (!dot)
             {
-                writer.put('.');
-                writer.put('0');
+                writer.push_back('.');
+                writer.push_back('0');
                 dot = true;
             }
             for (const char* q = pexp; q < send; ++q)
             {
-                writer.put(*q);
+                writer.push_back(*q);
             }
         }
     }

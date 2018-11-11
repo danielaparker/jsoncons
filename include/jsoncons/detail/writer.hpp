@@ -31,10 +31,9 @@ template <class CharT>
 class stream_char_writer
 {
 public:
-    typedef CharT char_type;
+    typedef CharT value_type;
     typedef std::basic_ostream<CharT> output_type;
 
-    typedef CharT value_type;
 private:
     static const size_t default_buffer_length = 16384;
 
@@ -69,7 +68,7 @@ public:
         p_ = buffer_.data();
     }
 
-    void write(const CharT* s, size_t length)
+    void insert(const CharT* s, size_t length)
     {
         size_t diff = end_buffer_ - p_;
         if (diff >= length)
@@ -83,11 +82,6 @@ public:
             os_.write(s,length);
             p_ = begin_buffer_;
         }
-    }
-
-    void put(CharT ch)
-    {
-        push_back(ch);
     }
 
     void push_back(CharT ch)
@@ -114,8 +108,8 @@ private:
 class stream_byte_writer
 {
 public:
-    typedef std::basic_ostream<char> output_type;
     typedef uint8_t value_type;
+    typedef std::basic_ostream<char> output_type;
 private:
     static const size_t default_buffer_length = 16384;
 
@@ -158,7 +152,7 @@ public:
         p_ = buffer_.data();
     }
 
-    void write(const uint8_t* s, size_t length)
+    void insert(const uint8_t* s, size_t length)
     {
         size_t diff = end_buffer_ - p_;
         if (diff >= length)
@@ -172,11 +166,6 @@ public:
             os_.write((char*)s,length);
             p_ = begin_buffer_;
         }
-    }
-
-    void put(uint8_t ch)
-    {
-        push_back(ch);
     }
 
     void push_back(uint8_t ch)
@@ -204,9 +193,8 @@ template <class StringT>
 class string_writer 
 {
 public:
-    typedef typename StringT::value_type char_type;
+    typedef typename StringT::value_type value_type;
     typedef StringT output_type;
-    typedef char_type value_type;
 private:
     output_type& s_;
 
@@ -224,17 +212,12 @@ public:
     {
     }
 
-    void write(const char_type* s, size_t length)
+    void insert(const value_type* s, size_t length)
     {
         s_.append(s,length);
     }
 
-    void put(char_type ch)
-    {
-        s_.push_back(ch);
-    }
-
-    void push_back(char_type ch)
+    void push_back(value_type ch)
     {
         s_.push_back(ch);
     }
@@ -243,8 +226,8 @@ public:
 class bytes_writer 
 {
 public:
-    typedef std::vector<uint8_t> output_type;
     typedef uint8_t value_type;
+    typedef std::vector<uint8_t> output_type;
 private:
     output_type& s_;
 
@@ -262,14 +245,9 @@ public:
     {
     }
 
-    void write(const uint8_t* s, size_t length)
+    void insert(const uint8_t* s, size_t length)
     {
         s_.insert(s_.end(), s, s+length);
-    }
-
-    void put(uint8_t ch)
-    {
-        s_.push_back(ch);
     }
 
     void push_back(uint8_t ch)
