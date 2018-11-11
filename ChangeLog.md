@@ -1,5 +1,5 @@
-master
-------
+v0.112.0
+--------
 
 Changes to `json_content_handler`
 
