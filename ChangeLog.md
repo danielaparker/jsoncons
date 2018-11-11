@@ -51,6 +51,10 @@ Extension of semantic tags to other values
       value with a `semantic_tag_type::undefined` tag, and the 
       `cbor_serializer` maps that combination back to a CBOR undefined tag. 
 
+Removed:
+
+- Long since deprecated `value()` functions have been removed from `json_content_handler`
+
 v0.111.1
 --------
 
