@@ -107,32 +107,40 @@ private:
     {
         stack_.push_back(stack_item(cbor_structure_type::object));
 
-        std::vector<uint8_t> v;
         if (length <= 0x17)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xa0 + length), v);
-        } else if (length <= 0xff)
+            binary::to_big_endian(static_cast<uint8_t>(0xa0 + length), 
+                                  std::back_inserter(writer_));
+        } 
+        else if (length <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xb8), v);
-            binary::to_big_endian(static_cast<uint8_t>(length), v);
-        } else if (length <= 0xffff)
+            binary::to_big_endian(static_cast<uint8_t>(0xb8), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(length), 
+                                  std::back_inserter(writer_));
+        } 
+        else if (length <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xb9), v);
-            binary::to_big_endian(static_cast<uint16_t>(length),v);
-        } else if (length <= 0xffffffff)
+            binary::to_big_endian(static_cast<uint8_t>(0xb9), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(length), 
+                                  std::back_inserter(writer_));
+        } 
+        else if (length <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xba), v);
-            binary::to_big_endian(static_cast<uint32_t>(length),v);
-        } else if (length <= 0xffffffffffffffff)
+            binary::to_big_endian(static_cast<uint8_t>(0xba), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(length), 
+                                  std::back_inserter(writer_));
+        } 
+        else if (length <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xbb), v);
-            binary::to_big_endian(static_cast<uint64_t>(length),v);
+            binary::to_big_endian(static_cast<uint8_t>(0xbb), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint64_t>(length), 
+                                  std::back_inserter(writer_));
         }
 
-        for (auto c : v)
-        {
-            writer_.put(c);
-        }
         return true;
     }
 
@@ -158,35 +166,39 @@ private:
 
     bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
     {
-        std::vector<uint8_t> v;
         stack_.push_back(stack_item(cbor_structure_type::array));
         if (length <= 0x17)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x80 + length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x80 + length), 
+                                  std::back_inserter(writer_));
         } 
         else if (length <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x98), v);
-            binary::to_big_endian(static_cast<uint8_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x98), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(length), 
+                                  std::back_inserter(writer_));
         } 
         else if (length <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x99), v);
-            binary::to_big_endian(static_cast<uint16_t>(length),v);
+            binary::to_big_endian(static_cast<uint8_t>(0x99), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(length), 
+                                  std::back_inserter(writer_));
         } 
         else if (length <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x9a), v);
-            binary::to_big_endian(static_cast<uint32_t>(length),v);
+            binary::to_big_endian(static_cast<uint8_t>(0x9a), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(length), 
+                                  std::back_inserter(writer_));
         } 
         else if (length <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x9b), v);
-            binary::to_big_endian(static_cast<uint64_t>(length),v);
-        }
-        for (auto c : v)
-        {
-            writer_.put(c);
+            binary::to_big_endian(static_cast<uint8_t>(0x9b), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint64_t>(length), 
+                                  std::back_inserter(writer_));
         }
         return true;
     }
@@ -226,7 +238,6 @@ private:
 
     void write_string_value(const string_view_type& sv)
     {
-        std::vector<uint8_t> v;
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
             sv.begin(), sv.end(), std::back_inserter(target), 
@@ -240,36 +251,42 @@ private:
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x60 + length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x60 + length), 
+                                  std::back_inserter(writer_));
         }
         else if (length <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x78), v);
-            binary::to_big_endian(static_cast<uint8_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x78), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(length), 
+                                  std::back_inserter(writer_));
         }
         else if (length <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x79), v);
-            binary::to_big_endian(static_cast<uint16_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x79), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(length), 
+                                  std::back_inserter(writer_));
         }
         else if (length <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x7a), v);
-            binary::to_big_endian(static_cast<uint32_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x7a), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(length), 
+                                  std::back_inserter(writer_));
         }
         else if (length <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x7b), v);
-            binary::to_big_endian(static_cast<uint64_t>(length),v);
+            binary::to_big_endian(static_cast<uint8_t>(0x7b), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint64_t>(length), 
+                                  std::back_inserter(writer_));
         }
 
         for (size_t i = 0; i < length; ++i)
         {
-            binary::to_big_endian(static_cast<uint8_t>(target.data()[i]), v);
-        }
-        for (auto c : v)
-        {
-            writer_.put(c);
+            binary::to_big_endian(static_cast<uint8_t>(target.data()[i]), 
+                                  std::back_inserter(writer_));
         }
     }
 
@@ -281,51 +298,53 @@ private:
         n.dump(signum, data);
         size_t length = data.size();
 
-        std::vector<uint8_t> v;
         if (signum == -1)
         {
-            v.push_back(0xc3);
+            writer_.push_back(0xc3);
         }
         else
         {
-            v.push_back(0xc2);
+            writer_.push_back(0xc2);
         }
 
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x40 + length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x40 + length), 
+                                  std::back_inserter(writer_));
         }
         else if (length <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x58), v);
-            binary::to_big_endian(static_cast<uint8_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x58), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(length), 
+                                  std::back_inserter(writer_));
         }
         else if (length <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x59), v);
-            binary::to_big_endian(static_cast<uint16_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x59), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(length), 
+                                  std::back_inserter(writer_));
         }
         else if (length <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x5a), v);
-            binary::to_big_endian(static_cast<uint32_t>(length), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x5a), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(length), 
+                                  std::back_inserter(writer_));
         }
         else if (length <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x5b), v);
-            binary::to_big_endian(static_cast<uint64_t>(length),v);
+            binary::to_big_endian(static_cast<uint8_t>(0x5b), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint64_t>(length), 
+                                  std::back_inserter(writer_));
         }
 
         for (size_t i = 0; i < length; ++i)
         {
-            v.push_back(data[i]);
-            //binary::to_big_endian(static_cast<uint8_t>(data[i]), v);
-        }
-
-        for (auto c : v)
-        {
-            writer_.put(c);
+            writer_.push_back(data[i]);
         }
     }
 
@@ -481,41 +500,44 @@ private:
 
     bool do_byte_string_value(const byte_string_view& b, semantic_tag_type, const serializing_context&) override
     {
-        std::vector<uint8_t> v;
-
         if (b.length() <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x40 + b.length()), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x40 + b.length()), 
+                                  std::back_inserter(writer_));
         }
         else if (b.length() <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x58), v);
-            binary::to_big_endian(static_cast<uint8_t>(b.length()), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x58), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(b.length()), 
+                                  std::back_inserter(writer_));
         }
         else if (b.length() <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x59), v);
-            binary::to_big_endian(static_cast<uint16_t>(b.length()), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x59), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(b.length()), 
+                                  std::back_inserter(writer_));
         }
         else if (b.length() <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x5a), v);
-            binary::to_big_endian(static_cast<uint32_t>(b.length()), v);
+            binary::to_big_endian(static_cast<uint8_t>(0x5a), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(b.length()), 
+                                  std::back_inserter(writer_));
         }
         else if (b.length() <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x5b), v);
-            binary::to_big_endian(static_cast<uint64_t>(b.length()),v);
+            binary::to_big_endian(static_cast<uint8_t>(0x5b), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint64_t>(b.length()), 
+                                  std::back_inserter(writer_));
         }
 
         for (size_t i = 0; i < b.length(); ++i)
         {
-            v.push_back(b.data()[i]);
-        }
-        for (auto c : v)
-        {
-            writer_.put(c);
+            writer_.push_back(b.data()[i]);
         }
 
         end_value();
@@ -532,22 +554,18 @@ private:
             writer_.put(0xc1);
         }
 
-        std::vector<uint8_t> v;
-
         float valf = (float)val;
         if ((double)valf == val)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xfa), v);
-            binary::to_big_endian(valf,v);
+            binary::to_big_endian(static_cast<uint8_t>(0xfa), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(valf, std::back_inserter(writer_));
         }
         else
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xfb), v);
-            binary::to_big_endian(val,v);
-        }
-        for (auto c : v)
-        {
-            writer_.put(c);
+            binary::to_big_endian(static_cast<uint8_t>(0xfb), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(val, std::back_inserter(writer_));
         }
 
         // write double
@@ -564,64 +582,77 @@ private:
         {
             writer_.put(0xc1);
         }
-        std::vector<uint8_t> v;
         if (value >= 0)
         {
             if (value <= 0x17)
             {
-                binary::to_big_endian(static_cast<uint8_t>(value), v);
+                binary::to_big_endian(static_cast<uint8_t>(value), 
+                                  std::back_inserter(writer_));
             } 
             else if (value <= (std::numeric_limits<uint8_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x18), v);
-                binary::to_big_endian(static_cast<uint8_t>(value), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x18), 
+                                  std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint8_t>(value), 
+                                  std::back_inserter(writer_));
             } 
             else if (value <= (std::numeric_limits<uint16_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x19), v);
-                binary::to_big_endian(static_cast<uint16_t>(value), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x19), 
+                                  std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint16_t>(value), 
+                                  std::back_inserter(writer_));
             } 
             else if (value <= (std::numeric_limits<uint32_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x1a), v);
-                binary::to_big_endian(static_cast<uint32_t>(value), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x1a), 
+                                  std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint32_t>(value), 
+                                  std::back_inserter(writer_));
             } 
             else if (value <= (std::numeric_limits<int64_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x1b), v);
-                binary::to_big_endian(static_cast<int64_t>(value), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x1b), 
+                                  std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<int64_t>(value), 
+                                  std::back_inserter(writer_));
             }
         } else
         {
             const auto posnum = -1 - value;
             if (value >= -24)
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x20 + posnum), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x20 + posnum), 
+                                  std::back_inserter(writer_));
             } 
             else if (posnum <= (std::numeric_limits<uint8_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x38), v);
-                binary::to_big_endian(static_cast<uint8_t>(posnum), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x38), 
+                                  std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint8_t>(posnum), 
+                                  std::back_inserter(writer_));
             } 
             else if (posnum <= (std::numeric_limits<uint16_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x39), v);
-                binary::to_big_endian(static_cast<uint16_t>(posnum), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x39), 
+                                  std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint16_t>(posnum), 
+                                  std::back_inserter(writer_));
             } 
             else if (posnum <= (std::numeric_limits<uint32_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x3a), v);
-                binary::to_big_endian(static_cast<uint32_t>(posnum), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x3a), 
+                                  std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint32_t>(posnum), 
+                                  std::back_inserter(writer_));
             } 
             else if (posnum <= (std::numeric_limits<int64_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x3b), v);
-                binary::to_big_endian(static_cast<int64_t>(posnum), v);
+                binary::to_big_endian(static_cast<uint8_t>(0x3b), 
+                                  std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<int64_t>(posnum), 
+                                  std::back_inserter(writer_));
             }
-        }
-        for (auto c : v)
-        {
-            writer_.put(c);
         }
         end_value();
         return true;
@@ -636,30 +667,38 @@ private:
             writer_.put(0xc1);
         }
 
-        std::vector<uint8_t> v;
         if (value <= 0x17)
         {
-            binary::to_big_endian(static_cast<uint8_t>(value),v);
-        } else if (value <=(std::numeric_limits<uint8_t>::max)())
+            binary::to_big_endian(static_cast<uint8_t>(value), 
+                                  std::back_inserter(writer_));
+        } 
+        else if (value <=(std::numeric_limits<uint8_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x18), v);
-            binary::to_big_endian(static_cast<uint8_t>(value),v);
-        } else if (value <=(std::numeric_limits<uint16_t>::max)())
+            binary::to_big_endian(static_cast<uint8_t>(0x18), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(value), 
+                                  std::back_inserter(writer_));
+        } 
+        else if (value <=(std::numeric_limits<uint16_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x19), v);
-            binary::to_big_endian(static_cast<uint16_t>(value),v);
-        } else if (value <=(std::numeric_limits<uint32_t>::max)())
+            binary::to_big_endian(static_cast<uint8_t>(0x19), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(value), 
+                                  std::back_inserter(writer_));
+        } 
+        else if (value <=(std::numeric_limits<uint32_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x1a), v);
-            binary::to_big_endian(static_cast<uint32_t>(value),v);
-        } else if (value <=(std::numeric_limits<uint64_t>::max)())
+            binary::to_big_endian(static_cast<uint8_t>(0x1a), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(value), 
+                                  std::back_inserter(writer_));
+        } 
+        else if (value <=(std::numeric_limits<uint64_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x1b), v);
-            binary::to_big_endian(static_cast<uint64_t>(value),v);
-        }
-        for (auto c : v)
-        {
-            writer_.put(c);
+            binary::to_big_endian(static_cast<uint8_t>(0x1b), 
+                                  std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint64_t>(value), 
+                                  std::back_inserter(writer_));
         }
         end_value();
         return true;

@@ -200,75 +200,79 @@ double decode_half(uint16_t half)
 
 // to_big_endian
 
-template<typename T>
+
+template<class T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint8_t),void>::type
-to_big_endian(T val, std::vector<uint8_t>& v)
+to_big_endian(T val, OutputIt d_first)
 {
-    v.push_back(static_cast<uint8_t>((val) & 0xff));
+    *d_first = static_cast<uint8_t>(val);
 }
 
-template<typename T>
+
+template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint16_t),void>::type
-to_big_endian(T val, std::vector<uint8_t>& v)
+to_big_endian(T val, OutputIt d_first)
 {
     T x = JSONCONS_BINARY_FROM_BE16(val);
 
     uint8_t where[sizeof(T)];
     memcpy(where, &x, sizeof(T));
 
-    for (auto e : where)
-    {
-        v.push_back(e);
-    }
+    *d_first++ = where[0];
+    *d_first++ = where[1];
 }
 
-template<typename T>
+template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint32_t),void>::type
-to_big_endian(T val, std::vector<uint8_t>& v)
+to_big_endian(T val, OutputIt d_first)
 {
     T x = JSONCONS_BINARY_FROM_BE32(val);
 
     uint8_t where[sizeof(T)];
     memcpy(where, &x, sizeof(T));
 
-    for (auto e : where)
-    {
-        v.push_back(e);
-    }
+    *d_first++ = where[0];
+    *d_first++ = where[1];
+    *d_first++ = where[2];
+    *d_first++ = where[3];
 }
 
-template<typename T>
+template<typename T, class OutputIt>
 typename std::enable_if<std::is_integral<T>::value && 
 sizeof(T) == sizeof(uint64_t),void>::type
-to_big_endian(T val, std::vector<uint8_t>& v)
+to_big_endian(T val, OutputIt d_first)
 {
     T x = JSONCONS_BINARY_FROM_BE64(val);
 
     uint8_t where[sizeof(T)];
     memcpy(where, &x, sizeof(T));
 
-    for (auto e : where)
-    {
-        v.push_back(e);
-    }
+    *d_first++ = where[0];
+    *d_first++ = where[1];
+    *d_first++ = where[2];
+    *d_first++ = where[3];
+    *d_first++ = where[4];
+    *d_first++ = where[5];
+    *d_first++ = where[6];
+    *d_first++ = where[7];
 }
 
-inline
-void to_big_endian(float val, std::vector<uint8_t>& v)
+template<class OutputIt>
+void to_big_endian(float val, OutputIt d_first)
 {
     uint32_t where;
     std::memcpy(&where,&val,sizeof(val));
-    to_big_endian(where, v);
+    to_big_endian(where, d_first);
 }
 
-inline
-void to_big_endian(double val, std::vector<uint8_t>& v)
+template<class OutputIt>
+void to_big_endian(double val, OutputIt d_first)
 {
     uint64_t where;
     std::memcpy(&where,&val,sizeof(val));
-    to_big_endian(where, v);
+    to_big_endian(where, d_first);
 }
 
 // from_big_endian

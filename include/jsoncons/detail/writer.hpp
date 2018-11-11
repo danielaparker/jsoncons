@@ -33,6 +33,8 @@ class stream_char_writer
 public:
     typedef CharT char_type;
     typedef std::basic_ostream<CharT> output_type;
+
+    typedef CharT value_type;
 private:
     static const size_t default_buffer_length = 16384;
 
@@ -85,6 +87,11 @@ public:
 
     void put(CharT ch)
     {
+        push_back(ch);
+    }
+
+    void push_back(CharT ch)
+    {
         if (p_ < end_buffer_)
         {
             *p_++ = ch;
@@ -93,7 +100,7 @@ public:
         {
             os_.write(begin_buffer_, buffer_length());
             p_ = begin_buffer_;
-            put(ch);
+            push_back(ch);
         }
     }
 private:
@@ -108,6 +115,7 @@ class stream_byte_writer
 {
 public:
     typedef std::basic_ostream<char> output_type;
+    typedef uint8_t value_type;
 private:
     static const size_t default_buffer_length = 16384;
 
@@ -168,6 +176,11 @@ public:
 
     void put(uint8_t ch)
     {
+        push_back(ch);
+    }
+
+    void push_back(uint8_t ch)
+    {
         if (p_ < end_buffer_)
         {
             *p_++ = ch;
@@ -176,7 +189,7 @@ public:
         {
             os_.write((char*)begin_buffer_, buffer_length());
             p_ = begin_buffer_;
-            put(ch);
+            push_back(ch);
         }
     }
 private:
@@ -193,6 +206,7 @@ class string_writer
 public:
     typedef typename StringT::value_type char_type;
     typedef StringT output_type;
+    typedef char_type value_type;
 private:
     output_type& s_;
 
@@ -219,12 +233,18 @@ public:
     {
         s_.push_back(ch);
     }
+
+    void push_back(char_type ch)
+    {
+        s_.push_back(ch);
+    }
 };
 
 class bytes_writer 
 {
 public:
     typedef std::vector<uint8_t> output_type;
+    typedef uint8_t value_type;
 private:
     output_type& s_;
 
@@ -248,6 +268,11 @@ public:
     }
 
     void put(uint8_t ch)
+    {
+        s_.push_back(ch);
+    }
+
+    void push_back(uint8_t ch)
     {
         s_.push_back(ch);
     }
