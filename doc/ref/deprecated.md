@@ -65,15 +65,15 @@ class json_content_handler|do_end_json||Remove
 class json_content_handler|do_begin_document||Remove
 class json_content_handler|do_end_document||Remove
 class output_format|`output_format`|<em>&#x2713;</em>|`json_serializing_options`
-&#160;|`serialization_options`|<em>&#x2713;</em>|Use `json_serializing_options`
-json_reader|max_depth(),max_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
-&#160;|max_nesting_depth(),max_nesting_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
-&#160;|json_input_handler& parent()|<em>&#x2713;</em>|Use json_input_handler& input_handler()
+class serialization_options|`serialization_options`|<em>&#x2713;</em>|Use `json_serializing_options`
+class json_reader|max_depth(),max_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
+class json_reader|max_nesting_depth(),max_nesting_depth(value)|<em>&#x2713;</em>|Use `json_serializing_options::max_nesting_depth`
+class json_reader|json_input_handler& parent()|<em>&#x2713;</em>|Use json_input_handler& input_handler()
 json_input_handler class|do_longlong_value(long long value, const parsing_context& context)||Override do_integer_value(int64_t value, const parsing_context& context)
-&#160;|do_ulonglong_value(unsigned long long value, const parsing_context& context)||Removed, override do_uinteger_value(uint64_t value, const parsing_context& context)
-&#160;|do_double_value(double value, const basic_parsing_context<CharT>& context)||Removed, override do_double_value(double value, uint8_t precision, const basic_parsing_context<CharT>& context)
-&#160;|`value(value,context)`|<em>&#x2713;</em>|Use `string_value(value,context)`, `integer_value(value,context)`, `uinteger_value(value,context)`, `double_value(value,precision,context)`, `bool_value(value,context)`, `null_value(context)`
-json_output_handler class|do_longlong_value(long long value)||Removed, override do_integer_value(int64_t value)
+class json_reader|do_ulonglong_value(unsigned long long value, const parsing_context& context)||Removed, override do_uinteger_value(uint64_t value, const parsing_context& context)
+class json_reader|do_double_value(double value, const basic_parsing_context<CharT>& context)||Removed, override do_double_value(double value, uint8_t precision, const basic_parsing_context<CharT>& context)
+class json_reader|`value(value,context)`|&#160;|Use `string_value(value,context)`, `integer_value(value,context)`, `uinteger_value(value,context)`, `double_value(value,precision,context)`, `bool_value(value,context)`, `null_value(context)`
+class json_output_handler class|do_longlong_value(long long value)||Removed, override do_integer_value(int64_t value)
 &#160;|do_ulonglong_value(unsigned long long value)||Removed, override do_uinteger_value(uint64_t value)
 &#160;|do_double_value(double value)||Removed, override do_double_value(double value, uint8_t precision)
 &#160;|`value(value)`|<em>&#x2713;</em>|Use `string_value(value)`, `integer_value(value)`, `uinteger_value(value)`, `double_value(value,precision=0)`, `bool_value(value)`, `null_value(context)`
