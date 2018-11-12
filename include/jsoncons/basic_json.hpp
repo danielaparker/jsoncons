@@ -2757,7 +2757,7 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s);
+        basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s);
         dump(serializer);
     }
 
@@ -2765,8 +2765,16 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, indenting line_indent) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, line_indent);
-        dump(serializer);
+        if (line_indent)
+        {
+            basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, line_indent);
+            dump(serializer);
+        }
+        else
+        {
+            basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s);
+            dump(serializer);
+        }
     }
 
     template <class SAllocator>
@@ -2774,7 +2782,7 @@ public:
               const basic_json_serializing_options<char_type>& options) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, options);
+        basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s, options);
         dump(serializer);
     }
 
@@ -2784,8 +2792,16 @@ public:
               indenting line_indent) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, options, line_indent);
-        dump(serializer);
+        if (line_indent)
+        {
+            basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, options, line_indent);
+            dump(serializer);
+        }
+        else
+        {
+            basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s, options);
+            dump(serializer);
+        }
     }
 
     void dump(basic_json_content_handler<char_type>& handler) const
