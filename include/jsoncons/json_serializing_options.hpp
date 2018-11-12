@@ -146,6 +146,8 @@ public:
 
     virtual int indent() const = 0;  
 
+    virtual size_t max_line_length() const = 0;  
+
     virtual chars_format floating_point_format() const = 0; 
 
     virtual uint8_t precision() const = 0; 
@@ -181,6 +183,7 @@ private:
     line_split_kind object_array_split_lines_;
     line_split_kind array_array_split_lines_;
     line_split_kind array_object_split_lines_;
+    size_t max_line_length_;
 
     size_t max_nesting_depth_;
 public:
@@ -203,7 +206,8 @@ public:
           object_array_split_lines_(line_split_kind::same_line),
           array_array_split_lines_(line_split_kind::new_line),
           array_object_split_lines_(line_split_kind::multi_line),
-          max_nesting_depth_((std::numeric_limits<size_t>::max)())
+          max_nesting_depth_((std::numeric_limits<size_t>::max)()),
+          max_line_length_(120)
     {
     }
 
@@ -280,6 +284,17 @@ public:
     basic_json_serializing_options<CharT>& indent(int value)
     {
         indent_ = value;
+        return *this;
+    }
+
+    size_t max_line_length() const override
+    {
+        return max_line_length_;
+    }
+
+    basic_json_serializing_options<CharT>& max_line_length(size_t value)
+    {
+        max_line_length_ = value;
         return *this;
     }
 
