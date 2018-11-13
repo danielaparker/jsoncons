@@ -1438,9 +1438,9 @@ private:
                 {
                     writer_.push_back('~');
                 }
-                encode_base64(v.data(), v.size(), writer_);
+                size_t length = encode_base64(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
-                column_ += (2);
+                column_ += (length+2);
                 break;
             }
             case bignum_chars_format::base64url:
@@ -1455,9 +1455,9 @@ private:
                 {
                     writer_.push_back('~');
                 }
-                encode_base64url(v.data(), v.size(), writer_);
+                size_t length = encode_base64url(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
-                column_ += (2);
+                column_ += (length+2);
                 break;
             }
             default:
@@ -1510,25 +1510,25 @@ private:
             case byte_string_chars_format::base16:
             {
                 writer_.push_back('\"');
-                encode_base16(b.data(),b.length(),writer_);
+                size_t length = encode_base16(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
-                //column_ += (s.size() + 2);
+                column_ += (length + 2);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
                 writer_.push_back('\"');
-                encode_base64url(b.data(),b.length(),writer_);
+                size_t length = encode_base64url(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
-                //column_ += (s.size() + 2);
+                column_ += (length + 2);
                 break;
             }
             default:
             {
                 writer_.push_back('\"');
-                encode_base64(b.data(), b.length(), writer_);
+                size_t length = encode_base64(b.data(), b.length(), writer_);
                 writer_.push_back('\"');
-                //column_ += (s.size() + 2);
+                column_ += (length + 2);
                 break;
             }
         }

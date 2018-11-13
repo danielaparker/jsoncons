@@ -581,7 +581,7 @@ static const char base64url_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 template <class Container>
-void encode_base16(const uint8_t* data, size_t length, Container& result)
+size_t encode_base16(const uint8_t* data, size_t length, Container& result)
 {
     static const char* lut = "0123456789ABCDEF";
 
@@ -591,6 +591,7 @@ void encode_base16(const uint8_t* data, size_t length, Container& result)
         result.push_back(lut[c >> 4]);
         result.push_back(lut[c & 15]);
     }
+    return length*2;
 }
 
 inline 
@@ -600,17 +601,15 @@ static bool is_base64(uint8_t c)
 }
 
 template <class Container>
-void encode_base64(const uint8_t* first, size_t length, const char* alphabet, Container& result)
+size_t encode_base64_generic(const uint8_t* first, size_t length, const char* alphabet, Container& result)
 {
+    size_t count = 0;
     const uint8_t* last = first + length;
     unsigned char a3[3];
     unsigned char a4[4];
     unsigned char fill = alphabet[64];
     int i = 0;
     int j = 0;
-
-    // 4 bytes for every 3 in the input 
-    //size_t untruncated_len = ((last-first) + 5) / 3 * 4;
 
     while (first != last)
     {
@@ -625,6 +624,7 @@ void encode_base64(const uint8_t* first, size_t length, const char* alphabet, Co
             for (i = 0; i < 4; i++) 
             {
                 result.push_back(alphabet[a4[i]]);
+                ++count;
             }
             i = 0;
         }
@@ -644,6 +644,7 @@ void encode_base64(const uint8_t* first, size_t length, const char* alphabet, Co
         for (j = 0; j < i + 1; ++j) 
         {
             result.push_back(alphabet[a4[j]]);
+            ++count;
         }
 
         if (fill != 0)
@@ -651,21 +652,24 @@ void encode_base64(const uint8_t* first, size_t length, const char* alphabet, Co
             while (i++ < 3) 
             {
                 result.push_back(fill);
+                ++count;
             }
         }
     }
+
+    return count;
 }
 
 template <class Container>
-void encode_base64url(const uint8_t* first, size_t length, Container& result)
+size_t encode_base64url(const uint8_t* first, size_t length, Container& result)
 {
-    return encode_base64(first, length, base64url_alphabet, result);
+    return encode_base64_generic(first, length, base64url_alphabet, result);
 }
 
 template <class Container>
-void encode_base64(const uint8_t* first, size_t length, Container& result)
+size_t encode_base64(const uint8_t* first, size_t length, Container& result)
 {
-    encode_base64(first, length, base64_alphabet, result);
+    return encode_base64_generic(first, length, base64_alphabet, result);
 }
 
 template <class CharT>

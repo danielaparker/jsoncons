@@ -206,8 +206,8 @@ public:
           object_array_split_lines_(line_split_kind::same_line),
           array_array_split_lines_(line_split_kind::new_line),
           array_object_split_lines_(line_split_kind::multi_line),
-          max_nesting_depth_((std::numeric_limits<size_t>::max)()),
-          max_line_length_(120)
+          max_line_length_(120),
+          max_nesting_depth_((std::numeric_limits<size_t>::max)())
     {
     }
 
