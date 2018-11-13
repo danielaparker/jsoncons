@@ -27,10 +27,11 @@
 
 namespace jsoncons { namespace detail {
 template <class CharT, class Writer>
-void escape_string(const CharT* s, size_t length,
-    bool escape_all_non_ascii, bool escape_solidus,
-    Writer& writer)
+size_t escape_string(const CharT* s, size_t length,
+                     bool escape_all_non_ascii, bool escape_solidus,
+                     Writer& writer)
 {
+    size_t count = 0;
     const CharT* begin = s;
     const CharT* end = s + length;
     for (const CharT* it = begin; it != end; ++it)
@@ -41,36 +42,44 @@ void escape_string(const CharT* s, size_t length,
         case '\\':
             writer.push_back('\\');
             writer.push_back('\\');
+            count += 2;
             break;
         case '"':
             writer.push_back('\\');
             writer.push_back('\"');
+            count += 2;
             break;
         case '\b':
             writer.push_back('\\');
             writer.push_back('b');
+            count += 2;
             break;
         case '\f':
             writer.push_back('\\');
             writer.push_back('f');
+            count += 2;
             break;
         case '\n':
             writer.push_back('\\');
             writer.push_back('n');
+            count += 2;
             break;
         case '\r':
             writer.push_back('\\');
             writer.push_back('r');
+            count += 2;
             break;
         case '\t':
             writer.push_back('\\');
             writer.push_back('t');
+            count += 2;
             break;
         default:
             if (escape_solidus && c == '/')
             {
                 writer.push_back('\\');
                 writer.push_back('/');
+                count += 2;
             }
             else if (is_control_character(c) || escape_all_non_ascii)
             {
@@ -102,6 +111,7 @@ void escape_string(const CharT* s, size_t length,
                         writer.push_back(to_hex_character(second >> 8 & 0x000F));
                         writer.push_back(to_hex_character(second >> 4 & 0x000F));
                         writer.push_back(to_hex_character(second & 0x000F));
+                        count += 12;
                     }
                     else
                     {
@@ -111,20 +121,24 @@ void escape_string(const CharT* s, size_t length,
                         writer.push_back(to_hex_character(cp >> 8 & 0x000F));
                         writer.push_back(to_hex_character(cp >> 4 & 0x000F));
                         writer.push_back(to_hex_character(cp & 0x000F));
+                        count += 6;
                     }
                 }
                 else
                 {
                     writer.push_back(c);
+                    ++count;
                 }
             }
             else
             {
                 writer.push_back(c);
+                ++count;
             }
             break;
         }
     }
+    return count;
 }
 }}
 
@@ -1220,6 +1234,465 @@ private:
         return true;
     }
 };
+
+// new_basic_json_serializer
+
+template<class CharT,class Writer=detail::stream_char_writer<CharT>>
+class new_basic_json_serializer final : public basic_json_content_handler<CharT>
+{
+public:
+    using typename basic_json_content_handler<CharT>::string_view_type;
+    typedef Writer writer_type;
+    typedef typename Writer::output_type output_type;
+    typedef typename basic_json_serializing_options<CharT>::string_type string_type;
+
+private:
+    enum class structure_type {object, array};
+
+    class serialization_context
+    {
+        structure_type type_;
+        size_t count_;
+    public:
+        serialization_context(structure_type type)
+           : type_(type), count_(0)
+        {
+        }
+
+        size_t count() const
+        {
+            return count_;
+        }
+
+        void increment_count()
+        {
+            ++count_;
+        }
+
+        bool is_array() const
+        {
+            return type_ == structure_type::array;
+        }
+    };
+
+    bool can_write_nan_replacement_;
+    bool can_write_pos_inf_replacement_;
+    bool can_write_neg_inf_replacement_;
+    string_type nan_replacement_;
+    string_type pos_inf_replacement_;
+    string_type neg_inf_replacement_;
+    bool escape_all_non_ascii_;
+    bool escape_solidus_;
+    byte_string_chars_format byte_string_format_;
+    bignum_chars_format bignum_format_;
+
+    std::vector<serialization_context> stack_;
+    detail::print_double fp_;
+    Writer writer_;
+    size_t column_;
+
+    // Noncopyable and nonmoveable
+    new_basic_json_serializer(const new_basic_json_serializer&) = delete;
+    new_basic_json_serializer& operator=(const new_basic_json_serializer&) = delete;
+public:
+    new_basic_json_serializer(output_type& os)
+        : new_basic_json_serializer(os, basic_json_serializing_options<CharT>())
+    {
+    }
+
+    new_basic_json_serializer(output_type& os, 
+                              const basic_json_write_options<CharT>& options)
+       : can_write_nan_replacement_(options.can_write_nan_replacement()),
+         can_write_pos_inf_replacement_(options.can_write_pos_inf_replacement()),
+         can_write_neg_inf_replacement_(options.can_write_neg_inf_replacement()),
+         nan_replacement_(options.nan_replacement()),
+         pos_inf_replacement_(options.pos_inf_replacement()),
+         neg_inf_replacement_(options.neg_inf_replacement()),
+         escape_all_non_ascii_(options.escape_all_non_ascii()),
+         escape_solidus_(options.escape_solidus()),
+         byte_string_format_(options.byte_string_format()),
+         bignum_format_(options.bignum_format()),
+         fp_(floating_point_options(options.floating_point_format(), 
+                                    options.precision(),
+                                    0)),
+         writer_(os),
+         column_(0)
+    {
+    }
+
+    ~new_basic_json_serializer()
+    {
+        try
+        {
+            writer_.flush();
+        }
+        catch (...)
+        {
+        }
+    }
+
+
+private:
+    // Implementing methods
+    void do_flush() override
+    {
+        writer_.flush();
+    }
+
+    bool do_begin_object(semantic_tag_type, const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+
+        stack_.push_back(serialization_context(structure_type::object));
+        writer_.push_back('{');
+        ++column_;
+        return true;
+    }
+
+    bool do_end_object(const serializing_context&) override
+    {
+        JSONCONS_ASSERT(!stack_.empty());
+        stack_.pop_back();
+        writer_.push_back('}');
+        ++column_;
+
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+
+
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+        stack_.push_back(serialization_context(structure_type::array));
+        writer_.push_back('[');
+        ++column_;
+        return true;
+    }
+
+    bool do_end_array(const serializing_context&) override
+    {
+        JSONCONS_ASSERT(!stack_.empty());
+        stack_.pop_back();
+        writer_.push_back(']');
+        ++column_;
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+
+    bool do_name(const string_view_type& name, const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+
+        writer_.push_back('\"');
+        size_t length = jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_);
+        writer_.push_back('\"');
+        writer_.push_back(':');
+        column_ += (length+3);
+        return true;
+    }
+
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+
+        writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().size());
+        column_ += detail::null_literal<CharT>().size();
+
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+
+    void write_string_value(const string_view_type& sv)
+    {
+        writer_.push_back('\"');
+        size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,writer_);
+        writer_.push_back('\"');
+        column_ += (length+2);
+    }
+
+    void write_bignum_value(const string_view_type& sv)
+    {
+        switch (bignum_format_)
+        {
+            case bignum_chars_format::integer:
+            {
+                writer_.insert(sv.data(),sv.size());
+                column_ += sv.size();
+                break;
+            }
+            case bignum_chars_format::base64:
+            {
+                bignum n(sv.data(), sv.length());
+                int signum;
+                std::vector<uint8_t> v;
+                n.dump(signum, v);
+
+                std::basic_string<CharT> s;
+                encode_base64(v.data(), v.size(), s);
+                if (signum == -1)
+                {
+                    s.insert(s.begin(), '~');
+                }
+                writer_.push_back('\"');
+                writer_.insert(s.data(),s.size());
+                writer_.push_back('\"');
+                column_ += (s.size() + 2);
+                break;
+            }
+            case bignum_chars_format::base64url:
+            {
+                bignum n(sv.data(), sv.length());
+                int signum;
+                std::vector<uint8_t> v;
+                n.dump(signum, v);
+
+                std::basic_string<CharT> s;
+                encode_base64url(v.data(), v.size(), s);
+                if (signum == -1)
+                {
+                    s.insert(s.begin(), '~');
+                }
+                writer_.push_back('\"');
+                writer_.insert(s.data(),s.size());
+                writer_.push_back('\"');
+                column_ += (s.size() + 2);
+                break;
+            }
+            default:
+            {
+                writer_.push_back('\"');
+                writer_.insert(sv.data(),sv.size());
+                writer_.push_back('\"');
+                column_ += (sv.size() + 2);
+                break;
+            }
+        }
+    }
+
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+
+        switch (tag)
+        {
+            case semantic_tag_type::bignum:
+                write_bignum_value(sv);
+                break;
+            default:
+                write_string_value(sv);
+                break;
+        }
+
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+
+    bool do_byte_string_value(const byte_string_view& b, 
+                              semantic_tag_type,
+                              const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+        switch (byte_string_format_)
+        {
+            case byte_string_chars_format::base16:
+            {
+                std::basic_string<CharT> s;
+                encode_base16(b.data(),b.length(),s);
+                writer_.push_back('\"');
+                writer_.insert(s.data(),s.size());
+                writer_.push_back('\"');
+                column_ += (s.size() + 2);
+                break;
+            }
+            case byte_string_chars_format::base64url:
+            {
+                std::basic_string<CharT> s;
+                encode_base64url(b.data(),b.length(),s);
+                writer_.push_back('\"');
+                writer_.insert(s.data(),s.size());
+                writer_.push_back('\"');
+                column_ += (s.size() + 2);
+                break;
+            }
+            default:
+            {
+                std::basic_string<CharT> s;
+                encode_base64(b.data(), b.length(), s);
+                writer_.push_back('\"');
+                writer_.insert(s.data(),s.size());
+                writer_.push_back('\"');
+                column_ += (s.size() + 2);
+                break;
+            }
+        }
+
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+
+    bool do_double_value(double value, 
+                         const floating_point_options& fmt, 
+                         semantic_tag_type,
+                         const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+
+        if ((std::isnan)(value))
+        {
+            if (can_write_nan_replacement_)
+            {
+                writer_.insert(nan_replacement_.data(), nan_replacement_.length());
+                column_ += nan_replacement_.length();
+            }
+            else
+            {
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                column_ += detail::null_literal<CharT>().length();
+            }
+        }
+        else if (value == std::numeric_limits<double>::infinity())
+        {
+            if (can_write_pos_inf_replacement_)
+            {
+                writer_.insert(pos_inf_replacement_.data(), pos_inf_replacement_.length());
+                column_ += pos_inf_replacement_.length();
+            }
+            else
+            {
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                column_ += detail::null_literal<CharT>().length();
+            }
+        }
+        else if (!(std::isfinite)(value))
+        {
+            if (can_write_neg_inf_replacement_)
+            {
+                writer_.insert(neg_inf_replacement_.data(), neg_inf_replacement_.length());
+                column_ += neg_inf_replacement_.length();
+            }
+            else
+            {
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                column_ += detail::null_literal<CharT>().length();
+            }
+        }
+        else
+        {
+            fp_(value, fmt, writer_);
+        }
+
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+
+    bool do_int64_value(int64_t value, 
+                        semantic_tag_type,
+                        const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+        detail::print_integer(value, writer_);
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+
+    bool do_uint64_value(uint64_t value, 
+                         semantic_tag_type, 
+                         const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+        detail::print_uinteger(value, writer_);
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+
+    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
+    {
+        if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
+        {
+            writer_.push_back(',');
+            ++column_;
+        }
+
+        if (value)
+        {
+            writer_.insert(detail::true_literal<CharT>().data(), detail::true_literal<CharT>().length());
+            column_ += detail::true_literal<CharT>().length();
+        }
+        else
+        {
+            writer_.insert(detail::false_literal<CharT>().data(), detail::false_literal<CharT>().length());
+            column_ += detail::false_literal<CharT>().length();
+        }
+
+        if (!stack_.empty())
+        {
+            stack_.back().increment_count();
+        }
+        return true;
+    }
+};
+
 
 typedef basic_json_serializer<char,detail::stream_char_writer<char>> json_serializer;
 typedef basic_json_serializer<wchar_t,detail::stream_char_writer<wchar_t>> wjson_serializer;
