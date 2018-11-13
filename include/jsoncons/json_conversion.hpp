@@ -93,7 +93,7 @@ void encode_json(const T& val, const basic_json_serializing_options<CharT>& opti
 template <class T, class CharT>
 void encode_json(const T& val, std::basic_ostream<CharT>& os, indenting line_indent)
 {
-    if (line_indent == indenting::indnet)
+    if (line_indent == indenting::indent)
     {
         basic_json_serializer<CharT> serializer(os);
         encode_json(val, serializer);
