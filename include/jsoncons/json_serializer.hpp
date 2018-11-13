@@ -536,14 +536,12 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                std::basic_string<CharT> s;
-                encode_base64(v.data(), v.size(), s);
+                writer_.push_back('\"');
                 if (signum == -1)
                 {
-                    s.insert(s.begin(), '~');
+                    writer_.push_back('~');
                 }
-                writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
                 break;
             }
@@ -554,14 +552,12 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                std::basic_string<CharT> s;
-                encode_base64url(v.data(), v.size(), s);
+                writer_.push_back('\"');
                 if (signum == -1)
                 {
-                    s.insert(s.begin(), '~');
+                    writer_.push_back('~');
                 }
-                writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64url(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
                 break;
             }
@@ -608,28 +604,22 @@ private:
         {
             case byte_string_chars_format::base16:
             {
-                std::basic_string<CharT> s;
-                encode_base16(b.data(),b.length(),s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base16(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64url:
             {
-                std::basic_string<CharT> s;
-                encode_base64url(b.data(),b.length(),s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64url(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
                 break;
             }
             default:
             {
-                std::basic_string<CharT> s;
-                encode_base64(b.data(), b.length(), s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64(b.data(), b.length(), writer_);
                 writer_.push_back('\"');
                 break;
             }
@@ -1007,14 +997,12 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                std::basic_string<CharT> s;
-                encode_base64(v.data(), v.size(), s);
+                writer_.push_back('\"');
                 if (signum == -1)
                 {
-                    s.insert(s.begin(), '~');
+                    writer_.push_back('~');
                 }
-                writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
                 break;
             }
@@ -1025,14 +1013,12 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                std::basic_string<CharT> s;
-                encode_base64url(v.data(), v.size(), s);
+                writer_.push_back('\"');
                 if (signum == -1)
                 {
-                    s.insert(s.begin(), '~');
+                    writer_.push_back('~');
                 }
-                writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64url(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
                 break;
             }
@@ -1082,28 +1068,22 @@ private:
         {
             case byte_string_chars_format::base16:
             {
-                std::basic_string<CharT> s;
-                encode_base16(b.data(),b.length(),s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base16(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64url:
             {
-                std::basic_string<CharT> s;
-                encode_base64url(b.data(),b.length(),s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64url(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
                 break;
             }
             default:
             {
-                std::basic_string<CharT> s;
-                encode_base64(b.data(), b.length(), s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64(b.data(), b.length(), writer_);
                 writer_.push_back('\"');
                 break;
             }
@@ -1453,16 +1433,14 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                std::basic_string<CharT> s;
-                encode_base64(v.data(), v.size(), s);
+                writer_.push_back('\"');
                 if (signum == -1)
                 {
-                    s.insert(s.begin(), '~');
+                    writer_.push_back('~');
                 }
+                encode_base64(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
-                writer_.push_back('\"');
-                column_ += (s.size() + 2);
+                column_ += (2);
                 break;
             }
             case bignum_chars_format::base64url:
@@ -1472,16 +1450,14 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                std::basic_string<CharT> s;
-                encode_base64url(v.data(), v.size(), s);
+                writer_.push_back('\"');
                 if (signum == -1)
                 {
-                    s.insert(s.begin(), '~');
+                    writer_.push_back('~');
                 }
+                encode_base64url(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
-                writer_.push_back('\"');
-                column_ += (s.size() + 2);
+                column_ += (2);
                 break;
             }
             default:
@@ -1533,32 +1509,26 @@ private:
         {
             case byte_string_chars_format::base16:
             {
-                std::basic_string<CharT> s;
-                encode_base16(b.data(),b.length(),s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base16(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
-                column_ += (s.size() + 2);
+                //column_ += (s.size() + 2);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
-                std::basic_string<CharT> s;
-                encode_base64url(b.data(),b.length(),s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64url(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
-                column_ += (s.size() + 2);
+                //column_ += (s.size() + 2);
                 break;
             }
             default:
             {
-                std::basic_string<CharT> s;
-                encode_base64(b.data(), b.length(), s);
                 writer_.push_back('\"');
-                writer_.insert(s.data(),s.size());
+                encode_base64(b.data(), b.length(), writer_);
                 writer_.push_back('\"');
-                column_ += (s.size() + 2);
+                //column_ += (s.size() + 2);
                 break;
             }
         }

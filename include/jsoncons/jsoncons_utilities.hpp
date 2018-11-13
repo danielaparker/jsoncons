@@ -580,12 +580,11 @@ static const char base64url_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                               "\0";
 
 
-template <class CharT>
-void encode_base16(const uint8_t* data, size_t length, std::basic_string<CharT>& result)
+template <class Writer>
+void encode_base16(const uint8_t* data, size_t length, Writer& result)
 {
     static const char* lut = "0123456789ABCDEF";
 
-    result.reserve(2 * length);
     for (size_t i = 0; i < length; ++i)
     {
         uint8_t c = data[i];
@@ -600,8 +599,8 @@ static bool is_base64(uint8_t c)
     return isalnum(c) || c == '+' || c == '/';
 }
 
-template <class CharT>
-void encode_base64(const uint8_t* first, size_t length, const char* alphabet, std::basic_string<CharT>& result)
+template <class Writer>
+void encode_base64(const uint8_t* first, size_t length, const char* alphabet, Writer& result)
 {
     const uint8_t* last = first + length;
     unsigned char a3[3];
@@ -611,8 +610,7 @@ void encode_base64(const uint8_t* first, size_t length, const char* alphabet, st
     int j = 0;
 
     // 4 bytes for every 3 in the input 
-    size_t untruncated_len = ((last-first) + 5) / 3 * 4;
-    result.reserve(untruncated_len);
+    //size_t untruncated_len = ((last-first) + 5) / 3 * 4;
 
     while (first != last)
     {
@@ -658,14 +656,14 @@ void encode_base64(const uint8_t* first, size_t length, const char* alphabet, st
     }
 }
 
-template <class CharT>
-void encode_base64url(const uint8_t* first, size_t length, std::basic_string<CharT>& result)
+template <class Writer>
+void encode_base64url(const uint8_t* first, size_t length, Writer& result)
 {
     return encode_base64(first, length, base64url_alphabet, result);
 }
 
-template <class CharT>
-void encode_base64(const uint8_t* first, size_t length, std::basic_string<CharT>& result)
+template <class Writer>
+void encode_base64(const uint8_t* first, size_t length, Writer& result)
 {
     encode_base64(first, length, base64_alphabet, result);
 }
