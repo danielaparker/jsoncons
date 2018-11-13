@@ -156,7 +156,7 @@ public:
 private:
     enum class structure_type {object, array};
 
-    class line_split_context
+    class serialization_context
     {
         structure_type type_;
         size_t count_;
@@ -164,11 +164,11 @@ private:
         bool indent_before_;
         bool unindent_after_;
     public:
-        line_split_context(structure_type type)
+        serialization_context(structure_type type)
            : type_(type), count_(0), split_lines_(line_split_kind::same_line), indent_before_(false), unindent_after_(false)
         {
         }
-        line_split_context(structure_type type, line_split_kind split_lines, bool indent_once)
+        serialization_context(structure_type type, line_split_kind split_lines, bool indent_once)
            : type_(type), count_(0), split_lines_(split_lines), indent_before_(indent_once), unindent_after_(false)
         {
         }
@@ -240,12 +240,12 @@ private:
     line_split_kind object_array_split_lines_;
     line_split_kind array_array_split_lines_;
     line_split_kind array_object_split_lines_;
-
+    size_t max_line_length_;
+    detail::print_double fp_;
     Writer writer_;
 
-    std::vector<line_split_context> stack_;
+    std::vector<serialization_context> stack_;
     int indent_amount_;
-    detail::print_double fp_;
     size_t column_;
     std::basic_string<CharT> colon_str_;
     std::basic_string<CharT> comma_str_;
@@ -284,6 +284,7 @@ public:
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
+         max_line_length_(options.max_line_length()),
          writer_(os), 
          column_(0)
     {
@@ -350,20 +351,6 @@ public:
         }
     }
 
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    basic_json_serializer(output_type& os, bool pprint)
-       : basic_json_serializer(os, basic_json_serializing_options<CharT>(), (pprint ? indenting::indent : indenting::no_indent))
-    {
-    }
-
-    basic_json_serializer(output_type& os, const basic_json_serializing_options<CharT>& options, bool pprint)
-        : basic_json_serializer(os, options, (pprint ? indenting::indent : indenting::no_indent))
-    {
-    }
-#endif
-
 private:
     // Implementing methods
     void do_flush() override
@@ -381,24 +368,24 @@ private:
 
         if (!stack_.empty() && stack_.back().is_object())
         {
-            stack_.push_back(line_split_context(structure_type::object,object_object_split_lines_, false));
+            stack_.emplace_back(structure_type::object,object_object_split_lines_, false);
         }
         else if (!stack_.empty())
         {
             if (array_object_split_lines_ != line_split_kind::same_line)
             {
                 stack_.back().unindent_after(true);
-                stack_.push_back(line_split_context(structure_type::object,array_object_split_lines_, false));
+                stack_.emplace_back(structure_type::object,array_object_split_lines_, false);
                 write_indent1();
             }
             else
             {
-                stack_.push_back(line_split_context(structure_type::object,array_object_split_lines_, false));
+                stack_.emplace_back(structure_type::object,array_object_split_lines_, false);
             }
         }
         else 
         {
-            stack_.push_back(line_split_context(structure_type::object, line_split_kind::multi_line, false));
+            stack_.emplace_back(structure_type::object, line_split_kind::multi_line, false);
         }
         increment_indent();
         
@@ -440,11 +427,11 @@ private:
                 increment_indent();
                 if (object_array_split_lines_ != line_split_kind::same_line)
                 {
-                    stack_.push_back(line_split_context(structure_type::array,object_array_split_lines_,true));
+                    stack_.emplace_back(structure_type::array,object_array_split_lines_,true);
                 }
                 else
                 {
-                    stack_.push_back(line_split_context(structure_type::array,object_array_split_lines_,false));
+                    stack_.emplace_back(structure_type::array,object_array_split_lines_,false);
                 }
             }
             else // array
@@ -455,19 +442,19 @@ private:
                     {
                         write_indent();
                     }
-                    stack_.push_back(line_split_context(structure_type::array,line_split_kind::same_line, false));
+                    stack_.emplace_back(structure_type::array,line_split_kind::same_line, false);
                     increment_indent();
                 }
                 else if (array_array_split_lines_ == line_split_kind::multi_line)
                 {
                     write_indent();
-                    stack_.push_back(line_split_context(structure_type::array,array_array_split_lines_, false));
+                    stack_.emplace_back(structure_type::array,array_array_split_lines_, false);
                     increment_indent();
                 }
                 else // new_line
                 {
                     write_indent();
-                    stack_.push_back(line_split_context(structure_type::array,array_array_split_lines_, false));
+                    stack_.emplace_back(structure_type::array,array_array_split_lines_, false);
                     increment_indent();
                 }
                 writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
@@ -476,7 +463,7 @@ private:
         }
         else 
         {
-            stack_.push_back(line_split_context(structure_type::array, line_split_kind::multi_line, false));
+            stack_.emplace_back(structure_type::array, line_split_kind::multi_line, false);
             writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
             column_ += open_array_bracket_str_.length();
             increment_indent();
@@ -938,7 +925,7 @@ private:
             writer_.push_back(',');
         }
 
-        stack_.push_back(serialization_context(structure_type::object));
+        stack_.emplace_back(structure_type::object);
         writer_.push_back('{');
         return true;
     }
@@ -963,7 +950,7 @@ private:
         {
             writer_.push_back(',');
         }
-        stack_.push_back(serialization_context(structure_type::array));
+        stack_.emplace_back(structure_type::array);
         writer_.push_back('[');
         return true;
     }
