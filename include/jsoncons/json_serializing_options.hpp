@@ -161,6 +161,8 @@ public:
     virtual spaces_option spaces_around_colon() const = 0;  
 
     virtual spaces_option spaces_around_comma() const = 0;  
+
+    virtual bool force_one_key_per_line() const = 0;  
 };
 
 template <class CharT>
@@ -194,6 +196,7 @@ private:
     size_t max_nesting_depth_;
     spaces_option spaces_around_colon_;
     spaces_option spaces_around_comma_;
+    bool force_one_key_per_line_;
 public:
     static const size_t default_indent = 4;
 
@@ -217,7 +220,8 @@ public:
           max_line_length_(120),
           max_nesting_depth_((std::numeric_limits<size_t>::max)()),
           spaces_around_colon_(spaces_option::space_after),
-          spaces_around_comma_(spaces_option::no_spaces)
+          spaces_around_comma_(spaces_option::no_spaces),
+          force_one_key_per_line_(false)
     {
     }
 
@@ -316,6 +320,17 @@ public:
     basic_json_serializing_options<CharT>& spaces_around_comma(spaces_option value)
     {
         spaces_around_comma_ = value;
+        return *this;
+    }
+
+    bool force_one_key_per_line() const override
+    {
+        return force_one_key_per_line_;
+    }
+
+    basic_json_serializing_options<CharT>& force_one_key_per_line(bool value)
+    {
+        force_one_key_per_line_ = value;
         return *this;
     }
 

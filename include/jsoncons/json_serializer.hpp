@@ -225,7 +225,7 @@ private:
 
     };
 
-    int indent_width_;
+    int indent_;
     bool can_write_nan_replacement_;
     bool can_write_pos_inf_replacement_;
     bool can_write_neg_inf_replacement_;
@@ -242,8 +242,7 @@ private:
     line_split_kind array_object_split_lines_;
 
     std::vector<line_split_context> stack_;
-    int indent_;
-    bool indenting_;
+    int indent_amount_;
     detail::print_double fp_;
     Writer writer_;
 
@@ -255,24 +254,13 @@ private:
     basic_json_serializer& operator=(const basic_json_serializer&) = delete;
 public:
     basic_json_serializer(output_type& os)
-        : basic_json_serializer(os, indenting::no_indent)
-    {
-    }
-
-    basic_json_serializer(output_type& os, indenting line_indent)
-        : basic_json_serializer(os, basic_json_serializing_options<CharT>(), line_indent)
-    {
-    }
-
-    basic_json_serializer(output_type& os, const basic_json_write_options<CharT>& options)
-       : basic_json_serializer(os, options, indenting::no_indent)
+        : basic_json_serializer(os, basic_json_serializing_options<CharT>())
     {
     }
 
     basic_json_serializer(output_type& os, 
-                          const basic_json_write_options<CharT>& options, 
-                          indenting line_indent)
-       : indent_width_(options.indent()),
+                          const basic_json_write_options<CharT>& options)
+       : indent_(options.indent()),
          can_write_nan_replacement_(options.can_write_nan_replacement()),
          can_write_pos_inf_replacement_(options.can_write_pos_inf_replacement()),
          can_write_neg_inf_replacement_(options.can_write_neg_inf_replacement()),
@@ -287,8 +275,7 @@ public:
          object_array_split_lines_(options.object_array_split_lines()),
          array_array_split_lines_(options.array_array_split_lines()),
          array_object_split_lines_(options.array_object_split_lines()),
-         indent_(0), 
-         indenting_(line_indent == indenting::indent),  
+         indent_amount_(0), 
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
@@ -368,35 +355,29 @@ private:
             }
         }
 
-        if (indenting_)
+        if (!stack_.empty() && stack_.back().is_object())
         {
-            if (!stack_.empty() && stack_.back().is_object())
-            {
-                stack_.push_back(line_split_context(structure_type::object,object_object_split_lines_, false));
-            }
-            else if (!stack_.empty())
-            {
-                if (array_object_split_lines_ != line_split_kind::same_line)
-                {
-                    stack_.back().unindent_after(true);
-                    stack_.push_back(line_split_context(structure_type::object,array_object_split_lines_, false));
-                    write_indent1();
-                }
-                else
-                {
-                    stack_.push_back(line_split_context(structure_type::object,array_object_split_lines_, false));
-                }
-            }
-            else 
-            {
-                stack_.push_back(line_split_context(structure_type::object, line_split_kind::multi_line, false));
-            }
-            indent();
+            stack_.push_back(line_split_context(structure_type::object,object_object_split_lines_, false));
         }
-        else
+        else if (!stack_.empty())
         {
-            stack_.push_back(line_split_context(structure_type::object));
+            if (array_object_split_lines_ != line_split_kind::same_line)
+            {
+                stack_.back().unindent_after(true);
+                stack_.push_back(line_split_context(structure_type::object,array_object_split_lines_, false));
+                write_indent1();
+            }
+            else
+            {
+                stack_.push_back(line_split_context(structure_type::object,array_object_split_lines_, false));
+            }
         }
+        else 
+        {
+            stack_.push_back(line_split_context(structure_type::object, line_split_kind::multi_line, false));
+        }
+        increment_indent();
+        
         writer_.push_back('{');
         return true;
     }
@@ -404,13 +385,10 @@ private:
     bool do_end_object(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        if (indenting_)
+        decrement_indent();
+        if (stack_.back().unindent_after())
         {
-            unindent();
-            if (stack_.back().unindent_after())
-            {
-                write_indent();
-            }
+            write_indent();
         }
         stack_.pop_back();
         writer_.push_back('}');
@@ -429,60 +407,52 @@ private:
                 writer_.insert(comma_str_.data(),comma_str_.length());
             }
         }
-        if (indenting_)
+        if (!stack_.empty())
         {
-            if (!stack_.empty())
+            if (stack_.back().is_object())
             {
-                if (stack_.back().is_object())
+                writer_.push_back('[');
+                increment_indent();
+                if (object_array_split_lines_ != line_split_kind::same_line)
                 {
-                    writer_.push_back('[');
-                    indent();
-                    if (object_array_split_lines_ != line_split_kind::same_line)
-                    {
-                        stack_.push_back(line_split_context(structure_type::array,object_array_split_lines_,true));
-                    }
-                    else
-                    {
-                        stack_.push_back(line_split_context(structure_type::array,object_array_split_lines_,false));
-                    }
+                    stack_.push_back(line_split_context(structure_type::array,object_array_split_lines_,true));
                 }
-                else // array
+                else
                 {
-                    if (array_array_split_lines_ == line_split_kind::same_line)
-                    {
-                        if (stack_.back().is_multi_line())
-                        {
-                            write_indent();
-                        }
-                        stack_.push_back(line_split_context(structure_type::array,line_split_kind::same_line, false));
-                        indent();
-                    }
-                    else if (array_array_split_lines_ == line_split_kind::multi_line)
-                    {
-                        write_indent();
-                        stack_.push_back(line_split_context(structure_type::array,array_array_split_lines_, false));
-                        indent();
-                    }
-                    else // new_line
-                    {
-                        write_indent();
-                        stack_.push_back(line_split_context(structure_type::array,array_array_split_lines_, false));
-                        indent();
-                    }
-                    writer_.push_back('[');
+                    stack_.push_back(line_split_context(structure_type::array,object_array_split_lines_,false));
                 }
             }
-            else 
+            else // array
             {
-                stack_.push_back(line_split_context(structure_type::array, line_split_kind::multi_line, false));
+                if (array_array_split_lines_ == line_split_kind::same_line)
+                {
+                    if (stack_.back().is_multi_line())
+                    {
+                        write_indent();
+                    }
+                    stack_.push_back(line_split_context(structure_type::array,line_split_kind::same_line, false));
+                    increment_indent();
+                }
+                else if (array_array_split_lines_ == line_split_kind::multi_line)
+                {
+                    write_indent();
+                    stack_.push_back(line_split_context(structure_type::array,array_array_split_lines_, false));
+                    increment_indent();
+                }
+                else // new_line
+                {
+                    write_indent();
+                    stack_.push_back(line_split_context(structure_type::array,array_array_split_lines_, false));
+                    increment_indent();
+                }
                 writer_.push_back('[');
-                indent();
             }
         }
-        else
+        else 
         {
-            stack_.push_back(line_split_context(structure_type::array));
+            stack_.push_back(line_split_context(structure_type::array, line_split_kind::multi_line, false));
             writer_.push_back('[');
+            increment_indent();
         }
         return true;
     }
@@ -490,14 +460,11 @@ private:
     bool do_end_array(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        if (indenting_)
-        {
-            unindent();
+            decrement_indent();
             if (stack_.back().unindent_after())
             {
                 write_indent();
             }
-        }
         stack_.pop_back();
         writer_.push_back(']');
         end_value();
@@ -512,12 +479,9 @@ private:
             {
                 writer_.insert(comma_str_.data(),comma_str_.length());
             }
-            if (indenting_)
+            if (stack_.back().is_multi_line())
             {
-                if (stack_.back().is_multi_line())
-                {
-                    write_indent();
-                }
+                write_indent();
             }
         }
 
@@ -772,12 +736,9 @@ private:
             {
                 writer_.insert(comma_str_.data(),comma_str_.length());
             }
-            if (indenting_)
+            if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
             {
-                if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
-                {
-                    write_indent();
-                }
+                write_indent();
             }
         }
     }
@@ -790,14 +751,14 @@ private:
         }
     }
 
-    void indent()
+    void increment_indent()
     {
-        indent_ += static_cast<int>(indent_width_);
+        indent_amount_ += static_cast<int>(indent_);
     }
 
-    void unindent()
+    void decrement_indent()
     {
-        indent_ -= static_cast<int>(indent_width_);
+        indent_amount_ -= static_cast<int>(indent_);
     }
 
     void write_indent()
@@ -807,7 +768,7 @@ private:
             stack_.back().unindent_after(true);
         }
         writer_.push_back('\n');
-        for (int i = 0; i < indent_; ++i)
+        for (int i = 0; i < indent_amount_; ++i)
         {
             writer_.push_back(' ');
         }
@@ -816,7 +777,7 @@ private:
     void write_indent1()
     {
         writer_.push_back('\n');
-        for (int i = 0; i < indent_; ++i)
+        for (int i = 0; i < indent_amount_; ++i)
         {
             writer_.push_back(' ');
         }
@@ -1262,9 +1223,10 @@ private:
     {
         structure_type type_;
         size_t count_;
+        bool unindent_after_;
     public:
         serialization_context(structure_type type)
-           : type_(type), count_(0)
+           : type_(type), count_(0), unindent_after_(false)
         {
         }
 
@@ -1282,8 +1244,19 @@ private:
         {
             return type_ == structure_type::array;
         }
+
+        bool unindent_after() const
+        {
+            return unindent_after_;
+        }
+
+        void unindent_after(bool value) 
+        {
+            unindent_after_ = value;
+        }
     };
 
+    int indent_;
     bool can_write_nan_replacement_;
     bool can_write_pos_inf_replacement_;
     bool can_write_neg_inf_replacement_;
@@ -1295,13 +1268,15 @@ private:
     byte_string_chars_format byte_string_format_;
     bignum_chars_format bignum_format_;
 
-    std::vector<serialization_context> stack_;
-    detail::print_double fp_;
-    Writer writer_;
-    size_t column_;
-
     std::basic_string<CharT> colon_str_;
     std::basic_string<CharT> comma_str_;
+    bool force_one_key_per_line_;
+    Writer writer_;
+
+    std::vector<serialization_context> stack_;
+    int indent_amount_;
+    detail::print_double fp_;
+    size_t column_;
 
     // Noncopyable and nonmoveable
     new_basic_json_serializer(const new_basic_json_serializer&) = delete;
@@ -1314,7 +1289,8 @@ public:
 
     new_basic_json_serializer(output_type& os, 
                               const basic_json_write_options<CharT>& options)
-       : can_write_nan_replacement_(options.can_write_nan_replacement()),
+       : indent_(options.indent()),
+         can_write_nan_replacement_(options.can_write_nan_replacement()),
          can_write_pos_inf_replacement_(options.can_write_pos_inf_replacement()),
          can_write_neg_inf_replacement_(options.can_write_neg_inf_replacement()),
          nan_replacement_(options.nan_replacement()),
@@ -1327,7 +1303,9 @@ public:
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
+         force_one_key_per_line_(options.force_one_key_per_line()),
          writer_(os),
+         indent_amount_(0), 
          column_(0)
     {
         switch (options.spaces_around_colon())
@@ -1728,11 +1706,46 @@ private:
         }
         return true;
     }
+
+    void increment_indent()
+    {
+        indent_amount_ += static_cast<int>(indent_);
+    }
+
+    void decrement_indent()
+    {
+        indent_amount_ -= static_cast<int>(indent_);
+    }
+
+    void write_indent()
+    {
+        if (!stack_.empty())
+        {
+            stack_.back().unindent_after(true);
+        }
+        writer_.push_back('\n');
+        for (int i = 0; i < indent_amount_; ++i)
+        {
+            writer_.push_back(' ');
+        }
+    }
+
+    void write_indent1()
+    {
+        writer_.push_back('\n');
+        for (int i = 0; i < indent_amount_; ++i)
+        {
+            writer_.push_back(' ');
+        }
+    }
 };
 
 
 typedef basic_json_serializer<char,detail::stream_char_writer<char>> json_serializer;
 typedef basic_json_serializer<wchar_t,detail::stream_char_writer<wchar_t>> wjson_serializer;
+
+typedef basic_json_compressed_serializer<char,detail::stream_char_writer<char>> json_compressed_serializer;
+typedef basic_json_compressed_serializer<wchar_t,detail::stream_char_writer<wchar_t>> wjson_compressed_serializer;
 
 typedef basic_json_serializer<char,detail::string_writer<std::string>> json_string_serializer;
 typedef basic_json_serializer<wchar_t,detail::string_writer<std::wstring>> wjson_string_serializer;

@@ -1230,7 +1230,7 @@ template <class T>
 class const_object_iterator;
 
 template <class T>
-class key_value_pair_view
+class key_value_view
 {
     const uint8_t* key_begin_;
     const uint8_t* key_end_;
@@ -1241,18 +1241,18 @@ class key_value_pair_view
 public:
     friend class const_object_iterator<T>;
 
-    key_value_pair_view()
+    key_value_view()
         : key_begin_(nullptr), key_end_(nullptr), val_begin_(nullptr), val_end_(nullptr)
     {
     }
-    key_value_pair_view(const uint8_t* key_begin, const uint8_t* key_end, 
+    key_value_view(const uint8_t* key_begin, const uint8_t* key_end, 
                         const uint8_t* val_begin, const uint8_t* val_end, 
                         const uint8_t* base_relative)
         : key_begin_(key_begin), key_end_(key_end), val_begin_(val_begin), val_end_(val_end), 
           base_relative_(base_relative)
     {
     }
-    key_value_pair_view(const key_value_pair_view& other) = default;
+    key_value_view(const key_value_view& other) = default;
 
     std::string key() const
     {
@@ -1272,12 +1272,12 @@ class const_object_iterator
     const uint8_t* p_;
     const uint8_t* last_;
     const uint8_t* base_relative_;
-    key_value_pair_view<T> kvpair_;
+    key_value_view<T> kvpair_;
 public:
     typedef typename T::difference_type difference_type;
-    typedef key_value_pair_view<T> value_type;
-    typedef const key_value_pair_view<T>& reference;
-    typedef const key_value_pair_view<T>* pointer;
+    typedef key_value_view<T> value_type;
+    typedef const key_value_view<T>& reference;
+    typedef const key_value_view<T>* pointer;
     typedef std::forward_iterator_tag iterator_catagory;
 
     const_object_iterator()
@@ -1326,13 +1326,13 @@ public:
     {
         const uint8_t* endp;
 
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->key_begin_ = p_;
+        const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
         detail::walk(kvpair_.key_begin_, last_, &endp);
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->key_end_ = endp;
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
+        const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endp;
+        const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
         detail::walk(kvpair_.val_begin_, last_, &endp);
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->val_end_ = endp;
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
+        const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endp;
+        const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
 
         return kvpair_;
     }
@@ -1341,13 +1341,13 @@ public:
     {
         const uint8_t* endp;
 
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->key_begin_ = p_;
+        const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
         detail::walk(kvpair_.key_begin_, last_, &endp);
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->key_end_ = endp;
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
+        const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endp;
+        const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
         detail::walk(kvpair_.val_begin_, last_, &endp);
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->val_end_ = endp;
-        const_cast<key_value_pair_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
+        const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endp;
+        const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
 
         return &kvpair_;
     }

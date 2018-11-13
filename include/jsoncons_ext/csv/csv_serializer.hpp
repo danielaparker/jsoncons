@@ -553,7 +553,7 @@ void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, c
 }
 
 typedef basic_csv_serializer<char> csv_serializer;
-typedef basic_json_serializer<char,jsoncons::detail::string_writer<std::string>> csv_string_serializer;
+typedef basic_csv_serializer<char,jsoncons::detail::string_writer<std::string>> csv_string_serializer;
 
 }}
 

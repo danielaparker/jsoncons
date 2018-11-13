@@ -2767,7 +2767,7 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, line_indent);
+            basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s);
             dump(serializer);
         }
         else
@@ -2794,7 +2794,7 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, options, line_indent);
+            basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, options);
             dump(serializer);
         }
         else
@@ -2875,7 +2875,7 @@ public:
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type> serializer(os, line_indent);
+            basic_json_serializer<char_type> serializer(os);
             dump(serializer);
         }
         else
@@ -2895,7 +2895,7 @@ public:
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type> serializer(os, options, line_indent);
+            basic_json_serializer<char_type> serializer(os, options);
             dump(serializer);
         }
         else
@@ -2935,14 +2935,30 @@ public:
 
     void dump(std::basic_ostream<char_type>& os, bool pprint) const
     {
-        basic_json_serializer<char_type> serializer(os, pprint);
-        dump(serializer);
+        if (pprint)
+        {
+            basic_json_serializer<char_type> serializer(os);
+            dump(serializer);
+        }
+        else
+        {
+            basic_json_compressed_serializer<char_type> serializer(os);
+            dump(serializer);
+        }
     }
 
     void dump(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options, bool pprint) const
     {
-        basic_json_serializer<char_type> serializer(os, options, pprint);
-        dump(serializer);
+        if (pprint)
+        {
+            basic_json_serializer<char_type> serializer(os, options);
+            dump(serializer);
+        }
+        else
+        {
+            basic_json_compressed_serializer<char_type> serializer(os, options);
+            dump(serializer);
+        }
     }
 
     void write_body(basic_json_content_handler<char_type>& handler) const

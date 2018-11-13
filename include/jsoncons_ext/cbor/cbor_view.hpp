@@ -48,7 +48,7 @@ public:
     typedef detail::const_object_iterator<cbor_view> const_object_iterator;
     typedef detail::const_array_iterator<cbor_view> array_iterator;
     typedef detail::const_array_iterator<cbor_view> const_array_iterator;
-    typedef detail::key_value_pair_view<cbor_view> key_value_type;
+    typedef detail::key_value_view<cbor_view> key_value_type;
 
     friend class detail::const_array_iterator<cbor_view>;
     friend class detail::const_object_iterator<cbor_view>;
@@ -847,7 +847,7 @@ public:
     void dump(std::basic_string<char,Traits,SAllocator>& s) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_serializer<char,jsoncons::detail::string_writer<string_type>> serializer(s);
+        basic_json_compressed_serializer<char,jsoncons::detail::string_writer<string_type>> serializer(s);
         dump(serializer);
     }
 
@@ -855,8 +855,16 @@ public:
     void dump(std::basic_string<char,Traits,SAllocator>& s, indenting line_indent) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_serializer<char,string_type> serializer(s, line_indent);
-        dump(serializer);
+        if (line_indent == indenting::indent)
+        {
+            basic_json_serializer<char,string_type> serializer(s);
+            dump(serializer);
+        }
+        else
+        {
+            basic_json_compressed_serializer<char,string_type> serializer(s);
+            dump(serializer);
+        }
     }
 
     template <typename Traits,typename SAllocator>
@@ -864,7 +872,7 @@ public:
               const json_serializing_options& options) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_serializer<char,jsoncons::detail::string_writer<string_type>> serializer(s, options);
+        basic_json_compressed_serializer<char,jsoncons::detail::string_writer<string_type>> serializer(s, options);
         dump(serializer);
     }
 
@@ -874,32 +882,56 @@ public:
               indenting line_indent) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_serializer<char,jsoncons::detail::string_writer<string_type>> serializer(s, options, line_indent);
-        dump(serializer);
+        if (line_indent == indenting::indent)
+        {
+            basic_json_serializer<char,string_type> serializer(s, options);
+            dump(serializer);
+        }
+        else
+        {
+            basic_json_compressed_serializer<char,string_type> serializer(s, options);
+            dump(serializer);
+        }
     }
 
     void dump(std::ostream& os) const
     {
-        json_serializer serializer(os);
+        json_compressed_serializer serializer(os);
         dump(serializer);
     }
 
     void dump(std::ostream& os, indenting line_indent) const
     {
-        json_serializer serializer(os, line_indent);
-        dump(serializer);
+        if (line_indent == indenting::indent)
+        {
+            json_serializer serializer(os);
+            dump(serializer);
+        }
+        else
+        {
+            json_compressed_serializer serializer(os);
+            dump(serializer);
+        }
     }
 
     void dump(std::ostream& os, const json_serializing_options& options) const
     {
-        json_serializer serializer(os, options);
+        json_compressed_serializer serializer(os, options);
         dump(serializer);
     }
 
     void dump(std::ostream& os, const json_serializing_options& options, indenting line_indent) const
     {
-        json_serializer serializer(os, options, line_indent);
-        dump(serializer);
+        if (line_indent == indenting::indent)
+        {
+            json_serializer serializer(os, options);
+            dump(serializer);
+        }
+        else
+        {
+            json_compressed_serializer serializer(os, options);
+            dump(serializer);
+        }
     }
 
     void dump(json_content_handler& handler) const
