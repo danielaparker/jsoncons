@@ -162,7 +162,9 @@ public:
 
     virtual spaces_option spaces_around_comma() const = 0;  
 
-    virtual bool force_one_key_per_line() const = 0;  
+    virtual bool pad_inside_object_braces() const = 0;
+
+    virtual bool pad_inside_array_brackets() const = 0;
 };
 
 template <class CharT>
@@ -196,7 +198,8 @@ private:
     size_t max_nesting_depth_;
     spaces_option spaces_around_colon_;
     spaces_option spaces_around_comma_;
-    bool force_one_key_per_line_;
+    bool pad_inside_object_braces_;
+    bool pad_inside_array_brackets_;
 public:
     static const size_t default_indent = 4;
 
@@ -221,7 +224,8 @@ public:
           max_nesting_depth_((std::numeric_limits<size_t>::max)()),
           spaces_around_colon_(spaces_option::space_after),
           spaces_around_comma_(spaces_option::no_spaces),
-          force_one_key_per_line_(false)
+          pad_inside_object_braces_(false),
+          pad_inside_array_brackets_(false)
     {
     }
 
@@ -323,14 +327,25 @@ public:
         return *this;
     }
 
-    bool force_one_key_per_line() const override
+    bool pad_inside_object_braces() const override
     {
-        return force_one_key_per_line_;
+        return pad_inside_object_braces_;
     }
 
-    basic_json_serializing_options<CharT>& force_one_key_per_line(bool value)
+    basic_json_serializing_options<CharT>& pad_inside_object_braces(bool value)
     {
-        force_one_key_per_line_ = value;
+        pad_inside_object_braces_ = value;
+        return *this;
+    }
+
+    bool pad_inside_array_brackets() const override
+    {
+        return pad_inside_array_brackets_;
+    }
+
+    basic_json_serializing_options<CharT>& pad_inside_array_brackets(bool value)
+    {
+        pad_inside_array_brackets_ = value;
         return *this;
     }
 
