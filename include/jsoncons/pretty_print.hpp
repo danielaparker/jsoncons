@@ -32,30 +32,30 @@ class json_printable
 public:
     typedef typename Json::char_type char_type;
 
-    json_printable(const Json& o, indenting line_indent)
-       : o_(&o), indenting_(line_indent)
+    json_printable(const Json& j, indenting line_indent)
+       : j_(&j), indenting_(line_indent)
     {
     }
 
-    json_printable(const Json& o,
+    json_printable(const Json& j,
                    const basic_json_serializing_options<char_type>& options,
                    indenting line_indent)
-       : o_(&o), options_(options), indenting_(line_indent)
+       : j_(&j), options_(options), indenting_(line_indent)
     {
     }
 
     void dump(std::basic_ostream<char_type>& os) const
     {
-        o_->dump(os, options_, indenting_);
+        j_->dump(os, options_, indenting_);
     }
 
-    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json>& o)
+    friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const json_printable<Json>& pr)
     {
-        o.dump(os);
+        pr.dump(os);
         return os;
     }
 
-    const Json *o_;
+    const Json *j_;
     basic_json_serializing_options<char_type> options_;
     indenting indenting_;
 private:
@@ -63,29 +63,29 @@ private:
 };
 
 template<class Json>
-json_printable<Json> print(const Json& val)
+json_printable<Json> print(const Json& j)
 {
-    return json_printable<Json>(val, indenting::no_indent);
+    return json_printable<Json>(j, indenting::no_indent);
 }
 
 template<class Json>
-json_printable<Json> print(const Json& val,
+json_printable<Json> print(const Json& j,
                            const basic_json_serializing_options<typename Json::char_type>& options)
 {
-    return json_printable<Json>(val, options, indenting::no_indent);
+    return json_printable<Json>(j, options, indenting::no_indent);
 }
 
 template<class Json>
-json_printable<Json> pretty_print(const Json& val)
+json_printable<Json> pretty_print(const Json& j)
 {
-    return json_printable<Json>(val, indenting::indent);
+    return json_printable<Json>(j, indenting::indent);
 }
 
 template<class Json>
-json_printable<Json> pretty_print(const Json& val,
+json_printable<Json> pretty_print(const Json& j,
                                   const basic_json_serializing_options<typename Json::char_type>& options)
 {
-    return json_printable<Json>(val, options, indenting::indent);
+    return json_printable<Json>(j, options, indenting::indent);
 }
 
 }

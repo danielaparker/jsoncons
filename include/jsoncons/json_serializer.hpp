@@ -229,9 +229,9 @@ private:
     bool can_write_nan_replacement_;
     bool can_write_pos_inf_replacement_;
     bool can_write_neg_inf_replacement_;
-    string_type nan_replacement_;
-    string_type pos_inf_replacement_;
-    string_type neg_inf_replacement_;
+    std::basic_string<CharT> nan_replacement_;
+    std::basic_string<CharT> pos_inf_replacement_;
+    std::basic_string<CharT> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
@@ -246,6 +246,9 @@ private:
     bool indenting_;
     detail::print_double fp_;
     Writer writer_;
+
+    std::basic_string<CharT> colon_str_;
+    std::basic_string<CharT> comma_str_;
 
     // Noncopyable and nonmoveable
     basic_json_serializer(const basic_json_serializer&) = delete;
@@ -291,6 +294,36 @@ public:
                                     0)),
          writer_(os)
     {
+        switch (options.spaces_around_colon())
+        {
+            case spaces_option::space_after:
+                colon_str_ = std::basic_string<CharT>({':',' '});
+                break;
+            case spaces_option::space_before:
+                colon_str_ = std::basic_string<CharT>({' ',':'});
+                break;
+            case spaces_option::space_before_and_after:
+                colon_str_ = std::basic_string<CharT>({' ',':',' '});
+                break;
+            default:
+                colon_str_.push_back(':');
+                break;
+        }
+        switch (options.spaces_around_comma())
+        {
+            case spaces_option::space_after:
+                comma_str_ = std::basic_string<CharT>({',',' '});
+                break;
+            case spaces_option::space_before:
+                comma_str_ = std::basic_string<CharT>({' ',','});
+                break;
+            case spaces_option::space_before_and_after:
+                comma_str_ = std::basic_string<CharT>({' ',',',' '});
+                break;
+            default:
+                comma_str_.push_back(',');
+                break;
+        }
     }
 
     ~basic_json_serializer()
@@ -331,7 +364,7 @@ private:
         {
             if (stack_.back().count() > 0)
             {
-                writer_.push_back(',');
+                writer_.insert(comma_str_.data(),comma_str_.length());
             }
         }
 
@@ -393,7 +426,7 @@ private:
         {
             if (stack_.back().count() > 0)
             {
-                writer_.push_back(',');
+                writer_.insert(comma_str_.data(),comma_str_.length());
             }
         }
         if (indenting_)
@@ -477,7 +510,7 @@ private:
         {
             if (stack_.back().count() > 0)
             {
-                writer_.push_back(',');
+                writer_.insert(comma_str_.data(),comma_str_.length());
             }
             if (indenting_)
             {
@@ -491,11 +524,7 @@ private:
         writer_.push_back('\"');
         jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_);
         writer_.push_back('\"');
-        writer_.push_back(':');
-        if (indenting_)
-        {
-            writer_.push_back(' ');
-        }
+        writer_.insert(colon_str_.data(),colon_str_.length());
         return true;
     }
 
@@ -741,7 +770,7 @@ private:
         {
             if (stack_.back().count() > 0)
             {
-                writer_.push_back(',');
+                writer_.insert(comma_str_.data(),comma_str_.length());
             }
             if (indenting_)
             {
@@ -835,9 +864,9 @@ private:
     bool can_write_nan_replacement_;
     bool can_write_pos_inf_replacement_;
     bool can_write_neg_inf_replacement_;
-    string_type nan_replacement_;
-    string_type pos_inf_replacement_;
-    string_type neg_inf_replacement_;
+    std::basic_string<CharT> nan_replacement_;
+    std::basic_string<CharT> pos_inf_replacement_;
+    std::basic_string<CharT> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
@@ -1258,9 +1287,9 @@ private:
     bool can_write_nan_replacement_;
     bool can_write_pos_inf_replacement_;
     bool can_write_neg_inf_replacement_;
-    string_type nan_replacement_;
-    string_type pos_inf_replacement_;
-    string_type neg_inf_replacement_;
+    std::basic_string<CharT> nan_replacement_;
+    std::basic_string<CharT> pos_inf_replacement_;
+    std::basic_string<CharT> neg_inf_replacement_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
@@ -1270,6 +1299,9 @@ private:
     detail::print_double fp_;
     Writer writer_;
     size_t column_;
+
+    std::basic_string<CharT> colon_str_;
+    std::basic_string<CharT> comma_str_;
 
     // Noncopyable and nonmoveable
     new_basic_json_serializer(const new_basic_json_serializer&) = delete;
@@ -1298,6 +1330,36 @@ public:
          writer_(os),
          column_(0)
     {
+        switch (options.spaces_around_colon())
+        {
+            case spaces_option::space_after:
+                colon_str_ = std::basic_string<CharT>({':',' '});
+                break;
+            case spaces_option::space_before:
+                colon_str_ = std::basic_string<CharT>({' ',':'});
+                break;
+            case spaces_option::space_before_and_after:
+                colon_str_ = std::basic_string<CharT>({' ',':',' '});
+                break;
+            default:
+                colon_str_.push_back(':');
+                break;
+        }
+        switch (options.spaces_around_comma())
+        {
+            case spaces_option::space_after:
+                comma_str_ = std::basic_string<CharT>({',',' '});
+                break;
+            case spaces_option::space_before:
+                comma_str_ = std::basic_string<CharT>({' ',','});
+                break;
+            case spaces_option::space_before_and_after:
+                comma_str_ = std::basic_string<CharT>({' ',',',' '});
+                break;
+            default:
+                comma_str_.push_back(',');
+                break;
+        }
     }
 
     ~new_basic_json_serializer()
@@ -1323,8 +1385,8 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
 
         stack_.push_back(serialization_context(structure_type::object));
@@ -1352,8 +1414,8 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
         stack_.push_back(serialization_context(structure_type::array));
         writer_.push_back('[');
@@ -1378,15 +1440,15 @@ private:
     {
         if (!stack_.empty() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
 
         writer_.push_back('\"');
         size_t length = jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_);
         writer_.push_back('\"');
-        writer_.push_back(':');
-        column_ += (length+3);
+        writer_.insert(colon_str_.data(),colon_str_.length());
+        column_ += (length+2+colon_str_.length());
         return true;
     }
 
@@ -1394,8 +1456,8 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
 
         writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().size());
@@ -1437,6 +1499,7 @@ private:
                 if (signum == -1)
                 {
                     writer_.push_back('~');
+                    ++column_;
                 }
                 size_t length = encode_base64(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
@@ -1454,6 +1517,7 @@ private:
                 if (signum == -1)
                 {
                     writer_.push_back('~');
+                    ++column_;
                 }
                 size_t length = encode_base64url(v.data(), v.size(), writer_);
                 writer_.push_back('\"');
@@ -1475,8 +1539,8 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
 
         switch (tag)
@@ -1502,8 +1566,8 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
         switch (byte_string_format_)
         {
@@ -1547,8 +1611,8 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
 
         if ((std::isnan)(value))
@@ -1592,7 +1656,8 @@ private:
         }
         else
         {
-            fp_(value, fmt, writer_);
+            size_t length = fp_(value, fmt, writer_);
+            column_ += length;
         }
 
         if (!stack_.empty())
@@ -1608,10 +1673,11 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
-        detail::print_integer(value, writer_);
+        size_t length = detail::print_integer(value, writer_);
+        column_ += length;
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1625,10 +1691,11 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
-        detail::print_uinteger(value, writer_);
+        size_t length = detail::print_uinteger(value, writer_);
+        column_ += length;
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1640,8 +1707,8 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            writer_.push_back(',');
-            ++column_;
+            writer_.insert(comma_str_.data(),comma_str_.length());
+            column_ += comma_str_.length();
         }
 
         if (value)

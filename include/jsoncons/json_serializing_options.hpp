@@ -87,6 +87,8 @@ enum class bignum_chars_format : uint8_t {integer, base10, base64, base64url
 
 enum class byte_string_chars_format : uint8_t {base16,base64,base64url};
 
+enum class spaces_option{no_spaces=0,space_after,space_before,space_before_and_after};
+
 template <class CharT>
 class basic_json_read_options
 {
@@ -155,6 +157,10 @@ public:
     virtual bool escape_all_non_ascii() const = 0; 
 
     virtual bool escape_solidus() const = 0; 
+
+    virtual spaces_option spaces_around_colon() const = 0;  
+
+    virtual spaces_option spaces_around_comma() const = 0;  
 };
 
 template <class CharT>
@@ -186,6 +192,8 @@ private:
     size_t max_line_length_;
 
     size_t max_nesting_depth_;
+    spaces_option spaces_around_colon_;
+    spaces_option spaces_around_comma_;
 public:
     static const size_t default_indent = 4;
 
@@ -207,7 +215,9 @@ public:
           array_array_split_lines_(line_split_kind::new_line),
           array_object_split_lines_(line_split_kind::multi_line),
           max_line_length_(120),
-          max_nesting_depth_((std::numeric_limits<size_t>::max)())
+          max_nesting_depth_((std::numeric_limits<size_t>::max)()),
+          spaces_around_colon_(spaces_option::space_after),
+          spaces_around_comma_(spaces_option::no_spaces)
     {
     }
 
@@ -284,6 +294,28 @@ public:
     basic_json_serializing_options<CharT>& indent(int value)
     {
         indent_ = value;
+        return *this;
+    }
+
+    spaces_option spaces_around_colon() const override
+    {
+        return spaces_around_colon_;
+    }
+
+    basic_json_serializing_options<CharT>& spaces_around_colon(spaces_option value)
+    {
+        spaces_around_colon_ = value;
+        return *this;
+    }
+
+    spaces_option spaces_around_comma() const override
+    {
+        return spaces_around_comma_;
+    }
+
+    basic_json_serializing_options<CharT>& spaces_around_comma(spaces_option value)
+    {
+        spaces_around_comma_ = value;
         return *this;
     }
 

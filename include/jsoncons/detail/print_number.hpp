@@ -29,9 +29,11 @@ namespace jsoncons { namespace detail {
 // print_integer
 
 template<class Writer> 
-void print_integer(int64_t value, Writer& writer)
+size_t print_integer(int64_t value, Writer& writer)
 {
     typedef typename Writer::value_type char_type;
+
+    size_t count = 0;
 
     char_type buf[255];
     uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
@@ -41,33 +43,42 @@ void print_integer(int64_t value, Writer& writer)
         *p++ = static_cast<char_type>(48 + u%10);
     }
     while (u /= 10);
+    count += (p-buf);
     if (value < 0)
     {
         writer.push_back('-');
+        ++count;
     }
     while (--p >= buf)
     {
         writer.push_back(*p);
     }
+
+    return count;
 }
 
 // print_uinteger
 
 template<class Writer>
-void print_uinteger(uint64_t value, Writer& writer)
+size_t print_uinteger(uint64_t value, Writer& writer)
 {
     typedef typename Writer::value_type char_type;
+
+    size_t count = 0;
 
     char_type buf[255];
     char_type* p = buf;
     do
     {
         *p++ = static_cast<char_type>(48 + value % 10);
-    } while (value /= 10);
+    } 
+    while (value /= 10);
+    count += (p-buf);
     while (--p >= buf)
     {
         writer.push_back(*p);
     }
+    return count;
 }
 
 // print_double
@@ -96,8 +107,10 @@ public:
     }
 
     template <class Writer>
-    void operator()(double val, const floating_point_options& fmt, Writer& writer)
+    size_t operator()(double val, const floating_point_options& fmt, Writer& writer)
     {
+        size_t count = 0;
+
         chars_format format = override_.format() != chars_format() ? override_.format() : fmt.format();
 
         int decimal_places;
@@ -200,12 +213,14 @@ public:
                 {
                 case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                     writer.push_back(*q);
+                    ++count;
                     break;
                 default:
                     if (*q == decimal_point_)
                     {
                         dot = true;
                         writer.push_back('.');
+                        ++count;
                     }
                     break;
                 }
@@ -214,13 +229,16 @@ public:
             {
                 writer.push_back('.');
                 writer.push_back('0');
+                count += 2;
                 dot = true;
             }
             for (const char* q = pexp; q < send; ++q)
             {
                 writer.push_back(*q);
+                ++count;
             }
         }
+        return count;
     }
 };
 

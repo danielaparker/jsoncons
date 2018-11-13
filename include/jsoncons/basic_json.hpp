@@ -2867,32 +2867,48 @@ public:
 
     void dump(std::basic_ostream<char_type>& os) const
     {
-        basic_json_serializer<char_type> serializer(os);
+        basic_json_compressed_serializer<char_type> serializer(os);
         dump(serializer);
     }
 
     void dump(std::basic_ostream<char_type>& os, indenting line_indent) const
     {
-        basic_json_serializer<char_type> serializer(os, line_indent);
-        dump(serializer);
+        if (line_indent == indenting::indent)
+        {
+            basic_json_serializer<char_type> serializer(os, line_indent);
+            dump(serializer);
+        }
+        else
+        {
+            basic_json_compressed_serializer<char_type> serializer(os);
+            dump(serializer);
+        }
     }
 
     void dump(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options) const
     {
-        basic_json_serializer<char_type> serializer(os, options);
+        basic_json_compressed_serializer<char_type> serializer(os, options);
         dump(serializer);
     }
 
     void dump(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options, indenting line_indent) const
     {
-        basic_json_serializer<char_type> serializer(os, options, line_indent);
-        dump(serializer);
+        if (line_indent == indenting::indent)
+        {
+            basic_json_serializer<char_type> serializer(os, options, line_indent);
+            dump(serializer);
+        }
+        else
+        {
+            basic_json_compressed_serializer<char_type> serializer(os, options);
+            dump(serializer);
+        }
     }
 
     string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const noexcept
     {
         string_type s(allocator);
-        basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s);
+        basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s);
         dump(serializer);
         return s;
     }
@@ -2901,7 +2917,7 @@ public:
                           const char_allocator_type& allocator=char_allocator_type()) const
     {
         string_type s(allocator);
-        basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s,options);
+        basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s,options);
         dump(serializer);
         return s;
     }
@@ -2960,20 +2976,17 @@ public:
 
     void to_stream(std::basic_ostream<char_type>& os) const
     {
-        basic_json_serializer<char_type> serializer(os);
-        to_stream(serializer);
+        dump(os);
     }
 
     void to_stream(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options) const
     {
-        basic_json_serializer<char_type> serializer(os, options);
-        to_stream(serializer);
+        dump(os,options);
     }
 
     void to_stream(std::basic_ostream<char_type>& os, const basic_json_serializing_options<char_type>& options, bool pprint) const
     {
-        basic_json_serializer<char_type> serializer(os, options, pprint);
-        to_stream(serializer);
+        dump(os,options,pprint ? indenting::indent : indenting::no_indent);
     }
 #endif
     bool is_null() const noexcept
