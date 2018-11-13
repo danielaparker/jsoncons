@@ -2765,7 +2765,7 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, indenting line_indent) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        if (line_indent)
+        if (line_indent == indenting::indent)
         {
             basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, line_indent);
             dump(serializer);
@@ -2792,7 +2792,7 @@ public:
               indenting line_indent) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        if (line_indent)
+        if (line_indent == indenting::indent)
         {
             basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, options, line_indent);
             dump(serializer);

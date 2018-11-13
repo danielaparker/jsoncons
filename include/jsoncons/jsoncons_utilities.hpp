@@ -580,8 +580,8 @@ static const char base64url_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                               "\0";
 
 
-template <class Writer>
-void encode_base16(const uint8_t* data, size_t length, Writer& result)
+template <class Container>
+void encode_base16(const uint8_t* data, size_t length, Container& result)
 {
     static const char* lut = "0123456789ABCDEF";
 
@@ -599,8 +599,8 @@ static bool is_base64(uint8_t c)
     return isalnum(c) || c == '+' || c == '/';
 }
 
-template <class Writer>
-void encode_base64(const uint8_t* first, size_t length, const char* alphabet, Writer& result)
+template <class Container>
+void encode_base64(const uint8_t* first, size_t length, const char* alphabet, Container& result)
 {
     const uint8_t* last = first + length;
     unsigned char a3[3];
@@ -656,14 +656,14 @@ void encode_base64(const uint8_t* first, size_t length, const char* alphabet, Wr
     }
 }
 
-template <class Writer>
-void encode_base64url(const uint8_t* first, size_t length, Writer& result)
+template <class Container>
+void encode_base64url(const uint8_t* first, size_t length, Container& result)
 {
     return encode_base64(first, length, base64url_alphabet, result);
 }
 
-template <class Writer>
-void encode_base64(const uint8_t* first, size_t length, Writer& result)
+template <class Container>
+void encode_base64(const uint8_t* first, size_t length, Container& result)
 {
     encode_base64(first, length, base64_alphabet, result);
 }
