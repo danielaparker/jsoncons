@@ -82,16 +82,16 @@ Negative infinity replacement. The default is `"null"`
     void max_nesting_depth(size_t depth)
 The maximum nesting depth allowed when deserializing. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
-    json_serializing_options& object_object_split_lines(line_split_kind value)
+    json_serializing_options& object_object_line_splits(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
-    json_serializing_options& array_object_split_lines(line_split_kind value)
+    json_serializing_options& array_object_line_splits(line_split_kind value)
 For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
-    json_serializing_options& object_array_split_lines(line_split_kind value)
+    json_serializing_options& object_array_line_splits(line_split_kind value)
 For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
 
-    json_serializing_options& array_array_split_lines(line_split_kind value)
+    json_serializing_options& array_array_line_splits(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
 
     size_t max_nesting_depth()
@@ -152,12 +152,12 @@ Output:
 
     std::cout << "New line" << std::endl;
     json_serializing_options options1;
-    format1.object_array_split_lines(line_split_kind::new_line);
+    format1.object_array_line_splits(line_split_kind::new_line);
     std::cout << pretty_print(val,options1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
     json_serializing_options options2;
-    format2.object_array_split_lines(line_split_kind::multi_line);
+    format2.object_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(val,options2) << std::endl;
 ```
 
@@ -229,12 +229,12 @@ Multi line
 
     std::cout << "Same line" << std::endl;
     json_serializing_options options1;
-    format1.array_array_split_lines(line_split_kind::same_line);
+    format1.array_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(val, options1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
     json_serializing_options options2;
-    format2.array_array_split_lines(line_split_kind::multi_line);
+    format2.array_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(val, options2) << std::endl;
 ```
 

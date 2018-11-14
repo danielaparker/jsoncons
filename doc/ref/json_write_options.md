@@ -63,16 +63,16 @@ Positive infinity replacement. The default is `"null"`
     virtual const std::string& neg_inf_replacement() const = 0; 
 Negative infinity replacement. The default is `"null"`
 
-    virtual json_write_options& object_object_split_lines(line_split_kind value) = 0;
+    virtual json_write_options& object_object_line_splits(line_split_kind value) = 0;
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
-    virtual json_write_options& array_object_split_lines(line_split_kind value) = 0;
+    virtual json_write_options& array_object_line_splits(line_split_kind value) = 0;
 For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
-    virtual json_write_options& object_array_split_lines(line_split_kind value) = 0;
+    virtual json_write_options& object_array_line_splits(line_split_kind value) = 0;
 For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind).
 
-    virtual json_write_options& array_array_split_lines(line_split_kind value) = 0;
+    virtual json_write_options& array_array_line_splits(line_split_kind value) = 0;
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind).
 
 

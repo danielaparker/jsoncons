@@ -43,7 +43,7 @@ TEST_CASE("test_serialization_1")
     CHECK(expected1 == os1.str());
 
     json_serializing_options options2 ;
-    options2 .array_array_split_lines(line_split_kind::same_line);
+    options2 .array_array_line_splits(line_split_kind::same_line);
     std::string expected2 = R"({
     "data": {
         "id": [1,2,3],
@@ -59,7 +59,7 @@ TEST_CASE("test_serialization_1")
     CHECK(expected2 == os2.str());
 
     json_serializing_options options3;
-    options3.array_array_split_lines(line_split_kind::new_line);
+    options3.array_array_line_splits(line_split_kind::new_line);
     std::string expected3 = R"({
     "data": {
         "id": [1,2,3],
@@ -77,7 +77,7 @@ TEST_CASE("test_serialization_1")
     CHECK(expected3 == os3.str());
 
     json_serializing_options options4;
-    options4.array_array_split_lines(line_split_kind::multi_line);
+    options4.array_array_line_splits(line_split_kind::multi_line);
     std::string expected4 = R"({
     "data": {
         "id": [1,2,3],
@@ -99,7 +99,7 @@ TEST_CASE("test_serialization_1")
     CHECK(expected4 == os4.str());
 
     json_serializing_options options5;
-    options5.object_array_split_lines(line_split_kind::same_line);
+    options5.object_array_line_splits(line_split_kind::same_line);
     std::string expected5 = R"({
     "data": {
         "id": [1,2,3],
@@ -117,7 +117,7 @@ TEST_CASE("test_serialization_1")
     CHECK(expected5 == os5.str());
 
     json_serializing_options options6;
-    options6.object_array_split_lines(line_split_kind::new_line);
+    options6.object_array_line_splits(line_split_kind::new_line);
     std::string expected6 = R"({
     "data": {
         "id": [
@@ -137,7 +137,7 @@ TEST_CASE("test_serialization_1")
     CHECK(expected6 == os6.str());
 
     json_serializing_options options7;
-    options7.object_array_split_lines(line_split_kind::multi_line);
+    options7.object_array_line_splits(line_split_kind::multi_line);
     std::string expected7 = R"({
     "data": {
         "id": [
@@ -159,7 +159,7 @@ TEST_CASE("test_serialization_1")
     CHECK(expected7 == os7.str());
 }
 
-// array_array_split_lines_(line_split_kind::new_line)
+// array_array_line_splits_(line_split_kind::new_line)
 
 TEST_CASE("test_array_of_array_of_string_string_array")
 {

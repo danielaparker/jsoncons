@@ -278,7 +278,7 @@ NY,LON,TOR;LON
 "NY","LON","TOR";"LON"
 )";
     json_serializing_options print_options;
-    print_options.array_array_split_lines(line_split_kind::same_line);
+    print_options.array_array_line_splits(line_split_kind::same_line);
 
     csv_serializing_options options1;
     params1.assume_header(true)

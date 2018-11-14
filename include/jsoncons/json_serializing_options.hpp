@@ -138,13 +138,13 @@ public:
 
     virtual bignum_chars_format bignum_format() const = 0; 
 
-    virtual line_split_kind object_object_split_lines() const = 0; 
+    virtual line_split_kind object_object_line_splits() const = 0; 
 
-    virtual line_split_kind array_object_split_lines() const = 0; 
+    virtual line_split_kind array_object_line_splits() const = 0; 
 
-    virtual line_split_kind object_array_split_lines() const = 0; 
+    virtual line_split_kind object_array_line_splits() const = 0; 
 
-    virtual line_split_kind array_array_split_lines() const = 0; 
+    virtual line_split_kind array_array_line_splits() const = 0; 
 
     virtual int indent() const = 0;  
 
@@ -189,10 +189,10 @@ private:
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
     bignum_chars_format bignum_format_;
-    line_split_kind object_object_split_lines_;
-    line_split_kind object_array_split_lines_;
-    line_split_kind array_array_split_lines_;
-    line_split_kind array_object_split_lines_;
+    line_split_kind object_object_line_splits_;
+    line_split_kind object_array_line_splits_;
+    line_split_kind array_array_line_splits_;
+    line_split_kind array_object_line_splits_;
     size_t line_length_limit_;
 
     size_t max_nesting_depth_;
@@ -216,10 +216,10 @@ public:
           escape_solidus_(false),
           byte_string_format_(byte_string_chars_format::base64url),
           bignum_format_(bignum_chars_format::base10),
-          object_object_split_lines_(line_split_kind::multi_line),
-          object_array_split_lines_(line_split_kind::same_line),
-          array_array_split_lines_(line_split_kind::new_line),
-          array_object_split_lines_(line_split_kind::multi_line),
+          object_object_line_splits_(line_split_kind::multi_line),
+          object_array_line_splits_(line_split_kind::same_line),
+          array_array_line_splits_(line_split_kind::new_line),
+          array_object_line_splits_(line_split_kind::multi_line),
           line_length_limit_(120),
           max_nesting_depth_((std::numeric_limits<size_t>::max)()),
           spaces_around_colon_(spaces_option::space_after),
@@ -236,17 +236,17 @@ public:
     bignum_chars_format bignum_format() const override {return bignum_format_;}
     basic_json_serializing_options<CharT>&  bignum_format(bignum_chars_format value) {bignum_format_ = value; return *this;}
 
-    line_split_kind object_object_split_lines() const override {return object_object_split_lines_;}
-    basic_json_serializing_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_split_lines_ = value; return *this;}
+    line_split_kind object_object_line_splits() const override {return object_object_line_splits_;}
+    basic_json_serializing_options<CharT>& object_object_line_splits(line_split_kind value) {object_object_line_splits_ = value; return *this;}
 
-    line_split_kind array_object_split_lines() const override {return array_object_split_lines_;}
-    basic_json_serializing_options<CharT>& array_object_split_lines(line_split_kind value) {array_object_split_lines_ = value; return *this;}
+    line_split_kind array_object_line_splits() const override {return array_object_line_splits_;}
+    basic_json_serializing_options<CharT>& array_object_line_splits(line_split_kind value) {array_object_line_splits_ = value; return *this;}
 
-    line_split_kind object_array_split_lines() const override {return object_array_split_lines_;}
-    basic_json_serializing_options<CharT>& object_array_split_lines(line_split_kind value) {object_array_split_lines_ = value; return *this;}
+    line_split_kind object_array_line_splits() const override {return object_array_line_splits_;}
+    basic_json_serializing_options<CharT>& object_array_line_splits(line_split_kind value) {object_array_line_splits_ = value; return *this;}
 
-    line_split_kind array_array_split_lines() const override {return array_array_split_lines_;}
-    basic_json_serializing_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
+    line_split_kind array_array_line_splits() const override {return array_array_line_splits_;}
+    basic_json_serializing_options<CharT>& array_array_line_splits(line_split_kind value) {array_array_line_splits_ = value; return *this;}
 
     int indent() const override
     {
@@ -436,6 +436,20 @@ public:
     {
         max_nesting_depth_ = value;
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    line_split_kind object_object_split_lines() const {return object_object_line_splits_;}
+    basic_json_serializing_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_line_splits_ = value; return *this;}
+
+    line_split_kind array_object_split_lines() const {return array_object_line_splits_;}
+    basic_json_serializing_options<CharT>& array_object_split_lines(line_split_kind value) {array_object_line_splits_ = value; return *this;}
+
+    line_split_kind object_array_split_lines() const {return object_array_line_splits_;}
+    basic_json_serializing_options<CharT>& object_array_split_lines(line_split_kind value) {object_array_line_splits_ = value; return *this;}
+
+    line_split_kind array_array_split_lines() const {return array_array_line_splits_;}
+    basic_json_serializing_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_line_splits_ = value; return *this;}
+#endif
 private:
     enum class input_state {initial,begin_quote,character,end_quote,escape,error};
     bool is_string(const string_view_type& s) const

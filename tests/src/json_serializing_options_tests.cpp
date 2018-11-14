@@ -71,7 +71,7 @@ TEST_CASE("test_read_write_read_nan_replacement")
     CHECK(expected.to_string() == j.to_string());
 }
 #endif
-TEST_CASE("line_length_limit tests")
+TEST_CASE("simple line_length_limit tests")
 {
     std::string s = R"(
 {
@@ -98,15 +98,96 @@ TEST_CASE("line_length_limit tests")
 
         std::cout << pretty_print(j, options) << "\n";
     }
-#endif
-    SECTION("object_array_split_lines(line_split_kind::new_line)")
+    SECTION("object_array_line_splits(line_split_kind::new_line)")
     {
         json j = json::parse(s);
 
         json_serializing_options options;
         options.line_length_limit(22)
                .spaces_around_comma(spaces_option::space_after)
-               .object_array_split_lines(line_split_kind::multi_line);
+               .object_array_line_splits(line_split_kind::multi_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::cout << pretty_print(j, options) << "\n";
+    }
+
+#endif
+}
+
+TEST_CASE("store line_length_limit tests")
+{
+    std::string s = R"(
+{
+    "store": {
+        "book": [
+            {
+                "category": "reference",
+                "author": "Nigel Rees",
+                "title": "Sayings of the Century",
+                "price": 8.95
+            },
+            {
+                "category": "fiction",
+                "author": "Evelyn Waugh",
+                "title": "Sword of Honour",
+                "price": 12.99
+            },
+            {
+                "category": "fiction",
+                "author": "Herman Melville",
+                "title": "Moby Dick",
+                "isbn": "0-553-21311-3",
+                "price": 8.99
+            },
+            {
+                "category": "fiction",
+                "author": "J. R. R. Tolkien",
+                "title": "The Lord of the Rings",
+                "isbn": "0-395-19395-8",
+                "price": 22.99
+            }
+        ]
+    }
+}
+    )";
+
+    SECTION("default")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::space_after);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::cout << pretty_print(j, options) << "\n";
+    }
+
+    SECTION("object_array_line_splits same_line, no line length limit")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::space_after)
+               .array_object_line_splits(line_split_kind::same_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::cout << pretty_print(j, options) << "\n";
+    }
+
+    SECTION("object_array_line_splits same_line, line length limit")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.line_length_limit(28)
+               .spaces_around_comma(spaces_option::space_after)
+               .array_object_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);

@@ -51,13 +51,13 @@ void serialization_example1()
     std::cout << pretty_print(val) << std::endl;
 
 
-    std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
-    std::cout << "array_object_split_lines(line_split_kind::new_line)" << std::endl;
+    std::cout << "array_array_line_splits(line_split_kind::new_line)" << std::endl;
+    std::cout << "array_object_line_splits(line_split_kind::new_line)" << std::endl;
 
     json_serializing_options options;
 
-    options.array_array_split_lines(line_split_kind::new_line)
-           .array_object_split_lines(line_split_kind::new_line);
+    options.array_array_line_splits(line_split_kind::new_line)
+           .array_object_line_splits(line_split_kind::new_line);
     std::cout << pretty_print(val,options) << std::endl;
 }
 
@@ -73,19 +73,19 @@ void serialization_example2()
     std::cout << "Default object-array same line options" << std::endl;
     std::cout << pretty_print(val) << std::endl;
 
-    std::cout << "object_array_split_lines(line_split_kind::same_line)" << std::endl;
+    std::cout << "object_array_line_splits(line_split_kind::same_line)" << std::endl;
     json_serializing_options options1;
-    options1.object_array_split_lines(line_split_kind::same_line);
+    options1.object_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(val,options1) << std::endl;
 
-    std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
+    std::cout << "object_array_line_splits(line_split_kind::new_line)" << std::endl;
     json_serializing_options options2 ;
-    options2 .object_array_split_lines(line_split_kind::new_line);
+    options2 .object_array_line_splits(line_split_kind::new_line);
     std::cout << pretty_print(val,options2 ) << std::endl;
 
-    std::cout << "object_array_split_lines(line_split_kind::multi_line)" << std::endl;
+    std::cout << "object_array_line_splits(line_split_kind::multi_line)" << std::endl;
     json_serializing_options options3;
-    options3.object_array_split_lines(line_split_kind::multi_line);
+    options3.object_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(val,options3) << std::endl;
 }
 
@@ -102,8 +102,8 @@ void serialization_example3()
         )");
 
         json_serializing_options options;
-        options.array_object_split_lines(line_split_kind::same_line);
-        std::cout << "array_object_split_lines(line_split_kind::same_line)" << std::endl;
+        options.array_object_line_splits(line_split_kind::same_line);
+        std::cout << "array_object_line_splits(line_split_kind::same_line)" << std::endl;
         std::cout << pretty_print(val,options) << std::endl;
     }
 
@@ -123,11 +123,11 @@ void serialization_example3()
         std::cout << pretty_print(val) << std::endl;
 
         json_serializing_options options1;
-        options1.array_array_split_lines(line_split_kind::same_line);
+        options1.array_array_line_splits(line_split_kind::same_line);
         std::cout << pretty_print(val,options1) << std::endl;
 
         json_serializing_options options;
-        options.object_object_split_lines(line_split_kind::new_line);
+        options.object_object_line_splits(line_split_kind::new_line);
         std::cout << pretty_print(val,options) << std::endl;
     }
 
@@ -146,19 +146,19 @@ void serialization_example3()
         std::cout << "Default" << std::endl;
         std::cout << pretty_print(val2) << std::endl;
      
-        std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
+        std::cout << "array_array_line_splits(line_split_kind::new_line)" << std::endl;
         json_serializing_options options2 ;
-        options2 .array_array_split_lines(line_split_kind::new_line);
+        options2 .array_array_line_splits(line_split_kind::new_line);
         std::cout << pretty_print(val2,options2 ) << std::endl;
 
-        std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
+        std::cout << "array_array_line_splits(line_split_kind::same_line)" << std::endl;
         json_serializing_options options4;
-        options4.array_array_split_lines(line_split_kind::same_line);
+        options4.array_array_line_splits(line_split_kind::same_line);
         std::cout << pretty_print(val2, options4) << std::endl;
 
-        std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
+        std::cout << "array_array_line_splits(line_split_kind::same_line)" << std::endl;
         json_serializing_options options5;
-        options5.array_array_split_lines(line_split_kind::same_line);
+        options5.array_array_line_splits(line_split_kind::same_line);
         std::cout << pretty_print(val2, options5) << std::endl;
     }
 
@@ -170,9 +170,9 @@ void serialization_example3()
    }
     }
 )");
-    std::cout << "array_array_split_lines(line_split_kind::new_line)" << std::endl;
+    std::cout << "array_array_line_splits(line_split_kind::new_line)" << std::endl;
     json_serializing_options options6;
-    options6.array_array_split_lines(line_split_kind::new_line);
+    options6.array_array_line_splits(line_split_kind::new_line);
     std::cout << pretty_print(val3,options6) << std::endl;
 }
 
@@ -194,21 +194,21 @@ void serialization_example4()
 
     std::cout << "Array-array same line options" << std::endl;
     json_serializing_options options1;
-    options1.array_array_split_lines(line_split_kind::same_line);
+    options1.array_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(val, options1) << std::endl;
 
-    std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
-    std::cout << "array_array_split_lines(line_split_kind::same_line)" << std::endl;
+    std::cout << "object_array_line_splits(line_split_kind::new_line)" << std::endl;
+    std::cout << "array_array_line_splits(line_split_kind::same_line)" << std::endl;
     json_serializing_options options2 ;
-    options2 .object_array_split_lines(line_split_kind::new_line)
-           .array_array_split_lines(line_split_kind::same_line);
+    options2 .object_array_line_splits(line_split_kind::new_line)
+           .array_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(val, options2 ) << std::endl;
 
-    std::cout << "object_array_split_lines(line_split_kind::new_line)" << std::endl;
-    std::cout << "array_array_split_lines(line_split_kind::multi_line)" << std::endl;
+    std::cout << "object_array_line_splits(line_split_kind::new_line)" << std::endl;
+    std::cout << "array_array_line_splits(line_split_kind::multi_line)" << std::endl;
     json_serializing_options options3;
-    options3.object_array_split_lines(line_split_kind::new_line)
-           .array_array_split_lines(line_split_kind::multi_line);
+    options3.object_array_line_splits(line_split_kind::new_line)
+           .array_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(val, options3) << std::endl;
 
     {
@@ -226,40 +226,40 @@ void serialization_example4()
         std::cout << "Default" << std::endl;
         std::cout << pretty_print(val) << std::endl;
 
-        std::string style1 = "array_array_split_lines(line_split_kind:same_line)";
+        std::string style1 = "array_array_line_splits(line_split_kind:same_line)";
         std::cout << style1 << std::endl;
         json_serializing_options options1;
-        options1.array_array_split_lines(line_split_kind::same_line);
+        options1.array_array_line_splits(line_split_kind::same_line);
         std::cout << pretty_print(val,options1) << std::endl;
 
-        std::string style2 = "array_array_split_lines(line_split_kind::new_line)";
+        std::string style2 = "array_array_line_splits(line_split_kind::new_line)";
         std::cout << style2 << std::endl;
         json_serializing_options options2 ;
-        options2 .array_array_split_lines(line_split_kind::new_line);
+        options2 .array_array_line_splits(line_split_kind::new_line);
         std::cout << pretty_print(val,options2 ) << std::endl;
 
-        std::string style3 = "array_array_split_lines(line_split_kind::multi_line)";
+        std::string style3 = "array_array_line_splits(line_split_kind::multi_line)";
         std::cout << style3 << std::endl;
         json_serializing_options options3;
-        options3.array_array_split_lines(line_split_kind::multi_line);
+        options3.array_array_line_splits(line_split_kind::multi_line);
         std::cout << pretty_print(val,options3) << std::endl;
 
-        std::string style4 = "object_array_split_lines(line_split_kind:same_line)";
+        std::string style4 = "object_array_line_splits(line_split_kind:same_line)";
         std::cout << style4 << std::endl;
         json_serializing_options options4;
-        options4.object_array_split_lines(line_split_kind::same_line);
+        options4.object_array_line_splits(line_split_kind::same_line);
         std::cout << pretty_print(val,options4) << std::endl;
 
-        std::string style5 = "object_array_split_lines(line_split_kind::new_line)";
+        std::string style5 = "object_array_line_splits(line_split_kind::new_line)";
         std::cout << style5 << std::endl;
         json_serializing_options options5;
-        options5.object_array_split_lines(line_split_kind::new_line);
+        options5.object_array_line_splits(line_split_kind::new_line);
         std::cout << pretty_print(val,options5) << std::endl;
 
-        std::string style6 = "object_array_split_lines(line_split_kind::multi_line)";
+        std::string style6 = "object_array_line_splits(line_split_kind::multi_line)";
         std::cout << style6 << std::endl;
         json_serializing_options options6;
-        options6.object_array_split_lines(line_split_kind::multi_line);
+        options6.object_array_line_splits(line_split_kind::multi_line);
         std::cout << pretty_print(val,options6) << std::endl;
     }
 }

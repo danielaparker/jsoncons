@@ -160,20 +160,20 @@ private:
     {
         structure_type type_;
         size_t count_;
-        line_split_kind split_lines_;
+        line_split_kind line_splits_;
         bool indent_before_;
         bool unindent_after_;
         size_t begin_pos_;
         size_t data_pos_;
     public:
         serialization_context(structure_type type)
-           : type_(type), count_(0), split_lines_(line_split_kind::same_line), indent_before_(false), unindent_after_(false),
+           : type_(type), count_(0), line_splits_(line_split_kind::same_line), indent_before_(false), unindent_after_(false),
              begin_pos_(begin_pos), data_pos_(data_pos)
         {
         }
         serialization_context(structure_type type, line_split_kind split_lines, bool indent_once,
                               size_t begin_pos, size_t data_pos)
-           : type_(type), count_(0), split_lines_(split_lines), indent_before_(indent_once), unindent_after_(false),
+           : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), unindent_after_(false),
              begin_pos_(begin_pos), data_pos_(data_pos)
         {
         }
@@ -220,17 +220,17 @@ private:
 
         bool is_same_line() const
         {
-            return split_lines_ == line_split_kind::same_line;
+            return line_splits_ == line_split_kind::same_line;
         }
 
         bool is_new_line() const
         {
-            return split_lines_ == line_split_kind::new_line;
+            return line_splits_ == line_split_kind::new_line;
         }
 
         bool is_multi_line() const
         {
-            return split_lines_ == line_split_kind::multi_line;
+            return line_splits_ == line_split_kind::multi_line;
         }
 
         bool is_indent_once() const
@@ -251,10 +251,10 @@ private:
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
     bignum_chars_format bignum_format_;
-    line_split_kind object_object_split_lines_;
-    line_split_kind object_array_split_lines_;
-    line_split_kind array_array_split_lines_;
-    line_split_kind array_object_split_lines_;
+    line_split_kind object_object_line_splits_;
+    line_split_kind object_array_line_splits_;
+    line_split_kind array_array_line_splits_;
+    line_split_kind array_object_line_splits_;
     size_t line_length_limit_;
     detail::print_double fp_;
     Writer writer_;
@@ -291,10 +291,10 @@ public:
          escape_solidus_(options.escape_solidus()),
          byte_string_format_(options.byte_string_format()),
          bignum_format_(options.bignum_format()),
-         object_object_split_lines_(options.object_object_split_lines()),
-         object_array_split_lines_(options.object_array_split_lines()),
-         array_array_split_lines_(options.array_array_split_lines()),
-         array_object_split_lines_(options.array_object_split_lines()),
+         object_object_line_splits_(options.object_object_line_splits()),
+         object_array_line_splits_(options.object_array_line_splits()),
+         array_array_line_splits_(options.array_array_line_splits()),
+         array_object_line_splits_(options.array_object_line_splits()),
          indent_amount_(0), 
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
@@ -383,21 +383,21 @@ private:
 
         if (!stack_.empty() && stack_.back().is_object()) // object
         {
-            stack_.emplace_back(structure_type::object,object_object_split_lines_, false,
+            stack_.emplace_back(structure_type::object,object_object_line_splits_, false,
                                 column_, column_+open_object_brace_str_.length());
         }
         else if (!stack_.empty()) // array
         {
-            if (array_object_split_lines_ != line_split_kind::same_line)
+            if (array_object_line_splits_ != line_split_kind::same_line)
             {
                 stack_.back().unindent_after(true);
-                stack_.emplace_back(structure_type::object,array_object_split_lines_, false,
+                stack_.emplace_back(structure_type::object,array_object_line_splits_, false,
                                     column_, column_+open_object_brace_str_.length());
                 write_indent1();
             }
             else
             {
-                stack_.emplace_back(structure_type::object,array_object_split_lines_, false,
+                stack_.emplace_back(structure_type::object,array_object_line_splits_, false,
                                     column_, column_+open_object_brace_str_.length());
             }
         }
@@ -442,14 +442,14 @@ private:
             if (stack_.back().is_object())
             {
                 increment_indent();
-                if (object_array_split_lines_ != line_split_kind::same_line)
+                if (object_array_line_splits_ != line_split_kind::same_line)
                 {
-                    stack_.emplace_back(structure_type::array,object_array_split_lines_,true,
+                    stack_.emplace_back(structure_type::array,object_array_line_splits_,true,
                                         column_, column_+open_array_bracket_str_.length());
                 }
                 else
                 {
-                    stack_.emplace_back(structure_type::array,object_array_split_lines_,false,
+                    stack_.emplace_back(structure_type::array,object_array_line_splits_,false,
                                         column_, column_ + open_array_bracket_str_.length());
                 }
                 writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
@@ -457,7 +457,7 @@ private:
             }
             else // array
             {
-                if (array_array_split_lines_ == line_split_kind::same_line)
+                if (array_array_line_splits_ == line_split_kind::same_line)
                 {
                     if (stack_.back().is_multi_line())
                     {
@@ -467,17 +467,17 @@ private:
                                         column_, column_+open_array_bracket_str_.length());
                     increment_indent();
                 }
-                else if (array_array_split_lines_ == line_split_kind::multi_line)
+                else if (array_array_line_splits_ == line_split_kind::multi_line)
                 {
                     write_indent();
-                    stack_.emplace_back(structure_type::array,array_array_split_lines_, false,
+                    stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
                     increment_indent();
                 }
                 else // new_line
                 {
                     write_indent();
-                    stack_.emplace_back(structure_type::array,array_array_split_lines_, false,
+                    stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
                     increment_indent();
                 }
@@ -536,13 +536,16 @@ private:
 
     bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
-        if (!stack_.empty() && stack_.back().is_array())
+        if (!stack_.empty()) 
         {
-            begin_scalar_value();
-        }
-        if (column_ >= line_length_limit_) 
-        {
-            break_line();
+            if (stack_.back().is_array())
+            {
+                begin_scalar_value();
+            }
+            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            {
+                break_line();
+            }
         }
 
         writer_.insert(detail::null_literal<CharT>().data(), 
@@ -551,6 +554,234 @@ private:
 
         end_value();
         return true;
+    }
+
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
+    {
+        if (!stack_.empty()) 
+        {
+            if (stack_.back().is_array())
+            {
+                begin_scalar_value();
+            }
+            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            {
+                break_line();
+            }
+        }
+
+        switch (tag)
+        {
+            case semantic_tag_type::bignum:
+                write_bignum_value(sv);
+                break;
+            default:
+                write_string_value(sv);
+                break;
+        }
+
+        end_value();
+        return true;
+    }
+
+    bool do_byte_string_value(const byte_string_view& b, 
+                              semantic_tag_type,
+                              const serializing_context&) override
+    {
+        if (!stack_.empty()) 
+        {
+            if (stack_.back().is_array())
+            {
+                begin_scalar_value();
+            }
+            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            {
+                break_line();
+            }
+        }
+        switch (byte_string_format_)
+        {
+            case byte_string_chars_format::base16:
+            {
+                writer_.push_back('\"');
+                size_t length = encode_base16(b.data(),b.length(),writer_);
+                writer_.push_back('\"');
+                column_ += (length + 2);
+                break;
+            }
+            case byte_string_chars_format::base64url:
+            {
+                writer_.push_back('\"');
+                size_t length = encode_base64url(b.data(),b.length(),writer_);
+                writer_.push_back('\"');
+                column_ += (length + 2);
+                break;
+            }
+            default:
+            {
+                writer_.push_back('\"');
+                size_t length = encode_base64(b.data(), b.length(), writer_);
+                writer_.push_back('\"');
+                column_ += (length + 2);
+                break;
+            }
+        }
+
+        end_value();
+        return true;
+    }
+
+    bool do_double_value(double value, 
+                         const floating_point_options& fmt, 
+                         semantic_tag_type,
+                         const serializing_context&) override
+    {
+        if (!stack_.empty()) 
+        {
+            if (stack_.back().is_array())
+            {
+                begin_scalar_value();
+            }
+            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            {
+                break_line();
+            }
+        }
+
+        if ((std::isnan)(value))
+        {
+            if (can_write_nan_replacement_)
+            {
+                writer_.insert(nan_replacement_.data(), nan_replacement_.length());
+                column_ += nan_replacement_.length();
+            }
+            else
+            {
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                column_ += detail::null_literal<CharT>().length();
+            }
+        }
+        else if (value == std::numeric_limits<double>::infinity())
+        {
+            if (can_write_pos_inf_replacement_)
+            {
+                writer_.insert(pos_inf_replacement_.data(), pos_inf_replacement_.length());
+                column_ += pos_inf_replacement_.length();
+            }
+            else
+            {
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                column_ += detail::null_literal<CharT>().length();
+            }
+        }
+        else if (!(std::isfinite)(value))
+        {
+            if (can_write_neg_inf_replacement_)
+            {
+                writer_.insert(neg_inf_replacement_.data(), neg_inf_replacement_.length());
+                column_ += neg_inf_replacement_.length();
+            }
+            else
+            {
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                column_ += detail::null_literal<CharT>().length();
+            }
+        }
+        else
+        {
+            size_t length = fp_(value, fmt, writer_);
+            column_ += length;
+        }
+
+        end_value();
+        return true;
+    }
+
+    bool do_int64_value(int64_t value, 
+                        semantic_tag_type,
+                        const serializing_context&) override
+    {
+        if (!stack_.empty()) 
+        {
+            if (stack_.back().is_array())
+            {
+                begin_scalar_value();
+            }
+            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            {
+                break_line();
+            }
+        }
+        size_t length = detail::print_integer(value, writer_);
+        column_ += length;
+        end_value();
+        return true;
+    }
+
+    bool do_uint64_value(uint64_t value, 
+                         semantic_tag_type, 
+                         const serializing_context&) override
+    {
+        if (!stack_.empty()) 
+        {
+            if (stack_.back().is_array())
+            {
+                begin_scalar_value();
+            }
+            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            {
+                break_line();
+            }
+        }
+        size_t length = detail::print_uinteger(value, writer_);
+        column_ += length;
+        end_value();
+        return true;
+    }
+
+    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
+    {
+        if (!stack_.empty()) 
+        {
+            if (stack_.back().is_array())
+            {
+                begin_scalar_value();
+            }
+            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            {
+                break_line();
+            }
+        }
+
+        if (value)
+        {
+            writer_.insert(detail::true_literal<CharT>().data(), detail::true_literal<CharT>().length());
+            column_ += detail::true_literal<CharT>().length();
+        }
+        else
+        {
+            writer_.insert(detail::false_literal<CharT>().data(), detail::false_literal<CharT>().length());
+            column_ += detail::false_literal<CharT>().length();
+        }
+
+        end_value();
+        return true;
+    }
+
+    void begin_scalar_value()
+    {
+        if (!stack_.empty())
+        {
+            if (stack_.back().count() > 0)
+            {
+                writer_.insert(comma_str_.data(),comma_str_.length());
+                column_ += comma_str_.length();
+            }
+            if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
+            {
+                write_indent();
+            }
+        }
     }
 
     void write_string_value(const string_view_type& sv)
@@ -614,216 +845,6 @@ private:
                 writer_.push_back('\"');
                 column_ += (sv.size() + 2);
                 break;
-            }
-        }
-    }
-
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
-    {
-        if (!stack_.empty() && stack_.back().is_array())
-        {
-            begin_scalar_value();
-        }
-        if (column_ >= line_length_limit_) 
-        {
-            break_line();
-        }
-
-        switch (tag)
-        {
-            case semantic_tag_type::bignum:
-                write_bignum_value(sv);
-                break;
-            default:
-                write_string_value(sv);
-                break;
-        }
-
-        end_value();
-        return true;
-    }
-
-    bool do_byte_string_value(const byte_string_view& b, 
-                              semantic_tag_type,
-                              const serializing_context&) override
-    {
-        if (!stack_.empty() && stack_.back().is_array())
-        {
-            begin_scalar_value();
-        }
-        if (column_ >= line_length_limit_) 
-        {
-            break_line();
-        }
-        switch (byte_string_format_)
-        {
-            case byte_string_chars_format::base16:
-            {
-                writer_.push_back('\"');
-                size_t length = encode_base16(b.data(),b.length(),writer_);
-                writer_.push_back('\"');
-                column_ += (length + 2);
-                break;
-            }
-            case byte_string_chars_format::base64url:
-            {
-                writer_.push_back('\"');
-                size_t length = encode_base64url(b.data(),b.length(),writer_);
-                writer_.push_back('\"');
-                column_ += (length + 2);
-                break;
-            }
-            default:
-            {
-                writer_.push_back('\"');
-                size_t length = encode_base64(b.data(), b.length(), writer_);
-                writer_.push_back('\"');
-                column_ += (length + 2);
-                break;
-            }
-        }
-
-        end_value();
-        return true;
-    }
-
-    bool do_double_value(double value, 
-                         const floating_point_options& fmt, 
-                         semantic_tag_type,
-                         const serializing_context&) override
-    {
-        if (!stack_.empty() && stack_.back().is_array())
-        {
-            begin_scalar_value();
-        }
-        if (column_ >= line_length_limit_) 
-        {
-            break_line();
-        }
-
-        if ((std::isnan)(value))
-        {
-            if (can_write_nan_replacement_)
-            {
-                writer_.insert(nan_replacement_.data(), nan_replacement_.length());
-                column_ += nan_replacement_.length();
-            }
-            else
-            {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
-                column_ += detail::null_literal<CharT>().length();
-            }
-        }
-        else if (value == std::numeric_limits<double>::infinity())
-        {
-            if (can_write_pos_inf_replacement_)
-            {
-                writer_.insert(pos_inf_replacement_.data(), pos_inf_replacement_.length());
-                column_ += pos_inf_replacement_.length();
-            }
-            else
-            {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
-                column_ += detail::null_literal<CharT>().length();
-            }
-        }
-        else if (!(std::isfinite)(value))
-        {
-            if (can_write_neg_inf_replacement_)
-            {
-                writer_.insert(neg_inf_replacement_.data(), neg_inf_replacement_.length());
-                column_ += neg_inf_replacement_.length();
-            }
-            else
-            {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
-                column_ += detail::null_literal<CharT>().length();
-            }
-        }
-        else
-        {
-            size_t length = fp_(value, fmt, writer_);
-            column_ += length;
-        }
-
-        end_value();
-        return true;
-    }
-
-    bool do_int64_value(int64_t value, 
-                        semantic_tag_type,
-                        const serializing_context&) override
-    {
-        if (!stack_.empty() && stack_.back().is_array())
-        {
-            begin_scalar_value();
-        }
-        if (column_ >= line_length_limit_) 
-        {
-            break_line();
-        }
-        size_t length = detail::print_integer(value, writer_);
-        column_ += length;
-        end_value();
-        return true;
-    }
-
-    bool do_uint64_value(uint64_t value, 
-                         semantic_tag_type, 
-                         const serializing_context&) override
-    {
-        if (!stack_.empty() && stack_.back().is_array())
-        {
-            begin_scalar_value();
-        }
-        if (column_ >= line_length_limit_) 
-        {
-            break_line();
-        }
-        size_t length = detail::print_uinteger(value, writer_);
-        column_ += length;
-        end_value();
-        return true;
-    }
-
-    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
-    {
-        if (!stack_.empty() && stack_.back().is_array())
-        {
-            begin_scalar_value();
-        }
-        if (column_ >= line_length_limit_) 
-        {
-            break_line();
-        }
-
-        if (value)
-        {
-            writer_.insert(detail::true_literal<CharT>().data(), detail::true_literal<CharT>().length());
-            column_ += detail::true_literal<CharT>().length();
-        }
-        else
-        {
-            writer_.insert(detail::false_literal<CharT>().data(), detail::false_literal<CharT>().length());
-            column_ += detail::false_literal<CharT>().length();
-        }
-
-        end_value();
-        return true;
-    }
-
-    void begin_scalar_value()
-    {
-        if (!stack_.empty())
-        {
-            if (stack_.back().count() > 0)
-            {
-                writer_.insert(comma_str_.data(),comma_str_.length());
-                column_ += comma_str_.length();
-            }
-            if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
-            {
-                write_indent();
             }
         }
     }
