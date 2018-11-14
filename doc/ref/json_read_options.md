@@ -13,7 +13,7 @@ An abstract class that defines accessors for JSON deserialization options. The `
 
 #### Implementing classes
 
-[json_serializing_options](json_serializing_options)
+[json_serializing_options](json_serializing_options.md)
 
 #### Destructor
 

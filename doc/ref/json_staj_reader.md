@@ -49,34 +49,34 @@ Constructors (1)-(7) read from a `std::istream` and throw a
 while processing the initial event.
 
 (1) Constructs a `json_staj_reader` that reads from an input stream `is` of 
-JSON text, uses default [json_read_options](json_read_options)
+JSON text, uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (2) Constructs a `json_staj_reader` that reads from an input stream `is` of 
-JSON text, applies a [staj_filter](staj_filter.md) to the events, uses default [json_read_options](json_read_options)
+JSON text, applies a [staj_filter](staj_filter.md) to the events, uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (3) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
-uses the specified [json_read_options](json_read_options)
+uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (4) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md) to the events, 
-uses the specified [json_read_options](json_read_options)
+uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (5) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
-uses default [json_read_options](json_read_options)
+uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 (6) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md) to the events, 
-uses default [json_read_options](json_read_options)
+uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 (7) Constructs a `json_staj_reader` that reads from an input stream `is` of JSON text, 
 applies a [staj_filter](staj_filter.md), 
-uses the specified [json_read_options](json_read_options)
+uses the specified [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
     json_staj_reader(std::istream& is,

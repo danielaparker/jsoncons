@@ -17,8 +17,8 @@ The default floating point formatting for a floating point value that was direct
 
 #### Abstract base classes
 
-[json_read_options](json_read_options)
-[json_write_options](json_write_options)
+[json_read_options](json_read_options.md)
+[json_write_options](json_write_options.md)
 
 #### Member constants
 
@@ -89,10 +89,10 @@ For an object whose parent is an object, set whether that object is split on a n
 For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
     json_serializing_options& object_array_split_lines(line_split_kind value)
-For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind).
+For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
 
     json_serializing_options& array_array_split_lines(line_split_kind value)
-For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind).
+For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
 
     size_t max_nesting_depth()
     json_serializing_options& max_nesting_depth(size_t value)

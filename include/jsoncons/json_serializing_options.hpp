@@ -148,7 +148,7 @@ public:
 
     virtual int indent() const = 0;  
 
-    virtual size_t max_line_length() const = 0;  
+    virtual size_t line_length_limit() const = 0;  
 
     virtual chars_format floating_point_format() const = 0; 
 
@@ -193,7 +193,7 @@ private:
     line_split_kind object_array_split_lines_;
     line_split_kind array_array_split_lines_;
     line_split_kind array_object_split_lines_;
-    size_t max_line_length_;
+    size_t line_length_limit_;
 
     size_t max_nesting_depth_;
     spaces_option spaces_around_colon_;
@@ -220,7 +220,7 @@ public:
           object_array_split_lines_(line_split_kind::same_line),
           array_array_split_lines_(line_split_kind::new_line),
           array_object_split_lines_(line_split_kind::multi_line),
-          max_line_length_(120),
+          line_length_limit_(120),
           max_nesting_depth_((std::numeric_limits<size_t>::max)()),
           spaces_around_colon_(spaces_option::space_after),
           spaces_around_comma_(spaces_option::no_spaces),
@@ -247,52 +247,6 @@ public:
 
     line_split_kind array_array_split_lines() const override {return array_array_split_lines_;}
     basic_json_serializing_options<CharT>& array_array_split_lines(line_split_kind value) {array_array_split_lines_ = value; return *this;}
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    block_options array_array_block_option()
-    {
-        return (array_array_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
-    }
-
-    basic_json_serializing_options<CharT>& array_array_block_option(block_options value)
-    {
-        array_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
-        return *this;
-    }
-
-    block_options array_object_block_option()
-    {
-        return (array_object_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
-    }
-
-    basic_json_serializing_options<CharT>& array_object_block_option(block_options value)
-    {
-        array_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
-        return *this;
-    }
-
-    block_options object_array_block_option()
-    {
-        return (object_array_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
-    }
-
-    basic_json_serializing_options<CharT>& object_array_block_option(block_options value)
-    {
-        object_array_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
-        return *this;
-    }
-
-    block_options object_object_block_option()
-    {
-        return (object_object_split_lines_ == line_split_kind::same_line) ? block_options::same_line : block_options::next_line;
-    }
-
-    basic_json_serializing_options<CharT>& object_object_block_option(block_options value)
-    {
-        object_object_split_lines_ = (value == block_options::same_line) ? line_split_kind::same_line : line_split_kind::new_line;
-        return *this;
-    }
-#endif
 
     int indent() const override
     {
@@ -349,14 +303,14 @@ public:
         return *this;
     }
 
-    size_t max_line_length() const override
+    size_t line_length_limit() const override
     {
-        return max_line_length_;
+        return line_length_limit_;
     }
 
-    basic_json_serializing_options<CharT>& max_line_length(size_t value)
+    basic_json_serializing_options<CharT>& line_length_limit(size_t value)
     {
-        max_line_length_ = value;
+        line_length_limit_ = value;
         return *this;
     }
 

@@ -25,7 +25,7 @@ The interface is the same as [wjson](wjson.md), substituting wide character inst
 
 - [wjson](wjson.md) constructs a wide character json value that sorts name-value members alphabetically
 
-- [json](json) constructs a utf8 character json value that sorts name-value members alphabetically
+- [json](json.md) constructs a utf8 character json value that sorts name-value members alphabetically
 
 - [ojson](ojson.md) constructs a utf8 character json value that preserves the original insertion order of an object's name/value pairs
 

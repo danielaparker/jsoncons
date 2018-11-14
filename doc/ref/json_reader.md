@@ -47,41 +47,41 @@ which omits the check for unconsumed non-whitespace characters.
 Constructors (1)-(4) use a default [json_content_handler](json_content_handler.md) that discards the JSON parse events, and are for validation only.
 
 (1) Constructs a `json_reader` that reads from an input stream `is` of 
-JSON text, uses default [json_read_options](json_read_options)
+JSON text, uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (2) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
-uses the specified [json_read_options](json_read_options)
+uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (3) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
-uses default [json_read_options](json_read_options)
+uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 (4) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
-uses the specified [json_read_options](json_read_options)
+uses the specified [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 Constructors (5)-(8) take a user supplied [json_content_handler](json_content_handler.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
 
 (5) Constructs a `json_reader` that reads JSON text from an input stream `is`,
 emits JSON parse events to the specified 
-[json_content_handler](json_content_handler.md), and uses default [json_read_options](json_read_options)
+[json_content_handler](json_content_handler.md), and uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (6) Constructs a `json_reader` that reads JSON text from an input stream `is`,
 emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
-and uses the specified [json_read_options](json_read_options)
+and uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
 (7) Constructs a `json_reader` that reads JSON text from an input stream `is`,
 emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
-and uses default [json_read_options](json_read_options)
+and uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 (8) Constructs a `json_reader` that reads JSON text from an input stream `is`,
 emits JSON parse events to the specified [json_content_handler](json_content_handler.md) and
-uses the specified [json_read_options](json_read_options)
+uses the specified [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
     json_reader(string_view_type& is); // (9)

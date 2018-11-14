@@ -45,16 +45,16 @@ and by the pull parser [json_staj_reader](json_staj_reader.md).
     json_parser(const json_read_options& options, 
                 parse_error_handler& err_handler); // (4)
 
-(1) Constructs a `json_parser` that uses default [json_read_options](json_read_options)
+(1) Constructs a `json_parser` that uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(2) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options)
+(2) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(3) Constructs a `json_parser` that uses default [json_read_options](json_read_options)
+(3) Constructs a `json_parser` that uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(4) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options)
+(4) Constructs a `json_parser` that uses the specified [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any error handler passed in the constuctor.

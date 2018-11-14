@@ -163,14 +163,29 @@ private:
         line_split_kind split_lines_;
         bool indent_before_;
         bool unindent_after_;
+        size_t begin_pos_;
+        size_t data_pos_;
     public:
         serialization_context(structure_type type)
-           : type_(type), count_(0), split_lines_(line_split_kind::same_line), indent_before_(false), unindent_after_(false)
+           : type_(type), count_(0), split_lines_(line_split_kind::same_line), indent_before_(false), unindent_after_(false),
+             begin_pos_(begin_pos), data_pos_(data_pos)
         {
         }
-        serialization_context(structure_type type, line_split_kind split_lines, bool indent_once)
-           : type_(type), count_(0), split_lines_(split_lines), indent_before_(indent_once), unindent_after_(false)
+        serialization_context(structure_type type, line_split_kind split_lines, bool indent_once,
+                              size_t begin_pos, size_t data_pos)
+           : type_(type), count_(0), split_lines_(split_lines), indent_before_(indent_once), unindent_after_(false),
+             begin_pos_(begin_pos), data_pos_(data_pos)
         {
+        }
+
+        size_t begin_pos() const
+        {
+            return begin_pos_;
+        }
+
+        size_t data_pos() const
+        {
+            return data_pos_;
         }
 
         size_t count() const
@@ -240,7 +255,7 @@ private:
     line_split_kind object_array_split_lines_;
     line_split_kind array_array_split_lines_;
     line_split_kind array_object_split_lines_;
-    size_t max_line_length_;
+    size_t line_length_limit_;
     detail::print_double fp_;
     Writer writer_;
 
@@ -284,7 +299,7 @@ public:
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
-         max_line_length_(options.max_line_length()),
+         line_length_limit_(options.line_length_limit()),
          writer_(os), 
          column_(0)
     {
@@ -366,26 +381,30 @@ private:
             column_ += comma_str_.length();
         }
 
-        if (!stack_.empty() && stack_.back().is_object())
+        if (!stack_.empty() && stack_.back().is_object()) // object
         {
-            stack_.emplace_back(structure_type::object,object_object_split_lines_, false);
+            stack_.emplace_back(structure_type::object,object_object_split_lines_, false,
+                                column_, column_+open_object_brace_str_.length());
         }
-        else if (!stack_.empty())
+        else if (!stack_.empty()) // array
         {
             if (array_object_split_lines_ != line_split_kind::same_line)
             {
                 stack_.back().unindent_after(true);
-                stack_.emplace_back(structure_type::object,array_object_split_lines_, false);
+                stack_.emplace_back(structure_type::object,array_object_split_lines_, false,
+                                    column_, column_+open_object_brace_str_.length());
                 write_indent1();
             }
             else
             {
-                stack_.emplace_back(structure_type::object,array_object_split_lines_, false);
+                stack_.emplace_back(structure_type::object,array_object_split_lines_, false,
+                                    column_, column_+open_object_brace_str_.length());
             }
         }
         else 
         {
-            stack_.emplace_back(structure_type::object, line_split_kind::multi_line, false);
+            stack_.emplace_back(structure_type::object, line_split_kind::multi_line, false,
+                                column_, column_+open_object_brace_str_.length());
         }
         increment_indent();
         
@@ -422,17 +441,19 @@ private:
         {
             if (stack_.back().is_object())
             {
-                writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
-                column_ += open_array_bracket_str_.length();
                 increment_indent();
                 if (object_array_split_lines_ != line_split_kind::same_line)
                 {
-                    stack_.emplace_back(structure_type::array,object_array_split_lines_,true);
+                    stack_.emplace_back(structure_type::array,object_array_split_lines_,true,
+                                        column_, column_+open_array_bracket_str_.length());
                 }
                 else
                 {
-                    stack_.emplace_back(structure_type::array,object_array_split_lines_,false);
+                    stack_.emplace_back(structure_type::array,object_array_split_lines_,false,
+                                        column_, column_ + open_array_bracket_str_.length());
                 }
+                writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
+                column_ += open_array_bracket_str_.length();
             }
             else // array
             {
@@ -442,19 +463,22 @@ private:
                     {
                         write_indent();
                     }
-                    stack_.emplace_back(structure_type::array,line_split_kind::same_line, false);
+                    stack_.emplace_back(structure_type::array,line_split_kind::same_line, false,
+                                        column_, column_+open_array_bracket_str_.length());
                     increment_indent();
                 }
                 else if (array_array_split_lines_ == line_split_kind::multi_line)
                 {
                     write_indent();
-                    stack_.emplace_back(structure_type::array,array_array_split_lines_, false);
+                    stack_.emplace_back(structure_type::array,array_array_split_lines_, false,
+                                        column_, column_+open_array_bracket_str_.length());
                     increment_indent();
                 }
                 else // new_line
                 {
                     write_indent();
-                    stack_.emplace_back(structure_type::array,array_array_split_lines_, false);
+                    stack_.emplace_back(structure_type::array,array_array_split_lines_, false,
+                                        column_, column_+open_array_bracket_str_.length());
                     increment_indent();
                 }
                 writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
@@ -463,7 +487,8 @@ private:
         }
         else 
         {
-            stack_.emplace_back(structure_type::array, line_split_kind::multi_line, false);
+            stack_.emplace_back(structure_type::array, line_split_kind::multi_line, false,
+                                column_, column_+open_array_bracket_str_.length());
             writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
             column_ += open_array_bracket_str_.length();
             increment_indent();
@@ -514,6 +539,10 @@ private:
         if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
+        }
+        if (column_ >= line_length_limit_) 
+        {
+            break_line();
         }
 
         writer_.insert(detail::null_literal<CharT>().data(), 
@@ -595,6 +624,10 @@ private:
         {
             begin_scalar_value();
         }
+        if (column_ >= line_length_limit_) 
+        {
+            break_line();
+        }
 
         switch (tag)
         {
@@ -617,6 +650,10 @@ private:
         if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
+        }
+        if (column_ >= line_length_limit_) 
+        {
+            break_line();
         }
         switch (byte_string_format_)
         {
@@ -658,6 +695,10 @@ private:
         if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
+        }
+        if (column_ >= line_length_limit_) 
+        {
+            break_line();
         }
 
         if ((std::isnan)(value))
@@ -717,6 +758,10 @@ private:
         {
             begin_scalar_value();
         }
+        if (column_ >= line_length_limit_) 
+        {
+            break_line();
+        }
         size_t length = detail::print_integer(value, writer_);
         column_ += length;
         end_value();
@@ -731,6 +776,10 @@ private:
         {
             begin_scalar_value();
         }
+        if (column_ >= line_length_limit_) 
+        {
+            break_line();
+        }
         size_t length = detail::print_uinteger(value, writer_);
         column_ += length;
         end_value();
@@ -742,6 +791,10 @@ private:
         if (!stack_.empty() && stack_.back().is_array())
         {
             begin_scalar_value();
+        }
+        if (column_ >= line_length_limit_) 
+        {
+            break_line();
         }
 
         if (value)
@@ -815,6 +868,20 @@ private:
             writer_.push_back(' ');
         }
         column_ = indent_amount_;
+    }
+
+    void break_line()
+    {
+        if (!stack_.empty()) 
+        {
+            writer_.push_back('\n');
+            size_t pos = stack_.back().data_pos();
+            for (size_t i = 0; i < pos; ++i) 
+            {
+                writer_.push_back(' ');
+            }
+            column_ = pos;
+        }
     }
 };
 

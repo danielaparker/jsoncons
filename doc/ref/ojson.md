@@ -15,7 +15,7 @@ The `jsoncons` library will always rebind the supplied allocator from the templa
 
 #### Interface
 
-The interface is the same as [json](json), with these provisos:
+The interface is the same as [json](json.md), with these provisos:
 
 - `ojson`, like `json`, supports object member `insert_or_assign` methods that take an `object_iterator` as the first parameter. But while with `json` that parameter is just a hint that allows optimization, with `ojson` it is the actual location where to insert the member.
 
@@ -23,7 +23,7 @@ The interface is the same as [json](json), with these provisos:
 
 #### See also
 
-- [json](json) constructs a json value that sorts name-value members alphabetically
+- [json](json.md) constructs a json value that sorts name-value members alphabetically
 
 - [wjson](wjson.md) constructs a wide character json value that sorts name-value members alphabetically
 
