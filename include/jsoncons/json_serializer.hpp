@@ -241,12 +241,12 @@ private:
     };
 
     int indent_;
-    bool can_write_nan_replacement_;
-    bool can_write_pos_inf_replacement_;
-    bool can_write_neg_inf_replacement_;
-    std::basic_string<CharT> nan_replacement_;
-    std::basic_string<CharT> pos_inf_replacement_;
-    std::basic_string<CharT> neg_inf_replacement_;
+    std::basic_string<CharT> nan_to_num_;
+    std::basic_string<CharT> inf_to_num_;
+    std::basic_string<CharT> neginf_to_num_;
+    std::basic_string<CharT> nan_to_str_;
+    std::basic_string<CharT> inf_to_str_;
+    std::basic_string<CharT> neginf_to_str_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
@@ -257,6 +257,7 @@ private:
     line_split_kind array_object_line_splits_;
     size_t line_length_limit_;
     detail::print_double fp_;
+    std::basic_string<CharT> new_line_chars_;
     Writer writer_;
 
     std::vector<serialization_context> stack_;
@@ -281,12 +282,12 @@ public:
     basic_json_serializer(output_type& os, 
                           const basic_json_write_options<CharT>& options)
        : indent_(options.indent()),
-         can_write_nan_replacement_(options.can_write_nan_replacement()),
-         can_write_pos_inf_replacement_(options.can_write_pos_inf_replacement()),
-         can_write_neg_inf_replacement_(options.can_write_neg_inf_replacement()),
-         nan_replacement_(options.nan_replacement()),
-         pos_inf_replacement_(options.pos_inf_replacement()),
-         neg_inf_replacement_(options.neg_inf_replacement()),
+         nan_to_num_(options.nan_to_num()),
+         inf_to_num_(options.inf_to_num()),
+         neginf_to_num_(options.neginf_to_num()),
+         nan_to_str_(options.nan_to_str()),
+         inf_to_str_(options.inf_to_str()),
+         neginf_to_str_(options.neginf_to_str()),
          escape_all_non_ascii_(options.escape_all_non_ascii()),
          escape_solidus_(options.escape_solidus()),
          byte_string_format_(options.byte_string_format()),
@@ -300,6 +301,7 @@ public:
                                     options.precision(),
                                     0)),
          line_length_limit_(options.line_length_limit()),
+         new_line_chars_(options.new_line_chars()),
          writer_(os), 
          column_(0)
     {
@@ -381,22 +383,53 @@ private:
             column_ += comma_str_.length();
         }
 
-        if (!stack_.empty() && stack_.back().is_object()) // object
+        if (!stack_.empty()) // object or array
         {
-            stack_.emplace_back(structure_type::object,object_object_line_splits_, false,
-                                column_, column_+open_object_brace_str_.length());
-        }
-        else if (!stack_.empty()) // array
-        {
-            if (array_object_line_splits_ != line_split_kind::same_line)
+            if (stack_.back().is_object())
             {
-                stack_.back().unindent_after(true);
-                stack_.emplace_back(structure_type::object,array_object_line_splits_, false,
+                switch (object_object_line_splits_)
+                {
+                    case line_split_kind::same_line:
+                        if (column_ >= line_length_limit_)
+                        {
+                            break_line();
+                        }
+                        break;
+                    case line_split_kind::new_line:
+                        if (column_ >= line_length_limit_)
+                        {
+                            break_line();
+                        }
+                        break;
+                    default: // multi_line
+                        break;
+                }
+                stack_.emplace_back(structure_type::object,object_object_line_splits_, false,
                                     column_, column_+open_object_brace_str_.length());
-                write_indent1();
             }
-            else
+            else // array
             {
+                switch (array_object_line_splits_)
+                {
+                    case line_split_kind::same_line:
+                        if (column_ >= line_length_limit_)
+                        {
+                            break_line();
+                        }
+                        break;
+                    case line_split_kind::new_line:
+                        new_line();
+                        if (column_ >= line_length_limit_)
+                        {
+                            break_line();
+                        }
+                        stack_.back().unindent_after(true);
+                        break;
+                    default: // multi_line
+                        stack_.back().unindent_after(true);
+                        new_line();
+                        break;
+                }
                 stack_.emplace_back(structure_type::object,array_object_line_splits_, false,
                                     column_, column_+open_object_brace_str_.length());
             }
@@ -419,7 +452,7 @@ private:
         decrement_indent();
         if (stack_.back().unindent_after())
         {
-            write_indent();
+            new_line();
         }
         stack_.pop_back();
         writer_.insert(close_object_brace_str_.data(), close_object_brace_str_.length());
@@ -428,7 +461,6 @@ private:
         end_value();
         return true;
     }
-
 
     bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
@@ -442,44 +474,54 @@ private:
             if (stack_.back().is_object())
             {
                 increment_indent();
-                if (object_array_line_splits_ != line_split_kind::same_line)
+                switch (object_array_line_splits_)
                 {
-                    stack_.emplace_back(structure_type::array,object_array_line_splits_,true,
-                                        column_, column_+open_array_bracket_str_.length());
-                }
-                else
-                {
-                    stack_.emplace_back(structure_type::array,object_array_line_splits_,false,
-                                        column_, column_ + open_array_bracket_str_.length());
+                    case line_split_kind::same_line:
+                        stack_.emplace_back(structure_type::array,object_array_line_splits_,false,
+                                            column_, column_ + open_array_bracket_str_.length());
+                        break;
+                    case line_split_kind::new_line:
+                    {
+                        stack_.emplace_back(structure_type::array,object_array_line_splits_,true,
+                                            column_, column_+open_array_bracket_str_.length());
+                        break;
+                    }
+                    default: // multi_line
+                        stack_.emplace_back(structure_type::array,object_array_line_splits_,true,
+                                            column_, column_+open_array_bracket_str_.length());
+                        break;
                 }
                 writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                 column_ += open_array_bracket_str_.length();
             }
             else // array
             {
-                if (array_array_line_splits_ == line_split_kind::same_line)
+                switch (array_array_line_splits_)
                 {
+                case line_split_kind::same_line:
+                    increment_indent();
                     if (stack_.back().is_multi_line())
                     {
-                        write_indent();
+                        stack_.back().unindent_after(true);
+                        new_line(stack_.back().data_pos());
                     }
                     stack_.emplace_back(structure_type::array,line_split_kind::same_line, false,
                                         column_, column_+open_array_bracket_str_.length());
+                    break;
+                case line_split_kind::new_line:
+                    stack_.back().unindent_after(true);
                     increment_indent();
-                }
-                else if (array_array_line_splits_ == line_split_kind::multi_line)
-                {
-                    write_indent();
+                    new_line(stack_.back().data_pos());
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
+                    break;
+                default: // multi_line
+                    stack_.back().unindent_after(true);
                     increment_indent();
-                }
-                else // new_line
-                {
-                    write_indent();
+                    new_line(stack_.back().data_pos());
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    increment_indent();
+                    break;
                 }
                 writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                 column_ += open_array_bracket_str_.length();
@@ -502,7 +544,7 @@ private:
             decrement_indent();
             if (stack_.back().unindent_after())
             {
-                write_indent();
+                new_line();
             }
         stack_.pop_back();
         writer_.insert(close_array_bracket_str_.data(), close_array_bracket_str_.length());
@@ -522,7 +564,12 @@ private:
             }
             if (stack_.back().is_multi_line())
             {
-                write_indent();
+                stack_.back().unindent_after(true);
+                new_line();
+            }
+            else if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            {
+                break_line();
             }
         }
 
@@ -542,7 +589,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
             {
                 break_line();
             }
@@ -564,7 +611,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
             {
                 break_line();
             }
@@ -594,7 +641,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
             {
                 break_line();
             }
@@ -634,7 +681,7 @@ private:
     bool do_double_value(double value, 
                          const floating_point_options& fmt, 
                          semantic_tag_type,
-                         const serializing_context&) override
+                         const serializing_context& context) override
     {
         if (!stack_.empty()) 
         {
@@ -642,7 +689,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
             {
                 break_line();
             }
@@ -650,10 +697,14 @@ private:
 
         if ((std::isnan)(value))
         {
-            if (can_write_nan_replacement_)
+            if (!nan_to_num_.empty())
             {
-                writer_.insert(nan_replacement_.data(), nan_replacement_.length());
-                column_ += nan_replacement_.length();
+                writer_.insert(nan_to_num_.data(), nan_to_num_.length());
+                column_ += nan_to_num_.length();
+            }
+            else if (!nan_to_str_.empty())
+            {
+                do_string_value(nan_to_str_, semantic_tag_type::none, context);
             }
             else
             {
@@ -663,10 +714,14 @@ private:
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            if (can_write_pos_inf_replacement_)
+            if (!inf_to_num_.empty())
             {
-                writer_.insert(pos_inf_replacement_.data(), pos_inf_replacement_.length());
-                column_ += pos_inf_replacement_.length();
+                writer_.insert(inf_to_num_.data(), inf_to_num_.length());
+                column_ += inf_to_num_.length();
+            }
+            else if (!inf_to_str_.empty())
+            {
+                do_string_value(inf_to_str_, semantic_tag_type::none, context);
             }
             else
             {
@@ -676,10 +731,14 @@ private:
         }
         else if (!(std::isfinite)(value))
         {
-            if (can_write_neg_inf_replacement_)
+            if (!neginf_to_num_.empty())
             {
-                writer_.insert(neg_inf_replacement_.data(), neg_inf_replacement_.length());
-                column_ += neg_inf_replacement_.length();
+                writer_.insert(neginf_to_num_.data(), neginf_to_num_.length());
+                column_ += neginf_to_num_.length();
+            }
+            else if (!neginf_to_str_.empty())
+            {
+                do_string_value(neginf_to_str_, semantic_tag_type::none, context);
             }
             else
             {
@@ -707,7 +766,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
             {
                 break_line();
             }
@@ -728,7 +787,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
             {
                 break_line();
             }
@@ -747,7 +806,7 @@ private:
             {
                 begin_scalar_value();
             }
-            if (stack_.back().is_same_line() && column_ >= line_length_limit_)
+            if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
             {
                 break_line();
             }
@@ -779,7 +838,18 @@ private:
             }
             if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
             {
-                write_indent();
+                stack_.back().unindent_after(true);
+                if (stack_.back().is_array())
+                {
+                    if (stack_.back().count() > 0)
+                    {
+                        new_line(stack_.back().data_pos());
+                    }
+                }
+                else
+                {
+                    new_line();
+                }
             }
         }
     }
@@ -867,13 +937,9 @@ private:
         indent_amount_ -= static_cast<int>(indent_);
     }
 
-    void write_indent()
+    void new_line()
     {
-        if (!stack_.empty())
-        {
-            stack_.back().unindent_after(true);
-        }
-        writer_.push_back('\n');
+        writer_.insert(new_line_chars_.data(),new_line_chars_.length());
         for (int i = 0; i < indent_amount_; ++i)
         {
             writer_.push_back(' ');
@@ -881,21 +947,21 @@ private:
         column_ = indent_amount_;
     }
 
-    void write_indent1()
+    void new_line(size_t len)
     {
-        writer_.push_back('\n');
-        for (int i = 0; i < indent_amount_; ++i)
+        writer_.insert(new_line_chars_.data(),new_line_chars_.length());
+        for (int i = 0; i < len; ++i)
         {
             writer_.push_back(' ');
         }
-        column_ = indent_amount_;
+        column_ = len;
     }
 
     void break_line()
     {
         if (!stack_.empty()) 
         {
-            writer_.push_back('\n');
+            writer_.insert(new_line_chars_.data(),new_line_chars_.length());
             size_t pos = stack_.back().data_pos();
             for (size_t i = 0; i < pos; ++i) 
             {
@@ -944,12 +1010,12 @@ private:
         }
     };
 
-    bool can_write_nan_replacement_;
-    bool can_write_pos_inf_replacement_;
-    bool can_write_neg_inf_replacement_;
-    std::basic_string<CharT> nan_replacement_;
-    std::basic_string<CharT> pos_inf_replacement_;
-    std::basic_string<CharT> neg_inf_replacement_;
+    std::basic_string<CharT> nan_to_num_;
+    std::basic_string<CharT> inf_to_num_;
+    std::basic_string<CharT> neginf_to_num_;
+    std::basic_string<CharT> nan_to_str_;
+    std::basic_string<CharT> inf_to_str_;
+    std::basic_string<CharT> neginf_to_str_;
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
@@ -970,12 +1036,12 @@ public:
 
     basic_json_compressed_serializer(output_type& os, 
                           const basic_json_write_options<CharT>& options)
-       : can_write_nan_replacement_(options.can_write_nan_replacement()),
-         can_write_pos_inf_replacement_(options.can_write_pos_inf_replacement()),
-         can_write_neg_inf_replacement_(options.can_write_neg_inf_replacement()),
-         nan_replacement_(options.nan_replacement()),
-         pos_inf_replacement_(options.pos_inf_replacement()),
-         neg_inf_replacement_(options.neg_inf_replacement()),
+       : nan_to_num_(options.nan_to_num()),
+         inf_to_num_(options.inf_to_num()),
+         neginf_to_num_(options.neginf_to_num()),
+         nan_to_str_(options.nan_to_str()),
+         inf_to_str_(options.inf_to_str()),
+         neginf_to_str_(options.neginf_to_str()),
          escape_all_non_ascii_(options.escape_all_non_ascii()),
          escape_solidus_(options.escape_solidus()),
          byte_string_format_(options.byte_string_format()),
@@ -1211,7 +1277,7 @@ private:
     bool do_double_value(double value, 
                          const floating_point_options& fmt, 
                          semantic_tag_type,
-                         const serializing_context&) override
+                         const serializing_context& context) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1220,41 +1286,47 @@ private:
 
         if ((std::isnan)(value))
         {
-            if (can_write_nan_replacement_)
+            if (!nan_to_num_.empty())
             {
-                writer_.insert(nan_replacement_.data(),
-                              nan_replacement_.length());
+                writer_.insert(nan_to_num_.data(), nan_to_num_.length());
+            }
+            else if (!nan_to_str_.empty())
+            {
+                do_string_value(nan_to_str_, semantic_tag_type::none, context);
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(),
-                              detail::null_literal<CharT>().length());
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
             }
         }
         else if (value == std::numeric_limits<double>::infinity())
         {
-            if (can_write_pos_inf_replacement_)
+            if (!inf_to_num_.empty())
             {
-                writer_.insert(pos_inf_replacement_.data(),
-                              pos_inf_replacement_.length());
+                writer_.insert(inf_to_num_.data(), inf_to_num_.length());
+            }
+            else if (!inf_to_str_.empty())
+            {
+                do_string_value(inf_to_str_, semantic_tag_type::none, context);
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(),
-                              detail::null_literal<CharT>().length());
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
             }
         }
         else if (!(std::isfinite)(value))
         {
-            if (can_write_neg_inf_replacement_)
+            if (!neginf_to_num_.empty())
             {
-                writer_.insert(neg_inf_replacement_.data(),
-                              neg_inf_replacement_.length());
+                writer_.insert(neginf_to_num_.data(), neginf_to_num_.length());
+            }
+            else if (!neginf_to_str_.empty())
+            {
+                do_string_value(neginf_to_str_, semantic_tag_type::none, context);
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(),
-                              detail::null_literal<CharT>().length());
+                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
             }
         }
         else

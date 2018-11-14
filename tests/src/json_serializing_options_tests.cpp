@@ -11,7 +11,7 @@
 #include <new>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("test_default_nan_replacement")
 {
     json obj;
@@ -34,9 +34,7 @@ TEST_CASE("test_write_nan_replacement")
     j["field3"] = -1.79e308 * 1000;
 
     json_serializing_options options;
-    options.nan_replacement("null")
-           .pos_inf_replacement("1e9999")
-           .neg_inf_replacement("-1e9999");
+    options.inf_to_num("1e9999");
 
     std::ostringstream os;
     os << print(j, options);
@@ -70,41 +68,110 @@ TEST_CASE("test_read_write_read_nan_replacement")
     CHECK(expected.to_string(options) == j.to_string(options));
     CHECK(expected.to_string() == j.to_string());
 }
-#endif
-TEST_CASE("simple line_length_limit tests")
+
+TEST_CASE("object_array empty array")
 {
     std::string s = R"(
 {
-    "code": 105,
-    "tags": ["persistent", "priority"],
-    "props": {
-        "finished": true,
-        "logged": false
-    },
-    "body": [1, 76, 345, 34, 234.3, 34, null, 234, 454, 278, 3, 55, 90, 45, 45.3, 234, 234, 234, 56, 3, 25, 342334, 234, 3, 6, 6, 45, 33, 34, 433, 65, 56, 3, 454, 3, 54, 45]
+    "foo": []
 }
     )";
-#if 0
-    SECTION("Defaults")
+
+    SECTION("same_line")
     {
         json j = json::parse(s);
 
         json_serializing_options options;
-        options.line_length_limit(22)
-               .spaces_around_comma(spaces_option::space_after);
+        options.object_array_line_splits(line_split_kind::same_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::string expected = R"({
+    "foo": []
+})";
+        CHECK(os.str() == expected);
+    }
+
+    SECTION("new_line")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.object_array_line_splits(line_split_kind::new_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::string expected = R"({
+    "foo": []
+})";
+        CHECK(os.str() == expected);
+    }
+
+    SECTION("multi_line")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.object_array_line_splits(line_split_kind::multi_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::string expected = R"({
+    "foo": []
+})";
+        CHECK(os.str() == expected);
+    }
+
+}
+
+TEST_CASE("object_array with/without line_length_limit")
+{
+    std::string s = R"(
+{
+    "foo": ["bar", "baz", [1, 2, 3]],
+    "qux": [1, 2, 3, null, 123, 45.3, 342334, 234]
+}
+    )";
+
+    SECTION("same_line")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.line_length_limit(120)
+               .spaces_around_comma(spaces_option::space_after)
+               .object_array_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);
 
         std::cout << pretty_print(j, options) << "\n";
     }
-    SECTION("object_array_line_splits(line_split_kind::new_line)")
+
+    SECTION("new_line")
     {
         json j = json::parse(s);
 
         json_serializing_options options;
-        options.line_length_limit(22)
+        options.line_length_limit(120)
                .spaces_around_comma(spaces_option::space_after)
+               .object_array_line_splits(line_split_kind::new_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::cout << pretty_print(j, options) << "\n";
+    }
+
+    SECTION("multi_line")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::space_after)
                .object_array_line_splits(line_split_kind::multi_line);
 
         std::ostringstream os;
@@ -113,47 +180,83 @@ TEST_CASE("simple line_length_limit tests")
         std::cout << pretty_print(j, options) << "\n";
     }
 
-#endif
-}
+    SECTION("same_line with line length limit")
+    {
+        json j = json::parse(s);
 
-TEST_CASE("store line_length_limit tests")
-{
-    std::string s = R"(
-{
-    "store": {
-        "book": [
-            {
-                "category": "reference",
-                "author": "Nigel Rees",
-                "title": "Sayings of the Century",
-                "price": 8.95
-            },
-            {
-                "category": "fiction",
-                "author": "Evelyn Waugh",
-                "title": "Sword of Honour",
-                "price": 12.99
-            },
-            {
-                "category": "fiction",
-                "author": "Herman Melville",
-                "title": "Moby Dick",
-                "isbn": "0-553-21311-3",
-                "price": 8.99
-            },
-            {
-                "category": "fiction",
-                "author": "J. R. R. Tolkien",
-                "title": "The Lord of the Rings",
-                "isbn": "0-395-19395-8",
-                "price": 22.99
-            }
-        ]
+        json_serializing_options options;
+        options.line_length_limit(20)
+               .spaces_around_comma(spaces_option::space_after)
+               .object_array_line_splits(line_split_kind::same_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::cout << pretty_print(j, options) << "\n";
+    }
+
+    SECTION("new_line with line length limit")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.line_length_limit(20)
+               .spaces_around_comma(spaces_option::space_after)
+               .object_array_line_splits(line_split_kind::new_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::cout << pretty_print(j, options) << "\n";
     }
 }
+
+TEST_CASE("array_object with/without line_length_limit")
+{
+    std::string s = R"(
+[
+   {
+       "author": "Graham Greene",
+       "title": "The Comedians"
+   },
+   {
+       "author": "Koji Suzuki",
+       "title": "ring"
+   }
+]
     )";
 
-    SECTION("default")
+    SECTION("same_line")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.line_length_limit(120)
+               .spaces_around_comma(spaces_option::space_after)
+               .array_object_line_splits(line_split_kind::same_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::cout << pretty_print(j, options) << "\n";
+    }
+
+    SECTION("new_line")
+    {
+        json j = json::parse(s);
+
+        json_serializing_options options;
+        options.line_length_limit(120)
+               .spaces_around_comma(spaces_option::space_after)
+               .array_object_line_splits(line_split_kind::new_line);
+
+        std::ostringstream os;
+        os << pretty_print(j, options);
+
+        std::cout << pretty_print(j, options) << "\n";
+    }
+
+    SECTION("multi_line (default)")
     {
         json j = json::parse(s);
 
@@ -166,12 +269,13 @@ TEST_CASE("store line_length_limit tests")
         std::cout << pretty_print(j, options) << "\n";
     }
 
-    SECTION("object_array_line_splits same_line, no line length limit")
+    SECTION("same_line with line length limit")
     {
         json j = json::parse(s);
 
         json_serializing_options options;
-        options.spaces_around_comma(spaces_option::space_after)
+        options.line_length_limit(20)
+               .spaces_around_comma(spaces_option::space_after)
                .array_object_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
@@ -180,14 +284,14 @@ TEST_CASE("store line_length_limit tests")
         std::cout << pretty_print(j, options) << "\n";
     }
 
-    SECTION("object_array_line_splits same_line, line length limit")
+    SECTION("new_line with line length limit")
     {
         json j = json::parse(s);
 
         json_serializing_options options;
-        options.line_length_limit(28)
+        options.line_length_limit(20)
                .spaces_around_comma(spaces_option::space_after)
-               .array_object_line_splits(line_split_kind::same_line);
+               .array_object_line_splits(line_split_kind::new_line);
 
         std::ostringstream os;
         os << pretty_print(j, options);

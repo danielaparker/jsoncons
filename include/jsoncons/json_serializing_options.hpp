@@ -73,10 +73,6 @@ public:
 
 enum class indenting : uint8_t {no_indent = 0, indent = 1};
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-enum class block_options {next_line,same_line};
-#endif
-
 enum class line_split_kind  : uint8_t {same_line,new_line,multi_line};
 
 enum class bignum_chars_format : uint8_t {integer, base10, base64, base64url
@@ -110,6 +106,12 @@ public:
     virtual const string_type& neg_inf_replacement() const = 0;
 
     virtual size_t max_nesting_depth() const = 0;
+
+    virtual std::basic_string<CharT> nan_to_str() const = 0;
+
+    virtual std::basic_string<CharT> inf_to_str() const = 0;
+
+    virtual std::basic_string<CharT> neginf_to_str() const = 0;
 };
 
 template <class CharT>
@@ -165,6 +167,20 @@ public:
     virtual bool pad_inside_object_braces() const = 0;
 
     virtual bool pad_inside_array_brackets() const = 0;
+
+    virtual std::basic_string<CharT> new_line_chars() const = 0;
+
+    virtual std::basic_string<CharT> nan_to_num() const = 0;
+
+    virtual std::basic_string<CharT> inf_to_num() const = 0;
+
+    virtual std::basic_string<CharT> neginf_to_num() const = 0;
+
+    virtual std::basic_string<CharT> nan_to_str() const = 0;
+
+    virtual std::basic_string<CharT> inf_to_str() const = 0;
+
+    virtual std::basic_string<CharT> neginf_to_str() const = 0;
 };
 
 template <class CharT>
@@ -200,6 +216,13 @@ private:
     spaces_option spaces_around_comma_;
     bool pad_inside_object_braces_;
     bool pad_inside_array_brackets_;
+    std::basic_string<CharT> new_line_chars_;
+    std::basic_string<CharT> nan_to_num_;
+    std::basic_string<CharT> inf_to_num_;
+    std::basic_string<CharT> neginf_to_num_;
+    std::basic_string<CharT> nan_to_str_;
+    std::basic_string<CharT> inf_to_str_;
+    std::basic_string<CharT> neginf_to_str_;
 public:
     static const size_t default_indent = 4;
 
@@ -223,10 +246,11 @@ public:
           line_length_limit_(120),
           max_nesting_depth_((std::numeric_limits<size_t>::max)()),
           spaces_around_colon_(spaces_option::space_after),
-          spaces_around_comma_(spaces_option::no_spaces),
+          spaces_around_comma_(spaces_option::space_after),
           pad_inside_object_braces_(false),
           pad_inside_array_brackets_(false)
     {
+        new_line_chars_.push_back('\n');
     }
 
 //  Properties
@@ -301,6 +325,151 @@ public:
     {
         pad_inside_array_brackets_ = value;
         return *this;
+    }
+
+    std::basic_string<CharT> new_line_chars() const override
+    {
+        return new_line_chars_;
+    }
+
+    basic_json_serializing_options<CharT>& new_line_chars(const std::basic_string<CharT>& value)
+    {
+        new_line_chars_ = value;
+        return *this;
+    }
+
+    std::basic_string<CharT> nan_to_num() const override
+    {
+        if (!nan_to_num_.empty())
+        {
+            return nan_to_num_;
+        }
+        else if (!can_read_nan_replacement_) // not string
+        {
+            return nan_replacement_;
+        }
+        else
+        {
+            return nan_to_num_; // empty string
+        }
+    }
+
+    basic_json_serializing_options<CharT>& nan_to_num(const std::basic_string<CharT>& value) 
+    {
+        nan_to_num_ = value;
+        return *this;
+    }
+
+    std::basic_string<CharT> inf_to_num() const override
+    {
+        if (!inf_to_num_.empty())
+        {
+            return inf_to_num_;
+        }
+        else if (!can_read_pos_inf_replacement_) // not string
+        {
+            return pos_inf_replacement_;
+        }
+        else
+        {
+            return inf_to_num_; // empty string
+        }
+    }
+
+    basic_json_serializing_options<CharT>& inf_to_num(const std::basic_string<CharT>& value) 
+    {
+        inf_to_num_ = value;
+        return *this;
+    }
+
+    std::basic_string<CharT> neginf_to_num() const override
+    {
+        if (!neginf_to_num_.empty())
+        {
+            return neginf_to_num_;
+        }
+        else if (!inf_to_num_.empty())
+        {
+            std::basic_string<CharT> s;
+            s.push_back('-');
+            s.append(inf_to_num_);
+            return s;
+        }
+        else if (!can_read_neg_inf_replacement_) // not string
+        {
+            return neg_inf_replacement_;
+        }
+        else
+        {
+            return neginf_to_num_; // empty string
+        }
+    }
+
+    std::basic_string<CharT> nan_to_str() const override
+    {
+        if (!nan_to_str_.empty())
+        {
+            return nan_to_str_;
+        }
+        else if (can_read_nan_replacement_ && nan_replacement_.size() >= 2) // string
+        {
+            return nan_replacement_.substr(1,nan_replacement_.size()-2); // Remove quotes
+        }
+        else
+        {
+            return nan_to_str_; // empty string
+        }
+    }
+
+    basic_json_serializing_options<CharT>& nan_to_str(const std::basic_string<CharT>& value) 
+    {
+        nan_to_str_ = value;
+        return *this;
+    }
+
+    std::basic_string<CharT> inf_to_str() const override
+    {
+        if (!inf_to_str_.empty())
+        {
+            return inf_to_str_;
+        }
+        else if (can_read_pos_inf_replacement_ && pos_inf_replacement_.size() >= 2) // string
+        {
+            return pos_inf_replacement_.substr(1,pos_inf_replacement_.size()-2); // Strip quotes
+        }
+        else
+        {
+            return inf_to_str_; // empty string
+        }
+    }
+
+    basic_json_serializing_options<CharT>& inf_to_str(const std::basic_string<CharT>& value) 
+    {
+        inf_to_str_ = value;
+        return *this;
+    }
+
+    std::basic_string<CharT> neginf_to_str() const override
+    {
+        if (!neginf_to_str_.empty())
+        {
+            return neginf_to_str_;
+        }
+        else if (!inf_to_str_.empty())
+        {
+            std::basic_string<CharT> s;
+            s.push_back('-');
+            s.append(inf_to_str_);
+            return s;
+        }
+        else if (can_read_neg_inf_replacement_ && neg_inf_replacement_.size() >= 2) // string
+        {
+            return neg_inf_replacement_.substr(1,neg_inf_replacement_.size()-2); // Strip quotes
+        }
+        else
+        {
+            return neginf_to_str_; // empty string
+        }
     }
 
     size_t line_length_limit() const override
