@@ -166,16 +166,16 @@ private:
         size_t begin_pos_;
         size_t data_pos_;
     public:
-        serialization_context(structure_type type)
-           : type_(type), count_(0), line_splits_(line_split_kind::same_line), indent_before_(false), unindent_after_(false),
-             begin_pos_(begin_pos), data_pos_(data_pos)
-        {
-        }
         serialization_context(structure_type type, line_split_kind split_lines, bool indent_once,
                               size_t begin_pos, size_t data_pos)
            : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), unindent_after_(false),
              begin_pos_(begin_pos), data_pos_(data_pos)
         {
+        }
+
+        void set_position(size_t pos)
+        {
+            data_pos_ = pos;
         }
 
         size_t begin_pos() const
@@ -255,8 +255,8 @@ private:
     line_split_kind object_array_line_splits_;
     line_split_kind array_array_line_splits_;
     line_split_kind array_object_line_splits_;
-    size_t line_length_limit_;
     detail::print_double fp_;
+    size_t line_length_limit_;
     std::basic_string<CharT> new_line_chars_;
     Writer writer_;
 
@@ -414,7 +414,8 @@ private:
                     case line_split_kind::same_line:
                         if (column_ >= line_length_limit_)
                         {
-                            break_line();
+                            stack_.back().unindent_after(true);
+                            new_line();
                         }
                         break;
                     case line_split_kind::new_line:
@@ -566,16 +567,22 @@ private:
             writer_.insert(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
+
         if (stack_.back().is_multi_line())
         {
             stack_.back().unindent_after(true);
             new_line();
         }
-        else if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+        else if (stack_.back().count() > 0 && column_ >= line_length_limit_)
         {
-            break_line();
+            //stack_.back().unindent_after(true);
+            new_line(stack_.back().data_pos());
         }
 
+        if (stack_.back().count() == 0)
+        {
+            stack_.back().set_position(column_);
+        }
         writer_.push_back('\"');
         size_t length = jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_);
         writer_.push_back('\"');
@@ -952,16 +959,8 @@ private:
 
     void break_line()
     {
-        if (!stack_.empty()) 
-        {
-            writer_.insert(new_line_chars_.data(),new_line_chars_.length());
-            size_t pos = stack_.back().data_pos();
-            for (size_t i = 0; i < pos; ++i) 
-            {
-                writer_.push_back(' ');
-            }
-            column_ = pos;
-        }
+        stack_.back().unindent_after(true);
+        new_line();
     }
 };
 
