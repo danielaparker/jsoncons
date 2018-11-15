@@ -424,18 +424,15 @@ private:
 
         if ((std::isnan)(val))
         {
-            writer.insert(options_.nan_replacement().data(),
-                         options_.nan_replacement().length());
+            writer.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
         }
         else if (val == std::numeric_limits<double>::infinity())
         {
-            writer.insert(options_.pos_inf_replacement().data(),
-                         options_.pos_inf_replacement().length());
+            writer.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
         }
         else if (!(std::isfinite)(val))
         {
-            writer.insert(options_.neg_inf_replacement().data(),
-                         options_.neg_inf_replacement().length());
+            writer.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
         }
         else
         {
