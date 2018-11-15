@@ -97,9 +97,15 @@ private:
 #define JSONCONS_STR2(x)  #x
 #define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
+#ifdef _DEBUG
 #define JSONCONS_ASSERT(x) if (!(x)) { \
     throw jsoncons::json_exception_impl<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
             JSONCONS_STR(__LINE__)); }
+#else
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    throw jsoncons::json_exception_impl<std::runtime_error>("assertion '" #x "' failed at  <> :" \
+            JSONCONS_STR( 0 )); }
+#endif // _DEBUG
 
 #define JSONCONS_THROW(x) throw (x)
 
