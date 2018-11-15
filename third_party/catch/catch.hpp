@@ -353,7 +353,8 @@ namespace Catch {
 #define CATCH_INTERNAL_LINEINFO \
     ::Catch::SourceLineInfo( __FILE__, static_cast<std::size_t>( __LINE__ ) )
 #else
-#define CATCH_INTERNAL_LINEINFO
+#define CATCH_INTERNAL_LINEINFO \
+    ::Catch::SourceLineInfo( __FILE__, static_cast<std::size_t>( 0 ) )
 #endif // _DEBUG
 
 // end catch_common.h
