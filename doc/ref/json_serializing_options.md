@@ -41,12 +41,12 @@ The indent size, the default is 4.
 
     spaces_option spaces_around_colon() const override
     json_serializing_options & spaces_around_colon(spaces_option value)
-Sets [space options](spaces_option.md) for name separator (`:`). Default
+Indicates [space option](spaces_option.md) for name separator (`:`). Default
 is space after.
 
     spaces_option spaces_around_comma() const override
     json_serializing_options & spaces_around_comma(spaces_option value)
-Sets [space options](spaces_option.md) for array value and object name/value pair separators (`,`). Default
+Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default
 is space after.
 
     bool pad_inside_object_braces() const override
@@ -128,24 +128,23 @@ Defaults to "\n"
 
     size_t max_nesting_depth() const
     void max_nesting_depth(size_t depth)
-The maximum nesting depth allowed when deserializing. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
+The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
+    line_split_kind object_object_line_splits() const;
     json_serializing_options& object_object_line_splits(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
+    line_split_kind array_object_line_splits() const;
     json_serializing_options& array_object_line_splits(line_split_kind value)
 For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
+    line_split_kind object_array_line_splits() const;
     json_serializing_options& object_array_line_splits(line_split_kind value)
 For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
 
+    line_split_kind array_array_line_splits() const;
     json_serializing_options& array_array_line_splits(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
-
-    size_t max_nesting_depth()
-    json_serializing_options& max_nesting_depth(size_t value)
- Maximum nesting depth when parsing JSON.
-
 
 ### Examples
 
