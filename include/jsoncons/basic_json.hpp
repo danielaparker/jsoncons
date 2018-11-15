@@ -2806,68 +2806,8 @@ public:
 
     void dump(basic_json_content_handler<char_type>& handler) const
     {
-        dump2(handler);
+        dump_noflush(handler);
         handler.flush();
-    }
-
-    void dump2(basic_json_content_handler<char_type>& handler) const
-    {
-        switch (var_.structure_tag())
-        {
-            case structure_tag_type::short_string_tag:
-            case structure_tag_type::long_string_tag:
-                handler.string_value(as_string_view(), var_.semantic_tag());
-                break;
-            case structure_tag_type::byte_string_tag:
-                handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), var_.semantic_tag());
-                break;
-            case structure_tag_type::double_tag:
-                handler.double_value(var_.double_data_cast()->value(), 
-                                     var_.double_data_cast()->options(), 
-                                     var_.semantic_tag());
-                break;
-            case structure_tag_type::int64_tag:
-                handler.int64_value(var_.int64_data_cast()->value(), var_.semantic_tag());
-                break;
-            case structure_tag_type::uint64_tag:
-                handler.uint64_value(var_.uint64_data_cast()->value(), var_.semantic_tag());
-                break;
-            case structure_tag_type::bool_tag:
-                handler.bool_value(var_.bool_data_cast()->value());
-                break;
-            case structure_tag_type::null_tag:
-                handler.null_value();
-                break;
-            case structure_tag_type::empty_object_tag:
-                handler.begin_object(0);
-                handler.end_object();
-                break;
-            case structure_tag_type::object_tag:
-                {
-                    handler.begin_object(size());
-                    const object& o = object_value();
-                    for (const_object_iterator it = o.begin(); it != o.end(); ++it)
-                    {
-                        handler.name(string_view_type((it->key()).data(),it->key().length()));
-                        it->value().dump2(handler);
-                    }
-                    handler.end_object();
-                }
-                break;
-            case structure_tag_type::array_tag:
-                {
-                    handler.begin_array(size());
-                    const array& o = array_value();
-                    for (const_array_iterator it = o.begin(); it != o.end(); ++it)
-                    {
-                        it->dump2(handler);
-                    }
-                    handler.end_array();
-                }
-                break;
-            default:
-                break;
-        }
     }
 
     void dump(std::basic_ostream<char_type>& os) const
@@ -4514,6 +4454,66 @@ public:
     }
 
 private:
+
+    void dump_noflush(basic_json_content_handler<char_type>& handler) const
+    {
+        switch (var_.structure_tag())
+        {
+            case structure_tag_type::short_string_tag:
+            case structure_tag_type::long_string_tag:
+                handler.string_value(as_string_view(), var_.semantic_tag());
+                break;
+            case structure_tag_type::byte_string_tag:
+                handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), var_.semantic_tag());
+                break;
+            case structure_tag_type::double_tag:
+                handler.double_value(var_.double_data_cast()->value(), 
+                                     var_.double_data_cast()->options(), 
+                                     var_.semantic_tag());
+                break;
+            case structure_tag_type::int64_tag:
+                handler.int64_value(var_.int64_data_cast()->value(), var_.semantic_tag());
+                break;
+            case structure_tag_type::uint64_tag:
+                handler.uint64_value(var_.uint64_data_cast()->value(), var_.semantic_tag());
+                break;
+            case structure_tag_type::bool_tag:
+                handler.bool_value(var_.bool_data_cast()->value());
+                break;
+            case structure_tag_type::null_tag:
+                handler.null_value();
+                break;
+            case structure_tag_type::empty_object_tag:
+                handler.begin_object(0);
+                handler.end_object();
+                break;
+            case structure_tag_type::object_tag:
+                {
+                    handler.begin_object(size());
+                    const object& o = object_value();
+                    for (const_object_iterator it = o.begin(); it != o.end(); ++it)
+                    {
+                        handler.name(string_view_type((it->key()).data(),it->key().length()));
+                        it->value().dump_noflush(handler);
+                    }
+                    handler.end_object();
+                }
+                break;
+            case structure_tag_type::array_tag:
+                {
+                    handler.begin_array(size());
+                    const array& o = array_value();
+                    for (const_array_iterator it = o.begin(); it != o.end(); ++it)
+                    {
+                        it->dump_noflush(handler);
+                    }
+                    handler.end_array();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
     friend std::basic_ostream<char_type>& operator<<(std::basic_ostream<char_type>& os, const basic_json& o)
     {
