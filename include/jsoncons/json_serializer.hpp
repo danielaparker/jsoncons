@@ -296,13 +296,13 @@ public:
          object_array_line_splits_(options.object_array_line_splits()),
          array_array_line_splits_(options.array_array_line_splits()),
          array_object_line_splits_(options.array_object_line_splits()),
-         indent_amount_(0), 
          fp_(floating_point_options(options.floating_point_format(), 
                                     options.precision(),
                                     0)),
          line_length_limit_(options.line_length_limit()),
          new_line_chars_(options.new_line_chars()),
          writer_(os), 
+         indent_amount_(0), 
          column_(0)
     {
         switch (options.spaces_around_colon())

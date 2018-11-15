@@ -12,7 +12,34 @@
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
-TEST_CASE("test_serialization_1")
+bool are_equal(const std::string& s1, const std::string& s2)
+{
+    size_t len1 = s1.size();
+    size_t len2 = s2.size();
+
+    size_t len = std::min(len1,len2);
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        if (s1[i] != s2[i])
+        {
+            for (size_t j = 0; j <= i; ++j)
+            {
+                std::cout << s1[j];
+            }
+            std::cout << "|";
+            std::cout << "\n";
+            std::cout << i << " s1: " << s1[i] << ", " << (int)s1[i] << " s2: " << s2[i] << ", " << (int)s2[i] << "\n";
+            std::cout << s1 << "\n";
+            std::cout << "---\n";
+            std::cout << s2 << "\n";
+            return false;
+        }
+    }
+    return true;
+}
+
+TEST_CASE("json_serializer line split tests")
 {
     json val = json::parse(R"(
     {
@@ -26,43 +53,9 @@ TEST_CASE("test_serialization_1")
     }
 )");
 
-    std::string expected1 = R"({
-    "data": {
-        "id": [1, 2, 3],
-        "item": [
-                 [1, 2, 3]
-        ],
-        "tags": []
-    },
-    "header": {
-        "properties": {}
-    }
-})";
-    std::ostringstream os1;
-    os1 << pretty_print(val);
-    std::cout << os1.str() << "\n";
-    //CHECK(expected1 == os1.str());
-    json_serializing_options options2 ;
-    options2 .array_array_line_splits(line_split_kind::same_line);
-    std::string expected2 = R"({
-    "data": {
-        "id": [1,2,3],
-        "item": [[1,2,3]],
-        "tags": []
-    },
-    "header": {
-        "properties": {}
-    }
-})";
-    std::ostringstream os2;
-    os2 << pretty_print(val,options2 );
-
-    std::cout << os2.str() << "\n";
-    //CHECK(expected2 == os2.str());
-
-    json_serializing_options options3;
-    options3.array_array_line_splits(line_split_kind::new_line);
-    std::string expected3 = R"({
+    SECTION("Default line splits")
+    {
+std::string expected = R"({
     "data": {
         "id": [1,2,3],
         "item": [
@@ -74,15 +67,65 @@ TEST_CASE("test_serialization_1")
         "properties": {}
     }
 })";
-    std::ostringstream os3;
-    os3 << pretty_print(val,options3);
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::no_spaces);
+        std::ostringstream os;
+        os << pretty_print(val, options);
+        CHECK(os.str() == expected);
+    }
 
-    std::cout << os3.str() << "\n";
-    //CHECK(expected3 == os3.str());
+    SECTION("array_array same_line")
+    {
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::no_spaces)
+               .array_array_line_splits(line_split_kind::same_line);
+    std::string expected = R"({
+    "data": {
+        "id": [1,2,3],
+        "item": [[1,2,3]],
+        "tags": []
+    },
+    "header": {
+        "properties": {}
+    }
+})";
+        std::ostringstream os;
+        os << pretty_print(val,options);
 
-    json_serializing_options options4;
-    options4.array_array_line_splits(line_split_kind::multi_line);
-    std::string expected4 = R"({
+        //std::cout << os.str() << "\n";
+        CHECK(expected == os.str());
+    }
+
+    SECTION("array_array new_line")
+    {
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::no_spaces)
+               .array_array_line_splits(line_split_kind::new_line);
+    std::string expected = R"({
+    "data": {
+        "id": [1,2,3],
+        "item": [
+            [1,2,3]
+        ],
+        "tags": []
+    },
+    "header": {
+        "properties": {}
+    }
+})";
+        std::ostringstream os;
+        os << pretty_print(val,options);
+
+        //std::cout << os.str() << "\n";
+        CHECK(expected == os.str());
+    }
+
+    SECTION("array_array multi_line")
+    {
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::no_spaces)
+               .array_array_line_splits(line_split_kind::multi_line);
+    std::string expected = R"({
     "data": {
         "id": [1,2,3],
         "item": [
@@ -98,14 +141,18 @@ TEST_CASE("test_serialization_1")
         "properties": {}
     }
 })";
-    std::ostringstream os4;
-    os4 << pretty_print(val,options4);
-    std::cout << os4.str() << "\n";
-    //CHECK(expected4 == os4.str());
+        std::ostringstream os;
+        os << pretty_print(val,options);
+        //std::cout << os.str() << "\n";
+        CHECK(expected == os.str());
+    }
 
-    json_serializing_options options5;
-    options5.object_array_line_splits(line_split_kind::same_line);
-    std::string expected5 = R"({
+    SECTION("object_array same_line")
+    {
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::no_spaces)
+               .object_array_line_splits(line_split_kind::same_line);
+    std::string expected = R"({
     "data": {
         "id": [1,2,3],
         "item": [
@@ -117,14 +164,18 @@ TEST_CASE("test_serialization_1")
         "properties": {}
     }
 })";
-    std::ostringstream os5;
-    os5 << pretty_print(val,options5);
-    std::cout << os5.str() << "\n";
-    //CHECK(expected5 == os5.str());
+        std::ostringstream os;
+        os << pretty_print(val,options);
+        //std::cout << os.str() << "\n";
+        CHECK(expected == os.str());
+    }
 
-    json_serializing_options options6;
-    options6.object_array_line_splits(line_split_kind::new_line);
-    std::string expected6 = R"({
+    SECTION("object_array new_line")
+    {
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::no_spaces)
+               .object_array_line_splits(line_split_kind::new_line);
+    std::string expected = R"({
     "data": {
         "id": [
             1,2,3
@@ -138,14 +189,18 @@ TEST_CASE("test_serialization_1")
         "properties": {}
     }
 })";
-    std::ostringstream os6;
-    os6 << pretty_print(val,options6);
-    std::cout << os6.str() << "\n";
-    //CHECK(expected6 == os6.str());
+        std::ostringstream os;
+        os << pretty_print(val,options);
+        //std::cout << os.str() << "\n";
+        CHECK(expected == os.str());
+    }
 
-    json_serializing_options options7;
-    options7.object_array_line_splits(line_split_kind::multi_line);
-    std::string expected7 = R"({
+    SECTION("")
+    {
+        json_serializing_options options;
+        options.spaces_around_comma(spaces_option::no_spaces)
+               .object_array_line_splits(line_split_kind::multi_line);
+    std::string expected = R"({
     "data": {
         "id": [
             1,
@@ -161,10 +216,11 @@ TEST_CASE("test_serialization_1")
         "properties": {}
     }
 })";
-    std::ostringstream os7;
-    os7 << pretty_print(val,options7);
-    std::cout << os7.str() << "\n";
-    //CHECK(expected7 == os7.str());
+        std::ostringstream os;
+        os << pretty_print(val,options);
+        //std::cout << os.str() << "\n";
+        CHECK(expected == os.str());
+    }
 }
 
 // array_array_line_splits_(line_split_kind::new_line)
@@ -179,7 +235,7 @@ TEST_CASE("test_array_of_array_of_string_string_array")
 ]
     )"_json;
 
-    std::cout << pretty_print(j) << std::endl;
+    //std::cout << pretty_print(j) << std::endl;
 }
 
 
