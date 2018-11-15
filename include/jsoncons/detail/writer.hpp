@@ -65,6 +65,7 @@ public:
     void flush()
     {
         os_.write(begin_buffer_, buffer_length());
+        os_.flush();
         p_ = buffer_.data();
     }
 

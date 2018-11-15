@@ -137,6 +137,13 @@ TEST_CASE("object_array with/without line_length_limit")
 
     SECTION("same_line")
     {
+    std::string expected = R"({
+    "foo": ["bar","baz",
+        [1,2,3]
+    ],
+    "qux": [1,2,3,null,123,45.3,342334,234]
+})";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -147,11 +154,21 @@ TEST_CASE("object_array with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
 
     SECTION("new_line")
     {
+    std::string expected = R"({
+    "foo": [
+        "bar","baz",
+        [1,2,3]
+    ],
+    "qux": [
+        1,2,3,null,123,45.3,342334,234
+    ]
+})";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -162,11 +179,30 @@ TEST_CASE("object_array with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
 
     SECTION("multi_line")
     {
+    std::string expected = R"({
+    "foo": [
+        "bar",
+        "baz",
+        [1,2,3]
+    ],
+    "qux": [
+        1,
+        2,
+        3,
+        null,
+        123,
+        45.3,
+        342334,
+        234
+    ]
+})";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -176,11 +212,22 @@ TEST_CASE("object_array with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
 
     SECTION("same_line with line length limit")
     {
+    std::string expected = R"({
+    "foo": ["bar","baz",
+        [1,2,3]
+    ],
+    "qux": [1,2,3,null,
+        123,45.3,342334,
+        234
+    ]
+})";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -191,11 +238,24 @@ TEST_CASE("object_array with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
 
     SECTION("new_line with line length limit")
     {
+    std::string expected = R"({
+    "foo": [
+        "bar","baz",
+        [1,2,3]
+    ],
+    "qux": [
+        1,2,3,null,123,
+        45.3,342334,
+        234
+    ]
+})";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -206,7 +266,8 @@ TEST_CASE("object_array with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
 }
 
@@ -221,12 +282,18 @@ TEST_CASE("array_object with/without line_length_limit")
    {
        "author": "Koji Suzuki",
        "title": "ring"
+   },
+   {
+       "author": "Haruki Murakami",
+       "title": "A Wild Sheep Chase"
    }
 ]
     )";
-
     SECTION("same_line")
     {
+    std::string expected = R"([{"author": "Graham Greene","title": "The Comedians"},{"author": "Koji Suzuki","title": "ring"},{"author": "Haruki Murakami",
+                                                                                                 "title": "A Wild Sheep Chase"}])";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -237,11 +304,18 @@ TEST_CASE("array_object with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
 
     SECTION("new_line")
     {
+    std::string expected = R"([
+    {"author": "Graham Greene","title": "The Comedians"},
+    {"author": "Koji Suzuki","title": "ring"},
+    {"author": "Haruki Murakami","title": "A Wild Sheep Chase"}
+])";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -252,11 +326,27 @@ TEST_CASE("array_object with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
 
     SECTION("multi_line (default)")
     {
+    std::string expected = R"([
+    {
+        "author": "Graham Greene",
+        "title": "The Comedians"
+    },
+    {
+        "author": "Koji Suzuki",
+        "title": "ring"
+    },
+    {
+        "author": "Haruki Murakami",
+        "title": "A Wild Sheep Chase"
+    }
+])";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -265,11 +355,18 @@ TEST_CASE("array_object with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
-
     SECTION("same_line with line length limit")
     {
+    std::string expected = R"([{"author": "Graham Greene",
+  "title": "The Comedians"},
+    {"author": "Koji Suzuki",
+     "title": "ring"},
+    {"author": "Haruki Murakami",
+     "title": "A Wild Sheep Chase"}])";
+
         json j = json::parse(s);
 
         json_serializing_options options;
@@ -280,16 +377,18 @@ TEST_CASE("array_object with/without line_length_limit")
         std::ostringstream os;
         os << pretty_print(j, options);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
+        CHECK(os.str() == expected);
     }
-
     SECTION("new_line with line length limit")
     {
     std::string expected = R"([
     {"author": "Graham Greene",
      "title": "The Comedians"},
     {"author": "Koji Suzuki",
-     "title": "ring"}
+     "title": "ring"},
+    {"author": "Haruki Murakami",
+     "title": "A Wild Sheep Chase"}
 ])";
         json j = json::parse(s);
 
@@ -302,8 +401,7 @@ TEST_CASE("array_object with/without line_length_limit")
         os << pretty_print(j, options);
         CHECK(os.str() == expected);
 
-        std::cout << pretty_print(j, options) << "\n";
+        //std::cout << pretty_print(j, options) << "\n";
     }
-
 }
 

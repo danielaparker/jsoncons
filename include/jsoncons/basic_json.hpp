@@ -2806,6 +2806,12 @@ public:
 
     void dump(basic_json_content_handler<char_type>& handler) const
     {
+        dump2(handler);
+        handler.flush();
+    }
+
+    void dump2(basic_json_content_handler<char_type>& handler) const
+    {
         switch (var_.structure_tag())
         {
             case structure_tag_type::short_string_tag:
@@ -2843,7 +2849,7 @@ public:
                     for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                     {
                         handler.name(string_view_type((it->key()).data(),it->key().length()));
-                        it->value().dump(handler);
+                        it->value().dump2(handler);
                     }
                     handler.end_object();
                 }
@@ -2854,7 +2860,7 @@ public:
                     const array& o = array_value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {
-                        it->dump(handler);
+                        it->dump2(handler);
                     }
                     handler.end_array();
                 }
@@ -2862,7 +2868,6 @@ public:
             default:
                 break;
         }
-        handler.flush();
     }
 
     void dump(std::basic_ostream<char_type>& os) const

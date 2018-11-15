@@ -165,7 +165,6 @@ class basic_json_serializing_options : public virtual basic_json_read_options<Ch
 {
 public:
     typedef CharT char_type;
-    typedef basic_string_view<CharT> string_view_type;
     typedef std::basic_string<CharT> string_type;
 private:
     size_t indent_size_;
@@ -202,12 +201,13 @@ private:
     std::basic_string<CharT> inf_to_str_;
     std::basic_string<CharT> neginf_to_str_;
 public:
-    static const size_t default_indent_size = 4;
+    static const size_t indent_size_default = 4;
+    static const size_t line_length_limit_default = 120;
 
 //  Constructors
 
     basic_json_serializing_options()
-        : indent_size_(default_indent_size),
+        : indent_size_(indent_size_default),
           floating_point_format_(chars_format()),
           precision_(0),
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -223,7 +223,7 @@ public:
           object_array_line_splits_(line_split_kind::same_line),
           array_array_line_splits_(line_split_kind::new_line),
           array_object_line_splits_(line_split_kind::multi_line),
-          line_length_limit_(120),
+          line_length_limit_(line_length_limit_default),
           max_nesting_depth_((std::numeric_limits<size_t>::max)()),
           spaces_around_colon_(spaces_option::space_after),
           spaces_around_comma_(spaces_option::space_after),
@@ -338,6 +338,7 @@ public:
 
     basic_json_serializing_options<CharT>& nan_to_num(const std::basic_string<CharT>& value) 
     {
+        nan_to_str_.clear();
         nan_to_num_ = value;
         return *this;
     }
@@ -362,6 +363,7 @@ public:
 
     basic_json_serializing_options<CharT>& inf_to_num(const std::basic_string<CharT>& value) 
     {
+        inf_to_str_.clear();
         inf_to_num_ = value;
         return *this;
     }
@@ -393,6 +395,7 @@ public:
 
     basic_json_serializing_options<CharT>& neginf_to_num(const std::basic_string<CharT>& value) 
     {
+        neginf_to_str_.clear();
         neginf_to_num_ = value;
         return *this;
     }
@@ -417,6 +420,7 @@ public:
 
     basic_json_serializing_options<CharT>& nan_to_str(const std::basic_string<CharT>& value) 
     {
+        nan_to_num_.clear();
         nan_to_str_ = value;
         return *this;
     }
@@ -441,6 +445,7 @@ public:
 
     basic_json_serializing_options<CharT>& inf_to_str(const std::basic_string<CharT>& value) 
     {
+        inf_to_num_.clear();
         inf_to_str_ = value;
         return *this;
     }
@@ -472,6 +477,7 @@ public:
 
     basic_json_serializing_options<CharT>& neginf_to_str(const std::basic_string<CharT>& value) 
     {
+        neginf_to_num_.clear();
         neginf_to_str_ = value;
         return *this;
     }
@@ -589,7 +595,7 @@ public:
         return nan_replacement_;
     }
 
-    basic_json_serializing_options<CharT>& nan_replacement(const string_view_type& value)
+    basic_json_serializing_options<CharT>& nan_replacement(const string_type& value)
     {
         nan_replacement_ = string_type(value);
 
@@ -603,7 +609,7 @@ public:
         return pos_inf_replacement_;
     }
 
-    basic_json_serializing_options<CharT>& pos_inf_replacement(const string_view_type& value)
+    basic_json_serializing_options<CharT>& pos_inf_replacement(const string_type& value)
     {
         pos_inf_replacement_ = string_type(value);
         can_read_pos_inf_replacement_ = is_string(value);
@@ -615,7 +621,7 @@ public:
         return neg_inf_replacement_;
     }
 
-    basic_json_serializing_options<CharT>& neg_inf_replacement(const string_view_type& value)
+    basic_json_serializing_options<CharT>& neg_inf_replacement(const string_type& value)
     {
         neg_inf_replacement_ = string_type(value);
         can_read_neg_inf_replacement_ = is_string(value);
@@ -636,7 +642,7 @@ public:
 #endif
 private:
     enum class input_state {initial,begin_quote,character,end_quote,escape,error};
-    bool is_string(const string_view_type& s) const
+    bool is_string(const string_type& s) const
     {
         input_state state = input_state::initial;
         for (CharT c : s)

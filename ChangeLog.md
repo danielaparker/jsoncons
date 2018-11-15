@@ -1,3 +1,26 @@
+master
+------
+
+Changes to `json_serializing_options`
+
+New options 
+
+- spaces_around_colon (defaults to `space_after`)
+- spaces_around_comma (defaults to `space_after`)
+- pad_inside_object_braces (defaults to `false`)
+- pad_inside_array_brackets (defaults to `false`)
+- line_length_limit (defaults to '120`)
+- new_line_chars (defaults to `\n`)
+
+`nan_replacement`, `pos_inf_replacement`, and `neg_inf_replacement` are deprecated (but still work)
+These have been replaced by
+
+- nan_to_num/nan_to_str
+- inf_to_num/inf_to_str
+- neginf_to_num/neginf_to_str (default is `-` followed by inf_to_num/inf_to_str)
+
+`nan_to_str`, `inf_to_str` and `neginf_to_str` are also used to substitute back to `nan`, `inf` and `neginf` in the parser. 
+
 v0.112.0
 --------
 

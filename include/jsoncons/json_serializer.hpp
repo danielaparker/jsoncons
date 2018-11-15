@@ -162,13 +162,13 @@ private:
         size_t count_;
         line_split_kind line_splits_;
         bool indent_before_;
-        bool unindent_after_;
+        bool new_line_after_;
         size_t begin_pos_;
         size_t data_pos_;
     public:
         serialization_context(structure_type type, line_split_kind split_lines, bool indent_once,
                               size_t begin_pos, size_t data_pos)
-           : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), unindent_after_(false),
+           : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), new_line_after_(false),
              begin_pos_(begin_pos), data_pos_(data_pos)
         {
         }
@@ -198,14 +198,14 @@ private:
             ++count_;
         }
 
-        bool unindent_after() const
+        bool new_line_after() const
         {
-            return unindent_after_;
+            return new_line_after_;
         }
 
-        void unindent_after(bool value) 
+        void new_line_after(bool value) 
         {
-            unindent_after_ = value;
+            new_line_after_ = value;
         }
 
         bool is_object() const
@@ -414,16 +414,16 @@ private:
                     case line_split_kind::same_line:
                         if (column_ >= line_length_limit_)
                         {
-                            stack_.back().unindent_after(true);
+                            //stack_.back().new_line_after(true);
                             new_line();
                         }
                         break;
                     case line_split_kind::new_line:
-                        stack_.back().unindent_after(true);
+                        stack_.back().new_line_after(true);
                         new_line();
                         break;
                     default: // multi_line
-                        stack_.back().unindent_after(true);
+                        stack_.back().new_line_after(true);
                         new_line();
                         break;
                 }
@@ -447,7 +447,7 @@ private:
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
-        if (stack_.back().unindent_after())
+        if (stack_.back().new_line_after())
         {
             new_line();
         }
@@ -495,20 +495,20 @@ private:
                 case line_split_kind::same_line:
                     if (stack_.back().is_multi_line())
                     {
-                        stack_.back().unindent_after(true);
+                        stack_.back().new_line_after(true);
                         new_line();
                     }
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
                     break;
                 case line_split_kind::new_line:
-                    stack_.back().unindent_after(true);
+                    stack_.back().new_line_after(true);
                     new_line();
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
                     break;
                 default: // multi_line
-                    stack_.back().unindent_after(true);
+                    stack_.back().new_line_after(true);
                     new_line();
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
@@ -532,7 +532,7 @@ private:
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
-        if (stack_.back().unindent_after())
+        if (stack_.back().new_line_after())
         {
             new_line();
         }
@@ -554,12 +554,12 @@ private:
 
         if (stack_.back().is_multi_line())
         {
-            stack_.back().unindent_after(true);
+            stack_.back().new_line_after(true);
             new_line();
         }
         else if (stack_.back().count() > 0 && column_ >= line_length_limit_)
         {
-            //stack_.back().unindent_after(true);
+            //stack_.back().new_line_after(true);
             new_line(stack_.back().data_pos());
         }
 
@@ -832,7 +832,7 @@ private:
             }
             if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
             {
-                stack_.back().unindent_after(true);
+                stack_.back().new_line_after(true);
                 new_line();
             }
         }
@@ -943,7 +943,7 @@ private:
 
     void break_line()
     {
-        stack_.back().unindent_after(true);
+        stack_.back().new_line_after(true);
         new_line();
     }
 };

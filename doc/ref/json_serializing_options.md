@@ -22,8 +22,11 @@ The default floating point formatting for a floating point value that was direct
 
 #### Member constants
 
-    default_indent
-The default indent is 4
+    static const size_t indent_size_default = 4;
+The default size indent is 4
+
+    static const size_t line_length_limit_default = 120;
+The default line length limit is 120
 
 #### Constructors
 
@@ -38,17 +41,21 @@ The indent size, the default is 4.
 
     spaces_option spaces_around_colon() const override
     json_serializing_options & spaces_around_colon(spaces_option value)
-[spaces_option](spaces_option.md)
+Sets [space options](spaces_option.md) for name separator (`:`). Default
+is space after.
 
     spaces_option spaces_around_comma() const override
     json_serializing_options & spaces_around_comma(spaces_option value)
-[spaces_option](spaces_option.md)
+Sets [space options](spaces_option.md) for array value and object name/value pair separators (`,`). Default
+is space after.
 
     bool pad_inside_object_braces() const override
     json_serializing_options & pad_inside_object_braces(bool value)
+Default is `false`
 
     bool pad_inside_array_brackets() const override
     json_serializing_options & pad_inside_array_brackets(bool value)
+Default is `false`
 
     chars_format floating_point_format() const 
     json_serializing_options& floating_point_format(chars_format value)
@@ -81,28 +88,36 @@ Escape all non-ascii characters. The default is `false`.
 Escape the solidus ('/') character. The default is `false`.
 
     const std::string& nan_to_num() const 
-    json_serializing_options& nan_to_num(const string_view_type& replacement)
-NaN number replacement. 
-
     const std::string& nan_to_str() const 
-    json_serializing_options& nan_to_str(const string_view_type& replacement)
+Replace `NaN` with a number (if `nan_to_num()` returns a non-empty string)
+or a string (if `nan_to_str()` returns a non-empty string.) If both
+are empty, replace `NaN` with `null`.
+
+    json_serializing_options& nan_to_num(const std::string& value)
+    json_serializing_options& nan_to_str(const std::string& value)
 NaN string replacement. 
 
     const std::string& inf_to_num() const 
-    json_serializing_options& inf_to_num(const string_view_type& value)
-Positive infinity string replacement. 
-
     const std::string& inf_to_str() const 
-    json_serializing_options& inf_to_str(const string_view_type& value)
+Replace positive infinity with a number (if `inf_to_num()` returns a non-empty string)
+or a string (if `inf_to_str()` returns a non-empty string.) If both
+are empty, replace positive infinity with `null`.
+
+    json_serializing_options& inf_to_num(const std::string& value)
+    json_serializing_options& inf_to_str(const std::string& value)
 Positive infinity string replacement. 
 
     const std::string& neginf_to_num() const 
-    json_serializing_options& neginf_to_num(const string_view_type& value)
-Negative infinity number replacement. 
-
     const std::string& neginf_to_str() const 
-    json_serializing_options& neginf_to_str(const string_view_type& value)
-Negative infinity string replacement. 
+Replace negative infinity with a number (if `neginf_to_num()` returns a non-empty string)
+or a string (if `neginf_to_str()` returns a non-empty string.) If both
+are empty, replace negative infinity with `null`.
+
+    json_serializing_options& neginf_to_num(const std::string& value)
+    json_serializing_options& neginf_to_str(const std::string& value)
+Negative infinity string replacement. Defaults to `-` followed by
+`inf_to_num()` if `inf_to_num()` is not empty, or `-` followed by
+`inf_to_str()` if `inf_to_str()` is not empty, otherwise empty.  
 
     std::string new_line_chars() const
     serializing_options& new_line_chars(const std::string& value)
