@@ -950,7 +950,7 @@ private:
     void new_line(size_t len)
     {
         writer_.insert(new_line_chars_.data(),new_line_chars_.length());
-        for (int i = 0; i < len; ++i)
+        for (size_t i = 0; i < len; ++i)
         {
             writer_.push_back(' ');
         }

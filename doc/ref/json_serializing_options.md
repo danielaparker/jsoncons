@@ -36,6 +36,20 @@ Constructs an `json_serializing_options` with default values.
     json_serializing_options& indent(int value)
 The level of indenting, the default is 4.
 
+    spaces_option spaces_around_colon() const override
+    json_serializing_options & spaces_around_colon(spaces_option value)
+[spaces_option](spaces_option.md)
+
+    spaces_option spaces_around_comma() const override
+    json_serializing_options & spaces_around_comma(spaces_option value)
+[spaces_option](spaces_option.md)
+
+    bool pad_inside_object_braces() const override
+    json_serializing_options & pad_inside_object_braces(bool value)
+
+    bool pad_inside_array_brackets() const override
+    json_serializing_options & pad_inside_array_brackets(bool value)
+
     chars_format floating_point_format() const 
     json_serializing_options& floating_point_format(chars_format value)
 Overrides [floating point format](chars_format.md) when serializing json.
@@ -66,17 +80,36 @@ Escape all non-ascii characters. The default is `false`.
     json_serializing_options& escape_solidus(bool value)
 Escape the solidus ('/') character. The default is `false`.
 
-    const std::string& nan_replacement() const 
-    json_serializing_options& nan_replacement(const string_view_type& replacement)
-NaN replacement. The default is `"null"`. 
+    const std::string& nan_to_num() const 
+    json_serializing_options& nan_to_num(const string_view_type& replacement)
+NaN number replacement. 
 
-    const std::string& pos_inf_replacement() const 
-    json_serializing_options& pos_inf_replacement(const string_view_type& replacement)
-Positive infinity replacement. The default is `"null"`
+    const std::string& nan_to_str() const 
+    json_serializing_options& nan_to_str(const string_view_type& replacement)
+NaN string replacement. 
 
-    const std::string& neg_inf_replacement() const 
-    json_serializing_options& neg_inf_replacement(const string_view_type& replacement)
-Negative infinity replacement. The default is `"null"`
+    const std::string& inf_to_num() const 
+    json_serializing_options& inf_to_num(const string_view_type& value)
+Positive infinity string replacement. 
+
+    const std::string& inf_to_str() const 
+    json_serializing_options& inf_to_str(const string_view_type& value)
+Positive infinity string replacement. 
+
+    const std::string& neginf_to_num() const 
+    json_serializing_options& neginf_to_num(const string_view_type& value)
+Negative infinity number replacement. 
+
+    const std::string& neginf_to_str() const 
+    json_serializing_options& neginf_to_str(const string_view_type& value)
+Negative infinity string replacement. 
+
+    std::string new_line_chars() const
+    serializing_options& new_line_chars(const std::string& value)
+Defaults to "\n"
+
+    size_t line_length_limit() const
+    json_serializing_options & line_length_limit(size_t value)
 
     size_t max_nesting_depth() const
     void max_nesting_depth(size_t depth)
