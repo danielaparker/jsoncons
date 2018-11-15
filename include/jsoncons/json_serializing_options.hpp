@@ -543,12 +543,12 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    int indent() const override
+    size_t indent() const 
     {
         return indent_size();
     }
 
-    basic_json_serializing_options<CharT>& indent(int value)
+    basic_json_serializing_options<CharT>& indent(size_t value)
     {
         return indent_size(value);
     }

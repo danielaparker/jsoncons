@@ -487,9 +487,6 @@ private:
                                             column_, column_+open_array_bracket_str_.length());
                         break;
                 }
-                writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
-                column_ += open_array_bracket_str_.length();
-                indent();
             }
             else // array
             {
@@ -503,27 +500,18 @@ private:
                     }
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    indent();
-                    writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
-                    column_ += open_array_bracket_str_.length();
                     break;
                 case line_split_kind::new_line:
                     stack_.back().unindent_after(true);
                     new_line();
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    indent();
-                    writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
-                    column_ += open_array_bracket_str_.length();
                     break;
                 default: // multi_line
                     stack_.back().unindent_after(true);
                     new_line();
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    indent();
-                    writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
-                    column_ += open_array_bracket_str_.length();
                     //new_line();
                     break;
                 }
@@ -533,10 +521,10 @@ private:
         {
             stack_.emplace_back(structure_type::array, line_split_kind::multi_line, false,
                                 column_, column_+open_array_bracket_str_.length());
-            writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
-            column_ += open_array_bracket_str_.length();
-            indent();
         }
+        indent();
+        writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
+        column_ += open_array_bracket_str_.length();
         return true;
     }
 
