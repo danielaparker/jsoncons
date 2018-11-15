@@ -1,18 +1,29 @@
 # Roadmap
 
+### For release 0.113
+
+- Enhanced JSON serialization options (currently on master)
+
+- Preserve CBOR tagging of expected conversion of byte strings 
+  to base64, base64url, or base16, and use in JSON serialization.     
+
+- Preserve CBOR bigfloat tag when decoding/encoding
+
+- Convert CBOR non text string keys to strings when decoding
+  to json values.
+
+- Add options for nan/inf substitution and floating point
+  precision in `csv_serializing_options`.
+
 ### For later releases
 
 - Support pull parsing for cbor and CSV.
 
 - Support selecting CSV fields using `json_pointer`
 
-- Revist `encode_json` and `decode_json` now that we have pull parsing.
-
 - Support more error recovery and introduce optional `lenient_error_handler`.
 
 - Improve MessagePack support
-
-- Revisit JSON serialization options
 
 - Remove names that have been deprecated for more than a year.
 

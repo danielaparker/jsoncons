@@ -1,6 +1,11 @@
 master
 ------
 
+Changes
+
+- __FILE__ and __LINE__ macros removed from JSONCONS_ASSERT 
+  if not defined _DEBUG (contributed by zhskyy.)
+
 Changes to `json_serializing_options`
 
 New options 
@@ -10,9 +15,9 @@ New options
 - pad_inside_object_braces (defaults to `false`)
 - pad_inside_array_brackets (defaults to `false`)
 - line_length_limit (defaults to '120`)
-- new_line_chars (defaults to `\n`)
+- new_line_chars (for json serialization, defaults to `\n`)
 
-`nan_replacement`, `pos_inf_replacement`, and `neg_inf_replacement` are deprecated (but still work)
+`nan_replacement`, `pos_inf_replacement`, and `neg_inf_replacement` are deprecated (still work)
 These have been replaced by
 
 - nan_to_num/nan_to_str
@@ -20,6 +25,16 @@ These have been replaced by
 - neginf_to_num/neginf_to_str (default is `-` followed by inf_to_num/inf_to_str)
 
 `nan_to_str`, `inf_to_str` and `neginf_to_str` are also used to substitute back to `nan`, `inf` and `neginf` in the parser. 
+
+- Long since deprecated options `array_array_block_option`,
+  `array_object_block_option`, `object_object_block_option` and
+  `object_array_block_option` have been removed.
+
+- The names `object_array_split_lines`, `object_array_split_lines`,
+  `object_array_split_lines` and `object_array_split_lines` have
+  been deprecated (still work) and renamed to `object_array_line_splits`, 
+  `object_array_line_splits`, `object_array_line_splits` and `object_array_line_splits`.
+  Rationale: consistency with `line_split_kind` name.  
 
 v0.112.0
 --------

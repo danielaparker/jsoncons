@@ -61,3 +61,6 @@ class.
 
 Alexander B, for uncovering a bug in how json_parser validated
 UTF-8 strings.
+
+zhskyy, for contributing __FILE__ and __LINE__ macros removed 
+from JSONCONS_ASSERT if not defined _DEBUG.

@@ -80,16 +80,22 @@ class json_output_handler class|do_longlong_value(long long value)||Removed, ove
 basic_parsing_context|last_char()|<em>&#x2713;</em>|Use current_char()
 json_filter|parent()|<em>&#x2713;</em>|Use downstream_handler()
 &#160;|input_handler()|<em>&#x2713;</em>|Use downstream_handler()
-csv|`csv_parameters`||Use `csv_serializing_options`
-&#160;|`csv_parameters::header(std::string value)`|&#160;|Use `csv_serializing_options::column_names(const std::string& value)`
-&#160;|`column_names(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_names(const std::string& value)`
-&#160;|`data_types(std::string value)`||Use `column_types(const std::string& value)`
-&#160;|`column_types(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_types(const std::string& value)`
-&#160;|`column_defaults(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_defaults(const std::string& value)`
-output_format|`array_array_block_option accessor and modifier` accessor and modifier|<em>&#x2713;</em>|Use `array_array_split_lines` accessor and modifier
-&#160;|`array_object_block_option accessor and modifier`|<em>&#x2713;</em>|Use `array_object_split_lines` accessor and modifier
-&#160;|`object_array_block_option accessor and modifier`|<em>&#x2713;</em>|Use `object_array_split_lines` accessor and modifier
-&#160;|`object_object_block_option accessor and modifier`|<em>&#x2713;</em>|Use `object_object_split_lines` accessor and modifier
+file `csv_parameters.hpp`|&#160;||Use `csv_serializing_options`
+class `csv_parameters`|`csv_parameters`|&#160;|Use `csv_serializing_options`
+class `csv_serializing_options`|`csv_parameters::header(std::string value)`|&#160;|Use `csv_serializing_options::column_names(const std::string& value)`
+class `csv_serializing_options`|`column_names(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_names(const std::string& value)`
+class `csv_serializing_options`|`data_types(std::string value)`||Use `column_types(const std::string& value)`
+class `csv_serializing_options`|`column_types(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_types(const std::string& value)`
+class `csv_serializing_options`|`column_defaults(std::vector<std::string>> value)`|<em>&#x2713;</em>|Use `column_defaults(const std::string& value)`
+file output_format.hpp|&#160;|&#160;|Use `json_serializing_options.hpp`
+class json_serializing_options|`array_array_block_option accessor and modifier` accessor and modifier|&#160;|Use `array_array_line_splits` accessor and modifier
+class json_serializing_options|`array_object_block_option accessor and modifier`|&#160;|Use `array_object_line_splits` accessor and modifier
+class json_serializing_options|`object_array_block_option accessor and modifier`|&#160;|Use `object_array_line_splits` accessor and modifier
+class json_serializing_options|`object_object_line_splits accessor and modifier`|&#160;|Use `object_object_line_splits` accessor and modifier
+class json_serializing_options|`array_array_line_splits accessor and modifier` accessor and modifier|<em>&#x2713;</em>|Use `array_array_line_splits` accessor and modifier
+class json_serializing_options|`array_object_line_splits accessor and modifier`|<em>&#x2713;</em>|Use `array_object_line_splits` accessor and modifier
+class json_serializing_options|`object_array_line_splits accessor and modifier`|<em>&#x2713;</em>|Use `object_array_line_splits` accessor and modifier
+class json_serializing_options|`object_object_line_splits accessor and modifier`|<em>&#x2713;</em>|Use `object_object_line_splits` accessor and modifier
 msgpack|`jsoncons_ext/msgpack/message_pack.hpp` header file|<em>&#x2713;</em>|Use `jsoncons_ext/msgpack/msgpack.hpp`
 &#160;|`encode_message_pack`|<em>&#x2713;</em>|Use `encode_msgpack`
 &#160;|`decode_message_pack`|<em>&#x2713;</em>|Use `decode_msgpack`
