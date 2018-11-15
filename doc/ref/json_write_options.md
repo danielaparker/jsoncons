@@ -21,8 +21,8 @@ An abstract class that defines accessors for JSON serialization options. The `js
 
 #### Accessors
 
-    int indent() const
-The level of indenting, the default is 4.
+    size_t  indent_size() const
+The indent size, the default is 4.
 
     virtual chars_format floating_point_format() const = 0;
 Overrides [floating point format](chars_format.md) when serializing json.

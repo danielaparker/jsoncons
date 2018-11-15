@@ -240,7 +240,7 @@ private:
 
     };
 
-    int indent_;
+    size_t indent_size_;
     std::basic_string<CharT> nan_to_num_;
     std::basic_string<CharT> inf_to_num_;
     std::basic_string<CharT> neginf_to_num_;
@@ -281,7 +281,7 @@ public:
 
     basic_json_serializer(output_type& os, 
                           const basic_json_write_options<CharT>& options)
-       : indent_(options.indent()),
+       : indent_size_(options.indent_size()),
          nan_to_num_(options.nan_to_num()),
          inf_to_num_(options.inf_to_num()),
          neginf_to_num_(options.neginf_to_num()),
@@ -419,12 +419,8 @@ private:
                         }
                         break;
                     case line_split_kind::new_line:
-                        new_line();
-                        if (column_ >= line_length_limit_)
-                        {
-                            break_line();
-                        }
                         stack_.back().unindent_after(true);
+                        new_line();
                         break;
                     default: // multi_line
                         stack_.back().unindent_after(true);
@@ -440,7 +436,7 @@ private:
             stack_.emplace_back(structure_type::object, line_split_kind::multi_line, false,
                                 column_, column_+open_object_brace_str_.length());
         }
-        increment_indent();
+        indent();
         
         writer_.insert(open_object_brace_str_.data(), open_object_brace_str_.length());
         column_ += open_object_brace_str_.length();
@@ -450,7 +446,7 @@ private:
     bool do_end_object(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        decrement_indent();
+        unindent();
         if (stack_.back().unindent_after())
         {
             new_line();
@@ -493,7 +489,7 @@ private:
                 }
                 writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                 column_ += open_array_bracket_str_.length();
-                increment_indent();
+                indent();
             }
             else // array
             {
@@ -507,7 +503,7 @@ private:
                     }
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    increment_indent();
+                    indent();
                     writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                     column_ += open_array_bracket_str_.length();
                     break;
@@ -516,7 +512,7 @@ private:
                     new_line();
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    increment_indent();
+                    indent();
                     writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                     column_ += open_array_bracket_str_.length();
                     break;
@@ -525,7 +521,7 @@ private:
                     new_line();
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    increment_indent();
+                    indent();
                     writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                     column_ += open_array_bracket_str_.length();
                     //new_line();
@@ -539,7 +535,7 @@ private:
                                 column_, column_+open_array_bracket_str_.length());
             writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
             column_ += open_array_bracket_str_.length();
-            increment_indent();
+            indent();
         }
         return true;
     }
@@ -547,7 +543,7 @@ private:
     bool do_end_array(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        decrement_indent();
+        unindent();
         if (stack_.back().unindent_after())
         {
             new_line();
@@ -927,14 +923,14 @@ private:
         }
     }
 
-    void increment_indent()
+    void indent()
     {
-        indent_amount_ += static_cast<int>(indent_);
+        indent_amount_ += static_cast<int>(indent_size_);
     }
 
-    void decrement_indent()
+    void unindent()
     {
-        indent_amount_ -= static_cast<int>(indent_);
+        indent_amount_ -= static_cast<int>(indent_size_);
     }
 
     void new_line()

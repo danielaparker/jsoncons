@@ -124,7 +124,7 @@ public:
 
     virtual line_split_kind array_array_line_splits() const = 0; 
 
-    virtual int indent() const = 0;  
+    virtual size_t  indent_size() const = 0;  
 
     virtual size_t line_length_limit() const = 0;  
 
@@ -168,7 +168,7 @@ public:
     typedef basic_string_view<CharT> string_view_type;
     typedef std::basic_string<CharT> string_type;
 private:
-    int indent_;
+    size_t indent_size_;
     chars_format floating_point_format_;
     uint8_t precision_;
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -202,12 +202,12 @@ private:
     std::basic_string<CharT> inf_to_str_;
     std::basic_string<CharT> neginf_to_str_;
 public:
-    static const size_t default_indent = 4;
+    static const size_t default_indent_size = 4;
 
 //  Constructors
 
     basic_json_serializing_options()
-        : indent_(default_indent),
+        : indent_size_(default_indent_size),
           floating_point_format_(chars_format()),
           precision_(0),
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -252,14 +252,14 @@ public:
     line_split_kind array_array_line_splits() const override {return array_array_line_splits_;}
     basic_json_serializing_options<CharT>& array_array_line_splits(line_split_kind value) {array_array_line_splits_ = value; return *this;}
 
-    int indent() const override
+    size_t indent_size() const override
     {
-        return indent_;
+        return indent_size_;
     }
 
-    basic_json_serializing_options<CharT>& indent(int value)
+    basic_json_serializing_options<CharT>& indent_size(size_t value)
     {
-        indent_ = value;
+        indent_size_ = value;
         return *this;
     }
 
@@ -542,6 +542,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    int indent() const override
+    {
+        return indent_size();
+    }
+
+    basic_json_serializing_options<CharT>& indent(int value)
+    {
+        return indent_size(value);
+    }
+
     bool can_read_nan_replacement() const {return can_read_nan_replacement_;}
 
     bool can_read_pos_inf_replacement() const {return can_read_pos_inf_replacement_;}

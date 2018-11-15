@@ -32,9 +32,9 @@ Constructs an `json_serializing_options` with default values.
 
 #### Accessors and modifiers
 
-    int indent() const
-    json_serializing_options& indent(int value)
-The level of indenting, the default is 4.
+    size_t  indent_size() const
+    json_serializing_options& indent(size_ value)
+The indent size, the default is 4.
 
     spaces_option spaces_around_colon() const override
     json_serializing_options & spaces_around_colon(spaces_option value)
