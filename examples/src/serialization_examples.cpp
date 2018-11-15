@@ -318,9 +318,8 @@ void nan_inf_replacement()
     j["field3"] = -1.79e308 * 1000;
 
     json_serializing_options options;
-    options.nan_replacement("\"NaN\"")
-           .pos_inf_replacement("\"Inf\"")
-           .neg_inf_replacement("\"-Inf\"");
+    options.nan_to_str("NaN")
+           .inf_to_str("Inf");
 
     std::ostringstream os;
     os << pretty_print(j, options);

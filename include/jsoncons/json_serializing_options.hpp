@@ -93,18 +93,6 @@ public:
 
     virtual ~basic_json_read_options() = default;
 
-    virtual bool can_read_nan_replacement() const = 0;
-
-    virtual const string_type& nan_replacement() const = 0;
-
-    virtual bool can_read_pos_inf_replacement() const = 0;
-
-    virtual const string_type& pos_inf_replacement() const = 0;
-
-    virtual bool can_read_neg_inf_replacement() const = 0;
-
-    virtual const string_type& neg_inf_replacement() const = 0;
-
     virtual size_t max_nesting_depth() const = 0;
 
     virtual std::basic_string<CharT> nan_to_str() const = 0;
@@ -121,18 +109,6 @@ public:
     typedef std::basic_string<CharT> string_type;
 
     virtual ~basic_json_write_options() = default;
-
-    virtual bool can_write_nan_replacement() const = 0;
-
-    virtual const string_type& nan_replacement() const = 0;
-
-    virtual bool can_write_pos_inf_replacement() const = 0;
-
-    virtual const string_type& pos_inf_replacement() const = 0;
-
-    virtual bool can_write_neg_inf_replacement() const = 0;
-
-    virtual const string_type& neg_inf_replacement() const = 0;
 
     virtual size_t max_nesting_depth() const = 0;
 
@@ -195,12 +171,14 @@ private:
     int indent_;
     chars_format floating_point_format_;
     uint8_t precision_;
+#if !defined(JSONCONS_NO_DEPRECATED)
     bool can_read_nan_replacement_;
     bool can_read_pos_inf_replacement_;
     bool can_read_neg_inf_replacement_;
     string_type nan_replacement_;
     string_type pos_inf_replacement_;
     string_type neg_inf_replacement_;
+#endif
     bool escape_all_non_ascii_;
     bool escape_solidus_;
     byte_string_chars_format byte_string_format_;
@@ -232,9 +210,11 @@ public:
         : indent_(default_indent),
           floating_point_format_(chars_format()),
           precision_(0),
+#if !defined(JSONCONS_NO_DEPRECATED)
           can_read_nan_replacement_(false),
           can_read_pos_inf_replacement_(false),
           can_read_neg_inf_replacement_(false),
+#endif
           escape_all_non_ascii_(false),
           escape_solidus_(false),
           byte_string_format_(byte_string_chars_format::base64url),
@@ -344,10 +324,12 @@ public:
         {
             return nan_to_num_;
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
         else if (!can_read_nan_replacement_) // not string
         {
             return nan_replacement_;
         }
+#endif
         else
         {
             return nan_to_num_; // empty string
@@ -366,10 +348,12 @@ public:
         {
             return inf_to_num_;
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
         else if (!can_read_pos_inf_replacement_) // not string
         {
             return pos_inf_replacement_;
         }
+#endif
         else
         {
             return inf_to_num_; // empty string
@@ -395,14 +379,22 @@ public:
             s.append(inf_to_num_);
             return s;
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
         else if (!can_read_neg_inf_replacement_) // not string
         {
             return neg_inf_replacement_;
         }
+#endif
         else
         {
             return neginf_to_num_; // empty string
         }
+    }
+
+    basic_json_serializing_options<CharT>& neginf_to_num(const std::basic_string<CharT>& value) 
+    {
+        neginf_to_num_ = value;
+        return *this;
     }
 
     std::basic_string<CharT> nan_to_str() const override
@@ -411,10 +403,12 @@ public:
         {
             return nan_to_str_;
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
         else if (can_read_nan_replacement_ && nan_replacement_.size() >= 2) // string
         {
             return nan_replacement_.substr(1,nan_replacement_.size()-2); // Remove quotes
         }
+#endif
         else
         {
             return nan_to_str_; // empty string
@@ -433,10 +427,12 @@ public:
         {
             return inf_to_str_;
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
         else if (can_read_pos_inf_replacement_ && pos_inf_replacement_.size() >= 2) // string
         {
             return pos_inf_replacement_.substr(1,pos_inf_replacement_.size()-2); // Strip quotes
         }
+#endif
         else
         {
             return inf_to_str_; // empty string
@@ -462,14 +458,22 @@ public:
             s.append(inf_to_str_);
             return s;
         }
+#if !defined(JSONCONS_NO_DEPRECATED)
         else if (can_read_neg_inf_replacement_ && neg_inf_replacement_.size() >= 2) // string
         {
             return neg_inf_replacement_.substr(1,neg_inf_replacement_.size()-2); // Strip quotes
         }
+#endif
         else
         {
             return neginf_to_str_; // empty string
         }
+    }
+
+    basic_json_serializing_options<CharT>& neginf_to_str(const std::basic_string<CharT>& value) 
+    {
+        neginf_to_str_ = value;
+        return *this;
     }
 
     size_t line_length_limit() const override
@@ -527,17 +531,28 @@ public:
         return *this;
     }
 
-    bool can_read_nan_replacement() const override {return can_read_nan_replacement_;}
+    size_t max_nesting_depth() const override
+    {
+        return max_nesting_depth_;
+    }
 
-    bool can_read_pos_inf_replacement() const override {return can_read_pos_inf_replacement_;}
+    void max_nesting_depth(size_t value)
+    {
+        max_nesting_depth_ = value;
+    }
 
-    bool can_read_neg_inf_replacement() const override {return can_read_neg_inf_replacement_;}
+#if !defined(JSONCONS_NO_DEPRECATED)
+    bool can_read_nan_replacement() const {return can_read_nan_replacement_;}
 
-    bool can_write_nan_replacement() const override {return !nan_replacement_.empty();}
+    bool can_read_pos_inf_replacement() const {return can_read_pos_inf_replacement_;}
 
-    bool can_write_pos_inf_replacement() const override {return !pos_inf_replacement_.empty();}
+    bool can_read_neg_inf_replacement() const {return can_read_neg_inf_replacement_;}
 
-    bool can_write_neg_inf_replacement() const override {return !neg_inf_replacement_.empty();}
+    bool can_write_nan_replacement() const {return !nan_replacement_.empty();}
+
+    bool can_write_pos_inf_replacement() const {return !pos_inf_replacement_.empty();}
+
+    bool can_write_neg_inf_replacement() const {return !neg_inf_replacement_.empty();}
 
     basic_json_serializing_options<CharT>& replace_inf(bool replace)
     {
@@ -558,7 +573,7 @@ public:
         return *this;
     }
 
-    const string_type& nan_replacement() const override
+    const string_type& nan_replacement() const
     {
         return nan_replacement_;
     }
@@ -572,7 +587,7 @@ public:
         return *this;
     }
 
-    const string_type& pos_inf_replacement() const override
+    const string_type& pos_inf_replacement() const 
     {
         return pos_inf_replacement_;
     }
@@ -584,7 +599,7 @@ public:
         return *this;
     }
 
-    const string_type& neg_inf_replacement() const override
+    const string_type& neg_inf_replacement() const 
     {
         return neg_inf_replacement_;
     }
@@ -596,17 +611,6 @@ public:
         return *this;
     }
 
-    size_t max_nesting_depth() const override
-    {
-        return max_nesting_depth_;
-    }
-
-    void max_nesting_depth(size_t value)
-    {
-        max_nesting_depth_ = value;
-    }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
     line_split_kind object_object_split_lines() const {return object_object_line_splits_;}
     basic_json_serializing_options<CharT>& object_object_split_lines(line_split_kind value) {object_object_line_splits_ = value; return *this;}
 

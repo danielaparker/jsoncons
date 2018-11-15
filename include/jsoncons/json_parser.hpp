@@ -38,30 +38,21 @@ class replacement_filter : public basic_json_filter<CharT>
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
     typedef typename basic_json_serializing_options<CharT>::string_type string_type;
 
-    bool can_read_nan_replacement_;
-    string_type nan_replacement_;
-    bool can_read_pos_inf_replacement_;
-    string_type pos_inf_replacement_;
-    bool can_read_neg_inf_replacement_;
-    string_type neg_inf_replacement_;
+    string_type nan_to_str_;
+    string_type inf_to_str_;
+    string_type neginf_to_str_;
 
 public:
     replacement_filter() = delete;
 
     replacement_filter(basic_json_content_handler<CharT>& handler,     
-                       bool can_read_nan_replacement,
-                       const string_type& nan_replacement,
-                       bool can_read_pos_inf_replacement,
-                       const string_type& pos_inf_replacement,
-                       bool can_read_neg_inf_replacement,
-                       const string_type& neg_inf_replacement)
+                       const string_type& nan_to_str,
+                       const string_type& inf_to_str,
+                       const string_type& neginf_to_str)
         : basic_json_filter<CharT>(handler), 
-          can_read_nan_replacement_(can_read_nan_replacement),
-          nan_replacement_(nan_replacement),
-          can_read_pos_inf_replacement_(can_read_pos_inf_replacement),
-          pos_inf_replacement_(pos_inf_replacement),
-          can_read_neg_inf_replacement_(can_read_neg_inf_replacement),
-          neg_inf_replacement_(neg_inf_replacement)
+          nan_to_str_(nan_to_str),
+          inf_to_str_(inf_to_str),
+          neginf_to_str_(neginf_to_str)
     {
     }
 
@@ -69,15 +60,15 @@ public:
     {
         if (tag == semantic_tag_type::none)
         {
-            if (can_read_nan_replacement_ && s == nan_replacement_.substr(1,nan_replacement_.length()-2))
+            if (!nan_to_str_.empty() && s == nan_to_str_)
             {
                 this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context);
             }
-            else if (can_read_pos_inf_replacement_ && s == pos_inf_replacement_.substr(1,pos_inf_replacement_.length()-2))
+            else if (!inf_to_str_.empty() && s == inf_to_str_)
             {
                 this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
-            else if (can_read_neg_inf_replacement_ && s == neg_inf_replacement_.substr(1,neg_inf_replacement_.length()-2))
+            else if (!neginf_to_str_.empty() && s == neginf_to_str_)
             {
                 this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
@@ -161,12 +152,9 @@ class basic_json_parser : private serializing_context
     default_parse_error_handler default_err_handler_;
 
     parse_error_handler& err_handler_;
-    bool can_read_nan_replacement_;
-    string_type nan_replacement_;
-    bool can_read_pos_inf_replacement_;
-    string_type pos_inf_replacement_;
-    bool can_read_neg_inf_replacement_;
-    string_type neg_inf_replacement_;
+    string_type nan_to_str_;
+    string_type inf_to_str_;
+    string_type neginf_to_str_;
     int initial_stack_capacity_;
     size_t max_nesting_depth_;
     size_t nesting_depth_;
@@ -212,12 +200,9 @@ public:
     basic_json_parser(const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
        : err_handler_(err_handler),
-         can_read_nan_replacement_(options.can_read_nan_replacement()),
-         nan_replacement_(options.nan_replacement()),
-         can_read_pos_inf_replacement_(options.can_read_pos_inf_replacement()),
-         pos_inf_replacement_(options.pos_inf_replacement()),
-         can_read_neg_inf_replacement_(options.can_read_neg_inf_replacement()),
-         neg_inf_replacement_(options.neg_inf_replacement()),
+         nan_to_str_(options.nan_to_str()),
+         inf_to_str_(options.inf_to_str()),
+         neginf_to_str_(options.neginf_to_str()),
          initial_stack_capacity_(default_initial_stack_capacity_),
          max_nesting_depth_(options.max_nesting_depth()),
          nesting_depth_(0), 
@@ -554,15 +539,12 @@ public:
 
     void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
     {
-        if (can_read_nan_replacement_ || can_read_pos_inf_replacement_ || can_read_neg_inf_replacement_)
+        if (!nan_to_str_.empty() || !inf_to_str_.empty() || !neginf_to_str_.empty())
         {
             detail::replacement_filter<CharT> h(handler,
-                can_read_nan_replacement_,
-                nan_replacement_,
-                can_read_pos_inf_replacement_,
-                pos_inf_replacement_,
-                can_read_neg_inf_replacement_,
-                neg_inf_replacement_);
+                nan_to_str_,
+                inf_to_str_,
+                neginf_to_str_);
             parse_some_(h, ec);
         }
         else

@@ -228,9 +228,8 @@ int main()
     )";
 
     json_serializing_options options; // Implements json_read_options
-    options.nan_replacement("\"NaN\"")
-           .pos_inf_replacement("\"Infinity\"")
-           .neg_inf_replacement("\"-Infinity\"");
+    options.nan_to_str("NaN")
+           .inf_to_str("Infinity");
 
     json_parser parser(options);
     jsoncons::json_decoder<json> decoder;

@@ -450,7 +450,7 @@ std::cout << pretty_print(j, options) << std::endl; // pretty print
 
 #### Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.
 
-Set the serializing options for `nan_replacement`, `pos_inf_replacement` and `neg_inf_replacement` to distinct string values.
+Set the serializing options for `nan` and `inf` to distinct string values.
 
 ```c++
 json j;
@@ -459,9 +459,8 @@ j["field2"] = 1.79e308 * 1000;
 j["field3"] = -1.79e308 * 1000;
 
 json_serializing_options options;
-options.nan_replacement("\"NaN\"")
-       .pos_inf_replacement("\"Inf\"")
-       .neg_inf_replacement("\"-Inf\""); // defaults are null
+options.nan_to_str("NaN")
+       .inf_to_str("Inf"); 
 
 std::ostringstream os;
 os << pretty_print(j, options);

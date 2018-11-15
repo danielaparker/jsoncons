@@ -113,7 +113,7 @@ Output:
 ```json
 {"field1":null,"field2":null,"field3":null}
 ```
-#### User specified `Nan`, `Inf` and `-Inf` replacement
+#### User specified `Nan` and `Inf` replacement
 
 ```c++
 json obj;
@@ -122,9 +122,8 @@ obj["field2"] = 1.79e308*1000;
 obj["field3"] = -1.79e308*1000;
 
 json_serializing_options options;
-format.nan_replacement("null");        // default is "null"
-format.pos_inf_replacement("1e9999");  // default is "null"
-format.neg_inf_replacement("-1e9999"); // default is "null"
+format.nan_to_num("null");        // default is "null"
+format.inf_to_num("1e9999");  // default is "null"
 
 std::cout << pretty_print(obj,options) << std::endl;
 ```

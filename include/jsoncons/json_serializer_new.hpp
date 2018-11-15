@@ -473,6 +473,7 @@ private:
         {
             if (stack_.back().is_object())
             {
+                increment_indent();
                 switch (object_array_line_splits_)
                 {
                     case line_split_kind::same_line:
@@ -481,53 +482,64 @@ private:
                         break;
                     case line_split_kind::new_line:
                     {
+                        stack_.back().unindent_after(true);
+                        //new_line(stack_.back().data_pos());
+                        new_line();
+                        increment_indent();
                         stack_.emplace_back(structure_type::array,object_array_line_splits_,true,
                                             column_, column_+open_array_bracket_str_.length());
                         break;
                     }
                     default: // multi_line
+                        stack_.back().unindent_after(true);
+                        new_line();
+                        increment_indent();
+                        //new_line(stack_.back().data_pos());
                         stack_.emplace_back(structure_type::array,object_array_line_splits_,true,
                                             column_, column_+open_array_bracket_str_.length());
                         break;
                 }
                 writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                 column_ += open_array_bracket_str_.length();
-                increment_indent();
             }
             else // array
             {
                 switch (array_array_line_splits_)
                 {
                 case line_split_kind::same_line:
-                    if (stack_.back().is_multi_line())
-                    {
-                        stack_.back().unindent_after(true);
-                        new_line();
-                    }
-                    stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
+                    //increment_indent();
+                    //if (stack_.back().is_multi_line())
+                    //{
+                    //    stack_.back().unindent_after(true);
+                        //new_line(stack_.back().data_pos());
+                    //    new_line();
+                    //}
+                    stack_.emplace_back(structure_type::array,line_split_kind::same_line, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    increment_indent();
                     writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                     column_ += open_array_bracket_str_.length();
                     break;
                 case line_split_kind::new_line:
                     stack_.back().unindent_after(true);
+                    //new_line(stack_.back().data_pos());
                     new_line();
+                    increment_indent();
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    increment_indent();
                     writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                     column_ += open_array_bracket_str_.length();
                     break;
                 default: // multi_line
                     stack_.back().unindent_after(true);
+                    //new_line(stack_.back().data_pos());
                     new_line();
+                    increment_indent();
                     stack_.emplace_back(structure_type::array,array_array_line_splits_, false,
                                         column_, column_+open_array_bracket_str_.length());
-                    increment_indent();
                     writer_.insert(open_array_bracket_str_.data(), open_array_bracket_str_.length());
                     column_ += open_array_bracket_str_.length();
-                    //new_line();
+                    new_line();
+                    increment_indent();
                     break;
                 }
             }
@@ -546,11 +558,11 @@ private:
     bool do_end_array(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        decrement_indent();
-        if (stack_.back().unindent_after())
-        {
-            new_line();
-        }
+            decrement_indent();
+            if (stack_.back().unindent_after())
+            {
+                new_line();
+            }
         stack_.pop_back();
         writer_.insert(close_array_bracket_str_.data(), close_array_bracket_str_.length());
         column_ += close_array_bracket_str_.length();
@@ -560,20 +572,22 @@ private:
 
     bool do_name(const string_view_type& name, const serializing_context&) override
     {
-        JSONCONS_ASSERT(!stack_.empty());
-        if (stack_.back().count() > 0)
+        if (!stack_.empty())
         {
-            writer_.insert(comma_str_.data(),comma_str_.length());
-            column_ += comma_str_.length();
-        }
-        if (stack_.back().is_multi_line())
-        {
-            stack_.back().unindent_after(true);
-            new_line();
-        }
-        else if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
-        {
-            break_line();
+            if (stack_.back().count() > 0)
+            {
+                writer_.insert(comma_str_.data(),comma_str_.length());
+                column_ += comma_str_.length();
+            }
+            if (stack_.back().is_multi_line())
+            {
+                stack_.back().unindent_after(true);
+                new_line();
+            }
+            else if (!stack_.back().is_multi_line() && column_ >= line_length_limit_)
+            {
+                break_line();
+            }
         }
 
         writer_.push_back('\"');
@@ -842,7 +856,17 @@ private:
             if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
             {
                 stack_.back().unindent_after(true);
-                new_line();
+                if (stack_.back().is_array())
+                {
+                    if (stack_.back().count() > 0)
+                    {
+                        new_line(stack_.back().data_pos());
+                    }
+                }
+                else
+                {
+                    new_line();
+                }
             }
         }
     }
