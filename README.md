@@ -217,7 +217,7 @@ int main()
     writer.begin_array(); // indefinite length outer array
     writer.begin_array(3); // a fixed length array
     writer.string_value("foo");
-    writer.byte_string_value(byte_string({'b','a','r'}));
+    writer.byte_string_value(byte_string{'P','u','s','s'}); // default conversion to base64url
     writer.bignum_value("-18446744073709551617");
     writer.end_array();
     writer.end_array();
@@ -236,8 +236,8 @@ int main()
       83 -- Array of length 3
         63 -- String value of length 3
           666f6f -- "foo" 
-        43 -- Byte string value of length 3
-          626172 -- 'b''a''r'
+        44 -- Byte string value of length 4
+          50757373 -- 'P''u''s''s'
         c3 -- Tag 3 (negative bignum)
           49 -- Byte string value of length 9
             010000000000000000 -- Bytes content
@@ -272,9 +272,10 @@ int main()
     json j = cbor::decode_cbor<json>(bv);
 
     json another_array = json::array(); 
-    another_array.emplace_back(byte_string({'q','u','x'}));
+    another_array.emplace_back(byte_string({'P','u','s','s'}),
+                               byte_string_chars_format::base64); // expected conversion to base64
     another_array.emplace_back("273.15", semantic_tag_type::decimal);
-    another_array.emplace(another_array.array_range().begin(),"baz"); // place at front
+    another_array.emplace(another_array.array_range().begin(),"bar"); // place at front
 
     j.push_back(std::move(another_array));
     std::cout << "(6)\n";
@@ -304,18 +305,19 @@ int main()
       83 -- Array of length 3
         63 -- String value of length 3
           666f6f -- "foo" 
-        43 -- Byte string value of length 3
-          626172 -- 'b''a''r'
+        44 -- Byte string value of length 4
+          50757373 -- 'P''u''s''s'
         c3 -- Tag 3 (negative bignum)
         49 -- Byte string value of length 9
           010000000000000000 -- Bytes content
       83 -- Another array of length 3
       63 -- String value of length 3
-        62617a -- "baz" 
-      43 -- Byte string value of length 3
-        717578 -- 'q''u''x'
-      c4 - Tag 4 (decimal fraction)
-        82 - Array of length 2
+        626172 -- "bar"
+      d6 - Expected conversion to base64
+      44 -- Byte string value of length 4
+        50757373 -- 'P''u''s''s'
+      c4 -- Tag 4 (decimal fraction)
+        82 -- Array of length 2
           21 -- -2
           19 6ab3 -- 27315
 */
@@ -342,50 +344,51 @@ int main()
 Output:
 ```
 (1)
-9f8363666f6f43626172c349010000000000000000ff
+9f8363666f6f4450757373c349010000000000000000ff
 
 (2)
-["foo","YmFy","-18446744073709551617"]
+["foo","UHVzcw","-18446744073709551617"]
 
+CHECK semantic_tag
 (3) -18446744073709551617
 
 (4)
 [
-    ["foo","YmFy","-18446744073709551617"]
+    ["foo", "UHVzcw", "-18446744073709551617"]
 ]
 
 (5)
 [
-    ["foo","YmFy","~AQAAAAAAAAAA"]
+    ["foo", "UHVzcw==", "~AQAAAAAAAAAA"]
 ]
 
 (6)
 [
-    ["foo","YmFy","-18446744073709551617"],
-    ["baz","cXV4","273.15"]
+    ["foo", "UHVzcw", "-18446744073709551617"],
+    ["bar", "UHVzcw==", "273.15"]
 ]
 
 (7) 273.15
 
 (8)
-828363666f6f43626172c349010000000000000000836362617a43717578c48221196ab3
+828363666f6f4450757373c3490100000000000000008363626172d64450757373c48221196ab3
 
 (9)
 [
-    ["foo","YmFy","-18446744073709551617"],
-    ["baz","cXV4","273.15"]
+    ["foo", "UHVzcw", "-18446744073709551617"],
+    ["bar", "UHVzcw==", "50757373", "273.15"]
 ]
 
 (10)
 Column 1,Column 2,Column 3
-foo,YmFy,-18446744073709551617
-baz,cXV4,273.15
+foo,UHVzcw,-18446744073709551617
+bar,UHVzcw==,273.15
 
 
 (11)
 Column 1,Column 2,Column 3
-foo,YmFy,-18446744073709551617
-baz,cXV4,273.15
+foo,UHVzcw,-18446744073709551617
+bar,UHVzcw==,50757373,273.15
 ```
 
 ### Convert json values to standard library types and back

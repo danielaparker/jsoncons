@@ -2,10 +2,12 @@
 
 ### For release 0.113
 
-- Enhanced JSON serialization options (currently on master)
+- Enhanced JSON serialization options. Currently on master.
 
-- Preserve CBOR tagging of expected conversion of byte strings 
-  to base64, base64url, or base16, and use in JSON serialization.     
+- Preserve CBOR semantic tagging of expected conversion of byte 
+  strings to base64, base64url, or base16, and use in JSON 
+  serialization (unless overridden in `json_serializing_options`.)
+  Currently on master.
 
 - Preserve CBOR bigfloat tag when decoding/encoding
 

@@ -21,7 +21,7 @@ namespace readme
         writer.begin_array(); // indefinite length outer array
         writer.begin_array(3); // a fixed length array
         writer.string_value("foo");
-        writer.byte_string_value(byte_string{'b','a','r'});
+        writer.byte_string_value(byte_string{'P','u','s','s'}); // default conversion to base64url
         writer.bignum_value("-18446744073709551617");
         writer.end_array();
         writer.end_array();
@@ -40,8 +40,8 @@ namespace readme
           83 -- Array of length 3
             63 -- String value of length 3
               666f6f -- "foo" 
-            43 -- Byte string value of length 3
-              626172 -- 'b''a''r'
+            44 -- Byte string value of length 4
+              50757373 -- 'P''u''s''s'
             c3 -- Tag 3 (negative bignum)
               49 -- Byte string value of length 9
                 010000000000000000 -- Bytes content
@@ -76,9 +76,10 @@ namespace readme
         json j = cbor::decode_cbor<json>(bv);
 
         json another_array = json::array(); 
-        another_array.emplace_back(byte_string({'q','u','x'}));
+        another_array.emplace_back(byte_string({'P','u','s','s'}),
+                                   byte_string_chars_format::base64); // expected conversion to base64
         another_array.emplace_back("273.15", semantic_tag_type::decimal);
-        another_array.emplace(another_array.array_range().begin(),"baz"); // place at front
+        another_array.emplace(another_array.array_range().begin(),"bar"); // place at front
 
         j.push_back(std::move(another_array));
         std::cout << "(6)\n";
@@ -110,16 +111,17 @@ namespace readme
           83 -- Array of length 3
             63 -- String value of length 3
               666f6f -- "foo" 
-            43 -- Byte string value of length 3
-              626172 -- 'b''a''r'
+            44 -- Byte string value of length 4
+              50757373 -- 'P''u''s''s'
             c3 -- Tag 3 (negative bignum)
             49 -- Byte string value of length 9
               010000000000000000 -- Bytes content
           83 -- Another array of length 3
           63 -- String value of length 3
-            62617a -- "baz" 
-          43 -- Byte string value of length 3
-            717578 -- 'q''u''x'
+            626172 -- "bar"
+          d6 - Expected conversion to base64
+          44 -- Byte string value of length 4
+            50757373 -- 'P''u''s''s'
           c4 -- Tag 4 (decimal fraction)
             82 -- Array of length 2
               21 -- -2

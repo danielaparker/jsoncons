@@ -755,6 +755,42 @@ public:
                         }
                         return s;
                     }
+                    case 21:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        std::string s;
+                        encode_base64url(v.data(),v.size(),s);
+                        return s;
+                    }
+                    case 22:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        std::string s;
+                        encode_base64(v.data(),v.size(),s);
+                        return s;
+                    }
+                    case 23:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        std::string s;
+                        encode_base16(v.data(),v.size(),s);
+                        return s;
+                    }
                     default:
                         cbor_view v(first_ + 1, last_ - (first_ + 1));
                         return v.as_string();
@@ -1024,41 +1060,79 @@ public:
             case cbor_major_type::semantic_tag:
             {
                 uint8_t tag = additional_information_value();
-                if (tag == 2)
+                switch (tag)
                 {
-                    const uint8_t* endp;
-                    std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
-                    if (endp == first_+1)
+                    case 2:
                     {
-                        JSONCONS_THROW(cbor_decode_error(0));
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_+1)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        bignum n(1, v.data(), v.size());
+                        std::string s;
+                        n.dump(s);
+                        handler.bignum_value(s);
+                        break;
                     }
-                    bignum n(1, v.data(), v.size());
-                    std::string s;
-                    n.dump(s);
-                    handler.bignum_value(s);
-                }
-                else if (tag == 3)
-                {
-                    const uint8_t* endp;
-                    std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
-                    if (endp == first_+1)
+                    case 3:
                     {
-                        JSONCONS_THROW(cbor_decode_error(0));
+                        const uint8_t* endp;
+                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_+1)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        bignum n(-1, v.data(), v.size());
+                        std::string s;
+                        n.dump(s);
+                        handler.bignum_value(s);
+                        break;
                     }
-                    bignum n(-1, v.data(), v.size());
-                    std::string s;
-                    n.dump(s);
-                    handler.bignum_value(s);
-                }
-                else if (tag == 4)
-                {
-                    const uint8_t* endp;
-                    std::string s = cbor::detail::get_decimal_as_string(first_,last_,&endp);
-                    if (endp == first_)
+                    case 4:
                     {
-                        JSONCONS_THROW(cbor_decode_error(0));
+                        const uint8_t* endp;
+                        std::string s = cbor::detail::get_decimal_as_string(first_,last_,&endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        handler.string_value(s, semantic_tag_type::decimal);
+                        break;
                     }
-                    handler.string_value(s, semantic_tag_type::decimal);
+                    case 21:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> s = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base64url);
+                    }
+                    case 22:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> s = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base64);
+                    }
+                    case 23:
+                    {
+                        const uint8_t* endp;
+                        std::vector<uint8_t> s = detail::get_byte_string(first_+1,last_,&endp);
+                        if (endp == first_)
+                        {
+                            JSONCONS_THROW(cbor_decode_error(0));
+                        }
+                        handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base16);
+                    }
+                    default:
+                        break;
                 }
                 break;
             }

@@ -299,13 +299,39 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format,
+                              byte_string_chars_format encoding_hint,
                               semantic_tag_type, 
                               const serializing_context& context) override
     {
+        byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(encoding_hint,byte_string_chars_format::none,byte_string_chars_format::base64url);
+
         std::basic_string<CharT> s;
-        encode_base64url(b.data(),b.length(),s);
-        do_string_value(s, semantic_tag_type::none, context);
+        switch (format)
+        {
+            case byte_string_chars_format::base16:
+            {
+                encode_base16(b.data(),b.length(),s);
+                do_string_value(s, semantic_tag_type::none, context);
+                break;
+            }
+            case byte_string_chars_format::base64:
+            {
+                encode_base64(b.data(),b.length(),s);
+                do_string_value(s, semantic_tag_type::none, context);
+                break;
+            }
+            case byte_string_chars_format::base64url:
+            {
+                encode_base64url(b.data(),b.length(),s);
+                do_string_value(s, semantic_tag_type::none, context);
+                break;
+            }
+            default:
+            {
+                JSONCONS_UNREACHABLE();
+            }
+        }
+
         return true;
     }
 

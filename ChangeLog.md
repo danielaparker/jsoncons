@@ -6,6 +6,12 @@ Changes
 - __FILE__ and __LINE__ macros removed from JSONCONS_ASSERT 
   if not defined _DEBUG (contributed by zhskyy.)
 
+New CBOR feature
+
+- CBOR semantic tagging of expected conversion of byte strings 
+  to base64, base64url and base16 are preserved and respected in JSON 
+  serialization (unless overridden in `json_serializing_options`.)
+
 Changes to `json_serializing_options`
 
 New options 
@@ -45,9 +51,8 @@ Changes to json_serializer
 - A new class `json_compressed_serializer` produces compressed json without 
   indenting.
    
-  These changes will be transparent to you if you access the serializer through the 
-  json `dump` functions or the `pretty_print` function or the output stream
-  operator.
+  The jsoncons functions that perform serialization including `json::dump`, 
+  `pretty_print` and the output stream operator are unaffected.
 
 v0.112.0
 --------

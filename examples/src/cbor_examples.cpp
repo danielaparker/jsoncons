@@ -57,7 +57,7 @@ void cbor_reputon_example()
 
 void decode_cbor_byte_string()
 {
-    // byte string for five bytes
+    // byte string of length 5
     std::vector<uint8_t> buf = {0x45,'H','e','l','l','o'};
     json j = cbor::decode_cbor<json>(buf);
 
@@ -78,22 +78,6 @@ void encode_cbor_byte_string()
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j, buf);
 
-    std::cout << std::hex << std::showbase << (int)buf[0];
-    for (size_t i = 1; i < buf.size(); ++i)
-    {
-        std::cout << (char)buf[i];
-    }
-    std::cout << std::dec << std::endl;
-}
-
-void byte_string_with_encoding_hint()
-{
-    // construct byte string value
-     json j1(byte_string("Hello"), byte_string_chars_format::base64);
-
-    std::vector<uint8_t> buf;
-    cbor::encode_cbor(j1, buf);
-
     std::cout << std::hex << std::showbase << "(1)\n";
     for (auto c : buf)
     {
@@ -103,6 +87,41 @@ void byte_string_with_encoding_hint()
 
     json j2 = cbor::decode_cbor<json>(buf);
     std::cout << "(2)\n" << j2 << std::endl;
+}
+
+void decode_byte_string_with_encoding_hint()
+{
+    // semantic tag indicating expected conversion to base64
+    // followed by byte string of length 5
+    std::vector<uint8_t> buf = {0xd6,0x45,'H','e','l','l','o'};
+    json j = cbor::decode_cbor<json>(buf);
+
+    auto bs = j.as<byte_string>();
+
+    // byte_string to ostream displays as hex
+    std::cout << "(1) "<< bs << "\n\n";
+
+    // byte string value to JSON text becomes base64
+    std::cout << "(2) " << j << std::endl;
+}
+
+void encode_byte_string_with_encoding_hint()
+{
+    // construct byte string value
+     json j1(byte_string("Hello"), byte_string_chars_format::base64);
+
+    std::vector<uint8_t> buf;
+    cbor::encode_cbor(j1, buf);
+
+    std::cout << std::hex << std::showbase << "(1) ";
+    for (auto c : buf)
+    {
+        std::cout << (int)c;
+    }
+    std::cout << std::dec << "\n\n";
+
+    json j2 = cbor::decode_cbor<json>(buf);
+    std::cout << "(2) " << j2 << std::endl;
 }
 
 void cbor_view_object_range()
@@ -138,12 +157,13 @@ void cbor_view_array_range()
 void cbor_examples()
 {
     std::cout << "\ncbor examples\n\n";
-    decode_cbor_byte_string();
-    encode_cbor_byte_string();
     cbor_view_object_range();
     cbor_view_array_range();
     cbor_reputon_example();
-    byte_string_with_encoding_hint();
+    decode_byte_string_with_encoding_hint();
+    encode_byte_string_with_encoding_hint();
+    decode_cbor_byte_string();
+    encode_cbor_byte_string();
     std::cout << std::endl;
 }
 

@@ -113,17 +113,56 @@ int main()
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j, buf);
 
-    std::cout << std::hex << std::showbase << (int)buf[0];
-    for (size_t i = 1; i < buf.size(); ++i)
+    std::cout << std::hex << std::showbase << "(1) ";
+    for (auto c : buf)
     {
-        std::cout << (char)buf[i];
+        std::cout << (int)c;
     }
-    std::cout << std::endl;
+    std::cout << std::dec << "\n\n";
+
+    json j2 = cbor::decode_cbor<json>(buf);
+    std::cout << "(2) " << j2 << std::endl;
 }
 ```
 Output:
 ```
-0x45Hello
+(1) 0x450x480x650x6c0x6c0x6f
+
+(2) "SGVsbG8"
+```
+
+#### Encode byte string with encoding hint
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    // construct byte string value
+     json j1(byte_string("Hello"), byte_string_chars_format::base64);
+
+    std::vector<uint8_t> buf;
+    cbor::encode_cbor(j1, buf);
+
+    std::cout << std::hex << std::showbase << "(1) ";
+    for (auto c : buf)
+    {
+        std::cout << (int)c;
+    }
+    std::cout << std::dec << "\n\n";
+
+    json j2 = cbor::decode_cbor<json>(buf);
+    std::cout << "(2) " << j2 << std::endl;
+}
+```
+Output:
+```
+(1) 0xd60x450x480x650x6c0x6c0x6f
+
+(2) "SGVsbG8="
 ```
 
 #### See also

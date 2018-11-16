@@ -125,7 +125,7 @@ using namespace jsoncons;
 
 int main()
 {
-    // byte string for five bytes
+    // byte string of length 5
     std::vector<uint8_t> buf = {0x45,'H','e','l','l','o'};
     json j = cbor::decode_cbor<json>(buf);
 
@@ -142,7 +142,38 @@ Output:
 ```
 (1) 0x480x650x6c0x6c0x6f
 
-(2) "SGVsbG8_"
+(2) "SGVsbG8"
+```
+
+#### Decode CBOR byte string with base64 encoding hint
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+using namespace jsoncons;
+
+int main()
+{
+    // semantic tag indicating expected conversion to base64
+    // followed by byte string of length 5
+    std::vector<uint8_t> buf = {0xd6,0x45,'H','e','l','l','o'};
+    json j = cbor::decode_cbor<json>(buf);
+
+    auto bs = j.as<byte_string>();
+
+    // byte_string to ostream displays as hex
+    std::cout << "(1) "<< bs << "\n\n";
+
+    // byte string value to JSON text becomes base64
+    std::cout << "(2) " << j << std::endl;
+}
+```
+Output:
+```
+(1) 0x480x650x6c0x6c0x6f
+
+(2) "SGVsbG8="
 ```
 
 #### See also
