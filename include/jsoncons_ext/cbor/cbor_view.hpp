@@ -1110,6 +1110,7 @@ public:
                             JSONCONS_THROW(cbor_decode_error(0));
                         }
                         handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base64url);
+                        break;
                     }
                     case 22:
                     {
@@ -1120,6 +1121,7 @@ public:
                             JSONCONS_THROW(cbor_decode_error(0));
                         }
                         handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base64);
+                        break;
                     }
                     case 23:
                     {
@@ -1130,6 +1132,7 @@ public:
                             JSONCONS_THROW(cbor_decode_error(0));
                         }
                         handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base16);
+                        break;
                     }
                     default:
                         break;
