@@ -140,6 +140,39 @@ size_t escape_string(const CharT* s, size_t length,
     }
     return count;
 }
+
+inline
+byte_string_chars_format resolve_byte_string_chars_format(byte_string_chars_format format1,
+                                                          byte_string_chars_format format2,
+                                                          byte_string_chars_format default_format = byte_string_chars_format::base64url)
+{
+    byte_string_chars_format result;
+    switch (format1)
+    {
+        case byte_string_chars_format::base16:
+        case byte_string_chars_format::base64:
+        case byte_string_chars_format::base64url:
+            result = format1;
+            break;
+        default:
+            switch (format2)
+            {
+                case byte_string_chars_format::base64url:
+                case byte_string_chars_format::base64:
+                case byte_string_chars_format::base16:
+                    result = format2;
+                    break;
+                default: // base64url
+                {
+                    result = default_format;
+                    break;
+                }
+            }
+            break;
+    }
+    return result;
+}
+
 }}
 
 namespace jsoncons {
@@ -626,7 +659,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format format,
+                              byte_string_chars_format suggested_encoding,
                               semantic_tag_type,
                               const serializing_context&) override
     {
@@ -641,7 +674,11 @@ private:
                 break_line();
             }
         }
-        switch (byte_string_format_)
+
+        byte_string_chars_format format = detail::resolve_byte_string_chars_format(byte_string_format_, 
+                                                                                   suggested_encoding, 
+                                                                                   byte_string_chars_format::base64url);
+        switch (format)
         {
             case byte_string_chars_format::base16:
             {
@@ -669,33 +706,7 @@ private:
             }
             default:
             {
-                switch (format)
-                {
-                    case byte_string_chars_format::base16:
-                    {
-                        writer_.push_back('\"');
-                        size_t length = encode_base16(b.data(),b.length(),writer_);
-                        writer_.push_back('\"');
-                        column_ += (length + 2);
-                        break;
-                    }
-                    case byte_string_chars_format::base64:
-                    {
-                        writer_.push_back('\"');
-                        size_t length = encode_base64(b.data(), b.length(), writer_);
-                        writer_.push_back('\"');
-                        column_ += (length + 2);
-                        break;
-                    }
-                    default: // base64url
-                    {
-                        writer_.push_back('\"');
-                        size_t length = encode_base64url(b.data(),b.length(),writer_);
-                        writer_.push_back('\"');
-                        column_ += (length + 2);
-                        break;
-                    }
-                }
+                JSONCONS_UNREACHABLE();
             }
         }
 
@@ -1242,7 +1253,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format format,
+                              byte_string_chars_format suggested_encoding,
                               semantic_tag_type,
                               const serializing_context&) override
     {
@@ -1250,55 +1261,36 @@ private:
         {
             writer_.push_back(',');
         }
-        switch (byte_string_format_)
+
+        byte_string_chars_format format = detail::resolve_byte_string_chars_format(byte_string_format_, 
+                                                                                   suggested_encoding, 
+                                                                                   byte_string_chars_format::base64url);
+        switch (format)
         {
             case byte_string_chars_format::base16:
             {
                 writer_.push_back('\"');
-                size_t length = encode_base16(b.data(),b.length(),writer_);
+                encode_base16(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64:
             {
                 writer_.push_back('\"');
-                size_t length = encode_base64(b.data(), b.length(), writer_);
+                encode_base64(b.data(), b.length(), writer_);
                 writer_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64url:
             {
                 writer_.push_back('\"');
-                size_t length = encode_base64url(b.data(),b.length(),writer_);
+                encode_base64url(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
                 break;
             }
             default:
             {
-                switch (format)
-                {
-                    case byte_string_chars_format::base16:
-                    {
-                        writer_.push_back('\"');
-                        size_t length = encode_base16(b.data(),b.length(),writer_);
-                        writer_.push_back('\"');
-                        break;
-                    }
-                    case byte_string_chars_format::base64:
-                    {
-                        writer_.push_back('\"');
-                        size_t length = encode_base64(b.data(), b.length(), writer_);
-                        writer_.push_back('\"');
-                        break;
-                    }
-                    default: // base64url
-                    {
-                        writer_.push_back('\"');
-                        size_t length = encode_base64url(b.data(),b.length(),writer_);
-                        writer_.push_back('\"');
-                        break;
-                    }
-                }
+                JSONCONS_UNREACHABLE();
             }
         }
 
