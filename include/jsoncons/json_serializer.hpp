@@ -626,6 +626,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
+                              byte_string_chars_format,
                               semantic_tag_type,
                               const serializing_context&) override
     {
@@ -1211,6 +1212,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
+                              byte_string_chars_format,
                               semantic_tag_type,
                               const serializing_context&) override
     {

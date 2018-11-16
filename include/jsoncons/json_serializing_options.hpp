@@ -81,7 +81,7 @@ enum class bignum_chars_format : uint8_t {integer, base10, base64, base64url
 #endif
 };
 
-enum class byte_string_chars_format : uint8_t {base16,base64,base64url};
+enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
 enum class spaces_option{no_spaces=0,space_after,space_before,space_before_and_after};
 

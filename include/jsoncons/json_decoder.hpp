@@ -237,7 +237,7 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag, const serializing_context&) override
+    bool do_byte_string_value(const byte_string_view& b, byte_string_chars_format, semantic_tag_type tag, const serializing_context&) override
     {
         switch (stack_offsets_.back().type_)
         {

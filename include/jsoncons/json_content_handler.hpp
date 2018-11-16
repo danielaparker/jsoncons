@@ -118,14 +118,25 @@ public:
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context()) 
     {
-        return do_byte_string_value(byte_string_view(data, length), tag, context);
+        return do_byte_string_value(byte_string_view(data, length), 
+                                    byte_string_chars_format::none,
+                                    tag, context);
     }
 
     bool byte_string_value(const byte_string_view& b, 
+                           byte_string_chars_format format,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
-        return do_byte_string_value(b, tag, context);
+        return do_byte_string_value(b, format, tag, context);
+    }
+
+    bool byte_string_value(const byte_string_view& b, 
+
+                           semantic_tag_type tag=semantic_tag_type::none, 
+                           const serializing_context& context=null_serializing_context())
+    {
+        return do_byte_string_value(b, byte_string_chars_format::unspecified, tag, context);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -305,7 +316,10 @@ private:
 
     virtual bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) = 0;
 
-    virtual bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag, const serializing_context& context) = 0;
+    virtual bool do_byte_string_value(const byte_string_view& b, 
+                                      byte_string_chars_format format,
+                                      semantic_tag_type tag, 
+                                      const serializing_context& context) = 0;
 
     virtual bool do_double_value(double value, 
                                  const floating_point_options& fmt, 
@@ -368,7 +382,8 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view&, 
+    bool do_byte_string_value(const byte_string_view&,
+                              byte_string_chars_format, 
                               semantic_tag_type, 
                               const serializing_context&) override
     {
