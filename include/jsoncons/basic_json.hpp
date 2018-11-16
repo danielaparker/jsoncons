@@ -3353,15 +3353,33 @@ public:
             case structure_tag_type::byte_string_tag:
             {
                 string_type s(allocator);
-                encode_base64url(var_.byte_string_data_cast()->data(), 
-                                 var_.byte_string_data_cast()->length(),
-                                 s);
+                byte_string_chars_format format = detail::resolve_byte_string_chars_format(options.byte_string_format(), 
+                                                                                           byte_string_chars_format::none, 
+                                                                                           byte_string_chars_format::base64url);
+                switch (format)
+                {
+                    case byte_string_chars_format::base64:
+                        encode_base64(var_.byte_string_data_cast()->data(), 
+                                      var_.byte_string_data_cast()->length(),
+                                      s);
+                        break;
+                    case byte_string_chars_format::base16:
+                        encode_base16(var_.byte_string_data_cast()->data(), 
+                                      var_.byte_string_data_cast()->length(),
+                                      s);
+                        break;
+                    default:
+                        encode_base64url(var_.byte_string_data_cast()->data(), 
+                                         var_.byte_string_data_cast()->length(),
+                                         s);
+                        break;
+                }
                 return s;
             }
             default:
             {
                 string_type s(allocator);
-                basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s,options);
+                basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s,options);
                 dump(serializer);
                 return s;
             }
