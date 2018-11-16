@@ -86,6 +86,25 @@ void encode_cbor_byte_string()
     std::cout << std::dec << std::endl;
 }
 
+void byte_string_with_encoding_hint()
+{
+    // construct byte string value
+     json j1(byte_string("Hello"), byte_string_chars_format::base64);
+
+    std::vector<uint8_t> buf;
+    cbor::encode_cbor(j1, buf);
+
+    std::cout << std::hex << std::showbase << "(1)\n";
+    for (auto c : buf)
+    {
+        std::cout << (int)c;
+    }
+    std::cout << std::dec << "\n\n";
+
+    json j2 = cbor::decode_cbor<json>(buf);
+    std::cout << "(2)\n" << j2 << std::endl;
+}
+
 void cbor_view_object_range()
 {
     // {\"foo\": [0, 1, 2],\"bar\": [3,4,5]}
@@ -124,6 +143,7 @@ void cbor_examples()
     cbor_view_object_range();
     cbor_view_array_range();
     cbor_reputon_example();
+    byte_string_with_encoding_hint();
     std::cout << std::endl;
 }
 

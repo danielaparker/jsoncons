@@ -114,29 +114,20 @@ public:
         return do_string_value(value, tag, context);
     }
 
-    bool byte_string_value(const uint8_t* data, size_t length, 
-                           semantic_tag_type tag=semantic_tag_type::none, 
-                           const serializing_context& context=null_serializing_context()) 
-    {
-        return do_byte_string_value(byte_string_view(data, length), 
-                                    byte_string_chars_format::none,
-                                    tag, context);
-    }
-
     bool byte_string_value(const byte_string_view& b, 
-                           byte_string_chars_format encoding_hint,
+                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
         return do_byte_string_value(b, encoding_hint, tag, context);
     }
 
-    bool byte_string_value(const byte_string_view& b, 
-
+    bool byte_string_value(const uint8_t* p, size_t size, 
+                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
-        return do_byte_string_value(b, byte_string_chars_format::none, tag, context);
+        return do_byte_string_value(byte_string(p, size), encoding_hint, tag, context);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)

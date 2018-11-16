@@ -36,6 +36,19 @@ These have been replaced by
   `object_array_line_splits`, `object_array_line_splits` and `object_array_line_splits`.
   Rationale: consistency with `line_split_kind` name.  
 
+Changes to json_serializer
+
+- Previously the constructor of `json_serializer` took an optional argument to 
+  indicate whether "indenting" was on. `json_serializer` now always produces
+  indented output, so this argument has been removed.
+
+- A new class `json_compressed_serializer` produces compressed json without 
+  indenting.
+   
+  These changes will be transparent to you if you access the serializer through the 
+  json `dump` functions or the `pretty_print` function or the output stream
+  operator.
+
 v0.112.0
 --------
 

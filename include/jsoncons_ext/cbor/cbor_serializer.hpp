@@ -506,13 +506,13 @@ private:
         switch (encoding_hint)
         {
             case byte_string_chars_format::base64url:
-                writer_.push_back(21);
+                writer_.push_back(0xd5);
                 break;
             case byte_string_chars_format::base64:
-                writer_.push_back(22);
+                writer_.push_back(0xd6);
                 break;
             case byte_string_chars_format::base16:
-                writer_.push_back(23);
+                writer_.push_back(0xd7);
                 break;
             default:
                 break;

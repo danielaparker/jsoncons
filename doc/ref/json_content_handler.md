@@ -61,16 +61,18 @@ Writes a string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool byte_string_value(const uint8_t* data, size_t length, 
+    bool byte_string_value(const byte_string_view& b, 
+                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
-                           const serializing_context& context=null_serializing_context()); 
+                           const serializing_context& context=null_serializing_context())
 Writes a byte string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    bool byte_string_value(const byte_string_view& v, 
+    bool byte_string_value(const uint8_t* p, size_t size, 
+                           byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                            semantic_tag_type tag=semantic_tag_type::none, 
-                           const serializing_context& context=null_serializing_context());
+                           const serializing_context& context=null_serializing_context())
 Writes a byte string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -181,7 +183,9 @@ Handles a string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_byte_string_value(const byte_string_view& b, semantic_tag_type tag,
+    virtual bool do_byte_string_value(const byte_string_view& b, 
+                                      byte_string_chars_format encoding_hint,
+                                      semantic_tag_type tag,
                                       const serializing_context& context) = 0;
 Handles a byte string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 

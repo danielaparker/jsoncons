@@ -1620,7 +1620,7 @@ public:
                 {
                     switch (semantic_tag)
                     {
-                        case 2:
+                        case 0x2:
                             {
                                 bignum n(1, v.data(), v.size());
                                 buffer_.clear();
@@ -1628,7 +1628,7 @@ public:
                                 handler_.bignum_value(buffer_, *this);
                                 break;
                             }
-                        case 3:
+                        case 0x3:
                             {
                                 bignum n(-1, v.data(), v.size());
                                 buffer_.clear();
@@ -1636,29 +1636,29 @@ public:
                                 handler_.bignum_value(buffer_, *this);
                                 break;
                             }
-                        case 21:
+                        case 0x15:
                             {
                                 handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64url, semantic_tag_type::none, *this);
                                 break;
                             }
-                        case 22:
+                        case 0x16:
                             {
                                 handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64, semantic_tag_type::none, *this);
                                 break;
                             }
-                        case 23:
+                        case 0x17:
                             {
                                 handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base16, semantic_tag_type::none, *this);
                                 break;
                             }
                         default:
-                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::none, *this);
+                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this);
                             break;
                     }
                 }
                 else
                 {
-                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), semantic_tag_type::none, *this);
+                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this);
                 }
                 break;
             }

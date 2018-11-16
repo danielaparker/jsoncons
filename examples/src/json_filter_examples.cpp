@@ -69,7 +69,7 @@ void name_fix_up_example1()
     std::ifstream is(in_file);
     std::ofstream os(out_file);
 
-    json_serializer serializer(os, jsoncons::indenting::indent);
+    json_serializer serializer(os);
     name_fix_up_filter filter(serializer);
     json_reader reader(is, filter);
     reader.read_next();
@@ -85,7 +85,7 @@ void name_fix_up_example2()
     json j;
     is >> j;
 
-    json_serializer serializer(os, jsoncons::indenting::indent);
+    json_serializer serializer(os);
     name_fix_up_filter filter(serializer);
     j.dump(filter);
 }

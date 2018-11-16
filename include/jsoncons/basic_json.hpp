@@ -434,7 +434,7 @@ public:
             typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> string_holder_allocator_type;
             typedef typename std::allocator_traits<string_holder_allocator_type>::pointer pointer;
 
-            byte_string_chars_format suggested_encoding_;
+            byte_string_chars_format encoding_hint_;
             pointer ptr_;
 
             template <typename... Args>
@@ -453,32 +453,38 @@ public:
                 }
             }
         public:
+
             byte_string_data(semantic_tag_type semantic_type, 
                              const uint8_t* data, size_t length, 
                              byte_string_chars_format encoding_hint,
                              const Allocator& a)
                 : data_base(structure_tag_type::byte_string_tag, semantic_type),
-                  suggested_encoding_(encoding_hint)
+                  encoding_hint_(encoding_hint)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
 
             byte_string_data(const byte_string_data& val)
-                : data_base(val.type())
+                : data_base(val.type()), encoding_hint_(val.encoding_hint()) 
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_data(byte_string_data&& val)
-                : data_base(val.type()), ptr_(nullptr)
+                : data_base(val.type()), encoding_hint_(val.encoding_hint()), ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             byte_string_data(const byte_string_data& val, const Allocator& a)
-                : data_base(val.type())
+                : data_base(val.type()), encoding_hint_(val.encoding_hint())
             { 
                 create(string_holder_allocator_type(a), *(val.ptr_), a);
+            }
+
+            byte_string_chars_format encoding_hint() const
+            {
+                return encoding_hint_;
             }
 
             ~byte_string_data()
@@ -4473,7 +4479,8 @@ private:
                 handler.string_value(as_string_view(), var_.semantic_tag());
                 break;
             case structure_tag_type::byte_string_tag:
-                handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), var_.semantic_tag());
+                handler.byte_string_value(var_.byte_string_data_cast()->data(), var_.byte_string_data_cast()->length(), 
+                                          var_.byte_string_data_cast()->encoding_hint(), var_.semantic_tag());
                 break;
             case structure_tag_type::double_tag:
                 handler.double_value(var_.double_data_cast()->value(), 

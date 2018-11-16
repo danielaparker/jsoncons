@@ -490,7 +490,7 @@ int main()
     try
     {
         std::cout << "jsoncons version: " << version() << std::endl;
-
+#if 0
         object_range_based_for_loop();
 
         basics_examples();
@@ -538,8 +538,6 @@ int main()
 
         jsonpatch_examples();
 
-        cbor_examples();
-
         csv_examples();
 
         max_nesting_path_example();
@@ -563,6 +561,8 @@ int main()
         pull_parser_examples();
 
         staj_iterator_examples();
+#endif
+        cbor_examples();
     }
     catch (const std::exception& e)
     {
