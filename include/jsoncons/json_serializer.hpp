@@ -659,7 +659,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format suggested_encoding,
+                              byte_string_chars_format encoding_hint,
                               semantic_tag_type,
                               const serializing_context&) override
     {
@@ -676,7 +676,7 @@ private:
         }
 
         byte_string_chars_format format = detail::resolve_byte_string_chars_format(byte_string_format_, 
-                                                                                   suggested_encoding, 
+                                                                                   encoding_hint, 
                                                                                    byte_string_chars_format::base64url);
         switch (format)
         {
@@ -1253,7 +1253,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format suggested_encoding,
+                              byte_string_chars_format encoding_hint,
                               semantic_tag_type,
                               const serializing_context&) override
     {
@@ -1263,7 +1263,7 @@ private:
         }
 
         byte_string_chars_format format = detail::resolve_byte_string_chars_format(byte_string_format_, 
-                                                                                   suggested_encoding, 
+                                                                                   encoding_hint, 
                                                                                    byte_string_chars_format::base64url);
         switch (format)
         {

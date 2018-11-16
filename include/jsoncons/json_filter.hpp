@@ -98,11 +98,11 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format format,
+                              byte_string_chars_format encoding_hint,
                               semantic_tag_type tag,
                               const serializing_context& context) override
     {
-        return destination_handler_.byte_string_value(b, format, tag, context);
+        return destination_handler_.byte_string_value(b, encoding_hint, tag, context);
     }
 
     bool do_double_value(double value, 
@@ -273,11 +273,11 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format format,
+                              byte_string_chars_format encoding_hint,
                               semantic_tag_type tag,
                               const serializing_context& context) override
     {
-        return destination_handler_.byte_string_value(b, format, tag, context);
+        return destination_handler_.byte_string_value(b, encoding_hint, tag, context);
     }
 
     bool do_double_value(double value, 

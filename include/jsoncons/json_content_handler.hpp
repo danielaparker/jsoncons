@@ -124,11 +124,11 @@ public:
     }
 
     bool byte_string_value(const byte_string_view& b, 
-                           byte_string_chars_format format,
+                           byte_string_chars_format encoding_hint,
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
-        return do_byte_string_value(b, format, tag, context);
+        return do_byte_string_value(b, encoding_hint, tag, context);
     }
 
     bool byte_string_value(const byte_string_view& b, 
@@ -317,7 +317,7 @@ private:
     virtual bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) = 0;
 
     virtual bool do_byte_string_value(const byte_string_view& b, 
-                                      byte_string_chars_format format,
+                                      byte_string_chars_format encoding_hint,
                                       semantic_tag_type tag, 
                                       const serializing_context& context) = 0;
 

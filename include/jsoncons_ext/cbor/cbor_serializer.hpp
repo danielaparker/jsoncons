@@ -499,11 +499,11 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format format,
+                              byte_string_chars_format encoding_hint,
                               semantic_tag_type, 
                               const serializing_context&) override
     {
-        switch (format)
+        switch (encoding_hint)
         {
             case byte_string_chars_format::base64url:
                 writer_.push_back(21);

@@ -455,10 +455,10 @@ public:
         public:
             byte_string_data(semantic_tag_type semantic_type, 
                              const uint8_t* data, size_t length, 
-                             byte_string_chars_format suggested_encoding,
+                             byte_string_chars_format encoding_hint,
                              const Allocator& a)
                 : data_base(structure_tag_type::byte_string_tag, semantic_type),
-                  suggested_encoding_(suggested_encoding)
+                  suggested_encoding_(encoding_hint)
             {
                 create(string_holder_allocator_type(a), data, data+length, a);
             }
@@ -737,14 +737,14 @@ public:
             }
         }
 
-        variant(const byte_string_view& bs, byte_string_chars_format suggested_encoding, semantic_tag_type tag)
+        variant(const byte_string_view& bs, byte_string_chars_format encoding_hint, semantic_tag_type tag)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), suggested_encoding, byte_allocator_type());
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), encoding_hint, byte_allocator_type());
         }
 
-        variant(const byte_string_view& bs, byte_string_chars_format suggested_encoding, semantic_tag_type tag, const Allocator& allocator)
+        variant(const byte_string_view& bs, byte_string_chars_format encoding_hint, semantic_tag_type tag, const Allocator& allocator)
         {
-            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), suggested_encoding, allocator);
+            new(reinterpret_cast<void*>(&data_))byte_string_data(tag, bs.data(), bs.length(), encoding_hint, allocator);
         }
 
         variant(const basic_bignum<byte_allocator_type>& n)
@@ -2638,17 +2638,17 @@ public:
     }
 
     explicit basic_json(const byte_string_view& bs, 
-                        byte_string_chars_format suggested_encoding = byte_string_chars_format::none,
+                        byte_string_chars_format encoding_hint = byte_string_chars_format::none,
                         semantic_tag_type tag = semantic_tag_type::none)
-        : var_(bs, suggested_encoding, tag)
+        : var_(bs, encoding_hint, tag)
     {
     }
 
     basic_json(const byte_string_view& bs, 
-               byte_string_chars_format suggested_encoding,
+               byte_string_chars_format encoding_hint,
                semantic_tag_type tag, 
                const Allocator& allocator)
-        : var_(bs, suggested_encoding, tag, allocator)
+        : var_(bs, encoding_hint, tag, allocator)
     {
     }
 
