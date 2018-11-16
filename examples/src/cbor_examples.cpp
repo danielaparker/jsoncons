@@ -70,25 +70,6 @@ void decode_cbor_byte_string()
     std::cout << "(2) " << j << std::endl;
 }
 
-void encode_cbor_byte_string()
-{
-    // construct byte string value
-    json j(byte_string("Hello"));
-
-    std::vector<uint8_t> buf;
-    cbor::encode_cbor(j, buf);
-
-    std::cout << std::hex << std::showbase << "(1)\n";
-    for (auto c : buf)
-    {
-        std::cout << (int)c;
-    }
-    std::cout << std::dec << "\n\n";
-
-    json j2 = cbor::decode_cbor<json>(buf);
-    std::cout << "(2)\n" << j2 << std::endl;
-}
-
 void decode_byte_string_with_encoding_hint()
 {
     // semantic tag indicating expected conversion to base64
@@ -103,6 +84,25 @@ void decode_byte_string_with_encoding_hint()
 
     // byte string value to JSON text becomes base64
     std::cout << "(2) " << j << std::endl;
+}
+
+void encode_cbor_byte_string()
+{
+    // construct byte string value
+    json j(byte_string("Hello"));
+
+    std::vector<uint8_t> buf;
+    cbor::encode_cbor(j, buf);
+
+    std::cout << std::hex << std::showbase << "(1) ";
+    for (auto c : buf)
+    {
+        std::cout << (int)c;
+    }
+    std::cout << std::dec << "\n\n";
+
+    json j2 = cbor::decode_cbor<json>(buf);
+    std::cout << "(2) " << j2 << std::endl;
 }
 
 void encode_byte_string_with_encoding_hint()
