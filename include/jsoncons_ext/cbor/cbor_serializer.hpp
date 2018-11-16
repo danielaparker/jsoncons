@@ -498,8 +498,25 @@ private:
         return true;
     }
 
-    bool do_byte_string_value(const byte_string_view& b, semantic_tag_type, const serializing_context&) override
+    bool do_byte_string_value(const byte_string_view& b, 
+                              byte_string_chars_format format,
+                              semantic_tag_type tag, 
+                              const serializing_context&) override
     {
+        switch (format)
+        {
+            case byte_string_chars_format::base64url:
+                writer_.push_back(21);
+                break;
+            case byte_string_chars_format::base64:
+                writer_.push_back(22);
+                break;
+            case byte_string_chars_format::base16:
+                writer_.push_back(23);
+                break;
+            default:
+                break;
+        }
         if (b.length() <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes

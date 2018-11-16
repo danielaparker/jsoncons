@@ -626,7 +626,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format,
+                              byte_string_chars_format format,
                               semantic_tag_type,
                               const serializing_context&) override
     {
@@ -651,6 +651,14 @@ private:
                 column_ += (length + 2);
                 break;
             }
+            case byte_string_chars_format::base64:
+            {
+                writer_.push_back('\"');
+                size_t length = encode_base64(b.data(), b.length(), writer_);
+                writer_.push_back('\"');
+                column_ += (length + 2);
+                break;
+            }
             case byte_string_chars_format::base64url:
             {
                 writer_.push_back('\"');
@@ -661,11 +669,33 @@ private:
             }
             default:
             {
-                writer_.push_back('\"');
-                size_t length = encode_base64(b.data(), b.length(), writer_);
-                writer_.push_back('\"');
-                column_ += (length + 2);
-                break;
+                switch (format)
+                {
+                    case byte_string_chars_format::base16:
+                    {
+                        writer_.push_back('\"');
+                        size_t length = encode_base16(b.data(),b.length(),writer_);
+                        writer_.push_back('\"');
+                        column_ += (length + 2);
+                        break;
+                    }
+                    case byte_string_chars_format::base64:
+                    {
+                        writer_.push_back('\"');
+                        size_t length = encode_base64(b.data(), b.length(), writer_);
+                        writer_.push_back('\"');
+                        column_ += (length + 2);
+                        break;
+                    }
+                    default: // base64url
+                    {
+                        writer_.push_back('\"');
+                        size_t length = encode_base64url(b.data(),b.length(),writer_);
+                        writer_.push_back('\"');
+                        column_ += (length + 2);
+                        break;
+                    }
+                }
             }
         }
 
@@ -1212,7 +1242,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format,
+                              byte_string_chars_format format,
                               semantic_tag_type,
                               const serializing_context&) override
     {
@@ -1225,23 +1255,50 @@ private:
             case byte_string_chars_format::base16:
             {
                 writer_.push_back('\"');
-                encode_base16(b.data(),b.length(),writer_);
+                size_t length = encode_base16(b.data(),b.length(),writer_);
+                writer_.push_back('\"');
+                break;
+            }
+            case byte_string_chars_format::base64:
+            {
+                writer_.push_back('\"');
+                size_t length = encode_base64(b.data(), b.length(), writer_);
                 writer_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64url:
             {
                 writer_.push_back('\"');
-                encode_base64url(b.data(),b.length(),writer_);
+                size_t length = encode_base64url(b.data(),b.length(),writer_);
                 writer_.push_back('\"');
                 break;
             }
             default:
             {
-                writer_.push_back('\"');
-                encode_base64(b.data(), b.length(), writer_);
-                writer_.push_back('\"');
-                break;
+                switch (format)
+                {
+                    case byte_string_chars_format::base16:
+                    {
+                        writer_.push_back('\"');
+                        size_t length = encode_base16(b.data(),b.length(),writer_);
+                        writer_.push_back('\"');
+                        break;
+                    }
+                    case byte_string_chars_format::base64:
+                    {
+                        writer_.push_back('\"');
+                        size_t length = encode_base64(b.data(), b.length(), writer_);
+                        writer_.push_back('\"');
+                        break;
+                    }
+                    default: // base64url
+                    {
+                        writer_.push_back('\"');
+                        size_t length = encode_base64url(b.data(),b.length(),writer_);
+                        writer_.push_back('\"');
+                        break;
+                    }
+                }
             }
         }
 

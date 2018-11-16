@@ -136,7 +136,7 @@ public:
                            semantic_tag_type tag=semantic_tag_type::none, 
                            const serializing_context& context=null_serializing_context())
     {
-        return do_byte_string_value(b, byte_string_chars_format::unspecified, tag, context);
+        return do_byte_string_value(b, byte_string_chars_format::none, tag, context);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)

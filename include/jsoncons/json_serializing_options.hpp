@@ -217,7 +217,7 @@ public:
 #endif
           escape_all_non_ascii_(false),
           escape_solidus_(false),
-          byte_string_format_(byte_string_chars_format::base64url),
+          byte_string_format_(byte_string_chars_format::none),
           bignum_format_(bignum_chars_format::base10),
           object_object_line_splits_(line_split_kind::multi_line),
           object_array_line_splits_(line_split_kind::same_line),
