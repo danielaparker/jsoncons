@@ -1435,5 +1435,8 @@ typedef basic_json_compressed_serializer<wchar_t,detail::stream_char_writer<wcha
 typedef basic_json_serializer<char,detail::string_writer<std::string>> json_string_serializer;
 typedef basic_json_serializer<wchar_t,detail::string_writer<std::wstring>> wjson_string_serializer;
 
+typedef basic_json_compressed_serializer<char,detail::string_writer<std::string>> json_compressed_string_serializer;
+typedef basic_json_compressed_serializer<wchar_t,detail::string_writer<std::wstring>> wjson_compressed_string_serializer;
+
 }
 #endif
