@@ -157,7 +157,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type tag, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
         writer_.push_back(0x9f);
