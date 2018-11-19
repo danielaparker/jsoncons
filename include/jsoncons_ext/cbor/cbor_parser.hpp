@@ -152,7 +152,7 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
             }
             break;
         }
-    case 0x1f: // terminated by "break"
+    case additional_information::indefinite_length: // terminated by "break"
         {
             switch (get_major_type(*first))
             {
@@ -221,7 +221,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
 
     switch (get_additional_information_value(*first))
     {
-        case 0x1f: // terminated by "break"
+        case additional_information::indefinite_length: // terminated by "break"
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -267,7 +267,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
 
     switch (get_additional_information_value(*first))
     {
-    case 0x1f: // indefinite length
+    case additional_information::indefinite_length: // indefinite length
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -316,7 +316,7 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
     uint8_t info = get_additional_information_value(*first);
     switch (info)
     {
-    case 0x1f: // indefinite length
+    case additional_information::indefinite_length: // indefinite length
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -381,7 +381,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     uint8_t info = get_additional_information_value(*first);
     switch (info)
     {
-        case 0x1f: // indefinite length
+        case additional_information::indefinite_length: // indefinite length
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -678,7 +678,7 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
         }
         case cbor_major_type::byte_string:
         {
-            if (info == 0x1f)
+            if (info == additional_information::indefinite_length)
             {
                 while (*p != 0xff)
                 {
@@ -704,7 +704,7 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
         }
         case cbor_major_type::text_string:
         {
-            if (info == 0x1f)
+            if (info == additional_information::indefinite_length)
             {
                 while (*p != 0xff)
                 {
