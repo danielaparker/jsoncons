@@ -267,7 +267,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
 
     switch (get_additional_information_value(*first))
     {
-    case 0x1f: // UTF-8 string, text strings follow, terminated by "break"
+    case 0x1f: // indefinite length
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -286,7 +286,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
             }
             break;
         }
-    default: 
+    default: // definite length
         {
             size_t length = get_length(first, last, endp);
             if (*endp == first)
@@ -316,7 +316,7 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
     uint8_t info = get_additional_information_value(*first);
     switch (info)
     {
-    case 0x1f:
+    case 0x1f: // indefinite length
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -339,7 +339,7 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
             *endp = p;
             break;
         }
-        default: // eight-byte uint64_t for n follow
+        default: // definite length
         {
             size_t size = detail::get_length(first,last,endp);
             if (*endp == first)
@@ -381,7 +381,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     uint8_t info = get_additional_information_value(*first);
     switch (info)
     {
-        case 0x1f: // array (indefinite length)
+        case 0x1f: // indefinite length
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -400,7 +400,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
             *endp = p;
             break;
         }
-        default:
+        default: // definite length
         {
             size_t size = detail::get_length(first,last,endp);
             if (*endp == first)
@@ -689,7 +689,8 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
                     walk(p, last, &p);
                 }
                 *endp = p;
-            } else
+            } 
+            else
             {
                 size_t len = get_length(first, last, endp);
                 if (*endp == first)
@@ -714,7 +715,8 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
                     walk(p, last, &p);
                 }
                 *endp = p;
-            } else
+            } 
+            else
             {
                 size_t len = get_length(first, last, endp);
                 if (*endp == first)
