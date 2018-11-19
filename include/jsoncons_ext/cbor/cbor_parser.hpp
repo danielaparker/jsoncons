@@ -85,14 +85,25 @@ namespace detail {
 
 void walk(const uint8_t* first, const uint8_t* last, const uint8_t** endp);
 
+
 inline 
-size_t get_byte_string_length(const uint8_t* first, const uint8_t* last, 
-                              const uint8_t** endp)
+size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::byte_string))
+    if (JSONCONS_UNLIKELY(last <= first))
     {
         *endp = first; 
         return 0;
+    }
+
+    switch (get_major_type(*first))
+    {
+        case cbor_major_type::byte_string:
+        case cbor_major_type::text_string:
+        case cbor_major_type::array:
+        case cbor_major_type::map:
+            break;
+        default:
+            return 0;
     }
 
     size_t length = 0;
@@ -143,16 +154,48 @@ size_t get_byte_string_length(const uint8_t* first, const uint8_t* last,
         }
     case 0x1f: // terminated by "break"
         {
-            length = 0;
-            while (*p != 0xff)
+            switch (get_major_type(*first))
             {
-                size_t len = detail::get_byte_string_length(p,last,endp);
-                if (*endp == p)
+                case cbor_major_type::array:
                 {
-                    *endp = first;
+                    length = 0;
+                    while (*p != 0xff)
+                    {
+                        walk(p, last, &p);
+                        ++length;
+                    }
+                    *endp = first + 1;
                     break;
                 }
-                length += len;
+                case cbor_major_type::map:
+                {
+                    length = 0;
+                    while (*p != 0xff)
+                    {
+                        walk(p, last, &p);
+                        walk(p, last, &p);
+                        ++length;
+                    }
+                    *endp = first + 1;
+                    break;
+                }
+                case cbor_major_type::text_string:
+                case cbor_major_type::byte_string:
+                    length = 0;
+                    while (*p != 0xff)
+                    {
+                        size_t len = detail::get_length(p,last,endp);
+                        if (*endp == p)
+                        {
+                            *endp = first;
+                            break;
+                        }
+                        length += len;
+                    }
+                    *endp = first + 1;
+                    break;
+                default:
+                    break;
             }
             break;
         }
@@ -196,7 +239,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
         }
     default: 
         {
-            size_t length = get_byte_string_length(first, last, endp);
+            size_t length = get_length(first, last, endp);
             if (*endp == first)
             {
                 return v;
@@ -209,85 +252,6 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
     }
     
     return v;
-}
-
-inline 
-size_t get_text_string_length(const uint8_t* first, const uint8_t* last, 
-                              const uint8_t** endp)
-{
-    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::text_string))
-    {
-        *endp = first; 
-        return 0;
-    }
-
-    size_t length = 0;
-    const uint8_t* p = first+1;
-    switch (get_additional_information_value(*first))
-    {
-        case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
-        {
-            length = *first & 0x1f;
-            *endp = p;
-            break;
-        }
-        case 0x18: // one-byte uint8_t for n follows
-        {
-            length = binary::from_big_endian<uint8_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            break;
-        }
-        case 0x19: // two-byte uint16_t for n follow
-        {
-            length = binary::from_big_endian<uint16_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            break;
-        }
-        case 0x1a: // four-byte uint32_t for n follow
-        {
-            length = binary::from_big_endian<uint32_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            break;
-        }
-        case 0x1b: // eight-byte uint64_t for n follow
-        {
-            length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            break;
-        }
-        case 0x1f: // terminated by "break"
-        {
-            length = 0;
-            while (*p != 0xff)
-            {
-                size_t len = detail::get_text_string_length(p,last,endp);
-                if (*endp == p)
-                {
-                    *endp = first;
-                    break;
-                }
-                length += len;
-            }
-            break;
-        }
-    default: 
-        *endp = first;
-        break;
-    }
-    
-    return length;
 }
 
 inline 
@@ -324,7 +288,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
         }
     default: 
         {
-            size_t length = get_text_string_length(first, last, endp);
+            size_t length = get_length(first, last, endp);
             if (*endp == first)
             {
                 return s;
@@ -343,132 +307,65 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
 inline
 void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    size_t size = 0;
-
     if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::map))
     {
         *endp = first; 
         return;
     }
 
-    const uint8_t* p = first+1;
     uint8_t info = get_additional_information_value(*first);
     switch (info)
     {
-        case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
-        {
-            size = info;
-            *endp = p;
-            for (size_t i = 0; i < size; ++i)
-            {
-                walk(*endp, last, endp);
-                walk(*endp, last, endp);
-            }
-            break;
-        }
-
-    case 0x18: // one-byte uint8_t for n follows
-        {
-            size = binary::from_big_endian<uint8_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            else
-            {
-                for (size_t i = 0; i < size; ++i)
-                {
-                    walk(*endp, last, endp);
-                    walk(*endp, last, endp);
-                }
-            }
-            break;
-        }
-
-    case 0x19: // two-byte uint16_t for n follow
-        {
-            size = binary::from_big_endian<uint16_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            else
-            {
-                for (size_t i = 0; i < size; ++i)
-                {
-                    walk(*endp, last, endp);
-                    walk(*endp, last, endp);
-                }
-            }
-            break;
-        }
-
-    case 0x1a: // four-byte uint32_t for n follow
-        {
-            size = binary::from_big_endian<uint32_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            else
-            {
-                for (size_t i = 0; i < size; ++i)
-                {
-                    walk(*endp, last, endp);
-                    walk(*endp, last, endp);
-                }
-            }
-            break;
-        }
-
-    case 0x1b: // eight-byte uint64_t for n follow
-        {
-            size = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            else
-            {
-                for (size_t i = 0; i < size; ++i)
-                {
-                    walk(*endp, last, endp);
-                    walk(*endp, last, endp);
-                }
-            }
-            break;
-        }
     case 0x1f:
         {
+            const uint8_t* p = first+1;
             while (*p != 0xff)
             {
                 walk(p, last, endp);
                 if (*endp == p)
                 {
                     *endp = first;
-                    break;
+                    return;
                 }
-                else
-                {
-                    p = *endp;
-                }
+                p = *endp;
                 walk(p, last, endp);
                 if (*endp == p)
                 {
                     *endp = first;
-                    break;
+                    return;
                 }
-                else
-                {
-                    p = *endp;
-                }
+                p = *endp;
             }
             *endp = p;
             break;
         }
-    default:
+        default: // eight-byte uint64_t for n follow
         {
-            *endp = first; 
+            size_t size = detail::get_length(first,last,endp);
+            if (*endp == first)
+            {
+                *endp = first;
+                return;
+            }
+            const uint8_t* p = *endp;
+            for (size_t i = 0; i < size; ++i)
+            {
+                walk(p, last, endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                    return;
+                }
+                p = *endp;
+                walk(p, last, endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                    return;
+                }
+                p = *endp;
+            }
+            break;
         }
     }    
 }
@@ -476,98 +373,17 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
 inline
 void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
-    size_t size = 0;
-
     if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::array))
     {
         *endp = first; 
         return;
     }
-    const uint8_t* p = first+1;
     uint8_t info = get_additional_information_value(*first);
     switch (info)
     {
-        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-        {
-            size = info;
-            *endp = p;
-            for (size_t i = 0; i < size; ++i)
-            {
-                walk(*endp, last, endp);
-            }
-            break;
-        }
-
-        case 0x18: // array (one-byte uint8_t for n follows)
-        {
-            size = binary::from_big_endian<uint8_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            else
-            {
-                for (size_t i = 0; i < size; ++i)
-                {
-                    walk(*endp, last, endp);
-                }
-            }
-            break;
-        }
-
-        case 0x19: // array (two-byte uint16_t for n follow)
-        {
-            size = binary::from_big_endian<uint16_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            else
-            {
-                for (size_t i = 0; i < size; ++i)
-                {
-                    walk(*endp, last, endp);
-                }
-            }
-            break;
-        }
-
-        case 0x1a: // array (four-byte uint32_t for n follow)
-        {
-            size = binary::from_big_endian<uint32_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            else
-            {
-                for (size_t i = 0; i < size; ++i)
-                {
-                    walk(*endp, last, endp);
-                }
-            }
-            break;
-        }
-
-        case 0x1b: // array (eight-byte uint64_t for n follow)
-        {
-            size = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
-            if (*endp == p)
-            {
-                *endp = first;
-            }
-            else
-            {
-                for (size_t i = 0; i < size; ++i)
-                {
-                    walk(*endp, last, endp);
-                }
-            }
-            break;
-        }
-
         case 0x1f: // array (indefinite length)
         {
+            const uint8_t* p = first+1;
             while (*p != 0xff)
             {
                 walk(p, last, endp);
@@ -586,8 +402,25 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         }
         default:
         {
-            *endp = first; 
-        }
+            size_t size = detail::get_length(first,last,endp);
+            if (*endp == first)
+            {
+                *endp = first;
+                return;
+            }
+            const uint8_t* p = *endp;
+            for (size_t i = 0; i < size; ++i)
+            {
+                walk(p, last, endp);
+                if (*endp == p)
+                {
+                    *endp = first;
+                    return;
+                }
+                p = *endp;
+            }
+            break;
+        } 
     }
 }
 
@@ -858,7 +691,7 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
                 *endp = p;
             } else
             {
-                size_t len = get_byte_string_length(first, last, endp);
+                size_t len = get_length(first, last, endp);
                 if (*endp == first)
                 {
                     *endp = first;
@@ -883,7 +716,7 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
                 *endp = p;
             } else
             {
-                size_t len = get_text_string_length(first, last, endp);
+                size_t len = get_length(first, last, endp);
                 if (*endp == first)
                 {
                     *endp = first;
@@ -953,202 +786,6 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
         }
     }
 
-}
-
-inline 
-size_t get_map_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::map))
-    {
-        *endp = first; 
-        return 0;
-    }
-
-    const uint8_t* p = first + 1;
-    uint8_t info = get_additional_information_value(*first);
-    switch (info)
-    {
-
-        case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
-        {
-            *endp = p;
-            return info;
-        }
-
-    case 0x18: // one-byte uint8_t for n follows 
-    {
-        const auto len = binary::from_big_endian<uint8_t>(p,last,endp);
-        if (*endp == p)
-        {
-            JSONCONS_THROW(cbor_decode_error(last-p));
-        }
-        else
-        {
-            p = *endp;
-        }
-        *endp = p;
-        return len;
-    }
-
-    case 0x19: // two-byte uint16_t for n follow 
-    {
-        const auto len = binary::from_big_endian<uint16_t>(p,last,endp);
-        if (*endp == p)
-        {
-            JSONCONS_THROW(cbor_decode_error(last-p));
-        }
-        else
-        {
-            p = *endp;
-        }
-        *endp = p;
-        return len;
-    }
-
-    case 0x1a: // four-byte uint32_t for n follow 
-    {
-        const auto len = binary::from_big_endian<uint32_t>(p,last,endp);
-        if (*endp == p)
-        {
-            JSONCONS_THROW(cbor_decode_error(last-p));
-        }
-        else
-        {
-            p = *endp;
-        }
-        *endp = p;
-        return len;
-    }
-
-    case 0x1b: // eight-byte uint64_t for n follow 
-    {
-        size_t len = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
-        if (*endp == p)
-        {
-            JSONCONS_THROW(cbor_decode_error(last-p));
-        }
-        else
-        {
-            p = *endp;
-        }
-        *endp = p;
-        return len;
-    }
-
-    case 0x1f: // indefinite length 
-    {
-        size_t len = 0;
-        while (*p != 0xff)
-        {
-            walk(p, last, &p);
-            walk(p, last, &p);
-            ++len;
-        }
-        *endp = first + 1;
-        return len;
-    }
-    default:
-        *endp = last;
-        return 0;
-    }
-}
-
-inline 
-size_t get_array_size(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
-{
-    if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::array))
-    {
-        *endp = first; 
-        return 0;
-    }
-
-    const uint8_t* p = first + 1;
-    uint8_t info = get_additional_information_value(*first);
-    switch (info)
-    {
-        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-        {
-            *endp = p;
-            return info;
-        }
-
-    case 0x18: // one-byte uint8_t for n follows 
-    {
-        const auto len = binary::from_big_endian<uint8_t>(p,last,endp);
-        if (*endp == p)
-        {
-            JSONCONS_THROW(cbor_decode_error(last-p));
-        }
-        else
-        {
-            p = *endp;
-        }
-        *endp = p;
-        return len;
-    }
-
-    case 0x19: // two-byte uint16_t for n follow 
-    {
-        const auto len = binary::from_big_endian<uint16_t>(p,last,endp);
-        if (*endp == p)
-        {
-            JSONCONS_THROW(cbor_decode_error(last-p));
-        }
-        else
-        {
-            p = *endp;
-        }
-        *endp = p;
-
-        return len;
-    }
-
-    case 0x1a: // four-byte uint32_t for n follow 
-    {
-        const auto len = binary::from_big_endian<int32_t>(p,last,endp);
-        if (*endp == p)
-        {
-            JSONCONS_THROW(cbor_decode_error(last-p));
-        }
-        else
-        {
-            p = *endp;
-        }
-        *endp = p;
-        return len;
-    }
-
-    case 0x1b: // eight-byte uint64_t for n follow 
-    {
-        size_t len = (size_t)binary::from_big_endian<int64_t>(p,last,endp);
-        if (*endp == p)
-        {
-            JSONCONS_THROW(cbor_decode_error(last-p));
-        }
-        else
-        {
-            p = *endp;
-        }
-        *endp = p;
-        return len;
-    }
-
-    case 0x1f: // indefinite length
-    {
-        size_t len = 0;
-        while (*p != 0xff)
-        {
-            walk(p, last, &p);
-            ++len;
-        }
-        *endp = first + 1;
-        return len;
-    }
-
-    default:
-        *endp = last;
-        return 0;
-    }
 }
 
 template <class T>
