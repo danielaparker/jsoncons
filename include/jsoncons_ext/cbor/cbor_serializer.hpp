@@ -159,17 +159,17 @@ private:
 
     bool do_begin_array(semantic_tag_type tag, const serializing_context&) override
     {
-        if (tag == semantic_tag_type::custom1)
-        {
-            writer_.push_back(0xc5);
-        }
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
         writer_.push_back(0x9f);
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context&) override
     {
+        if (length == 2 && tag == semantic_tag_type::custom1)
+        {
+            writer_.push_back(0xc5);
+        }
         stack_.push_back(stack_item(cbor_structure_type::array));
         if (length <= 0x17)
         {

@@ -40,6 +40,7 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
         }
 
         REQUIRE(expected == result);
+        CHECK(expected.semantic_tag() == result.semantic_tag());
     }
     catch (const std::exception& e)
     {
@@ -146,6 +147,13 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x82,'\0','\0'},json::array({0,0}));
     check_parsing({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
     check_parsing({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
+
+    // big float
+    check_parsing({0xc5, // Tag 5 
+                     0x82, // Array of length 2
+                       0x21, // -2 
+                         0x19, 0x6a, 0xb3 // 27315 
+                  },json(json::array({-2,27315}),semantic_tag_type::custom1));
 
     // indefinite length arrays
     check_parsing({0x9f,0xff},json::array());

@@ -4512,18 +4512,18 @@ private:
                 handler.uint64_value(var_.uint64_data_cast()->value(), var_.semantic_tag());
                 break;
             case structure_tag_type::bool_tag:
-                handler.bool_value(var_.bool_data_cast()->value());
+                handler.bool_value(var_.bool_data_cast()->value(), var_.semantic_tag());
                 break;
             case structure_tag_type::null_tag:
-                handler.null_value();
+                handler.null_value(var_.semantic_tag());
                 break;
             case structure_tag_type::empty_object_tag:
-                handler.begin_object(0);
+                handler.begin_object(0, var_.semantic_tag());
                 handler.end_object();
                 break;
             case structure_tag_type::object_tag:
                 {
-                    handler.begin_object(size());
+                    handler.begin_object(size(), var_.semantic_tag());
                     const object& o = object_value();
                     for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                     {
@@ -4535,7 +4535,7 @@ private:
                 break;
             case structure_tag_type::array_tag:
                 {
-                    handler.begin_array(size());
+                    handler.begin_array(size(), var_.semantic_tag());
                     const array& o = array_value();
                     for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {

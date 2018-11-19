@@ -20,10 +20,10 @@ void check_encode_cbor(const std::vector<uint8_t>& expected, const json& j)
 {
     std::vector<uint8_t> result;
     encode_cbor(j,result);
-    REQUIRE(expected.size() == result.size());
+    REQUIRE(result.size() == expected.size());
     for (size_t i = 0; i < expected.size(); ++i)
     {
-        REQUIRE(expected[i] == result[i]);
+        REQUIRE(result[i] == expected[i]);
     }
 }
 
@@ -109,6 +109,7 @@ TEST_CASE("cbor_encoder_test")
                  json("123456789012345678901234"));
 
 }
+
 TEST_CASE("cbor_arrays_and_maps")
 {
     check_encode_cbor({0x80},json::array());
@@ -119,6 +120,20 @@ TEST_CASE("cbor_arrays_and_maps")
     check_encode_cbor({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
     check_encode_cbor({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
+    // big float
+    json j(json::array({-2,27315}),semantic_tag_type::custom1);
+    CHECK(j.semantic_tag() == semantic_tag_type::custom1);
+    json j2 = j;
+    CHECK(j2.semantic_tag() == semantic_tag_type::custom1);
+    json j3;
+    j3 = j;
+    CHECK(j3.semantic_tag() == semantic_tag_type::custom1);
+
+    check_encode_cbor({0xc5, // Tag 5 
+                         0x82, // Array of length 2
+                           0x21, // -2 
+                             0x19, 0x6a, 0xb3 // 27315 
+                  },json(json::array({-2,27315}),semantic_tag_type::custom1));
     check_encode_cbor({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
     check_encode_cbor({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }
