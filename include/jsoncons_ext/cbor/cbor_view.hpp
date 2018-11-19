@@ -262,7 +262,7 @@ public:
         switch (major_type())
         {
             case cbor_major_type::text_string:
-                return additional_information_value() != additional_information::indefinite_length;
+                return additional_information_value() != additional_info::indefinite_length;
             case cbor_major_type::semantic_tag:
             {
                 cbor_view v(first_ + 1, last_ - (first_ + 1));
@@ -294,7 +294,7 @@ public:
         switch (major_type())
         {
             case cbor_major_type::byte_string:
-                return additional_information_value() != additional_information::indefinite_length;
+                return additional_information_value() != additional_info::indefinite_length;
             case cbor_major_type::semantic_tag:
             {
                 cbor_view v(first_ + 1, last_ - (first_ + 1));
