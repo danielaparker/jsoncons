@@ -23,6 +23,7 @@ It also allows optional semantic tagging of the major types:
  string     | bignum       | Maps to CBOR bignum 
  &#160;     | decimal      | Maps to CBOR decimal fraction 
  &#160;     | date_time    | Maps to CBOR date/time
+ array      | custom1      | Maps to CBOR bigfloat
 
 ### Examples
 
