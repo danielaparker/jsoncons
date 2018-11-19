@@ -29,7 +29,8 @@ enum class semantic_tag_type : uint8_t
     decimal,
     date_time,
     epoch_time,
-    undefined
+    undefined,
+    custom1
 };
 
 template <class CharT>

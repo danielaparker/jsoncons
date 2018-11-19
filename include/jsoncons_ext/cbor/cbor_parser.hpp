@@ -1324,12 +1324,13 @@ public:
             case cbor_major_type::array:
             {
                 size_t info = get_additional_information_value(*pos);
+                semantic_tag_type tag = (has_semantic_tag && semantic_tag == 5)? semantic_tag_type::custom1 : semantic_tag_type::none;
                 switch (info)
                 {
                     case additional_information::indefinite_length:
                     {
                         ++nesting_depth_;
-                        handler_.begin_array(semantic_tag_type::none, *this);
+                        handler_.begin_array(tag, *this);
                         while (*input_ptr_ != 0xff)
                         {
                             parse_some(ec);
@@ -1353,11 +1354,18 @@ public:
                             return;
                         }
                         input_ptr_ = endp;
-                        parse_array(len, ec);
-                        if (ec)
+                        ++nesting_depth_;
+                        handler_.begin_array(len, tag, *this);
+                        for (size_t i = 0; i < len; ++i)
                         {
-                            return;
+                            parse_some(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
                         }
+                        handler_.end_array(*this);
+                        --nesting_depth_;
                         break;
                     }
                 }
@@ -1400,11 +1408,23 @@ public:
                             return;
                         }
                         input_ptr_ = endp;
-                        parse_object(len, ec);
-                        if (ec)
+                        ++nesting_depth_;
+                        handler_.begin_object(len, semantic_tag_type::none, *this);
+                        for (size_t i = 0; i < len; ++i)
                         {
-                            return;
+                            parse_name(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            parse_some(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
                         }
+                        handler_.end_object(*this);
+                        --nesting_depth_;
                         break;
                     }
                 }
@@ -1491,43 +1511,6 @@ private:
             ec = cbor_parse_errc::source_error;
             return;
         }
-    }
-
-    void parse_array(size_t len, std::error_code& ec)
-    {
-        ++nesting_depth_;
-        handler_.begin_array(len, semantic_tag_type::none, *this);
-        for (size_t i = 0; i < len; ++i)
-        {
-            parse_some(ec);
-            if (ec)
-            {
-                return;
-            }
-        }
-        handler_.end_array(*this);
-        --nesting_depth_;
-    }
-
-    void parse_object(size_t len, std::error_code& ec)
-    {
-        ++nesting_depth_;
-        handler_.begin_object(len, semantic_tag_type::none, *this);
-        for (size_t i = 0; i < len; ++i)
-        {
-            parse_name(ec);
-            if (ec)
-            {
-                return;
-            }
-            parse_some(ec);
-            if (ec)
-            {
-                return;
-            }
-        }
-        handler_.end_object(*this);
-        --nesting_depth_;
     }
 };
 
