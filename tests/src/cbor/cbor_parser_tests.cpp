@@ -218,126 +218,117 @@ TEST_CASE("test_decimal_as_string")
 {
     SECTION("-2 27315")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x21, // -2
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(std::string("273.15") == s);
     }
     SECTION("-6 27315")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x25, // -6
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(std::string("0.27315e-1") == s);
     }
     SECTION("-5 27315")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x24, // -5
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(std::string("0.27315") == s);
     }
     SECTION("0 27315")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x00, // 0
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(std::string("27315.0") == s);
     }
     SECTION("2 27315")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x02, // 2
                                   0x19,0x6a,0xb3 // 27315
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(s == std::string("27315e2"));
     }
     SECTION("-2 18446744073709551616")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x21, // -2
                                   0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 // 18446744073709551616
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(std::string("184467440737095516.16") == s);
     }
     SECTION("-2 -65537")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x21, // -2
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(s == std::string("-655.37"));
     }
     SECTION("-5 -65537")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x24, // -5
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(s == std::string("-0.65537"));
     }
     SECTION("-6 -65537")
     {
-        std::vector<uint8_t> v = {0xc4, // Tag 4
-                                  0x82, // Array of length 2
+        std::vector<uint8_t> v = {0x82, // Array of length 2
                                   0x25, // -6
                                   0x3a,0,1,0x00,0x00 // -65537
                                   };
 
         const uint8_t* endp = nullptr;
-        std::string s = cbor::detail::get_decimal_as_string(v.data(),v.data()+v.size(),&endp);
+        std::string s = cbor::detail::get_array_as_decimal_string(v.data(),v.data()+v.size(),&endp);
         REQUIRE_FALSE(endp == v.data());
         REQUIRE(endp == (v.data()+v.size()));
         CHECK(s == std::string("-0.65537e-1"));
@@ -409,7 +400,11 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
 
     json j = cbor::decode_cbor<json>(bytes);
 
-    CHECK(expected == j);
+    REQUIRE(expected == j);
+    for (size_t i = 0; i < j.size(); ++i)
+    {
+        CHECK(j[i].semantic_tag() == expected[i].semantic_tag()); 
+    }
 }
 
 

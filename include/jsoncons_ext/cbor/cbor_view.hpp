@@ -748,7 +748,7 @@ public:
                     case 4:
                     {
                         const uint8_t* endp;
-                        std::string s = cbor::detail::get_decimal_as_string(first_,last_,&endp);
+                        std::string s = cbor::detail::get_array_as_decimal_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -1093,7 +1093,7 @@ public:
                     case 4:
                     {
                         const uint8_t* endp;
-                        std::string s = cbor::detail::get_decimal_as_string(first_,last_,&endp);
+                        std::string s = cbor::detail::get_array_as_decimal_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));

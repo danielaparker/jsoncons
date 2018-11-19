@@ -161,7 +161,7 @@ private:
     {
         if (tag == semantic_tag_type::custom1)
         {
-            writer_.push_back(0x05);
+            writer_.push_back(0xc5);
         }
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
         writer_.push_back(0x9f);

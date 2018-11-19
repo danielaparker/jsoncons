@@ -993,15 +993,18 @@ public:
 };
 
 inline
-std::string get_decimal_as_string(const uint8_t* first, const uint8_t* last, 
+std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* last, 
                                   const uint8_t** endpp)
 {
     std::string s;
 
-    JSONCONS_ASSERT(get_major_type(*first) == cbor_major_type::semantic_tag);
-    JSONCONS_ASSERT(get_additional_information_value(*first) == 4);
+    if (JSONCONS_UNLIKELY(last <= first))
+    {
+        *endpp = first; 
+        return s;
+    }
 
-    const uint8_t* p = first+1;
+    const uint8_t* p = first;
     const uint8_t* pos = p++;
 
     JSONCONS_ASSERT(get_major_type(*pos) == cbor_major_type::array);
@@ -1173,30 +1176,14 @@ public:
 
     void parse_some(std::error_code& ec)
     {
-        bool has_semantic_tag = false;
-        uint8_t semantic_tag = 0;
+        bool has_cbor_tag = false;
+        uint8_t cbor_tag = 0;
 
         if (get_major_type(*input_ptr_) == cbor_major_type::semantic_tag)
         {
-            has_semantic_tag = true;
-            semantic_tag = get_additional_information_value(*input_ptr_);
-            if (semantic_tag == 4)
-            {
-                const uint8_t* endp;
-                std::string s = cbor::detail::get_decimal_as_string(input_ptr_,end_input_,&endp);
-                if (endp == input_ptr_)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                handler_.string_value(s, semantic_tag_type::decimal);
-                input_ptr_ = endp;
-                return;
-            }
-            else
-            {
-                input_ptr_++;
-            }
+            has_cbor_tag = true;
+            cbor_tag = get_additional_information_value(*input_ptr_);
+            input_ptr_++;
         }
 
         const uint8_t* pos = input_ptr_++;
@@ -1214,7 +1201,7 @@ public:
                 }
                 input_ptr_ = endp;
 
-                if (has_semantic_tag && semantic_tag == 1)
+                if (has_cbor_tag && cbor_tag == 1)
                 {
                     handler_.uint64_value(val, semantic_tag_type::epoch_time, *this);
                 }
@@ -1234,7 +1221,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                if (has_semantic_tag && semantic_tag == 1)
+                if (has_cbor_tag && cbor_tag == 1)
                 {
                     handler_.int64_value(val, semantic_tag_type::epoch_time, *this);
                 }
@@ -1255,9 +1242,9 @@ public:
                 }
                 input_ptr_ = endp;
 
-                if (has_semantic_tag)
+                if (has_cbor_tag)
                 {
-                    switch (semantic_tag)
+                    switch (cbor_tag)
                     {
                         case 0x2:
                             {
@@ -1311,7 +1298,7 @@ public:
                     return;
                 }
                 input_ptr_ = endp;
-                if (has_semantic_tag && semantic_tag == 0)
+                if (has_cbor_tag && cbor_tag == 0)
                 {
                     handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time, *this);
                 }
@@ -1324,49 +1311,79 @@ public:
             case cbor_major_type::array:
             {
                 size_t info = get_additional_information_value(*pos);
-                semantic_tag_type tag = (has_semantic_tag && semantic_tag == 5)? semantic_tag_type::custom1 : semantic_tag_type::none;
-                switch (info)
+
+                semantic_tag_type tag = semantic_tag_type::none;
+                if (has_cbor_tag)
                 {
-                    case additional_information::indefinite_length:
+                    switch (cbor_tag)
                     {
-                        ++nesting_depth_;
-                        handler_.begin_array(tag, *this);
-                        while (*input_ptr_ != 0xff)
-                        {
-                            parse_some(ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            pos = input_ptr_;
-                        }
-                        handler_.end_array(*this);
-                        --nesting_depth_;
-                        break;
+                        case 0x04:
+                            tag = semantic_tag_type::decimal;
+                            break;
+                        case 0x05:
+                            tag = semantic_tag_type::custom1;
+                            break;
+                        default:
+                            break;
                     }
-                    default: // definite length
+                }
+                if (tag == semantic_tag_type::decimal)
+                {
+                    const uint8_t* endp;
+                    std::string s = cbor::detail::get_array_as_decimal_string(pos, end_input_, &endp);
+                    if (endp == pos)
                     {
-                        const uint8_t* endp;
-                        size_t len = detail::get_length(pos,end_input_,&endp);
-                        if (endp == pos)
+                        ec = cbor_parse_errc::unexpected_eof;
+                        return;
+                    }
+                    handler_.string_value(s, semantic_tag_type::decimal);
+                    input_ptr_ = endp;
+                }
+                else
+                {
+                    switch (info)
+                    {
+                        case additional_information::indefinite_length:
                         {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        ++nesting_depth_;
-                        handler_.begin_array(len, tag, *this);
-                        for (size_t i = 0; i < len; ++i)
-                        {
-                            parse_some(ec);
-                            if (ec)
+                            ++nesting_depth_;
+                            handler_.begin_array(tag, *this);
+                            while (*input_ptr_ != 0xff)
                             {
+                                parse_some(ec);
+                                if (ec)
+                                {
+                                    return;
+                                }
+                                pos = input_ptr_;
+                            }
+                            handler_.end_array(*this);
+                            --nesting_depth_;
+                            break;
+                        }
+                        default: // definite length
+                        {
+                            const uint8_t* endp;
+                            size_t len = detail::get_length(pos,end_input_,&endp);
+                            if (endp == pos)
+                            {
+                                ec = cbor_parse_errc::unexpected_eof;
                                 return;
                             }
+                            input_ptr_ = endp;
+                            ++nesting_depth_;
+                            handler_.begin_array(len, tag, *this);
+                            for (size_t i = 0; i < len; ++i)
+                            {
+                                parse_some(ec);
+                                if (ec)
+                                {
+                                    return;
+                                }
+                            }
+                            handler_.end_array(*this);
+                            --nesting_depth_;
+                            break;
                         }
-                        handler_.end_array(*this);
-                        --nesting_depth_;
-                        break;
                     }
                 }
                 break;
@@ -1439,21 +1456,21 @@ public:
                 size_t info = get_additional_information_value(*pos);
                 switch (info)
                 {
-                    case 20:
+                    case 0x14:
                         handler_.bool_value(false, semantic_tag_type::none, *this);
                         break;
-                    case 21:
+                    case 0x15:
                         handler_.bool_value(true, semantic_tag_type::none, *this);
                         break;
-                    case 22:
+                    case 0x16:
                         handler_.null_value(semantic_tag_type::none, *this);
                         break;
-                    case 23:
+                    case 0x17:
                         handler_.null_value(semantic_tag_type::undefined, *this);
                         break;
-                    case 25: // Half-Precision Float (two-byte IEEE 754)
-                    case 26: // Single-Precision Float (four-byte IEEE 754)
-                    case 27: // Double-Precision Float (eight-byte IEEE 754)
+                    case 0x19: // Half-Precision Float (two-byte IEEE 754)
+                    case 0x1a: // Single-Precision Float (four-byte IEEE 754)
+                    case 0x1b: // Double-Precision Float (eight-byte IEEE 754)
                         const uint8_t* endp;
                         double val = detail::get_double(pos,end_input_,&endp);
                         if (endp == pos)
@@ -1462,7 +1479,7 @@ public:
                             return;
                         }
                         input_ptr_ = endp;
-                        if (has_semantic_tag && semantic_tag == 1)
+                        if (has_cbor_tag && cbor_tag == 1)
                         {
                             handler_.double_value(val, floating_point_options(), semantic_tag_type::epoch_time, *this);
                         }
