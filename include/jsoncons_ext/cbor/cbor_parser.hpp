@@ -152,7 +152,7 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
             }
             break;
         }
-    case additional_information::indefinite_length: // terminated by "break"
+    case additional_information::indefinite_length: 
         {
             switch (get_major_type(*first))
             {
@@ -221,7 +221,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
 
     switch (get_additional_information_value(*first))
     {
-        case additional_information::indefinite_length: // terminated by "break"
+        case additional_information::indefinite_length: 
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -267,7 +267,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
 
     switch (get_additional_information_value(*first))
     {
-    case additional_information::indefinite_length: // indefinite length
+    case additional_information::indefinite_length:
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -316,7 +316,7 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
     uint8_t info = get_additional_information_value(*first);
     switch (info)
     {
-    case additional_information::indefinite_length: // indefinite length
+    case additional_information::indefinite_length: 
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -381,7 +381,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
     uint8_t info = get_additional_information_value(*first);
     switch (info)
     {
-        case additional_information::indefinite_length: // indefinite length
+        case additional_information::indefinite_length: 
         {
             const uint8_t* p = first+1;
             while (*p != 0xff)
@@ -1326,84 +1326,7 @@ public:
                 size_t info = get_additional_information_value(*pos);
                 switch (info)
                 {
-                    case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-                    {
-                        parse_array(info, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 0x18:
-                    {
-                        const uint8_t* endp;
-                        const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        parse_array(len, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 0x19:
-                    {
-                        const uint8_t* endp;
-                        const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        parse_array(len, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 0x20:
-                    {
-                        const uint8_t* endp;
-                        const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        parse_array(len, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 0x21:
-                    {
-                        const uint8_t* endp;
-                        size_t len = (size_t)binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        parse_array(len, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 31:
+                    case additional_information::indefinite_length:
                     {
                         ++nesting_depth_;
                         handler_.begin_array(semantic_tag_type::none, *this);
@@ -1420,6 +1343,23 @@ public:
                         --nesting_depth_;
                         break;
                     }
+                    default: // definite length
+                    {
+                        const uint8_t* endp;
+                        size_t len = detail::get_length(pos,end_input_,&endp);
+                        if (endp == pos)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_array(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
+                    }
                 }
                 break;
             }
@@ -1428,84 +1368,7 @@ public:
                 size_t info = get_additional_information_value(*pos);
                 switch (info)
                 {
-                    case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-                    {
-                        parse_object(info, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 0x18:
-                    {
-                        const uint8_t* endp;
-                        const auto len = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        parse_object(len, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 0x19:
-                    {
-                        const uint8_t* endp;
-                        const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        parse_object(len, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 0x20:
-                    {
-                        const uint8_t* endp;
-                        const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        parse_object(len, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 0x21:
-                    {
-                        const uint8_t* endp;
-                        size_t len = (size_t)binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
-                        if (endp == input_ptr_)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        parse_object(len, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        break;
-                    }
-                    case 31:
+                    case additional_information::indefinite_length: 
                     {
                         ++nesting_depth_;
                         handler_.begin_object(semantic_tag_type::none, *this);
@@ -1525,6 +1388,23 @@ public:
                         }
                         handler_.end_object(*this);
                         --nesting_depth_;
+                        break;
+                    }
+                    default: // definite_length
+                    {
+                        const uint8_t* endp;
+                        size_t len = detail::get_length(pos,end_input_,&endp);
+                        if (endp == pos)
+                        {
+                            ec = cbor_parse_errc::unexpected_eof;
+                            return;
+                        }
+                        input_ptr_ = endp;
+                        parse_object(len, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
                         break;
                     }
                 }
