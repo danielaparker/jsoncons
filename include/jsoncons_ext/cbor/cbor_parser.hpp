@@ -22,6 +22,7 @@
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 #include <jsoncons_ext/cbor/cbor_error_category.hpp>
 #include <jsoncons_ext/cbor/cbor_utilities.hpp>
+#include <jsoncons_ext/cbor/cbor_view.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -406,8 +407,9 @@ private:
         }
         else
         {
-            ec = cbor_parse_errc::source_error;
-            return;
+            cbor_view v(pos,end_input_ - pos);
+            std::string s = v.as_string();
+            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
         }
     }
 };

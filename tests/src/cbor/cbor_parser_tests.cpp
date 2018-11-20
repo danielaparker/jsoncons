@@ -159,14 +159,47 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x9f,0xff},json::array());
     check_parsing({0x9f,0x9f,0xff,0xff},json::parse("[[]]"));
 
-    // maps
-    check_parsing({0xa0},json::object());
-    check_parsing({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
-    check_parsing({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
+    SECTION("maps with definite length")
+    {
+        check_parsing({0xa0},json::object());
+        check_parsing({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
+        check_parsing({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
+    }
 
-    // indefinite length maps
-    check_parsing({0xbf,0xff},json::object());
-    check_parsing({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
+    SECTION("maps with indefinite length")
+    {
+        check_parsing({0xbf,0xff},json::object());
+        check_parsing({0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff},json::parse("{\"Name\":{}}"));
+
+        check_parsing({0xbf,                       // Start indefinite-length map
+                           0x63,                   // First key, UTF-8 string length 3
+                               0x46,0x75,0x6e,     // "Fun"
+                           0xf5,                   // First value, true
+                               0x63,               // Second key, UTF-8 string length 3
+                                   0x41,0x6d,0x74, // "Amt"
+                           0x21,                   // -2
+                               0xff},              // "break"
+                      json::parse("{\"Fun\": true, \"Amt\": -2}"));
+
+        check_parsing({0xbf,                       // Start indefinite-length map
+                           0x21,                   // First key, -2
+                           0xf5,                   // First value, true
+                               0xf5,               // Second key, UTF-8 string length 3
+                           0x21,                   // -2
+                               0xff},              // "break"
+                      json::parse("{\"-2\": true, \"true\": -2}"));
+    }
+
+    SECTION("maps with non-string keys")
+    {
+        check_parsing({0xbf,                       // Start indefinite-length map
+                           0x21,                   // First key, -2
+                           0xf5,                   // First value, true
+                               0xf5,               // Second key, UTF-8 string length 3
+                           0x21,                   // -2
+                               0xff},              // "break"
+                      json::parse("{\"-2\": true, \"true\": -2}"));
+    }
 
     // bignum
     check_parsing({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
