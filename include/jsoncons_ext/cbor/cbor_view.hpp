@@ -1098,7 +1098,7 @@ public:
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
                         }
-                        handler.string_value(s, semantic_tag_type::decimal);
+                        handler.string_value(s, semantic_tag_type::decimal_fraction);
                         break;
                     }
                     case 21:

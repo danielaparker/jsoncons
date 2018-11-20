@@ -209,7 +209,7 @@ TEST_CASE("test_serialize_decimal")
     {
         std::vector<uint8_t> v;
         cbor_bytes_serializer serializer(v);
-        serializer.string_value("18446744073709551616.0", semantic_tag_type::decimal);
+        serializer.string_value("18446744073709551616.0", semantic_tag_type::decimal_fraction);
         serializer.flush();
         try
         {
@@ -225,7 +225,7 @@ TEST_CASE("test_serialize_decimal")
     {
         std::vector<uint8_t> v;
         cbor_bytes_serializer serializer(v);
-        serializer.string_value("18446744073709551616e-5", semantic_tag_type::decimal);
+        serializer.string_value("18446744073709551616e-5", semantic_tag_type::decimal_fraction);
         serializer.flush();
         try
         {
@@ -241,7 +241,7 @@ TEST_CASE("test_serialize_decimal")
     {
         std::vector<uint8_t> v;
         cbor_bytes_serializer serializer(v);
-        serializer.string_value("-18446744073709551616e-5", semantic_tag_type::decimal);
+        serializer.string_value("-18446744073709551616e-5", semantic_tag_type::decimal_fraction);
         serializer.flush();
         try
         {
@@ -257,7 +257,7 @@ TEST_CASE("test_serialize_decimal")
     {
         std::vector<uint8_t> v;
         cbor_bytes_serializer serializer(v);
-        serializer.string_value("-18446744073709551616e5", semantic_tag_type::decimal);
+        serializer.string_value("-18446744073709551616e5", semantic_tag_type::decimal_fraction);
         serializer.flush();
         try
         {

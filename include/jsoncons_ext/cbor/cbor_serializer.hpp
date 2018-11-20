@@ -166,7 +166,7 @@ private:
 
     bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context&) override
     {
-        if (length == 2 && tag == semantic_tag_type::custom1)
+        if (length == 2 && tag == semantic_tag_type::bigfloat)
         {
             writer_.push_back(0xc5);
         }
@@ -480,7 +480,7 @@ private:
                 write_bignum_value(sv);
                 break;
             }
-            case semantic_tag_type::decimal:
+            case semantic_tag_type::decimal_fraction:
             {
                 write_decimal_value(sv, context);
                 break;

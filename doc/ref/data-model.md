@@ -23,7 +23,7 @@ It also allows optional semantic tagging of the major types:
  string     | bignum       | Maps to CBOR bignum 
  &#160;     | decimal      | Maps to CBOR decimal fraction 
  &#160;     | date_time    | Maps to CBOR date/time
- array      | custom1      | Maps to CBOR bigfloat
+ array      | bigfloat      | Maps to CBOR bigfloat
 
 ### Examples
 
@@ -42,7 +42,7 @@ int main()
     j.emplace_back("foo");
     j.emplace_back(byte_string{ 'b','a','r' });
     j.emplace_back("-18446744073709551617", semantic_tag_type::bignum);
-    j.emplace_back("273.15", semantic_tag_type::decimal);
+    j.emplace_back("273.15", semantic_tag_type::decimal_fraction);
     j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag_type::date_time);
     j.emplace_back(1431027667, semantic_tag_type::epoch_time);
     j.emplace_back(-1431027667, semantic_tag_type::epoch_time);

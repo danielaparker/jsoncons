@@ -16,7 +16,7 @@ using namespace jsoncons::msgpack;
 void check_decode(const std::vector<uint8_t>& v, const json& expected)
 {
     json result = decode_msgpack<json>(v);
-    REQUIRE(expected == result);
+    REQUIRE(result == expected);
 }
 
 void print_msgpack(const json j)

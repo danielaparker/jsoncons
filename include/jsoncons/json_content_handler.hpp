@@ -25,12 +25,12 @@ struct null_type
 enum class semantic_tag_type : uint8_t 
 {
     none = 0,
-    bignum,
-    decimal,
+    undefined,
     date_time,
     epoch_time,
-    undefined,
-    custom1
+    bignum,
+    decimal_fraction,
+    bigfloat
 };
 
 template <class CharT>
@@ -156,7 +156,7 @@ public:
 
     bool decimal_value(const string_view_type& s) 
     {
-        return do_string_value(s, semantic_tag_type::decimal, null_serializing_context());
+        return do_string_value(s, semantic_tag_type::decimal_fraction, null_serializing_context());
     }
 
     bool date_time_value(const string_view_type& s) 

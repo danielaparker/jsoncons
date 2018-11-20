@@ -157,22 +157,22 @@ TEST_CASE("test_lt")
     std::string s1 = "(3 < 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
     auto result1 = expr1.eval(context);
-    CHECK(json(false) == result1);
+    CHECK(result1 == json(false));
 
     std::string s2 = "(3 < @.length)";
     auto expr2 = parser.parse(context, s2.c_str(), s2.c_str()+ s2.length(), &pend);
     auto result2 = expr2.eval(context);
-    CHECK(json(false) == result2);
+    CHECK(result2 == json(false));
 
     std::string s3 = "(@.length < 3)";
     auto expr3 = parser.parse(context, s3.c_str(), s3.c_str()+ s3.length(), &pend);
     auto result3 = expr3.eval(context);
-    CHECK(json(true) == result3);
+    CHECK(result3 == json(true));
 
     std::string s4 = "(@.length < @.length)";
     auto expr4 = parser.parse(context, s4.c_str(), s4.c_str()+ s4.length(), &pend);
     auto result4 = expr4.eval(context);
-    CHECK(json(false) == result4);
+    CHECK(result4 == json(false));
 
     std::string s5 = "(@.length < @.0)";
     auto expr5 = parser.parse(context, s5.c_str(), s5.c_str()+ s5.length(), &pend);
@@ -196,12 +196,12 @@ TEST_CASE("test_lte")
     std::string s1 = "(3 <= 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
     auto result1 = expr1.eval(context);
-    CHECK(json(false) == result1);
+    CHECK(result1 == json(false));
 
     std::string s2 = "(3 <= @.length)";
     auto expr2 = parser.parse(context, s2.c_str(), s2.c_str()+ s2.length(), &pend);
     auto result2 = expr2.eval(context);
-    CHECK(json(false) == result2);
+    CHECK(result2 == json(false));
 }
 
 TEST_CASE("test_gt")
@@ -215,12 +215,12 @@ TEST_CASE("test_gt")
     std::string s1 = "(3 > 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
     auto result1 = expr1.eval(context);
-    CHECK(json(true) == result1);
+    CHECK(result1 == json(true));
 
     std::string s2 = "(3 > @.length)";
     auto expr2 = parser.parse(context, s2.c_str(), s2.c_str()+ s2.length(), &pend);
     auto result2 = expr2.eval(context);
-    CHECK(json(true) == result2);
+    CHECK(result2 == json(true));
 }
 
 TEST_CASE("test_gte")
@@ -234,12 +234,12 @@ TEST_CASE("test_gte")
     std::string s1 = "(3 >= 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
     auto result1 = expr1.eval(context);
-    CHECK(json(true) == result1);
+    CHECK(result1 == json(true));
 
     std::string s2 = "(3 >= @.length)";
     auto expr2 = parser.parse(context, s2.c_str(), s2.c_str()+ s2.length(), &pend);
     auto result2 = expr2.eval(context);
-    CHECK(json(true) == result2);
+    CHECK(result2 == json(true));
 }
 
 TEST_CASE("test_eq")
@@ -253,22 +253,22 @@ TEST_CASE("test_eq")
     std::string s1 = "(3 == 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
     auto result1 = expr1.eval(context);
-    CHECK(json(false) == result1);
+    CHECK(result1 == json(false));
 
     std::string s2 = "(3 == @.length)";
     auto expr2 = parser.parse(context, s2.c_str(), s2.c_str()+ s2.length(), &pend);
     auto result2 = expr2.eval(context);
-    CHECK(json(false) == result2);
+    CHECK(result2 == json(false));
 
     std::string s3 = "(1 == 1)";
     auto expr3 = parser.parse(context, s3.c_str(), s3.c_str()+ s3.length(), &pend);
     auto result3 = expr3.eval(context);
-    CHECK(json(true) == result3);
+    CHECK(result3 == json(true));
 
     std::string s4 = "(1 == @.length)";
     auto expr4 = parser.parse(context, s4.c_str(), s4.c_str()+ s4.length(), &pend);
     auto result4 = expr4.eval(context);
-    CHECK(json(true) == result4);
+    CHECK(result4 == json(true));
 }
 
 TEST_CASE("test_precedence")
@@ -283,22 +283,22 @@ TEST_CASE("test_precedence")
     std::string s1 = "(@.0 == 1 && @.1 == 2)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
     auto result1 = expr1.eval(context);
-    CHECK(json(true) == result1);
+    CHECK(result1 == json(true));
 
     std::string s2 = "((@.0 == 1) && (@.1 == 2))";
     auto expr2 = parser.parse(context, s2.c_str(), s2.c_str()+ s2.length(), &pend);
     auto result2 = expr2.eval(context);
-    CHECK(json(true) == result2);
+    CHECK(result2 == json(true));
 
     std::string s3 = "(@.0 == 2 && @.1 == 2)";
     auto expr3 = parser.parse(context, s3.c_str(), s3.c_str()+ s3.length(), &pend);
     auto result3 = expr3.eval(context);
-    CHECK(json(false) == result3);
+    CHECK(result3 == json(false));
 
     std::string s4 = "((@.0 == 1) && (@.1 == 1))";
     auto expr4 = parser.parse(context, s4.c_str(), s4.c_str()+ s4.length(), &pend);
     auto result4 = expr4.eval(context);
-    CHECK(json(false) == result4);
+    CHECK(result4 == json(false));
 }
 
 TEST_CASE("test_ne")
@@ -312,22 +312,22 @@ TEST_CASE("test_ne")
     std::string s1 = "(3 != 1)";
     auto expr1 = parser.parse(context, s1.c_str(), s1.c_str()+ s1.length(), &pend);
     auto result1 = expr1.eval(context);
-    CHECK(json(true) == result1);
+    CHECK(result1 == json(true));
 
     std::string s2 = "(3 != @.length)";
     auto expr2 = parser.parse(context, s2.c_str(), s2.c_str()+ s2.length(), &pend);
     auto result2 = expr2.eval(context);
-    CHECK(json(true) == result2);
+    CHECK(result2 == json(true));
 
     std::string s3 = "(1 != 1)";
     auto expr3 = parser.parse(context, s3.c_str(), s3.c_str()+ s3.length(), &pend);
     auto result3 = expr3.eval(context);
-    CHECK(json(false) == result3);
+    CHECK(result3 == json(false));
 
     std::string s4 = "(1 != @.length)";
     auto expr4 = parser.parse(context, s4.c_str(), s4.c_str()+ s4.length(), &pend);
     auto result4 = expr4.eval(context);
-    CHECK(json(false) == result4);
+    CHECK(result4 == json(false));
 }
 
 TEST_CASE("test_jsonpath_filter")
@@ -366,12 +366,12 @@ TEST_CASE("test_jsonpath_filter_exclaim")
     std::string expr1 = "(!(1 + 1))";
     auto res1 = parser.parse(parent, expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
     auto result1 = res1.eval(parent);
-    CHECK(json(false) == result1);
+    CHECK(result1 == json(false));
 
     std::string expr2 = "(!0)";
     auto res2 = parser.parse(parent, expr2.c_str(), expr2.c_str()+ expr2.length(), &pend);
     auto result2= res2.eval(parent);
-    CHECK(json(true) == result2);
+    CHECK(result2 == json(true));
 }
 
 
@@ -470,17 +470,17 @@ TEST_CASE("test_jsonpath_filter_regex")
     std::string expr1 = "('today I go' =~ /today.*?/)";
     auto res1 = parser.parse(parent, expr1.c_str(), expr1.c_str()+ expr1.length(), &pend);
     auto result1 = res1.eval(parent);
-    CHECK(json(true) == result1);
+    CHECK(result1 == json(true));
 
     std::string expr2 = "('today I go' =~ /Today.*?/)";
     auto res2 = parser.parse(parent, expr2.c_str(), expr2.c_str()+ expr2.length(), &pend);
     auto result2 = res2.eval(parent);
-    CHECK(json(false) == result2);
+    CHECK(result2 == json(false));
 
     std::string expr3 = "('today I go' =~ /Today.*?/i)";
     auto res3 = parser.parse(parent, expr3.c_str(), expr3.c_str()+ expr3.length(), &pend);
     auto result3 = res3.eval(parent);
-    CHECK(json(true) == result3);
+    CHECK(result3 == json(true));
 }
 #endif
 

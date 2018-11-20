@@ -69,7 +69,7 @@ const json expected = json::parse(R"(
     std::string path = "$.store.book[0].category";
 
     json result = json_query(store,"$.store.book[0].category",result_type::path);
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_string_index")
@@ -85,7 +85,7 @@ const json expected = json::parse(R"(
     std::string path = "$.store.book.0.category[0,2]";
 
     json result = json_query(store,path,result_type::path);
-    CHECK(expected == result);
+    CHECK(result == expected);
 
     //json result2 = json_query(store,path,result_type::value);
     //std::cout << pretty_print(result2) << std::endl;
@@ -102,7 +102,7 @@ const json expected = json::parse(R"(
 
     std::string path = "$.store.book.length";
     json result = json_query(store,path,result_type::path);
-    CHECK(expected == result);
+    CHECK(result == expected);
 
     std::string path2 = "$.store.book['length']";
     json result2 = json_query(store, path, result_type::path);
@@ -121,7 +121,7 @@ const json expected = json::parse(R"(
 
     std::string path = "$.store.book[?(@.price < 10)].title";
     json result = json_query(store,path,result_type::path);
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_length_expression")
@@ -135,7 +135,7 @@ const json expected = json::parse(R"(
 
     std::string path = "$.store.book[(@.length-1)].title";
     json result = json_query(store,path,result_type::path);
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 

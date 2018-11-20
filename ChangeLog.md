@@ -1,10 +1,18 @@
 master
 ------
 
+Bug fix
+
+- Fixed issue with indefinite length byte strings, text strings, arrays, 
+  and maps nested inside other CBOR items (wasn't advancing the
+  input pointer past the "break" indicator.) 
+
 Changes
 
 - __FILE__ and __LINE__ macros removed from JSONCONS_ASSERT 
   if not defined _DEBUG (contributed by zhskyy.)
+
+- semantic_tag_type name `decimal` changed to `decimal_fraction`
 
 New CBOR feature
 
@@ -13,6 +21,9 @@ New CBOR feature
   serialization (unless overridden in `json_serializing_options`.)
 
 - CBOR semantic tagging of bigfloat preserved with `semantic_tag_type::custom1`
+
+- CBOR non text string keys converted to strings when decoding
+  to json values
 
 Changes to `json_serializing_options`
 

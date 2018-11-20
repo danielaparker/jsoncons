@@ -200,16 +200,16 @@ public:
                     switch (cbor_tag)
                     {
                         case 0x04:
-                            tag = semantic_tag_type::decimal;
+                            tag = semantic_tag_type::decimal_fraction;
                             break;
                         case 0x05:
-                            tag = semantic_tag_type::custom1;
+                            tag = semantic_tag_type::bigfloat;
                             break;
                         default:
                             break;
                     }
                 }
-                if (tag == semantic_tag_type::decimal)
+                if (tag == semantic_tag_type::decimal_fraction)
                 {
                     const uint8_t* endp;
                     std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(pos, end_input_, &endp);
@@ -218,7 +218,7 @@ public:
                         ec = cbor_parse_errc::unexpected_eof;
                         return;
                     }
-                    handler_.string_value(s, semantic_tag_type::decimal);
+                    handler_.string_value(s, semantic_tag_type::decimal_fraction);
                     input_ptr_ = endp;
                 }
                 else
@@ -236,8 +236,8 @@ public:
                                 {
                                     return;
                                 }
-                                pos = input_ptr_;
                             }
+                            ++input_ptr_;
                             handler_.end_array(*this);
                             --nesting_depth_;
                             break;
@@ -291,8 +291,8 @@ public:
                             {
                                 return;
                             }
-                            pos = input_ptr_;
                         }
+                        ++input_ptr_;
                         handler_.end_object(*this);
                         --nesting_depth_;
                         break;

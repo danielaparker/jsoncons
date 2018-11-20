@@ -20,13 +20,13 @@ void check_get_with_const_ref(const json& example, const std::string& pointer, c
     std::error_code ec;
     const json& result = jsonpointer::get(example,pointer,ec);
     CHECK_FALSE(ec);
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 void check_contains(const json& example, const std::string& pointer, bool expected)
 {
     bool result = jsonpointer::contains(example,pointer);
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 void check_add(json& example, const std::string& path, const json& value, const json& expected)

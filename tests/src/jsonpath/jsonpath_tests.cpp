@@ -181,7 +181,7 @@ TEST_CASE("test_path")
     json expected = json::array();
     expected.push_back(fixture.book());
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 
     //std::cout << pretty_print(result) << std::endl;
 }
@@ -197,7 +197,7 @@ TEST_CASE("test_jsonpath_store_book2")
     json expected = json::array();
     expected.push_back(fixture.book());
 
-    CHECK(expected == result);
+    CHECK(result == expected);
     //    std::c/out << pretty_print(result) << std::endl;
 }
 
@@ -212,7 +212,7 @@ TEST_CASE("test_jsonpath_bracket_with_double_quotes")
     json expected = json::array();
     expected.push_back(fixture.book());
 
-    CHECK(expected == result);
+    CHECK(result == expected);
     //    std::c/out << pretty_print(result) << std::endl;
 }
 
@@ -227,7 +227,7 @@ TEST_CASE("test_jsonpath_store_book_bicycle")
     json expected = json::array();
     expected.push_back(fixture.book());
     expected.push_back(fixture.bicycle());
-    CHECK(expected == result);
+    CHECK(result == expected);
 
     //std::cout << pretty_print(result) << std::endl;
 }
@@ -243,7 +243,7 @@ TEST_CASE("test_jsonpath_store_book_bicycle_unquoted")
     json expected = json::array();
     expected.push_back(fixture.book());
     expected.push_back(fixture.bicycle());
-    CHECK(expected == result);
+    CHECK(result == expected);
 
     //std::cout << pretty_print(result) << std::endl;
 }
@@ -278,7 +278,7 @@ TEST_CASE("test_jsonpath_store_book_star")
     json expected = fixture.book();
 
     //std::cout << pretty_print(result) << std::endl;
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_store_dotdot_price")
@@ -298,7 +298,7 @@ TEST_CASE("test_store_dotdot_price")
 
     //std::cout << pretty_print(result) << std::endl;
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_recursive_descent")
@@ -368,7 +368,7 @@ TEST_CASE("test_jsonpath_filter1")
             expected.push_back(books[i]);
         }
     }
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_filter2")
@@ -390,7 +390,7 @@ TEST_CASE("test_jsonpath_filter2")
             expected.push_back(books[i]);
         }
     }
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
  
 TEST_CASE("test_jsonpath_filter_category_eq_reference")
@@ -414,7 +414,7 @@ TEST_CASE("test_jsonpath_filter_category_eq_reference")
             expected.push_back(books[i]);
         }
     }
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_filter3")
@@ -439,7 +439,7 @@ TEST_CASE("test_jsonpath_filter3")
     //std::cout << pretty_print(result) << std::endl;
     //std::cout << pretty_print(expected) << std::endl;
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_book_isbn")
@@ -457,7 +457,7 @@ TEST_CASE("test_jsonpath_book_isbn")
             json result = json_query(books[i],"@.isbn");
             json expected = json::array();
             expected.push_back(books[i]["isbn"]);
-            CHECK(expected == result);
+            CHECK(result == expected);
             //std::cout << pretty_print(result) << std::endl;
         }
     }
@@ -478,7 +478,7 @@ TEST_CASE("test_jsonpath_book_empty_isbn")
             json result = json_query(books[i],"@.isbn");
             json expected = json::array();
             expected.push_back(books[i]["isbn"]);
-            CHECK(expected == result);
+            CHECK(result == expected);
             //std::cout << pretty_print(result) << std::endl;
         }
     }
@@ -505,7 +505,7 @@ TEST_CASE("test_jsonpath_filter4")
     //std::cout << pretty_print(result) << std::endl;
     //std::cout << pretty_print(expected) << std::endl;
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 TEST_CASE("test_jsonpath_array_length")
 {
@@ -540,7 +540,7 @@ TEST_CASE("test_jsonpath_book_filter_false")
     
     json expected = json::array();
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_book_filter_false_and_false")
@@ -553,7 +553,7 @@ TEST_CASE("test_jsonpath_book_filter_false_and_false")
     
     json expected = json::array();
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_book_filter_false_or_false")
@@ -565,7 +565,7 @@ TEST_CASE("test_jsonpath_book_filter_false_or_false")
     
     json expected = json::array();
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_book_filter_false_or_true")
@@ -603,7 +603,7 @@ TEST_CASE("test_jsonpath_store_book_authors")
 
     //std::cout << pretty_print(result) << std::endl;
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_store_book_tests")
@@ -712,7 +712,7 @@ TEST_CASE("test_jsonpath_everything")
     expected.push_back(fixture.bicycle());
     expected.push_back(fixture.book());
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_everything_in_store")
@@ -726,7 +726,7 @@ TEST_CASE("test_jsonpath_everything_in_store")
     json expected = json::array();
     expected.push_back(root["store"]);
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_last_of_two_arrays")
@@ -764,7 +764,7 @@ TEST_CASE("test_jsonpath_last_of_two_arrays")
 
     json result = json_query(val, "$..book[(@.length - 1)]");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_next_to_last_of_two_arrays")
@@ -802,7 +802,7 @@ TEST_CASE("test_jsonpath_next_to_last_of_two_arrays")
 
     json result = json_query(val, "$..book[(@.length - 2)]");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 
     json expected2 = json::parse(R"(
 [
@@ -881,7 +881,7 @@ TEST_CASE("test_jsonpath_aggregation2")
     json expected = json::parse(R"(
 [{"author": "Herman Melville"},{"author": "Evelyn Waugh"}]
 )");
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_jsonpath_aggregation3")
@@ -1142,7 +1142,7 @@ TEST_CASE("test_max")
     )");
 
     json result = json_query(store,path);
-    CHECK(expected == result);
+    CHECK(result == expected);
 
     //std::cout << result << std::endl;
 }
@@ -1156,7 +1156,7 @@ TEST_CASE("test_min")
     )");
 
     json result = json_query(store,path);
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_ws1")
@@ -1170,7 +1170,7 @@ TEST_CASE("test_ws1")
 ]
 )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_select_two")
@@ -1212,7 +1212,7 @@ TEST_CASE("test_select_two")
 ]
 )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_select_length_4")
@@ -1237,7 +1237,7 @@ TEST_CASE("test_select_length_4")
 [{"result":[1,2,3,4]}]
     )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_select_length_4_2")
@@ -1249,7 +1249,7 @@ TEST_CASE("test_select_length_4_2")
 [{"result":[1,2,3,4]},{"result":[1,2,3,4]}]
     )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_select_length_4_2_plus")
@@ -1262,7 +1262,7 @@ TEST_CASE("test_select_length_4_2_plus")
 [{"result":[1,2,3,4]}]
     )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_select_length_4_2_plus_plus")
@@ -1275,7 +1275,7 @@ TEST_CASE("test_select_length_4_2_plus_plus")
 [{"result":[1,2,3,4]},{"result":[1,2,3,4]}]
     )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_nested")
@@ -1303,7 +1303,7 @@ TEST_CASE("test_nested")
 ]
 )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_array_nested")
@@ -1335,7 +1335,7 @@ TEST_CASE("test_array_nested")
 ]
 )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 TEST_CASE("test_array_array_nested")
@@ -1367,7 +1367,7 @@ TEST_CASE("test_array_array_nested")
 ]
 )");
 
-    CHECK(expected == result);
+    CHECK(result == expected);
 }
 
 

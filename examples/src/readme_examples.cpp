@@ -78,7 +78,7 @@ namespace readme
         json another_array = json::array(); 
         another_array.emplace_back(byte_string({'P','u','s','s'}),
                                    byte_string_chars_format::base64); // expected conversion to base64
-        another_array.emplace_back("273.15", semantic_tag_type::decimal);
+        another_array.emplace_back("273.15", semantic_tag_type::decimal_fraction);
         another_array.emplace(another_array.array_range().begin(),"bar"); // place at front
 
         j.push_back(std::move(another_array));

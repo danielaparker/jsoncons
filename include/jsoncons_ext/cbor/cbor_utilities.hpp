@@ -235,6 +235,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
                 p = *endp;
                 v.insert(v.end(),ss.begin(),ss.end());
             }
+            *endp = p+1;
             break;
         }
     default: 
@@ -284,6 +285,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
                     s.append(std::move(ss));
                 }
             }
+            *endp = p+1;
             break;
         }
     default: // definite length

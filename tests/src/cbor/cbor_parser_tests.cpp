@@ -27,7 +27,7 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
 
         json result = decoder.get_result();
 
-        if (!(expected == result))
+        if (!(result == expected))
         {
             std::cout << "v: ";
             for (auto b : v)
@@ -35,12 +35,12 @@ void check_parsing(const std::vector<uint8_t>& v, const json& expected)
                 std::cout << "0x" << std::hex << (int)b;
             }
             std::cout << "\n";
-            std::cout << "expected: " << expected << "\n";
             std::cout << "result: " << result << "\n";
+            std::cout << "expected: " << expected << "\n";
         }
 
-        REQUIRE(expected == result);
-        CHECK(expected.semantic_tag() == result.semantic_tag());
+        REQUIRE(result == expected);
+        CHECK(result.semantic_tag() == expected.semantic_tag());
     }
     catch (const std::exception& e)
     {
@@ -141,23 +141,54 @@ TEST_CASE("test_cbor_parsing")
     check_parsing({0x7f,0x61,'H',0x61,'e',0x61,'l',0x61,'l',0x61,'o',0xff}, json("Hello"));
     check_parsing({0x7f,0x61,'H',0x61,'e',0x61,'l',0x60,0x61,'l',0x61,'o',0xff}, json("Hello"));
 
-    // arrays
-    check_parsing({0x80},json::array());
-    check_parsing({0x81,'\0'},json::parse("[0]"));
-    check_parsing({0x82,'\0','\0'},json::array({0,0}));
-    check_parsing({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
-    check_parsing({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
+    SECTION ("arrays with definite length")
+    {
+        check_parsing({0x80},json::array());
+        check_parsing({0x81,'\0'},json::parse("[0]"));
+        check_parsing({0x82,'\0','\0'},json::array({0,0}));
+        check_parsing({0x82,0x81,'\0','\0'}, json::parse("[[0],0]"));
+        check_parsing({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
+        check_parsing({0x83,0x01,0x82,0x02,0x03,0x82,0x04,0x05},json::parse("[1, [2, 3], [4, 5]]"));
+
+        check_parsing({0x82,
+                       0x7f,0xff,
+                       0x7f,0xff},
+                      json::parse("[\"\",\"\"]"));
+
+        check_parsing({0x82,
+                       0x5f,0xff,
+                       0x5f,0xff},
+                      json::array{json(byte_string()),json(byte_string())});
+    }
+
+    SECTION("arrays with indefinite length")
+    {
+        check_parsing({0x9f,0xff},json::array());
+        check_parsing({0x9f,0x9f,0xff,0xff},json::parse("[[]]"));
+
+        check_parsing({0x9f,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff,0xff},json::parse("[1, [2, 3], [4, 5]]"));
+        check_parsing({0x9f,0x01,0x82,0x02,0x03,0x82,0x04,0x05,0xff},json::parse("[1, [2, 3], [4, 5]]"));
+
+        check_parsing({0x83,0x01,0x82,0x02,0x03,0x9f,0x04,0x05,0xff},json::parse("[1, [2, 3], [4, 5]]"));
+        check_parsing({0x83,             // Array of length 3
+                           0x01,         // 1
+                               0x9f,     // Start indefinite-length array
+                                  0x02,  // 2
+                                  0x03,  // 3
+                                  0xff,  // "break"
+                                0x82,    // Array of length 2
+                                  0x04,  // 4
+                                  0x05}, // 5
+                      json::parse("[1, [2, 3], [4, 5]]"));
+
+    }
     // big float
     check_parsing({0xc5, // Tag 5 
                      0x82, // Array of length 2
                        0x21, // -2 
                          0x19, 0x6a, 0xb3 // 27315 
-                  },json(json::array({-2,27315}),semantic_tag_type::custom1));
-
-    // indefinite length arrays
-    check_parsing({0x9f,0xff},json::array());
-    check_parsing({0x9f,0x9f,0xff,0xff},json::parse("[[]]"));
+                  },json(json::array({-2,27315}),semantic_tag_type::bigfloat));
 
     SECTION("maps with definite length")
     {
@@ -221,38 +252,38 @@ TEST_CASE("cbor decimal fraction")
                    0x21, // -2
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("273.15", semantic_tag_type::decimal));
+                  json("273.15", semantic_tag_type::decimal_fraction));
     check_parsing({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x22, // -3
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("27.315", semantic_tag_type::decimal));
+                  json("27.315", semantic_tag_type::decimal_fraction));
     check_parsing({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x23, // -4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("2.7315", semantic_tag_type::decimal));
+                  json("2.7315", semantic_tag_type::decimal_fraction));
     check_parsing({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x24, // -5
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.27315", semantic_tag_type::decimal));
+                  json("0.27315", semantic_tag_type::decimal_fraction));
     check_parsing({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x25, // -6
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.27315e-1", semantic_tag_type::decimal));
+                  json("0.27315e-1", semantic_tag_type::decimal_fraction));
 
     check_parsing({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x04, // 4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("27315e4", semantic_tag_type::decimal));
+                  json("27315e4", semantic_tag_type::decimal_fraction));
 }
 
 TEST_CASE("test_decimal_as_string")
@@ -433,7 +464,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     expected.emplace_back("foo");
     expected.emplace_back(byte_string{ 'b','a','r' });
     expected.emplace_back("-18446744073709551617", semantic_tag_type::bignum);
-    expected.emplace_back("273.15", semantic_tag_type::decimal);
+    expected.emplace_back("273.15", semantic_tag_type::decimal_fraction);
     expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag_type::date_time);
     expected.emplace_back(1431027667, semantic_tag_type::epoch_time);
     expected.emplace_back(-1431027667, semantic_tag_type::epoch_time);
@@ -447,5 +478,4 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
         CHECK(j[i].semantic_tag() == expected[i].semantic_tag()); 
     }
 }
-
 
