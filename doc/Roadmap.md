@@ -1,6 +1,6 @@
 # Roadmap
 
-### For release 0.113
+### For release 0.113.0
 
 - Enhanced JSON serialization options.
   (Currently implemented on master.)

@@ -560,9 +560,9 @@ int main()
 
         staj_iterator_examples();
 
-        readme_examples();
-
         cbor_examples();
+
+        readme_examples();
     }
     catch (const std::exception& e)
     {

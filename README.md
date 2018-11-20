@@ -349,7 +349,6 @@ Output:
 (2)
 ["foo","UHVzcw","-18446744073709551617"]
 
-CHECK semantic_tag
 (3) -18446744073709551617
 
 (4)
@@ -376,7 +375,7 @@ CHECK semantic_tag
 (9)
 [
     ["foo", "UHVzcw", "-18446744073709551617"],
-    ["bar", "UHVzcw==", "50757373", "273.15"]
+    ["bar", "UHVzcw==", "273.15"]
 ]
 
 (10)
@@ -388,7 +387,7 @@ bar,UHVzcw==,273.15
 (11)
 Column 1,Column 2,Column 3
 foo,UHVzcw,-18446744073709551617
-bar,UHVzcw==,50757373,273.15
+bar,UHVzcw==,273.15
 ```
 
 ### Convert json values to standard library types and back
