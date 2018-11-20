@@ -236,51 +236,51 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
     typedef typename Json::string_type string_type;
     typedef typename Json::string_view_type string_view_type;
 
-   jsoncons::jsonpatch::detailoperation_unwinder<Json> unwinder(target);
+   jsoncons::jsonpatch::detail::operation_unwinder<Json> unwinder(target);
 
     // Validate
     
     string_type bad_path;
     for (const auto& operation : patch.array_range())
     {
-        unwinder.state =jsoncons::jsonpatch::detailstate_type::begin;
+        unwinder.state =jsoncons::jsonpatch::detail::state_type::begin;
 
         if (operation.count(detail::op_literal<char_type>()) != 1 || operation.count(detail::path_literal<char_type>()) != 1)
         {
             patch_ec = jsonpatch_errc::invalid_patch;
-            unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+            unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
         }
         else
         {
             const string_view_type op = operation.at(detail::op_literal<char_type>()).as_string_view();
             const string_view_type path = operation.at(detail::path_literal<char_type>()).as_string_view();
 
-            if (op ==jsoncons::jsonpatch::detailtest_literal<char_type>())
+            if (op ==jsoncons::jsonpatch::detail::test_literal<char_type>())
             {
                 std::error_code ec;
                 Json val = jsonpointer::get(target,path,ec);
                 if (ec)
                 {
                     patch_ec = jsonpatch_errc::test_failed;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
                 else if (operation.count(detail::value_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
                 else if (val != operation.at(detail::value_literal<char_type>()))
                 {
                     patch_ec = jsonpatch_errc::test_failed;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
             }
-            else if (op ==jsoncons::jsonpatch::detailadd_literal<char_type>())
+            else if (op ==jsoncons::jsonpatch::detail::add_literal<char_type>())
             {
                 if (operation.count(detail::value_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
                 else
                 {
@@ -295,7 +295,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                         if (select_ec) // shouldn't happen
                         {
                             patch_ec = jsonpatch_errc::add_failed;
-                            unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                            unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                         }
                         else
                         {
@@ -304,7 +304,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                             if (replace_ec)
                             {
                                 patch_ec = jsonpatch_errc::add_failed;
-                                unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                                unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                             }
                             else
                             {
@@ -318,14 +318,14 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                 }
             }
-            else if (op ==jsoncons::jsonpatch::detailremove_literal<char_type>())
+            else if (op ==jsoncons::jsonpatch::detail::remove_literal<char_type>())
             {
                 std::error_code ec;
                 Json val = jsonpointer::get(target,path,ec);
                 if (ec)
                 {
                     patch_ec = jsonpatch_errc::remove_failed;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
                 else
                 {
@@ -333,7 +333,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     if (ec)
                     {
                         patch_ec = jsonpatch_errc::remove_failed;
-                        unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                        unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                     }
                     else
                     {
@@ -341,19 +341,19 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                 }
             }
-            else if (op ==jsoncons::jsonpatch::detailreplace_literal<char_type>())
+            else if (op ==jsoncons::jsonpatch::detail::replace_literal<char_type>())
             {
                 std::error_code ec;
                 Json val = jsonpointer::get(target,path,ec);
                 if (ec)
                 {
                     patch_ec = jsonpatch_errc::replace_failed;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
                 else if (operation.count(detail::value_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
                 else
                 {
@@ -361,7 +361,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     if (ec)
                     {
                         patch_ec = jsonpatch_errc::replace_failed;
-                        unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                        unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                     }
                     else
                     {
@@ -369,12 +369,12 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                 }
             }
-            else if (op ==jsoncons::jsonpatch::detailmove_literal<char_type>())
+            else if (op ==jsoncons::jsonpatch::detail::move_literal<char_type>())
             {
                 if (operation.count(detail::from_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
                 else
                 {
@@ -384,7 +384,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     if (ec)
                     {
                         patch_ec = jsonpatch_errc::move_failed;
-                        unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                        unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                     }
                     else 
                     {
@@ -392,7 +392,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                         if (ec)
                         {
                             patch_ec = jsonpatch_errc::move_failed;
-                            unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                            unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                         }
                         else
                         {
@@ -408,7 +408,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                                 if (select_ec) // shouldn't happen
                                 {
                                     patch_ec = jsonpatch_errc::copy_failed;
-                                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                                 }
                                 else
                                 {
@@ -417,12 +417,12 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                                     if (replace_ec)
                                     {
                                         patch_ec = jsonpatch_errc::copy_failed;
-                                        unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                                        unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
 
                                     }
                                     else
                                     {
-                                        unwinder.stack.push_back({jsoncons::jsonpatch::detailop_type::replace,npath,orig_val });
+                                        unwinder.stack.push_back({jsoncons::jsonpatch::detail::op_type::replace,npath,orig_val });
                                     }
                                     
                                 }
@@ -435,12 +435,12 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                 }
             }
-            else if (op ==jsoncons::jsonpatch::detailcopy_literal<char_type>())
+            else if (op ==jsoncons::jsonpatch::detail::copy_literal<char_type>())
             {
                 if (operation.count(detail::from_literal<char_type>()) != 1)
                 {
                     patch_ec = jsonpatch_errc::invalid_patch;
-                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                 }
                 else
                 {
@@ -450,7 +450,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     if (ec)
                     {
                         patch_ec = jsonpatch_errc::copy_failed;
-                        unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                        unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                     }
                     else
                     {
@@ -465,7 +465,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                             if (select_ec) // shouldn't happen
                             {
                                 patch_ec = jsonpatch_errc::copy_failed;
-                                unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                                unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                             }
                             else 
                             {
@@ -474,11 +474,11 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                                 if (replace_ec)
                                 {
                                     patch_ec = jsonpatch_errc::copy_failed;
-                                    unwinder.state =jsoncons::jsonpatch::detailstate_type::abort;
+                                    unwinder.state =jsoncons::jsonpatch::detail::state_type::abort;
                                 }
                                 else
                                 {
-                                    unwinder.stack.push_back({jsoncons::jsonpatch::detailop_type::replace,npath,orig_val });
+                                    unwinder.stack.push_back({jsoncons::jsonpatch::detail::op_type::replace,npath,orig_val });
                                 }
                             }
                         }
@@ -489,19 +489,19 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                 }
             }
-            if (unwinder.state !=jsoncons::jsonpatch::detailstate_type::begin)
+            if (unwinder.state !=jsoncons::jsonpatch::detail::state_type::begin)
             {
                 bad_path = string_type(path);
             }
         }
-        if (unwinder.state !=jsoncons::jsonpatch::detailstate_type::begin)
+        if (unwinder.state !=jsoncons::jsonpatch::detail::state_type::begin)
         {
             break;
         }
     }
-    if (unwinder.state ==jsoncons::jsonpatch::detailstate_type::begin)
+    if (unwinder.state ==jsoncons::jsonpatch::detail::state_type::begin)
     {
-        unwinder.state =jsoncons::jsonpatch::detailstate_type::commit;
+        unwinder.state =jsoncons::jsonpatch::detail::state_type::commit;
     }
 }
 
@@ -509,7 +509,7 @@ template <class Json>
 Json from_diff(const Json& source, const Json& target)
 {
     typename Json::string_type path;
-    returnjsoncons::jsonpatch::detailfrom_diff(source, target, path);
+    returnjsoncons::jsonpatch::detail::from_diff(source, target, path);
 }
 
 template <class Json>
