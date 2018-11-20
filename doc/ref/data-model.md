@@ -14,16 +14,16 @@ The jsoncons data model consists of the following fundumental types:
 
 It also allows optional semantic tagging of the major types:
 
- Type       | Semantic tag | CBOR mapping
-------------|--------------|---------------
- null       | undefined    | Maps to CBOR undefined
- int64      | epoch_time   | Maps to CBOR epoch time (unsigned or negative integer)
- uint64     | epoch_time   | Maps to CBOR epoch time (unsigned integer)
- double     | epoch_time   | Maps to CBOR epoch time (double)
- string     | bignum       | Maps to CBOR bignum 
- &#160;     | decimal      | Maps to CBOR decimal fraction 
- &#160;     | date_time    | Maps to CBOR date/time
- array      | bigfloat      | Maps to CBOR bigfloat
+ Type       | Semantic tag     | CBOR mapping
+------------|------------------|---------------
+ null       | undefined        | Maps to CBOR undefined
+ int64      | epoch_time       | Maps to CBOR epoch time (unsigned or negative integer)
+ uint64     | epoch_time       | Maps to CBOR epoch time (unsigned integer)
+ double     | epoch_time       | Maps to CBOR epoch time (double)
+ string     | bignum           | Maps to CBOR bignum 
+ &#160;     | decimal_fraction | Maps to CBOR decimal fraction 
+ &#160;     | date_time        | Maps to CBOR date/time
+ array      | bigfloat         | Maps to CBOR bigfloat
 
 ### Examples
 

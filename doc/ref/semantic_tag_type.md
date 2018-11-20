@@ -3,12 +3,13 @@
 ```c++
 enum class semantic_tag_type : uint8_t 
 {
-    none,
-    bignum,
-    decimal,
+    none = 0,
+    undefined,
     date_time,
     epoch_time,
-    undefined
+    bignum,
+    decimal_fraction,
+    bigfloat
 };
 ```
 
