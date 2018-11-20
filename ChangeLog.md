@@ -12,7 +12,7 @@ New CBOR feature
   to base64, base64url and base16 are preserved and respected in JSON 
   serialization (unless overridden in `json_serializing_options`.)
 
-- CBOR semantic tagging of bigfloat preserved with `semantic_tag_type::custom1`
+- CBOR semantic tagging of bigfloat preserved with `semantic_tag_type::bigfloat`
 
 Changes to `json_serializing_options`
 

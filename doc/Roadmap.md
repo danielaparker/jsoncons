@@ -16,9 +16,6 @@
 - Convert CBOR non text string keys to strings when decoding
   to json values.
 
-- Add options for nan/inf substitution and floating point
-  precision in `csv_serializing_options`.
-
 ### For later releases
 
 - Support pull parsing for cbor and CSV.
