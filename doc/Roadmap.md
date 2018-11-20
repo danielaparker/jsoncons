@@ -1,23 +1,20 @@
 # Roadmap
 
-### For release 0.113
+### For release 0.113.0
 
 - Enhanced JSON serialization options.
   (Currently implemented on master.)
 
 - Preserve CBOR semantic tagging of expected conversion of byte 
   strings to base64, base64url, or base16, and , unless overridden 
-  in `json_serializing_options`, use in JSON serialization
-  (implemented on master.)
+  in `json_serializing_options`, use in JSON serialization.
+  (Currently implemented on master.)
 
-- Preserve CBOR bigfloat tag when decoding/encoding
-  (implemented on master.)
+- Preserve CBOR bigfloat tag when decoding/encoding.
+  (Currently implemented on master.)
 
 - Convert CBOR non text string keys to strings when decoding
-  to json values (implemented on master.)
-
-- Add options for floating point precision in 
-  `csv_serializing_options`.
+  to json values.
 
 ### For later releases
 

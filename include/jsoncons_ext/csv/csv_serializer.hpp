@@ -16,7 +16,6 @@
 #include <memory>
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/print_number.hpp>
 #include <jsoncons_ext/csv/csv_serializing_options.hpp>
@@ -54,7 +53,6 @@ private:
     };
     Writer writer_;
     basic_csv_serializing_options<CharT,Allocator> parameters_;
-    basic_json_serializing_options<CharT> options_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
     std::vector<string_type,string_allocator_type> column_names_;
@@ -67,14 +65,7 @@ private:
     basic_csv_serializer& operator=(const basic_csv_serializer&) = delete;
 public:
     basic_csv_serializer(output_type& os)
-       :
-       writer_(os),
-       options_(),
-       stack_(),
-       fp_(floating_point_options(options_.floating_point_format(), 
-                                  options_.precision(),
-                                  0)),
-       column_names_(parameters_.column_names())
+       : basic_csv_serializer(os, basic_csv_serializing_options<CharT,Allocator>())
     {
     }
 
@@ -83,7 +74,6 @@ public:
        :
        writer_(os),
        parameters_(options),
-       options_(),
        stack_(),
        fp_(floating_point_options(options.floating_point_format(), 
                                   options.precision(),
