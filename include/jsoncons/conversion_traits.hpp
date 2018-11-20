@@ -73,7 +73,7 @@ struct conversion_traits
 
 template <class T>
 struct conversion_traits<T,
-    typename std::enable_if<detail::is_vector_like<T>::value
+    typename std::enable_if<jsoncons::detail::is_vector_like<T>::value
 >::type>
 {
     typedef typename T::value_type value_type;
@@ -145,7 +145,7 @@ struct conversion_traits<std::array<T,N>>
 
 template <class T>
 struct conversion_traits<T,
-    typename std::enable_if<detail::is_map_like<T>::value
+    typename std::enable_if<jsoncons::detail::is_map_like<T>::value
 >::type>
 {
     typedef typename T::mapped_type mapped_type;

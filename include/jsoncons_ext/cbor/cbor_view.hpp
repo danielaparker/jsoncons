@@ -44,14 +44,14 @@ public:
     typedef char char_type;
     typedef std::char_traits<char_type> char_traits_type;
     typedef basic_string_view<char_type> string_view_type;
-    typedef detail::const_object_iterator<cbor_view> object_iterator;
-    typedef detail::const_object_iterator<cbor_view> const_object_iterator;
-    typedef detail::const_array_iterator<cbor_view> array_iterator;
-    typedef detail::const_array_iterator<cbor_view> const_array_iterator;
-    typedef detail::key_value_view<cbor_view> key_value_type;
+    typedef jsoncons::cbor::detail::const_object_iterator<cbor_view> object_iterator;
+    typedef jsoncons::cbor::detail::const_object_iterator<cbor_view> const_object_iterator;
+    typedef jsoncons::cbor::detail::const_array_iterator<cbor_view> array_iterator;
+    typedef jsoncons::cbor::detail::const_array_iterator<cbor_view> const_array_iterator;
+    typedef jsoncons::cbor::detail::key_value_view<cbor_view> key_value_type;
 
-    friend class detail::const_array_iterator<cbor_view>;
-    friend class detail::const_object_iterator<cbor_view>;
+    friend class jsoncons::cbor::detail::const_array_iterator<cbor_view>;
+    friend class jsoncons::cbor::detail::const_object_iterator<cbor_view>;
 
     range<const_object_iterator> object_range() const
     {
@@ -60,7 +60,7 @@ public:
 
         if (major_type() == cbor_major_type::map)
         {
-            detail::get_length(first_,last_,&begin);
+            jsoncons::cbor::detail::get_length(first_,last_,&begin);
             if (begin == first_)
             {
                 JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Failed finding size"));
@@ -70,7 +70,7 @@ public:
         {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an object"));
         }
-        detail::walk_object(first_,last_,&endp);
+        jsoncons::cbor::detail::walk_object(first_,last_,&endp);
 
         return range<const_object_iterator>(const_object_iterator(begin,endp,base_relative_), const_object_iterator(endp, endp, base_relative_));
     }
@@ -80,12 +80,12 @@ public:
         const uint8_t* endp;
         const uint8_t* begin;
 
-        detail::get_length(first_, last_, &begin);
+        jsoncons::cbor::detail::get_length(first_, last_, &begin);
         if (begin == first_)
         {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
         }
-        detail::walk_array(first_,last_,&endp);
+        jsoncons::cbor::detail::walk_array(first_,last_,&endp);
         if (endp == first_)
         {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
@@ -170,13 +170,13 @@ public:
         else if (is_string())
         {
             const uint8_t* endp;
-            size_t length = detail::get_length(first_,last_,&endp);
+            size_t length = jsoncons::cbor::detail::get_length(first_,last_,&endp);
             is_empty = (length == 0);
         }
         else if (is_byte_string())
         {
             const uint8_t* endp;
-            size_t length = detail::get_length(first_, last_, &endp);
+            size_t length = jsoncons::cbor::detail::get_length(first_, last_, &endp);
             is_empty = (length == 0);
         }
         else
@@ -367,7 +367,7 @@ public:
             case cbor_major_type::unsigned_integer:
             {
                 const uint8_t* endp;
-                uint64_t x = detail::get_uint64_value(first_,last_,&endp);
+                uint64_t x = jsoncons::cbor::detail::get_uint64_value(first_,last_,&endp);
                 if (endp == first_)
                 {
                     return false;
@@ -416,13 +416,13 @@ public:
             case cbor_major_type::array:
             {
                     const uint8_t* endp;
-                    len = detail::get_length(first_,last_,&endp);
+                    len = jsoncons::cbor::detail::get_length(first_,last_,&endp);
                     break;
             }
             case cbor_major_type::map:
             {
                     const uint8_t* endp;
-                    len = detail::get_length(first_,last_,&endp);
+                    len = jsoncons::cbor::detail::get_length(first_,last_,&endp);
                     break;
             }
             case cbor_major_type::semantic_tag:
@@ -453,12 +453,12 @@ public:
         JSONCONS_ASSERT(is_array());
         const uint8_t* it = first_;
 
-        detail::get_length(it, last_, &it);
+        jsoncons::cbor::detail::get_length(it, last_, &it);
 
         for (size_t i = 0; i < index; ++i)
         {
             const uint8_t* endp;
-            detail::walk(it, last_, &endp);
+            jsoncons::cbor::detail::walk(it, last_, &endp);
             if (endp == it)
             {
                 JSONCONS_THROW(cbor_decode_error(0));
@@ -467,7 +467,7 @@ public:
         }
 
         const uint8_t* endp;
-        detail::walk(it, last_, &endp);
+        jsoncons::cbor::detail::walk(it, last_, &endp);
         if (endp == it)
         {
             JSONCONS_THROW(cbor_decode_error(0));
@@ -481,12 +481,12 @@ public:
         JSONCONS_ASSERT(is_object());
         const uint8_t* it = first_;
 
-        size_t len = detail::get_length(first_, last_, &it);
+        size_t len = jsoncons::cbor::detail::get_length(first_, last_, &it);
 
         for (size_t i = 0; i < len; ++i)
         {
             const uint8_t* endp;
-            string_type a_key = detail::get_text_string(it, last_, &endp);
+            string_type a_key = jsoncons::cbor::detail::get_text_string(it, last_, &endp);
             if (endp == it)
             {
                 JSONCONS_THROW(cbor_decode_error(last_-it));
@@ -498,12 +498,12 @@ public:
             if (a_key == key)
             {
                 const uint8_t* last;
-                detail::walk(it, last_, &last);
+                jsoncons::cbor::detail::walk(it, last_, &last);
                 JSONCONS_ASSERT(last >= it);
                 return cbor_view(it, last-it, base_relative_);
             }
             const uint8_t* last;
-            detail::walk(it, last_, &last);
+            jsoncons::cbor::detail::walk(it, last_, &last);
             it = last;
         }
         JSONCONS_THROW(json_exception_impl<std::runtime_error>("Key not found"));
@@ -517,12 +517,12 @@ public:
         }
         const uint8_t* it = first_;
 
-        size_t len = detail::get_length(it, last_, &it);
+        size_t len = jsoncons::cbor::detail::get_length(it, last_, &it);
 
         for (size_t i = 0; i < len; ++i)
         {
             const uint8_t* endp;
-            string_type a_key = detail::get_text_string(it, last_,&endp);
+            string_type a_key = jsoncons::cbor::detail::get_text_string(it, last_,&endp);
             if (endp == it)
             {
                 JSONCONS_THROW(cbor_decode_error(last_-it));
@@ -535,7 +535,7 @@ public:
             {
                 return true;
             }
-            detail::walk(it, last_, &it);
+            jsoncons::cbor::detail::walk(it, last_, &it);
         }
         return false;
     }
@@ -566,7 +566,7 @@ public:
             case cbor_major_type::negative_integer:
             {
                 const uint8_t* endp;
-                int64_t val = detail::get_int64_value(first_,last_,&endp);
+                int64_t val = jsoncons::cbor::detail::get_int64_value(first_,last_,&endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
@@ -593,7 +593,7 @@ public:
             case cbor_major_type::negative_integer:
             {
                 const uint8_t* endp;
-                uint64_t val = detail::get_uint64_value(first_,last_,&endp);
+                uint64_t val = jsoncons::cbor::detail::get_uint64_value(first_,last_,&endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
@@ -641,7 +641,7 @@ public:
             case cbor_major_type::unsigned_integer:
             {
                 const uint8_t* endp;
-                uint64_t val = detail::get_uint64_value(first_, last_, &endp);
+                uint64_t val = jsoncons::cbor::detail::get_uint64_value(first_, last_, &endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -651,7 +651,7 @@ public:
             case cbor_major_type::negative_integer:
             {
                 const uint8_t* endp;
-                int64_t val = detail::get_int64_value(first_, last_, &endp);
+                int64_t val = jsoncons::cbor::detail::get_int64_value(first_, last_, &endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -667,7 +667,7 @@ public:
                     case 0x1b:
                     {
                         const uint8_t* endp;
-                        double val = detail::get_double(first_, last_, &endp);
+                        double val = jsoncons::cbor::detail::get_double(first_, last_, &endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
@@ -696,7 +696,7 @@ public:
             case cbor_major_type::text_string:
             {
                 const uint8_t* endp;
-                std::string s = detail::get_text_string(first_,last_,&endp);
+                std::string s = jsoncons::cbor::detail::get_text_string(first_,last_,&endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a string"));
@@ -706,7 +706,7 @@ public:
             case cbor_major_type::byte_string:
             {
                 const uint8_t* endp;
-                std::vector<uint8_t> v = detail::get_byte_string(first_,last_,&endp);
+                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_,last_,&endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
@@ -722,7 +722,7 @@ public:
                     case 2:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -735,7 +735,7 @@ public:
                     case 3:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -758,7 +758,7 @@ public:
                     case 21:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -770,7 +770,7 @@ public:
                     case 22:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -782,7 +782,7 @@ public:
                     case 23:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -814,7 +814,7 @@ public:
             case cbor_major_type::byte_string:
             {
                 const uint8_t* endp;
-                std::vector<uint8_t> v = detail::get_byte_string(first_,last_,&endp);
+                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_,last_,&endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
@@ -846,7 +846,7 @@ public:
                     case 2:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -857,7 +857,7 @@ public:
                     case 3:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -991,7 +991,7 @@ public:
             case cbor_major_type::byte_string:
             {
                 const uint8_t* endp;
-                std::vector<uint8_t> s = detail::get_byte_string(first_,last_,&endp);
+                std::vector<uint8_t> s = jsoncons::cbor::detail::get_byte_string(first_,last_,&endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
@@ -1002,7 +1002,7 @@ public:
             case cbor_major_type::text_string:
             {
                 const uint8_t* endp;
-                std::string s = detail::get_text_string(first_,last_,&endp);
+                std::string s = jsoncons::cbor::detail::get_text_string(first_,last_,&endp);
                 if (endp == first_)
                 {
                     JSONCONS_THROW(cbor_decode_error(0));
@@ -1013,12 +1013,12 @@ public:
             case cbor_major_type::array:
             {
                 const uint8_t* it;
-                size_t len = detail::get_length(first_,last_,&it);
+                size_t len = jsoncons::cbor::detail::get_length(first_,last_,&it);
                 handler.begin_array(len);
                 for (size_t i = 0; i < len; ++i)
                 {
                     const uint8_t* endp;
-                    detail::walk(it, last_, &endp);
+                    jsoncons::cbor::detail::walk(it, last_, &endp);
                     if (endp == it)
                     {
                         JSONCONS_THROW(cbor_decode_error(0));
@@ -1033,19 +1033,19 @@ public:
             case cbor_major_type::map:
             {
                 const uint8_t* it;
-                size_t len = detail::get_length(first_,last_,&it);
+                size_t len = jsoncons::cbor::detail::get_length(first_,last_,&it);
                 handler.begin_object(len);
                 for (size_t i = 0; i < len; ++i)
                 {
                     const uint8_t* endp;
-                    std::string key = detail::get_text_string(it, last_, &endp);
+                    std::string key = jsoncons::cbor::detail::get_text_string(it, last_, &endp);
                     if (endp == it)
                     {
                         JSONCONS_THROW(cbor_decode_error(last_-it));
                     }
                     handler.name(key);
                     it = endp;
-                    detail::walk(it, last_, &endp);
+                    jsoncons::cbor::detail::walk(it, last_, &endp);
                     if (endp == it)
                     {
                         JSONCONS_THROW(cbor_decode_error(0));
@@ -1065,7 +1065,7 @@ public:
                     case 2:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -1079,7 +1079,7 @@ public:
                     case 3:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> v = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -1104,7 +1104,7 @@ public:
                     case 21:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> s = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> s = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -1115,7 +1115,7 @@ public:
                     case 22:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> s = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> s = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));
@@ -1126,7 +1126,7 @@ public:
                     case 23:
                     {
                         const uint8_t* endp;
-                        std::vector<uint8_t> s = detail::get_byte_string(first_+1,last_,&endp);
+                        std::vector<uint8_t> s = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
                             JSONCONS_THROW(cbor_decode_error(0));

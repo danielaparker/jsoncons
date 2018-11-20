@@ -172,7 +172,7 @@ class basic_json_parser : private serializing_context
     bool done_;
 
     std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
-    detail::string_to_double to_double_;
+    jsoncons::detail::string_to_double to_double_;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<json_parse_state> parse_state_allocator_type;
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
@@ -541,7 +541,7 @@ public:
     {
         if (!nan_to_str_.empty() || !inf_to_str_.empty() || !neginf_to_str_.empty())
         {
-            detail::replacement_filter<CharT> h(handler,
+            jsoncons::detail::replacement_filter<CharT> h(handler,
                 nan_to_str_,
                 inf_to_str_,
                 neginf_to_str_);

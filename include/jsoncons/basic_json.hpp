@@ -365,7 +365,7 @@ public:
         // long_string_data
         class long_string_data final : public data_base
         {
-            typedef typename detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
+            typedef typename jsoncons::detail::heap_only_string_factory<char_type, Allocator>::string_pointer pointer;
 
             pointer ptr_;
         public:
@@ -373,13 +373,13 @@ public:
             long_string_data(semantic_tag_type semantic_type, const char_type* data, size_t length, const Allocator& a)
                 : data_base(structure_tag_type::long_string_tag, semantic_type)
             {
-                ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
+                ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(data,length,a);
             }
 
             long_string_data(const long_string_data& val)
                 : data_base(structure_tag_type::long_string_tag, semantic_tag_type::none)
             {
-                ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
+                ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),val.get_allocator());
             }
 
             long_string_data(long_string_data&& val)
@@ -391,14 +391,14 @@ public:
             long_string_data(const long_string_data& val, const Allocator& a)
                 : data_base(val.type())
             {
-                ptr_ = detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
+                ptr_ = jsoncons::detail::heap_only_string_factory<char_type,Allocator>::create(val.data(),val.length(),a);
             }
 
             ~long_string_data()
             {
                 if (ptr_ != nullptr)
                 {
-                    detail::heap_only_string_factory<char_type,Allocator>::destroy(ptr_);
+                    jsoncons::detail::heap_only_string_factory<char_type,Allocator>::destroy(ptr_);
                 }
             }
 
@@ -444,7 +444,7 @@ public:
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::construct(alloc, detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -492,7 +492,7 @@ public:
                 if (ptr_ != nullptr)
                 {
                     typename std::allocator_traits<string_holder_allocator_type>:: template rebind_alloc<byte_string_storage_type> alloc(ptr_->get_allocator());
-                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::destroy(alloc, detail::to_plain_pointer(ptr_));
+                    std::allocator_traits<string_holder_allocator_type>:: template rebind_traits<byte_string_storage_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
@@ -531,7 +531,7 @@ public:
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -574,7 +574,7 @@ public:
                 if (ptr_ != nullptr)
                 {
                     typename std::allocator_traits<array_allocator>:: template rebind_alloc<array> alloc(ptr_->get_allocator());
-                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, detail::to_plain_pointer(ptr_));
+                    std::allocator_traits<array_allocator>:: template rebind_traits<array>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
@@ -613,7 +613,7 @@ public:
                 ptr_ = alloc.allocate(1);
                 try
                 {
-                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                    std::allocator_traits<object_allocator>:: template rebind_traits<object>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 catch (...)
                 {
@@ -657,7 +657,7 @@ public:
                 if (ptr_ != nullptr)
                 {
                     typename std::allocator_traits<Allocator>:: template rebind_alloc<object> alloc(ptr_->get_allocator());
-                    std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, detail::to_plain_pointer(ptr_));
+                    std::allocator_traits<Allocator>:: template rebind_traits<object>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
                     alloc.deallocate(ptr_,1);
                 }
             }
@@ -1044,7 +1044,7 @@ public:
             {
                 case structure_tag_type::short_string_tag:
                 case structure_tag_type::long_string_tag:
-                    if (!detail::is_integer(as_string_view().data(), as_string_view().length()))
+                    if (!jsoncons::detail::is_integer(as_string_view().data(), as_string_view().length()))
                     {
                         JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
                     }
@@ -2772,7 +2772,7 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s);
+        basic_json_compressed_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s);
         dump(serializer);
     }
 
@@ -2782,12 +2782,12 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s);
+            basic_json_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s);
+            basic_json_compressed_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s);
             dump(serializer);
         }
     }
@@ -2797,7 +2797,7 @@ public:
               const basic_json_serializing_options<char_type>& options) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s, options);
+        basic_json_compressed_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s, options);
         dump(serializer);
     }
 
@@ -2809,12 +2809,12 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type,detail::string_writer<string_type>> serializer(s, options);
+            basic_json_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s, options);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s, options);
+            basic_json_compressed_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s, options);
             dump(serializer);
         }
     }
@@ -2868,7 +2868,7 @@ public:
     string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const noexcept
     {
         string_type s(allocator);
-        basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s);
+        basic_json_compressed_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s);
         dump(serializer);
         return s;
     }
@@ -2877,7 +2877,7 @@ public:
                           const char_allocator_type& allocator=char_allocator_type()) const
     {
         string_type s(allocator);
-        basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s,options);
+        basic_json_compressed_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s,options);
         dump(serializer);
         return s;
     }
@@ -3042,7 +3042,7 @@ public:
         {
             case structure_tag_type::short_string_tag:
             case structure_tag_type::long_string_tag:
-                return detail::is_integer(as_string_view().data(), as_string_view().length());
+                return jsoncons::detail::is_integer(as_string_view().data(), as_string_view().length());
             case structure_tag_type::int64_tag:
             case structure_tag_type::uint64_tag:
                 return true;
@@ -3232,11 +3232,11 @@ public:
         case structure_tag_type::short_string_tag:
         case structure_tag_type::long_string_tag:
             {
-                if (!detail::is_integer(as_string_view().data(), as_string_view().length()))
+                if (!jsoncons::detail::is_integer(as_string_view().data(), as_string_view().length()))
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
                 }
-                auto result = detail::to_integer<T>(as_string_view().data(), as_string_view().length());
+                auto result = jsoncons::detail::to_integer<T>(as_string_view().data(), as_string_view().length());
                 if (result.overflow)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Integer overflow"));
@@ -3353,7 +3353,7 @@ public:
             case structure_tag_type::byte_string_tag:
             {
                 string_type s(allocator);
-                byte_string_chars_format format = detail::resolve_byte_string_chars_format(options.byte_string_format(), 
+                byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(options.byte_string_format(), 
                                                                                            byte_string_chars_format::none, 
                                                                                            byte_string_chars_format::base64url);
                 switch (format)
@@ -3379,7 +3379,7 @@ public:
             default:
             {
                 string_type s(allocator);
-                basic_json_compressed_serializer<char_type,detail::string_writer<string_type>> serializer(s,options);
+                basic_json_compressed_serializer<char_type,jsoncons::detail::string_writer<string_type>> serializer(s,options);
                 dump(serializer);
                 return s;
             }

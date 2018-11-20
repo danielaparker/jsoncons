@@ -305,19 +305,19 @@ public:
             column_types_.reserve(value.size());
             for (size_t i = 0; i < value.size(); ++i)
             {
-                if (value[i] == detail::string_literal<CharT>()())
+                if (value[i] == jsoncons::detail::string_literal<CharT>()())
                 {
                     column_types_.emplace_back(csv_column_type::string_t,0);
                 }
-                else if (value[i] == detail::integer_literal<CharT>()())
+                else if (value[i] == jsoncons::detail::integer_literal<CharT>()())
                 {
                     column_types_.emplace_back(csv_column_type::integer_t,0);
                 }
-                else if (value[i] == detail::float_literal<CharT>()())
+                else if (value[i] == jsoncons::detail::float_literal<CharT>()())
                 {
                     column_types_.emplace_back(csv_column_type::float_t,0);
                 }
-                else if (value[i] == detail::boolean_literal<CharT>()())
+                else if (value[i] == jsoncons::detail::boolean_literal<CharT>()())
                 {
                     column_types_.emplace_back(csv_column_type::boolean_t,0);
                 }

@@ -26,13 +26,13 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 {
     if (result_t == result_type::value)
     {
-        detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
         evaluator.evaluate(root,path.data(),path.length());
         return evaluator.get_values();
     }
     else
     {
-        detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
         evaluator.evaluate(root,path.data(),path.length());
         return evaluator.get_normalized_paths();
     }
@@ -41,7 +41,7 @@ Json json_query(const Json& root, const typename Json::string_view_type& path, r
 template<class Json, class T>
 void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
 {
-    detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
+    jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
     evaluator.evaluate(root,path.data(),path.length());
     evaluator.replace(std::forward<T>(new_value));
 }

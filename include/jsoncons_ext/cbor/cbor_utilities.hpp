@@ -184,7 +184,7 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
                     length = 0;
                     while (*p != 0xff)
                     {
-                        size_t len = detail::get_length(p,last,endp);
+                        size_t len = jsoncons::cbor::detail::get_length(p,last,endp);
                         if (*endp == p)
                         {
                             *endp = first;
@@ -226,7 +226,7 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
             const uint8_t* p = first+1;
             while (*p != 0xff)
             {
-                std::vector<uint8_t> ss = detail::get_byte_string(p,last,endp);
+                std::vector<uint8_t> ss = jsoncons::cbor::detail::get_byte_string(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -272,7 +272,7 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
             const uint8_t* p = first+1;
             while (*p != 0xff)
             {
-                std::string ss = detail::get_text_string(p,last,endp);
+                std::string ss = jsoncons::cbor::detail::get_text_string(p,last,endp);
                 if (*endp == p)
                 {
                     *endp = first;
@@ -341,7 +341,7 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
         }
         default: // definite length
         {
-            size_t size = detail::get_length(first,last,endp);
+            size_t size = jsoncons::cbor::detail::get_length(first,last,endp);
             if (*endp == first)
             {
                 *endp = first;
@@ -402,7 +402,7 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         }
         default: // definite length
         {
-            size_t size = detail::get_length(first,last,endp);
+            size_t size = jsoncons::cbor::detail::get_length(first,last,endp);
             if (*endp == first)
             {
                 *endp = first;
@@ -571,7 +571,7 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
 
             case cbor_major_type::unsigned_integer:
             {
-                uint64_t x = detail::get_uint64_value(first,last,endp);
+                uint64_t x = jsoncons::cbor::detail::get_uint64_value(first,last,endp);
                 if (*endp != first)
                 {
                     if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
@@ -833,21 +833,21 @@ public:
 
     const_array_iterator& operator++()
     {
-        detail::walk(p_, last_, &p_);
+        jsoncons::cbor::detail::walk(p_, last_, &p_);
         return *this;
     }
 
     const_array_iterator operator++(int) // postfix increment
     {
         const_array_iterator temp(*this);
-        detail::walk(p_, last_, &p_);
+        jsoncons::cbor::detail::walk(p_, last_, &p_);
         return temp;
     }
 
     reference operator*() const
     {
         const uint8_t* endp;
-        detail::walk(p_, last_, &endp);
+        jsoncons::cbor::detail::walk(p_, last_, &endp);
         const_cast<T*>(&current_)->first_ = p_;
         const_cast<T*>(&current_)->last_ = endp;
         const_cast<T*>(&current_)->base_relative_ = base_relative_;
@@ -857,7 +857,7 @@ public:
     pointer operator->() const
     {
         const uint8_t* endp;
-        detail::walk(p_, last_, &endp);
+        jsoncons::cbor::detail::walk(p_, last_, &endp);
         const_cast<T*>(&current_)->first_ = p_;
         const_cast<T*>(&current_)->last_ = endp;
         const_cast<T*>(&current_)->base_relative_ = base_relative_;
@@ -948,16 +948,16 @@ public:
 
     const_object_iterator& operator++()
     {
-        detail::walk(p_, last_, &p_);
-        detail::walk(p_, last_, &p_);
+        jsoncons::cbor::detail::walk(p_, last_, &p_);
+        jsoncons::cbor::detail::walk(p_, last_, &p_);
         return *this;
     }
 
     const_object_iterator operator++(int) // postfix increment
     {
         const_object_iterator temp(*this);
-        detail::walk(p_, last_, &p_);
-        detail::walk(p_, last_, &p_);
+        jsoncons::cbor::detail::walk(p_, last_, &p_);
+        jsoncons::cbor::detail::walk(p_, last_, &p_);
         return temp;
     }
 
@@ -966,10 +966,10 @@ public:
         const uint8_t* endp;
 
         const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
-        detail::walk(kvpair_.key_begin_, last_, &endp);
+        jsoncons::cbor::detail::walk(kvpair_.key_begin_, last_, &endp);
         const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endp;
         const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
-        detail::walk(kvpair_.val_begin_, last_, &endp);
+        jsoncons::cbor::detail::walk(kvpair_.val_begin_, last_, &endp);
         const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endp;
         const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
 
@@ -981,10 +981,10 @@ public:
         const uint8_t* endp;
 
         const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
-        detail::walk(kvpair_.key_begin_, last_, &endp);
+        jsoncons::cbor::detail::walk(kvpair_.key_begin_, last_, &endp);
         const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endp;
         const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
-        detail::walk(kvpair_.val_begin_, last_, &endp);
+        jsoncons::cbor::detail::walk(kvpair_.val_begin_, last_, &endp);
         const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endp;
         const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
 
@@ -1016,7 +1016,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
     {
         case cbor_major_type::unsigned_integer:
         {
-            exponent = detail::get_uint64_value(pos,last,endpp);
+            exponent = jsoncons::cbor::detail::get_uint64_value(pos,last,endpp);
             if (*endpp == pos)
             {
                 return s;
@@ -1026,7 +1026,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
         }
         case cbor_major_type::negative_integer:
         {
-            exponent = detail::get_int64_value(pos,last,endpp);
+            exponent = jsoncons::cbor::detail::get_int64_value(pos,last,endpp);
             if (*endpp == pos)
             {
                 return s;
@@ -1043,7 +1043,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
     {
         case cbor_major_type::unsigned_integer:
         {
-            uint64_t val = detail::get_uint64_value(pos,last,endpp);
+            uint64_t val = jsoncons::cbor::detail::get_uint64_value(pos,last,endpp);
             if (*endpp == pos)
             {
                 return s;
@@ -1055,7 +1055,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
         }
         case cbor_major_type::negative_integer:
         {
-            int64_t val = detail::get_int64_value(pos,last,endpp);
+            int64_t val = jsoncons::cbor::detail::get_int64_value(pos,last,endpp);
             if (*endpp == pos)
             {
                 return s;
@@ -1071,7 +1071,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
             pos = p++;
             if (get_major_type(*pos) == cbor_major_type::byte_string)
             {
-                std::vector<uint8_t> v = detail::get_byte_string(pos,last,endpp);
+                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(pos,last,endpp);
                 if (*endpp == pos)
                 {
                     return s;

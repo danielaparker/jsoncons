@@ -177,7 +177,7 @@ byte_string_chars_format resolve_byte_string_chars_format(byte_string_chars_form
 
 namespace jsoncons {
 
-template<class CharT,class Writer=detail::stream_char_writer<CharT>>
+template<class CharT,class Writer=jsoncons::detail::stream_char_writer<CharT>>
 class basic_json_serializer final : public basic_json_content_handler<CharT>
 {
 public:
@@ -288,7 +288,7 @@ private:
     line_split_kind object_array_line_splits_;
     line_split_kind array_array_line_splits_;
     line_split_kind array_object_line_splits_;
-    detail::print_double fp_;
+    jsoncons::detail::print_double fp_;
     size_t line_length_limit_;
     std::basic_string<CharT> new_line_chars_;
     Writer writer_;
@@ -622,9 +622,9 @@ private:
             }
         }
 
-        writer_.insert(detail::null_literal<CharT>().data(), 
-                       detail::null_literal<CharT>().size());
-        column_ += detail::null_literal<CharT>().size();
+        writer_.insert(jsoncons::detail::null_literal<CharT>().data(), 
+                       jsoncons::detail::null_literal<CharT>().size());
+        column_ += jsoncons::detail::null_literal<CharT>().size();
 
         end_value();
         return true;
@@ -675,7 +675,7 @@ private:
             }
         }
 
-        byte_string_chars_format format = detail::resolve_byte_string_chars_format(byte_string_format_, 
+        byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(byte_string_format_, 
                                                                                    encoding_hint, 
                                                                                    byte_string_chars_format::base64url);
         switch (format)
@@ -744,8 +744,8 @@ private:
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
-                column_ += detail::null_literal<CharT>().length();
+                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                column_ += jsoncons::detail::null_literal<CharT>().length();
             }
         }
         else if (value == std::numeric_limits<double>::infinity())
@@ -761,8 +761,8 @@ private:
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
-                column_ += detail::null_literal<CharT>().length();
+                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                column_ += jsoncons::detail::null_literal<CharT>().length();
             }
         }
         else if (!(std::isfinite)(value))
@@ -778,8 +778,8 @@ private:
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
-                column_ += detail::null_literal<CharT>().length();
+                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
+                column_ += jsoncons::detail::null_literal<CharT>().length();
             }
         }
         else
@@ -807,7 +807,7 @@ private:
                 break_line();
             }
         }
-        size_t length = detail::print_integer(value, writer_);
+        size_t length = jsoncons::detail::print_integer(value, writer_);
         column_ += length;
         end_value();
         return true;
@@ -828,7 +828,7 @@ private:
                 break_line();
             }
         }
-        size_t length = detail::print_uinteger(value, writer_);
+        size_t length = jsoncons::detail::print_uinteger(value, writer_);
         column_ += length;
         end_value();
         return true;
@@ -850,13 +850,13 @@ private:
 
         if (value)
         {
-            writer_.insert(detail::true_literal<CharT>().data(), detail::true_literal<CharT>().length());
-            column_ += detail::true_literal<CharT>().length();
+            writer_.insert(jsoncons::detail::true_literal<CharT>().data(), jsoncons::detail::true_literal<CharT>().length());
+            column_ += jsoncons::detail::true_literal<CharT>().length();
         }
         else
         {
-            writer_.insert(detail::false_literal<CharT>().data(), detail::false_literal<CharT>().length());
-            column_ += detail::false_literal<CharT>().length();
+            writer_.insert(jsoncons::detail::false_literal<CharT>().data(), jsoncons::detail::false_literal<CharT>().length());
+            column_ += jsoncons::detail::false_literal<CharT>().length();
         }
 
         end_value();
@@ -990,7 +990,7 @@ private:
     }
 };
 
-template<class CharT,class Writer=detail::stream_char_writer<CharT>>
+template<class CharT,class Writer=jsoncons::detail::stream_char_writer<CharT>>
 class basic_json_compressed_serializer final : public basic_json_content_handler<CharT>
 {
 public:
@@ -1040,7 +1040,7 @@ private:
     bignum_chars_format bignum_format_;
 
     std::vector<serialization_context> stack_;
-    detail::print_double fp_;
+    jsoncons::detail::print_double fp_;
     Writer writer_;
 
     // Noncopyable and nonmoveable
@@ -1160,8 +1160,8 @@ private:
             writer_.push_back(',');
         }
 
-        writer_.insert(detail::null_literal<CharT>().data(), 
-                      detail::null_literal<CharT>().size());
+        writer_.insert(jsoncons::detail::null_literal<CharT>().data(), 
+                      jsoncons::detail::null_literal<CharT>().size());
 
         if (!stack_.empty())
         {
@@ -1262,7 +1262,7 @@ private:
             writer_.push_back(',');
         }
 
-        byte_string_chars_format format = detail::resolve_byte_string_chars_format(byte_string_format_, 
+        byte_string_chars_format format = jsoncons::detail::resolve_byte_string_chars_format(byte_string_format_, 
                                                                                    encoding_hint, 
                                                                                    byte_string_chars_format::base64url);
         switch (format)
@@ -1323,7 +1323,7 @@ private:
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
             }
         }
         else if (value == std::numeric_limits<double>::infinity())
@@ -1338,7 +1338,7 @@ private:
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
             }
         }
         else if (!(std::isfinite)(value))
@@ -1353,7 +1353,7 @@ private:
             }
             else
             {
-                writer_.insert(detail::null_literal<CharT>().data(), detail::null_literal<CharT>().length());
+                writer_.insert(jsoncons::detail::null_literal<CharT>().data(), jsoncons::detail::null_literal<CharT>().length());
             }
         }
         else
@@ -1376,7 +1376,7 @@ private:
         {
             writer_.push_back(',');
         }
-        detail::print_integer(value, writer_);
+        jsoncons::detail::print_integer(value, writer_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1392,7 +1392,7 @@ private:
         {
             writer_.push_back(',');
         }
-        detail::print_uinteger(value, writer_);
+        jsoncons::detail::print_uinteger(value, writer_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1409,13 +1409,13 @@ private:
 
         if (value)
         {
-            writer_.insert(detail::true_literal<CharT>().data(),
-                           detail::true_literal<CharT>().length());
+            writer_.insert(jsoncons::detail::true_literal<CharT>().data(),
+                           jsoncons::detail::true_literal<CharT>().length());
         }
         else
         {
-            writer_.insert(detail::false_literal<CharT>().data(),
-                           detail::false_literal<CharT>().length());
+            writer_.insert(jsoncons::detail::false_literal<CharT>().data(),
+                           jsoncons::detail::false_literal<CharT>().length());
         }
 
         if (!stack_.empty())
@@ -1426,17 +1426,17 @@ private:
     }
 };
 
-typedef basic_json_serializer<char,detail::stream_char_writer<char>> json_serializer;
-typedef basic_json_serializer<wchar_t,detail::stream_char_writer<wchar_t>> wjson_serializer;
+typedef basic_json_serializer<char,jsoncons::detail::stream_char_writer<char>> json_serializer;
+typedef basic_json_serializer<wchar_t,jsoncons::detail::stream_char_writer<wchar_t>> wjson_serializer;
 
-typedef basic_json_compressed_serializer<char,detail::stream_char_writer<char>> json_compressed_serializer;
-typedef basic_json_compressed_serializer<wchar_t,detail::stream_char_writer<wchar_t>> wjson_compressed_serializer;
+typedef basic_json_compressed_serializer<char,jsoncons::detail::stream_char_writer<char>> json_compressed_serializer;
+typedef basic_json_compressed_serializer<wchar_t,jsoncons::detail::stream_char_writer<wchar_t>> wjson_compressed_serializer;
 
-typedef basic_json_serializer<char,detail::string_writer<std::string>> json_string_serializer;
-typedef basic_json_serializer<wchar_t,detail::string_writer<std::wstring>> wjson_string_serializer;
+typedef basic_json_serializer<char,jsoncons::detail::string_writer<std::string>> json_string_serializer;
+typedef basic_json_serializer<wchar_t,jsoncons::detail::string_writer<std::wstring>> wjson_string_serializer;
 
-typedef basic_json_compressed_serializer<char,detail::string_writer<std::string>> json_compressed_string_serializer;
-typedef basic_json_compressed_serializer<wchar_t,detail::string_writer<std::wstring>> wjson_compressed_string_serializer;
+typedef basic_json_compressed_serializer<char,jsoncons::detail::string_writer<std::string>> json_compressed_string_serializer;
+typedef basic_json_compressed_serializer<wchar_t,jsoncons::detail::string_writer<std::wstring>> wjson_compressed_string_serializer;
 
 }
 #endif

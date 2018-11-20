@@ -103,7 +103,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<detail::is_string_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<jsoncons::detail::is_string_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         as() const
     {
         T s;
@@ -115,43 +115,43 @@ public:
             break;
         case staj_event_type::int64_value:
         {
-            detail::string_writer<T> writer(s);
-            detail::print_integer(value_.int64_value_, writer);
+            jsoncons::detail::string_writer<T> writer(s);
+            jsoncons::detail::print_integer(value_.int64_value_, writer);
             break;
         }
         case staj_event_type::uint64_value:
         {
-            detail::string_writer<T> writer(s);
-            detail::print_uinteger(value_.uint64_value_, writer);
+            jsoncons::detail::string_writer<T> writer(s);
+            jsoncons::detail::print_uinteger(value_.uint64_value_, writer);
             break;
         }
         case staj_event_type::double_value:
         {
-            detail::string_writer<T> writer(s);
-            detail::print_double f(fmt_);
+            jsoncons::detail::string_writer<T> writer(s);
+            jsoncons::detail::print_double f(fmt_);
             f(value_.double_value_, fmt_, writer);
             break;
         }
         case staj_event_type::bool_value:
         {
-            detail::string_writer<T> writer(s);
+            jsoncons::detail::string_writer<T> writer(s);
             if (value_.bool_value_)
             {
-                writer.insert(detail::true_literal<CharT>().data(),
-                    detail::true_literal<CharT>().length());
+                writer.insert(jsoncons::detail::true_literal<CharT>().data(),
+                    jsoncons::detail::true_literal<CharT>().length());
             }
             else
             {
-                writer.insert(detail::false_literal<CharT>().data(),
-                    detail::false_literal<CharT>().length());
+                writer.insert(jsoncons::detail::false_literal<CharT>().data(),
+                    jsoncons::detail::false_literal<CharT>().length());
             }
             break;
         }
         case staj_event_type::null_value:
         {
-            detail::string_writer<T> writer(s);
-            writer.insert(detail::null_literal<CharT>().data(),
-                detail::null_literal<CharT>().size());
+            jsoncons::detail::string_writer<T> writer(s);
+            writer.insert(jsoncons::detail::null_literal<CharT>().data(),
+                jsoncons::detail::null_literal<CharT>().size());
             break;
         }
         default:
@@ -161,7 +161,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<detail::is_string_view_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<jsoncons::detail::is_string_view_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         as() const
     {
         T s;
@@ -178,21 +178,21 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<detail::is_integer_like<T>::value, T>::type
+    typename std::enable_if<jsoncons::detail::is_integer_like<T>::value, T>::type
         as() const
     {
         return static_cast<T>(as_int64());
     }
 
     template<class T>
-    typename std::enable_if<detail::is_uinteger_like<T>::value, T>::type
+    typename std::enable_if<jsoncons::detail::is_uinteger_like<T>::value, T>::type
         as() const
     {
         return static_cast<T>(as_uint64());
     }
 
     template<class T>
-    typename std::enable_if<detail::is_floating_point_like<T>::value, T>::type
+    typename std::enable_if<jsoncons::detail::is_floating_point_like<T>::value, T>::type
         as() const
     {
         return static_cast<T>(as_double());
@@ -225,11 +225,11 @@ private:
         case staj_event_type::name:
         case staj_event_type::string_value:
         {
-            if (!detail::is_integer(value_.string_data_, length_))
+            if (!jsoncons::detail::is_integer(value_.string_data_, length_))
             {
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
             }
-            auto result = detail::to_integer<int64_t>(value_.string_data_, length_);
+            auto result = jsoncons::detail::to_integer<int64_t>(value_.string_data_, length_);
             if (result.overflow)
             {
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Integer overflow"));
@@ -263,11 +263,11 @@ private:
         case staj_event_type::name:
         case staj_event_type::string_value:
         {
-            if (!detail::is_uinteger(value_.string_data_, length_))
+            if (!jsoncons::detail::is_uinteger(value_.string_data_, length_))
             {
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
             }
-            auto result = detail::to_integer<uint64_t>(value_.string_data_, length_);
+            auto result = jsoncons::detail::to_integer<uint64_t>(value_.string_data_, length_);
             if (result.overflow)
             {
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Integer overflow"));
@@ -307,7 +307,7 @@ private:
             {
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
             }
-            detail::string_to_double f;
+            jsoncons::detail::string_to_double f;
             return f(target.data(), target.length());
         }
         case staj_event_type::double_value:
@@ -344,7 +344,7 @@ private:
         switch (event_type_)
         {
         case staj_event_type::string_value:
-            if (!detail::is_integer(value_.string_data_, length_))
+            if (!jsoncons::detail::is_integer(value_.string_data_, length_))
             {
                 JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a bignum"));
             }

@@ -59,7 +59,7 @@ struct is_compatible_string_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_string_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    detail::is_string_like<T>::value && 
+    jsoncons::detail::is_string_like<T>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
@@ -70,7 +70,7 @@ struct is_compatible_string_view_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_string_view_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    detail::is_string_view_like<T>::value && 
+    jsoncons::detail::is_string_view_like<T>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
@@ -81,7 +81,7 @@ struct is_compatible_array_type : std::false_type {};
 template<class Json, class T>
 struct is_compatible_array_type<Json,T, 
     typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-    detail::is_vector_like<T>::value && 
+    jsoncons::detail::is_vector_like<T>::value && 
     !is_incompatible<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
 >::type> : std::true_type {};
 
@@ -300,7 +300,7 @@ struct json_type_traits<Json, typename type_wrapper<typename Json::char_type>::p
 
 template<class Json, class T>
 struct json_type_traits<Json, T,
-                        typename std::enable_if<detail::is_integer_like<T>::value
+                        typename std::enable_if<jsoncons::detail::is_integer_like<T>::value
 >::type>
 {
     typedef typename Json::allocator_type allocator_type;
@@ -332,7 +332,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, class T>
 struct json_type_traits<Json, T,
-                        typename std::enable_if<detail::is_uinteger_like<T>::value>::type>
+                        typename std::enable_if<jsoncons::detail::is_uinteger_like<T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
@@ -517,8 +517,8 @@ struct json_type_traits<Json, std::vector<bool>::reference>
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<detail::is_compatible_array_type<Json,T>::value && 
-                                                !detail::is_std_array<T>::value>::type>
+                        typename std::enable_if<jsoncons::detail::is_compatible_array_type<Json,T>::value && 
+                                                !jsoncons::detail::is_std_array<T>::value>::type>
 {
     typedef typename std::iterator_traits<typename T::iterator>::value_type element_type;
     typedef typename Json::allocator_type allocator_type;
@@ -546,8 +546,8 @@ struct json_type_traits<Json, T,
     {
         if (j.is_array())
         {
-            T v(detail::json_array_input_iterator<Json, element_type>(j.array_range().begin()),
-                detail::json_array_input_iterator<Json, element_type>(j.array_range().end()));
+            T v(jsoncons::detail::json_array_input_iterator<Json, element_type>(j.array_range().begin()),
+                jsoncons::detail::json_array_input_iterator<Json, element_type>(j.array_range().end()));
             return v;
         }
         else
@@ -562,8 +562,8 @@ struct json_type_traits<Json, T,
     {
         if (j.is_array())
         {
-            T v(detail::json_array_input_iterator<Json, element_type>(j.array_range().begin()),
-                detail::json_array_input_iterator<Json, element_type>(j.array_range().end()));
+            T v(jsoncons::detail::json_array_input_iterator<Json, element_type>(j.array_range().begin()),
+                jsoncons::detail::json_array_input_iterator<Json, element_type>(j.array_range().end()));
             return v;
         }
         else if (j.is_byte_string_view())
@@ -614,7 +614,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<detail::is_compatible_string_type<Json,T>::value>::type>
+                        typename std::enable_if<jsoncons::detail::is_compatible_string_type<Json,T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
@@ -641,7 +641,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<detail::is_compatible_string_view_type<Json,T>::value>::type>
+                        typename std::enable_if<jsoncons::detail::is_compatible_string_view_type<Json,T>::value>::type>
 {
     typedef typename Json::allocator_type allocator_type;
 
@@ -668,7 +668,7 @@ struct json_type_traits<Json, T,
 
 template<class Json, typename T>
 struct json_type_traits<Json, T, 
-                        typename std::enable_if<detail::is_compatible_object_type<Json,T>::value>::type
+                        typename std::enable_if<jsoncons::detail::is_compatible_object_type<Json,T>::value>::type
 >
 {
     typedef typename T::mapped_type mapped_type;
@@ -690,8 +690,8 @@ struct json_type_traits<Json, T,
 
     static T as(const Json& j)
     {
-        T v(detail::json_object_input_iterator<Json,value_type>(j.object_range().begin()),
-            detail::json_object_input_iterator<Json,value_type>(j.object_range().end()));
+        T v(jsoncons::detail::json_object_input_iterator<Json,value_type>(j.object_range().begin()),
+            jsoncons::detail::json_object_input_iterator<Json,value_type>(j.object_range().end()));
         return v;
     }
 
@@ -834,7 +834,7 @@ template<class Json, typename... E>
 struct json_type_traits<Json, std::tuple<E...>>
 {
 private:
-    using helper = detail::json_tuple_helper<sizeof...(E), Json, std::tuple<E...>>;
+    using helper = jsoncons::detail::json_tuple_helper<sizeof...(E), Json, std::tuple<E...>>;
 
 public:
     static bool is(const Json& j) noexcept
