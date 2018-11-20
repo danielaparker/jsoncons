@@ -509,7 +509,7 @@ template <class Json>
 Json from_diff(const Json& source, const Json& target)
 {
     typename Json::string_type path;
-    returnjsoncons::jsonpatch::detail::from_diff(source, target, path);
+    return jsoncons::jsonpatch::detail::from_diff(source, target, path);
 }
 
 template <class Json>
