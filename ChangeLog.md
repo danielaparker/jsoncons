@@ -49,10 +49,10 @@ These have been replaced by
   `array_object_block_option`, `object_object_block_option` and
   `object_array_block_option` have been removed.
 
-- The names `object_array_split_lines`, `object_array_split_lines`,
-  `object_array_split_lines` and `object_array_split_lines` have
+- The names `object_array_split_lines`, `object_object_split_lines`,
+  `array_array_split_lines` and `array_object_split_lines` have
   been deprecated (still work) and renamed to `object_array_line_splits`, 
-  `object_array_line_splits`, `object_array_line_splits` and `object_array_line_splits`.
+  `object_object_line_splits`, `array_array_line_splits` and `array_object_line_splits`.
   Rationale: consistency with `line_split_kind` name.  
 
 Changes to json_serializer
