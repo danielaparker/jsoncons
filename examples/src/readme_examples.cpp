@@ -21,7 +21,7 @@ namespace readme
         writer.begin_array(); // indefinite length outer array
         writer.begin_array(3); // a fixed length array
         writer.string_value("foo");
-        writer.byte_string_value(byte_string{'P','u','s','s'}); // default conversion to base64url
+        writer.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
         writer.bignum_value("-18446744073709551617");
         writer.end_array();
         writer.end_array();
@@ -77,7 +77,7 @@ namespace readme
 
         json another_array = json::array(); 
         another_array.emplace_back(byte_string({'P','u','s','s'}),
-                                   byte_string_chars_format::base64); // expected conversion to base64
+                                   byte_string_chars_format::base64); // suggested conversion to base64
         another_array.emplace_back("273.15", semantic_tag_type::decimal_fraction);
         another_array.emplace(another_array.array_range().begin(),"bar"); // place at front
 
