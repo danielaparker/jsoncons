@@ -221,7 +221,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context& context) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&) override
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
@@ -267,7 +267,7 @@ private:
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
-                              byte_string_chars_format encoding_hint,
+                              byte_string_chars_format,
                               semantic_tag_type, 
                               const serializing_context&) override
     {
