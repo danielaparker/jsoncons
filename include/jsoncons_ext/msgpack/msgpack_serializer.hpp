@@ -130,8 +130,7 @@ private:
     bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         
-        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Indefinite length not supported."));
-        return true;
+        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Indefinite object length not supported."));
     }
 
     bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&) override
@@ -174,8 +173,7 @@ private:
 
     bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
-        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Indefinite length not supported."));
-        return true;
+        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Indefinite array length not supported."));
     }
 
     bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
