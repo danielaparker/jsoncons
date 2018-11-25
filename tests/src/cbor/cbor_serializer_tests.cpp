@@ -45,7 +45,7 @@ json j = json::parse(R"(
     CHECK(j == j2);
 }
 
-TEST_CASE("test_serialize_array")
+TEST_CASE("serialize array to cbor")
 {
     std::vector<uint8_t> v;
     cbor_bytes_serializer serializer(v);
@@ -163,9 +163,9 @@ TEST_CASE("test_serialize_negative_bignum2")
         json result = decode_cbor<json>(v);
         json_serializing_options options;
         options.bignum_format(bignum_chars_format::integer);
-        std::string s;
-        result.dump(s,options);
-        CHECK(std::string("[-18446744073709551617]") ==s);
+        std::string result;
+        result.dump(result,options);
+        CHECK(std::string("[-18446744073709551617]") == result);
     }
     catch (const std::exception& e)
     {
@@ -193,9 +193,9 @@ TEST_CASE("test_serialize_negative_bignum3")
         json result = decode_cbor<json>(v);
         json_serializing_options options;
         options.bignum_format(bignum_chars_format::base64url);
-        std::string s;
-        result.dump(s,options);
-        CHECK(std::string("[\"~AQAAAAAAAAAA\"]") == s);
+        std::string result;
+        result.dump(result,options);
+        CHECK(std::string("[\"~AQAAAAAAAAAA\"]") == result);
     }
     catch (const std::exception& e)
     {

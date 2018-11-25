@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_PARSER_HPP
-#define JSONCONS_CBOR_CBOR_PARSER_HPP
+#ifndef JSONCONS_MSGPACK_MSGPACK_PARSER_HPP
+#define JSONCONS_MSGPACK_MSGPACK_PARSER_HPP
 
 #include <string>
 #include <sstream>
@@ -19,14 +19,14 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_utilities.hpp>
-#include <jsoncons_ext/cbor/cbor_serializer.hpp>
-#include <jsoncons_ext/cbor/cbor_error_category.hpp>
-#include <jsoncons_ext/cbor/cbor_utilities.hpp>
-#include <jsoncons_ext/cbor/cbor_view.hpp>
+#include <jsoncons_ext/msgpack/cbor_serializer.hpp>
+#include <jsoncons_ext/msgpack/cbor_error_category.hpp>
+#include <jsoncons_ext/msgpack/cbor_utilities.hpp>
+#include <jsoncons_ext/msgpack/cbor_view.hpp>
 
-namespace jsoncons { namespace cbor {
+namespace jsoncons { namespace msgpack {
 
-class cbor_parser : public serializing_context
+class msgpack_parser : public serializing_context
 {
     const uint8_t* begin_input_;
     const uint8_t* end_input_;
@@ -36,7 +36,7 @@ class cbor_parser : public serializing_context
     size_t nesting_depth_;
     std::string buffer_;
 public:
-    cbor_parser(json_content_handler& handler)
+    msgpack_parser(json_content_handler& handler)
        : handler_(handler), 
          column_(1),
          nesting_depth_(0)
@@ -75,7 +75,7 @@ public:
             case cbor_major_type::unsigned_integer:
             {
                 const uint8_t* endp;
-                uint64_t val = jsoncons::cbor::detail::get_uint64_value(pos,end_input_,&endp);
+                uint64_t val = jsoncons::msgpack::detail::get_uint64_value(pos,end_input_,&endp);
                 if (endp == pos)
                 {
                     ec = cbor_parse_errc::unexpected_eof;
@@ -96,7 +96,7 @@ public:
             case cbor_major_type::negative_integer:
             {
                 const uint8_t* endp;
-                int64_t val = jsoncons::cbor::detail::get_int64_value(pos,end_input_,&endp);
+                int64_t val = jsoncons::msgpack::detail::get_int64_value(pos,end_input_,&endp);
                 if (endp == pos)
                 {
                     ec = cbor_parse_errc::unexpected_eof;
@@ -116,7 +116,7 @@ public:
             case cbor_major_type::byte_string:
             {
                 const uint8_t* endp;
-                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(pos,end_input_,&endp);
+                std::vector<uint8_t> v = jsoncons::msgpack::detail::get_byte_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
                     ec = cbor_parse_errc::unexpected_eof;
@@ -173,7 +173,7 @@ public:
             case cbor_major_type::text_string:
             {
                 const uint8_t* endp;
-                std::string s = jsoncons::cbor::detail::get_text_string(pos,end_input_,&endp);
+                std::string s = jsoncons::msgpack::detail::get_text_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
                     ec = cbor_parse_errc::unexpected_eof;
@@ -212,7 +212,7 @@ public:
                 if (tag == semantic_tag_type::decimal_fraction)
                 {
                     const uint8_t* endp;
-                    std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(pos, end_input_, &endp);
+                    std::string s = jsoncons::msgpack::detail::get_array_as_decimal_string(pos, end_input_, &endp);
                     if (endp == pos)
                     {
                         ec = cbor_parse_errc::unexpected_eof;
@@ -245,7 +245,7 @@ public:
                         default: // definite length
                         {
                             const uint8_t* endp;
-                            size_t len = jsoncons::cbor::detail::get_length(pos,end_input_,&endp);
+                            size_t len = jsoncons::msgpack::detail::get_length(pos,end_input_,&endp);
                             if (endp == pos)
                             {
                                 ec = cbor_parse_errc::unexpected_eof;
@@ -300,7 +300,7 @@ public:
                     default: // definite_length
                     {
                         const uint8_t* endp;
-                        size_t len = jsoncons::cbor::detail::get_length(pos,end_input_,&endp);
+                        size_t len = jsoncons::msgpack::detail::get_length(pos,end_input_,&endp);
                         if (endp == pos)
                         {
                             ec = cbor_parse_errc::unexpected_eof;
@@ -354,7 +354,7 @@ public:
                     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
                     case 0x1b: // Double-Precision Float (eight-byte IEEE 754)
                         const uint8_t* endp;
-                        double val = jsoncons::cbor::detail::get_double(pos,end_input_,&endp);
+                        double val = jsoncons::msgpack::detail::get_double(pos,end_input_,&endp);
                         if (endp == pos)
                         {
                             ec = cbor_parse_errc::unexpected_eof;
@@ -396,7 +396,7 @@ private:
         if (get_major_type(*pos) == cbor_major_type::text_string)
         {
             const uint8_t* endp;
-            std::string s = jsoncons::cbor::detail::get_text_string(pos,end_input_,&endp);
+            std::string s = jsoncons::msgpack::detail::get_text_string(pos,end_input_,&endp);
             if (endp == pos)
             {
                 ec = cbor_parse_errc::unexpected_eof;

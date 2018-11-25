@@ -1107,8 +1107,8 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
 
         if (digits_length > 0)
         {
-            size_t pos = is_negative ? digits_length+1 : digits_length; 
-            s.insert(pos, ".");
+            size_t index = is_negative ? digits_length+1 : digits_length; 
+            s.insert(index, ".");
         }
         else if (digits_length == 0)
         {
@@ -1117,8 +1117,8 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
         }
         else 
         {
-            size_t pos = is_negative ? 1 : 0; 
-            s.insert(pos, "0.");
+            size_t index = is_negative ? 1 : 0; 
+            s.insert(index, "0.");
             s.append("e-");
             uint64_t u = static_cast<uint64_t>(-digits_length);
             do 
