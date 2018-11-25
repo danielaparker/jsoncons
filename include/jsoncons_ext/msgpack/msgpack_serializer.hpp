@@ -178,7 +178,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context&) override
+    bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(msgpack_structure_type::array));
         if (length <= 15)
@@ -215,7 +215,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type tag, const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         // nil
         binary::to_big_endian(static_cast<uint8_t>(msgpack_format::nil_cd), std::back_inserter(writer_));
@@ -223,7 +223,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context& context) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context& context) override
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
@@ -305,7 +305,7 @@ private:
 
     bool do_double_value(double val, 
                          const floating_point_options&, 
-                         semantic_tag_type tag,
+                         semantic_tag_type,
                          const serializing_context&) override
     {
         float valf = (float)val;
@@ -329,7 +329,7 @@ private:
     }
 
     bool do_int64_value(int64_t val, 
-                        semantic_tag_type tag, 
+                        semantic_tag_type, 
                         const serializing_context&) override
     {
         if (val >= 0)
@@ -401,7 +401,7 @@ private:
     }
 
     bool do_uint64_value(uint64_t val, 
-                         semantic_tag_type tag, 
+                         semantic_tag_type, 
                          const serializing_context&) override
     {
         if (val <= (std::numeric_limits<int8_t>::max)())
