@@ -24,10 +24,10 @@ TEST_CASE("test_integer_limits")
     {
         std::ostringstream os;
 
-        os << "{\"min int64_t\":" << (std::numeric_limits<int64_t>::min)() << "}";
+        os << "{\"min int64_t\":" << (std::numeric_limits<int64_t>::lowest)() << "}";
         json val = json::parse(os.str());
         REQUIRE(val["min int64_t"].is_int64());
-        CHECK(val["min int64_t"].as<int64_t>() == (std::numeric_limits<int64_t>::min)());
+        CHECK(val["min int64_t"].as<int64_t>() == (std::numeric_limits<int64_t>::lowest)());
     }
 
     // test overflow

@@ -25,6 +25,38 @@
 
 namespace jsoncons { namespace msgpack {
 
+namespace msgpack_format
+{
+    const uint8_t positive_fixint_base_cd = 0x00;
+    const uint8_t nil_cd = 0xc0;
+    const uint8_t false_cd = 0xc2;
+    const uint8_t true_cd = 0xc3;
+    const uint8_t float32_cd = 0xca;
+    const uint8_t float64_cd = 0xcb;
+    const uint8_t uint8_cd = 0xcc;
+    const uint8_t uint16_cd = 0xcd;
+    const uint8_t uint32_cd = 0xce;
+    const uint8_t uint64_cd = 0xcf;
+    const uint8_t int8_cd = 0xd0;
+    const uint8_t int16_cd = 0xd1;
+    const uint8_t int32_cd = 0xd2;
+    const uint8_t int64_cd = 0xd3;
+    const uint8_t fixmap_base_cd = 0x80;
+    const uint8_t fixarray_base_cd = 0x90;
+    const uint8_t fixstr_base_cd = 0xa0;
+    const uint8_t str8_cd = 0xd9;
+    const uint8_t str16_cd = 0xda;
+    const uint8_t str32_cd = 0xdb;
+    const uint8_t bin8_cd = 0xc7;
+    const uint8_t bin16_cd = 0xc8;
+    const uint8_t bin32_cd = 0xc9;
+    const uint8_t array16_cd = 0xdc;
+    const uint8_t array32_cd = 0xdd;
+    const uint8_t map16_cd = 0xde;
+    const uint8_t map32_cd = 0xdf;
+    const uint8_t negative_fixint_base_cd = 0xe0;
+}
+
 enum class msgpack_structure_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class CharT,class Writer=jsoncons::detail::stream_byte_writer>
@@ -109,7 +141,7 @@ private:
         if (length <= 15)
         {
             // fixmap
-            binary::to_big_endian(static_cast<uint8_t>(0x80 | (length & 0xf)), 
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::fixmap_base_cd | (length & 0xf)), 
                                   std::back_inserter(writer_));
         }
         else if (length <= 65535)
@@ -148,22 +180,23 @@ private:
 
     bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context&) override
     {
+        stack_.push_back(stack_item(msgpack_structure_type::array));
         if (length <= 15)
         {
             // fixarray
-            binary::to_big_endian(static_cast<uint8_t>(0x90 | length), writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::fixarray_base_cd | (length & 0xf)), std::back_inserter(writer_));
         }
         else if (length <= (std::numeric_limits<uint16_t>::max)())
         {
             // array 16
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::array16_cd), writer_);
-            binary::to_big_endian(static_cast<uint16_t>(length),writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::array16_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(length),std::back_inserter(writer_));
         }
         else if (length <= (std::numeric_limits<uint32_t>::max)())
         {
             // array 32
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::array32_cd), writer_);
-            binary::to_big_endian(static_cast<uint32_t>(length),writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::array32_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
         }
         return true;
     }
@@ -185,12 +218,12 @@ private:
     bool do_null_value(semantic_tag_type tag, const serializing_context&) override
     {
         // nil
-        binary::to_big_endian(static_cast<uint8_t>(msgpack_format::nil_cd), writer_);
+        binary::to_big_endian(static_cast<uint8_t>(msgpack_format::nil_cd), std::back_inserter(writer_));
         end_value();
         return true;
     }
 
-    void write_string_value(const string_view_type& sv)
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context& context) override
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
@@ -205,36 +238,31 @@ private:
         if (length <= 31)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0xa0 | length), writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::fixstr_base_cd | length), std::back_inserter(writer_));
         }
         else if (length <= (std::numeric_limits<uint8_t>::max)())
         {
             // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::str8_cd), writer_);
-            binary::to_big_endian(static_cast<uint8_t>(length), writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::str8_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(length), std::back_inserter(writer_));
         }
         else if (length <= (std::numeric_limits<uint16_t>::max)())
         {
             // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::str16_cd), writer_);
-            binary::to_big_endian(static_cast<uint16_t>(length), writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::str16_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(length), std::back_inserter(writer_));
         }
         else if (length <= (std::numeric_limits<uint32_t>::max)())
         {
             // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::str32_cd), writer_);
-            binary::to_big_endian(static_cast<uint32_t>(length),writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::str32_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
         }
 
-        for (size_t i = 0; i < length; ++i)
+        for (auto c : target)
         {
-            binary::to_big_endian(static_cast<uint8_t>(target.data()[i]), writer_);
+            writer_.push_back(c);
         }
-    }
-
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context& context) override
-    {
-        encode_string(sv, binary::to_big_endian, writer_);
 
         end_value();
         return true;
@@ -245,58 +273,30 @@ private:
                               semantic_tag_type, 
                               const serializing_context&) override
     {
-        switch (encoding_hint)
+
+        const size_t length = b.length();
+        if (length <= (std::numeric_limits<uint8_t>::max)())
         {
-            case byte_string_chars_format::base64url:
-                writer_.push_back(0xd5);
-                break;
-            case byte_string_chars_format::base64:
-                writer_.push_back(0xd6);
-                break;
-            case byte_string_chars_format::base16:
-                writer_.push_back(0xd7);
-                break;
-            default:
-                break;
+            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::bin8_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(length), std::back_inserter(writer_));
         }
-        if (b.length() <= 0x17)
+        else if (length <= (std::numeric_limits<uint16_t>::max)())
         {
-            // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x40 + b.length()), 
-                                  std::back_inserter(writer_));
+            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::bin16_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(length), std::back_inserter(writer_));
         }
-        else if (b.length() <= 0xff)
+        else if (length <= (std::numeric_limits<uint32_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x58), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(b.length()), 
-                                  std::back_inserter(writer_));
-        }
-        else if (b.length() <= 0xffff)
-        {
-            binary::to_big_endian(static_cast<uint8_t>(0x59), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(b.length()), 
-                                  std::back_inserter(writer_));
-        }
-        else if (b.length() <= 0xffffffff)
-        {
-            binary::to_big_endian(static_cast<uint8_t>(0x5a), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(b.length()), 
-                                  std::back_inserter(writer_));
-        }
-        else if (b.length() <= 0xffffffffffffffff)
-        {
-            binary::to_big_endian(static_cast<uint8_t>(0x5b), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint64_t>(b.length()), 
-                                  std::back_inserter(writer_));
+            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::bin32_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
         }
 
-        for (size_t i = 0; i < b.length(); ++i)
+        for (auto c : b)
         {
-            writer_.push_back(b.data()[i]);
+            writer_.push_back(c);
         }
 
         end_value();
@@ -312,14 +312,14 @@ private:
         if ((double)valf == val)
         {
             // float 32
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::float64_cd), writer_);
-            binary::to_big_endian(jval.as_double(),writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::float32_cd), std::back_inserter(writer_));
+            binary::to_big_endian(valf,std::back_inserter(writer_));
         }
         else
         {
             // float 64
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::float64_cd), writer_);
-            binary::to_big_endian(jval.as_double(),writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::float64_cd), std::back_inserter(writer_));
+            binary::to_big_endian(val,std::back_inserter(writer_));
         }
 
         // write double
@@ -334,34 +334,34 @@ private:
     {
         if (val >= 0)
         {
-            if (val <= (std::numeric_limits<int8_t>::max)())
+            if (val <= 0x7f)
             {
                 // positive fixnum stores 7-bit positive integer
-                binary::to_big_endian(static_cast<int8_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(writer_));
             }
             else if (val <= (std::numeric_limits<uint8_t>::max)())
             {
                 // uint 8 stores a 8-bit unsigned integer
-                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint8_cd), writer_);
-                binary::to_big_endian(static_cast<uint8_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint8_cd), std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(writer_));
             }
             else if (val <= (std::numeric_limits<uint16_t>::max)())
             {
                 // uint 16 stores a 16-bit big-endian unsigned integer
-                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint16_cd), writer_);
-                binary::to_big_endian(static_cast<uint16_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint16_cd), std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint16_t>(val),std::back_inserter(writer_));
             }
             else if (val <= (std::numeric_limits<uint32_t>::max)())
             {
                 // uint 32 stores a 32-bit big-endian unsigned integer
-                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint32_cd), writer_);
-                binary::to_big_endian(static_cast<uint32_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint32_cd), std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(writer_));
             }
             else if (val <= (std::numeric_limits<int64_t>::max)())
             {
                 // int 64 stores a 64-bit big-endian signed integer
-                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int64_cd), writer_);
-                binary::to_big_endian(static_cast<int64_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint64_cd), std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<uint64_t>(val),std::back_inserter(writer_));
             }
         }
         else
@@ -369,31 +369,31 @@ private:
             if (val >= -32)
             {
                 // negative fixnum stores 5-bit negative integer
-                binary::to_big_endian(static_cast<int8_t>(val), writer_);
+                binary::to_big_endian(static_cast<int8_t>(val), std::back_inserter(writer_));
             }
-            else if (val >= (std::numeric_limits<int8_t>::min)())
+            else if (val >= (std::numeric_limits<int8_t>::lowest)())
             {
                 // int 8 stores a 8-bit signed integer
-                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int8_cd), writer_);
-                binary::to_big_endian(static_cast<int8_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int8_cd), std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<int8_t>(val),std::back_inserter(writer_));
             }
-            else if (val >= (std::numeric_limits<int16_t>::min)())
+            else if (val >= (std::numeric_limits<int16_t>::lowest)())
             {
                 // int 16 stores a 16-bit big-endian signed integer
-                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int16_cd), writer_);
-                binary::to_big_endian(static_cast<int16_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int16_cd), std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<int16_t>(val),std::back_inserter(writer_));
             }
-            else if (val >= (std::numeric_limits<int32_t>::min)())
+            else if (val >= (std::numeric_limits<int32_t>::lowest)())
             {
                 // int 32 stores a 32-bit big-endian signed integer
-                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int32_cd), writer_);
-                binary::to_big_endian(static_cast<int32_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int32_cd), std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<int32_t>(val),std::back_inserter(writer_));
             }
-            else if (val >= (std::numeric_limits<int64_t>::min)())
+            else if (val >= (std::numeric_limits<int64_t>::lowest)())
             {
                 // int 64 stores a 64-bit big-endian signed integer
-                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int64_cd), writer_);
-                binary::to_big_endian(static_cast<int64_t>(val),writer_);
+                binary::to_big_endian(static_cast<uint8_t>(msgpack_format::int64_cd), std::back_inserter(writer_));
+                binary::to_big_endian(static_cast<int64_t>(val),std::back_inserter(writer_));
             }
         }
         end_value();
@@ -407,31 +407,31 @@ private:
         if (val <= (std::numeric_limits<int8_t>::max)())
         {
             // positive fixnum stores 7-bit positive integer
-            binary::to_big_endian(static_cast<uint8_t>(val), writer_);
+            binary::to_big_endian(static_cast<uint8_t>(val), std::back_inserter(writer_));
         }
         else if (val <= (std::numeric_limits<uint8_t>::max)())
         {
             // uint 8 stores a 8-bit unsigned integer
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint8_cd), writer_);
-            binary::to_big_endian(static_cast<uint8_t>(val), writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint8_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(val), std::back_inserter(writer_));
         }
         else if (val <= (std::numeric_limits<uint16_t>::max)())
         {
             // uint 16 stores a 16-bit big-endian unsigned integer
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint16_cd), writer_);
-            binary::to_big_endian(static_cast<uint16_t>(val),writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint16_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint16_t>(val),std::back_inserter(writer_));
         }
         else if (val <= (std::numeric_limits<uint32_t>::max)())
         {
             // uint 32 stores a 32-bit big-endian unsigned integer
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint32_cd), writer_);
-            binary::to_big_endian(static_cast<uint32_t>(val),writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint32_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(writer_));
         }
         else if (val <= (std::numeric_limits<uint64_t>::max)())
         {
             // uint 64 stores a 64-bit big-endian unsigned integer
-            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint64_cd), writer_);
-            binary::to_big_endian(static_cast<uint64_t>(val),writer_);
+            binary::to_big_endian(static_cast<uint8_t>(msgpack_format::uint64_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint64_t>(val),std::back_inserter(writer_));
         }
         end_value();
         return true;
@@ -440,7 +440,8 @@ private:
     bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
     {
         // true and false
-        binary::to_big_endian(static_cast<uint8_t>(jval.as_bool() ? msgpack_format::true_cd : msgpack_format::false_cd),writer_);
+        writer_.push_back(static_cast<uint8_t>(val ? msgpack_format::true_cd : msgpack_format::false_cd));
+        //binary::to_big_endian(static_cast<uint8_t>(val ? msgpack_format::true_cd : msgpack_format::false_cd), std::back_inserter(writer_));
 
         end_value();
         return true;

@@ -17,6 +17,7 @@
 #include <cassert>
 #include <jsoncons/json.hpp>
 #include <jsoncons/config/binary_utilities.hpp>
+#include <jsoncons_ext/msgpack/msgpack_serializer.hpp>
 
 namespace jsoncons { namespace msgpack {
   
@@ -40,30 +41,6 @@ private:
     std::string buffer_;
 };
 
-namespace msgpack_format
-{
-    const uint8_t nil_cd = 0xc0;
-    const uint8_t false_cd = 0xc2;
-    const uint8_t true_cd = 0xc3;
-    const uint8_t float32_cd = 0xca;
-    const uint8_t float64_cd = 0xcb;
-    const uint8_t uint8_cd = 0xcc;
-    const uint8_t uint16_cd = 0xcd;
-    const uint8_t uint32_cd = 0xce;
-    const uint8_t uint64_cd = 0xcf;
-    const uint8_t int8_cd = 0xd0;
-    const uint8_t int16_cd = 0xd1;
-    const uint8_t int32_cd = 0xd2;
-    const uint8_t int64_cd = 0xd3;
-    const uint8_t str8_cd = 0xd9;
-    const uint8_t str16_cd = 0xda;
-    const uint8_t str32_cd = 0xdb;
-    const uint8_t array16_cd = 0xdc;
-    const uint8_t array32_cd = 0xdd;
-    const uint8_t map16_cd = 0xde;
-    const uint8_t map32_cd = 0xdf;
-}
-
 struct Encode_msgpack_
 {
     template <typename T>
@@ -79,268 +56,6 @@ struct Calculate_size_
     void operator()(T, size_t& size)
     {
         size += sizeof(T);
-    }
-};
-
-template<class Json>
-class msgpack_Encoder_
-{
-public:
-    typedef typename Json::string_view_type string_view_type;
-
-    static size_t calculate_size(const Json& j)
-    {
-        size_t n = 0;
-        msgpack_Encoder_<Json>::encode(j,Calculate_size_(),n);
-        return n;
-    }
-
-    template <class Action, class Result>
-    static void encode(const Json& jval, Action action, Result& v)
-    {
-        switch (jval.structure_tag())
-        {
-            case structure_tag_type::null_tag:
-            {
-                // nil
-                action(static_cast<uint8_t>(msgpack_format::nil_cd), v);
-                break;
-            }
-
-            case structure_tag_type::bool_tag:
-            {
-                // true and false
-                action(static_cast<uint8_t>(jval.as_bool() ? msgpack_format::true_cd : msgpack_format::false_cd),v);
-                break;
-            }
-
-            case structure_tag_type::int64_tag:
-            {
-                int64_t val = jval.template as<int64_t>();
-                if (val >= 0)
-                {
-                    if (val <= (std::numeric_limits<int8_t>::max)())
-                    {
-                        // positive fixnum stores 7-bit positive integer
-                        action(static_cast<int8_t>(val),v);
-                    }
-                    else if (val <= (std::numeric_limits<uint8_t>::max)())
-                    {
-                        // uint 8 stores a 8-bit unsigned integer
-                        action(static_cast<uint8_t>(msgpack_format::uint8_cd), v);
-                        action(static_cast<uint8_t>(val),v);
-                    }
-                    else if (val <= (std::numeric_limits<uint16_t>::max)())
-                    {
-                        // uint 16 stores a 16-bit big-endian unsigned integer
-                        action(static_cast<uint8_t>(msgpack_format::uint16_cd), v);
-                        action(static_cast<uint16_t>(val),v);
-                    }
-                    else if (val <= (std::numeric_limits<uint32_t>::max)())
-                    {
-                        // uint 32 stores a 32-bit big-endian unsigned integer
-                        action(static_cast<uint8_t>(msgpack_format::uint32_cd), v);
-                        action(static_cast<uint32_t>(val),v);
-                    }
-                    else if (val <= (std::numeric_limits<int64_t>::max)())
-                    {
-                        // int 64 stores a 64-bit big-endian signed integer
-                        action(static_cast<uint8_t>(msgpack_format::int64_cd), v);
-                        action(static_cast<int64_t>(val),v);
-                    }
-                }
-                else
-                {
-                    if (val >= -32)
-                    {
-                        // negative fixnum stores 5-bit negative integer
-                        action(static_cast<int8_t>(val), v);
-                    }
-                    else if (val >= (std::numeric_limits<int8_t>::min)())
-                    {
-                        // int 8 stores a 8-bit signed integer
-                        action(static_cast<uint8_t>(msgpack_format::int8_cd), v);
-                        action(static_cast<int8_t>(val),v);
-                    }
-                    else if (val >= (std::numeric_limits<int16_t>::min)())
-                    {
-                        // int 16 stores a 16-bit big-endian signed integer
-                        action(static_cast<uint8_t>(msgpack_format::int16_cd), v);
-                        action(static_cast<int16_t>(val),v);
-                    }
-                    else if (val >= (std::numeric_limits<int32_t>::min)())
-                    {
-                        // int 32 stores a 32-bit big-endian signed integer
-                        action(static_cast<uint8_t>(msgpack_format::int32_cd), v);
-                        action(static_cast<int32_t>(val),v);
-                    }
-                    else if (val >= (std::numeric_limits<int64_t>::min)())
-                    {
-                        // int 64 stores a 64-bit big-endian signed integer
-                        action(static_cast<uint8_t>(msgpack_format::int64_cd), v);
-                        action(static_cast<int64_t>(val),v);
-                    }
-                }
-                break;
-            }
-
-        case structure_tag_type::uint64_tag:
-            {
-                uint64_t val = jval.template as<uint64_t>();
-                if (val <= (std::numeric_limits<int8_t>::max)())
-                {
-                    // positive fixnum stores 7-bit positive integer
-                    action(static_cast<uint8_t>(val), v);
-                }
-                else if (val <= (std::numeric_limits<uint8_t>::max)())
-                {
-                    // uint 8 stores a 8-bit unsigned integer
-                    action(static_cast<uint8_t>(msgpack_format::uint8_cd), v);
-                    action(static_cast<uint8_t>(val), v);
-                }
-                else if (val <= (std::numeric_limits<uint16_t>::max)())
-                {
-                    // uint 16 stores a 16-bit big-endian unsigned integer
-                    action(static_cast<uint8_t>(msgpack_format::uint16_cd), v);
-                    action(static_cast<uint16_t>(val),v);
-                }
-                else if (val <= (std::numeric_limits<uint32_t>::max)())
-                {
-                    // uint 32 stores a 32-bit big-endian unsigned integer
-                    action(static_cast<uint8_t>(msgpack_format::uint32_cd), v);
-                    action(static_cast<uint32_t>(val),v);
-                }
-                else if (val <= (std::numeric_limits<uint64_t>::max)())
-                {
-                    // uint 64 stores a 64-bit big-endian unsigned integer
-                    action(static_cast<uint8_t>(msgpack_format::uint64_cd), v);
-                    action(static_cast<uint64_t>(val),v);
-                }
-                break;
-            }
-
-            case structure_tag_type::double_tag:
-            {
-                // float 64
-                action(static_cast<uint8_t>(msgpack_format::float64_cd), v);
-                action(jval.as_double(),v);
-                break;
-            }
-
-            case structure_tag_type::short_string_tag:
-            case structure_tag_type::long_string_tag:
-            {
-                encode_string(jval.as_string_view(), action, v);
-                break;
-            }
-
-            case structure_tag_type::array_tag:
-            {
-                const auto length = jval.array_value().size();
-                if (length <= 15)
-                {
-                    // fixarray
-                    action(static_cast<uint8_t>(0x90 | length), v);
-                }
-                else if (length <= (std::numeric_limits<uint16_t>::max)())
-                {
-                    // array 16
-                    action(static_cast<uint8_t>(msgpack_format::array16_cd), v);
-                    action(static_cast<uint16_t>(length),v);
-                }
-                else if (length <= (std::numeric_limits<uint32_t>::max)())
-                {
-                    // array 32
-                    action(static_cast<uint8_t>(msgpack_format::array32_cd), v);
-                    action(static_cast<uint32_t>(length),v);
-                }
-
-                // append each element
-                for (const auto& el : jval.array_range())
-                {
-                    encode(el, action, v);
-                }
-                break;
-            }
-
-            case structure_tag_type::object_tag:
-            {
-                const auto length = jval.object_value().size();
-                if (length <= 15)
-                {
-                    // fixmap
-                    action(static_cast<uint8_t>(0x80 | (length & 0xf)), v);
-                }
-                else if (length <= 65535)
-                {
-                    // map 16
-                    action(static_cast<uint8_t>(msgpack_format::map16_cd), v);
-                    action(static_cast<uint16_t>(length), v);
-                }
-                else if (length <= 4294967295)
-                {
-                    // map 32
-                    action(static_cast<uint8_t>(msgpack_format::map32_cd), v);
-                    action(static_cast<uint32_t>(length),v);
-                }
-
-                // append each element
-                for (const auto& kv: jval.object_range())
-                {
-                    encode_string(kv.key(), action, v);
-                    encode(kv.value(), action, v);
-                }
-                break;
-            }
-
-            default:
-            {
-                break;
-            }
-        }
-    }
-
-    template <class Action, class Result>
-    static void encode_string(const string_view_type& sv, Action action, Result& v)
-    {
-        std::basic_string<uint8_t> target;
-        auto result = unicons::convert(
-            sv.begin(), sv.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
-        if (result.ec != unicons::conv_errc())
-        {
-            JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-        }
-
-        const size_t length = target.length();
-        if (length <= 31)
-        {
-            // fixstr stores a byte array whose length is upto 31 bytes
-            action(static_cast<uint8_t>(0xa0 | length), v);
-        }
-        else if (length <= (std::numeric_limits<uint8_t>::max)())
-        {
-            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            action(static_cast<uint8_t>(msgpack_format::str8_cd), v);
-            action(static_cast<uint8_t>(length), v);
-        }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
-        {
-            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            action(static_cast<uint8_t>(msgpack_format::str16_cd), v);
-            action(static_cast<uint16_t>(length), v);
-        }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
-        {
-            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            action(static_cast<uint8_t>(msgpack_format::str32_cd), v);
-            action(static_cast<uint32_t>(length),v);
-        }
-
-        for (size_t i = 0; i < length; ++i)
-        {
-            action(static_cast<uint8_t>(target.data()[i]), v);
-        }
     }
 };
 
@@ -762,16 +477,25 @@ public:
     }
 };
 
+// encode_msgpack
+
+template<class Json>
+void encode_msgpack(const Json& j, std::basic_ostream<typename Json::char_type>& os)
+{
+    typedef typename Json::char_type char_type;
+    basic_msgpack_serializer<char_type> serializer(os);
+    j.dump(serializer);
+}
+
 template<class Json>
 void encode_msgpack(const Json& j, std::vector<uint8_t>& v)
 {
-    size_t n = 0;
-    msgpack_Encoder_<Json>::encode(j,Calculate_size_(),n);
-    v.reserve(n);
-    //v.reserve(msgpack_Encoder_<Json>::calculate_size(j));
-
-    msgpack_Encoder_<Json>::encode(j,Encode_msgpack_(),v);
+    typedef typename Json::char_type char_type;
+    basic_msgpack_serializer<char_type,jsoncons::detail::bytes_writer> serializer(v);
+    j.dump(serializer);
 }
+
+// decode_msgpack
 
 template<class Json>
 Json decode_msgpack(const std::vector<uint8_t>& v)

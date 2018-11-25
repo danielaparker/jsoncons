@@ -13,25 +13,27 @@
 using namespace jsoncons;
 using namespace jsoncons::msgpack;
 
-void check_encode_msgpack(const std::vector<uint8_t>& expected, const json& j)
+void check_encode_msgpack(const std::vector<uint8_t>& expected, 
+                          const json& j)
 {
     std::vector<uint8_t> result;
     encode_msgpack(j, result);
-    if (expected.size() != result.size())
+    if (result.size() != expected.size())
     {
         std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;
     }
-    REQUIRE(expected.size() == result.size());
+    REQUIRE(result.size() == expected.size());
     for (size_t i = 0; i < expected.size(); ++i)
     {
         if (expected[i] != result[i])
         {
+            std::cout << "Different " << i << "\n"; 
             for (size_t k = 0; k < expected.size(); ++k)
             {
                 std::cout << std::hex << (int)expected[k] << " " << std::hex << (int)result[k] << std::endl;
             }
         }
-        REQUIRE(expected[i] == result[i]);
+        REQUIRE(result[i] == expected[i]);
     }
 }
 
@@ -64,8 +66,8 @@ TEST_CASE("encode_msgpack_test")
     check_encode_msgpack({0xcd,0xff,0xff},json(65535));
     check_encode_msgpack({0xce,0,1,0x00,0x00},json(65536));
     check_encode_msgpack({0xce,0xff,0xff,0xff,0xff},json(4294967295));
-    check_encode_msgpack({0xd3,0,0,0,1,0,0,0,0},json(4294967296));
-    check_encode_msgpack({0xd3,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<int64_t>::max()));
+    check_encode_msgpack({0xcf,0,0,0,1,0,0,0,0},json(4294967296));
+    check_encode_msgpack({0xcf,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<int64_t>::max()));
 
     // negative fixint 0xe0 - 0xff
     check_encode_msgpack({0xe0},json(-32));
@@ -85,9 +87,9 @@ TEST_CASE("encode_msgpack_test")
     check_encode_msgpack({0xc2},json(false)); //
 
     // floating point
-    check_encode_msgpack({0xcb,0,0,0,0,0,0,0,0},json(0.0));
-    check_encode_msgpack({0xcb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
-    check_encode_msgpack({0xcb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
+    check_encode_msgpack({0xca,0,0,0,0},json(0.0));
+    check_encode_msgpack({0xca,0xbf,0x80,0,0},json(-1.0));
+    check_encode_msgpack({0xca,0xcb,0x7f,0xff,0xff},json(-16777215.0));
 
     // string
     check_encode_msgpack({0xa0},json(""));

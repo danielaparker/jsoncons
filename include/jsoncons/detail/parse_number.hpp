@@ -95,7 +95,7 @@ to_integer(const CharT* s, size_t length)
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static const T min_value = (std::numeric_limits<T>::min)();
+        static const T min_value = (std::numeric_limits<T>::lowest)();
         static const T min_value_div_10 = min_value / 10;
         ++s;
         for (; s < end; ++s)

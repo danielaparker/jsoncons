@@ -309,7 +309,7 @@ struct json_type_traits<Json, T,
     {
         if (j.is_int64())
         {
-            return (j.template as_integer<int64_t>() >= (std::numeric_limits<T>::min)()) && (j.template as_integer<int64_t>() <= (std::numeric_limits<T>::max)());
+            return (j.template as_integer<int64_t>() >= (std::numeric_limits<T>::lowest)()) && (j.template as_integer<int64_t>() <= (std::numeric_limits<T>::max)());
         }
         else if (j.is_uint64())
         {

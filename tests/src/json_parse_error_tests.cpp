@@ -204,7 +204,7 @@ TEST_CASE("test_uinteger_overflow")
 }
 TEST_CASE("test_negative_integer_overflow")
 {
-    int64_t m = (std::numeric_limits<int64_t>::min)();
+    int64_t m = (std::numeric_limits<int64_t>::lowest)();
     std::string s1 = std::to_string(m);
     std::string s2 = s1;
     s2.push_back('0');
