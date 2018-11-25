@@ -163,9 +163,9 @@ TEST_CASE("test_serialize_negative_bignum2")
         json result = decode_cbor<json>(v);
         json_serializing_options options;
         options.bignum_format(bignum_chars_format::integer);
-        std::string result;
-        result.dump(result,options);
-        CHECK(std::string("[-18446744073709551617]") == result);
+        std::string text;
+        result.dump(text,options);
+        CHECK(std::string("[-18446744073709551617]") == text);
     }
     catch (const std::exception& e)
     {
@@ -193,9 +193,9 @@ TEST_CASE("test_serialize_negative_bignum3")
         json result = decode_cbor<json>(v);
         json_serializing_options options;
         options.bignum_format(bignum_chars_format::base64url);
-        std::string result;
-        result.dump(result,options);
-        CHECK(std::string("[\"~AQAAAAAAAAAA\"]") == result);
+        std::string text;
+        result.dump(text,options);
+        CHECK(std::string("[\"~AQAAAAAAAAAA\"]") == text);
     }
     catch (const std::exception& e)
     {
