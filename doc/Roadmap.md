@@ -1,5 +1,13 @@
 # Roadmap
 
+### For release 0.114.0
+
+MessagePack 
+
+- New msgpack_serializer, supports bin format (now on master)
+
+- New msgpack_parser, supports bin format (now on master)
+
 ### For later releases
 
 - Support pull parsing for cbor and CSV.
@@ -7,8 +15,6 @@
 - Support selecting CSV fields using `json_pointer`
 
 - Support more error recovery and introduce optional `lenient_error_handler`.
-
-- Improve MessagePack support
 
 - Remove names that have been deprecated for more than a year.
 
