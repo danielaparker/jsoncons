@@ -1,3 +1,16 @@
+master
+------
+
+Bug fix
+
+- Fixed compile issue with `j = json::make_array()`.
+
+Message Pack enhancements
+
+- New msgpack_serializer that supports bin format 
+
+- New msgpack_parser that supports bin format 
+
 version 0.113.0
 ---------------
 
