@@ -7,9 +7,13 @@ Bug fix
 
 Message Pack enhancements
 
-- New msgpack_serializer that supports bin format 
+- New `msgpack_serializer` that supports Message Pack bin formats 
 
-- New msgpack_parser that supports bin format 
+- New `msgpack_parser` that supports Message Pack bin formats 
+
+- `encode_msgpack` and `decode_msgpack` have been
+  rewritten using `msgpack_serializer` and `msgpack_parser`,
+  and also now support bin formats.
 
 version 0.113.0
 ---------------

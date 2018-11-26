@@ -4,9 +4,11 @@
 
 MessagePack 
 
-- New msgpack_serializer that supports bin format (now on master)
+- New msgpack_serializer that supports Message Pack bin formats 
+  (now on master)
 
-- New msgpack_parser that supports bin format (now on master)
+- New msgpack_parser that supports Message Pack bin formats 
+  (now on master)
 
 - Add semantic tag types to accomodate Message Pack timestamp 32,
   64 and 96, and support conversion with CBOR epoch time.
