@@ -242,7 +242,7 @@ private:
 
     void write_string_value(const string_view_type& sv)
     {
-        std::basic_string<uint8_t> target;
+        std::vector<uint8_t> target;
         auto result = unicons::convert(
             sv.begin(), sv.end(), std::back_inserter(target), 
             unicons::conv_flags::strict);
@@ -251,7 +251,7 @@ private:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
 
-        const size_t length = target.length();
+        const size_t length = target.size();
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
@@ -287,10 +287,9 @@ private:
                                   std::back_inserter(writer_));
         }
 
-        for (size_t i = 0; i < length; ++i)
+        for (auto c : target)
         {
-            binary::to_big_endian(static_cast<uint8_t>(target.data()[i]), 
-                                  std::back_inserter(writer_));
+            writer_.push_back(c);
         }
     }
 
@@ -346,9 +345,9 @@ private:
                                   std::back_inserter(writer_));
         }
 
-        for (size_t i = 0; i < length; ++i)
+        for (auto c : data)
         {
-            writer_.push_back(data[i]);
+            writer_.push_back(c);
         }
     }
 
@@ -556,9 +555,9 @@ private:
                                   std::back_inserter(writer_));
         }
 
-        for (size_t i = 0; i < b.length(); ++i)
+        for (auto c : b)
         {
-            writer_.push_back(b.data()[i]);
+            writer_.push_back(c);
         }
 
         end_value();
