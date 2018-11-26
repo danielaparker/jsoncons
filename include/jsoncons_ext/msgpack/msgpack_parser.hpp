@@ -19,10 +19,8 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_utilities.hpp>
-#include <jsoncons_ext/msgpack/cbor_serializer.hpp>
-#include <jsoncons_ext/msgpack/cbor_error_category.hpp>
-#include <jsoncons_ext/msgpack/cbor_utilities.hpp>
-#include <jsoncons_ext/msgpack/cbor_view.hpp>
+#include <jsoncons_ext/msgpack/msgpack_detail.hpp>
+#include <jsoncons_ext/msgpack/msgpack_error_category.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -58,325 +56,456 @@ public:
 
     void parse_some(std::error_code& ec)
     {
-        bool has_cbor_tag = false;
-        uint8_t cbor_tag = 0;
-
-        if (get_major_type(*input_ptr_) == cbor_major_type::semantic_tag)
-        {
-            has_cbor_tag = true;
-            cbor_tag = get_additional_information_value(*input_ptr_);
-            input_ptr_++;
-        }
-
         const uint8_t* pos = input_ptr_++;
-
-        switch (get_major_type(*pos))
+        if (*pos <= 0xbf)
         {
-            case cbor_major_type::unsigned_integer:
+            if (*pos <= 0x7f) 
             {
-                const uint8_t* endp;
-                uint64_t val = jsoncons::msgpack::detail::get_uint64_value(pos,end_input_,&endp);
-                if (endp == pos)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-
-                if (has_cbor_tag && cbor_tag == 1)
-                {
-                    handler_.uint64_value(val, semantic_tag_type::epoch_time, *this);
-                }
-                else
-                {
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
-                }
-                break;
+                // positive fixint
+                handler_.uint64_value(*pos, semantic_tag_type::none, *this);
             }
-            case cbor_major_type::negative_integer:
+            else if (*pos <= 0x8f) 
             {
-                const uint8_t* endp;
-                int64_t val = jsoncons::msgpack::detail::get_int64_value(pos,end_input_,&endp);
-                if (endp == pos)
+                // fixmap
+                const size_t len = *pos & 0x0f;
+                handler_.begin_object(len, semantic_tag_type::none, *this);
+                for (size_t i = 0; i < len; ++i)
                 {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                if (has_cbor_tag && cbor_tag == 1)
-                {
-                    handler_.int64_value(val, semantic_tag_type::epoch_time, *this);
-                }
-                else 
-                {
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
-                }
-                break;
-            }
-            case cbor_major_type::byte_string:
-            {
-                const uint8_t* endp;
-                std::vector<uint8_t> v = jsoncons::msgpack::detail::get_byte_string(pos,end_input_,&endp);
-                if (endp == pos)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-
-                if (has_cbor_tag)
-                {
-                    switch (cbor_tag)
+                    parse_name(ec);
+                    if (ec)
                     {
-                        case 0x2:
-                            {
-                                bignum n(1, v.data(), v.size());
-                                buffer_.clear();
-                                n.dump(buffer_);
-                                handler_.bignum_value(buffer_, *this);
-                                break;
-                            }
-                        case 0x3:
-                            {
-                                bignum n(-1, v.data(), v.size());
-                                buffer_.clear();
-                                n.dump(buffer_);
-                                handler_.bignum_value(buffer_, *this);
-                                break;
-                            }
-                        case 0x15:
-                            {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64url, semantic_tag_type::none, *this);
-                                break;
-                            }
-                        case 0x16:
-                            {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64, semantic_tag_type::none, *this);
-                                break;
-                            }
-                        case 0x17:
-                            {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base16, semantic_tag_type::none, *this);
-                                break;
-                            }
-                        default:
-                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this);
-                            break;
-                    }
-                }
-                else
-                {
-                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this);
-                }
-                break;
-            }
-            case cbor_major_type::text_string:
-            {
-                const uint8_t* endp;
-                std::string s = jsoncons::msgpack::detail::get_text_string(pos,end_input_,&endp);
-                if (endp == pos)
-                {
-                    ec = cbor_parse_errc::unexpected_eof;
-                    return;
-                }
-                input_ptr_ = endp;
-                if (has_cbor_tag && cbor_tag == 0)
-                {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time, *this);
-                }
-                else
-                {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
-                }
-                break;
-            }
-            case cbor_major_type::array:
-            {
-                size_t info = get_additional_information_value(*pos);
-
-                semantic_tag_type tag = semantic_tag_type::none;
-                if (has_cbor_tag)
-                {
-                    switch (cbor_tag)
-                    {
-                        case 0x04:
-                            tag = semantic_tag_type::decimal_fraction;
-                            break;
-                        case 0x05:
-                            tag = semantic_tag_type::bigfloat;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                if (tag == semantic_tag_type::decimal_fraction)
-                {
-                    const uint8_t* endp;
-                    std::string s = jsoncons::msgpack::detail::get_array_as_decimal_string(pos, end_input_, &endp);
-                    if (endp == pos)
-                    {
-                        ec = cbor_parse_errc::unexpected_eof;
                         return;
                     }
-                    handler_.string_value(s, semantic_tag_type::decimal_fraction);
-                    input_ptr_ = endp;
-                }
-                else
-                {
-                    switch (info)
+                    parse_some(ec);
+                    if (ec)
                     {
-                        case additional_info::indefinite_length:
-                        {
-                            ++nesting_depth_;
-                            handler_.begin_array(tag, *this);
-                            while (*input_ptr_ != 0xff)
-                            {
-                                parse_some(ec);
-                                if (ec)
-                                {
-                                    return;
-                                }
-                            }
-                            ++input_ptr_;
-                            handler_.end_array(*this);
-                            --nesting_depth_;
-                            break;
-                        }
-                        default: // definite length
-                        {
-                            const uint8_t* endp;
-                            size_t len = jsoncons::msgpack::detail::get_length(pos,end_input_,&endp);
-                            if (endp == pos)
-                            {
-                                ec = cbor_parse_errc::unexpected_eof;
-                                return;
-                            }
-                            input_ptr_ = endp;
-                            ++nesting_depth_;
-                            handler_.begin_array(len, tag, *this);
-                            for (size_t i = 0; i < len; ++i)
-                            {
-                                parse_some(ec);
-                                if (ec)
-                                {
-                                    return;
-                                }
-                            }
-                            handler_.end_array(*this);
-                            --nesting_depth_;
-                            break;
-                        }
+                        return;
                     }
                 }
-                break;
+                handler_.end_object(*this);
+                --nesting_depth_;
             }
-            case cbor_major_type::map:
+            else if (*pos <= 0x9f) 
             {
-                size_t info = get_additional_information_value(*pos);
-                switch (info)
+                // fixarray
+                const size_t len = *pos & 0x0f;
+                handler_.begin_array(len, semantic_tag_type::none, *this);
+                for (size_t i = 0; i < len; ++i)
                 {
-                    case additional_info::indefinite_length: 
+                    parse_some(ec);
+                    if (ec)
                     {
-                        ++nesting_depth_;
-                        handler_.begin_object(semantic_tag_type::none, *this);
-                        while (*input_ptr_ != 0xff)
-                        {
-                            parse_name(ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            parse_some(ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                        }
-                        ++input_ptr_;
-                        handler_.end_object(*this);
-                        --nesting_depth_;
-                        break;
-                    }
-                    default: // definite_length
-                    {
-                        const uint8_t* endp;
-                        size_t len = jsoncons::msgpack::detail::get_length(pos,end_input_,&endp);
-                        if (endp == pos)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        ++nesting_depth_;
-                        handler_.begin_object(len, semantic_tag_type::none, *this);
-                        for (size_t i = 0; i < len; ++i)
-                        {
-                            parse_name(ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            parse_some(ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                        }
-                        handler_.end_object(*this);
-                        --nesting_depth_;
-                        break;
+                        return;
                     }
                 }
-                break;
+                handler_.end_array(*this);
+                --nesting_depth_;
             }
-            case cbor_major_type::semantic_tag:
+            else 
             {
-                break;
-            }
-            case cbor_major_type::simple:
-            {
-                size_t info = get_additional_information_value(*pos);
-                switch (info)
+                // fixstr
+                const size_t len = *pos & 0x1f;
+                const uint8_t* first = input_ptr_;
+                const uint8_t* last = first + len;
+                input_ptr_ += len; 
+
+                std::basic_string<char> s;
+                auto result = unicons::convert(
+                    first, last, std::back_inserter(s), unicons::conv_flags::strict);
+                if (result.ec != unicons::conv_errc())
                 {
-                    case 0x14:
-                        handler_.bool_value(false, semantic_tag_type::none, *this);
-                        break;
-                    case 0x15:
-                        handler_.bool_value(true, semantic_tag_type::none, *this);
-                        break;
-                    case 0x16:
-                        handler_.null_value(semantic_tag_type::none, *this);
-                        break;
-                    case 0x17:
-                        handler_.null_value(semantic_tag_type::undefined, *this);
-                        break;
-                    case 0x19: // Half-Precision Float (two-byte IEEE 754)
-                    case 0x1a: // Single-Precision Float (four-byte IEEE 754)
-                    case 0x1b: // Double-Precision Float (eight-byte IEEE 754)
-                        const uint8_t* endp;
-                        double val = jsoncons::msgpack::detail::get_double(pos,end_input_,&endp);
-                        if (endp == pos)
-                        {
-                            ec = cbor_parse_errc::unexpected_eof;
-                            return;
-                        }
-                        input_ptr_ = endp;
-                        if (has_cbor_tag && cbor_tag == 1)
-                        {
-                            handler_.double_value(val, floating_point_options(), semantic_tag_type::epoch_time, *this);
-                        }
-                        else
-                        {
-                            handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
-                        }
-                        break;
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                 }
-                break;
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
             }
         }
-        if (nesting_depth_ == 0)
+        else if (*pos >= 0xe0) 
         {
-            handler_.flush();
+            // negative fixint
+            handler_.int64_value(static_cast<int8_t>(*pos), semantic_tag_type::none, *this);
+        }
+        else
+        {
+            switch (*pos)
+            {
+                case msgpack_format::nil_cd: 
+                {
+                    handler_.null_value(semantic_tag_type::none, *this);
+                    break;
+                }
+                case msgpack_format::true_cd:
+                {
+                    handler_.bool_value(true, semantic_tag_type::none, *this);
+                    break;
+                }
+                case msgpack_format::false_cd:
+                {
+                    handler_.bool_value(false, semantic_tag_type::none, *this);
+                    break;
+                }
+                case msgpack_format::float32_cd: 
+                {
+                    const uint8_t* endp;
+                    float res = binary::from_big_endian<float>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.double_value(res, floating_point_options(), semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::float64_cd: 
+                {
+                    const uint8_t* endp;
+                    double res = binary::from_big_endian<double>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.double_value(res, floating_point_options(), semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::uint8_cd: 
+                {
+                    const uint8_t* endp;
+                    auto x = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.uint64_value(x, semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::uint16_cd: 
+                {
+                    const uint8_t* endp;
+                    auto x = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.uint64_value(x, semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::uint32_cd: 
+                {
+                    const uint8_t* endp;
+                    auto x = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.uint64_value(x, semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::uint64_cd: 
+                {
+                    const uint8_t* endp;
+                    auto x = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.uint64_value(x, semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::int8_cd: 
+                {
+                    const uint8_t* endp;
+                    auto x = binary::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.int64_value(x, semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::int16_cd: 
+                {
+                    const uint8_t* endp;
+                    auto x = binary::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.int64_value(x, semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::int32_cd: 
+                {
+                    const uint8_t* endp;
+                    auto x = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.int64_value(x, semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::int64_cd: 
+                {
+                    const uint8_t* endp;
+                    auto x = binary::from_big_endian<int64_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.int64_value(x, semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::str8_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+                    const uint8_t* first = &(*(pos + 2));
+                    const uint8_t* last = first + len;
+                    input_ptr_ += len; 
+
+                    std::basic_string<char> s;
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(s),unicons::conv_flags::strict);
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                    }
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::str16_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+                    const uint8_t* first = &(*(pos + 3));
+                    const uint8_t* last = first + len;
+                    input_ptr_ += len; 
+
+                    std::basic_string<char> s;
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(s),unicons::conv_flags::strict);
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                    }
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::str32_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+                    const uint8_t* first = &(*(pos + 5));
+                    const uint8_t* last = first + len;
+                    input_ptr_ += len; 
+
+                    std::basic_string<char> s;
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(s),unicons::conv_flags::strict);
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                    }
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::array16_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.begin_array(len, semantic_tag_type::none, *this);
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        parse_some(ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    handler_.end_array(*this);
+                    --nesting_depth_;
+                    break;
+                }
+
+                case msgpack_format::array32_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.begin_array(len, semantic_tag_type::none, *this);
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        parse_some(ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    handler_.end_array(*this);
+                    --nesting_depth_;
+                    break;
+                }
+
+                case msgpack_format::map16_cd : 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.begin_object(len, semantic_tag_type::none, *this);
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        parse_name(ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        parse_some(ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    handler_.end_object(*this);
+                    --nesting_depth_;
+                    break;
+                }
+
+                case msgpack_format::map32_cd : 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+                    handler_.begin_object(len, semantic_tag_type::none, *this);
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        parse_name(ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        parse_some(ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    handler_.end_object(*this);
+                    --nesting_depth_;
+                    break;
+                }
+
+                default:
+                {
+                    JSONCONS_THROW(msgpack_decode_error(end_input_-pos));
+                }
+            }
         }
     }
 
@@ -393,23 +522,112 @@ private:
     void parse_name(std::error_code& ec)
     {
         const uint8_t* pos = input_ptr_++;
-        if (get_major_type(*pos) == cbor_major_type::text_string)
+        if (*pos >= 0xa0 && *pos <= 0xbf)
         {
-            const uint8_t* endp;
-            std::string s = jsoncons::msgpack::detail::get_text_string(pos,end_input_,&endp);
-            if (endp == pos)
-            {
-                ec = cbor_parse_errc::unexpected_eof;
-                return;
-            }
-            input_ptr_ = endp;
-            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    // fixstr
+                const size_t len = *pos & 0x1f;
+                const uint8_t* first = input_ptr_;
+                const uint8_t* last = first + len;
+                input_ptr_ += len; 
+
+                std::basic_string<char> s;
+                auto result = unicons::convert(
+                    first, last, std::back_inserter(s), unicons::conv_flags::strict);
+                if (result.ec != unicons::conv_errc())
+                {
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                }
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
         }
         else
         {
-            cbor_view v(pos,end_input_ - pos);
-            std::string s = v.as_string();
-            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+            switch (*pos)
+            {
+                case msgpack_format::str8_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+                    const uint8_t* first = &(*(pos + 2));
+                    const uint8_t* last = first + len;
+                    input_ptr_ += len; 
+
+                    std::basic_string<char> s;
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(s),unicons::conv_flags::strict);
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                    }
+                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    break;
+                }
+
+                case msgpack_format::str16_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+                    const uint8_t* first = &(*(pos + 3));
+                    const uint8_t* last = first + len;
+                    input_ptr_ += len; 
+
+                    std::basic_string<char> s;
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(s),unicons::conv_flags::strict);
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                    }
+                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    break;
+                }
+
+                case msgpack_format::str32_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+                    const uint8_t* first = &(*(pos + 5));
+                    const uint8_t* last = first + len;
+                    input_ptr_ += len; 
+
+                    std::basic_string<char> s;
+                    auto result = unicons::convert(
+                        first, last,std::back_inserter(s),unicons::conv_flags::strict);
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
+                    }
+                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    break;
+                }
+            }
+
         }
     }
 };

@@ -30,6 +30,7 @@ void print_msgpack(const json j)
     std::cout << std::endl;
 }
 
+#if 0
 TEST_CASE("decode_number_msgpack_test")
 {
     // positive fixint 0x00 - 0x7f
@@ -98,21 +99,24 @@ TEST_CASE("decode_number_msgpack_test")
                             '1','2'},
                  json("12345678901234567890123456789012"));
 
-
 }
-
+#endif
 TEST_CASE("decode_msgpack_arrays_and_maps")
 {
     // fixarray
+/*
     check_decode({0x90},json::array());
     check_decode({0x80},json::object());
 
     check_decode({0x91,'\0'},json::parse("[0]"));
     check_decode({0x92,'\0','\0'},json::array({0,0}));
+*/
     check_decode({0x92,0x91,'\0','\0'}, json::parse("[[0],0]"));
+/*
     check_decode({0x91,0xa5,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
     check_decode({0x81,0xa2,'o','c',0x91,'\0'}, json::parse("{\"oc\": [0]}"));
     check_decode({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
+*/
 }
 
