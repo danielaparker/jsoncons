@@ -214,6 +214,10 @@ TEST_CASE("test_reserve_array_capacity")
     CHECK(cities.size() == 3);
 }
 
+TEST_CASE("test make_array()")
+{
+    json j = json::make_array();
+}
 
 TEST_CASE("test_one_dim_array")
 {
