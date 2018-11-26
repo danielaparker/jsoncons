@@ -45,10 +45,6 @@ void encode_msgpack(const Json& j, std::vector<uint8_t>& v)
 template<class Json>
 Json decode_msgpack(const std::vector<uint8_t>& v)
 {
-/*
-    Decode_msgpack_<Json> decoder(v.data(),v.data()+v.size());
-    return decoder.decode();
-*/
     jsoncons::json_decoder<Json> decoder;
     msgpack_parser parser(decoder);
     parser.update(v.data(),v.size());

@@ -891,7 +891,7 @@ const json expected = json::parse(R"(
 
     j.merge(source);
     CHECK(j.size() == 3);
-    CHECK(expected == j);
+    CHECK(j == expected);
 
     j2.merge(j2.object_range().begin()+1,source);
     CHECK(j2.size() == 3);
@@ -927,7 +927,7 @@ const ojson expected = ojson::parse(R"(
 
     j.merge(source);
     CHECK(j.size() == 3);
-    CHECK(expected == j);
+    CHECK(j == expected);
 
     j2.merge(j2.object_range().begin()+1,source);
     CHECK(j2.size() == 3);
@@ -965,7 +965,7 @@ json expected = json::parse(R"(
 
     j.merge(std::move(source));
     CHECK(j.size() == 3);
-    CHECK(expected == j);
+    CHECK(j == expected);
 
     j2.merge(std::move(source2));
     CHECK(j2.size() == 3);
@@ -1003,7 +1003,7 @@ ojson expected = ojson::parse(R"(
 
     j.merge(std::move(source));
     CHECK(j.size() == 3);
-    CHECK(expected == j);
+    CHECK(j == expected);
 
     j2.merge(j2.object_range().begin(),std::move(source2));
     CHECK(j2.size() == 3);
@@ -1042,7 +1042,7 @@ const json expected = json::parse(R"(
 
     j.merge_or_update(source);
     CHECK(j.size() == 3);
-    CHECK(expected == j);
+    CHECK(j == expected);
 
     j2.merge_or_update(j2.object_range().begin()+1,source);
     CHECK(j2.size() == 3);
@@ -1078,7 +1078,7 @@ const ojson expected = ojson::parse(R"(
 
     j.merge_or_update(source);
     CHECK(j.size() == 3);
-    CHECK(expected == j);
+    CHECK(j == expected);
 
     j2.merge_or_update(j2.object_range().begin()+1,source);
     CHECK(j2.size() == 3);
@@ -1116,7 +1116,7 @@ json expected = json::parse(R"(
 
     j.merge_or_update(std::move(source));
     CHECK(j.size() == 3);
-    CHECK(expected == j);
+    CHECK(j == expected);
 
     j2.merge_or_update(std::move(source2));
     CHECK(j2.size() == 3);
@@ -1154,7 +1154,7 @@ ojson expected = ojson::parse(R"(
 
     j.merge_or_update(std::move(source));
     CHECK(j.size() == 3);
-    CHECK(expected == j);
+    CHECK(j == expected);
 
     j2.merge_or_update(j2.object_range().begin(),std::move(source2));
     CHECK(j2.size() == 3);

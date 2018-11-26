@@ -56,7 +56,7 @@ NY,LON,TOR;LON
     try
     {
         json j = decode_csv<json>(s,options);
-        CHECK(expected == j);
+        CHECK(j == expected);
         //std::cout << pretty_print(j) << std::endl;
     }
     catch (const std::exception& e)
@@ -98,7 +98,7 @@ NY,LON,TOR;LON
     try
     {
         json j = decode_csv<json>(s,options);
-        CHECK(expected == j);
+        CHECK(j == expected);
         //std::cout << pretty_print(j) << std::endl;
     }
     catch (const std::exception& e)
@@ -137,7 +137,7 @@ NY,LON,TOR;LON
     try
     {
         json j = decode_csv<json>(s,options);
-        CHECK(expected == j);
+        CHECK(j == expected);
         //std::cout << pretty_print(j) << std::endl;
     }
     catch (const std::exception& e)

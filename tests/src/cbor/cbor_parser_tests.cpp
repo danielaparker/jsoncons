@@ -472,7 +472,7 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
 
     json j = cbor::decode_cbor<json>(bytes);
 
-    REQUIRE(expected == j);
+    REQUIRE(j == expected);
     for (size_t i = 0; i < j.size(); ++i)
     {
         CHECK(j[i].semantic_tag() == expected[i].semantic_tag()); 

@@ -30,7 +30,6 @@ void print_msgpack(const json j)
     std::cout << std::endl;
 }
 
-#if 0
 TEST_CASE("decode_number_msgpack_test")
 {
     // positive fixint 0x00 - 0x7f
@@ -100,23 +99,39 @@ TEST_CASE("decode_number_msgpack_test")
                  json("12345678901234567890123456789012"));
 
 }
-#endif
+
 TEST_CASE("decode_msgpack_arrays_and_maps")
 {
     // fixarray
-/*
     check_decode({0x90},json::array());
     check_decode({0x80},json::object());
 
     check_decode({0x91,'\0'},json::parse("[0]"));
     check_decode({0x92,'\0','\0'},json::array({0,0}));
-*/
     check_decode({0x92,0x91,'\0','\0'}, json::parse("[[0],0]"));
-/*
     check_decode({0x91,0xa5,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
     check_decode({0x81,0xa2,'o','c',0x91,'\0'}, json::parse("{\"oc\": [0]}"));
     check_decode({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
-*/
+}
+
+TEST_CASE("Compare msgpack packed item and jsoncons item")
+{
+    std::vector<uint8_t> bytes;
+    msgpack::msgpack_bytes_serializer writer(bytes);
+    writer.begin_array(2); // Must be definite length array
+    writer.string_value("foo");
+    writer.byte_string_value(byte_string{'b','a','r'});
+    writer.end_array();
+    writer.flush();
+
+    json expected = json::array();
+
+    expected.emplace_back("foo");
+    expected.emplace_back(byte_string{ 'b','a','r' });
+
+    json j = msgpack::decode_msgpack<json>(bytes);
+
+    REQUIRE(j == expected);
 }
 

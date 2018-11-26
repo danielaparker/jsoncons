@@ -21,7 +21,7 @@
 #include <jsoncons/config/binary_utilities.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 #include <jsoncons_ext/cbor/cbor_error_category.hpp>
-#include <jsoncons_ext/cbor/cbor_utilities.hpp>
+#include <jsoncons_ext/cbor/cbor_details.hpp>
 #include <jsoncons_ext/cbor/cbor_view.hpp>
 
 namespace jsoncons { namespace cbor {

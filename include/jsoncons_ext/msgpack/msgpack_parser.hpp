@@ -69,6 +69,7 @@ public:
                 // fixmap
                 const size_t len = *pos & 0x0f;
                 handler_.begin_object(len, semantic_tag_type::none, *this);
+                ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
                     parse_name(ec);
@@ -90,6 +91,7 @@ public:
                 // fixarray
                 const size_t len = *pos & 0x0f;
                 handler_.begin_array(len, semantic_tag_type::none, *this);
+                ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
                     parse_some(ec);
@@ -316,7 +318,7 @@ public:
                         input_ptr_ = endp;
                     }
 
-                    const uint8_t* first = &(*(pos + 2));
+                    const uint8_t* first = endp;
                     const uint8_t* last = first + len;
                     input_ptr_ += len; 
 
@@ -344,7 +346,7 @@ public:
                         input_ptr_ = endp;
                     }
 
-                    const uint8_t* first = &(*(pos + 3));
+                    const uint8_t* first = endp;
                     const uint8_t* last = first + len;
                     input_ptr_ += len; 
 
@@ -372,7 +374,7 @@ public:
                         input_ptr_ = endp;
                     }
 
-                    const uint8_t* first = &(*(pos + 5));
+                    const uint8_t* first = endp;
                     const uint8_t* last = first + len;
                     input_ptr_ += len; 
 
@@ -384,6 +386,86 @@ public:
                         JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                     }
                     handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    break;
+                }
+
+                case msgpack_format::bin8_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+                    const uint8_t* first = endp;
+                    const uint8_t* last = first + len;
+
+                    std::vector<uint8_t> v(first, last);
+                    input_ptr_ += len; 
+
+                    handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
+                                               byte_string_chars_format::none, 
+                                               semantic_tag_type::none, 
+                                               *this);
+                    break;
+                }
+
+                case msgpack_format::bin16_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+
+                    const uint8_t* first = endp;
+                    const uint8_t* last = first + len;
+
+                    std::vector<uint8_t> v(first, last);
+                    input_ptr_ += len; 
+
+                    handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
+                                               byte_string_chars_format::none, 
+                                               semantic_tag_type::none, 
+                                               *this);
+                    break;
+                }
+
+                case msgpack_format::bin32_cd: 
+                {
+                    const uint8_t* endp;
+                    const auto len = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                    if (endp == input_ptr_)
+                    {
+                        JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
+                    }
+                    else
+                    {
+                        input_ptr_ = endp;
+                    }
+
+
+                    const uint8_t* first = endp;
+                    const uint8_t* last = first + len;
+
+                    std::vector<uint8_t> v(first, last);
+                    input_ptr_ += len; 
+
+                    handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
+                                               byte_string_chars_format::none, 
+                                               semantic_tag_type::none, 
+                                               *this);
                     break;
                 }
 
@@ -400,6 +482,7 @@ public:
                         input_ptr_ = endp;
                     }
                     handler_.begin_array(len, semantic_tag_type::none, *this);
+                    ++nesting_depth_;
                     for (size_t i = 0; i < len; ++i)
                     {
                         parse_some(ec);
@@ -426,6 +509,7 @@ public:
                         input_ptr_ = endp;
                     }
                     handler_.begin_array(len, semantic_tag_type::none, *this);
+                    ++nesting_depth_;
                     for (size_t i = 0; i < len; ++i)
                     {
                         parse_some(ec);
@@ -452,6 +536,7 @@ public:
                         input_ptr_ = endp;
                     }
                     handler_.begin_object(len, semantic_tag_type::none, *this);
+                    ++nesting_depth_;
                     for (size_t i = 0; i < len; ++i)
                     {
                         parse_name(ec);
@@ -483,6 +568,7 @@ public:
                         input_ptr_ = endp;
                     }
                     handler_.begin_object(len, semantic_tag_type::none, *this);
+                    ++nesting_depth_;
                     for (size_t i = 0; i < len; ++i)
                     {
                         parse_name(ec);
@@ -519,7 +605,7 @@ public:
         return column_;
     }
 private:
-    void parse_name(std::error_code& ec)
+    void parse_name(std::error_code&)
     {
         const uint8_t* pos = input_ptr_++;
         if (*pos >= 0xa0 && *pos <= 0xbf)
@@ -556,7 +642,7 @@ private:
                         input_ptr_ = endp;
                     }
 
-                    const uint8_t* first = &(*(pos + 2));
+                    const uint8_t* first = endp;
                     const uint8_t* last = first + len;
                     input_ptr_ += len; 
 
@@ -584,7 +670,7 @@ private:
                         input_ptr_ = endp;
                     }
 
-                    const uint8_t* first = &(*(pos + 3));
+                    const uint8_t* first = endp;
                     const uint8_t* last = first + len;
                     input_ptr_ += len; 
 
@@ -612,7 +698,7 @@ private:
                         input_ptr_ = endp;
                     }
 
-                    const uint8_t* first = &(*(pos + 5));
+                    const uint8_t* first = endp;
                     const uint8_t* last = first + len;
                     input_ptr_ += len; 
 
