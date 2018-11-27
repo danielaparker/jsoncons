@@ -46,10 +46,6 @@ namespace jsoncons {
         unpaired_high_surrogate
     };
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-typedef json_errc json_parser_errc;
-#endif
-
 class json_error_category_impl
    : public std::error_category
 {
@@ -138,6 +134,10 @@ std::error_code make_error_code(json_errc result)
 {
     return std::error_code(static_cast<int>(result),json_error_category());
 }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef json_errc json_parser_errc;
+#endif
 
 
 }

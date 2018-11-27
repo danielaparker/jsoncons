@@ -12,16 +12,12 @@
 
 namespace jsoncons { namespace cbor {
 
-    enum class cbor_errc
-    {
-        ok = 0,
-        unexpected_eof = 1,
-        source_error
-    };
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-typedef cbor_errc cbor_parser_errc;
-#endif
+enum class cbor_errc
+{
+    ok = 0,
+    unexpected_eof = 1,
+    source_error
+};
 
 class cbor_error_category_impl
    : public std::error_category
@@ -67,5 +63,9 @@ namespace std {
     {
     };
 }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef cbor_errc cbor_parser_errc;
+#endif
 
 #endif
