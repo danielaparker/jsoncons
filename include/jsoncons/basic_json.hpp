@@ -2424,17 +2424,17 @@ public:
 
     static basic_json make_array()
     {
-        return basic_json(variant(array()));
+        return basic_json(array());
     }
 
     static basic_json make_array(const array& a)
     {
-        return basic_json(variant(a));
+        return basic_json(a);
     }
 
     static basic_json make_array(const array& a, allocator_type allocator)
     {
-        return basic_json(variant(a,allocator));
+        return basic_json(variant(a, semantic_tag_type::none, allocator));
     }
 
     static basic_json make_array(std::initializer_list<basic_json> init, const Allocator& allocator = Allocator())

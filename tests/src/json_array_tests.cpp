@@ -12,6 +12,19 @@
 
 using namespace jsoncons;
 
+TEST_CASE("test make_array()")
+{
+    json j = json::make_array();
+    CHECK(j.is_array());
+    CHECK(j.size() == 0);
+    j.emplace_back("Toronto");
+    j.emplace_back("Vancouver");
+    j.emplace(j.array_range().begin(),"Montreal");
+    CHECK(j[0].as<std::string>() == std::string("Montreal"));
+    CHECK(j[1].as<std::string>() == std::string("Toronto"));
+    CHECK(j[2].as<std::string>() == std::string("Vancouver"));
+}
+
 TEST_CASE("test_initializer_list_of_integers")
 {
     json arr = json::array{0,1,2,3};
@@ -118,7 +131,7 @@ TEST_CASE("test_array_constructor")
     CHECK(arr[0].as<double>() == Approx(10.0).epsilon(0.0000001));
 }
 
-TEST_CASE("test_make_array")
+TEST_CASE("test json::array()")
 {
     json arr = json::array();
     CHECK(arr.size() == 0);

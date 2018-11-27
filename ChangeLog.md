@@ -1,3 +1,10 @@
+version 0.113.1
+---------------
+
+Bug fix
+
+- Fixed compile issue with j = json::make_array().
+
 version 0.113.0
 ---------------
 
