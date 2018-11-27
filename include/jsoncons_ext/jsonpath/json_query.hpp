@@ -15,7 +15,7 @@
 #include <memory>
 #include <jsoncons/json.hpp>
 #include "jsonpath_filter.hpp"
-#include "jsonpath_error_category.hpp"
+#include "jsonpath_error.hpp"
 
 namespace jsoncons { namespace jsonpath {
 

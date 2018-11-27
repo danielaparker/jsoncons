@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <memory>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer_error_category.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 
 namespace jsoncons { namespace jsonpointer {
 

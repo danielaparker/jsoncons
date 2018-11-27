@@ -15,7 +15,7 @@
 #include <memory>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonpatch/jsonpatch_error_category.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
 
 namespace jsoncons { namespace jsonpatch {
 

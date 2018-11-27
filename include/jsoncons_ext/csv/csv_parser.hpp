@@ -23,7 +23,7 @@
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons_ext/csv/csv_error_category.hpp>
+#include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_serializing_options.hpp>
 
 namespace jsoncons { namespace csv {
@@ -438,8 +438,8 @@ public:
             }
             if (!pop_mode(csv_mode_type::initial))
             {
-                err_handler_.fatal_error(csv_parse_errc::unexpected_eof, *this);
-                ec = csv_parse_errc::unexpected_eof;
+                err_handler_.fatal_error(csv_errc::unexpected_eof, *this);
+                ec = csv_errc::unexpected_eof;
                 continue_ = false;
                 return;
             }
@@ -623,8 +623,8 @@ all_csv_states:
                 }
                 break;
             default:
-                err_handler_.fatal_error(csv_parse_errc::invalid_state, *this);
-                ec = csv_parse_errc::invalid_state;
+                err_handler_.fatal_error(csv_errc::invalid_state, *this);
+                ec = csv_errc::invalid_state;
                 continue_ = false;
                 return;
             }
@@ -856,8 +856,8 @@ private:
             }
             break;
         default:
-            err_handler_.fatal_error(csv_parse_errc::invalid_csv_text, *this);
-            ec = csv_parse_errc::invalid_csv_text;
+            err_handler_.fatal_error(csv_errc::invalid_csv_text, *this);
+            ec = csv_errc::invalid_csv_text;
             continue_ = false;
             return;
         }

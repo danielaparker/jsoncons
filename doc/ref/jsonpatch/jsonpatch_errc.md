@@ -5,7 +5,7 @@ The constant integer values scoped by `jsonpatch_errc` define the values for jso
 #### Header
 
 ```c++
-#include <jsoncons_ext/jsonpatch/jsonpatch_error_category.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch_error.hpp>
 ```
 
 ### Member constants

@@ -4,36 +4,36 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BSON_BSON_ERROR_CATEGORY_HPP
-#define JSONCONS_BSON_BSON_ERROR_CATEGORY_HPP
+#ifndef JSONCONS_UBJSON_UBJSON_ERROR_HPP
+#define JSONCONS_UBJSON_UBJSON_ERROR_HPP
 
 #include <system_error>
 #include <jsoncons/config/jsoncons_config.hpp>
 
-namespace jsoncons { namespace bson {
+namespace jsoncons { namespace ubjson {
 
-enum class bson_parse_errc
+enum class ubjson_errc
 {
     ok = 0,
     unexpected_eof = 1,
     source_error
 };
 
-class bson_error_category_impl
+class ubjson_error_category_impl
    : public std::error_category
 {
 public:
     virtual const char* name() const noexcept
     {
-        return "bson";
+        return "ubjson";
     }
     virtual std::string message(int ev) const
     {
-        switch (static_cast<bson_parse_errc>(ev))
+        switch (static_cast<ubjson_errc>(ev))
         {
-        case bson_parse_errc::unexpected_eof:
+        case ubjson_errc::unexpected_eof:
             return "Unexpected end of file";
-        case bson_parse_errc::source_error:
+        case ubjson_errc::source_error:
             return "Source error";
        default:
             return "Unknown CBOR parser error";
@@ -42,16 +42,16 @@ public:
 };
 
 inline
-const std::error_category& bson_error_category()
+const std::error_category& ubjson_error_category()
 {
-  static bson_error_category_impl instance;
+  static ubjson_error_category_impl instance;
   return instance;
 }
 
 inline 
-std::error_code make_error_code(bson_parse_errc result)
+std::error_code make_error_code(ubjson_errc result)
 {
-    return std::error_code(static_cast<int>(result),bson_error_category());
+    return std::error_code(static_cast<int>(result),ubjson_error_category());
 }
 
 
@@ -59,7 +59,7 @@ std::error_code make_error_code(bson_parse_errc result)
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::bson::bson_parse_errc> : public true_type
+    struct is_error_code_enum<jsoncons::ubjson::ubjson_errc> : public true_type
     {
     };
 }

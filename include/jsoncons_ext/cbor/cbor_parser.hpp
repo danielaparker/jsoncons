@@ -20,7 +20,7 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_utilities.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
-#include <jsoncons_ext/cbor/cbor_error_category.hpp>
+#include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_details.hpp>
 #include <jsoncons_ext/cbor/cbor_view.hpp>
 
@@ -78,7 +78,7 @@ public:
                 uint64_t val = jsoncons::cbor::detail::get_uint64_value(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parse_errc::unexpected_eof;
+                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -99,7 +99,7 @@ public:
                 int64_t val = jsoncons::cbor::detail::get_int64_value(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parse_errc::unexpected_eof;
+                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -119,7 +119,7 @@ public:
                 std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parse_errc::unexpected_eof;
+                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -176,7 +176,7 @@ public:
                 std::string s = jsoncons::cbor::detail::get_text_string(pos,end_input_,&endp);
                 if (endp == pos)
                 {
-                    ec = cbor_parse_errc::unexpected_eof;
+                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
                 input_ptr_ = endp;
@@ -215,7 +215,7 @@ public:
                     std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(pos, end_input_, &endp);
                     if (endp == pos)
                     {
-                        ec = cbor_parse_errc::unexpected_eof;
+                        ec = cbor_errc::unexpected_eof;
                         return;
                     }
                     handler_.string_value(s, semantic_tag_type::decimal_fraction);
@@ -248,7 +248,7 @@ public:
                             size_t len = jsoncons::cbor::detail::get_length(pos,end_input_,&endp);
                             if (endp == pos)
                             {
-                                ec = cbor_parse_errc::unexpected_eof;
+                                ec = cbor_errc::unexpected_eof;
                                 return;
                             }
                             input_ptr_ = endp;
@@ -303,7 +303,7 @@ public:
                         size_t len = jsoncons::cbor::detail::get_length(pos,end_input_,&endp);
                         if (endp == pos)
                         {
-                            ec = cbor_parse_errc::unexpected_eof;
+                            ec = cbor_errc::unexpected_eof;
                             return;
                         }
                         input_ptr_ = endp;
@@ -357,7 +357,7 @@ public:
                         double val = jsoncons::cbor::detail::get_double(pos,end_input_,&endp);
                         if (endp == pos)
                         {
-                            ec = cbor_parse_errc::unexpected_eof;
+                            ec = cbor_errc::unexpected_eof;
                             return;
                         }
                         input_ptr_ = endp;
@@ -399,7 +399,7 @@ private:
             std::string s = jsoncons::cbor::detail::get_text_string(pos,end_input_,&endp);
             if (endp == pos)
             {
-                ec = cbor_parse_errc::unexpected_eof;
+                ec = cbor_errc::unexpected_eof;
                 return;
             }
             input_ptr_ = endp;

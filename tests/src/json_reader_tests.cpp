@@ -52,24 +52,24 @@ TEST_CASE("test_missing_separator")
 {
     std::string jtext = R"({"field1"{}})";    
 
-    test_json_reader_error(jtext, jsoncons::json_parse_errc::expected_colon);
-    test_json_reader_ec(jtext, jsoncons::json_parse_errc::expected_colon);
+    test_json_reader_error(jtext, jsoncons::json_errc::expected_colon);
+    test_json_reader_ec(jtext, jsoncons::json_errc::expected_colon);
 }
 
 TEST_CASE("test_read_invalid_value")
 {
     std::string jtext = R"({"field1":ru})";    
 
-    test_json_reader_error(jtext,jsoncons::json_parse_errc::expected_value);
-    test_json_reader_ec(jtext, jsoncons::json_parse_errc::expected_value);
+    test_json_reader_error(jtext,jsoncons::json_errc::expected_value);
+    test_json_reader_ec(jtext, jsoncons::json_errc::expected_value);
 }
 
 TEST_CASE("test_read_unexpected_end_of_file")
 {
     std::string jtext = R"({"field1":{})";    
 
-    test_json_reader_error(jtext, jsoncons::json_parse_errc::unexpected_eof);
-    test_json_reader_ec(jtext, jsoncons::json_parse_errc::unexpected_eof);
+    test_json_reader_error(jtext, jsoncons::json_errc::unexpected_eof);
+    test_json_reader_ec(jtext, jsoncons::json_errc::unexpected_eof);
 }
 
 
@@ -77,8 +77,8 @@ TEST_CASE("test_read_value_not_found")
 {
     std::string jtext = R"({"name":})";    
 
-    test_json_reader_error(jtext, jsoncons::json_parse_errc::expected_value);
-    test_json_reader_ec(jtext, jsoncons::json_parse_errc::expected_value);
+    test_json_reader_error(jtext, jsoncons::json_errc::expected_value);
+    test_json_reader_ec(jtext, jsoncons::json_errc::expected_value);
 }
 
 TEST_CASE("test_read_escaped_characters")
@@ -93,30 +93,30 @@ TEST_CASE("test_read_escaped_characters")
 
 TEST_CASE("test_read_expected_colon")
 {
-    test_json_reader_error("{\"name\" 10}", jsoncons::json_parse_errc::expected_colon);
-    test_json_reader_error("{\"name\" true}", jsoncons::json_parse_errc::expected_colon);
-    test_json_reader_error("{\"name\" false}", jsoncons::json_parse_errc::expected_colon);
-    test_json_reader_error("{\"name\" null}", jsoncons::json_parse_errc::expected_colon);
-    test_json_reader_error("{\"name\" \"value\"}", jsoncons::json_parse_errc::expected_colon);
-    test_json_reader_error("{\"name\" {}}", jsoncons::json_parse_errc::expected_colon);
-    test_json_reader_error("{\"name\" []}", jsoncons::json_parse_errc::expected_colon);
+    test_json_reader_error("{\"name\" 10}", jsoncons::json_errc::expected_colon);
+    test_json_reader_error("{\"name\" true}", jsoncons::json_errc::expected_colon);
+    test_json_reader_error("{\"name\" false}", jsoncons::json_errc::expected_colon);
+    test_json_reader_error("{\"name\" null}", jsoncons::json_errc::expected_colon);
+    test_json_reader_error("{\"name\" \"value\"}", jsoncons::json_errc::expected_colon);
+    test_json_reader_error("{\"name\" {}}", jsoncons::json_errc::expected_colon);
+    test_json_reader_error("{\"name\" []}", jsoncons::json_errc::expected_colon);
 }
 
 TEST_CASE("test_read_expected_name")
 {
-    test_json_reader_error("{10}", jsoncons::json_parse_errc::expected_name);
-    test_json_reader_error("{true}", jsoncons::json_parse_errc::expected_name);
-    test_json_reader_error("{false}", jsoncons::json_parse_errc::expected_name);
-    test_json_reader_error("{null}", jsoncons::json_parse_errc::expected_name);
-    test_json_reader_error("{{}}", jsoncons::json_parse_errc::expected_name);
-    test_json_reader_error("{[]}", jsoncons::json_parse_errc::expected_name);
+    test_json_reader_error("{10}", jsoncons::json_errc::expected_name);
+    test_json_reader_error("{true}", jsoncons::json_errc::expected_name);
+    test_json_reader_error("{false}", jsoncons::json_errc::expected_name);
+    test_json_reader_error("{null}", jsoncons::json_errc::expected_name);
+    test_json_reader_error("{{}}", jsoncons::json_errc::expected_name);
+    test_json_reader_error("{[]}", jsoncons::json_errc::expected_name);
 }
 
 TEST_CASE("test_read_expected_value")
 {
-    test_json_reader_error("[tru]", jsoncons::json_parse_errc::invalid_value);
-    test_json_reader_error("[fa]", jsoncons::json_parse_errc::invalid_value);
-    test_json_reader_error("[n]", jsoncons::json_parse_errc::invalid_value);
+    test_json_reader_error("[tru]", jsoncons::json_errc::invalid_value);
+    test_json_reader_error("[fa]", jsoncons::json_errc::invalid_value);
+    test_json_reader_error("[n]", jsoncons::json_errc::invalid_value);
 }
 
 TEST_CASE("test_read_primitive_pass")
@@ -147,20 +147,20 @@ TEST_CASE("test_read_empty_structures")
 
 TEST_CASE("test_read_primitive_fail")
 {
-    test_json_reader_error("null {}", jsoncons::json_parse_errc::extra_character);
-    test_json_reader_error("n ", jsoncons::json_parse_errc::invalid_value);
-    test_json_reader_error("nu ", jsoncons::json_parse_errc::invalid_value);
-    test_json_reader_error("nul ", jsoncons::json_parse_errc::invalid_value);
-    test_json_reader_error("false {}", jsoncons::json_parse_errc::extra_character);
-    test_json_reader_error("fals ", jsoncons::json_parse_errc::invalid_value);
-    test_json_reader_error("true []", jsoncons::json_parse_errc::extra_character);
-    test_json_reader_error("tru ", jsoncons::json_parse_errc::invalid_value);
-    test_json_reader_error("10 {}", jsoncons::json_parse_errc::extra_character);
-    test_json_reader_error("1a ", jsoncons::json_parse_errc::invalid_number);
-    test_json_reader_error("1.999 []", jsoncons::json_parse_errc::extra_character);
-    test_json_reader_error("1e0-1", jsoncons::json_parse_errc::invalid_number);
-    test_json_reader_error("\"string\"{}", jsoncons::json_parse_errc::extra_character);
-    test_json_reader_error("\"string\"[]", jsoncons::json_parse_errc::extra_character);
+    test_json_reader_error("null {}", jsoncons::json_errc::extra_character);
+    test_json_reader_error("n ", jsoncons::json_errc::invalid_value);
+    test_json_reader_error("nu ", jsoncons::json_errc::invalid_value);
+    test_json_reader_error("nul ", jsoncons::json_errc::invalid_value);
+    test_json_reader_error("false {}", jsoncons::json_errc::extra_character);
+    test_json_reader_error("fals ", jsoncons::json_errc::invalid_value);
+    test_json_reader_error("true []", jsoncons::json_errc::extra_character);
+    test_json_reader_error("tru ", jsoncons::json_errc::invalid_value);
+    test_json_reader_error("10 {}", jsoncons::json_errc::extra_character);
+    test_json_reader_error("1a ", jsoncons::json_errc::invalid_number);
+    test_json_reader_error("1.999 []", jsoncons::json_errc::extra_character);
+    test_json_reader_error("1e0-1", jsoncons::json_errc::invalid_number);
+    test_json_reader_error("\"string\"{}", jsoncons::json_errc::extra_character);
+    test_json_reader_error("\"string\"[]", jsoncons::json_errc::extra_character);
 }
 
 TEST_CASE("test_read_multiple")

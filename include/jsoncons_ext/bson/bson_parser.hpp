@@ -20,7 +20,7 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_utilities.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
-#include <jsoncons_ext/bson/bson_error_category.hpp>
+#include <jsoncons_ext/bson/bson_error.hpp>
 
 namespace jsoncons { namespace bson {
 

@@ -22,7 +22,7 @@
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/json_error_category.hpp>
+#include <jsoncons/json_error.hpp>
 
 namespace jsoncons {
 

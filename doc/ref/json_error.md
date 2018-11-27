@@ -1,10 +1,10 @@
-### jsoncons::json_parse_errc
+### jsoncons::json_errc
 
-The constant integer values scoped by `jsoncons::json_parse_errc` define the values for json text error codes.
+The constant integer values scoped by `jsoncons::json_errc` define the values for json text error codes.
 
 #### Header
 
-    #include <jsoncons/json_error_category.hpp>
+    #include <jsoncons/json_error.hpp>
 
 ### Member constants
 

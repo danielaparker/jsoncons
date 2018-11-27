@@ -355,7 +355,7 @@ public:
                 {
                     if (is_.fail())
                     {
-                        ec = json_parse_errc::source_error;
+                        ec = json_errc::source_error;
                         return;
                     }        
                     read_buffer(ec);
@@ -379,7 +379,7 @@ public:
                 {
                     if (is_.fail())
                     {
-                        ec = json_parse_errc::source_error;
+                        ec = json_errc::source_error;
                         return;
                     }        
                     read_buffer(ec);
@@ -434,7 +434,7 @@ public:
                     {
                         if (is_.fail())
                         {
-                            ec = json_parse_errc::source_error;
+                            ec = json_errc::source_error;
                             return;
                         }   
                         read_buffer(ec);     

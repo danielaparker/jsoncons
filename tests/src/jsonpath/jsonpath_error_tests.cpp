@@ -106,7 +106,7 @@ TEST_CASE("test_dot_star_name")
 TEST_CASE("test_filter_error")
 {
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$..book[?(.price<10)]", json_parse_errc::invalid_json_text,1,17);
+    test_error_code(root, "$..book[?(.price<10)]", json_errc::invalid_json_text,1,17);
 }
 
 

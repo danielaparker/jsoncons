@@ -18,7 +18,7 @@
 #include <functional>
 #include <cmath> 
 #include <jsoncons/json.hpp>
-#include "jsonpath_error_category.hpp"
+#include "jsonpath_error.hpp"
 
 namespace jsoncons { namespace jsonpath { namespace detail {
 

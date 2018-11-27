@@ -5,7 +5,7 @@ The constant integer values scoped by `jsonpointer_errc` define the values for j
 #### Header
 
 ```c++
-#include <jsoncons_ext/jsonpointer/jsonpointer_error_category.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer_error.hpp>
 ```
 
 ### Member constants

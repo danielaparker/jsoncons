@@ -16,7 +16,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
-#include <jsoncons_ext/csv/csv_error_category.hpp>
+#include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_parser.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>

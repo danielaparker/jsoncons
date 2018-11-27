@@ -89,7 +89,7 @@ Throws [parse_error](parse_error.md) if parsing fails.
                     std::error_code& ec)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
 Parse events are sent to the supplied `handler`.
-Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
+Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void finish_parse(json_content_handler<CharT>& handler)
 Called after `source_exhausted()` is `true` and there is no more input. 
@@ -100,7 +100,7 @@ Throws [parse_error](parse_error.md) if parsing fails.
                    std::error_code& ec)
 Called after `source_exhausted()` is `true` and there is no more input. 
 Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
-Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
+Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void skip_bom()
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
@@ -111,7 +111,7 @@ Throws if there are any unconsumed non-whitespace characters in the input.
 Throws [parse_error](parse_error.md) if parsing fails.
 
     void check_done(std::error_code& ec)
-Sets `ec` to a [json_parse_errc](jsoncons::json_parse_errc.md) if parsing fails.
+Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     size_t reset() const
 Resets the state of the parser to its initial state. In this state

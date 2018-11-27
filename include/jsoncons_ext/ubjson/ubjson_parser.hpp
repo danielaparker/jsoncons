@@ -20,7 +20,7 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_utilities.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
-#include <jsoncons_ext/ubjson/ubjson_error_category.hpp>
+#include <jsoncons_ext/ubjson/ubjson_error.hpp>
 
 namespace jsoncons { namespace ubjson {
 
