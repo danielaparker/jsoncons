@@ -217,6 +217,14 @@ TEST_CASE("test_reserve_array_capacity")
 TEST_CASE("test make_array()")
 {
     json j = json::make_array();
+    CHECK(j.is_array());
+    CHECK(j.size() == 0);
+    j.emplace_back("Toronto");
+    j.emplace_back("Vancouver");
+    j.emplace(j.array_range().begin(),"Montreal");
+    CHECK(j[0].as<std::string>() == std::string("Montreal"));
+    CHECK(j[1].as<std::string>() == std::string("Toronto"));
+    CHECK(j[2].as<std::string>() == std::string("Vancouver"));
 }
 
 TEST_CASE("test_one_dim_array")
