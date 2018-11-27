@@ -21,34 +21,24 @@ namespace jsoncons { namespace bson {
 
 namespace bson_format
 {
-    const uint8_t positive_fixint_base_cd = 0x00;
-    const uint8_t nil_cd = 0xc0;
-    const uint8_t false_cd = 0xc2;
-    const uint8_t true_cd = 0xc3;
-    const uint8_t float32_cd = 0xca;
-    const uint8_t float64_cd = 0xcb;
-    const uint8_t uint8_cd = 0xcc;
-    const uint8_t uint16_cd = 0xcd;
-    const uint8_t uint32_cd = 0xce;
-    const uint8_t uint64_cd = 0xcf;
-    const uint8_t int8_cd = 0xd0;
-    const uint8_t int16_cd = 0xd1;
-    const uint8_t int32_cd = 0xd2;
-    const uint8_t int64_cd = 0xd3;
-    const uint8_t fixmap_base_cd = 0x80;
-    const uint8_t fixarray_base_cd = 0x90;
-    const uint8_t fixstr_base_cd = 0xa0;
-    const uint8_t str8_cd = 0xd9;
-    const uint8_t str16_cd = 0xda;
-    const uint8_t str32_cd = 0xdb;
-    const uint8_t bin8_cd = 0xc7;
-    const uint8_t bin16_cd = 0xc8;
-    const uint8_t bin32_cd = 0xc9;
-    const uint8_t array16_cd = 0xdc;
-    const uint8_t array32_cd = 0xdd;
-    const uint8_t map16_cd = 0xde;
-    const uint8_t map32_cd = 0xdf;
-    const uint8_t negative_fixint_base_cd = 0xe0;
+    const uint8_t double_cd = 0x01;
+    const uint8_t string_cd = 0x02;
+    const uint8_t embedded_document_cd = 0x03;
+    const uint8_t array_cd = 0x04;
+    const uint8_t binary_cd = 0x05;
+    const uint8_t object_id_cd = 0x07;
+    const uint8_t bool_cd = 0x08;
+    const uint8_t datetime_cd = 0x09;
+    const uint8_t null_cd = 0x0a;
+    const uint8_t regex_cd = 0x0b;
+    const uint8_t javascript_cd = 0x0d;
+    const uint8_t javascript_with_scope_cd = 0x0f;
+    const uint8_t int32_cd = 0x10;
+    const uint8_t timestamp_cd = 0x11; // uint64
+    const uint8_t int64_cd = 0x12;
+    const uint8_t decimal128_cd = 0x13;
+    const uint8_t min_key_cd = 0xff;
+    const uint8_t max_key_cd = 0x7f;
 }
  
 class bson_decode_error : public std::invalid_argument, public virtual json_exception

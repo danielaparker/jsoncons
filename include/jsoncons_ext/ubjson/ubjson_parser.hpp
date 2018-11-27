@@ -57,6 +57,8 @@ public:
     void parse_some(std::error_code& ec)
     {
         const uint8_t* pos = input_ptr_++;
+        switch (*pos)
+        {
         if (*pos <= 0xbf)
         {
             if (*pos <= 0x7f) 
@@ -375,7 +377,7 @@ public:
                     }
 
                     const uint8_t* first = endp;
-                    const uint8_t* last = first + len;
+                    const uint8_t* last = first + len - 1; // len includes null terminator
                     input_ptr_ += len; 
 
                     std::basic_string<char> s;

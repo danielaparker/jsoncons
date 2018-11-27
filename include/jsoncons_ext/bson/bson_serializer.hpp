@@ -106,27 +106,14 @@ private:
     {
         stack_.push_back(stack_item(bson_structure_type::object));
 
-        if (length <= 15)
-        {
-            // fixmap
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::fixmap_base_cd | (length & 0xf)), 
-                                  std::back_inserter(writer_));
-        }
-        else if (length <= 65535)
-        {
-            // map 16
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::map16_cd), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(length), 
-                                  std::back_inserter(writer_));
-        }
-        else if (length <= 4294967295)
+        if (length <= std::numeric_limits<int32_t>::max())
         {
             // map 32
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::map32_cd), 
+            binary::to_big_endian(static_cast<uint8_t>(bson_format::embedded_document_cd), 
                                   std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(length),
+            binary::to_big_endian(static_cast<int32_t>(length),
                                   std::back_inserter(writer_));
+            writer_.push_back(0x00);
         }
 
         return true;
@@ -147,23 +134,11 @@ private:
 
     bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
     {
-        stack_.push_back(stack_item(bson_structure_type::array));
-        if (length <= 15)
-        {
-            // fixarray
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::fixarray_base_cd | (length & 0xf)), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
-        {
-            // array 16
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::array16_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(length),std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
+        if (length <= (std::numeric_limits<int32_t>::max)())
         {
             // array 32
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::array32_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(bson_format::array_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<int32_t>(length),std::back_inserter(writer_));
         }
         return true;
     }
@@ -185,7 +160,7 @@ private:
     bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         // nil
-        binary::to_big_endian(static_cast<uint8_t>(bson_format::nil_cd), std::back_inserter(writer_));
+        binary::to_big_endian(static_cast<uint8_t>(bson_format::null_cd), std::back_inserter(writer_));
         end_value();
         return true;
     }
@@ -202,27 +177,10 @@ private:
         }
 
         const size_t length = target.length();
-        if (length <= 31)
-        {
-            // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::fixstr_base_cd | length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint8_t>::max)())
-        {
-            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::str8_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
-        {
-            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::str16_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
+        if (length <= (std::numeric_limits<int32_t>::max)())
         {
             // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::str32_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(bson_format::string_cd), std::back_inserter(writer_));
             binary::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
         }
 
@@ -230,6 +188,7 @@ private:
         {
             writer_.push_back(c);
         }
+        writer_.push_back(0x00);
 
         end_value();
         return true;
@@ -242,23 +201,11 @@ private:
     {
 
         const size_t length = b.length();
-        if (length <= (std::numeric_limits<uint8_t>::max)())
-        {
-            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::bin8_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
-        {
-            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::bin16_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
+        if (length <= (std::numeric_limits<iint32_t>::max)())
         {
             // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::bin32_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(bson_format::binary_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<int32_t>(length),std::back_inserter(writer_));
         }
 
         for (auto c : b)
@@ -275,21 +222,8 @@ private:
                          semantic_tag_type,
                          const serializing_context&) override
     {
-        float valf = (float)val;
-        if ((double)valf == val)
-        {
-            // float 32
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::float32_cd), std::back_inserter(writer_));
-            binary::to_big_endian(valf,std::back_inserter(writer_));
-        }
-        else
-        {
-            // float 64
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::float64_cd), std::back_inserter(writer_));
-            binary::to_big_endian(val,std::back_inserter(writer_));
-        }
-
-        // write double
+        binary::to_big_endian(static_cast<uint8_t>(bson_format::double_cd), std::back_inserter(writer_));
+        binary::to_big_endian(val,std::back_inserter(writer_));
 
         end_value();
         return true;
@@ -299,69 +233,16 @@ private:
                         semantic_tag_type, 
                         const serializing_context&) override
     {
-        if (val >= 0)
+        if (val <= (std::numeric_limits<int32_t>::max)
+            &&  <= (std::numeric_limits<int32_t>::max))
         {
-            if (val <= 0x7f)
-            {
-                // positive fixnum stores 7-bit positive integer
-                binary::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(writer_));
-            }
-            else if (val <= (std::numeric_limits<uint8_t>::max)())
-            {
-                // uint 8 stores a 8-bit unsigned integer
-                binary::to_big_endian(static_cast<uint8_t>(bson_format::uint8_cd), std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(writer_));
-            }
-            else if (val <= (std::numeric_limits<uint16_t>::max)())
-            {
-                // uint 16 stores a 16-bit big-endian unsigned integer
-                binary::to_big_endian(static_cast<uint8_t>(bson_format::uint16_cd), std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint16_t>(val),std::back_inserter(writer_));
-            }
-            else if (val <= (std::numeric_limits<uint32_t>::max)())
-            {
-                // uint 32 stores a 32-bit big-endian unsigned integer
-                binary::to_big_endian(static_cast<uint8_t>(bson_format::uint32_cd), std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(writer_));
-            }
-            else if (val <= (std::numeric_limits<int64_t>::max)())
-            {
-                // int 64 stores a 64-bit big-endian signed integer
-                binary::to_big_endian(static_cast<uint8_t>(bson_format::uint64_cd), std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint64_t>(val),std::back_inserter(writer_));
-            }
+            binary::to_big_endian(static_cast<uint8_t>(bson_format::uint32_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(writer_));
         }
-        else
+        else if ()
         {
-            if (val >= -32)
-            {
-                // negative fixnum stores 5-bit negative integer
-                binary::to_big_endian(static_cast<int8_t>(val), std::back_inserter(writer_));
-            }
-            else if (val >= (std::numeric_limits<int8_t>::lowest)())
-            {
-                // int 8 stores a 8-bit signed integer
-                binary::to_big_endian(static_cast<uint8_t>(bson_format::int8_cd), std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<int8_t>(val),std::back_inserter(writer_));
-            }
-            else if (val >= (std::numeric_limits<int16_t>::lowest)())
-            {
-                // int 16 stores a 16-bit big-endian signed integer
-                binary::to_big_endian(static_cast<uint8_t>(bson_format::int16_cd), std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<int16_t>(val),std::back_inserter(writer_));
-            }
-            else if (val >= (std::numeric_limits<int32_t>::lowest)())
-            {
-                // int 32 stores a 32-bit big-endian signed integer
-                binary::to_big_endian(static_cast<uint8_t>(bson_format::int32_cd), std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<int32_t>(val),std::back_inserter(writer_));
-            }
-            else if (val >= (std::numeric_limits<int64_t>::lowest)())
-            {
-                // int 64 stores a 64-bit big-endian signed integer
-                binary::to_big_endian(static_cast<uint8_t>(bson_format::int64_cd), std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<int64_t>(val),std::back_inserter(writer_));
-            }
+            binary::to_big_endian(static_cast<uint8_t>(bson_format::int64_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<int64_t>(val),std::back_inserter(writer_));
         }
         end_value();
         return true;
@@ -371,34 +252,16 @@ private:
                          semantic_tag_type, 
                          const serializing_context&) override
     {
-        if (val <= (std::numeric_limits<int8_t>::max)())
+        if (val <= (std::numeric_limits<int32_t>::max)
+            &&  <= (std::numeric_limits<int32_t>::max))
         {
-            // positive fixnum stores 7-bit positive integer
-            binary::to_big_endian(static_cast<uint8_t>(val), std::back_inserter(writer_));
-        }
-        else if (val <= (std::numeric_limits<uint8_t>::max)())
-        {
-            // uint 8 stores a 8-bit unsigned integer
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::uint8_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(val), std::back_inserter(writer_));
-        }
-        else if (val <= (std::numeric_limits<uint16_t>::max)())
-        {
-            // uint 16 stores a 16-bit big-endian unsigned integer
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::uint16_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(val),std::back_inserter(writer_));
-        }
-        else if (val <= (std::numeric_limits<uint32_t>::max)())
-        {
-            // uint 32 stores a 32-bit big-endian unsigned integer
             binary::to_big_endian(static_cast<uint8_t>(bson_format::uint32_cd), std::back_inserter(writer_));
             binary::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(writer_));
         }
-        else if (val <= (std::numeric_limits<uint64_t>::max)())
+        else if ()
         {
-            // uint 64 stores a 64-bit big-endian unsigned integer
-            binary::to_big_endian(static_cast<uint8_t>(bson_format::uint64_cd), std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint64_t>(val),std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<uint8_t>(bson_format::int64_cd), std::back_inserter(writer_));
+            binary::to_big_endian(static_cast<int64_t>(val),std::back_inserter(writer_));
         }
         end_value();
         return true;
