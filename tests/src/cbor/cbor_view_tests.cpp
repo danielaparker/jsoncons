@@ -1,6 +1,9 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
+#if defined(_MSC_VER)
+#include "windows.h"
+#endif
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>

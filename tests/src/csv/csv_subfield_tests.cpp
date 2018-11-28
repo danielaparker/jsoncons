@@ -1,6 +1,9 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#if defined(_MSC_VER)
+#include "windows.h" // test no inadvertant macro expansions
+#endif
 #include <catch/catch.hpp>
 //#include <jsoncons_ext/csv/csv_serializing_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>

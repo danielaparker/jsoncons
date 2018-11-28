@@ -1,6 +1,9 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
+#if defined(_MSC_VER)
+#include "windows.h"
+#endif
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
@@ -63,7 +66,7 @@ TEST_CASE("test_cbor_parsing")
     check_parse_cbor({0x1a,0,1,0x00,0x00},json(65536U));
     check_parse_cbor({0x1a,0xff,0xff,0xff,0xff},json(4294967295U));
     check_parse_cbor({0x1b,0,0,0,1,0,0,0,0},json(4294967296U));
-    check_parse_cbor({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<uint64_t>::max()));
+    check_parse_cbor({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<uint64_t>::max)()));
 
     // positive signed integer
     check_parse_cbor({0x00},json(0));
@@ -77,7 +80,7 @@ TEST_CASE("test_cbor_parsing")
     check_parse_cbor({0x1a,0,1,0x00,0x00},json(65536));
     check_parse_cbor({0x1a,0xff,0xff,0xff,0xff},json(4294967295));
     check_parse_cbor({0x1b,0,0,0,1,0,0,0,0},json(4294967296));
-    check_parse_cbor({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<int64_t>::max()));
+    check_parse_cbor({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
     // negative integers
     check_parse_cbor({0x20},json(-1));
     check_parse_cbor({0x21},json(-2));

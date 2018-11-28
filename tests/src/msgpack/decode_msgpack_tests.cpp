@@ -1,6 +1,9 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
+#if defined(_MSC_VER)
+#include "windows.h" // test no inadvertant macro expansions
+#endif
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
@@ -35,7 +38,7 @@ TEST_CASE("decode_number_msgpack_test")
     check_decode_msgpack({0xce,0,1,0x00,0x00},json(65536U));
     check_decode_msgpack({0xce,0xff,0xff,0xff,0xff},json(4294967295U));
     check_decode_msgpack({0xcf,0,0,0,1,0,0,0,0},json(4294967296U));
-    check_decode_msgpack({0xcf,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<uint64_t>::max()));
+    check_decode_msgpack({0xcf,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<uint64_t>::max)()));
 
     check_decode_msgpack({0x01},json(1));
     check_decode_msgpack({0x0a},json(10));
@@ -49,7 +52,7 @@ TEST_CASE("decode_number_msgpack_test")
     check_decode_msgpack({0xce,0,1,0x00,0x00},json(65536));
     check_decode_msgpack({0xce,0xff,0xff,0xff,0xff},json(4294967295));
     check_decode_msgpack({0xd3,0,0,0,1,0,0,0,0},json(4294967296));
-    check_decode_msgpack({0xd3,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<int64_t>::max()));
+    check_decode_msgpack({0xd3,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
 
     // negative fixint 0xe0 - 0xff
     check_decode_msgpack({0xe0},json(-32));

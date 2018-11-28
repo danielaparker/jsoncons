@@ -51,6 +51,5 @@ TEST_CASE("test_exponent")
     double expected1 = 1.15507e+173;
     CHECK(expected1 == j1.as<double>());
 
-    //std::cout << std::numeric_limits<double>::max() << std::endl;
 }
 

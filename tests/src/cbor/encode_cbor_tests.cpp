@@ -1,6 +1,9 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
+#if defined(_MSC_VER)
+#include "windows.h" // test no inadvertant macro expansions
+#endif
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
@@ -41,7 +44,7 @@ TEST_CASE("cbor_encoder_test")
     check_encode_cbor({0x1a,0,1,0x00,0x00},json(65536U));
     check_encode_cbor({0x1a,0xff,0xff,0xff,0xff},json(4294967295U));
     check_encode_cbor({0x1b,0,0,0,1,0,0,0,0},json(4294967296U));
-    check_encode_cbor({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<uint64_t>::max()));
+    check_encode_cbor({0x1b,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<uint64_t>::max)()));
 
     // positive signed integer
     check_encode_cbor({0x00},json(0));
@@ -55,7 +58,7 @@ TEST_CASE("cbor_encoder_test")
     check_encode_cbor({0x1a,0,1,0x00,0x00},json(65536));
     check_encode_cbor({0x1a,0xff,0xff,0xff,0xff},json(4294967295));
     check_encode_cbor({0x1b,0,0,0,1,0,0,0,0},json(4294967296));
-    check_encode_cbor({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json(std::numeric_limits<int64_t>::max()));
+    check_encode_cbor({0x1b,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
 
     // negative integers
     check_encode_cbor({0x20},json(-1));

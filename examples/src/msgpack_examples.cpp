@@ -38,11 +38,11 @@ ojson j1 = ojson::parse(R"(
 
     std::cout << std::endl;
 
-    wjson j4 = decode_msgpack<wjson>(v);
+    //wjson j4 = decode_msgpack<wjson>(v);
 
-    std::wcout << pretty_print(j4) << std::endl;
+    //std::wcout << pretty_print(j4) << std::endl;
 
-    std::cout << std::endl;
+    //std::cout << std::endl;
 }
 
 void message_pack_example2()

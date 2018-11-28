@@ -4,8 +4,7 @@
 #include <string>
 #include <vector>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/cbor/cbor_serializer.hpp>
-#include <jsoncons_ext/cbor/cbor_view.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/csv/csv_serializer.hpp>
 
