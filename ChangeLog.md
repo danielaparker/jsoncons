@@ -1,3 +1,18 @@
+version 0.113.2
+---------------
+
+Bug fix
+
+- On Windows platforms, fixed issue with macro expansion of max when 
+  including windows.h 
+
+version 0.113.1
+---------------
+
+Bug fix
+
+- Fixed compile issue with j = json::make_array().
+
 version 0.113.1
 ---------------
 

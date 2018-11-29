@@ -1459,7 +1459,7 @@ public:
 };  
 
 template <class Allocator>
-const uint64_t basic_bignum<Allocator>::max_basic_type = std::numeric_limits<uint64_t>::max();
+const uint64_t basic_bignum<Allocator>::max_basic_type = (std::numeric_limits<uint64_t>::max)();
 template <class Allocator>
 const uint64_t basic_bignum<Allocator>::basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
 template <class Allocator>

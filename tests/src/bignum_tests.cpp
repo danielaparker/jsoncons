@@ -1,6 +1,9 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#if defined(_MSC_VER)
+#include "windows.h"
+#endif
 #include <catch/catch.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json.hpp>
@@ -76,7 +79,7 @@ TEST_CASE("test_negative_bignum")
 
 TEST_CASE("test_longlong")
 {
-    long long n = std::numeric_limits<long long>::max();
+    long long n = (std::numeric_limits<long long>::max)();
 
     bignum val = n;
 
