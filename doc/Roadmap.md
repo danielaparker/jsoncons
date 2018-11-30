@@ -2,6 +2,16 @@
 
 ### For release 0.114.0
 
+More binary support
+
+- BSON
+
+- UBJSON
+
+CBOR
+
+- Improve error codes
+
 MessagePack 
 
 - New msgpack_serializer that supports Message Pack bin formats 
@@ -22,8 +32,6 @@ MessagePack
 - Support more error recovery and introduce optional `lenient_error_handler`.
 
 - Remove names that have been deprecated for more than a year.
-
-- Support more binary data formats (BSON, UBJSON)
 
 At this point we'll slap a Version 1.0.0 Full Release stamp on `jsoncons`
 (we've been leading up to this since 2013.)

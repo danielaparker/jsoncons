@@ -3,6 +3,9 @@ master
 
 Bug fix
 
+- On Windows platforms, fixed issue with macro expansion of max when 
+  including windows.h 
+
 - Fixed compile issue with `j = json::make_array()`.
 
 Message Pack enhancements
