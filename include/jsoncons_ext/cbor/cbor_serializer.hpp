@@ -20,22 +20,22 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons/detail/writer.hpp>
+#include <jsoncons/detail/result.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 
 namespace jsoncons { namespace cbor {
 
 enum class cbor_structure_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class CharT,class Writer=jsoncons::detail::stream_byte_writer>
+template<class CharT,class Result=jsoncons::detail::byte_stream_result>
 class basic_cbor_serializer final : public basic_json_content_handler<CharT>
 {
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
-    typedef Writer writer_type;
-    typedef typename Writer::output_type output_type;
+    typedef Result result_type;
+    typedef typename Result::output_type output_type;
 
 private:
     struct stack_item
@@ -65,14 +65,14 @@ private:
 
     };
     std::vector<stack_item> stack_;
-    Writer writer_;
+    Result result_;
 
     // Noncopyable and nonmoveable
     basic_cbor_serializer(const basic_cbor_serializer&) = delete;
     basic_cbor_serializer& operator=(const basic_cbor_serializer&) = delete;
 public:
     basic_cbor_serializer(output_type& os)
-       : writer_(os)
+       : result_(os)
     {
     }
 
@@ -80,7 +80,7 @@ public:
     {
         try
         {
-            writer_.flush();
+            result_.flush();
         }
         catch (...)
         {
@@ -92,14 +92,14 @@ private:
 
     void do_flush() override
     {
-        writer_.flush();
+        result_.flush();
     }
 
     bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_object));
         
-        writer_.push_back(0xbf);
+        result_.push_back(0xbf);
         return true;
     }
 
@@ -109,36 +109,36 @@ private:
 
         if (length <= 0x17)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xa0 + length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0xa0 + length), 
+                                  std::back_inserter(result_));
         } 
         else if (length <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xb8), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0xb8), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(length), 
+                                  std::back_inserter(result_));
         } 
         else if (length <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xb9), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0xb9), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), 
+                                  std::back_inserter(result_));
         } 
         else if (length <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xba), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0xba), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length), 
+                                  std::back_inserter(result_));
         } 
         else if (length <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xbb), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint64_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0xbb), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint64_t>(length), 
+                                  std::back_inserter(result_));
         }
 
         return true;
@@ -149,7 +149,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
-            writer_.push_back(0xff);
+            result_.push_back(0xff);
         }
         stack_.pop_back();
 
@@ -160,7 +160,7 @@ private:
     bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(cbor_structure_type::indefinite_length_array));
-        writer_.push_back(0x9f);
+        result_.push_back(0x9f);
         return true;
     }
 
@@ -168,41 +168,41 @@ private:
     {
         if (length == 2 && tag == semantic_tag_type::bigfloat)
         {
-            writer_.push_back(0xc5);
+            result_.push_back(0xc5);
         }
         stack_.push_back(stack_item(cbor_structure_type::array));
         if (length <= 0x17)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x80 + length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x80 + length), 
+                                  std::back_inserter(result_));
         } 
         else if (length <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x98), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x98), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(length), 
+                                  std::back_inserter(result_));
         } 
         else if (length <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x99), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x99), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), 
+                                  std::back_inserter(result_));
         } 
         else if (length <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x9a), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x9a), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length), 
+                                  std::back_inserter(result_));
         } 
         else if (length <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x9b), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint64_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x9b), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint64_t>(length), 
+                                  std::back_inserter(result_));
         }
         return true;
     }
@@ -212,7 +212,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
-            writer_.push_back(0xff);
+            result_.push_back(0xff);
         }
         stack_.pop_back();
         end_value();
@@ -229,11 +229,11 @@ private:
     {
         if (tag == semantic_tag_type::undefined)
         {
-            writer_.push_back(0xf7);
+            result_.push_back(0xf7);
         }
         else
         {
-            writer_.push_back(0xf6);
+            result_.push_back(0xf6);
         }
 
         end_value();
@@ -255,41 +255,41 @@ private:
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x60 + length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x60 + length), 
+                                  std::back_inserter(result_));
         }
         else if (length <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x78), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x78), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(length), 
+                                  std::back_inserter(result_));
         }
         else if (length <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x79), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x79), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), 
+                                  std::back_inserter(result_));
         }
         else if (length <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x7a), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x7a), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length), 
+                                  std::back_inserter(result_));
         }
         else if (length <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x7b), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint64_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x7b), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint64_t>(length), 
+                                  std::back_inserter(result_));
         }
 
         for (auto c : target)
         {
-            writer_.push_back(c);
+            result_.push_back(c);
         }
     }
 
@@ -303,51 +303,51 @@ private:
 
         if (signum == -1)
         {
-            writer_.push_back(0xc3);
+            result_.push_back(0xc3);
         }
         else
         {
-            writer_.push_back(0xc2);
+            result_.push_back(0xc2);
         }
 
         if (length <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x40 + length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x40 + length), 
+                                  std::back_inserter(result_));
         }
         else if (length <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x58), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x58), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(length), 
+                                  std::back_inserter(result_));
         }
         else if (length <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x59), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x59), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), 
+                                  std::back_inserter(result_));
         }
         else if (length <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x5a), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x5a), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length), 
+                                  std::back_inserter(result_));
         }
         else if (length <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x5b), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint64_t>(length), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x5b), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint64_t>(length), 
+                                  std::back_inserter(result_));
         }
 
         for (auto c : data)
         {
-            writer_.push_back(c);
+            result_.push_back(c);
         }
     }
 
@@ -445,7 +445,7 @@ private:
             }
         }
 
-        writer_.push_back(0xc4);
+        result_.push_back(0xc4);
         do_begin_array((size_t)2, semantic_tag_type::none, context);
         if (exponent.length() > 0)
         {
@@ -486,7 +486,7 @@ private:
             }
             case semantic_tag_type::date_time:
             {
-                writer_.push_back(0xc0);
+                result_.push_back(0xc0);
                 write_string_value(sv);
                 break;
             }
@@ -509,13 +509,13 @@ private:
         switch (encoding_hint)
         {
             case byte_string_chars_format::base64url:
-                writer_.push_back(0xd5);
+                result_.push_back(0xd5);
                 break;
             case byte_string_chars_format::base64:
-                writer_.push_back(0xd6);
+                result_.push_back(0xd6);
                 break;
             case byte_string_chars_format::base16:
-                writer_.push_back(0xd7);
+                result_.push_back(0xd7);
                 break;
             default:
                 break;
@@ -523,41 +523,41 @@ private:
         if (b.length() <= 0x17)
         {
             // fixstr stores a byte array whose length is upto 31 bytes
-            binary::to_big_endian(static_cast<uint8_t>(0x40 + b.length()), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x40 + b.length()), 
+                                  std::back_inserter(result_));
         }
         else if (b.length() <= 0xff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x58), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(b.length()), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x58), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(b.length()), 
+                                  std::back_inserter(result_));
         }
         else if (b.length() <= 0xffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x59), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(b.length()), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x59), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint16_t>(b.length()), 
+                                  std::back_inserter(result_));
         }
         else if (b.length() <= 0xffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x5a), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(b.length()), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x5a), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint32_t>(b.length()), 
+                                  std::back_inserter(result_));
         }
         else if (b.length() <= 0xffffffffffffffff)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x5b), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint64_t>(b.length()), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x5b), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint64_t>(b.length()), 
+                                  std::back_inserter(result_));
         }
 
         for (auto c : b)
         {
-            writer_.push_back(c);
+            result_.push_back(c);
         }
 
         end_value();
@@ -571,21 +571,21 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.push_back(0xc1);
+            result_.push_back(0xc1);
         }
 
         float valf = (float)val;
         if ((double)valf == val)
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xfa), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(valf, std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0xfa), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(valf, std::back_inserter(result_));
         }
         else
         {
-            binary::to_big_endian(static_cast<uint8_t>(0xfb), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(val, std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0xfb), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(val, std::back_inserter(result_));
         }
 
         // write double
@@ -600,78 +600,78 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.push_back(0xc1);
+            result_.push_back(0xc1);
         }
         if (value >= 0)
         {
             if (value <= 0x17)
             {
-                binary::to_big_endian(static_cast<uint8_t>(value), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(value), 
+                                  std::back_inserter(result_));
             } 
             else if (value <= (std::numeric_limits<uint8_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x18), 
-                                  std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint8_t>(value), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x18), 
+                                  std::back_inserter(result_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(value), 
+                                  std::back_inserter(result_));
             } 
             else if (value <= (std::numeric_limits<uint16_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x19), 
-                                  std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint16_t>(value), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x19), 
+                                  std::back_inserter(result_));
+                jsoncons::detail::to_big_endian(static_cast<uint16_t>(value), 
+                                  std::back_inserter(result_));
             } 
             else if (value <= (std::numeric_limits<uint32_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x1a), 
-                                  std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint32_t>(value), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x1a), 
+                                  std::back_inserter(result_));
+                jsoncons::detail::to_big_endian(static_cast<uint32_t>(value), 
+                                  std::back_inserter(result_));
             } 
             else if (value <= (std::numeric_limits<int64_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x1b), 
-                                  std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<int64_t>(value), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x1b), 
+                                  std::back_inserter(result_));
+                jsoncons::detail::to_big_endian(static_cast<int64_t>(value), 
+                                  std::back_inserter(result_));
             }
         } else
         {
             const auto posnum = -1 - value;
             if (value >= -24)
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x20 + posnum), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x20 + posnum), 
+                                  std::back_inserter(result_));
             } 
             else if (posnum <= (std::numeric_limits<uint8_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x38), 
-                                  std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint8_t>(posnum), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x38), 
+                                  std::back_inserter(result_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(posnum), 
+                                  std::back_inserter(result_));
             } 
             else if (posnum <= (std::numeric_limits<uint16_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x39), 
-                                  std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint16_t>(posnum), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x39), 
+                                  std::back_inserter(result_));
+                jsoncons::detail::to_big_endian(static_cast<uint16_t>(posnum), 
+                                  std::back_inserter(result_));
             } 
             else if (posnum <= (std::numeric_limits<uint32_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x3a), 
-                                  std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<uint32_t>(posnum), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x3a), 
+                                  std::back_inserter(result_));
+                jsoncons::detail::to_big_endian(static_cast<uint32_t>(posnum), 
+                                  std::back_inserter(result_));
             } 
             else if (posnum <= (std::numeric_limits<int64_t>::max)())
             {
-                binary::to_big_endian(static_cast<uint8_t>(0x3b), 
-                                  std::back_inserter(writer_));
-                binary::to_big_endian(static_cast<int64_t>(posnum), 
-                                  std::back_inserter(writer_));
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x3b), 
+                                  std::back_inserter(result_));
+                jsoncons::detail::to_big_endian(static_cast<int64_t>(posnum), 
+                                  std::back_inserter(result_));
             }
         }
         end_value();
@@ -684,41 +684,41 @@ private:
     {
         if (tag == semantic_tag_type::epoch_time)
         {
-            writer_.push_back(0xc1);
+            result_.push_back(0xc1);
         }
 
         if (value <= 0x17)
         {
-            binary::to_big_endian(static_cast<uint8_t>(value), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(value), 
+                                  std::back_inserter(result_));
         } 
         else if (value <=(std::numeric_limits<uint8_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x18), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint8_t>(value), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x18), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(value), 
+                                  std::back_inserter(result_));
         } 
         else if (value <=(std::numeric_limits<uint16_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x19), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint16_t>(value), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x19), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint16_t>(value), 
+                                  std::back_inserter(result_));
         } 
         else if (value <=(std::numeric_limits<uint32_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x1a), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint32_t>(value), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x1a), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint32_t>(value), 
+                                  std::back_inserter(result_));
         } 
         else if (value <=(std::numeric_limits<uint64_t>::max)())
         {
-            binary::to_big_endian(static_cast<uint8_t>(0x1b), 
-                                  std::back_inserter(writer_));
-            binary::to_big_endian(static_cast<uint64_t>(value), 
-                                  std::back_inserter(writer_));
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(0x1b), 
+                                  std::back_inserter(result_));
+            jsoncons::detail::to_big_endian(static_cast<uint64_t>(value), 
+                                  std::back_inserter(result_));
         }
         end_value();
         return true;
@@ -728,11 +728,11 @@ private:
     {
         if (value)
         {
-            writer_.push_back(0xf5);
+            result_.push_back(0xf5);
         }
         else
         {
-            writer_.push_back(0xf4);
+            result_.push_back(0xf4);
         }
 
         end_value();
@@ -748,9 +748,9 @@ private:
     }
 };
 
-typedef basic_cbor_serializer<char,jsoncons::detail::stream_byte_writer> cbor_serializer;
+typedef basic_cbor_serializer<char,jsoncons::detail::byte_stream_result> cbor_serializer;
 
-typedef basic_cbor_serializer<char,jsoncons::detail::bytes_writer> cbor_bytes_serializer;
+typedef basic_cbor_serializer<char,jsoncons::detail::bytes_result> cbor_bytes_serializer;
 
 }}
 #endif

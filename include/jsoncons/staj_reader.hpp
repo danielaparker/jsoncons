@@ -22,7 +22,7 @@
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/serializing_context.hpp>
-#include <jsoncons/detail/writer.hpp>
+#include <jsoncons/detail/result.hpp>
 #include <jsoncons/detail/print_number.hpp>
 
 namespace jsoncons {
@@ -115,26 +115,26 @@ public:
             break;
         case staj_event_type::int64_value:
         {
-            jsoncons::detail::string_writer<T> writer(s);
+            jsoncons::detail::string_result<T> writer(s);
             jsoncons::detail::print_integer(value_.int64_value_, writer);
             break;
         }
         case staj_event_type::uint64_value:
         {
-            jsoncons::detail::string_writer<T> writer(s);
+            jsoncons::detail::string_result<T> writer(s);
             jsoncons::detail::print_uinteger(value_.uint64_value_, writer);
             break;
         }
         case staj_event_type::double_value:
         {
-            jsoncons::detail::string_writer<T> writer(s);
+            jsoncons::detail::string_result<T> writer(s);
             jsoncons::detail::print_double f(fmt_);
             f(value_.double_value_, fmt_, writer);
             break;
         }
         case staj_event_type::bool_value:
         {
-            jsoncons::detail::string_writer<T> writer(s);
+            jsoncons::detail::string_result<T> writer(s);
             if (value_.bool_value_)
             {
                 writer.insert(jsoncons::detail::true_literal<CharT>().data(),
@@ -149,7 +149,7 @@ public:
         }
         case staj_event_type::null_value:
         {
-            jsoncons::detail::string_writer<T> writer(s);
+            jsoncons::detail::string_result<T> writer(s);
             writer.insert(jsoncons::detail::null_literal<CharT>().data(),
                 jsoncons::detail::null_literal<CharT>().size());
             break;

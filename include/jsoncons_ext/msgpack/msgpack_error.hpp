@@ -49,9 +49,9 @@ const std::error_category& msgpack_error_category()
 }
 
 inline 
-std::error_code make_error_code(msgpack_errc result)
+std::error_code make_error_code(msgpack_errc e)
 {
-    return std::error_code(static_cast<int>(result),msgpack_error_category());
+    return std::error_code(static_cast<int>(e),msgpack_error_category());
 }
 
 

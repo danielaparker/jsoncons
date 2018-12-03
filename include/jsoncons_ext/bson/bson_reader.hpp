@@ -50,7 +50,7 @@ public:
             JSONCONS_THROW(bson_decode_error(0));
         }
         const uint8_t* endp;
-        const auto len = binary::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+        const auto len = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
         handler_.begin_object(semantic_tag_type::none, *this);
         ++nesting_depth_;
@@ -62,7 +62,7 @@ public:
     void parse_e_list(bson_structure_type type, std::error_code& ec)
     {
         uint8_t t;
-        while (source_.get(&t) > 0 && t != 0x00)
+        while (source_.get(t) > 0 && t != 0x00)
         {
             std::basic_string<char> s;
             uint8_t c;
@@ -91,7 +91,7 @@ public:
                     JSONCONS_THROW(bson_decode_error(0));
                 }
                 const uint8_t* endp;
-                double res = binary::from_little_endian<double>(buf,buf+sizeof(buf),&endp);
+                double res = jsoncons::detail::from_little_endian<double>(buf,buf+sizeof(buf),&endp);
                 handler_.double_value(res, floating_point_options(), semantic_tag_type::none, *this);
                 break;
             }
@@ -103,7 +103,7 @@ public:
                     JSONCONS_THROW(bson_decode_error(0));
                 }
                 const uint8_t* endp;
-                auto len = binary::from_little_endian<int32_t>(buf, buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(buf),&endp);
 
                 std::basic_string<char> s;
                 s.reserve(len - 1);
@@ -134,7 +134,7 @@ public:
                     JSONCONS_THROW(bson_decode_error(0));
                 }
                 const uint8_t* endp;
-                const auto len = binary::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+                const auto len = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
                 handler_.begin_array(semantic_tag_type::none, *this);
                 ++nesting_depth_;
@@ -166,7 +166,7 @@ public:
                     JSONCONS_THROW(bson_decode_error(0));
                 }
                 const uint8_t* endp;
-                auto val = binary::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+                auto val = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
                 handler_.int64_value(val, semantic_tag_type::none, *this);
                 break;
             }
@@ -179,7 +179,7 @@ public:
                     JSONCONS_THROW(bson_decode_error(0));
                 }
                 const uint8_t* endp;
-                auto val = binary::from_little_endian<uint64_t>(buf, buf+sizeof(uint64_t),&endp);
+                auto val = jsoncons::detail::from_little_endian<uint64_t>(buf, buf+sizeof(uint64_t),&endp);
                 handler_.uint64_value(val, semantic_tag_type::epoch_time, *this);
                 break;
             }
@@ -192,7 +192,7 @@ public:
                     JSONCONS_THROW(bson_decode_error(0));
                 }
                 const uint8_t* endp;
-                auto val = binary::from_little_endian<int64_t>(buf, buf+sizeof(int64_t),&endp);
+                auto val = jsoncons::detail::from_little_endian<int64_t>(buf, buf+sizeof(int64_t),&endp);
                 handler_.int64_value(val, semantic_tag_type::none, *this);
                 break;
             }
@@ -204,7 +204,7 @@ public:
                     JSONCONS_THROW(bson_decode_error(0));
                 }
                 const uint8_t* endp;
-                const auto len = binary::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+                const auto len = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
                 std::vector<uint8_t> v(len, 0);
                 if (source_.read(v.data(), v.size()) != v.size())

@@ -123,7 +123,7 @@
 #  endif
 #endif
 
-namespace jsoncons { namespace binary { 
+namespace jsoncons { namespace detail { 
   
 class read_nbytes_failed : public std::invalid_argument, public virtual json_exception
 {

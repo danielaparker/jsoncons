@@ -17,13 +17,11 @@ TEST_CASE("serialize array to bson")
 {
     std::vector<uint8_t> v;
     bson_bytes_serializer serializer(v);
-    //serializer.begin_object(1);
-    serializer.begin_array(3);
-    serializer.bool_value(true);
-    serializer.bool_value(false);
+
+    serializer.begin_object();
+    serializer.name("null");
     serializer.null_value();
-    serializer.end_array();
-    //serializer.end_object();
+    serializer.end_object();
     serializer.flush();
 
     try
@@ -35,6 +33,5 @@ TEST_CASE("serialize array to bson")
     {
         std::cout << e.what() << std::endl;
     }
-
 } 
 

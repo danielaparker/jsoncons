@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_WRITERS_HPP
-#define JSONCONS_DETAIL_WRITERS_HPP
+#ifndef JSONCONS_DETAIL_RESULT_HPP
+#define JSONCONS_DETAIL_RESULT_HPP
 
 #include <stdexcept>
 #include <string>
@@ -28,7 +28,7 @@
 namespace jsoncons { namespace detail {
 
 template <class CharT>
-class stream_char_writer
+class char_stream_result
 {
 public:
     typedef CharT value_type;
@@ -44,19 +44,19 @@ private:
     CharT* p_;
 
     // Noncopyable and nonmoveable
-    stream_char_writer(const stream_char_writer&) = delete;
-    stream_char_writer& operator=(const stream_char_writer&) = delete;
+    char_stream_result(const char_stream_result&) = delete;
+    char_stream_result& operator=(const char_stream_result&) = delete;
 
 public:
-    stream_char_writer(std::basic_ostream<CharT>& os)
+    char_stream_result(std::basic_ostream<CharT>& os)
         : os_(os), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    stream_char_writer(std::basic_ostream<CharT>& os, size_t buflen)
+    char_stream_result(std::basic_ostream<CharT>& os, size_t buflen)
     : os_(os), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    ~stream_char_writer()
+    ~char_stream_result()
     {
         os_.write(begin_buffer_, buffer_length());
         os_.flush();
@@ -106,7 +106,7 @@ private:
     }
 };
 
-class stream_byte_writer
+class byte_stream_result
 {
 public:
     typedef uint8_t value_type;
@@ -121,11 +121,11 @@ private:
     uint8_t* p_;
 
     // Noncopyable and nonmoveable
-    stream_byte_writer(const stream_byte_writer&) = delete;
-    stream_byte_writer& operator=(const stream_byte_writer&) = delete;
+    byte_stream_result(const byte_stream_result&) = delete;
+    byte_stream_result& operator=(const byte_stream_result&) = delete;
 
 public:
-    stream_byte_writer(std::basic_ostream<char>& os)
+    byte_stream_result(std::basic_ostream<char>& os)
         : os_(os), 
           buffer_(default_buffer_length), 
           begin_buffer_(buffer_.data()), 
@@ -133,7 +133,7 @@ public:
           p_(begin_buffer_)
     {
     }
-    stream_byte_writer(std::basic_ostream<char>& os, size_t buflen)
+    byte_stream_result(std::basic_ostream<char>& os, size_t buflen)
         : os_(os), 
           buffer_(buflen), 
           begin_buffer_(buffer_.data()), 
@@ -141,7 +141,7 @@ public:
           p_(begin_buffer_)
     {
     }
-    ~stream_byte_writer()
+    ~byte_stream_result()
     {
         os_.write((char*)begin_buffer_, buffer_length());
         os_.flush();
@@ -191,7 +191,7 @@ private:
 };
 
 template <class StringT>
-class string_writer 
+class string_result 
 {
 public:
     typedef typename StringT::value_type value_type;
@@ -200,11 +200,11 @@ private:
     output_type& s_;
 
     // Noncopyable and nonmoveable
-    string_writer(const string_writer&) = delete;
-    string_writer& operator=(const string_writer&) = delete;
+    string_result(const string_result&) = delete;
+    string_result& operator=(const string_result&) = delete;
 public:
 
-    string_writer(output_type& s)
+    string_result(output_type& s)
         : s_(s)
     {
     }
@@ -224,7 +224,7 @@ public:
     }
 };
 
-class bytes_writer 
+class bytes_result 
 {
 public:
     typedef uint8_t value_type;
@@ -233,11 +233,11 @@ private:
     output_type& s_;
 
     // Noncopyable and nonmoveable
-    bytes_writer(const bytes_writer&) = delete;
-    bytes_writer& operator=(const bytes_writer&) = delete;
+    bytes_result(const bytes_result&) = delete;
+    bytes_result& operator=(const bytes_result&) = delete;
 public:
 
-    bytes_writer(output_type& s)
+    bytes_result(output_type& s)
         : s_(s)
     {
     }

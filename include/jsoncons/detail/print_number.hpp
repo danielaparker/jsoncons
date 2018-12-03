@@ -28,10 +28,10 @@ namespace jsoncons { namespace detail {
 
 // print_integer
 
-template<class Writer> 
-size_t print_integer(int64_t value, Writer& writer)
+template<class Result> 
+size_t print_integer(int64_t value, Result& writer)
 {
-    typedef typename Writer::value_type char_type;
+    typedef typename Result::value_type char_type;
 
     size_t count = 0;
 
@@ -59,10 +59,10 @@ size_t print_integer(int64_t value, Writer& writer)
 
 // print_uinteger
 
-template<class Writer>
-size_t print_uinteger(uint64_t value, Writer& writer)
+template<class Result>
+size_t print_uinteger(uint64_t value, Result& writer)
 {
-    typedef typename Writer::value_type char_type;
+    typedef typename Result::value_type char_type;
 
     size_t count = 0;
 
@@ -106,8 +106,8 @@ public:
         }
     }
 
-    template <class Writer>
-    size_t operator()(double val, const floating_point_options& fmt, Writer& writer)
+    template <class Result>
+    size_t operator()(double val, const floating_point_options& fmt, Result& writer)
     {
         size_t count = 0;
 

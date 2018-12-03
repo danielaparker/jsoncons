@@ -19,15 +19,15 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/print_number.hpp>
 #include <jsoncons_ext/csv/csv_serializing_options.hpp>
-#include <jsoncons/detail/writer.hpp>
+#include <jsoncons/detail/result.hpp>
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Writer=jsoncons::detail::stream_char_writer<CharT>,class Allocator=std::allocator<CharT>>
+template<class CharT,class Result=jsoncons::detail::char_stream_result<CharT>,class Allocator=std::allocator<CharT>>
 class basic_csv_serializer final : public basic_json_content_handler<CharT>
 {
 public:
-    typedef typename Writer::output_type output_type;
+    typedef typename Result::output_type output_type;
 
     typedef Allocator allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
@@ -51,7 +51,7 @@ private:
         size_t count_;
         string_type name_;
     };
-    Writer writer_;
+    Result writer_;
     basic_csv_serializing_options<CharT,Allocator> parameters_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
@@ -250,7 +250,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
+                    jsoncons::detail::string_result<std::basic_string<CharT>> bo(s);
                     accept_null_value(bo);
                     bo.flush();
                     it->second = s;
@@ -274,7 +274,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
+                    jsoncons::detail::string_result<std::basic_string<CharT>> bo(s);
                     value(sv,bo);
                     bo.flush();
                     it->second = s;
@@ -338,7 +338,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
+                    jsoncons::detail::string_result<std::basic_string<CharT>> bo(s);
                     value(val, fmt, bo);
                     bo.flush();
                     it->second = s;
@@ -364,7 +364,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
+                    jsoncons::detail::string_result<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -390,7 +390,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
+                    jsoncons::detail::string_result<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -414,7 +414,7 @@ private:
                 if (it != buffered_line_.end())
                 {
                     std::basic_string<CharT> s;
-                    jsoncons::detail::string_writer<std::basic_string<CharT>> bo(s);
+                    jsoncons::detail::string_result<std::basic_string<CharT>> bo(s);
                     value(val,bo);
                     bo.flush();
                     it->second = s;
@@ -548,7 +548,7 @@ template <class Json>
 void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_serializer<char_type,jsoncons::detail::string_writer<std::basic_string<typename Json::char_type>>> serializer(s);
+    basic_csv_serializer<char_type,jsoncons::detail::string_result<std::basic_string<typename Json::char_type>>> serializer(s);
     j.dump(serializer);
 }
 
@@ -556,7 +556,7 @@ template <class Json,class Allocator>
 void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_serializer<char_type,jsoncons::detail::stream_char_writer<char_type>,Allocator> serializer(os,options);
+    basic_csv_serializer<char_type,jsoncons::detail::char_stream_result<char_type>,Allocator> serializer(os,options);
     j.dump(serializer);
 }
 
@@ -564,12 +564,12 @@ template <class Json,class Allocator>
 void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
 {
     typedef typename Json::char_type char_type;
-    basic_csv_serializer<char_type,jsoncons::detail::string_writer<std::basic_string<typename Json::char_type>>,Allocator> serializer(s,options);
+    basic_csv_serializer<char_type,jsoncons::detail::string_result<std::basic_string<typename Json::char_type>>,Allocator> serializer(s,options);
     j.dump(serializer);
 }
 
 typedef basic_csv_serializer<char> csv_serializer;
-typedef basic_csv_serializer<char,jsoncons::detail::string_writer<std::string>> csv_string_serializer;
+typedef basic_csv_serializer<char,jsoncons::detail::string_result<std::string>> csv_string_serializer;
 
 }}
 

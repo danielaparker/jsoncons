@@ -49,9 +49,9 @@ const std::error_category& cbor_error_category()
 }
 
 inline 
-std::error_code make_error_code(cbor_errc result)
+std::error_code make_error_code(cbor_errc e)
 {
-    return std::error_code(static_cast<int>(result),cbor_error_category());
+    return std::error_code(static_cast<int>(e),cbor_error_category());
 }
 
 #if !defined(JSONCONS_NO_DEPRECATED)

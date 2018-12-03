@@ -22,14 +22,14 @@
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_serializing_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/detail/writer.hpp>
+#include <jsoncons/detail/result.hpp>
 #include <jsoncons/detail/print_number.hpp>
 
 namespace jsoncons { namespace detail {
-template <class CharT, class Writer>
+template <class CharT, class Result>
 size_t escape_string(const CharT* s, size_t length,
                      bool escape_all_non_ascii, bool escape_solidus,
-                     Writer& writer)
+                     Result& writer)
 {
     size_t count = 0;
     const CharT* begin = s;
@@ -177,13 +177,13 @@ byte_string_chars_format resolve_byte_string_chars_format(byte_string_chars_form
 
 namespace jsoncons {
 
-template<class CharT,class Writer=jsoncons::detail::stream_char_writer<CharT>>
+template<class CharT,class Result=jsoncons::detail::char_stream_result<CharT>>
 class basic_json_serializer final : public basic_json_content_handler<CharT>
 {
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
-    typedef Writer writer_type;
-    typedef typename Writer::output_type output_type;
+    typedef Result result_type;
+    typedef typename Result::output_type output_type;
     typedef typename basic_json_serializing_options<CharT>::string_type string_type;
 
 private:
@@ -291,7 +291,7 @@ private:
     jsoncons::detail::print_double fp_;
     size_t line_length_limit_;
     std::basic_string<CharT> new_line_chars_;
-    Writer writer_;
+    Result writer_;
 
     std::vector<serialization_context> stack_;
     int indent_amount_;
@@ -990,13 +990,13 @@ private:
     }
 };
 
-template<class CharT,class Writer=jsoncons::detail::stream_char_writer<CharT>>
+template<class CharT,class Result=jsoncons::detail::char_stream_result<CharT>>
 class basic_json_compressed_serializer final : public basic_json_content_handler<CharT>
 {
 public:
     using typename basic_json_content_handler<CharT>::string_view_type;
-    typedef Writer writer_type;
-    typedef typename Writer::output_type output_type;
+    typedef Result result_type;
+    typedef typename Result::output_type output_type;
     typedef typename basic_json_serializing_options<CharT>::string_type string_type;
 
 private:
@@ -1041,7 +1041,7 @@ private:
 
     std::vector<serialization_context> stack_;
     jsoncons::detail::print_double fp_;
-    Writer writer_;
+    Result writer_;
 
     // Noncopyable and nonmoveable
     basic_json_compressed_serializer(const basic_json_compressed_serializer&) = delete;
@@ -1426,17 +1426,17 @@ private:
     }
 };
 
-typedef basic_json_serializer<char,jsoncons::detail::stream_char_writer<char>> json_serializer;
-typedef basic_json_serializer<wchar_t,jsoncons::detail::stream_char_writer<wchar_t>> wjson_serializer;
+typedef basic_json_serializer<char,jsoncons::detail::char_stream_result<char>> json_serializer;
+typedef basic_json_serializer<wchar_t,jsoncons::detail::char_stream_result<wchar_t>> wjson_serializer;
 
-typedef basic_json_compressed_serializer<char,jsoncons::detail::stream_char_writer<char>> json_compressed_serializer;
-typedef basic_json_compressed_serializer<wchar_t,jsoncons::detail::stream_char_writer<wchar_t>> wjson_compressed_serializer;
+typedef basic_json_compressed_serializer<char,jsoncons::detail::char_stream_result<char>> json_compressed_serializer;
+typedef basic_json_compressed_serializer<wchar_t,jsoncons::detail::char_stream_result<wchar_t>> wjson_compressed_serializer;
 
-typedef basic_json_serializer<char,jsoncons::detail::string_writer<std::string>> json_string_serializer;
-typedef basic_json_serializer<wchar_t,jsoncons::detail::string_writer<std::wstring>> wjson_string_serializer;
+typedef basic_json_serializer<char,jsoncons::detail::string_result<std::string>> json_string_serializer;
+typedef basic_json_serializer<wchar_t,jsoncons::detail::string_result<std::wstring>> wjson_string_serializer;
 
-typedef basic_json_compressed_serializer<char,jsoncons::detail::string_writer<std::string>> json_compressed_string_serializer;
-typedef basic_json_compressed_serializer<wchar_t,jsoncons::detail::string_writer<std::wstring>> wjson_compressed_string_serializer;
+typedef basic_json_compressed_serializer<char,jsoncons::detail::string_result<std::string>> json_compressed_string_serializer;
+typedef basic_json_compressed_serializer<wchar_t,jsoncons::detail::string_result<std::wstring>> wjson_compressed_string_serializer;
 
 }
 #endif

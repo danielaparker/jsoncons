@@ -883,7 +883,7 @@ public:
     void dump(std::basic_string<char,Traits,SAllocator>& s) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_compressed_serializer<char,jsoncons::detail::string_writer<string_type>> serializer(s);
+        basic_json_compressed_serializer<char,jsoncons::detail::string_result<string_type>> serializer(s);
         dump(serializer);
     }
 
@@ -908,7 +908,7 @@ public:
               const json_serializing_options& options) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_compressed_serializer<char,jsoncons::detail::string_writer<string_type>> serializer(s, options);
+        basic_json_compressed_serializer<char,jsoncons::detail::string_result<string_type>> serializer(s, options);
         dump(serializer);
     }
 

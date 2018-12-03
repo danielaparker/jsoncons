@@ -148,7 +148,7 @@ public:
                 case msgpack_format::float32_cd: 
                 {
                     const uint8_t* endp;
-                    float res = binary::from_big_endian<float>(input_ptr_,end_input_,&endp);
+                    float res = jsoncons::detail::from_big_endian<float>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -164,7 +164,7 @@ public:
                 case msgpack_format::float64_cd: 
                 {
                     const uint8_t* endp;
-                    double res = binary::from_big_endian<double>(input_ptr_,end_input_,&endp);
+                    double res = jsoncons::detail::from_big_endian<double>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -180,7 +180,7 @@ public:
                 case msgpack_format::uint8_cd: 
                 {
                     const uint8_t* endp;
-                    auto x = binary::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
+                    auto x = jsoncons::detail::from_big_endian<uint8_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -196,7 +196,7 @@ public:
                 case msgpack_format::uint16_cd: 
                 {
                     const uint8_t* endp;
-                    auto x = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
+                    auto x = jsoncons::detail::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -212,7 +212,7 @@ public:
                 case msgpack_format::uint32_cd: 
                 {
                     const uint8_t* endp;
-                    auto x = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
+                    auto x = jsoncons::detail::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -228,7 +228,7 @@ public:
                 case msgpack_format::uint64_cd: 
                 {
                     const uint8_t* endp;
-                    auto x = binary::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
+                    auto x = jsoncons::detail::from_big_endian<uint64_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -244,7 +244,7 @@ public:
                 case msgpack_format::int8_cd: 
                 {
                     const uint8_t* endp;
-                    auto x = binary::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
+                    auto x = jsoncons::detail::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -260,7 +260,7 @@ public:
                 case msgpack_format::int16_cd: 
                 {
                     const uint8_t* endp;
-                    auto x = binary::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
+                    auto x = jsoncons::detail::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -276,7 +276,7 @@ public:
                 case msgpack_format::int32_cd: 
                 {
                     const uint8_t* endp;
-                    auto x = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                    auto x = jsoncons::detail::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -292,7 +292,7 @@ public:
                 case msgpack_format::int64_cd: 
                 {
                     const uint8_t* endp;
-                    auto x = binary::from_big_endian<int64_t>(input_ptr_,end_input_,&endp);
+                    auto x = jsoncons::detail::from_big_endian<int64_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -308,7 +308,7 @@ public:
                 case msgpack_format::str8_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -336,7 +336,7 @@ public:
                 case msgpack_format::str16_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -364,7 +364,7 @@ public:
                 case msgpack_format::str32_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -392,7 +392,7 @@ public:
                 case msgpack_format::bin8_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -418,7 +418,7 @@ public:
                 case msgpack_format::bin16_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -445,7 +445,7 @@ public:
                 case msgpack_format::bin32_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -472,7 +472,7 @@ public:
                 case msgpack_format::array16_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -499,7 +499,7 @@ public:
                 case msgpack_format::array32_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -526,7 +526,7 @@ public:
                 case msgpack_format::map16_cd : 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<uint16_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -558,7 +558,7 @@ public:
                 case msgpack_format::map32_cd : 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<uint32_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -632,7 +632,7 @@ private:
                 case msgpack_format::str8_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int8_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -660,7 +660,7 @@ private:
                 case msgpack_format::str16_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int16_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));
@@ -688,7 +688,7 @@ private:
                 case msgpack_format::str32_cd: 
                 {
                     const uint8_t* endp;
-                    const auto len = binary::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
+                    const auto len = jsoncons::detail::from_big_endian<int32_t>(input_ptr_,end_input_,&endp);
                     if (endp == input_ptr_)
                     {
                         JSONCONS_THROW(msgpack_decode_error(end_input_-input_ptr_));

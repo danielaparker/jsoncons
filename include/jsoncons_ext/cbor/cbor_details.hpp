@@ -118,7 +118,7 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
         }
     case 0x18: // one-byte uint8_t for n follows
         {
-            length = binary::from_big_endian<uint8_t>(p,last,endp);
+            length = jsoncons::detail::from_big_endian<uint8_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -127,7 +127,7 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
         }
     case 0x19: // two-byte uint16_t for n follow
         {
-            length = binary::from_big_endian<uint16_t>(p,last,endp);
+            length = jsoncons::detail::from_big_endian<uint16_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -136,7 +136,7 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
         }
     case 0x1a: // four-byte uint32_t for n follow
         {
-            length = binary::from_big_endian<uint32_t>(p,last,endp);
+            length = jsoncons::detail::from_big_endian<uint32_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -145,7 +145,7 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
         }
     case 0x1b: // eight-byte uint64_t for n follow
         {
-            length = (size_t)binary::from_big_endian<uint64_t>(p,last,endp);
+            length = (size_t)jsoncons::detail::from_big_endian<uint64_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -447,7 +447,7 @@ uint64_t get_uint64_value(const uint8_t* first, const uint8_t* last, const uint8
 
     case 0x18: // Unsigned integer (one-byte uint8_t follows)
         {
-            val = binary::from_big_endian<uint8_t>(p,last,endp);
+            val = jsoncons::detail::from_big_endian<uint8_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -457,7 +457,7 @@ uint64_t get_uint64_value(const uint8_t* first, const uint8_t* last, const uint8
 
     case 0x19: // Unsigned integer (two-byte uint16_t follows)
         {
-            val = binary::from_big_endian<uint16_t>(p,last,endp);
+            val = jsoncons::detail::from_big_endian<uint16_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -467,7 +467,7 @@ uint64_t get_uint64_value(const uint8_t* first, const uint8_t* last, const uint8
 
     case 0x1a: // Unsigned integer (four-byte uint32_t follows)
         {
-            val = binary::from_big_endian<uint32_t>(p,last,endp);
+            val = jsoncons::detail::from_big_endian<uint32_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -477,7 +477,7 @@ uint64_t get_uint64_value(const uint8_t* first, const uint8_t* last, const uint8
 
     case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
         {
-            val = binary::from_big_endian<uint64_t>(p,last,endp);
+            val = jsoncons::detail::from_big_endian<uint64_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -515,7 +515,7 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
                     break;
                 case 0x18: // Negative integer (one-byte uint8_t follows)
                     {
-                        auto x = binary::from_big_endian<uint8_t>(p,last,endp);
+                        auto x = jsoncons::detail::from_big_endian<uint8_t>(p,last,endp);
                         if (*endp == p)
                         {
                             *endp = first;
@@ -529,7 +529,7 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
 
                 case 0x19: // Negative integer -1-n (two-byte uint16_t follows)
                     {
-                        auto x = binary::from_big_endian<uint16_t>(p,last,endp);
+                        auto x = jsoncons::detail::from_big_endian<uint16_t>(p,last,endp);
                         if (*endp == p)
                         {
                             *endp = first;
@@ -543,7 +543,7 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
 
                 case 0x1a: // Negative integer -1-n (four-byte uint32_t follows)
                     {
-                        auto x = binary::from_big_endian<uint32_t>(p,last,endp);
+                        auto x = jsoncons::detail::from_big_endian<uint32_t>(p,last,endp);
                         if (*endp == p)
                         {
                             *endp = first;
@@ -557,7 +557,7 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
 
                 case 0x1b: // Negative integer -1-n (eight-byte uint64_t follows)
                     {
-                        auto x = binary::from_big_endian<uint64_t>(p,last,endp);
+                        auto x = jsoncons::detail::from_big_endian<uint64_t>(p,last,endp);
                         if (*endp == p)
                         {
                             *endp = first;
@@ -613,14 +613,14 @@ double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** end
     {
     case 0x19: // Half-Precision Float (two-byte IEEE 754)
         {
-            uint16_t x = binary::from_big_endian<uint16_t>(p,last,endp);
+            uint16_t x = jsoncons::detail::from_big_endian<uint16_t>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
             }
             else
             {
-                val = binary::decode_half(x);
+                val = jsoncons::detail::decode_half(x);
             }
         }
         break;
@@ -628,7 +628,7 @@ double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** end
 
     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
         {
-            val = binary::from_big_endian<float>(p,last,endp);
+            val = jsoncons::detail::from_big_endian<float>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -638,7 +638,7 @@ double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** end
 
     case 0x1b: //  Double-Precision Float (eight-byte IEEE 754)
         {
-            val = binary::from_big_endian<double>(p,last,endp);
+            val = jsoncons::detail::from_big_endian<double>(p,last,endp);
             if (*endp == p)
             {
                 *endp = first;
@@ -1050,7 +1050,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
             {
                 return s;
             }
-            jsoncons::detail::string_writer<std::string> writer(s);
+            jsoncons::detail::string_result<std::string> writer(s);
             jsoncons::detail::print_uinteger(val, writer);
             p = *endpp;
             break;
@@ -1062,7 +1062,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
             {
                 return s;
             }
-            jsoncons::detail::string_writer<std::string> writer(s);
+            jsoncons::detail::string_result<std::string> writer(s);
             jsoncons::detail::print_integer(val, writer);
             p = *endpp;
             break;

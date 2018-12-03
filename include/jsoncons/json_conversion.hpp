@@ -124,7 +124,7 @@ void encode_json(const T& val, const basic_json_serializing_options<CharT>& opti
 template <class T, class CharT>
 void encode_json(const T& val, std::basic_string<CharT>& s)
 {
-    basic_json_compressed_serializer<CharT,jsoncons::detail::string_writer<std::basic_string<CharT>>> serializer(s);
+    basic_json_compressed_serializer<CharT,jsoncons::detail::string_result<std::basic_string<CharT>>> serializer(s);
     encode_json(val, serializer);
 }
 
@@ -132,7 +132,7 @@ template <class T, class CharT>
 void encode_json(const T& val, const basic_json_serializing_options<CharT>& options,
           std::basic_string<CharT>& s)
 {
-    basic_json_compressed_serializer<CharT,jsoncons::detail::string_writer<std::basic_string<CharT>>> serializer(s, options);
+    basic_json_compressed_serializer<CharT,jsoncons::detail::string_result<std::basic_string<CharT>>> serializer(s, options);
     encode_json(val, serializer);
 }
 
@@ -141,19 +141,19 @@ void encode_json(const T& val, std::basic_string<CharT>& s, indenting line_inden
 {
     if (line_indent == indenting::indent)
     {
-        basic_json_serializer<CharT,jsoncons::detail::string_writer<std::basic_string<CharT>>> serializer(s);
+        basic_json_serializer<CharT,jsoncons::detail::string_result<std::basic_string<CharT>>> serializer(s);
         encode_json(val, serializer);
     }
     else
     {
-        basic_json_compressed_serializer<CharT,jsoncons::detail::string_writer<std::basic_string<CharT>>> serializer(s);
+        basic_json_compressed_serializer<CharT,jsoncons::detail::string_result<std::basic_string<CharT>>> serializer(s);
         encode_json(val, serializer);
     }
 }
 
 template <class T, class CharT>
 void encode_json(const T& val, const basic_json_serializing_options<CharT>& options,
-                 std::basic_string<CharT,jsoncons::detail::string_writer<std::basic_string<CharT>>>& s, indenting line_indent)
+                 std::basic_string<CharT,jsoncons::detail::string_result<std::basic_string<CharT>>>& s, indenting line_indent)
 {
     if (line_indent == indenting::indent)
     {
