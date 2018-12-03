@@ -16,7 +16,7 @@
 #include <limits>
 #include <cassert>
 #include <jsoncons/json.hpp>
-#include <jsoncons/config/binary_utilities.hpp>
+#include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_serializer.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
 

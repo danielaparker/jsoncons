@@ -19,7 +19,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/config/binary_utilities.hpp>
+#include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons/detail/writer.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>

@@ -18,7 +18,7 @@
 #include <iterator>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/config/binary_utilities.hpp>
+#include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 

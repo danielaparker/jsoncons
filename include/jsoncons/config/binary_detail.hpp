@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CONFIG_BINARY_UTILITIES_HPP
-#define JSONCONS_CONFIG_BINARY_UTILITIES_HPP
+#ifndef JSONCONS_CONFIG_BINARY_DETAIL_HPP
+#define JSONCONS_CONFIG_BINARY_DETAIL_HPP
 
 #include <assert.h>
 #include <cfloat>
@@ -37,52 +37,78 @@
 #if (defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 403)) || \
     (__has_builtin(__builtin_bswap64) && __has_builtin(__builtin_bswap32))
 #  if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#    define JSONCONS_NTOH64     __builtin_bswap64
-#    define JSONCONS_HTON64     __builtin_bswap64
-#    define JSONCONS_NTOH32      __builtin_bswap32
-#    define JSONCONS_HTON32      __builtin_bswap32
+#    define JSONCONS_BE64_TO_H     __builtin_bswap64
+#    define JSONCONS_H_TO_BE64     __builtin_bswap64
+#    define JSONCONS_BE32_TO_H      __builtin_bswap32
+#    define JSONCONS_H_TO_BE32      __builtin_bswap32
 #    ifdef __INTEL_COMPILER
-#      define JSONCONS_NTOH16    _bswap16
-#      define JSONCONS_HTON16    _bswap16
+#      define JSONCONS_BE16_TO_H    _bswap16
+#      define JSONCONS_H_TO_BE16    _bswap16
 #    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
-#      define JSONCONS_NTOH16    __builtin_bswap16
-#      define JSONCONS_HTON16    __builtin_bswap16
+#      define JSONCONS_BE16_TO_H    __builtin_bswap16
+#      define JSONCONS_H_TO_BE16    __builtin_bswap16
 #    else
-#      define JSONCONS_NTOH16(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
-#      define JSONCONS_HTON16    JSONCONS_NTOH16
+#      define JSONCONS_BE16_TO_H(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
+#      define JSONCONS_H_TO_BE16    JSONCONS_BE16_TO_H
 #    endif
+#    define JSONCONS_LE64_TO_H
+#    define JSONCONS_H_TO_LE64
+#    define JSONCONS_LE32_TO_H
+#    define JSONCONS_H_TO_LE32
+#    define JSONCONS_LE16_TO_H
+#    define JSONCONS_H_TO_LE16
 #  else
-#    define JSONCONS_NTOH64
-#    define JSONCONS_HTON64
-#    define JSONCONS_NTOH32
-#    define JSONCONS_HTON32
-#    define JSONCONS_NTOH16
-#    define JSONCONS_HTON16
+#    define JSONCONS_LE64_TO_H     __builtin_bswap64
+#    define JSONCONS_H_TO_LE64     __builtin_bswap64
+#    define JSONCONS_LE32_TO_H      __builtin_bswap32
+#    define JSONCONS_H_TO_LE32      __builtin_bswap32
+#    ifdef __INTEL_COMPILER
+#      define JSONCONS_LE16_TO_H    _bswap16
+#      define JSONCONS_H_TO_LE16    _bswap16
+#    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
+#      define JSONCONS_LE16_TO_H    __builtin_bswap16
+#      define JSONCONS_H_TO_LE16    __builtin_bswap16
+#    else
+#      define JSONCONS_LE16_TO_H(x) (((uint16_t)x >> 8) | ((uint16_t)x << 8))
+#      define JSONCONS_H_TO_LE16    JSONCONS_LE16_TO_H
+#    endif
+#    define JSONCONS_BE64_TO_H
+#    define JSONCONS_H_TO_BE64
+#    define JSONCONS_BE32_TO_H
+#    define JSONCONS_H_TO_BE32
+#    define JSONCONS_BE16_TO_H
+#    define JSONCONS_H_TO_BE16
 #  endif
 #elif defined(__sun)
 #  include <sys/byteorder.h>
 #elif defined(_MSC_VER)
 /* MSVC, which implies Windows, which implies little-endian and sizeof(long) == 4 */
-#  define JSONCONS_NTOH64       _byteswap_uint64
-#  define JSONCONS_HTON64       _byteswap_uint64
-#  define JSONCONS_NTOH32        _byteswap_ulong
-#  define JSONCONS_HTON32        _byteswap_ulong
-#  define JSONCONS_NTOH16        _byteswap_ushort
-#  define JSONCONS_HTON16        _byteswap_ushort
+#  define JSONCONS_BE64_TO_H       _byteswap_uint64
+#  define JSONCONS_H_TO_BE64       _byteswap_uint64
+#  define JSONCONS_BE32_TO_H        _byteswap_ulong
+#  define JSONCONS_H_TO_BE32        _byteswap_ulong
+#  define JSONCONS_BE16_TO_H        _byteswap_ushort
+#  define JSONCONS_H_TO_BE16        _byteswap_ushort
+#  define JSONCONS_LE64_TO_H
+#  define JSONCONS_H_TO_LE64
+#  define JSONCONS_LE32_TO_H
+#  define JSONCONS_H_TO_LE32
+#  define JSONCONS_LE16_TO_H
+#  define JSONCONS_H_TO_LE16
 #endif
-#ifndef JSONCONS_NTOH16
+#ifndef JSONCONS_BE16_TO_H
 #  include <arpa/inet.h>
-#  define JSONCONS_NTOH16        ntohs
-#  define JSONCONS_HTON16        htons
+#  define JSONCONS_BE16_TO_H        ntohs
+#  define JSONCONS_H_TO_BE16        htons
 #endif
-#ifndef JSONCONS_NTOH32
+#ifndef JSONCONS_BE32_TO_H
 #  include <arpa/inet.h>
-#  define JSONCONS_NTOH32        ntohl
-#  define JSONCONS_HTON32        htonl
+#  define JSONCONS_BE32_TO_H        ntohl
+#  define JSONCONS_H_TO_BE32        htonl
 #endif
-#ifndef JSONCONS_NTOH64
-#  define JSONCONS_NTOH64       ntohll
-#  define JSONCONS_HTON64       htonll
+#ifndef JSONCONS_BE64_TO_H
+#  define JSONCONS_BE64_TO_H       ntohll
+#  define JSONCONS_H_TO_BE64       htonll
 /* ntohll isn't usually defined */
 #  ifndef ntohll
 #    if defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -214,7 +240,7 @@ typename std::enable_if<std::is_integral<T>::value &&
 sizeof(T) == sizeof(uint16_t),void>::type
 to_big_endian(T val, OutputIt d_first)
 {
-    T x = JSONCONS_HTON16(val);
+    T x = JSONCONS_H_TO_BE16(val);
 
     uint8_t where[sizeof(T)];
     memcpy(where, &x, sizeof(T));
@@ -228,7 +254,7 @@ typename std::enable_if<std::is_integral<T>::value &&
 sizeof(T) == sizeof(uint32_t),void>::type
 to_big_endian(T val, OutputIt d_first)
 {
-    T x = JSONCONS_HTON32(val);
+    T x = JSONCONS_H_TO_BE32(val);
 
     uint8_t where[sizeof(T)];
     memcpy(where, &x, sizeof(T));
@@ -244,7 +270,7 @@ typename std::enable_if<std::is_integral<T>::value &&
 sizeof(T) == sizeof(uint64_t),void>::type
 to_big_endian(T val, OutputIt d_first)
 {
-    T x = JSONCONS_HTON64(val);
+    T x = JSONCONS_H_TO_BE64(val);
 
     uint8_t where[sizeof(T)];
     memcpy(where, &x, sizeof(T));
@@ -309,10 +335,10 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_NTOH16(val);
+        return JSONCONS_BE16_TO_H(val);
     }
 }
-
+ 
 template<class T>
 typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
 from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
@@ -327,7 +353,7 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_NTOH32(val);
+        return JSONCONS_BE32_TO_H(val);
     }
 }
 
@@ -345,7 +371,7 @@ from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
         *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
-        return JSONCONS_NTOH64(val);
+        return JSONCONS_BE64_TO_H(val);
     }
 }
 
@@ -366,6 +392,102 @@ sizeof(T) == sizeof(uint64_t),T>::type
 from_big_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     uint64_t data = from_big_endian<uint64_t>(first,last,endp);
+    T val;
+    std::memcpy(&val,&data,sizeof(T));
+    return val;
+}
+
+// from_little_endian
+
+template<class T>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint8_t),T>::type
+from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    if (first + sizeof(T) > last)
+    {
+        *endp = first;
+        return 0;
+    }
+    else
+    {
+        *endp = first + sizeof(T);
+        return static_cast<T>(*(first));
+    }
+}
+
+template<class T>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint16_t),T>::type
+from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    if (first + sizeof(T) > last)
+    {
+        *endp = first;
+        return 0;
+    }
+    else
+    {
+        *endp = first + sizeof(T);
+        T val;
+        std::memcpy(&val,first,sizeof(T));
+        return JSONCONS_LE16_TO_H(val);
+    }
+}
+
+template<class T>
+typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint32_t),T>::type
+from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    if (first + sizeof(T) > last)
+    {
+        *endp = first;
+        return 0;
+    }
+    else
+    {
+        *endp = first + sizeof(T);
+        T val;
+        std::memcpy(&val,first,sizeof(T));
+        return JSONCONS_LE32_TO_H(val);
+    }
+}
+
+template<class T>
+typename std::enable_if<std::is_integral<T>::value && sizeof(T) == sizeof(uint64_t),T>::type
+from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    if (first + sizeof(T) > last)
+    {
+        *endp = first;
+        return 0;
+    }
+    else
+    {
+        *endp = first + sizeof(T);
+        T val;
+        std::memcpy(&val,first,sizeof(T));
+        return JSONCONS_LE64_TO_H(val);
+    }
+}
+
+template<class T>
+typename std::enable_if<std::is_floating_point<T>::value && 
+sizeof(T) == sizeof(uint32_t),T>::type
+from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    uint32_t data = from_little_endian<uint32_t>(first,last,endp);
+    T val;
+    std::memcpy(&val,&data,sizeof(T));
+    return val;
+}
+
+template<class T>
+typename std::enable_if<std::is_floating_point<T>::value && 
+sizeof(T) == sizeof(uint64_t),T>::type
+from_little_endian(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+{
+    uint64_t data = from_little_endian<uint64_t>(first,last,endp);
     T val;
     std::memcpy(&val,&data,sizeof(T));
     return val;
