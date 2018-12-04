@@ -301,6 +301,60 @@ void to_big_endian(double val, OutputIt d_first)
     to_big_endian(where, d_first);
 }
 
+// to_little_endian
+
+template<typename T, class OutputIt>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint32_t),void>::type
+to_little_endian(T val, OutputIt d_first)
+{
+    T x = JSONCONS_H_TO_LE32(val);
+
+    uint8_t where[sizeof(T)];
+    memcpy(where, &x, sizeof(T));
+
+    *d_first++ = where[0];
+    *d_first++ = where[1];
+    *d_first++ = where[2];
+    *d_first++ = where[3];
+}
+
+template<typename T, class OutputIt>
+typename std::enable_if<std::is_integral<T>::value && 
+sizeof(T) == sizeof(uint64_t),void>::type
+to_little_endian(T val, OutputIt d_first)
+{
+    T x = JSONCONS_H_TO_LE64(val);
+
+    uint8_t where[sizeof(T)];
+    memcpy(where, &x, sizeof(T));
+
+    *d_first++ = where[0];
+    *d_first++ = where[1];
+    *d_first++ = where[2];
+    *d_first++ = where[3];
+    *d_first++ = where[4];
+    *d_first++ = where[5];
+    *d_first++ = where[6];
+    *d_first++ = where[7];
+}
+
+template<class OutputIt>
+void to_little_endian(float val, OutputIt d_first)
+{
+    uint32_t where;
+    std::memcpy(&where,&val,sizeof(val));
+    to_little_endian(where, d_first);
+}
+
+template<class OutputIt>
+void to_little_endian(double val, OutputIt d_first)
+{
+    uint64_t where;
+    std::memcpy(&where,&val,sizeof(val));
+    to_little_endian(where, d_first);
+}
+
 // from_big_endian
 
 template<class T>

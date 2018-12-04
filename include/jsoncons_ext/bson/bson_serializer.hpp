@@ -123,10 +123,11 @@ private:
     bool do_end_object(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
-        stack_.pop_back();
-        end_value();
 
         buffer_.push_back(0x00);
+        jsoncons::detail::to_little_endian(static_cast<uint32_t>(buffer_.size()), buffer_.begin()+stack_.back().offset());
+
+        stack_.pop_back();
         if (stack_.empty())
         {
             for (auto c : buffer_)
@@ -139,7 +140,10 @@ private:
 
     bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
-        buffer_.push_back(bson_format::array_cd);
+        if (buffer_.size() > 0)
+        {
+            buffer_.push_back(bson_format::array_cd);
+        }
         stack_.emplace_back(bson_structure_type::array, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         return true;
@@ -148,8 +152,19 @@ private:
     bool do_end_array(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+
+        buffer_.push_back(0x00);
+
+        jsoncons::detail::to_little_endian(static_cast<uint32_t>(buffer_.size()), buffer_.begin()+stack_.back().offset());
+
         stack_.pop_back();
-        end_value();
+        if (stack_.empty())
+        {
+            for (auto c : buffer_)
+            {
+                result_.push_back(c);
+            }
+        }
         return true;
     }
 
@@ -167,37 +182,32 @@ private:
 
     bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
-        if (stack_.back().is_object())
+        before_value(bson_format::null_cd);
+        return true;
+    }
+
+    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
+    {
+        before_value(bson_format::bool_cd);
+        if (val)
         {
-            buffer_[stack_.back().member_offset()] = bson_format::null_cd;
+            buffer_.push_back(0x01);
         }
         else
         {
-            buffer_.push_back(bson_format::null_cd);
-            std::string name = std::to_string(stack_.back().next_index());
-            buffer_.insert(buffer_.begin(), name.begin(), name.end());
             buffer_.push_back(0x00);
         }
-        end_value();
+
         return true;
     }
 
     bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&) override
     {
-        if (stack_.back().is_object())
-        {
-            buffer_[stack_.back().member_offset()] = bson_format::string_cd;
-        }
-        else
-        {
-            buffer_.push_back(bson_format::string_cd);
-            std::string name = std::to_string(stack_.back().next_index());
-            buffer_.insert(buffer_.begin(), name.begin(), name.end());
-            buffer_.push_back(0x00);
-        }
+        before_value(bson_format::string_cd);
 
-        buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         size_t offset = buffer_.size();
+        buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
+        size_t string_offset = buffer_.size();
         auto result = unicons::convert(
             sv.begin(), sv.end(), std::back_inserter(buffer_), 
             unicons::conv_flags::strict);
@@ -205,12 +215,10 @@ private:
         {
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
-        size_t length = buffer_.size() - offset;
-        jsoncons::detail::to_big_endian(static_cast<uint32_t>(length), buffer_.begin()+offset);
+        buffer_.push_back(0x00);
+        size_t length = buffer_.size() - string_offset;
+        jsoncons::detail::to_little_endian(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
-        result_.push_back(0x00);
-
-        end_value();
         return true;
     }
 
@@ -219,21 +227,61 @@ private:
                               semantic_tag_type, 
                               const serializing_context&) override
     {
+        before_value(bson_format::binary_cd);
 
-        const size_t length = b.length();
-        if (length <= (std::numeric_limits<int32_t>::max)())
-        {
-            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(bson_format::binary_cd), std::back_inserter(result_));
-            jsoncons::detail::to_big_endian(static_cast<int32_t>(length),std::back_inserter(result_));
-        }
+        size_t offset = buffer_.size();
+        buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
+        size_t string_offset = buffer_.size();
 
         for (auto c : b)
         {
-            result_.push_back(c);
+            buffer_.push_back(c);
+        }
+        size_t length = buffer_.size() - string_offset;
+        jsoncons::detail::to_little_endian(static_cast<uint32_t>(length), buffer_.begin()+offset);
+
+        return true;
+    }
+
+    bool do_int64_value(int64_t val, 
+                        semantic_tag_type, 
+                        const serializing_context&) override
+    {
+        before_value(bson_format::int64_cd);
+        if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
+        {
+            jsoncons::detail::to_little_endian(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+        }
+        else if (val >= (std::numeric_limits<int64_t>::lowest)() && val <= (std::numeric_limits<int64_t>::max)())
+        {
+            jsoncons::detail::to_little_endian(static_cast<int64_t>(val),std::back_inserter(buffer_));
+        }
+        else
+        {
+            // error
         }
 
-        end_value();
+        return true;
+    }
+
+    bool do_uint64_value(uint64_t val, 
+                         semantic_tag_type, 
+                         const serializing_context&) override
+    {
+        before_value(bson_format::int64_cd);
+        if (val <= (std::numeric_limits<int32_t>::max)())
+        {
+            jsoncons::detail::to_little_endian(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+        }
+        else if (val <= (uint64_t)(std::numeric_limits<int64_t>::max)())
+        {
+            jsoncons::detail::to_little_endian(static_cast<uint64_t>(val),std::back_inserter(buffer_));
+        }
+        else
+        {
+            // error
+        }
+
         return true;
     }
 
@@ -242,66 +290,25 @@ private:
                          semantic_tag_type,
                          const serializing_context&) override
     {
-        jsoncons::detail::to_big_endian(static_cast<uint8_t>(bson_format::double_cd), std::back_inserter(result_));
-        jsoncons::detail::to_big_endian(val,std::back_inserter(result_));
+        before_value(bson_format::double_cd);
 
-        end_value();
+        jsoncons::detail::to_little_endian(val,std::back_inserter(buffer_));
+
         return true;
     }
 
-    bool do_int64_value(int64_t val, 
-                        semantic_tag_type, 
-                        const serializing_context&) override
+    void before_value(uint8_t code) 
     {
-        if (val <= (std::numeric_limits<int32_t>::max)()
-            && val <= (std::numeric_limits<int32_t>::max)())
+        if (stack_.back().is_object())
         {
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(bson_format::int32_cd), std::back_inserter(result_));
-            jsoncons::detail::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(result_));
+            buffer_[stack_.back().member_offset()] = code;
         }
-        else if (val <= (std::numeric_limits<int32_t>::max)())
+        else
         {
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(bson_format::int64_cd), std::back_inserter(result_));
-            jsoncons::detail::to_big_endian(static_cast<int64_t>(val),std::back_inserter(result_));
-        }
-        end_value();
-        return true;
-    }
-
-    bool do_uint64_value(uint64_t val, 
-                         semantic_tag_type, 
-                         const serializing_context&) override
-    {
-        if (val <= (std::numeric_limits<int32_t>::max)()
-            &&  val <= (std::numeric_limits<int32_t>::max)())
-        {
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(bson_format::int32_cd), std::back_inserter(result_));
-            jsoncons::detail::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(result_));
-        }
-        else if (val <= (std::numeric_limits<int32_t>::max)())
-        {
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(bson_format::int64_cd), std::back_inserter(result_));
-            jsoncons::detail::to_big_endian(static_cast<int64_t>(val),std::back_inserter(result_));
-        }
-        end_value();
-        return true;
-    }
-
-    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
-    {
-        // true and false
-        //result_.push_back(static_cast<uint8_t>(val ? bson_format::true_cd : bson_format::false_cd));
-        //jsoncons::detail::to_big_endian(static_cast<uint8_t>(val ? bson_format::true_cd : bson_format::false_cd), std::back_inserter(result_));
-
-        end_value();
-        return true;
-    }
-
-    void end_value()
-    {
-        if (!stack_.empty())
-        {
-            //++stack_.back().offset_;
+            buffer_.push_back(code);
+            std::string name = std::to_string(stack_.back().next_index());
+            buffer_.insert(buffer_.end(), name.begin(), name.end());
+            buffer_.push_back(0x00);
         }
     }
 };
