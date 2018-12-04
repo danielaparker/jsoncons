@@ -37,19 +37,31 @@ TEST_CASE("serialize object to bson")
 
 namespace jsoncons { namespace bson {
 
-        void are_equal(const std::vector<uint8_t>& v, const std::vector<uint8_t>& expected)
-        {
-            REQUIRE(v.size() == expected.size());
+    void test_equal(const std::vector<uint8_t>& v, const std::vector<uint8_t>& expected)
+    {
+        REQUIRE(v.size() == expected.size());
 
-            for (size_t i = 0; i < v.size(); ++i)
-            {
-                if (v[i] != expected[i])
-                {
-                    std::cout << "i: " << i << "\n";
-                }
-                CHECK(v[i] == expected[i]);
-            }
+        for (size_t i = 0; i < v.size(); ++i)
+        {
+            CHECK(v[i] == expected[i]);
         }
+    }
+
+    void check_equal(const std::vector<uint8_t>& v, const std::vector<uint8_t>& expected)
+    {
+        test_equal(v, expected);
+        try
+        {
+            json j = decode_bson<json>(v);
+            std::vector<uint8_t> u;
+            encode_bson(j, u);
+            test_equal(v,u);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
 }}
 
 TEST_CASE("serialize to bson")
@@ -108,7 +120,8 @@ TEST_CASE("serialize to bson")
                                      'h','i','s','s',
                                      0x00 // terminator
                                      };
-        jsoncons::bson::are_equal(v,bson);
+        jsoncons::bson::check_equal(v,bson);
+
     }
     SECTION("object")
     {
@@ -172,7 +185,7 @@ TEST_CASE("serialize to bson")
                                      'h','i','s','s',
                                      0x00 // terminator
                                      };
-        jsoncons::bson::are_equal(v,bson);
+        jsoncons::bson::check_equal(v,bson);
     }
 
     SECTION("outer object")
@@ -201,7 +214,7 @@ TEST_CASE("serialize to bson")
                                      0x00, // terminator
                                      0x00 // terminator
                                      };
-        jsoncons::bson::are_equal(v,bson);
+        jsoncons::bson::check_equal(v,bson);
     }
 
     SECTION("outer array")
@@ -229,7 +242,7 @@ TEST_CASE("serialize to bson")
                                      0x00, // terminator
                                      0x00 // terminator
                                      };
-        jsoncons::bson::are_equal(v,bson);
+        jsoncons::bson::check_equal(v,bson);
     }
 }
 
