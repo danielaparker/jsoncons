@@ -112,7 +112,7 @@ private:
     {
         if (buffer_.size() > 0)
         {
-            buffer_.push_back(bson_format::document_cd);
+            before_value(bson_format::document_cd);
         }
         stack_.emplace_back(bson_structure_type::document, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
@@ -125,7 +125,9 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
 
         buffer_.push_back(0x00);
-        jsoncons::detail::to_little_endian(static_cast<uint32_t>(buffer_.size()), buffer_.begin()+stack_.back().offset());
+
+        size_t length = buffer_.size() - stack_.back().offset();
+        jsoncons::detail::to_little_endian(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
 
         stack_.pop_back();
         if (stack_.empty())
@@ -142,7 +144,7 @@ private:
     {
         if (buffer_.size() > 0)
         {
-            buffer_.push_back(bson_format::array_cd);
+            before_value(bson_format::array_cd);
         }
         stack_.emplace_back(bson_structure_type::array, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
@@ -155,7 +157,8 @@ private:
 
         buffer_.push_back(0x00);
 
-        jsoncons::detail::to_little_endian(static_cast<uint32_t>(buffer_.size()), buffer_.begin()+stack_.back().offset());
+        size_t length = buffer_.size() - stack_.back().offset();
+        jsoncons::detail::to_little_endian(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
 
         stack_.pop_back();
         if (stack_.empty())
