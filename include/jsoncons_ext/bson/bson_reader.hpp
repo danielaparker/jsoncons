@@ -32,7 +32,6 @@ class basic_bson_reader : public serializing_context
     json_content_handler& handler_;
     size_t column_;
     size_t nesting_depth_;
-    std::string buffer_;
 public:
     basic_bson_reader(typename Source::input_reference input, json_content_handler& handler)
        : source_(input),
@@ -234,13 +233,15 @@ public:
 private:
 };
 
+typedef basic_bson_reader<jsoncons::detail::buffer_source<std::vector<uint8_t>>> bson_reader;
+
 // decode_bson
 
 template<class Json>
 Json decode_bson(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
-    basic_bson_reader<jsoncons::detail::bytes_source> parser(v, decoder);
+    basic_bson_reader<jsoncons::detail::buffer_source<std::vector<uint8_t>>> parser{ v, decoder };
     std::error_code ec;
     parser.parse_document(ec);
     if (ec)
@@ -249,8 +250,6 @@ Json decode_bson(const std::vector<uint8_t>& v)
     }
     return decoder.get_result();
 }
-
-typedef basic_bson_reader<jsoncons::detail::bytes_source> bson_reader;
 
 }}
 

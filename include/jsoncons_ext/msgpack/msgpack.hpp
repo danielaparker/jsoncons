@@ -18,7 +18,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_serializer.hpp>
-#include <jsoncons_ext/msgpack/msgpack_parser.hpp>
+#include <jsoncons_ext/msgpack/msgpack_reader.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -46,7 +46,7 @@ template<class Json>
 Json decode_msgpack(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
-    msgpack_parser parser(decoder);
+    msgpack_reader parser(v, decoder);
     parser.update(v.data(),v.size());
     std::error_code ec;
     parser.parse_some(ec);

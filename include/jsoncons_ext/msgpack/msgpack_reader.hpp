@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_PARSER_HPP
-#define JSONCONS_MSGPACK_MSGPACK_PARSER_HPP
+#ifndef JSONCONS_MSGPACK_MSGPACK_READER_HPP
+#define JSONCONS_MSGPACK_MSGPACK_READER_HPP
 
 #include <string>
 #include <sstream>
@@ -17,6 +17,7 @@
 #include <cassert>
 #include <iterator>
 #include <jsoncons/json.hpp>
+#include <jsoncons/detail/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
@@ -24,8 +25,10 @@
 
 namespace jsoncons { namespace msgpack {
 
-class msgpack_parser : public serializing_context
+template <class Source>
+class basic_msgpack_reader : public serializing_context
 {
+    Source source_;
     const uint8_t* begin_input_;
     const uint8_t* end_input_;
     const uint8_t* input_ptr_;
@@ -34,8 +37,9 @@ class msgpack_parser : public serializing_context
     size_t nesting_depth_;
     std::string buffer_;
 public:
-    msgpack_parser(json_content_handler& handler)
-       : handler_(handler), 
+    basic_msgpack_reader(typename Source::input_reference input, json_content_handler& handler)
+       : source_(input),
+         handler_(handler), 
          column_(1),
          nesting_depth_(0)
     {
@@ -717,6 +721,8 @@ private:
         }
     }
 };
+
+typedef basic_msgpack_reader<jsoncons::detail::buffer_source<std::vector<uint8_t>>> msgpack_reader;
 
 }}
 

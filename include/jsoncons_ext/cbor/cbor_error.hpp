@@ -55,7 +55,7 @@ std::error_code make_error_code(cbor_errc e)
 }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef cbor_errc cbor_parser_errc;
+typedef cbor_errc cbor_reader_errc;
 #endif
 
 }}

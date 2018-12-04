@@ -19,7 +19,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons_ext/cbor/cbor_parser.hpp>
+#include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 #include <jsoncons_ext/cbor/cbor_view.hpp>
 
@@ -50,7 +50,7 @@ typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>
 decode_cbor(const cbor_view& v)
 {
     jsoncons::json_decoder<Json> decoder;
-    cbor_parser parser(decoder);
+    basic_cbor_reader<jsoncons::detail::buffer_source<cbor_view>> parser(v, decoder);
     parser.update(v.buffer(),v.buflen());
     std::error_code ec;
     parser.parse_some(ec);
@@ -67,7 +67,7 @@ decode_cbor(const cbor_view& v)
 {
     jsoncons::json_decoder<Json> decoder;
     basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
-    cbor_parser parser(adaptor);
+    basic_cbor_reader<jsoncons::detail::buffer_source<cbor_view>> parser(v, adaptor);
     parser.update(v.buffer(),v.buflen());
     std::error_code ec;
     parser.parse_some(ec);
@@ -91,7 +91,7 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
     is.read((char_type*)&v[0],v.size());
 
     jsoncons::json_decoder<Json> decoder;
-    cbor_parser parser(decoder);
+    cbor_reader parser(v, decoder);
     parser.update(v.data(),v.size());
     std::error_code ec;
     parser.parse_some(ec);
@@ -116,7 +116,7 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
 
     jsoncons::json_decoder<Json> decoder;
     basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
-    cbor_parser parser(adaptor);
+    cbor_reader parser(v, adaptor);
     parser.update(v.data(),v.size());
     std::error_code ec;
     parser.parse_some(ec);

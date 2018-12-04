@@ -7,7 +7,7 @@
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
-#include <jsoncons_ext/cbor/cbor_parser.hpp>
+#include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -24,7 +24,7 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         std::error_code ec;
 
         jsoncons::json_decoder<json> decoder;
-        cbor_parser parser(decoder);
+        cbor_reader parser(v, decoder);
         parser.update(v.data(),v.size());
         parser.parse_some(ec);
 

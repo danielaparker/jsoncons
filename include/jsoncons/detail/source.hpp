@@ -24,23 +24,24 @@
 
 namespace jsoncons { namespace detail {
 
-class bytes_source 
+template <class Container>
+class buffer_source 
 {
 public:
-    typedef uint8_t value_type;
-    typedef std::vector<uint8_t> input_type;
-    typedef const std::vector<uint8_t>& input_reference;
+    typedef typename Container::value_type value_type;
+    typedef Container input_type;
+    typedef const Container& input_reference;
 private:
     input_reference s_;
     size_t i_;
     bool eof_;
 
     // Noncopyable and nonmoveable
-    bytes_source(const bytes_source&) = delete;
-    bytes_source& operator=(const bytes_source&) = delete;
+    buffer_source(const buffer_source&) = delete;
+    buffer_source& operator=(const buffer_source&) = delete;
 public:
 
-    bytes_source(input_reference s)
+    buffer_source(input_reference s)
         : s_(s), i_(0), eof_(s.size() == 0) 
     {
     }
@@ -50,7 +51,7 @@ public:
         return eof_; 
     }
 
-    size_t get(uint8_t& c)
+    size_t get(value_type& c)
     {
         if (i_ < s_.size())
         {
@@ -65,7 +66,7 @@ public:
         }
     }
 
-    size_t read(uint8_t* p, size_t length)
+    size_t read(value_type* p, size_t length)
     {
         size_t len;
         if (i_ + length >= s_.size())
