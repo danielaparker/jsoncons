@@ -106,7 +106,7 @@ public:
 
                 std::basic_string<char> s;
                 s.reserve(len - 1);
-                if (source_.read(len-1,std::back_inserter(s)) != len-1)
+                if ((int32_t)source_.read(len-1,std::back_inserter(s)) != len-1)
                 {
                     JSONCONS_THROW(bson_error(0));
                 }
