@@ -41,7 +41,7 @@ public:
     {
     }
 
-    void parse_document(std::error_code& ec)
+    void read(std::error_code& ec)
     {
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -117,7 +117,7 @@ public:
             }
             case bson_format::document_cd: 
             {
-                parse_document(ec);
+                read(ec);
                 if (ec)
                 {
                     return;
@@ -243,7 +243,7 @@ Json decode_bson(const std::vector<uint8_t>& v)
     jsoncons::json_decoder<Json> decoder;
     basic_bson_reader<jsoncons::detail::buffer_source> parser{ v, decoder };
     std::error_code ec;
-    parser.parse_document(ec);
+    parser.read(ec);
     if (ec)
     {
         throw parse_error(ec,parser.line_number(),parser.column_number());

@@ -49,7 +49,7 @@ Json decode_msgpack(const std::vector<uint8_t>& v)
     msgpack_reader parser(v, decoder);
     parser.update(v.data(),v.size());
     std::error_code ec;
-    parser.parse_some(ec);
+    parser.read(ec);
     if (ec)
     {
         throw parse_error(ec,parser.line_number(),parser.column_number());

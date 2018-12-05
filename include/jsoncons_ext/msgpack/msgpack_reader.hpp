@@ -37,8 +37,8 @@ class basic_msgpack_reader : public serializing_context
     size_t nesting_depth_;
     std::string buffer_;
 public:
-    basic_msgpack_reader(typename Source::input_reference input, json_content_handler& handler)
-       : source_(input),
+    basic_msgpack_reader(Source&& source, json_content_handler& handler)
+       : source_(std::move(source)),
          handler_(handler), 
          column_(1),
          nesting_depth_(0)
@@ -58,7 +58,7 @@ public:
         nesting_depth_ = 0;
     }
 
-    void parse_some(std::error_code& ec)
+    void read(std::error_code& ec)
     {
         const uint8_t* pos = input_ptr_++;
         if (*pos <= 0xbf)
@@ -81,7 +81,7 @@ public:
                     {
                         return;
                     }
-                    parse_some(ec);
+                    read(ec);
                     if (ec)
                     {
                         return;
@@ -98,7 +98,7 @@ public:
                 ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
-                    parse_some(ec);
+                    read(ec);
                     if (ec)
                     {
                         return;
@@ -489,7 +489,7 @@ public:
                     ++nesting_depth_;
                     for (size_t i = 0; i < len; ++i)
                     {
-                        parse_some(ec);
+                        read(ec);
                         if (ec)
                         {
                             return;
@@ -516,7 +516,7 @@ public:
                     ++nesting_depth_;
                     for (size_t i = 0; i < len; ++i)
                     {
-                        parse_some(ec);
+                        read(ec);
                         if (ec)
                         {
                             return;
@@ -548,7 +548,7 @@ public:
                         {
                             return;
                         }
-                        parse_some(ec);
+                        read(ec);
                         if (ec)
                         {
                             return;
@@ -580,7 +580,7 @@ public:
                         {
                             return;
                         }
-                        parse_some(ec);
+                        read(ec);
                         if (ec)
                         {
                             return;
