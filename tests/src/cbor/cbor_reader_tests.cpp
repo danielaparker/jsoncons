@@ -223,7 +223,7 @@ TEST_CASE("test_cbor_parsing")
                                0xff},              // "break"
                       json::parse("{\"-2\": true, \"true\": -2}"));
     }
-#if 0
+
 
     SECTION("maps with non-string keys")
     {
@@ -235,7 +235,7 @@ TEST_CASE("test_cbor_parsing")
                                0xff},              // "break"
                       json::parse("{\"-2\": true, \"true\": -2}"));
     }
-#endif
+
     // bignum
     check_parse_cbor({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
                   json(bignum(1,{0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00})));

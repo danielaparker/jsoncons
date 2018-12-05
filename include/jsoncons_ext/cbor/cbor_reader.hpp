@@ -387,6 +387,11 @@ private:
         }
         else
         {
+            std::string s;
+            json_string_serializer serializer(s);
+            basic_cbor_reader<Source> reader(std::move(source_), serializer);
+            reader.read(ec);
+            source_ = std::move(reader.source_);
             //cbor_view v(pos,end_input_ - pos);
             //std::string s = v.as_string();
             //handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
