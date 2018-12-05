@@ -15,8 +15,9 @@ namespace jsoncons { namespace cbor {
 enum class cbor_errc
 {
     ok = 0,
-    unexpected_eof = 1,
-    source_error
+    unexpected_eof,
+    source_error,
+    invalid_decimal
 };
 
 class cbor_error_category_impl
@@ -35,6 +36,8 @@ public:
             return "Unexpected end of file";
         case cbor_errc::source_error:
             return "Source error";
+       case cbor_errc::invalid_decimal:
+           return "Invalid decimal";
        default:
             return "Unknown CBOR parser error";
         }

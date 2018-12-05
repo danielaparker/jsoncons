@@ -24,62 +24,85 @@
 
 namespace jsoncons { namespace detail {
 
-template <class Container>
 class buffer_source 
 {
 public:
-    typedef typename Container::value_type value_type;
-    typedef Container input_type;
-    typedef const Container& input_reference;
+    typedef uint8_t value_type;
 private:
-    input_reference s_;
-    size_t i_;
+    const uint8_t* input_ptr_;
+    const uint8_t* input_end_;
     bool eof_;
 
     // Noncopyable and nonmoveable
     buffer_source(const buffer_source&) = delete;
     buffer_source& operator=(const buffer_source&) = delete;
 public:
+    buffer_source(buffer_source&&) = default;
 
-    buffer_source(input_reference s)
-        : s_(s), i_(0), eof_(s.size() == 0) 
+    buffer_source(const std::vector<uint8_t>& s)
+        : input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(false)
     {
     }
 
+    buffer_source(const uint8_t* data, size_t size)
+        : input_ptr_(data), input_end_(data+size), eof_(false)  
+    {
+    }
+
+    buffer_source& operator=(buffer_source&&) = default;
+
     bool eof() const
     {
-        return eof_; 
+        return eof_;  
     }
 
     size_t get(value_type& c)
     {
-        if (i_ < s_.size())
+        if (input_ptr_ < input_end_)
         {
-            c = s_[i_++];
+            c = *input_ptr_++;
             return 1;
         }
         else
        {
-            i_ = s_.size();
             eof_ = true;
+            input_ptr_ = input_end_;
             return 0;
         }
+    }
+
+    void increment()
+    {
+        if (input_ptr_ < input_end_)
+        {
+            input_ptr_++;
+        }
+        else
+       {
+            eof_ = true;
+            input_ptr_ = input_end_;
+        }
+    }
+
+    uint8_t peek() const
+    {
+        return *input_ptr_;
     }
 
     size_t read(value_type* p, size_t length)
     {
         size_t len;
-        if (i_ + length >= s_.size())
+        if ((size_t)(input_end_ - input_ptr_) < length)
         {
-            len = s_.size() - i_;
+            len = input_end_ - input_ptr_;
             eof_ = true;
         }
         else
         {
             len = length;
         }
-        memcpy(p, &s_[i_], len);
-        i_ += len;
+        memcpy(p, input_ptr_, len);
+        input_ptr_  += len;
         return len;
     }
 
@@ -87,9 +110,9 @@ public:
     size_t read(size_t count, OutputIt d_first)
     {
         size_t len;
-        if (i_ + count >= s_.size())
+        if ((size_t)(input_end_ - input_ptr_) < count)
         {
-            len = s_.size() - i_;
+            len = input_end_ - input_ptr_;
             eof_ = true;
         }
         else
@@ -98,7 +121,7 @@ public:
         }
         for (size_t i = 0; i < len; ++i)
         {
-            *d_first++ = s_[i_++];
+            *d_first++ = *input_ptr_++;
         }
         return len;
     }

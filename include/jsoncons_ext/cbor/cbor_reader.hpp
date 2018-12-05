@@ -39,8 +39,8 @@ class basic_cbor_reader : public serializing_context
     size_t nesting_depth_;
     std::string buffer_;
 public:
-    basic_cbor_reader(typename Source::input_reference input, json_content_handler& handler)
-       : source_(input),
+    basic_cbor_reader(Source&& source, json_content_handler& handler)
+       : source_(std::move(source)),
          handler_(handler), 
          column_(1),
          nesting_depth_(0)
@@ -62,30 +62,36 @@ public:
 
     void parse_some(std::error_code& ec)
     {
+        uint8_t* pos = nullptr;
         bool has_cbor_tag = false;
         uint8_t cbor_tag = 0;
 
-        if (get_major_type(*input_ptr_) == cbor_major_type::semantic_tag)
+        uint8_t type;
+        if (source_.get(type) == 0)
+        {
+            ec = cbor_errc::unexpected_eof;
+            return;
+        }
+        if (get_major_type(type) == cbor_major_type::semantic_tag)
         {
             has_cbor_tag = true;
-            cbor_tag = get_additional_information_value(*input_ptr_);
-            input_ptr_++;
+            cbor_tag = get_additional_information_value(type);
+            if (source_.get(type) == 0)
+            {
+                ec = cbor_errc::unexpected_eof;
+                return;
+            }
         }
 
-        const uint8_t* pos = input_ptr_++;
-
-        switch (get_major_type(*pos))
+        switch (get_major_type(type))
         {
             case cbor_major_type::unsigned_integer:
             {
-                const uint8_t* endp;
-                uint64_t val = jsoncons::cbor::detail::get_uint64_value(pos,end_input_,&endp);
-                if (endp == pos)
+                uint64_t val = jsoncons::cbor::detail::get_uint64_value(type, source_, ec);
+                if (ec)
                 {
-                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
-                input_ptr_ = endp;
 
                 if (has_cbor_tag && cbor_tag == 1)
                 {
@@ -99,14 +105,11 @@ public:
             }
             case cbor_major_type::negative_integer:
             {
-                const uint8_t* endp;
-                int64_t val = jsoncons::cbor::detail::get_int64_value(pos,end_input_,&endp);
-                if (endp == pos)
+                int64_t val = jsoncons::cbor::detail::get_int64_value(type, source_, ec);
+                if (ec)
                 {
-                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
-                input_ptr_ = endp;
                 if (has_cbor_tag && cbor_tag == 1)
                 {
                     handler_.int64_value(val, semantic_tag_type::epoch_time, *this);
@@ -119,14 +122,11 @@ public:
             }
             case cbor_major_type::byte_string:
             {
-                const uint8_t* endp;
-                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(pos,end_input_,&endp);
-                if (endp == pos)
+                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(type, source_, ec);
+                if (ec)
                 {
-                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
-                input_ptr_ = endp;
 
                 if (has_cbor_tag)
                 {
@@ -176,14 +176,11 @@ public:
             }
             case cbor_major_type::text_string:
             {
-                const uint8_t* endp;
-                std::string s = jsoncons::cbor::detail::get_text_string(pos,end_input_,&endp);
-                if (endp == pos)
+                std::string s = jsoncons::cbor::detail::get_text_string(type, source_, ec);
+                if (ec)
                 {
-                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
-                input_ptr_ = endp;
                 if (has_cbor_tag && cbor_tag == 0)
                 {
                     handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time, *this);
@@ -196,7 +193,7 @@ public:
             }
             case cbor_major_type::array:
             {
-                size_t info = get_additional_information_value(*pos);
+                size_t info = get_additional_information_value(type);
 
                 semantic_tag_type tag = semantic_tag_type::none;
                 if (has_cbor_tag)
@@ -215,15 +212,12 @@ public:
                 }
                 if (tag == semantic_tag_type::decimal_fraction)
                 {
-                    const uint8_t* endp;
-                    std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(pos, end_input_, &endp);
-                    if (endp == pos)
+                    std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(type, source_, ec);
+                    if (ec)
                     {
-                        ec = cbor_errc::unexpected_eof;
                         return;
                     }
                     handler_.string_value(s, semantic_tag_type::decimal_fraction);
-                    input_ptr_ = endp;
                 }
                 else
                 {
@@ -233,29 +227,31 @@ public:
                         {
                             ++nesting_depth_;
                             handler_.begin_array(tag, *this);
-                            while (*input_ptr_ != 0xff)
+                            while (source_.peek() != 0xff)
                             {
                                 parse_some(ec);
                                 if (ec)
                                 {
                                     return;
                                 }
+                                if (source_.eof())
+                                {
+                                    ec = cbor_errc::unexpected_eof;
+                                    return;
+                                }
                             }
-                            ++input_ptr_;
+                            source_.increment();
                             handler_.end_array(*this);
                             --nesting_depth_;
                             break;
                         }
                         default: // definite length
                         {
-                            const uint8_t* endp;
-                            size_t len = jsoncons::cbor::detail::get_length(pos,end_input_,&endp);
-                            if (endp == pos)
+                            size_t len = jsoncons::cbor::detail::get_length(type,source_,ec);
+                            if (ec)
                             {
-                                ec = cbor_errc::unexpected_eof;
                                 return;
                             }
-                            input_ptr_ = endp;
                             ++nesting_depth_;
                             handler_.begin_array(len, tag, *this);
                             for (size_t i = 0; i < len; ++i)
@@ -276,14 +272,14 @@ public:
             }
             case cbor_major_type::map:
             {
-                size_t info = get_additional_information_value(*pos);
+                size_t info = get_additional_information_value(type);
                 switch (info)
                 {
                     case additional_info::indefinite_length: 
                     {
                         ++nesting_depth_;
                         handler_.begin_object(semantic_tag_type::none, *this);
-                        while (*input_ptr_ != 0xff)
+                        while (source_.peek() != 0xff)
                         {
                             parse_name(ec);
                             if (ec)
@@ -296,21 +292,19 @@ public:
                                 return;
                             }
                         }
-                        ++input_ptr_;
+                        source_.increment();
                         handler_.end_object(*this);
                         --nesting_depth_;
                         break;
                     }
                     default: // definite_length
                     {
-                        const uint8_t* endp;
-                        size_t len = jsoncons::cbor::detail::get_length(pos,end_input_,&endp);
-                        if (endp == pos)
+                        size_t len = jsoncons::cbor::detail::get_length(type, source_, ec);
+                        if (ec)
                         {
-                            ec = cbor_errc::unexpected_eof;
                             return;
                         }
-                        input_ptr_ = endp;
+                        std::cout << "object length: " << len << "\n";
                         ++nesting_depth_;
                         handler_.begin_object(len, semantic_tag_type::none, *this);
                         for (size_t i = 0; i < len; ++i)
@@ -339,7 +333,7 @@ public:
             }
             case cbor_major_type::simple:
             {
-                size_t info = get_additional_information_value(*pos);
+                size_t info = get_additional_information_value(type);
                 switch (info)
                 {
                     case 0x14:
@@ -357,14 +351,11 @@ public:
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
                     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
                     case 0x1b: // Double-Precision Float (eight-byte IEEE 754)
-                        const uint8_t* endp;
-                        double val = jsoncons::cbor::detail::get_double(pos,end_input_,&endp);
-                        if (endp == pos)
+                        double val = jsoncons::cbor::detail::get_double(type, source_, ec);
+                        if (ec)
                         {
-                            ec = cbor_errc::unexpected_eof;
                             return;
                         }
-                        input_ptr_ = endp;
                         if (has_cbor_tag && cbor_tag == 1)
                         {
                             handler_.double_value(val, floating_point_options(), semantic_tag_type::epoch_time, *this);
@@ -396,29 +387,25 @@ public:
 private:
     void parse_name(std::error_code& ec)
     {
-        const uint8_t* pos = input_ptr_++;
-        if (get_major_type(*pos) == cbor_major_type::text_string)
+        if (get_major_type(source_.peek()) == cbor_major_type::text_string)
         {
-            const uint8_t* endp;
-            std::string s = jsoncons::cbor::detail::get_text_string(pos,end_input_,&endp);
-            if (endp == pos)
+            std::string s = jsoncons::cbor::detail::get_text_string(source_,ec);
+            if (ec)
             {
-                ec = cbor_errc::unexpected_eof;
                 return;
             }
-            input_ptr_ = endp;
             handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
         }
         else
         {
-            cbor_view v(pos,end_input_ - pos);
-            std::string s = v.as_string();
-            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+            //cbor_view v(pos,end_input_ - pos);
+            //std::string s = v.as_string();
+            //handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
         }
     }
 };
 
-typedef basic_cbor_reader<jsoncons::detail::buffer_source<std::vector<uint8_t>>> cbor_reader;
+typedef basic_cbor_reader<jsoncons::detail::buffer_source> cbor_reader;
 
 }}
 

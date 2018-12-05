@@ -722,7 +722,7 @@ private:
     }
 };
 
-typedef basic_msgpack_reader<jsoncons::detail::buffer_source<std::vector<uint8_t>>> msgpack_reader;
+typedef basic_msgpack_reader<jsoncons::detail::buffer_source> msgpack_reader;
 
 }}
 
