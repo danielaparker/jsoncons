@@ -19,7 +19,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons_ext/cbor/cbor_details.hpp>
+#include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
 
 namespace jsoncons { namespace cbor {
@@ -167,16 +167,11 @@ public:
         {
             is_empty = (size() == 0);
         }
-        else if (is_string())
+        else if (is_string() || is_byte_string())
         {
-            const uint8_t* endp;
-            size_t length = jsoncons::cbor::detail::get_length(first_,last_,&endp);
-            is_empty = (length == 0);
-        }
-        else if (is_byte_string())
-        {
-            const uint8_t* endp;
-            size_t length = jsoncons::cbor::detail::get_length(first_, last_, &endp);
+            std::error_code ec;
+            jsoncons::detail::buffer_source source(first_,last_-first_);
+            size_t length = jsoncons::cbor::detail::get_length(source, ec);
             is_empty = (length == 0);
         }
         else
@@ -414,16 +409,15 @@ public:
         switch (major_type())
         {
             case cbor_major_type::array:
-            {
-                    const uint8_t* endp;
-                    len = jsoncons::cbor::detail::get_length(first_,last_,&endp);
-                    break;
-            }
             case cbor_major_type::map:
             {
-                    const uint8_t* endp;
-                    len = jsoncons::cbor::detail::get_length(first_,last_,&endp);
-                    break;
+                //const uint8_t* endp; 
+                //len = jsoncons::cbor::detail::get_length(first_,last_,&endp);
+                //break;
+                std::error_code ec;
+                jsoncons::detail::buffer_source source(first_,last_-first_);
+                len = jsoncons::cbor::detail::get_length(source,ec);
+                break;
             }
             case cbor_major_type::semantic_tag:
             {

@@ -49,12 +49,12 @@ public:
     buffer_source(buffer_source&&) = default;
 
     buffer_source(const std::vector<uint8_t>& s)
-        : input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(false)
+        : input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
     {
     }
 
     buffer_source(const uint8_t* data, size_t size)
-        : input_ptr_(data), input_end_(data+size), eof_(false)  
+        : input_ptr_(data), input_end_(data+size), eof_(size == 0)  
     {
     }
 
@@ -105,6 +105,21 @@ public:
             eof_ = true;
             input_ptr_ = input_end_;
         }
+    }
+
+    void ignore(size_t count)
+    {
+        size_t len;
+        if ((size_t)(input_end_ - input_ptr_) < count)
+        {
+            len = input_end_ - input_ptr_;
+            eof_ = true;
+        }
+        else
+        {
+            len = count;
+        }
+        input_ptr_ += len;
     }
 
     int peek() const

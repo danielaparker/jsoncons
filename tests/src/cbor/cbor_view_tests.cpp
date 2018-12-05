@@ -307,6 +307,7 @@ TEST_CASE("test_indefinite_length_object_iterator")
 
 TEST_CASE("test_indefinite_length_array_iterator")
 {
+
     std::vector<uint8_t> b1;
     cbor::cbor_bytes_serializer serializer1(b1);
     serializer1.begin_array(); // indefinite length array
@@ -330,6 +331,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
     CHECK(it2 != bv2.array_range().end());
     CHECK(++it2 != bv2.array_range().end());
     CHECK(++it2 == bv2.array_range().end());
+
 }
 
 TEST_CASE("cbor_view array comparison test")
@@ -393,7 +395,9 @@ TEST_CASE("cbor_view object comparison")
     serializer1.date_time_value("2018-05-07 12:41:07-07:00");
     serializer1.end_object(); 
     serializer1.flush();
-    cbor_view v1 = buf1;
+    cbor_view view1 = buf1;
+
+    REQUIRE(view1.size() == 3);
 
     std::vector<uint8_t> buf2;
     cbor::cbor_bytes_serializer serializer2(buf2);
@@ -406,25 +410,105 @@ TEST_CASE("cbor_view object comparison")
     serializer2.date_time_value("2018-10-18 12:41:07-07:00");
     serializer2.end_object(); 
     serializer2.flush();
-    cbor_view v2 = buf2;
+    cbor_view view2 = buf2;
+    REQUIRE(view2.size() == view1.size());
 
-    REQUIRE(v1.size() == 3);
-    REQUIRE(v2.size() == v1.size());
+    std::vector<uint8_t> buf3;
+    cbor::cbor_bytes_serializer serializer3(buf3);
+    serializer3.begin_object(); // indefinite length array
+    serializer3.name("empty-object");
+    serializer3.begin_object(0);
+    serializer3.end_object();
+    serializer3.name("empty-array");
+    serializer3.begin_array(0);
+    serializer3.end_array();
+    serializer3.name("empty-string");
+    serializer3.string_value("");
+    serializer3.name("empty-byte_string");
+    serializer3.byte_string_value(jsoncons::byte_string{});
+    serializer3.end_object(); 
+    serializer3.flush();
+    cbor_view view3 = buf3;
 
     SECTION("contains")
     {
-        CHECK(v1.contains("City"));
-        CHECK(v1.contains("Amount"));
-        CHECK(v1.contains("Date"));
-        CHECK_FALSE(v1.contains("Country"));
+        CHECK(view1.contains("City"));
+        CHECK(view1.contains("Amount"));
+        CHECK(view1.contains("Date"));
+        CHECK_FALSE(view1.contains("Country"));
+    }
+
+    SECTION("empty")
+    {
+        CHECK_FALSE(view3.empty());
+        CHECK(view3["empty-object"].empty());
+        CHECK(view3["empty-array"].empty());
+        CHECK(view3["empty-string"].empty());
+        CHECK(view3["empty-byte_string"].empty());
+    }
+
+    SECTION("size")
+    {
+        CHECK(view1.size() == 3);
     }
 
     SECTION("operator==")
     {
-        CHECK_FALSE(v1 == v2);
-        CHECK_FALSE(v1["City"] == v2["City"]);
-        CHECK(v1["Amount"] == v2["Amount"]);
-        CHECK_FALSE(v1["Date"] == v2["Date"]);
+        CHECK_FALSE(view1 == view2);
+        CHECK_FALSE(view1["City"] == view2["City"]);
+        CHECK(view1["Amount"] == view2["Amount"]);
+        CHECK_FALSE(view1["Date"] == view2["Date"]);
+    }
+
+}
+
+TEST_CASE("cbor_view member tests")
+{
+    std::vector<uint8_t> buf;
+    cbor::cbor_bytes_serializer serializer(buf);
+    serializer.begin_object(); // indefinite length array
+    serializer.name("empty-object");
+    serializer.begin_object(0);
+    serializer.end_object();
+    serializer.name("empty-array");
+    serializer.begin_array(0);
+    serializer.end_array();
+    serializer.name("empty-string");
+    serializer.string_value("");
+    serializer.name("empty-byte_string");
+    serializer.byte_string_value(jsoncons::byte_string{});
+
+    serializer.name("City");
+    serializer.string_value("Montreal");
+    serializer.name("Amount");
+    serializer.decimal_value("273.15");
+    serializer.name("Date");
+    serializer.date_time_value("2018-05-07 12:41:07-07:00");
+
+    serializer.end_object(); 
+    serializer.flush();
+    cbor_view view = buf;
+
+    SECTION("contains")
+    {
+        CHECK(view.contains("City"));
+        CHECK(view.contains("Amount"));
+        CHECK(view.contains("Date"));
+        CHECK_FALSE(view.contains("Country"));
+    }
+
+    SECTION("empty")
+    {
+        CHECK_FALSE(view.empty());
+        CHECK(view["empty-object"].empty());
+        CHECK(view["empty-array"].empty());
+        CHECK(view["empty-string"].empty());
+        CHECK(view["empty-byte_string"].empty());
+    }
+
+    SECTION("size")
+    {
+        CHECK(view.size() == 7);
     }
 }
 
