@@ -51,9 +51,8 @@ decode_cbor(const cbor_view& v)
 {
     jsoncons::json_decoder<Json> decoder;
     basic_cbor_reader<jsoncons::detail::buffer_source> parser(jsoncons::detail::buffer_source(v.buffer(),v.buflen()), decoder);
-    parser.update(v.buffer(),v.buflen());
     std::error_code ec;
-    parser.parse_some(ec);
+    parser.read(ec);
     if (ec)
     {
         throw parse_error(ec,parser.line_number(),parser.column_number());
@@ -68,9 +67,8 @@ decode_cbor(const cbor_view& v)
     jsoncons::json_decoder<Json> decoder;
     basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
     basic_cbor_reader<jsoncons::detail::buffer_source> parser(jsoncons::detail::buffer_source(v.buffer(),v.buflen()), adaptor);
-    parser.update(v.buffer(),v.buflen());
     std::error_code ec;
-    parser.parse_some(ec);
+    parser.read(ec);
     if (ec)
     {
         throw parse_error(ec,parser.line_number(),parser.column_number());
@@ -92,9 +90,8 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
 
     jsoncons::json_decoder<Json> decoder;
     cbor_reader parser(v, decoder);
-    parser.update(v.data(),v.size());
     std::error_code ec;
-    parser.parse_some(ec);
+    parser.read(ec);
     if (ec)
     {
         throw parse_error(ec,parser.line_number(),parser.column_number());
@@ -119,7 +116,7 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
     cbor_reader parser(v, adaptor);
     parser.update(v.data(),v.size());
     std::error_code ec;
-    parser.parse_some(ec);
+    parser.read(ec);
     if (ec)
     {
         throw parse_error(ec,parser.line_number(),parser.column_number());

@@ -25,8 +25,7 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
 
         jsoncons::json_decoder<json> decoder;
         cbor_reader parser(v, decoder);
-        parser.update(v.data(),v.size());
-        parser.parse_some(ec);
+        parser.read(ec);
 
         json result = decoder.get_result();
 
@@ -54,7 +53,6 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
 
 TEST_CASE("test_cbor_parsing")
 {
-#if 0
     // unsigned integer
     check_parse_cbor({0x00},json(0U));
     check_parse_cbor({0x01},json(1U));
@@ -101,7 +99,7 @@ TEST_CASE("test_cbor_parsing")
     check_parse_cbor({0xf7},json{null_type(),semantic_tag_type::undefined});
     check_parse_cbor({0xf5},json(true));
     check_parse_cbor({0xf4},json(false));
-#endif
+
     // floating point
     check_parse_cbor({0xfb,0,0,0,0,0,0,0,0},json(0.0));
     check_parse_cbor({0xfb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
@@ -201,7 +199,6 @@ TEST_CASE("test_cbor_parsing")
         check_parse_cbor({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
         //check_parse_cbor({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
     }
-#if 0
 
     SECTION("maps with indefinite length")
     {
@@ -226,6 +223,7 @@ TEST_CASE("test_cbor_parsing")
                                0xff},              // "break"
                       json::parse("{\"-2\": true, \"true\": -2}"));
     }
+#if 0
 
     SECTION("maps with non-string keys")
     {
@@ -237,7 +235,7 @@ TEST_CASE("test_cbor_parsing")
                                0xff},              // "break"
                       json::parse("{\"-2\": true, \"true\": -2}"));
     }
-
+#endif
     // bignum
     check_parse_cbor({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
                   json(bignum(1,{0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00})));
@@ -249,9 +247,8 @@ TEST_CASE("test_cbor_parsing")
     // epoch_time
     check_parse_cbor({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
                   json(1431027667, semantic_tag_type::epoch_time));
-#endif
 }
-#if 0
+
 TEST_CASE("cbor decimal fraction")
 {
     check_parse_cbor({0xc4, // Tag 4
@@ -485,4 +482,4 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
         CHECK(j[i].semantic_tag() == expected[i].semantic_tag()); 
     }
 }
-#endif
+

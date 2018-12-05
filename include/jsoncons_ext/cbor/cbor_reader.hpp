@@ -31,9 +31,6 @@ template <class Source>
 class basic_cbor_reader : public serializing_context
 {
     Source source_;
-    const uint8_t* begin_input_;
-    const uint8_t* end_input_;
-    const uint8_t* input_ptr_;
     json_content_handler& handler_;
     size_t column_;
     size_t nesting_depth_;
@@ -47,47 +44,34 @@ public:
     {
     }
 
-    void update(const uint8_t* input, size_t length)
-    {
-        begin_input_ = input;
-        end_input_ = input + length;
-        input_ptr_ = begin_input_;
-    }
-
     void reset()
     {
         column_ = 1;
         nesting_depth_ = 0;
     }
 
-    void parse_some(std::error_code& ec)
+    void read(std::error_code& ec)
     {
-        uint8_t* pos = nullptr;
         bool has_cbor_tag = false;
         uint8_t cbor_tag = 0;
 
-        uint8_t type;
-        if (source_.get(type) == 0)
-        {
-            ec = cbor_errc::unexpected_eof;
-            return;
-        }
-        if (get_major_type(type) == cbor_major_type::semantic_tag)
+        if (get_major_type(source_.peek()) == cbor_major_type::semantic_tag)
         {
             has_cbor_tag = true;
-            cbor_tag = get_additional_information_value(type);
-            if (source_.get(type) == 0)
+            uint8_t c;
+            if (source_.get(c) == 0)
             {
                 ec = cbor_errc::unexpected_eof;
                 return;
             }
+            cbor_tag = get_additional_information_value(c);
         }
 
-        switch (get_major_type(type))
+        switch (get_major_type(source_.peek()))
         {
             case cbor_major_type::unsigned_integer:
             {
-                uint64_t val = jsoncons::cbor::detail::get_uint64_value(type, source_, ec);
+                uint64_t val = jsoncons::cbor::detail::get_uint64_value(source_, ec);
                 if (ec)
                 {
                     return;
@@ -105,7 +89,7 @@ public:
             }
             case cbor_major_type::negative_integer:
             {
-                int64_t val = jsoncons::cbor::detail::get_int64_value(type, source_, ec);
+                int64_t val = jsoncons::cbor::detail::get_int64_value(source_, ec);
                 if (ec)
                 {
                     return;
@@ -122,7 +106,7 @@ public:
             }
             case cbor_major_type::byte_string:
             {
-                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(type, source_, ec);
+                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source_, ec);
                 if (ec)
                 {
                     return;
@@ -176,7 +160,7 @@ public:
             }
             case cbor_major_type::text_string:
             {
-                std::string s = jsoncons::cbor::detail::get_text_string(type, source_, ec);
+                std::string s = jsoncons::cbor::detail::get_text_string(source_, ec);
                 if (ec)
                 {
                     return;
@@ -193,7 +177,7 @@ public:
             }
             case cbor_major_type::array:
             {
-                size_t info = get_additional_information_value(type);
+                size_t info = get_additional_information_value(source_.peek());
 
                 semantic_tag_type tag = semantic_tag_type::none;
                 if (has_cbor_tag)
@@ -212,7 +196,7 @@ public:
                 }
                 if (tag == semantic_tag_type::decimal_fraction)
                 {
-                    std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(type, source_, ec);
+                    std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(source_, ec);
                     if (ec)
                     {
                         return;
@@ -227,9 +211,10 @@ public:
                         {
                             ++nesting_depth_;
                             handler_.begin_array(tag, *this);
+                            source_.increment();
                             while (source_.peek() != 0xff)
                             {
-                                parse_some(ec);
+                                read(ec);
                                 if (ec)
                                 {
                                     return;
@@ -247,7 +232,7 @@ public:
                         }
                         default: // definite length
                         {
-                            size_t len = jsoncons::cbor::detail::get_length(type,source_,ec);
+                            size_t len = jsoncons::cbor::detail::get_length(source_,ec);
                             if (ec)
                             {
                                 return;
@@ -256,7 +241,7 @@ public:
                             handler_.begin_array(len, tag, *this);
                             for (size_t i = 0; i < len; ++i)
                             {
-                                parse_some(ec);
+                                read(ec);
                                 if (ec)
                                 {
                                     return;
@@ -272,13 +257,14 @@ public:
             }
             case cbor_major_type::map:
             {
-                size_t info = get_additional_information_value(type);
+                size_t info = get_additional_information_value(source_.peek());
                 switch (info)
                 {
                     case additional_info::indefinite_length: 
                     {
                         ++nesting_depth_;
                         handler_.begin_object(semantic_tag_type::none, *this);
+                        source_.increment();
                         while (source_.peek() != 0xff)
                         {
                             parse_name(ec);
@@ -286,7 +272,7 @@ public:
                             {
                                 return;
                             }
-                            parse_some(ec);
+                            read(ec);
                             if (ec)
                             {
                                 return;
@@ -299,12 +285,11 @@ public:
                     }
                     default: // definite_length
                     {
-                        size_t len = jsoncons::cbor::detail::get_length(type, source_, ec);
+                        size_t len = jsoncons::cbor::detail::get_length(source_, ec);
                         if (ec)
                         {
                             return;
                         }
-                        std::cout << "object length: " << len << "\n";
                         ++nesting_depth_;
                         handler_.begin_object(len, semantic_tag_type::none, *this);
                         for (size_t i = 0; i < len; ++i)
@@ -314,7 +299,7 @@ public:
                             {
                                 return;
                             }
-                            parse_some(ec);
+                            read(ec);
                             if (ec)
                             {
                                 return;
@@ -333,25 +318,29 @@ public:
             }
             case cbor_major_type::simple:
             {
-                size_t info = get_additional_information_value(type);
+                size_t info = get_additional_information_value(source_.peek());
                 switch (info)
                 {
                     case 0x14:
                         handler_.bool_value(false, semantic_tag_type::none, *this);
+                        source_.increment();
                         break;
                     case 0x15:
                         handler_.bool_value(true, semantic_tag_type::none, *this);
+                        source_.increment();
                         break;
                     case 0x16:
                         handler_.null_value(semantic_tag_type::none, *this);
+                        source_.increment();
                         break;
                     case 0x17:
                         handler_.null_value(semantic_tag_type::undefined, *this);
+                        source_.increment();
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
                     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
                     case 0x1b: // Double-Precision Float (eight-byte IEEE 754)
-                        double val = jsoncons::cbor::detail::get_double(type, source_, ec);
+                        double val = jsoncons::cbor::detail::get_double(source_, ec);
                         if (ec)
                         {
                             return;

@@ -86,7 +86,7 @@ namespace detail {
 void walk(const uint8_t* first, const uint8_t* last, const uint8_t** endp);
 
 template <class Source>
-void walk(uint8_t type, Source& source, std::error_code& ec);
+void walk(Source& source, std::error_code& ec);
 
 inline 
 size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
@@ -211,177 +211,6 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
 }
 
 template <class Source>
-size_t get_length(uint8_t type, Source& source, std::error_code& ec)
-{
-    const uint8_t* endp = nullptr;
-    switch (get_major_type(type))
-    {
-        case cbor_major_type::byte_string:
-        case cbor_major_type::text_string:
-        case cbor_major_type::array:
-        case cbor_major_type::map:
-            break;
-        default:
-            return 0;
-    }
-
-    size_t length = 0;
-    uint8_t info = get_additional_information_value(type);
-    switch (info)
-    {
-        case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
-        {
-            length = info;
-            break;
-        }
-    case 0x18: // one-byte uint8_t for n follows
-        {
-            uint8_t c;
-            source.get(c);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            length = c;
-            break;
-        }
-    case 0x19: // two-byte uint16_t for n follow
-        {
-            uint8_t buf[sizeof(uint16_t)];
-            source.read(sizeof(uint16_t),buf);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            length = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-    case 0x1a: // four-byte uint32_t for n follow
-        {
-            uint8_t buf[sizeof(uint32_t)];
-            source.read(sizeof(uint32_t),buf);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            length = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-    case 0x1b: // eight-byte uint64_t for n follow
-        {
-            uint8_t buf[sizeof(uint64_t)];
-            source.read(sizeof(uint64_t),buf);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            length = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-    case additional_info::indefinite_length: 
-        {
-            switch (get_major_type(type))
-            {
-                case cbor_major_type::array:
-                {
-                    length = 0;
-                    uint8_t c;
-                    source.get(c);
-                    if (source.eof())
-                    {
-                        ec = cbor_errc::unexpected_eof;
-                        return 0;
-                    }
-                    while (c != 0xff)
-                    {
-                        walk(c, source, ec);
-                        ++length;
-                        uint8_t c;
-                        source.get(c);
-                        if (source.eof())
-                        {
-                            ec = cbor_errc::unexpected_eof;
-                            return 0;
-                        }
-                    }
-                    break;
-                }
-                case cbor_major_type::map:
-                {
-                    length = 0;
-                    uint8_t c;
-                    source.get(c);
-                    if (source.eof())
-                    {
-                        ec = cbor_errc::unexpected_eof;
-                        return 0;
-                    }
-                    while (c != 0xff)
-                    {
-                        walk(c, source, ec);
-                        uint8_t c;
-                        source.get(c);
-                        if (source.eof())
-                        {
-                            ec = cbor_errc::unexpected_eof;
-                            return 0;
-                        }
-                        walk(c, source, ec);
-                        source.get(c);
-                        if (source.eof())
-                        {
-                            ec = cbor_errc::unexpected_eof;
-                            return 0;
-                        }
-                        ++length;
-                    }
-                    break;
-                }
-                case cbor_major_type::text_string:
-                case cbor_major_type::byte_string:
-                {
-                    length = 0;
-                    uint8_t c;
-                    source.get(c);
-                    if (source.eof())
-                    {
-                        ec = cbor_errc::unexpected_eof;
-                        return 0;
-                    }
-                    while (c != 0xff)
-                    {
-                        size_t len = jsoncons::cbor::detail::get_length(c, source, ec);
-                        if (ec)
-                        {
-                            return 0;
-                        }
-                        length += len;
-                        source.get(c);
-                        if (source.eof())
-                        {
-                            ec = cbor_errc::unexpected_eof;
-                            return 0;
-                        }
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-            break;
-        }
-        default: 
-            break;
-    }
-    
-    return length;
-}
-
-template <class Source>
 size_t get_length(Source& source, std::error_code& ec)
 {
     const uint8_t* endp = nullptr;
@@ -469,56 +298,36 @@ size_t get_length(Source& source, std::error_code& ec)
                 case cbor_major_type::array:
                 {
                     length = 0;
-                    uint8_t c;
-                    source.get(c);
-                    if (source.eof())
+                    while (source.peek() != 0xff)
                     {
-                        ec = cbor_errc::unexpected_eof;
-                        return 0;
-                    }
-                    while (c != 0xff)
-                    {
-                        walk(c, source, ec);
-                        ++length;
-                        uint8_t c;
-                        source.get(c);
-                        if (source.eof())
+                        walk(source, ec);
+                        if (ec)
                         {
                             ec = cbor_errc::unexpected_eof;
                             return 0;
                         }
                     }
+                    source.increment();
                     break;
                 }
                 case cbor_major_type::map:
                 {
                     length = 0;
-                    uint8_t c;
-                    source.get(c);
-                    if (source.eof())
+                    while (source.peek() != 0xff)
                     {
-                        ec = cbor_errc::unexpected_eof;
-                        return 0;
-                    }
-                    while (c != 0xff)
-                    {
-                        walk(c, source, ec);
-                        uint8_t c;
-                        source.get(c);
-                        if (source.eof())
+                        walk(source, ec);
+                        if (ec)
                         {
-                            ec = cbor_errc::unexpected_eof;
                             return 0;
                         }
-                        walk(c, source, ec);
-                        source.get(c);
-                        if (source.eof())
+                        walk(source, ec);
+                        if (ec)
                         {
-                            ec = cbor_errc::unexpected_eof;
                             return 0;
                         }
                         ++length;
                     }
+                    source.increment();
                     break;
                 }
                 case cbor_major_type::text_string:
@@ -534,6 +343,7 @@ size_t get_length(Source& source, std::error_code& ec)
                         }
                         length += len;
                     }
+                    source.increment();
                     break;
                 }
                 default:
@@ -596,41 +406,30 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
 }
 
 template <class Source>
-std::vector<uint8_t> get_byte_string(uint8_t type, Source& source, std::error_code& ec)
+std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
 {
     std::vector<uint8_t> v;
 
-    switch (get_additional_information_value(type))
+    switch (get_additional_information_value(source.peek()))
     {
         case additional_info::indefinite_length: 
         {
-            uint8_t c;
-            source.get(c);
-            if (source.eof())
+            source.increment();
+            while (source.peek() != 0xff)
             {
-                ec = cbor_errc::unexpected_eof;
-                return v;
-            }
-            while (c != 0xff)
-            {
-                std::vector<uint8_t> ss = jsoncons::cbor::detail::get_byte_string(c, source, ec);
+                std::vector<uint8_t> ss = jsoncons::cbor::detail::get_byte_string(source, ec);
                 if (ec)
                 {
                     return v;
                 }
                 v.insert(v.end(),ss.begin(),ss.end());
-                source.get(c);
-                if (source.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    return v;
-                }
             }
+            source.increment();
             break;
         }
     default: 
         {
-            size_t length = get_length(type, source, ec);
+            size_t length = get_length(source, ec);
             if (ec)
             {
                 return v;
@@ -693,60 +492,6 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
             *endp = p + length;
             s.resize(length);
             std::copy(p,*endp,s.begin());
-            break;
-        }
-    }
-    
-    return s;
-}
-
-template <class Source>
-std::string get_text_string(uint8_t type, Source& source, std::error_code& ec)
-{
-    std::string s;
-
-    switch (get_additional_information_value(type))
-    {
-    case additional_info::indefinite_length:
-        {
-            uint8_t c;
-            source.get(c);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return s;
-            }
-            while (c != 0xff)
-            {
-                std::string ss = jsoncons::cbor::detail::get_text_string(c, source, ec);
-                if (ec)
-                {
-                    return s;
-                }
-                s.append(std::move(ss));
-                source.get(c);
-                if (source.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    return s;
-                }
-            }
-            break;
-        }
-    default: // definite length
-        {
-            size_t length = get_length(type, source, ec);
-            if (ec)
-            {
-                return s;
-            }
-            s.reserve(length);
-            source.read(length,std::back_inserter(s));
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return s;
-            }
             break;
         }
     }
@@ -866,68 +611,52 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
 }
 
 template <class Source>
-void walk_object(uint8_t type, Source& source, std::error_code& ec)
+void walk_object(Source& source, std::error_code& ec)
 {
-    uint8_t info = get_additional_information_value(type);
+    uint8_t info = get_additional_information_value(source.peek());
     switch (info)
     {
     case additional_info::indefinite_length: 
         {
-            uint8_t c;
-            source.get(c);
+            source.increment();
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
                 return;
             }
-            while (c != 0xff)
+            while (source.peek() != 0xff)
             {
-                walk(c, source, ec);
-                uint8_t c;
-                source.get(c);
-                if (source.eof())
+                walk(source, ec);
+                if (ec)
                 {
-                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
-                walk(c, source, ec);
-                source.get(c);
-                if (source.eof())
+                walk(source, ec);
+                if (ec)
                 {
-                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
             }
+            source.increment();
             break;
         }
         default: // definite length
         {
-            size_t size = jsoncons::cbor::detail::get_length(type, source, ec);
+            size_t size = jsoncons::cbor::detail::get_length(source, ec);
             if (ec)
             {
                 return;
             }
-            uint8_t c;
-            source.get(c);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return;
-            }
             for (size_t i = 0; i < size; ++i)
             {
-                walk(c, source, ec);
-                source.get(c);
-                if (source.eof())
+                walk(source, ec);
+                if (ec)
                 {
-                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
-                walk(c, source, ec);
-                source.get(c);
-                if (source.eof())
+                walk(source, ec);
+                if (ec)
                 {
-                    ec = cbor_errc::unexpected_eof;
                     return;
                 }
             }
@@ -991,47 +720,35 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 }
 
 template <class Source>
-void walk_array(uint8_t type, Source& source, std::error_code& ec)
+void walk_array(Source& source, std::error_code& ec)
 {
-    uint8_t info = get_additional_information_value(type);
+    uint8_t info = get_additional_information_value(source.peek());
     switch (info)
     {
         case additional_info::indefinite_length: 
         {
-            uint8_t c;
-            source.get(c);
-            if (source.eof())
+            source.increment();
+            while (source.peek() != 0xff)
             {
-                ec = cbor_errc::unexpected_eof;
-                return;
-            }
-            while (c != 0xff)
-            {
-                walk(c, source, ec);
+                walk(source, ec);
                 if (ec)
                 {
                     return;
                 }
             }
+            source.increment();
             break;
         }
         default: // definite length
         {
-            size_t size = jsoncons::cbor::detail::get_length(type, source, ec);
+            size_t size = jsoncons::cbor::detail::get_length(source, ec);
             if (ec)
             {
                 return;
             }
             for (size_t i = 0; i < size; ++i)
             {
-                uint8_t c;
-                source.get(c);
-                if (source.eof())
-                {
-                    ec = cbor_errc::unexpected_eof;
-                    return;
-                }
-                walk(c, source, ec);
+                walk(source, ec);
                 if (ec)
                 {
                     return;
@@ -1043,11 +760,17 @@ void walk_array(uint8_t type, Source& source, std::error_code& ec)
 }
 
 template <class Source>
-uint64_t get_uint64_value(uint8_t type, Source& source, std::error_code& ec)
+uint64_t get_uint64_value(Source& source, std::error_code& ec)
 {
     const uint8_t* endp = nullptr;
     uint64_t val = 0;
 
+    uint8_t type;
+    if (source.get(type) == 0)
+    {
+        ec = cbor_errc::unexpected_eof;
+        return 0;
+    }
     uint8_t info = get_additional_information_value(type);
     switch (info)
     {
@@ -1265,15 +988,16 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
 }
 
 template <class Source>
-int64_t get_int64_value(uint8_t type, Source& source, std::error_code& ec)
+int64_t get_int64_value(Source& source, std::error_code& ec)
 {
     const uint8_t* endp = nullptr;
     int64_t val = 0;
 
-    uint8_t info = get_additional_information_value(type);
-    switch (get_major_type(type))
+    uint8_t info = get_additional_information_value(source.peek());
+    switch (get_major_type(source.peek()))
     {
         case cbor_major_type::negative_integer:
+            source.increment();
             switch (info)
             {
                 case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
@@ -1329,7 +1053,7 @@ int64_t get_int64_value(uint8_t type, Source& source, std::error_code& ec)
 
             case cbor_major_type::unsigned_integer:
             {
-                uint64_t x = jsoncons::cbor::detail::get_uint64_value(type, source, ec);
+                uint64_t x = jsoncons::cbor::detail::get_uint64_value(source, ec);
                 if (ec)
                 {
                     return 0;
@@ -1412,11 +1136,17 @@ double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** end
 }
 
 template <class Source>
-double get_double(uint8_t type, Source& source, std::error_code& ec)
+double get_double(Source& source, std::error_code& ec)
 {
     double val = 0;
     const uint8_t* endp = nullptr;
 
+    uint8_t type;
+    if (source.get(type) == 0)
+    {
+        ec = cbor_errc::unexpected_eof;
+        return 0;
+    }
     uint8_t info = get_additional_information_value(type);
     switch (info)
     {
@@ -1606,19 +1336,19 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
 }
 
 template <class Source>
-void walk(uint8_t type, Source& source, std::error_code& ec)
+void walk(Source& source, std::error_code& ec)
 {
-    uint8_t info = get_additional_information_value(type);
-    switch (get_major_type(type))
+    uint8_t info = get_additional_information_value(source.peek());
+    switch (get_major_type(source.peek()))
     {
         case cbor_major_type::unsigned_integer:
         {
-            get_uint64_value(type, source, ec);
+            get_uint64_value(source, ec);
             break;
         }
         case cbor_major_type::negative_integer:
         {
-            get_int64_value(type, source, ec);
+            get_int64_value(source, ec);
             break;
         }
         case cbor_major_type::byte_string:
@@ -1626,28 +1356,19 @@ void walk(uint8_t type, Source& source, std::error_code& ec)
         {
             if (info == additional_info::indefinite_length)
             {
-                uint8_t c;
-                source.get(c);
-                if (source.eof())
+                source.increment();
+                while (source.peek() != 0xff)
                 {
-                    ec = cbor_errc::unexpected_eof;
-                    return;
-                }
-                while (c != 0xff)
-                {
-                    walk(c, source, ec);
-                    uint8_t c;
-                    source.get(c);
-                    if (source.eof())
+                    walk(source, ec);
+                    if (ec)
                     {
-                        ec = cbor_errc::unexpected_eof;
                         return;
                     }
                 }
             } 
             else
             {
-                get_length(type, source, ec);
+                get_length(source, ec);
                 if (ec)
                 {
                     return;
@@ -1657,24 +1378,17 @@ void walk(uint8_t type, Source& source, std::error_code& ec)
         }
         case cbor_major_type::array:
         {
-            walk_array(type, source, ec);
+            walk_array(source, ec);
             break;
         }
         case cbor_major_type::map:
         {
-            walk_object(type, source, ec);
+            walk_object(source, ec);
             break;
         }
         case cbor_major_type::semantic_tag:
         {
-            uint8_t c;
-            source.get(c);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return;
-            }
-            walk(c, source, ec);
+            source.increment();
             break;
         }
         case cbor_major_type::simple:
@@ -1686,22 +1400,26 @@ void walk(uint8_t type, Source& source, std::error_code& ec)
                 case 22: // Null
                 case 23: // Undefined
                 {
+                    source.increment();
                     break;
                 }
                 case 25: // Half-Precision Float (two-byte IEEE 754)
                 {
+                    source.increment();
                     uint8_t buf[sizeof(uint16_t)];
                     source.read(sizeof(uint16_t),buf);
                     break;
                 }
                 case 26: // Single-Precision Float (four-byte IEEE 754)
                 {
+                    source.increment();
                     uint8_t buf[sizeof(float)];
                     source.read(sizeof(float),buf);
                     break;
                 }
                 case 27: // Double-Precision Float (eight-byte IEEE 754)
                 {
+                    source.increment();
                     uint8_t buf[sizeof(double)];
                     source.read(sizeof(double),buf);
                     break;
@@ -1718,7 +1436,6 @@ void walk(uint8_t type, Source& source, std::error_code& ec)
             break;
         }
     }
-
 }
 
 template <class T>
@@ -2074,15 +1791,14 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
 }
 
 template <class Source>
-std::string get_array_as_decimal_string(uint8_t type, Source& source, std::error_code& ec)
+std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
 {
     std::string s;
 
-    JSONCONS_ASSERT(get_major_type(type) == cbor_major_type::array);
-    JSONCONS_ASSERT(get_additional_information_value(type) == 2);
+    JSONCONS_ASSERT(get_major_type(source.peek()) == cbor_major_type::array);
+    JSONCONS_ASSERT(get_additional_information_value(source.peek()) == 2);
 
-    uint8_t c;
-    source.get(c);
+    source.increment();
     if (source.eof())
     {
         ec = cbor_errc::unexpected_eof;
@@ -2090,11 +1806,11 @@ std::string get_array_as_decimal_string(uint8_t type, Source& source, std::error
     }
 
     int64_t exponent = 0;
-    switch (get_major_type(c))
+    switch (get_major_type(source.peek()))
     {
         case cbor_major_type::unsigned_integer:
         {
-            exponent = jsoncons::cbor::detail::get_uint64_value(c,source,ec);
+            exponent = jsoncons::cbor::detail::get_uint64_value(source,ec);
             if (ec)
             {
                 return s;
@@ -2103,7 +1819,7 @@ std::string get_array_as_decimal_string(uint8_t type, Source& source, std::error
         }
         case cbor_major_type::negative_integer:
         {
-            exponent = jsoncons::cbor::detail::get_int64_value(c,source,ec);
+            exponent = jsoncons::cbor::detail::get_int64_value(source,ec);
             if (ec)
             {
                 return s;
@@ -2117,17 +1833,11 @@ std::string get_array_as_decimal_string(uint8_t type, Source& source, std::error
         }
     }
 
-    source.get(c);
-    if (source.eof())
-    {
-        ec = cbor_errc::unexpected_eof;
-        return s;
-    }
-    switch (get_major_type(c))
+    switch (get_major_type(source.peek()))
     {
         case cbor_major_type::unsigned_integer:
         {
-            uint64_t val = jsoncons::cbor::detail::get_uint64_value(c,source,ec);
+            uint64_t val = jsoncons::cbor::detail::get_uint64_value(source,ec);
             if (ec)
             {
                 return s;
@@ -2138,7 +1848,7 @@ std::string get_array_as_decimal_string(uint8_t type, Source& source, std::error
         }
         case cbor_major_type::negative_integer:
         {
-            int64_t val = jsoncons::cbor::detail::get_int64_value(c,source,ec);
+            int64_t val = jsoncons::cbor::detail::get_int64_value(source,ec);
             if (ec)
             {
                 return s;
@@ -2149,16 +1859,16 @@ std::string get_array_as_decimal_string(uint8_t type, Source& source, std::error
         }
         case cbor_major_type::semantic_tag:
         {
-            uint8_t tag = get_additional_information_value(type);
-            source.get(c);
+            uint8_t tag;
+            source.get(tag);
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
                 return s;
             }
-            if (get_major_type(c) == cbor_major_type::byte_string)
+            if (get_major_type(source.peek()) == cbor_major_type::byte_string)
             {
-                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(c,source,ec);
+                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source,ec);
                 if (ec)
                 {
                     return s;
