@@ -317,7 +317,7 @@ size_t get_length(Source& source, std::error_code& ec)
                         }
                         ++length;
                     }
-                    source.increment();
+                    source.ignore(1);
                     break;
                 }
                 case cbor_major_type::map:
@@ -337,7 +337,7 @@ size_t get_length(Source& source, std::error_code& ec)
                         }
                         ++length;
                     }
-                    source.increment();
+                    source.ignore(1);
                     break;
                 }
                 case cbor_major_type::text_string:
@@ -353,7 +353,7 @@ size_t get_length(Source& source, std::error_code& ec)
                         }
                         length += len;
                     }
-                    source.increment();
+                    source.ignore(1);
                     break;
                 }
                 default:
@@ -429,7 +429,7 @@ std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
     {
         case additional_info::indefinite_length: 
         {
-            source.increment();
+            source.ignore(1);
             while (source.peek() != 0xff)
             {
                 std::vector<uint8_t> ss = jsoncons::cbor::detail::get_byte_string(source, ec);
@@ -439,7 +439,7 @@ std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
                 }
                 v.insert(v.end(),ss.begin(),ss.end());
             }
-            source.increment();
+            source.ignore(1);
             break;
         }
     default: 
@@ -530,7 +530,7 @@ std::string get_text_string(Source& source, std::error_code& ec)
     {
         case additional_info::indefinite_length:
         {
-            source.increment();
+            source.ignore(1);
             while (source.peek() != 0xff)
             {
                 std::string ss = jsoncons::cbor::detail::get_text_string(source, ec);
@@ -540,7 +540,7 @@ std::string get_text_string(Source& source, std::error_code& ec)
                 }
                 s.append(std::move(ss));
             }
-            source.increment();
+            source.ignore(1);
             break;
         }
         default: // definite length
@@ -643,7 +643,7 @@ void walk_object(Source& source, std::error_code& ec)
     {
     case additional_info::indefinite_length: 
         {
-            source.increment();
+            source.ignore(1);
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -662,7 +662,7 @@ void walk_object(Source& source, std::error_code& ec)
                     return;
                 }
             }
-            source.increment();
+            source.ignore(1);
             break;
         }
         default: // definite length
@@ -757,7 +757,7 @@ void walk_array(Source& source, std::error_code& ec)
     {
         case additional_info::indefinite_length: 
         {
-            source.increment();
+            source.ignore(1);
             while (source.peek() != 0xff)
             {
                 walk(source, ec);
@@ -766,7 +766,7 @@ void walk_array(Source& source, std::error_code& ec)
                     return;
                 }
             }
-            source.increment();
+            source.ignore(1);
             break;
         }
         default: // definite length
@@ -1037,7 +1037,7 @@ int64_t get_int64_value(Source& source, std::error_code& ec)
     switch (get_major_type(source.peek()))
     {
         case cbor_major_type::negative_integer:
-            source.increment();
+            source.ignore(1);
             switch (info)
             {
                 case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
@@ -1406,7 +1406,7 @@ void walk(Source& source, std::error_code& ec)
         {
             if (info == additional_info::indefinite_length)
             {
-                source.increment();
+                source.ignore(1);
                 while (source.peek() != 0xff)
                 {
                     walk(source, ec);
@@ -1415,7 +1415,7 @@ void walk(Source& source, std::error_code& ec)
                         return;
                     }
                 }
-                source.increment();
+                source.ignore(1);
             } 
             else
             {
@@ -1440,7 +1440,7 @@ void walk(Source& source, std::error_code& ec)
         }
         case cbor_major_type::semantic_tag:
         {
-            source.increment();
+            source.ignore(1);
             walk(source, ec);
             break;
         }
@@ -1453,33 +1453,33 @@ void walk(Source& source, std::error_code& ec)
                 case 22: // Null
                 case 23: // Undefined
                 {
-                    source.increment();
+                    source.ignore(1);
                     break;
                 }
                 case 25: // Half-Precision Float (two-byte IEEE 754)
                 {
-                    source.increment();
+                    source.ignore(1);
                     uint8_t buf[sizeof(uint16_t)];
                     source.read(sizeof(uint16_t),buf);
                     break;
                 }
                 case 26: // Single-Precision Float (four-byte IEEE 754)
                 {
-                    source.increment();
+                    source.ignore(1);
                     uint8_t buf[sizeof(float)];
                     source.read(sizeof(float),buf);
                     break;
                 }
                 case 27: // Double-Precision Float (eight-byte IEEE 754)
                 {
-                    source.increment();
+                    source.ignore(1);
                     uint8_t buf[sizeof(double)];
                     source.read(sizeof(double),buf);
                     break;
                 }
                 default:
                 {
-                    source.increment();
+                    source.ignore(1);
                     break;
                 }
             }
@@ -1857,7 +1857,7 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
     JSONCONS_ASSERT(get_major_type(source.peek()) == cbor_major_type::array);
     JSONCONS_ASSERT(get_additional_information_value(source.peek()) == 2);
 
-    source.increment();
+    source.ignore(1);
     if (source.eof())
     {
         ec = cbor_errc::unexpected_eof;

@@ -211,7 +211,7 @@ public:
                         {
                             ++nesting_depth_;
                             handler_.begin_array(tag, *this);
-                            source_.increment();
+                            source_.ignore(1);
                             while (source_.peek() != 0xff)
                             {
                                 read(ec);
@@ -225,7 +225,7 @@ public:
                                     return;
                                 }
                             }
-                            source_.increment();
+                            source_.ignore(1);
                             handler_.end_array(*this);
                             --nesting_depth_;
                             break;
@@ -264,7 +264,7 @@ public:
                     {
                         ++nesting_depth_;
                         handler_.begin_object(semantic_tag_type::none, *this);
-                        source_.increment();
+                        source_.ignore(1);
                         while (source_.peek() != 0xff)
                         {
                             parse_name(ec);
@@ -278,7 +278,7 @@ public:
                                 return;
                             }
                         }
-                        source_.increment();
+                        source_.ignore(1);
                         handler_.end_object(*this);
                         --nesting_depth_;
                         break;
@@ -323,19 +323,19 @@ public:
                 {
                     case 0x14:
                         handler_.bool_value(false, semantic_tag_type::none, *this);
-                        source_.increment();
+                        source_.ignore(1);
                         break;
                     case 0x15:
                         handler_.bool_value(true, semantic_tag_type::none, *this);
-                        source_.increment();
+                        source_.ignore(1);
                         break;
                     case 0x16:
                         handler_.null_value(semantic_tag_type::none, *this);
-                        source_.increment();
+                        source_.ignore(1);
                         break;
                     case 0x17:
                         handler_.null_value(semantic_tag_type::undefined, *this);
-                        source_.increment();
+                        source_.ignore(1);
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
                     case 0x1a: // Single-Precision Float (four-byte IEEE 754)

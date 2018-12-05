@@ -94,19 +94,6 @@ public:
         }
     }
 
-    void increment()
-    {
-        if (input_ptr_ < input_end_)
-        {
-            input_ptr_++;
-        }
-        else
-       {
-            eof_ = true;
-            input_ptr_ = input_end_;
-        }
-    }
-
     void ignore(size_t count)
     {
         size_t len;

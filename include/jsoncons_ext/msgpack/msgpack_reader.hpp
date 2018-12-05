@@ -105,6 +105,11 @@ public:
 
                 std::basic_string<char> s;
                 source_.read(len,std::back_inserter(s));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    return;
+                }
 
                 //auto result = unicons::convert(
                 //    first, last, std::back_inserter(s), unicons::conv_flags::strict);
@@ -143,6 +148,11 @@ public:
                 {
                     uint8_t buf[sizeof(float)];
                     source_.read(sizeof(float), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
                     handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
@@ -153,6 +163,11 @@ public:
                 {
                     uint8_t buf[sizeof(double)];
                     source_.read(sizeof(double), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
                     handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
@@ -171,6 +186,11 @@ public:
                 {
                     uint8_t buf[sizeof(uint16_t)];
                     source_.read(sizeof(uint16_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     uint16_t val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
                     handler_.uint64_value(val, semantic_tag_type::none, *this);
@@ -181,6 +201,11 @@ public:
                 {
                     uint8_t buf[sizeof(uint32_t)];
                     source_.read(sizeof(uint32_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     uint32_t val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
                     handler_.uint64_value(val, semantic_tag_type::none, *this);
@@ -191,6 +216,11 @@ public:
                 {
                     uint8_t buf[sizeof(uint64_t)];
                     source_.read(sizeof(uint64_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     uint64_t val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
                     handler_.uint64_value(val, semantic_tag_type::none, *this);
@@ -201,6 +231,11 @@ public:
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(sizeof(int8_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
                     handler_.int64_value(val, semantic_tag_type::none, *this);
@@ -211,6 +246,11 @@ public:
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
                     handler_.int64_value(val, semantic_tag_type::none, *this);
@@ -221,6 +261,11 @@ public:
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
                     handler_.int64_value(val, semantic_tag_type::none, *this);
@@ -231,6 +276,11 @@ public:
                 {
                     uint8_t buf[sizeof(int64_t)];
                     source_.read(sizeof(int64_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
                     handler_.int64_value(val, semantic_tag_type::none, *this);
@@ -241,11 +291,21 @@ public:
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(sizeof(int8_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
                     source_.read(len, std::back_inserter(s));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     //auto result = unicons::convert(
                     //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
                     //if (result.ec != unicons::conv_errc())
@@ -260,11 +320,21 @@ public:
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
                     source_.read(len, std::back_inserter(s));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
 
                     //std::basic_string<char> s;
                     //auto result = unicons::convert(
@@ -281,11 +351,21 @@ public:
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
                     source_.read(len, std::back_inserter(s));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
 
                     //std::basic_string<char> s;
                     //auto result = unicons::convert(
@@ -302,12 +382,22 @@ public:
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(sizeof(int8_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
                     source_.read(len, std::back_inserter(v));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                byte_string_chars_format::none, 
@@ -320,12 +410,22 @@ public:
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
                     source_.read(len, std::back_inserter(v));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                byte_string_chars_format::none, 
@@ -338,12 +438,22 @@ public:
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
                     source_.read(len, std::back_inserter(v));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
 
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                byte_string_chars_format::none, 
@@ -356,6 +466,11 @@ public:
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
@@ -378,6 +493,11 @@ public:
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
@@ -400,6 +520,11 @@ public:
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
@@ -427,6 +552,11 @@ public:
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
@@ -468,7 +598,7 @@ public:
         return column_;
     }
 private:
-    void parse_name(std::error_code&)
+    void parse_name(std::error_code& ec)
     {
         uint8_t type;
         source_.get(type);
@@ -484,6 +614,11 @@ private:
 
                 std::basic_string<char> s;
                 source_.read(len, std::back_inserter(s));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    return;
+                }
                 //auto result = unicons::convert(
                 //    first, last, std::back_inserter(s), unicons::conv_flags::strict);
                 //if (result.ec != unicons::conv_errc())
@@ -500,11 +635,21 @@ private:
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(sizeof(int8_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
                     source_.read(len, std::back_inserter(s));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
 
                     //auto result = unicons::convert(
                     //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
@@ -520,11 +665,21 @@ private:
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
                     source_.read(len, std::back_inserter(s));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
 
                     //std::basic_string<char> s;
                     //auto result = unicons::convert(
@@ -541,11 +696,21 @@ private:
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
                     source_.read(len, std::back_inserter(s));
+                    if (source_.eof())
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
 
                     //std::basic_string<char> s;
                     //auto result = unicons::convert(

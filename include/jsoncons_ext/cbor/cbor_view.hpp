@@ -170,7 +170,7 @@ public:
         else if (is_string() || is_byte_string())
         {
             std::error_code ec;
-            jsoncons::detail::buffer_source source(first_,last_-first_);
+            jsoncons::detail::buffer_source source(buffer(),buflen());
             size_t length = jsoncons::cbor::detail::get_length(source, ec);
             is_empty = (length == 0);
         }
@@ -361,9 +361,16 @@ public:
                 return true;
             case cbor_major_type::unsigned_integer:
             {
-                const uint8_t* endp;
-                uint64_t x = jsoncons::cbor::detail::get_uint64_value(first_,last_,&endp);
-                if (endp == first_)
+                //const uint8_t* endp;
+                //uint64_t x = jsoncons::cbor::detail::get_uint64_value(first_,last_,&endp);
+                //if (endp == first_)
+                //{
+                //    return false;
+                //}
+                jsoncons::detail::buffer_source source(buffer(),buflen());
+                std::error_code ec;
+                uint64_t x = jsoncons::cbor::detail::get_uint64_value(source,ec);
+                if (ec)
                 {
                     return false;
                 }
@@ -415,7 +422,7 @@ public:
                 //len = jsoncons::cbor::detail::get_length(first_,last_,&endp);
                 //break;
                 std::error_code ec;
-                jsoncons::detail::buffer_source source(first_,last_-first_);
+                jsoncons::detail::buffer_source source(buffer(),buflen());
                 len = jsoncons::cbor::detail::get_length(source,ec);
                 break;
             }
