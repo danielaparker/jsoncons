@@ -1863,13 +1863,15 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
         }
         case cbor_major_type::semantic_tag:
         {
-            uint8_t tag;
-            source.get(tag);
+            uint8_t c;
+            source.get(c);
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
                 return s;
             }
+            uint8_t tag = get_additional_information_value(c);
+
             if (get_major_type(source.peek()) == cbor_major_type::byte_string)
             {
                 std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source,ec);

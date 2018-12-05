@@ -114,7 +114,7 @@ TEST_CASE("test_serialize_bignum")
     try
     {
         json result = decode_cbor<json>(v);
-        CHECK(std::string("18446744073709551616") == result[0].as<std::string>());
+        CHECK(result[0].as<std::string>() == std::string("18446744073709551616"));
     }
     catch (const std::exception& e)
     {
@@ -139,7 +139,7 @@ TEST_CASE("test_serialize_negative_bignum1")
     try
     {
         json result = decode_cbor<json>(v);
-        CHECK(std::string("-18446744073709551617") ==result[0].as<std::string>());
+        CHECK(result[0].as<std::string>() == std::string("-18446744073709551617"));
     }
     catch (const std::exception& e)
     {
@@ -168,7 +168,7 @@ TEST_CASE("test_serialize_negative_bignum2")
         options.bignum_format(bignum_chars_format::integer);
         std::string text;
         result.dump(text,options);
-        CHECK(std::string("[-18446744073709551617]") == text);
+        CHECK(text == std::string("[-18446744073709551617]"));
     }
     catch (const std::exception& e)
     {
@@ -198,14 +198,13 @@ TEST_CASE("test_serialize_negative_bignum3")
         options.bignum_format(bignum_chars_format::base64url);
         std::string text;
         result.dump(text,options);
-        CHECK(std::string("[\"~AQAAAAAAAAAA\"]") == text);
+        CHECK(text == std::string("[\"~AQAAAAAAAAAA\"]"));
     }
     catch (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
 } 
-
 TEST_CASE("test_serialize_decimal")
 {
     SECTION("-1 184467440737095516160")
@@ -217,7 +216,7 @@ TEST_CASE("test_serialize_decimal")
         try
         {
             json result = decode_cbor<json>(v);
-            CHECK(std::string("18446744073709551616.0") == result.as<std::string>());
+            CHECK(result.as<std::string>() == std::string("18446744073709551616.0"));
         }
         catch (const std::exception& e)
         {
@@ -233,7 +232,7 @@ TEST_CASE("test_serialize_decimal")
         try
         {
             json result = decode_cbor<json>(v);
-            CHECK(std::string("184467440737095.51616") == result.as<std::string>());
+            CHECK(result.as<std::string>() == std::string("184467440737095.51616"));
         }
         catch (const std::exception& e)
         {
@@ -249,7 +248,7 @@ TEST_CASE("test_serialize_decimal")
         try
         {
             json result = decode_cbor<json>(v);
-            CHECK(std::string("-184467440737095.51616") == result.as<std::string>());
+            CHECK(result.as<std::string>() == std::string("-184467440737095.51616"));
         }
         catch (const std::exception& e)
         {
@@ -265,7 +264,7 @@ TEST_CASE("test_serialize_decimal")
         try
         {
             json result = decode_cbor<json>(v);
-            CHECK(std::string("-18446744073709551616e5") == result.as<std::string>());
+            CHECK(result.as<std::string>() == std::string("-18446744073709551616e5"));
         }
         catch (const std::exception& e)
         {
