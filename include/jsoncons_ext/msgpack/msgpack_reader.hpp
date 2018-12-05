@@ -476,7 +476,7 @@ public:
 
                     handler_.begin_array(len, semantic_tag_type::none, *this);
                     ++nesting_depth_;
-                    for (size_t i = 0; i < len; ++i)
+                    for (int16_t i = 0; i < len; ++i)
                     {
                         read(ec);
                         if (ec)
@@ -503,7 +503,7 @@ public:
 
                     handler_.begin_array(len, semantic_tag_type::none, *this);
                     ++nesting_depth_;
-                    for (size_t i = 0; i < len; ++i)
+                    for (int32_t i = 0; i < len; ++i)
                     {
                         read(ec);
                         if (ec)
@@ -530,7 +530,7 @@ public:
 
                     handler_.begin_object(len, semantic_tag_type::none, *this);
                     ++nesting_depth_;
-                    for (size_t i = 0; i < len; ++i)
+                    for (int16_t i = 0; i < len; ++i)
                     {
                         parse_name(ec);
                         if (ec)
@@ -562,7 +562,7 @@ public:
 
                     handler_.begin_object(len, semantic_tag_type::none, *this);
                     ++nesting_depth_;
-                    for (size_t i = 0; i < len; ++i)
+                    for (int32_t i = 0; i < len; ++i)
                     {
                         parse_name(ec);
                         if (ec)
