@@ -49,7 +49,7 @@ public:
             JSONCONS_THROW(bson_error(0));
         }
         const uint8_t* endp;
-        const auto len = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+        /* auto len = */jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
         handler_.begin_object(semantic_tag_type::none, *this);
         ++nesting_depth_;
@@ -133,7 +133,7 @@ public:
                     JSONCONS_THROW(bson_error(0));
                 }
                 const uint8_t* endp;
-                const auto len = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
+                /* auto len = */ jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
                 handler_.begin_array(semantic_tag_type::none, *this);
                 ++nesting_depth_;

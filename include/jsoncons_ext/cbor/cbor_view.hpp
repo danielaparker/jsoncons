@@ -566,12 +566,20 @@ public:
             case cbor_major_type::unsigned_integer:
             case cbor_major_type::negative_integer:
             {
-                const uint8_t* endp;
-                int64_t val = jsoncons::cbor::detail::get_int64_value(first_,last_,&endp);
-                if (endp == first_)
+                //const uint8_t* endp;
+                //int64_t val = jsoncons::cbor::detail::get_int64_value(first_,last_,&endp);
+                //if (endp == first_)
+                //{
+                //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                //}
+                jsoncons::detail::buffer_source source(buffer(),buflen());
+                std::error_code ec;
+                int64_t val = jsoncons::cbor::detail::get_int64_value(source,ec);
+                if (ec)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
                 }
+
                 return (T)val;
             }
             case cbor_major_type::semantic_tag:
@@ -593,11 +601,12 @@ public:
             case cbor_major_type::unsigned_integer:
             case cbor_major_type::negative_integer:
             {
-                const uint8_t* endp;
-                uint64_t val = jsoncons::cbor::detail::get_uint64_value(first_,last_,&endp);
-                if (endp == first_)
+                jsoncons::detail::buffer_source source(buffer(),buflen());
+                std::error_code ec;
+                uint64_t val = jsoncons::cbor::detail::get_uint64_value(source, ec);
+                if (ec)
                 {
-                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
+                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an unsigned integer"));
                 }
                 return (T)val;
             }
@@ -641,9 +650,10 @@ public:
         {
             case cbor_major_type::unsigned_integer:
             {
-                const uint8_t* endp;
-                uint64_t val = jsoncons::cbor::detail::get_uint64_value(first_, last_, &endp);
-                if (endp == first_)
+                jsoncons::detail::buffer_source source(buffer(),buflen());
+                std::error_code ec;
+                uint64_t val = jsoncons::cbor::detail::get_uint64_value(source, ec);
+                if (ec)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
                 }
@@ -651,9 +661,10 @@ public:
             }
             case cbor_major_type::negative_integer:
             {
-                const uint8_t* endp;
-                int64_t val = jsoncons::cbor::detail::get_int64_value(first_, last_, &endp);
-                if (endp == first_)
+                jsoncons::detail::buffer_source source(buffer(),buflen());
+                std::error_code ec;
+                int64_t val = jsoncons::cbor::detail::get_int64_value(source,ec);
+                if (ec)
                 {
                     JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
                 }
@@ -667,9 +678,10 @@ public:
                     case 0x1a:
                     case 0x1b:
                     {
-                        const uint8_t* endp;
-                        double val = jsoncons::cbor::detail::get_double(first_, last_, &endp);
-                        if (endp == first_)
+                        jsoncons::detail::buffer_source source(buffer(),buflen());
+                        std::error_code ec;
+                        double val = jsoncons::cbor::detail::get_double(source, ec);
+                        if (ec)
                         {
                             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not a double"));
                         }
