@@ -461,7 +461,7 @@ public:
             jsoncons::cbor::detail::walk(it, last_, &endp);
             if (endp == it)
             {
-                JSONCONS_THROW(cbor_decode_error(0));
+                JSONCONS_THROW(cbor_error(0));
             }
             it = endp;
         }
@@ -470,7 +470,7 @@ public:
         jsoncons::cbor::detail::walk(it, last_, &endp);
         if (endp == it)
         {
-            JSONCONS_THROW(cbor_decode_error(0));
+            JSONCONS_THROW(cbor_error(0));
         }
 
         return cbor_view(it, endp-it, base_relative_);
@@ -489,7 +489,7 @@ public:
             string_type a_key = jsoncons::cbor::detail::get_text_string(it, last_, &endp);
             if (endp == it)
             {
-                JSONCONS_THROW(cbor_decode_error(last_-it));
+                JSONCONS_THROW(cbor_error(last_-it));
             }
             else
             {
@@ -525,7 +525,7 @@ public:
             string_type a_key = jsoncons::cbor::detail::get_text_string(it, last_,&endp);
             if (endp == it)
             {
-                JSONCONS_THROW(cbor_decode_error(last_-it));
+                JSONCONS_THROW(cbor_error(last_-it));
             }
             else
             {
@@ -709,7 +709,7 @@ public:
                 std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_,last_,&endp);
                 if (endp == first_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(0));
+                    JSONCONS_THROW(cbor_error(0));
                 }
                 std::string s;
                 encode_base64url(v.data(),v.size(),s);
@@ -725,7 +725,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         bignum n = bignum(1, v.data(), v.size());
                         std::string s;
@@ -738,7 +738,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         bignum n = bignum(-1, v.data(), v.size());
                         std::string s;
@@ -751,7 +751,7 @@ public:
                         std::string s = cbor::detail::get_array_as_decimal_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         return s;
                     }
@@ -761,7 +761,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         std::string s;
                         encode_base64url(v.data(),v.size(),s);
@@ -773,7 +773,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         std::string s;
                         encode_base64(v.data(),v.size(),s);
@@ -785,7 +785,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         std::string s;
                         encode_base16(v.data(),v.size(),s);
@@ -817,7 +817,7 @@ public:
                 std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_,last_,&endp);
                 if (endp == first_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(0));
+                    JSONCONS_THROW(cbor_error(0));
                 }
                 return basic_byte_string<BAllocator>(v.data(),v.size());
             }
@@ -849,7 +849,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         bignum n = bignum(1, v.data(), v.size());
                         return n;
@@ -860,7 +860,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         bignum n = bignum(-1, v.data(), v.size());
                         return n;
@@ -994,7 +994,7 @@ public:
                 std::vector<uint8_t> s = jsoncons::cbor::detail::get_byte_string(first_,last_,&endp);
                 if (endp == first_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(0));
+                    JSONCONS_THROW(cbor_error(0));
                 }
                 handler.byte_string_value(s.data(), s.size());
                 break;
@@ -1005,7 +1005,7 @@ public:
                 std::string s = jsoncons::cbor::detail::get_text_string(first_,last_,&endp);
                 if (endp == first_)
                 {
-                    JSONCONS_THROW(cbor_decode_error(0));
+                    JSONCONS_THROW(cbor_error(0));
                 }
                 handler.string_value(s);
                 break;
@@ -1021,7 +1021,7 @@ public:
                     jsoncons::cbor::detail::walk(it, last_, &endp);
                     if (endp == it)
                     {
-                        JSONCONS_THROW(cbor_decode_error(0));
+                        JSONCONS_THROW(cbor_error(0));
                     }
 
                     cbor_view(it,endp-it).dump(handler);
@@ -1041,14 +1041,14 @@ public:
                     std::string key = jsoncons::cbor::detail::get_text_string(it, last_, &endp);
                     if (endp == it)
                     {
-                        JSONCONS_THROW(cbor_decode_error(last_-it));
+                        JSONCONS_THROW(cbor_error(last_-it));
                     }
                     handler.name(key);
                     it = endp;
                     jsoncons::cbor::detail::walk(it, last_, &endp);
                     if (endp == it)
                     {
-                        JSONCONS_THROW(cbor_decode_error(0));
+                        JSONCONS_THROW(cbor_error(0));
                     }
 
                     cbor_view(it,endp-it).dump(handler);
@@ -1068,7 +1068,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         bignum n(1, v.data(), v.size());
                         std::string s;
@@ -1082,7 +1082,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_+1)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         bignum n(-1, v.data(), v.size());
                         std::string s;
@@ -1096,7 +1096,7 @@ public:
                         std::string s = cbor::detail::get_array_as_decimal_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         handler.string_value(s, semantic_tag_type::decimal_fraction);
                         break;
@@ -1107,7 +1107,7 @@ public:
                         std::vector<uint8_t> s = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base64url);
                         break;
@@ -1118,7 +1118,7 @@ public:
                         std::vector<uint8_t> s = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base64);
                         break;
@@ -1129,7 +1129,7 @@ public:
                         std::vector<uint8_t> s = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
                         if (endp == first_)
                         {
-                            JSONCONS_THROW(cbor_decode_error(0));
+                            JSONCONS_THROW(cbor_error(0));
                         }
                         handler.byte_string_value(s.data(), s.size(),byte_string_chars_format::base16);
                         break;

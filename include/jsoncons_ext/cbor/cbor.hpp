@@ -114,7 +114,6 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
     jsoncons::json_decoder<Json> decoder;
     basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
     cbor_reader parser(v, adaptor);
-    parser.update(v.data(),v.size());
     std::error_code ec;
     parser.read(ec);
     if (ec)

@@ -51,16 +51,16 @@ namespace msgpack_format
     const uint8_t negative_fixint_base_cd = 0xe0;
 }
  
-class msgpack_decode_error : public std::invalid_argument, public virtual json_exception
+class msgpack_error : public std::invalid_argument, public virtual json_exception
 {
 public:
-    explicit msgpack_decode_error(size_t pos) noexcept
+    explicit msgpack_error(size_t pos) noexcept
         : std::invalid_argument("")
     {
         buffer_.append("Error decoding a message pack at position ");
         buffer_.append(std::to_string(pos));
     }
-    ~msgpack_decode_error() noexcept
+    ~msgpack_error() noexcept
     {
     }
     const char* what() const noexcept override
@@ -70,6 +70,10 @@ public:
 private:
     std::string buffer_;
 };
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef msgpack_error msgpack_decode_error;
+#endif
 
 }}
 

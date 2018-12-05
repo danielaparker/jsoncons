@@ -41,16 +41,16 @@ namespace bson_format
     const uint8_t max_key_cd = 0x7f;
 }
  
-class bson_decode_error : public std::invalid_argument, public virtual json_exception
+class bson_error : public std::invalid_argument, public virtual json_exception
 {
 public:
-    explicit bson_decode_error(size_t pos) noexcept
+    explicit bson_error(size_t pos) noexcept
         : std::invalid_argument("")
     {
         buffer_.append("Error decoding a message pack at position ");
         buffer_.append(std::to_string(pos));
     }
-    ~bson_decode_error() noexcept
+    ~bson_error() noexcept
     {
     }
     const char* what() const noexcept override
@@ -60,6 +60,10 @@ public:
 private:
     std::string buffer_;
 };
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+typedef bson_error bson_decode_error;
+#endif
 
 enum class bson_structure_type {document, array};
 

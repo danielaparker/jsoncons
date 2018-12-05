@@ -452,7 +452,7 @@ public:
 
                 default:
                 {
-                    //JSONCONS_THROW(msgpack_decode_error(end_input_-pos));
+                    //JSONCONS_THROW(msgpack_error(end_input_-pos));
                 }
             }
         }
