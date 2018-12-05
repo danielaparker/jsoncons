@@ -24,10 +24,19 @@
 
 namespace jsoncons { namespace detail {
 
+struct binary_traits
+{
+    static int eof() 
+    {
+        return std::char_traits<char>::eof();
+    }
+};
+
 class buffer_source 
 {
 public:
     typedef uint8_t value_type;
+    typedef binary_traits traits_type;
 private:
     const uint8_t* input_ptr_;
     const uint8_t* input_end_;
@@ -71,6 +80,20 @@ public:
         }
     }
 
+    int get()
+    {
+        if (input_ptr_ < input_end_)
+        {
+            return *input_ptr_++;
+        }
+        else
+       {
+            eof_ = true;
+            input_ptr_ = input_end_;
+            return traits_type::eof();
+        }
+    }
+
     void increment()
     {
         if (input_ptr_ < input_end_)
@@ -84,9 +107,9 @@ public:
         }
     }
 
-    uint8_t peek() const
+    int peek() const
     {
-        return *input_ptr_;
+        return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
     }
 
     size_t read(value_type* p, size_t length)

@@ -47,7 +47,6 @@ Json decode_msgpack(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
     msgpack_reader parser(v, decoder);
-    parser.update(v.data(),v.size());
     std::error_code ec;
     parser.read(ec);
     if (ec)
