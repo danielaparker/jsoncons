@@ -10,6 +10,10 @@ template<class Json>
 Json decode_bson(const std::vector<uint8_t>& v)
 ```
 
+#### Exceptions
+
+Throws [parse_error](../parse_error.md) if parsing fails.
+
 #### See also
 
 - [encode_bson](encode_bson.md) encodes a json value to the [bson](http://bsonspec.org/) binary serialization format.

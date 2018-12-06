@@ -13,6 +13,10 @@ template<class Json>
 Json decode_cbor(std::basic_istream<typename Json::char_type>& is); // (2)
 ```
 
+#### Exceptions
+
+Throws [parse_error](../parse_error.md) if parsing fails.
+
 ### Examples
 
 #### Round trip (JSON to CBOR bytes back to JSON)
