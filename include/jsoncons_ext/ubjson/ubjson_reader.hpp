@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_READER_HPP
-#define JSONCONS_MSGPACK_MSGPACK_READER_HPP
+#ifndef JSONCONS_UBJSON_UBJSON_READER_HPP
+#define JSONCONS_UBJSON_UBJSON_READER_HPP
 
 #include <string>
 #include <sstream>
@@ -20,13 +20,13 @@
 #include <jsoncons/detail/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons_ext/msgpack/msgpack_detail.hpp>
-#include <jsoncons_ext/msgpack/msgpack_error.hpp>
+#include <jsoncons_ext/ubjson/ubjson_detail.hpp>
+#include <jsoncons_ext/ubjson/ubjson_error.hpp>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { namespace ubjson {
 
 template <class Source>
-class basic_msgpack_reader : public serializing_context
+class basic_ubjson_reader : public serializing_context
 {
     Source source_;
     json_content_handler& handler_;
@@ -34,7 +34,7 @@ class basic_msgpack_reader : public serializing_context
     size_t nesting_depth_;
     std::string buffer_;
 public:
-    basic_msgpack_reader(Source&& source, json_content_handler& handler)
+    basic_ubjson_reader(Source&& source, json_content_handler& handler)
        : source_(std::move(source)),
          handler_(handler), 
          column_(1),
@@ -107,7 +107,7 @@ public:
                 source_.read(len,std::back_inserter(s));
                 if (source_.eof())
                 {
-                    ec = msgpack_errc::unexpected_eof;
+                    ec = ubjson_errc::unexpected_eof;
                     return;
                 }
 
@@ -129,28 +129,28 @@ public:
         {
             switch (type)
             {
-                case msgpack_format::nil_cd: 
+                case ubjson_format::nil_cd: 
                 {
                     handler_.null_value(semantic_tag_type::none, *this);
                     break;
                 }
-                case msgpack_format::true_cd:
+                case ubjson_format::true_cd:
                 {
                     handler_.bool_value(true, semantic_tag_type::none, *this);
                     break;
                 }
-                case msgpack_format::false_cd:
+                case ubjson_format::false_cd:
                 {
                     handler_.bool_value(false, semantic_tag_type::none, *this);
                     break;
                 }
-                case msgpack_format::float32_cd: 
+                case ubjson_format::float32_cd: 
                 {
                     uint8_t buf[sizeof(float)];
                     source_.read(sizeof(float), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -159,13 +159,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::float64_cd: 
+                case ubjson_format::float64_cd: 
                 {
                     uint8_t buf[sizeof(double)];
                     source_.read(sizeof(double), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -174,7 +174,7 @@ public:
                     break;
                 }
 
-                case msgpack_format::uint8_cd: 
+                case ubjson_format::uint8_cd: 
                 {
                     uint8_t val;
                     source_.get(val);
@@ -182,13 +182,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::uint16_cd: 
+                case ubjson_format::uint16_cd: 
                 {
                     uint8_t buf[sizeof(uint16_t)];
                     source_.read(sizeof(uint16_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -197,13 +197,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::uint32_cd: 
+                case ubjson_format::uint32_cd: 
                 {
                     uint8_t buf[sizeof(uint32_t)];
                     source_.read(sizeof(uint32_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -212,13 +212,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::uint64_cd: 
+                case ubjson_format::uint64_cd: 
                 {
                     uint8_t buf[sizeof(uint64_t)];
                     source_.read(sizeof(uint64_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -227,13 +227,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::int8_cd: 
+                case ubjson_format::int8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(sizeof(int8_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -242,13 +242,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::int16_cd: 
+                case ubjson_format::int16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -257,13 +257,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::int32_cd: 
+                case ubjson_format::int32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -272,13 +272,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::int64_cd: 
+                case ubjson_format::int64_cd: 
                 {
                     uint8_t buf[sizeof(int64_t)];
                     source_.read(sizeof(int64_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -287,13 +287,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::str8_cd: 
+                case ubjson_format::str8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(sizeof(int8_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -303,7 +303,7 @@ public:
                     source_.read(len, std::back_inserter(s));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     //auto result = unicons::convert(
@@ -316,13 +316,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::str16_cd: 
+                case ubjson_format::str16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -332,7 +332,7 @@ public:
                     source_.read(len, std::back_inserter(s));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
 
@@ -347,13 +347,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::str32_cd: 
+                case ubjson_format::str32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -363,7 +363,7 @@ public:
                     source_.read(len, std::back_inserter(s));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
 
@@ -378,13 +378,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::bin8_cd: 
+                case ubjson_format::bin8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(sizeof(int8_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -395,7 +395,7 @@ public:
                     source_.read(len, std::back_inserter(v));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
 
@@ -406,13 +406,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::bin16_cd: 
+                case ubjson_format::bin16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -423,7 +423,7 @@ public:
                     source_.read(len, std::back_inserter(v));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
 
@@ -434,13 +434,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::bin32_cd: 
+                case ubjson_format::bin32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -451,7 +451,7 @@ public:
                     source_.read(len, std::back_inserter(v));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
 
@@ -462,13 +462,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::array16_cd: 
+                case ubjson_format::array16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -489,13 +489,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::array32_cd: 
+                case ubjson_format::array32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -516,13 +516,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::map16_cd : 
+                case ubjson_format::map16_cd : 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -548,13 +548,13 @@ public:
                     break;
                 }
 
-                case msgpack_format::map32_cd : 
+                case ubjson_format::map32_cd : 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -582,7 +582,7 @@ public:
 
                 default:
                 {
-                    //error
+                    //JSONCONS_THROW(ubjson_error(end_input_-pos));
                 }
             }
         }
@@ -616,7 +616,7 @@ private:
                 source_.read(len, std::back_inserter(s));
                 if (source_.eof())
                 {
-                    ec = msgpack_errc::unexpected_eof;
+                    ec = ubjson_errc::unexpected_eof;
                     return;
                 }
                 //auto result = unicons::convert(
@@ -631,13 +631,13 @@ private:
         {
             switch (type)
             {
-                case msgpack_format::str8_cd: 
+                case ubjson_format::str8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(sizeof(int8_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -647,7 +647,7 @@ private:
                     source_.read(len, std::back_inserter(s));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
 
@@ -661,13 +661,13 @@ private:
                     break;
                 }
 
-                case msgpack_format::str16_cd: 
+                case ubjson_format::str16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     source_.read(sizeof(int16_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -677,7 +677,7 @@ private:
                     source_.read(len, std::back_inserter(s));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
 
@@ -692,13 +692,13 @@ private:
                     break;
                 }
 
-                case msgpack_format::str32_cd: 
+                case ubjson_format::str32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     source_.read(sizeof(int32_t), buf);
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
                     const uint8_t* endp;
@@ -708,7 +708,7 @@ private:
                     source_.read(len, std::back_inserter(s));
                     if (source_.eof())
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
                         return;
                     }
 
@@ -728,7 +728,7 @@ private:
     }
 };
 
-typedef basic_msgpack_reader<jsoncons::detail::buffer_source> msgpack_reader;
+typedef basic_ubjson_reader<jsoncons::detail::buffer_source> ubjson_reader;
 
 }}
 

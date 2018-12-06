@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_MSGPACK_MSGPACK_DETAIL_HPP
-#define JSONCONS_MSGPACK_MSGPACK_DETAIL_HPP
+#ifndef JSONCONS_UBJSON_UBJSON_DETAIL_HPP
+#define JSONCONS_UBJSON_UBJSON_DETAIL_HPP
 
 #include <string>
 #include <sstream>
@@ -17,9 +17,9 @@
 #include <cassert>
 #include <jsoncons/config/binary_detail.hpp>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { namespace ubjson {
 
-namespace msgpack_format
+namespace ubjson_format
 {
     const uint8_t positive_fixint_base_cd = 0x00;
     const uint8_t nil_cd = 0xc0;
