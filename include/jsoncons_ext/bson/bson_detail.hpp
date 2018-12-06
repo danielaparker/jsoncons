@@ -41,10 +41,6 @@ namespace bson_format
     const uint8_t max_key_cd = 0x7f;
 }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-typedef bson_error bson_decode_error;
-#endif
-
 enum class bson_structure_type {document, array};
 
 }}
