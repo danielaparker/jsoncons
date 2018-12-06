@@ -13,6 +13,11 @@
 using namespace jsoncons;
 using namespace jsoncons::bson;
 
+void check_decode_bson(const std::vector<uint8_t>& v, const json& expected)
+{
+    json result = decode_bson<json>(v);
+    REQUIRE(result == expected);
+}
 TEST_CASE("bson hello world")
 {
     check_decode_bson({0x16,0x00,0x00,0x00, // total document size
