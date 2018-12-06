@@ -750,7 +750,11 @@ private:
 
 typedef basic_cbor_serializer<char,jsoncons::detail::byte_stream_result> cbor_serializer;
 
+typedef basic_cbor_serializer<char,jsoncons::detail::bytes_result> cbor_buffer_serializer;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_cbor_serializer<char,jsoncons::detail::bytes_result> cbor_bytes_serializer;
+#endif
 
 }}
 #endif

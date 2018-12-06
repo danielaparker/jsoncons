@@ -119,7 +119,7 @@ TEST_CASE("jsonpointer_test")
 TEST_CASE("as_string_test")
 {
     std::vector<uint8_t> b;
-    jsoncons::cbor::cbor_bytes_serializer serializer(b);
+    jsoncons::cbor::cbor_buffer_serializer serializer(b);
     serializer.begin_array(10);
     serializer.bool_value(true);
     serializer.bool_value(false);
@@ -197,7 +197,7 @@ TEST_CASE("as_string_test")
 TEST_CASE("test_dump_to_string")
 {
     std::vector<uint8_t> b;
-    cbor_bytes_serializer serializer(b);
+    cbor_buffer_serializer serializer(b);
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
@@ -239,7 +239,7 @@ TEST_CASE("test_dump_to_string")
 TEST_CASE("test_dump_to_stream")
 {
     std::vector<uint8_t> b;
-    cbor_bytes_serializer serializer(b);
+    cbor_buffer_serializer serializer(b);
     serializer.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bignum n(-1, bytes.data(), bytes.size());
@@ -281,7 +281,7 @@ TEST_CASE("test_dump_to_stream")
 TEST_CASE("test_indefinite_length_object_iterator")
 {
     std::vector<uint8_t> b1;
-    cbor::cbor_bytes_serializer serializer1(b1);
+    cbor::cbor_buffer_serializer serializer1(b1);
     serializer1.begin_object(); // indefinite length object
     serializer1.end_object(); 
     serializer1.flush();
@@ -289,7 +289,7 @@ TEST_CASE("test_indefinite_length_object_iterator")
     CHECK(bv1.object_range().begin() == bv1.object_range().end());
 
     std::vector<uint8_t> b2;
-    cbor::cbor_bytes_serializer serializer2(b2);
+    cbor::cbor_buffer_serializer serializer2(b2);
     serializer2.begin_object(); // indefinite length object
     serializer2.name("City");
     serializer2.string_value("Toronto");
@@ -309,7 +309,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
 {
 
     std::vector<uint8_t> b1;
-    cbor::cbor_bytes_serializer serializer1(b1);
+    cbor::cbor_buffer_serializer serializer1(b1);
     serializer1.begin_array(); // indefinite length array
     serializer1.end_array(); 
     serializer1.flush();
@@ -317,7 +317,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
     CHECK(bv1.array_range().begin() == bv1.array_range().end());
 
     std::vector<uint8_t> b2;
-    cbor::cbor_bytes_serializer serializer2(b2);
+    cbor::cbor_buffer_serializer serializer2(b2);
     serializer2.begin_array(); // indefinite length array
     serializer2.string_value("Toronto");
     serializer2.string_value("Ontario");
@@ -337,7 +337,7 @@ TEST_CASE("test_indefinite_length_array_iterator")
 TEST_CASE("cbor_view array comparison test")
 {
     std::vector<uint8_t> buf1;
-    cbor::cbor_bytes_serializer serializer1(buf1);
+    cbor::cbor_buffer_serializer serializer1(buf1);
     serializer1.begin_array(); // indefinite length array
     serializer1.string_value("Toronto");
     serializer1.string_value("Vancouver");
@@ -346,7 +346,7 @@ TEST_CASE("cbor_view array comparison test")
     cbor_view v1 = buf1;
 
     std::vector<uint8_t> buf2;
-    cbor::cbor_bytes_serializer serializer2(buf2);
+    cbor::cbor_buffer_serializer serializer2(buf2);
     serializer2.begin_array(); // indefinite length array
     serializer2.string_value("Toronto");
     serializer2.string_value("Vancouver");
@@ -355,7 +355,7 @@ TEST_CASE("cbor_view array comparison test")
     cbor_view v2 = buf2;
 
     std::vector<uint8_t> buf3;
-    cbor::cbor_bytes_serializer serializer3(buf3);
+    cbor::cbor_buffer_serializer serializer3(buf3);
     serializer3.begin_array(); // indefinite length array
     serializer3.string_value("Toronto");
     serializer3.string_value("Montreal");
@@ -385,7 +385,7 @@ TEST_CASE("cbor_view array comparison test")
 TEST_CASE("cbor_view object comparison")
 {
     std::vector<uint8_t> buf1;
-    cbor::cbor_bytes_serializer serializer1(buf1);
+    cbor::cbor_buffer_serializer serializer1(buf1);
     serializer1.begin_object(); // indefinite length array
     serializer1.name("City");
     serializer1.string_value("Montreal");
@@ -400,7 +400,7 @@ TEST_CASE("cbor_view object comparison")
     REQUIRE(view1.size() == 3);
 
     std::vector<uint8_t> buf2;
-    cbor::cbor_bytes_serializer serializer2(buf2);
+    cbor::cbor_buffer_serializer serializer2(buf2);
     serializer2.begin_object(); // indefinite length array
     serializer2.name("City");
     serializer2.string_value("Toronto");
@@ -414,7 +414,7 @@ TEST_CASE("cbor_view object comparison")
     REQUIRE(view2.size() == view1.size());
 
     std::vector<uint8_t> buf3;
-    cbor::cbor_bytes_serializer serializer3(buf3);
+    cbor::cbor_buffer_serializer serializer3(buf3);
     serializer3.begin_object(); // indefinite length array
     serializer3.name("empty-object");
     serializer3.begin_object(0);
@@ -465,7 +465,7 @@ TEST_CASE("cbor_view object comparison")
 TEST_CASE("cbor_view member tests")
 {
     std::vector<uint8_t> buf;
-    cbor::cbor_bytes_serializer serializer(buf);
+    cbor::cbor_buffer_serializer serializer(buf);
     serializer.begin_object(); // indefinite length array
     serializer.name("empty-object");
     serializer.begin_object(0);

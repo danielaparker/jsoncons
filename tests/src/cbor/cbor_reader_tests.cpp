@@ -414,7 +414,7 @@ TEST_CASE("test_decimal_as_string")
 TEST_CASE("Compare CBOR packed item and jsoncons item")
 {
     std::vector<uint8_t> bytes;
-    cbor::cbor_bytes_serializer writer(bytes);
+    cbor::cbor_buffer_serializer writer(bytes);
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string{'b','a','r'});

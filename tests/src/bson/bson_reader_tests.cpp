@@ -118,7 +118,7 @@ TEST_CASE("bson hello world")
 /* TEST_CASE("Compare bson packed item and jsoncons item")
 {
     std::vector<uint8_t> bytes;
-    bson::bson_bytes_serializer writer(bytes);
+    bson::bson_buffer_serializer writer(bytes);
     writer.begin_array(2); // Must be definite length array
     writer.string_value("foo");
     writer.byte_string_value(byte_string{'b','a','r'});

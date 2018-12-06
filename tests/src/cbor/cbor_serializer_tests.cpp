@@ -51,7 +51,7 @@ json j = json::parse(R"(
 TEST_CASE("serialize array to cbor")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_serializer serializer(v);
+    cbor_buffer_serializer serializer(v);
     //serializer.begin_object(1);
     serializer.begin_array(3);
     serializer.bool_value(true);
@@ -75,7 +75,7 @@ TEST_CASE("serialize array to cbor")
 TEST_CASE("test_serialize_indefinite_length_array")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_serializer serializer(v);
+    cbor_buffer_serializer serializer(v);
     serializer.begin_array();
     serializer.begin_array(4);
     serializer.bool_value(true);
@@ -100,7 +100,7 @@ TEST_CASE("test_serialize_indefinite_length_array")
 TEST_CASE("test_serialize_bignum")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_serializer serializer(v);
+    cbor_buffer_serializer serializer(v);
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -125,7 +125,7 @@ TEST_CASE("test_serialize_bignum")
 TEST_CASE("test_serialize_negative_bignum1")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_serializer serializer(v);
+    cbor_buffer_serializer serializer(v);
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -150,7 +150,7 @@ TEST_CASE("test_serialize_negative_bignum1")
 TEST_CASE("test_serialize_negative_bignum2")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_serializer serializer(v);
+    cbor_buffer_serializer serializer(v);
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -179,7 +179,7 @@ TEST_CASE("test_serialize_negative_bignum2")
 TEST_CASE("test_serialize_negative_bignum3")
 {
     std::vector<uint8_t> v;
-    cbor_bytes_serializer serializer(v);
+    cbor_buffer_serializer serializer(v);
     serializer.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -210,7 +210,7 @@ TEST_CASE("test_serialize_decimal")
     SECTION("-1 184467440737095516160")
     {
         std::vector<uint8_t> v;
-        cbor_bytes_serializer serializer(v);
+        cbor_buffer_serializer serializer(v);
         serializer.string_value("18446744073709551616.0", semantic_tag_type::decimal_fraction);
         serializer.flush();
         try
@@ -226,7 +226,7 @@ TEST_CASE("test_serialize_decimal")
     SECTION("18446744073709551616e-5")
     {
         std::vector<uint8_t> v;
-        cbor_bytes_serializer serializer(v);
+        cbor_buffer_serializer serializer(v);
         serializer.string_value("18446744073709551616e-5", semantic_tag_type::decimal_fraction);
         serializer.flush();
         try
@@ -242,7 +242,7 @@ TEST_CASE("test_serialize_decimal")
     SECTION("-18446744073709551616e-5")
     {
         std::vector<uint8_t> v;
-        cbor_bytes_serializer serializer(v);
+        cbor_buffer_serializer serializer(v);
         serializer.string_value("-18446744073709551616e-5", semantic_tag_type::decimal_fraction);
         serializer.flush();
         try
@@ -258,7 +258,7 @@ TEST_CASE("test_serialize_decimal")
     SECTION("-18446744073709551616e5")
     {
         std::vector<uint8_t> v;
-        cbor_bytes_serializer serializer(v);
+        cbor_buffer_serializer serializer(v);
         serializer.string_value("-18446744073709551616e5", semantic_tag_type::decimal_fraction);
         serializer.flush();
         try

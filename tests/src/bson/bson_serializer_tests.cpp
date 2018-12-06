@@ -16,7 +16,7 @@ using namespace jsoncons::bson;
 TEST_CASE("serialize object to bson")
 {
     std::vector<uint8_t> v;
-    bson_bytes_serializer serializer(v);
+    bson_buffer_serializer serializer(v);
 
     serializer.begin_object();
     serializer.name("null");
@@ -69,7 +69,7 @@ TEST_CASE("serialize to bson")
     SECTION("array")
     {
         std::vector<uint8_t> v;
-        bson_bytes_serializer serializer(v);
+        bson_buffer_serializer serializer(v);
 
         serializer.begin_array();
         serializer.int64_value((std::numeric_limits<int64_t>::max)());
@@ -126,7 +126,7 @@ TEST_CASE("serialize to bson")
     SECTION("object")
     {
         std::vector<uint8_t> v;
-        bson_bytes_serializer serializer(v);
+        bson_buffer_serializer serializer(v);
 
         serializer.begin_object();
         serializer.name("0");
@@ -191,7 +191,7 @@ TEST_CASE("serialize to bson")
     SECTION("outer object")
     {
         std::vector<uint8_t> v;
-        bson_bytes_serializer serializer(v);
+        bson_buffer_serializer serializer(v);
 
         serializer.begin_object();
         serializer.name("a");
@@ -220,7 +220,7 @@ TEST_CASE("serialize to bson")
     SECTION("outer array")
     {
         std::vector<uint8_t> v;
-        bson_bytes_serializer serializer(v);
+        bson_buffer_serializer serializer(v);
 
         serializer.begin_array();
         serializer.begin_object();

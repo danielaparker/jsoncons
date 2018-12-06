@@ -425,7 +425,11 @@ private:
 
 typedef basic_msgpack_serializer<char,jsoncons::detail::byte_stream_result> msgpack_serializer;
 
+typedef basic_msgpack_serializer<char,jsoncons::detail::bytes_result> msgpack_buffer_serializer;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_msgpack_serializer<char,jsoncons::detail::bytes_result> msgpack_bytes_serializer;
+#endif
 
 }}
 #endif

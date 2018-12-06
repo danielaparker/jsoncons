@@ -18,6 +18,16 @@ Message Pack enhancements
   rewritten using `msgpack_serializer` and `msgpack_parser`,
   and also now support bin formats.
 
+Changes:
+
+- The name `cbor_bytes_reader` has been deprecated and renamed to `cbor_buffer_reader`
+
+- The name `msgpack_bytes_reader` has been deprecated and renamed to `msgpack_buffer_reader`
+
+New features:
+
+- decode from and encode to the [bson](http://bsonspec.org/) binary serialization format
+
 version 0.113.0
 ---------------
 

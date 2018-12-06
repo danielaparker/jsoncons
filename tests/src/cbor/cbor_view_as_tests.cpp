@@ -20,7 +20,7 @@ using namespace jsoncons::cbor;
 TEST_CASE("cbor_view array as<> test")
 {
     std::vector<uint8_t> bytes;
-    cbor::cbor_bytes_serializer writer(bytes);
+    cbor::cbor_buffer_serializer writer(bytes);
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string({'b','a','r'}));

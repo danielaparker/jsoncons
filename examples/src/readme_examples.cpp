@@ -16,7 +16,7 @@ namespace readme
     {
         // Construct some CBOR using the streaming API
         std::vector<uint8_t> b;
-        cbor::cbor_bytes_serializer writer(b);
+        cbor::cbor_buffer_serializer writer(b);
         writer.begin_array(); // indefinite length outer array
         writer.begin_array(3); // a fixed length array
         writer.string_value("foo");

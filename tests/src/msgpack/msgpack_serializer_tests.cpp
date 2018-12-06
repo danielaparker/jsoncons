@@ -19,7 +19,7 @@ using namespace jsoncons::msgpack;
 TEST_CASE("serialize array to msgpack")
 {
     std::vector<uint8_t> v;
-    msgpack_bytes_serializer serializer(v);
+    msgpack_buffer_serializer serializer(v);
     //serializer.begin_object(1);
     serializer.begin_array(3);
     serializer.bool_value(true);
