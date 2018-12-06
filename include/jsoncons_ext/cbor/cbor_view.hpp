@@ -770,9 +770,10 @@ public:
                     }
                     case 21:
                     {
-                        const uint8_t* endp;
-                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
-                        if (endp == first_)
+                        std::error_code ec;
+                        jsoncons::detail::buffer_source source(buffer()+1,buflen()-1);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
+                        if (ec)
                         {
                             JSONCONS_THROW(cbor_error(0));
                         }
@@ -782,9 +783,10 @@ public:
                     }
                     case 22:
                     {
-                        const uint8_t* endp;
-                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
-                        if (endp == first_)
+                        std::error_code ec;
+                        jsoncons::detail::buffer_source source(buffer()+1,buflen()-1);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
+                        if (ec)
                         {
                             JSONCONS_THROW(cbor_error(0));
                         }
@@ -794,9 +796,10 @@ public:
                     }
                     case 23:
                     {
-                        const uint8_t* endp;
-                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(first_+1,last_,&endp);
-                        if (endp == first_)
+                        std::error_code ec;
+                        jsoncons::detail::buffer_source source(buffer()+1,buflen()-1);
+                        std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
+                        if (ec)
                         {
                             JSONCONS_THROW(cbor_error(0));
                         }

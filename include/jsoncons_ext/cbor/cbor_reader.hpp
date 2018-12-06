@@ -267,7 +267,7 @@ public:
                         source_.ignore(1);
                         while (source_.peek() != 0xff)
                         {
-                            parse_name(ec);
+                            read_name(ec);
                             if (ec)
                             {
                                 return;
@@ -294,7 +294,7 @@ public:
                         handler_.begin_object(len, semantic_tag_type::none, *this);
                         for (size_t i = 0; i < len; ++i)
                         {
-                            parse_name(ec);
+                            read_name(ec);
                             if (ec)
                             {
                                 return;
@@ -374,27 +374,40 @@ public:
         return column_;
     }
 private:
-    void parse_name(std::error_code& ec)
+    void read_name(std::error_code& ec)
     {
-        if (get_major_type(source_.peek()) == cbor_major_type::text_string)
+        switch (get_major_type(source_.peek()))
         {
-            std::string s = jsoncons::cbor::detail::get_text_string(source_,ec);
-            if (ec)
+            case cbor_major_type::text_string:
             {
-                return;
+                std::string s = jsoncons::cbor::detail::get_text_string(source_,ec);
+                if (ec)
+                {
+                    return;
+                }
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                break;
             }
-            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
-        }
-        else
-        {
-            std::string s;
-            json_string_serializer serializer(s);
-            basic_cbor_reader<Source> reader(std::move(source_), serializer);
-            reader.read(ec);
-            source_ = std::move(reader.source_);
-            //cbor_view v(pos,end_input_ - pos);
-            //std::string s = v.as_string();
-            //handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+            case cbor_major_type::byte_string:
+            {
+                std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source_,ec);
+                if (ec)
+                {
+                    return;
+                }
+                std::string s;
+                encode_base64url(v.data(),v.size(),s);
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                break;
+            }
+            default:
+            {
+                std::string s;
+                json_string_serializer serializer(s);
+                basic_cbor_reader<Source> reader(std::move(source_), serializer);
+                reader.read(ec);
+                source_ = std::move(reader.source_);
+            }
         }
     }
 };
