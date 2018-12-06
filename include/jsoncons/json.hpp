@@ -4,10 +4,10 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_SERIALIZING_OPTIONS_HPP
-#define JSONCONS_JSON_SERIALIZING_OPTIONS_HPP
+#ifndef JSONCONS_JSON_HPP
+#define JSONCONS_JSON_HPP
 
-#include <jsoncons/json_options.hpp>
+#include <jsoncons/basic_json.hpp>
 
 #endif
 
