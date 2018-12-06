@@ -1,6 +1,6 @@
 ### jsoncons::bson::decode_bson
 
-Decodes a [bson](http://bsonspec.org/) binary serialization format to a json value.
+Decodes a [Bin­ary JSON](http://bsonspec.org/) binary serialization format to a json value.
 
 #### Header
 ```c++
@@ -16,6 +16,6 @@ Throws [parse_error](../parse_error.md) if parsing fails.
 
 #### See also
 
-- [encode_bson](encode_bson.md) encodes a json value to the [bson](http://bsonspec.org/) binary serialization format.
+- [encode_bson](encode_bson.md) encodes a json value to the [Bin­ary JSON](http://bsonspec.org/) binary serialization format.
 
 
