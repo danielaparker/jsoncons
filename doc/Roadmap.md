@@ -4,7 +4,7 @@
 
 More binary support
 
-- BSON
+- BSON (now on master)
 
 - UBJSON
 
