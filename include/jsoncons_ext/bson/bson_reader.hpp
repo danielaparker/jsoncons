@@ -46,7 +46,8 @@ public:
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
         {
-            JSONCONS_THROW(bson_error(0));
+            ec = bson_errc::unexpected_eof;
+            return;
         }
         const uint8_t* endp;
         /* auto len = */jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
@@ -87,7 +88,8 @@ public:
                 uint8_t buf[sizeof(double)]; 
                 if (source_.read(buf, sizeof(double)) != sizeof(double))
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 const uint8_t* endp;
                 double res = jsoncons::detail::from_little_endian<double>(buf,buf+sizeof(buf),&endp);
@@ -99,7 +101,8 @@ public:
                 uint8_t buf[sizeof(int32_t)]; 
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 const uint8_t* endp;
                 auto len = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(buf),&endp);
@@ -108,7 +111,8 @@ public:
                 s.reserve(len - 1);
                 if ((int32_t)source_.read(len-1,std::back_inserter(s)) != len-1)
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 uint8_t c;
                 source_.get(c); // discard 0
@@ -130,7 +134,8 @@ public:
                 uint8_t buf[sizeof(int32_t)]; 
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 const uint8_t* endp;
                 /* auto len = */ jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
@@ -152,7 +157,8 @@ public:
                 uint8_t val;
                 if (source_.get(val) == 0)
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 handler_.bool_value(val != 0, semantic_tag_type::none, *this);
                 break;
@@ -162,7 +168,8 @@ public:
                 uint8_t buf[sizeof(int32_t)]; 
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
@@ -175,7 +182,8 @@ public:
                 uint8_t buf[sizeof(uint64_t)]; 
                 if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::from_little_endian<uint64_t>(buf, buf+sizeof(uint64_t),&endp);
@@ -188,7 +196,8 @@ public:
                 uint8_t buf[sizeof(int64_t)]; 
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::from_little_endian<int64_t>(buf, buf+sizeof(int64_t),&endp);
@@ -200,7 +209,8 @@ public:
                 uint8_t buf[sizeof(int32_t)]; 
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
                 const uint8_t* endp;
                 const auto len = jsoncons::detail::from_little_endian<int32_t>(buf, buf+sizeof(int32_t),&endp);
@@ -208,7 +218,8 @@ public:
                 std::vector<uint8_t> v(len, 0);
                 if (source_.read(v.data(), v.size()) != v.size())
                 {
-                    JSONCONS_THROW(bson_error(0));
+                    ec = bson_errc::unexpected_eof;
+                    return;
                 }
 
                 handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
@@ -234,22 +245,6 @@ private:
 };
 
 typedef basic_bson_reader<jsoncons::detail::buffer_source> bson_reader;
-
-// decode_bson
-
-template<class Json>
-Json decode_bson(const std::vector<uint8_t>& v)
-{
-    jsoncons::json_decoder<Json> decoder;
-    basic_bson_reader<jsoncons::detail::buffer_source> parser{ v, decoder };
-    std::error_code ec;
-    parser.read(ec);
-    if (ec)
-    {
-        throw parse_error(ec,parser.line_number(),parser.column_number());
-    }
-    return decoder.get_result();
-}
 
 }}
 

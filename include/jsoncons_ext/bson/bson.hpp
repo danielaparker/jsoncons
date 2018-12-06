@@ -22,6 +22,22 @@
 
 namespace jsoncons { namespace bson {
 
+// decode_bson
+
+template<class Json>
+Json decode_bson(const std::vector<uint8_t>& v)
+{
+    jsoncons::json_decoder<Json> decoder;
+    basic_bson_reader<jsoncons::detail::buffer_source> parser{ v, decoder };
+    std::error_code ec;
+    parser.read(ec);
+    if (ec)
+    {
+        throw parse_error(ec,parser.line_number(),parser.column_number());
+    }
+    return decoder.get_result();
+}
+
 // encode_bson
 
 template<class Json>
