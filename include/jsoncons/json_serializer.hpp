@@ -20,7 +20,7 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/bignum.hpp>
-#include <jsoncons/json_serializing_options.hpp>
+#include <jsoncons/json_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/result.hpp>
 #include <jsoncons/detail/print_number.hpp>
@@ -184,7 +184,7 @@ public:
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Result result_type;
     typedef typename Result::output_type output_type;
-    typedef typename basic_json_serializing_options<CharT>::string_type string_type;
+    typedef typename basic_json_options<CharT>::string_type string_type;
 
 private:
     enum class structure_type {object, array};
@@ -308,7 +308,7 @@ private:
     basic_json_serializer& operator=(const basic_json_serializer&) = delete;
 public:
     basic_json_serializer(output_type& os)
-        : basic_json_serializer(os, basic_json_serializing_options<CharT>())
+        : basic_json_serializer(os, basic_json_options<CharT>())
     {
     }
 
@@ -997,7 +997,7 @@ public:
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Result result_type;
     typedef typename Result::output_type output_type;
-    typedef typename basic_json_serializing_options<CharT>::string_type string_type;
+    typedef typename basic_json_options<CharT>::string_type string_type;
 
 private:
     enum class structure_type {object, array};
@@ -1048,7 +1048,7 @@ private:
     basic_json_compressed_serializer& operator=(const basic_json_compressed_serializer&) = delete;
 public:
     basic_json_compressed_serializer(output_type& os)
-        : basic_json_compressed_serializer(os, basic_json_serializing_options<CharT>())
+        : basic_json_compressed_serializer(os, basic_json_options<CharT>())
     {
     }
 

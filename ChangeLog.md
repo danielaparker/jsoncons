@@ -1,6 +1,18 @@
 master
 ------
 
+Name changes:
+
+The following names have been deprecated (still work) and renamed
+
+- `cbor_bytes_serializer` to `cbor_buffer_serializer`
+
+- `msgpack_bytes_serializer` to `msgpack_buffer_serializer`
+
+- `json_serializing_options` to `json_options`
+
+- `csv_serializing_options` to `csv_options`
+
 Bug fix
 
 - On Windows platforms, fixed issue with macro expansion of max when 
@@ -17,12 +29,6 @@ Message Pack enhancements
 - `encode_msgpack` and `decode_msgpack` have been
   rewritten using `msgpack_serializer` and `msgpack_parser`,
   and also now support bin formats.
-
-Changes:
-
-- The name `cbor_bytes_reader` has been deprecated and renamed to `cbor_buffer_reader`
-
-- The name `msgpack_bytes_reader` has been deprecated and renamed to `msgpack_buffer_reader`
 
 New features:
 

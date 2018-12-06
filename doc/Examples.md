@@ -152,7 +152,7 @@ Like this,
 std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
 try
 {
-    json_serializing_options options;
+    json_options options;
     options.max_nesting_depth(20);
     json j = json::parse(s, options);
 }
@@ -432,7 +432,7 @@ std::cout << pretty_print(j) << std::endl; // pretty print
 #### Escape all non-ascii characters
 
 ```
-json_serializing_options options;
+json_options options;
 options.escape_all_non_ascii(true);
 
 j.dump(std::cout, options); // compressed
@@ -458,7 +458,7 @@ j["field1"] = std::sqrt(-1.0);
 j["field2"] = 1.79e308 * 1000;
 j["field3"] = -1.79e308 * 1000;
 
-json_serializing_options options;
+json_options options;
 options.nan_to_str("NaN")
        .inf_to_str("Inf"); 
 

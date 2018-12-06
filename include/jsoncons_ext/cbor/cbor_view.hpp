@@ -921,7 +921,7 @@ public:
 
     template <typename Traits,typename SAllocator>
     void dump(std::basic_string<char,Traits,SAllocator>& s,
-              const json_serializing_options& options) const
+              const json_options& options) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
         basic_json_compressed_serializer<char,jsoncons::detail::string_result<string_type>> serializer(s, options);
@@ -930,7 +930,7 @@ public:
 
     template <typename Traits,typename SAllocator>
     void dump(std::basic_string<char,Traits,SAllocator>& s,
-              const json_serializing_options& options,
+              const json_options& options,
               indenting line_indent) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
@@ -966,13 +966,13 @@ public:
         }
     }
 
-    void dump(std::ostream& os, const json_serializing_options& options) const
+    void dump(std::ostream& os, const json_options& options) const
     {
         json_compressed_serializer serializer(os, options);
         dump(serializer);
     }
 
-    void dump(std::ostream& os, const json_serializing_options& options, indenting line_indent) const
+    void dump(std::ostream& os, const json_options& options, indenting line_indent) const
     {
         if (line_indent == indenting::indent)
         {

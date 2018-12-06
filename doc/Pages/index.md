@@ -357,7 +357,7 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    csv_serializing_options options;
+    csv_options options;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
@@ -436,10 +436,10 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [json_serializing_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_serializing_options.md), that allows custom formatting of output.
+The `pretty_print` function takes an optional second parameter, [json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_options.md), that allows custom formatting of output.
 To display the array scalar values on a new line, set the `object_array_line_splits` property to `line_split_kind::new_line`. The code
 ```c++
-json_serializing_options options;
+json_options options;
 format.object_array_line_splits(line_split_kind::new_line);
 std::cout << pretty_print(val,options) << std::endl;
 ```
@@ -459,7 +459,7 @@ produces
 ```
 To display the elements of array values on multiple lines, set the `object_array_line_splits` property to `line_split_kind::multi_line`. The code
 ```c++
-json_serializing_options options;
+json_options options;
 format.object_array_line_splits(line_split_kind::multi_line);
 std::cout << pretty_print(val,options) << std::endl;
 ```

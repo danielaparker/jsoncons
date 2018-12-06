@@ -5,7 +5,7 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <catch/catch.hpp>
-//#include <jsoncons_ext/csv/csv_serializing_options.hpp>
+//#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons_ext/csv/csv_serializer.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -27,7 +27,7 @@ TEST_CASE("n_objects_test")
 )";
 
     json_decoder<ojson> decoder;
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
           .subfield_delimiter(0);
           //.column_types("string,float,float,float,float");
@@ -59,7 +59,7 @@ TEST_CASE("m_columns_test")
 )";
 
     json_decoder<ojson> decoder;
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .mapping(mapping_type::m_columns);
 
@@ -85,7 +85,7 @@ TEST_CASE("m_columns with ignore_empty_value")
     //std::cout << bond_yields << std::endl <<std::endl;
 
     json_decoder<ojson> decoder;
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .ignore_empty_values(true)
            .mapping(mapping_type::m_columns);
@@ -114,7 +114,7 @@ TEST_CASE("csv_test_empty_values")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .column_types("boolean,integer,float,string");
 
@@ -161,7 +161,7 @@ TEST_CASE("csv_test_empty_values_with_defaults")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true) 
            .column_types("boolean,integer,float,string")
            .column_defaults("false,0,0.0,\"\"");
@@ -211,7 +211,7 @@ TEST_CASE("csv_test_empty_values_with_empty_defaults")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .column_types("boolean,integer,float,string")
            .column_defaults(",,,");
@@ -255,7 +255,7 @@ TEST_CASE("csv_test1_array_1col_skip1_a")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.header_lines(1);
 
     csv_reader reader(is,decoder,options);
@@ -276,7 +276,7 @@ TEST_CASE("csv_test1_array_1col_skip1_b")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.header_lines(1);
     options.infer_types(false);
 
@@ -298,7 +298,7 @@ TEST_CASE("csv_test1_array_1col_a")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false);
 
     csv_reader reader(is,decoder,options);
@@ -319,7 +319,7 @@ TEST_CASE("csv_test1_array_1col_b")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false)
            .infer_types(false);
 
@@ -341,7 +341,7 @@ TEST_CASE("csv_test1_array_3cols")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false);
 
     csv_reader reader(is,decoder,options);
@@ -369,7 +369,7 @@ TEST_CASE("csv_test1_array_3cols_trim_leading")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false)
            .trim_leading(true);
 
@@ -399,7 +399,7 @@ TEST_CASE("csv_test1_array_3cols_trim_trailing")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false)
            .trim_trailing(true);
 
@@ -429,7 +429,7 @@ TEST_CASE("csv_test1_array_3cols_trim")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false)
            .trim(true)
            .unquoted_empty_value_is_null(true);
@@ -460,7 +460,7 @@ TEST_CASE("csv_test1_array_3cols_comment")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.comment_starter('#');
 
     csv_reader reader(is,decoder,options);
@@ -485,7 +485,7 @@ TEST_CASE("csv_test1_object_1col")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -506,7 +506,7 @@ TEST_CASE("csv_test1_object_3cols")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -531,7 +531,7 @@ TEST_CASE("csv_test1_object_3cols_header")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.column_names("x,y,z")
            .header_lines(1);
 
@@ -557,7 +557,7 @@ TEST_CASE("csv_test1_object_3cols_bool")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.column_names("x,y,z")
            .column_types("boolean,boolean,boolean")
            .header_lines(1);
@@ -584,7 +584,7 @@ TEST_CASE("csv_test1_object_1col_quoted")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -605,7 +605,7 @@ TEST_CASE("csv_test1_object_3cols_quoted")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -630,7 +630,7 @@ TEST_CASE("csv_test1_array_1col_crlf")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false);
 
     csv_reader reader(is,decoder,options);
@@ -651,7 +651,7 @@ TEST_CASE("csv_test1_array_3cols_crlf")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false);
 
     csv_reader reader(is,decoder,options);
@@ -680,7 +680,7 @@ TEST_CASE("csv_test1_object_1col_crlf")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -701,7 +701,7 @@ TEST_CASE("csv_test1_object_3cols_crlf")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -726,7 +726,7 @@ TEST_CASE("read_comma_delimited_file")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -751,7 +751,7 @@ TEST_CASE("read_comma_delimited_file_header")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.column_names("Country Code,Name")
            .header_lines(1);
 
@@ -774,7 +774,7 @@ TEST_CASE("serialize_comma_delimited_file")
     std::string in_file = "./input/countries.json";
     std::ifstream is(in_file);
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false);
 
     json_decoder<ojson> encoder1;
@@ -800,7 +800,7 @@ TEST_CASE("test_tab_delimited_file")
     std::ifstream is(in_file);
 
     json_decoder<json> decoder;
-    csv_serializing_options options;
+    csv_options options;
     options.field_delimiter('\t')
            .assume_header(true);
 
@@ -820,7 +820,7 @@ TEST_CASE("serialize_tab_delimited_file")
     std::ifstream is(in_file);
 
     json_decoder<ojson> decoder;
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false)
            .header_lines(1)
            .column_names("dept,employee-name,employee-no,note,comment,salary")
@@ -861,7 +861,7 @@ TEST_CASE("csv_test1_array_3cols_grouped1")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false)
            .column_types("integer,[integer]*");
 
@@ -893,7 +893,7 @@ TEST_CASE("csv_test1_array_3cols_grouped2")
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(false)
            .column_types("integer,[integer,integer]*");
 
@@ -923,7 +923,7 @@ TEST_CASE("csv_test1_repeat")
     2017-01-08,0.0063,0.0076,0.0084,0.0112,0.014
     )";    
 
-    auto result = csv_serializing_options::parse_column_types("string,float*");
+    auto result = csv_options::parse_column_types("string,float*");
     REQUIRE(result.size() == 3);
     CHECK(result[0].col_type == csv_column_type::string_t);
     CHECK(result[0].level == 0);
@@ -935,7 +935,7 @@ TEST_CASE("csv_test1_repeat")
     CHECK(result[2].level == 0);
     CHECK(1 == result[2].rep_count);
 
-    auto result2 = csv_serializing_options::parse_column_types("string,[float*]");
+    auto result2 = csv_options::parse_column_types("string,[float*]");
     REQUIRE(result2.size() == 3);
     CHECK(result2[0].col_type == csv_column_type::string_t);
     CHECK(result2[0].level == 0);
@@ -947,7 +947,7 @@ TEST_CASE("csv_test1_repeat")
     CHECK(result2[2].level == 1);
     CHECK(1 == result2[2].rep_count);
 
-    auto result3 = csv_serializing_options::parse_column_types("string,[float]*");
+    auto result3 = csv_options::parse_column_types("string,[float]*");
     REQUIRE(result3.size() == 3);
     CHECK(result3[0].col_type == csv_column_type::string_t);
     CHECK(result3[0].level == 0);
@@ -962,7 +962,7 @@ TEST_CASE("csv_test1_repeat")
 
 TEST_CASE("csv_test1_repeat2")
 {
-    csv_serializing_options options1;
+    csv_options options1;
     options1.column_types("[integer,string]*");
     for (auto x : options1.column_types())
     {
@@ -984,7 +984,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -1009,7 +1009,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .ignore_empty_lines(false);
 
@@ -1035,7 +1035,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
 
     csv_reader reader(is,decoder,options);
@@ -1060,7 +1060,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 
     json_decoder<json> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .trim(true);
 
@@ -1075,7 +1075,7 @@ WLF,WALLIS & FUTUNA ISLANDS
 TEST_CASE("test_decode_csv_from_string")
 {
     std::string s = "some label\nsome value";
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
     std::cout << decode_csv<json>(s,options) << std::endl;
 }
@@ -1084,7 +1084,7 @@ TEST_CASE("test_decode_csv_from_stream")
 {
     std::string s = "some label\nsome value";
     std::stringstream is(s);
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
     std::cout << decode_csv<json>(is,options) << std::endl;
 }
@@ -1094,7 +1094,7 @@ TEST_CASE("test_encode_csv_to_stream")
     json j = json::array();
     j.push_back(json::object({ {"a",1},{"b",2} }));
     std::cout << j << std::endl;
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true);
     std::ostringstream os;
     encode_csv(j, os, options);
@@ -1114,7 +1114,7 @@ TEST_CASE("test_type_inference")
 
     json_decoder<ojson> decoder;
 
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .mapping(mapping_type::n_rows);
 

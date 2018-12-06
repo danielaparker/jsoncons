@@ -169,7 +169,7 @@ public:
     typedef basic_string_view<CharT> string_view_type;
 
     explicit basic_json_reader(std::basic_istream<CharT>& is)
-        : basic_json_reader(is,default_content_handler_,basic_json_serializing_options<CharT>(),default_err_handler_)
+        : basic_json_reader(is,default_content_handler_,basic_json_options<CharT>(),default_err_handler_)
     {
     }
 
@@ -181,13 +181,13 @@ public:
 
     basic_json_reader(std::basic_istream<CharT>& is,
                       parse_error_handler& err_handler)
-        : basic_json_reader(is,default_content_handler_,basic_json_serializing_options<CharT>(),err_handler)
+        : basic_json_reader(is,default_content_handler_,basic_json_options<CharT>(),err_handler)
     {
     }
 
     basic_json_reader(std::basic_istream<CharT>& is, 
                       basic_json_content_handler<CharT>& handler)
-        : basic_json_reader(is,handler,basic_json_serializing_options<CharT>(),default_err_handler_)
+        : basic_json_reader(is,handler,basic_json_options<CharT>(),default_err_handler_)
     {
     }
 
@@ -201,7 +201,7 @@ public:
     basic_json_reader(std::basic_istream<CharT>& is,
                       basic_json_content_handler<CharT>& handler,
                       parse_error_handler& err_handler)
-        : basic_json_reader(is,handler,basic_json_serializing_options<CharT>(),err_handler)
+        : basic_json_reader(is,handler,basic_json_options<CharT>(),err_handler)
     {
     }
 
@@ -227,7 +227,7 @@ public:
     }
 
     explicit basic_json_reader(const string_view_type& s)
-        : basic_json_reader(s,default_content_handler_,basic_json_serializing_options<CharT>(),default_err_handler_)
+        : basic_json_reader(s,default_content_handler_,basic_json_options<CharT>(),default_err_handler_)
     {
     }
 
@@ -239,13 +239,13 @@ public:
 
     basic_json_reader(const string_view_type& s,
                       parse_error_handler& err_handler)
-        : basic_json_reader(s,default_content_handler_,basic_json_serializing_options<CharT>(),err_handler)
+        : basic_json_reader(s,default_content_handler_,basic_json_options<CharT>(),err_handler)
     {
     }
 
     basic_json_reader(const string_view_type& s, 
                       basic_json_content_handler<CharT>& handler)
-        : basic_json_reader(s,handler,basic_json_serializing_options<CharT>(),default_err_handler_)
+        : basic_json_reader(s,handler,basic_json_options<CharT>(),default_err_handler_)
     {
     }
 
@@ -259,7 +259,7 @@ public:
     basic_json_reader(const string_view_type& s,
                       basic_json_content_handler<CharT>& handler,
                       parse_error_handler& err_handler)
-        : basic_json_reader(s,handler,basic_json_serializing_options<CharT>(),err_handler)
+        : basic_json_reader(s,handler,basic_json_options<CharT>(),err_handler)
     {
     }
 

@@ -262,7 +262,7 @@ int main()
     std::cout << pretty_print(bv) << "\n\n";
 
     // Print JSON representation with different options
-    json_serializing_options options;
+    json_options options;
     options.byte_string_format(byte_string_chars_format::base64)
            .bignum_format(bignum_chars_format::base64url);
     std::cout << "(5)\n";
@@ -326,7 +326,7 @@ int main()
     std::cout << pretty_print(bv2) << "\n\n";
 
     // Serialize to CSV
-    csv::csv_serializing_options csv_options;
+    csv::csv_options csv_options;
     csv_options.column_names("Column 1,Column 2,Column 3");
 
     std::string csv_j;

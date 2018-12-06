@@ -1,19 +1,19 @@
-### jsoncons::csv::csv_serializing_options
+### jsoncons::csv::csv_options
 
 ```c++
-typedef basic_csv_serializing_options<char> csv_serializing_options
+typedef basic_csv_options<char> csv_options
 ```
-Specifies options for serializing and deserializing csv data. The `csv_serializing_options` class is an instantiation of the `basic_csv_serializing_options` class template that uses `char` as the character type.
+Specifies options for serializing and deserializing csv data. The `csv_options` class is an instantiation of the `basic_csv_options` class template that uses `char` as the character type.
 
 #### Header
 ```c++
-#include <jsoncons_ext/csv/csv_serializing_options.hpp>
+#include <jsoncons_ext/csv/csv_options.hpp>
 ```
 
 #### Constructors
 
-    csv_serializing_options()
-Constructs an `csv_serializing_options` with default values. 
+    csv_options()
+Constructs an `csv_options` with default values. 
 
 #### Properties
 

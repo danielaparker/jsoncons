@@ -5,7 +5,7 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <catch/catch.hpp>
-//#include <jsoncons_ext/csv/csv_serializing_options.hpp>
+//#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons_ext/csv/csv_serializer.hpp>
 #include <jsoncons/json_reader.hpp>
@@ -27,7 +27,7 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .subfield_delimiter(';');
 
@@ -76,7 +76,7 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_serializing_options options;
+    csv_options options;
     options.mapping(mapping_type::n_rows)
            .subfield_delimiter(';');
 
@@ -118,7 +118,7 @@ NY,LON,TOR;LON
 "NY";"LON","TOR","LON"
 "NY","LON","TOR";"LON"
 )";
-    csv_serializing_options options;
+    csv_options options;
     options.assume_header(true)
            .mapping(mapping_type::m_columns)
            .subfield_delimiter(';');

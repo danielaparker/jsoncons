@@ -12,7 +12,7 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/serializing_context.hpp>
-#include <jsoncons/json_serializing_options.hpp>
+#include <jsoncons/json_options.hpp>
 
 namespace jsoncons {
 

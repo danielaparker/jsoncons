@@ -14,15 +14,15 @@ The `csv_reader` class is an instantiation of the `basic_csv_reader` class templ
                json_content_handler& handler)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text and a [json_content_handler](../json_content_handler.md) that receives
-JSON events. Uses default [csv_serializing_options](csv_serializing_options.md).
+JSON events. Uses default [csv_options](csv_options.md).
 You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
                json_content_handler& handler,
-               const csv_serializing_options& options)
+               const csv_options& options)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_content_handler](../json_content_handler.md) that receives
-JSON events, and [csv_serializing_options](csv_serializing_options.md).
+JSON events, and [csv_options](csv_options.md).
 You must ensure that the input stream and input handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
@@ -31,16 +31,16 @@ You must ensure that the input stream and input handler exist as long as does `c
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_content_handler](../json_content_handler.md) that receives
 JSON events and the specified [parse_error_handler](../parse_error_handler.md).
-Uses default [csv_serializing_options](csv_serializing_options.md).
+Uses default [csv_options](csv_options.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
     csv_reader(std::istream& is,
                json_content_handler& handler,
-               const csv_serializing_options& options,
+               const csv_options& options,
                parse_error_handler& err_handler)
 Constructs a `csv_reader` that is associated with an input stream
 `is` of CSV text, a [json_content_handler](../json_content_handler.md) that receives
-JSON events, [csv_serializing_options](csv_serializing_options.md),
+JSON events, [csv_options](csv_options.md),
 and the specified [parse_error_handler](../parse_error_handler.md).
 You must ensure that the input stream, input handler, and error handler exist as long as does `csv_reader`, as `csv_reader` holds pointers to but does not own these objects.
 
@@ -119,7 +119,7 @@ std::string in_file = "employees.txt";
 std::ifstream is(in_file);
 
 json_decoder<json> decoder;
-csv_serializing_options options;
+csv_options options;
 params.field_delimiter = '\t'
       .assume_header = true;
 
@@ -178,7 +178,7 @@ std::ifstream is(in_file);
 
 json_decoder<json> decoder;
 
-csv_serializing_options options;
+csv_options options;
 params.column_names("Country Code,Name")
       .header_lines(1);
 
@@ -227,7 +227,7 @@ Date,1Y,2Y,3Y,5Y
 
 ```c++
 json_decoder<ojson> decoder;
-csv_serializing_options options;
+csv_options options;
 params.assume_header(true)
        .column_types("string,float,float,float,float");
 
@@ -312,7 +312,7 @@ int main()
 
     // array of arrays
     json_decoder<ojson> decoder1;
-    csv_serializing_options options1;
+    csv_options options1;
     params1.header_lines(1);
     params1.assume_header(false);
     params1.column_types("string,float*");
@@ -324,7 +324,7 @@ int main()
 
     // array of objects
     json_decoder<ojson> decoder2;
-    csv_serializing_options options2;
+    csv_options options2;
     params2.assume_header(true);
     params2.column_types("string,[float*]");
     std::istringstream is2(bond_yields);
@@ -370,7 +370,7 @@ const std::string holidays = R"(1,CAD,2,UK,3,EUR,4,US + UK,5,US
 )";
 
     json_decoder<ojson> decoder;
-    csv_serializing_options options;
+    csv_options options;
     params.column_types("[integer,string]*");
 
     // Default

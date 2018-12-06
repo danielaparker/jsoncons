@@ -6,7 +6,7 @@ The csv extension implements reading (writing) JSON values from (to) CSV files
 
 [encode_csv](encode_csv.md)
 
-[csv_serializing_options](csv_serializing_options.md)
+[csv_options](csv_options.md)
 
 [csv_reader](csv_reader.md)
 
@@ -33,7 +33,7 @@ using namespace jsoncons::csv;
 
 int main()
 {
-    csv_serializing_options options;
+    csv_options options;
     params.assume_header(true);
 
     params.mapping(mapping_type::n_objects);

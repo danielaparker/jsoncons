@@ -164,7 +164,7 @@ TEST_CASE("test_serialize_negative_bignum2")
     try
     {
         json result = decode_cbor<json>(v);
-        json_serializing_options options;
+        json_options options;
         options.bignum_format(bignum_chars_format::integer);
         std::string text;
         result.dump(text,options);
@@ -194,7 +194,7 @@ TEST_CASE("test_serialize_negative_bignum3")
     try
     {
         json result = decode_cbor<json>(v);
-        json_serializing_options options;
+        json_options options;
         options.bignum_format(bignum_chars_format::base64url);
         std::string text;
         result.dump(text,options);

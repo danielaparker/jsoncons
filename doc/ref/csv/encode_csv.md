@@ -13,7 +13,7 @@ void encode_csv(const Json& j,
 template <class Json>
 void encode_csv(const Json& j, 
                 std::basic_ostream<typename Json::char_type>& os, 
-                const basic_csv_serializing_options<typename Json::char_type>& options); // (2)
+                const basic_csv_options<typename Json::char_type>& options); // (2)
 
 template <class Json>
 void encode_csv(const Json& j, 
@@ -22,16 +22,16 @@ void encode_csv(const Json& j,
 template <class Json>
 void encode_csv(const Json& j, 
                 std::basic_string<typename Json::char_type>& s, 
-                const basic_csv_serializing_options<typename Json::char_type>& options); // (4)
+                const basic_csv_options<typename Json::char_type>& options); // (4)
 ```
 
-(1) Serializes json value as CSV to an output stream using default [serializing options](csv_serializing_options.md)
+(1) Serializes json value as CSV to an output stream using default [serializing options](csv_options.md)
 
-(2) Serializes json value as CSV to an output stream using specified [serializing options](csv_serializing_options.md)
+(2) Serializes json value as CSV to an output stream using specified [serializing options](csv_options.md)
 
-(3) Serializes json value as CSV to a string using default [serializing options](csv_serializing_options.md)
+(3) Serializes json value as CSV to a string using default [serializing options](csv_options.md)
 
-(4) Serializes json value as CSV to a string using specified [serializing options](csv_serializing_options.md)
+(4) Serializes json value as CSV to a string using specified [serializing options](csv_options.md)
 
 ### Examples
 

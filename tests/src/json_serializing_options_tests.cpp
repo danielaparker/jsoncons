@@ -33,7 +33,7 @@ TEST_CASE("test_write_nan_replacement")
     j["field2"] = 1.79e308 * 1000;
     j["field3"] = -1.79e308 * 1000;
 
-    json_serializing_options options;
+    json_options options;
     options.inf_to_num("1e9999");
 
     std::ostringstream os;
@@ -50,7 +50,7 @@ TEST_CASE("test_read_write_read_nan_replacement")
     j["field2"] = 1.79e308 * 1000;
     j["field3"] = -1.79e308 * 1000;
 
-    json_serializing_options options;
+    json_options options;
     options.nan_to_str("NaN")
            .inf_to_str("Inf");
 
@@ -80,7 +80,7 @@ TEST_CASE("object_array empty array")
     {
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.object_array_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
@@ -96,7 +96,7 @@ TEST_CASE("object_array empty array")
     {
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.object_array_line_splits(line_split_kind::new_line);
 
         std::ostringstream os;
@@ -112,7 +112,7 @@ TEST_CASE("object_array empty array")
     {
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.object_array_line_splits(line_split_kind::multi_line);
 
         std::ostringstream os;
@@ -146,7 +146,7 @@ TEST_CASE("object_array with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.line_length_limit(120)
                .spaces_around_comma(spaces_option::no_spaces)
                .object_array_line_splits(line_split_kind::same_line);
@@ -171,7 +171,7 @@ TEST_CASE("object_array with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.line_length_limit(120)
                .spaces_around_comma(spaces_option::no_spaces)
                .object_array_line_splits(line_split_kind::new_line);
@@ -205,7 +205,7 @@ TEST_CASE("object_array with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces)
                .object_array_line_splits(line_split_kind::multi_line);
 
@@ -230,7 +230,7 @@ TEST_CASE("object_array with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.line_length_limit(20)
                .spaces_around_comma(spaces_option::no_spaces)
                .object_array_line_splits(line_split_kind::same_line);
@@ -258,7 +258,7 @@ TEST_CASE("object_array with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.line_length_limit(20)
                .spaces_around_comma(spaces_option::no_spaces)
                .object_array_line_splits(line_split_kind::new_line);
@@ -296,7 +296,7 @@ TEST_CASE("array_object with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.line_length_limit(120)
                .spaces_around_comma(spaces_option::no_spaces)
                .array_object_line_splits(line_split_kind::same_line);
@@ -318,7 +318,7 @@ TEST_CASE("array_object with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.line_length_limit(120)
                .spaces_around_comma(spaces_option::no_spaces)
                .array_object_line_splits(line_split_kind::new_line);
@@ -349,7 +349,7 @@ TEST_CASE("array_object with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces);
 
         std::ostringstream os;
@@ -369,7 +369,7 @@ TEST_CASE("array_object with/without line_length_limit")
 
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.line_length_limit(20)
                .spaces_around_comma(spaces_option::no_spaces)
                .array_object_line_splits(line_split_kind::same_line);
@@ -392,7 +392,7 @@ TEST_CASE("array_object with/without line_length_limit")
 ])";
         json j = json::parse(s);
 
-        json_serializing_options options;
+        json_options options;
         options.line_length_limit(20)
                .spaces_around_comma(spaces_option::no_spaces)
                .array_object_line_splits(line_split_kind::new_line);

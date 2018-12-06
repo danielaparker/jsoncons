@@ -17,7 +17,7 @@
 #include <system_error>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
-#include <jsoncons/json_serializing_options.hpp>
+#include <jsoncons/json_options.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/json_error.hpp>
@@ -36,7 +36,7 @@ template <class CharT>
 class replacement_filter : public basic_json_filter<CharT>
 {
     typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
-    typedef typename basic_json_serializing_options<CharT>::string_type string_type;
+    typedef typename basic_json_options<CharT>::string_type string_type;
 
     string_type nan_to_str_;
     string_type inf_to_str_;
@@ -183,12 +183,12 @@ class basic_json_parser : private serializing_context
 
 public:
     basic_json_parser()
-        : basic_json_parser(basic_json_serializing_options<CharT>(), default_err_handler_)
+        : basic_json_parser(basic_json_options<CharT>(), default_err_handler_)
     {
     }
 
     basic_json_parser(parse_error_handler& err_handler)
-        : basic_json_parser(basic_json_serializing_options<CharT>(), err_handler)
+        : basic_json_parser(basic_json_options<CharT>(), err_handler)
     {
     }
 

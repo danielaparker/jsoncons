@@ -1,10 +1,10 @@
-### jsoncons::json_serializing_options
+### jsoncons::json_options
 
 ```c++
-typedef basic_json_serializing_options<char> json_serializing_options
+typedef basic_json_options<char> json_options
 ```
 
-Specifies options for serializing and deserializing JSON text. The `json_serializing_options` class is an instantiation of the `basic_json_serializing_options` class template that uses `char` as the character type.
+Specifies options for serializing and deserializing JSON text. The `json_options` class is an instantiation of the `basic_json_options` class template that uses `char` as the character type.
 
 The default floating point formatting for a floating point value that was previously decoded from json text is to preserve the original format and precision. This ensures round-trip for both format and precision, e.g. 1.1 read will remain `1.1` when written, and not become `1.1000000000000001` (an equivalent but longer representation.)
 
@@ -12,7 +12,7 @@ The default floating point formatting for a floating point value that was direct
 
 #### Header
 ```c++
-#include <jsoncons/json_serializing_options.hpp>
+#include <jsoncons/json_options.hpp>
 ```
 
 #### Abstract base classes
@@ -30,61 +30,61 @@ The default line length limit is 120
 
 #### Constructors
 
-    json_serializing_options()
-Constructs an `json_serializing_options` with default values. 
+    json_options()
+Constructs an `json_options` with default values. 
 
 #### Accessors and modifiers
 
     size_t  indent_size() const
-    json_serializing_options& indent(size_ value)
+    json_options& indent(size_ value)
 The indent size, the default is 4.
 
     spaces_option spaces_around_colon() const override
-    json_serializing_options & spaces_around_colon(spaces_option value)
+    json_options & spaces_around_colon(spaces_option value)
 Indicates [space option](spaces_option.md) for name separator (`:`). Default
 is space after.
 
     spaces_option spaces_around_comma() const override
-    json_serializing_options & spaces_around_comma(spaces_option value)
+    json_options & spaces_around_comma(spaces_option value)
 Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default
 is space after.
 
     bool pad_inside_object_braces() const override
-    json_serializing_options & pad_inside_object_braces(bool value)
+    json_options & pad_inside_object_braces(bool value)
 Default is `false`
 
     bool pad_inside_array_brackets() const override
-    json_serializing_options & pad_inside_array_brackets(bool value)
+    json_options & pad_inside_array_brackets(bool value)
 Default is `false`
 
     chars_format floating_point_format() const 
-    json_serializing_options& floating_point_format(chars_format value)
+    json_options& floating_point_format(chars_format value)
 Overrides [floating point format](chars_format.md) when serializing json.
 The default, for a floating point value that was previously decoded from json text, is to preserve the original format when serializing.
 The default, for a floating point value that was directly inserted into a json value, to serialize with [chars_format::general](chars_format.md). 
 
     bignum_chars_format bignum_format() const 
-    json_serializing_options& bignum_format(bignum_chars_format value)
+    json_options& bignum_format(bignum_chars_format value)
 Overrides [bignum format](bignum_chars_format.md) when serializing json.
 The default is [bignum_chars_format::base10](bignum_chars_format.md). 
 
     byte_string_chars_format byte_string_format() const 
-    json_serializing_options& byte_string_format(byte_string_chars_format value)
+    json_options& byte_string_format(byte_string_chars_format value)
 Overrides [byte string format](byte_string_chars_format.md) when serializing json.
 The default is [byte_string_chars_format::base64url](byte_string_chars_format.md). 
 
     uint8_t precision() const 
-    json_serializing_options& precision(uint8_t value)
+    json_options& precision(uint8_t value)
 Overrides floating point precision when serializing json. 
 The default, for a floating point value that was previously decoded from json text, is to preserve the original precision. 
 The fefault, for a floating point value that was directly inserted into a json value, to serialize with shortest representation. 
 
     bool escape_all_non_ascii() const
-    json_serializing_options& escape_all_non_ascii(bool value)
+    json_options& escape_all_non_ascii(bool value)
 Escape all non-ascii characters. The default is `false`.
 
     bool escape_solidus() const
-    json_serializing_options& escape_solidus(bool value)
+    json_options& escape_solidus(bool value)
 Escape the solidus ('/') character. The default is `false`.
 
     const std::string& nan_to_num() const 
@@ -93,8 +93,8 @@ Replace `NaN` with a number (if `nan_to_num()` returns a non-empty string)
 or a string (if `nan_to_str()` returns a non-empty string.) If both
 are empty, replace `NaN` with `null`.
 
-    json_serializing_options& nan_to_num(const std::string& value)
-    json_serializing_options& nan_to_str(const std::string& value)
+    json_options& nan_to_num(const std::string& value)
+    json_options& nan_to_str(const std::string& value)
 NaN string replacement. 
 
     const std::string& inf_to_num() const 
@@ -103,8 +103,8 @@ Replace positive infinity with a number (if `inf_to_num()` returns a non-empty s
 or a string (if `inf_to_str()` returns a non-empty string.) If both
 are empty, replace positive infinity with `null`.
 
-    json_serializing_options& inf_to_num(const std::string& value)
-    json_serializing_options& inf_to_str(const std::string& value)
+    json_options& inf_to_num(const std::string& value)
+    json_options& inf_to_str(const std::string& value)
 Positive infinity string replacement. 
 
     const std::string& neginf_to_num() const 
@@ -113,8 +113,8 @@ Replace negative infinity with a number (if `neginf_to_num()` returns a non-empt
 or a string (if `neginf_to_str()` returns a non-empty string.) If both
 are empty, replace negative infinity with `null`.
 
-    json_serializing_options& neginf_to_num(const std::string& value)
-    json_serializing_options& neginf_to_str(const std::string& value)
+    json_options& neginf_to_num(const std::string& value)
+    json_options& neginf_to_str(const std::string& value)
 Negative infinity string replacement. Defaults to `-` followed by
 `inf_to_num()` if `inf_to_num()` is not empty, or `-` followed by
 `inf_to_str()` if `inf_to_str()` is not empty, otherwise empty.  
@@ -124,26 +124,26 @@ Negative infinity string replacement. Defaults to `-` followed by
 Defaults to "\n"
 
     size_t line_length_limit() const
-    json_serializing_options & line_length_limit(size_t value)
+    json_options & line_length_limit(size_t value)
 
     size_t max_nesting_depth() const
     void max_nesting_depth(size_t depth)
 The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
     line_split_kind object_object_line_splits() const;
-    json_serializing_options& object_object_line_splits(line_split_kind value)
+    json_options& object_object_line_splits(line_split_kind value)
 For an object whose parent is an object, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
     line_split_kind array_object_line_splits() const;
-    json_serializing_options& array_object_line_splits(line_split_kind value)
+    json_options& array_object_line_splits(line_split_kind value)
 For an object whose parent is an array, set whether that object is split on a new line, or if its members are split on multiple lines. The default is [line_split_kind::multi_line](line_split_kind.md).
 
     line_split_kind object_array_line_splits() const;
-    json_serializing_options& object_array_line_splits(line_split_kind value)
+    json_options& object_array_line_splits(line_split_kind value)
 For an array whose parent is an object, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::same_line](line_split_kind.md).
 
     line_split_kind array_array_line_splits() const;
-    json_serializing_options& array_array_line_splits(line_split_kind value)
+    json_options& array_array_line_splits(line_split_kind value)
 For an array whose parent is an array, set whether that array is split on a new line, or if its elements are split on multiple lines. The default is [line_split_kind::new_line](line_split_kind.md).
 
 ### Examples
@@ -168,7 +168,7 @@ obj["field1"] = std::sqrt(-1.0);
 obj["field2"] = 1.79e308*1000;
 obj["field3"] = -1.79e308*1000;
 
-json_serializing_options options;
+json_options options;
 format.nan_to_num("null");        // default is "null"
 format.inf_to_num("1e9999");  // default is "null"
 
@@ -197,12 +197,12 @@ Output:
     std::cout << pretty_print(val) << std::endl;
 
     std::cout << "New line" << std::endl;
-    json_serializing_options options1;
+    json_options options1;
     format1.object_array_line_splits(line_split_kind::new_line);
     std::cout << pretty_print(val,options1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
-    json_serializing_options options2;
+    json_options options2;
     format2.object_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(val,options2) << std::endl;
 ```
@@ -274,12 +274,12 @@ Multi line
     std::cout << pretty_print(val) << std::endl;
 
     std::cout << "Same line" << std::endl;
-    json_serializing_options options1;
+    json_options options1;
     format1.array_array_line_splits(line_split_kind::same_line);
     std::cout << pretty_print(val, options1) << std::endl;
 
     std::cout << "Multi line" << std::endl;
-    json_serializing_options options2;
+    json_options options2;
     format2.array_array_line_splits(line_split_kind::multi_line);
     std::cout << pretty_print(val, options2) << std::endl;
 ```

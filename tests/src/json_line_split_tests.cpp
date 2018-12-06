@@ -67,7 +67,7 @@ std::string expected = R"({
         "properties": {}
     }
 })";
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces);
         std::ostringstream os;
         os << pretty_print(val, options);
@@ -76,7 +76,7 @@ std::string expected = R"({
 
     SECTION("array_array same_line")
     {
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces)
                .array_array_line_splits(line_split_kind::same_line);
     std::string expected = R"({
@@ -98,7 +98,7 @@ std::string expected = R"({
 
     SECTION("array_array new_line")
     {
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces)
                .array_array_line_splits(line_split_kind::new_line);
     std::string expected = R"({
@@ -122,7 +122,7 @@ std::string expected = R"({
 
     SECTION("array_array multi_line")
     {
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces)
                .array_array_line_splits(line_split_kind::multi_line);
     std::string expected = R"({
@@ -149,7 +149,7 @@ std::string expected = R"({
 
     SECTION("object_array same_line")
     {
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces)
                .object_array_line_splits(line_split_kind::same_line);
     std::string expected = R"({
@@ -172,7 +172,7 @@ std::string expected = R"({
 
     SECTION("object_array new_line")
     {
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces)
                .object_array_line_splits(line_split_kind::new_line);
     std::string expected = R"({
@@ -197,7 +197,7 @@ std::string expected = R"({
 
     SECTION("")
     {
-        json_serializing_options options;
+        json_options options;
         options.spaces_around_comma(spaces_option::no_spaces)
                .object_array_line_splits(line_split_kind::multi_line);
     std::string expected = R"({

@@ -104,7 +104,7 @@ void parse_nan_replacement_example()
         }
     )";
 
-    json_serializing_options options;
+    json_options options;
     options.nan_to_str("NaN")
            .inf_to_str("Infinity");
 

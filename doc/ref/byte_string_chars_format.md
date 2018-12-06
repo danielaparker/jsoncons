@@ -6,7 +6,7 @@ enum class byte_string_chars_format : uint8_t {base16, base64, base64url};
 
 #### Header
 ```c++
-#include <jsoncons/json_serializing_options.hpp>
+#include <jsoncons/json_options.hpp>
 ```
 
 Specifies byte string formatting. 
@@ -30,17 +30,17 @@ int main()
     std::cout << "(1) "<< j << "\n\n";
 
     // base16
-    json_serializing_options options2;
+    json_options options2;
     options2.byte_string_format(byte_string_chars_format::base16);
     std::cout << "(2) "<< print(j, options2) << "\n\n";
 
     // base64
-    json_serializing_options options3;
+    json_options options3;
     options3.byte_string_format(byte_string_chars_format::base64);
     std::cout << "(3) "<< print(j, options3) << "\n\n";
 
     // base64url
-    json_serializing_options options4;
+    json_options options4;
     options4.byte_string_format(byte_string_chars_format::base64url);
     std::cout << "(4) "<< print(j, options4) << "\n\n";
 }

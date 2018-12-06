@@ -16,7 +16,7 @@
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/basic_json.hpp>
-#include <jsoncons/json_serializing_options.hpp>
+#include <jsoncons/json_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_type_traits.hpp>

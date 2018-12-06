@@ -15,7 +15,7 @@ void encode_json(const T& val, std::basic_ostream<CharT>& os); // (2)
 
 template <class T, class CharT>
 void encode_json(const T& val, 
-                 const basic_json_serializing_options<CharT>& options,
+                 const basic_json_options<CharT>& options,
                  std::basic_ostream<CharT>& os); // (3)
 
 template <class T, class CharT>
@@ -23,7 +23,7 @@ void encode_json(const T& val, std::basic_ostream<CharT>& os, indenting line_ind
 
 template <class T, class CharT>
 void encode_json(const T& val, 
-                 const basic_json_serializing_options<CharT>& options,
+                 const basic_json_options<CharT>& options,
                  std::basic_ostream<CharT>& os, indenting line_indent); // (5)
 ```
 
@@ -61,7 +61,7 @@ None
 #### See also
 
 - [json_content_handler](json_content_handler.md)
-- [json_serializing_options](json_serializing_options.md)
+- [json_options](json_options.md)
     
 ### Examples
 

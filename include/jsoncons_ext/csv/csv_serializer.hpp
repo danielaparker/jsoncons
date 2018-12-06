@@ -18,7 +18,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/detail/print_number.hpp>
-#include <jsoncons_ext/csv/csv_serializing_options.hpp>
+#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons/detail/result.hpp>
 
 namespace jsoncons { namespace csv {
@@ -52,7 +52,7 @@ private:
         string_type name_;
     };
     Result writer_;
-    basic_csv_serializing_options<CharT,Allocator> parameters_;
+    basic_csv_options<CharT,Allocator> parameters_;
     std::vector<stack_item> stack_;
     jsoncons::detail::print_double fp_;
     std::vector<string_type,string_allocator_type> column_names_;
@@ -65,12 +65,12 @@ private:
     basic_csv_serializer& operator=(const basic_csv_serializer&) = delete;
 public:
     basic_csv_serializer(output_type& os)
-       : basic_csv_serializer(os, basic_csv_serializing_options<CharT,Allocator>())
+       : basic_csv_serializer(os, basic_csv_options<CharT,Allocator>())
     {
     }
 
     basic_csv_serializer(output_type& os,
-                         const basic_csv_serializing_options<CharT,Allocator>& options)
+                         const basic_csv_options<CharT,Allocator>& options)
        :
        writer_(os),
        parameters_(options),
@@ -553,7 +553,7 @@ void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s)
 }
 
 template <class Json,class Allocator>
-void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
+void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os, const basic_csv_options<typename Json::char_type,Allocator>& options)
 {
     typedef typename Json::char_type char_type;
     basic_csv_serializer<char_type,jsoncons::detail::char_stream_result<char_type>,Allocator> serializer(os,options);
@@ -561,7 +561,7 @@ void encode_csv(const Json& j, std::basic_ostream<typename Json::char_type>& os,
 }
 
 template <class Json,class Allocator>
-void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
+void encode_csv(const Json& j, std::basic_string<typename Json::char_type>& s, const basic_csv_options<typename Json::char_type,Allocator>& options)
 {
     typedef typename Json::char_type char_type;
     basic_csv_serializer<char_type,jsoncons::detail::string_result<std::basic_string<typename Json::char_type>>,Allocator> serializer(s,options);

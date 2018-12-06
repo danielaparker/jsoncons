@@ -19,7 +19,7 @@
 #include <cstring>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>
-#include <jsoncons/json_serializing_options.hpp>
+#include <jsoncons/json_options.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/json_error.hpp>
@@ -38,7 +38,7 @@ public:
     }
 
     json_printable(const Json& j,
-                   const basic_json_serializing_options<char_type>& options,
+                   const basic_json_options<char_type>& options,
                    indenting line_indent)
        : j_(&j), options_(options), indenting_(line_indent)
     {
@@ -56,7 +56,7 @@ public:
     }
 
     const Json *j_;
-    basic_json_serializing_options<char_type> options_;
+    basic_json_options<char_type> options_;
     indenting indenting_;
 private:
     json_printable();
@@ -70,7 +70,7 @@ json_printable<Json> print(const Json& j)
 
 template<class Json>
 json_printable<Json> print(const Json& j,
-                           const basic_json_serializing_options<typename Json::char_type>& options)
+                           const basic_json_options<typename Json::char_type>& options)
 {
     return json_printable<Json>(j, options, indenting::no_indent);
 }
@@ -83,7 +83,7 @@ json_printable<Json> pretty_print(const Json& j)
 
 template<class Json>
 json_printable<Json> pretty_print(const Json& j,
-                                  const basic_json_serializing_options<typename Json::char_type>& options)
+                                  const basic_json_options<typename Json::char_type>& options)
 {
     return json_printable<Json>(j, options, indenting::indent);
 }

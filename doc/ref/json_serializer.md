@@ -48,7 +48,7 @@ int main()
     A(1, 0) = 3;
     A(1, 1) = 4;
 
-    json_serializing_options options;
+    json_options options;
     json_serializer os(std::cout, options); 
     os.begin_array();
     for (size_t i = 0; i < A.size1(); ++i)

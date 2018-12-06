@@ -12,13 +12,13 @@ The `csv_serializer` class is an instantiation of the `basic_csv_serializer` cla
 
     csv_serializer(std::ostream& os)
 Constructs a `csv_serializer` that is associated with an output stream
-`os`. Uses default [csv_serializing_options](csv_serializing_options.md).
+`os`. Uses default [csv_options](csv_options.md).
 You must ensure that the output stream exists as long as does `csv_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
     csv_serializer(std::ostream& os,
-                   const csv_serializing_options& options)
+                   const csv_options& options)
 Constructs a `csv_serializer` that is associated with an output stream
-`os` and [csv_serializing_options](csv_serializing_options.md).
+`os` and [csv_options](csv_options.md).
 You must ensure that the output stream exists as long as does `csv_serializer`, as `json_serializer` holds a pointer to but does not own this object.
 
 #### Member functions
@@ -114,7 +114,7 @@ std::string in_file = "input/employees.json";
 std::ifstream is(in_file);
 
 json_decoder<json> decoder;
-csv_serializing_options options;
+csv_options options;
 params.field_delimiter = '\t';
 
 json_reader reader(is,decoder);
@@ -164,7 +164,7 @@ int main()
     ]
     )");
 
-    csv_serializing_options options;
+    csv_options options;
     params.column_names("author,title,price");
 
     csv_serializer serializer(std::cout, options);

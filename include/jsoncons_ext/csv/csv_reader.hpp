@@ -21,7 +21,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_decoder.hpp>
-#include <jsoncons_ext/csv/csv_serializing_options.hpp>
+#include <jsoncons_ext/csv/csv_options.hpp>
 
 namespace jsoncons { namespace csv {
 
@@ -65,14 +65,14 @@ public:
 
        : basic_csv_reader(is, 
                           handler, 
-                          basic_csv_serializing_options<CharT,Allocator>(), 
+                          basic_csv_options<CharT,Allocator>(), 
                           default_err_handler_)
     {
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_content_handler<CharT>& handler,
-                     const basic_csv_serializing_options<CharT,Allocator>& options)
+                     const basic_csv_options<CharT,Allocator>& options)
 
         : basic_csv_reader(is, 
                            handler, 
@@ -86,14 +86,14 @@ public:
                      parse_error_handler& err_handler)
         : basic_csv_reader(is, 
                            handler, 
-                           basic_csv_serializing_options<CharT,Allocator>(), 
+                           basic_csv_options<CharT,Allocator>(), 
                            err_handler)
     {
     }
 
     basic_csv_reader(std::basic_istream<CharT>& is,
                      basic_json_content_handler<CharT>& handler,
-                     basic_csv_serializing_options<CharT,Allocator> options,
+                     basic_csv_options<CharT,Allocator> options,
                      parse_error_handler& err_handler)
        :
          parser_(handler, options, err_handler),
@@ -193,7 +193,7 @@ Json decode_csv(typename Json::string_view_type s)
 }
 
 template <class Json,class Allocator>
-Json decode_csv(typename Json::string_view_type s, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
+Json decode_csv(typename Json::string_view_type s, const basic_csv_options<typename Json::char_type,Allocator>& options)
 {
     json_decoder<Json,Allocator> decoder;
 
@@ -216,7 +216,7 @@ Json decode_csv(std::basic_istream<typename Json::char_type>& is)
 }
 
 template <class Json,class Allocator>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_serializing_options<typename Json::char_type,Allocator>& options)
+Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_options<typename Json::char_type,Allocator>& options)
 {
     json_decoder<Json,Allocator> decoder;
 

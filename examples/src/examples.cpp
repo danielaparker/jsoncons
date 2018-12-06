@@ -139,7 +139,7 @@ void first_example_c()
     ]
     )");
 
-    json_serializing_options options;
+    json_options options;
 
     for (const auto& book : books.array_range())
     {
@@ -169,7 +169,7 @@ void first_example_d()
     }
     json books = json::parse(is);
 
-    json_serializing_options options;
+    json_options options;
     //options.floatfield(std::ios::fixed);
     options.precision(2);
 
@@ -294,7 +294,7 @@ void json_constructor_examples()
     arr.push_back(j3);
     arr.push_back(j4);
 
-    json_serializing_options options;
+    json_options options;
     std::cout << pretty_print(arr) << std::endl;
 }
 
@@ -436,7 +436,7 @@ void max_nesting_path_example()
     std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
     try
     {
-        json_serializing_options options;
+        json_options options;
         options.max_nesting_depth(20);
         json::parse(s, options);
     }

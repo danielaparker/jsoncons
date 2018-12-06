@@ -343,7 +343,7 @@ TEST_CASE("test_fail18")
     REQUIRE(is);
     try
     {
-        json_serializing_options options;
+        json_options options;
         options.max_nesting_depth(19);
         json::parse(is, options);
     }

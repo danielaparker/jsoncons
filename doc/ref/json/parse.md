@@ -4,26 +4,26 @@
 static json parse(const string_view_type& s); // (1)
 
 static json parse(const string_view_type& s, 
-                  const json_serializing_options& options); // (2)
+                  const json_options& options); // (2)
 
 static json parse(const string_view_type& s, 
                   parse_error_handler& err_handler); // (3)
 
 static json parse(const string_view_type& s, 
-                  const json_serializing_options& options,
+                  const json_options& options,
                   parse_error_handler& err_handler); // (4)
 
 static json parse(std::istream& is); // (5)
 
 static json parse(std::istream& is,
-                  const json_serializing_options& options); // (6)
+                  const json_options& options); // (6)
               
 static json parse(std::istream& is, 
-                  const json_serializing_options& options,
+                  const json_options& options,
                   parse_error_handler& err_handler); // (7)
 
 static json parse(std::istream& is, 
-                  const json_serializing_options& options,
+                  const json_options& options,
                   parse_error_handler& err_handler); // (8)
 ```
 (1) - (4) Parses a string of JSON text and returns a json object or array value. 
@@ -81,7 +81,7 @@ Extra comma at line 1 and column 10
 ```c++
 std::string s = R"({"field1":"NaN","field2":"PositiveInfinity","field3":"NegativeInfinity"})";
 
-json_serializing_options options;
+json_options options;
 options.nan_to_str("NaN")
        .inf_to_str("PositiveInfinity")
        .neginf_to_str("NegativeInfinity");

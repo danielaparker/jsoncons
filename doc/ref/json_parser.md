@@ -227,7 +227,7 @@ int main()
         }
     )";
 
-    json_serializing_options options; // Implements json_read_options
+    json_options options; // Implements json_read_options
     options.nan_to_str("NaN")
            .inf_to_str("Infinity");
 
