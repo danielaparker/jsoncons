@@ -3,7 +3,7 @@
 
 #include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/bson/bson_reader.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
