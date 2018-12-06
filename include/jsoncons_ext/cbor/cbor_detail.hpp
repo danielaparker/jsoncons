@@ -241,7 +241,7 @@ size_t get_length(Source& source, std::error_code& ec)
         case cbor_major_type::map:
             break;
         default:
-            return 0;
+            return length;
     }
 
     uint8_t info = get_additional_information_value(type);
@@ -254,12 +254,12 @@ size_t get_length(Source& source, std::error_code& ec)
         }
     case 0x18: // one-byte uint8_t for n follows
         {
-            uint8_t c;
+            uint8_t c{};
             source.get(c);
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
-                return 0;
+                return length;
             }
             length = c;
             break;
@@ -817,8 +817,13 @@ uint64_t get_uint64_value(Source& source, std::error_code& ec)
 
         case 0x18: // Unsigned integer (one-byte uint8_t follows)
         {
-            uint8_t c;
+            uint8_t c{};
             source.get(c);
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return val;
+            }
             val = c;
             break;
         }
@@ -1047,8 +1052,13 @@ int64_t get_int64_value(Source& source, std::error_code& ec)
                 }
                 case 0x18: // Negative integer (one-byte uint8_t follows)
                     {
-                        uint8_t c;
+                        uint8_t c{};
                         source.get(c);
+                        if (source.eof())
+                        {
+                            ec = cbor_errc::unexpected_eof;
+                            return val;
+                        }
                         val = static_cast<int64_t>(-1)- c;
                         break;
                     }
@@ -1918,7 +1928,7 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
         }
         case cbor_major_type::semantic_tag:
         {
-            uint8_t c;
+            uint8_t c{};
             source.get(c);
             if (source.eof())
             {
