@@ -700,8 +700,8 @@ typedef basic_json_options<char> output_format;
 typedef basic_json_options<wchar_t> woutput_format;
 typedef basic_json_options<char> serialization_options;
 typedef basic_json_options<wchar_t> wserialization_options;
-typedef basic_json_options<char> json_options;
-typedef basic_json_options<wchar_t> wjson_options;
+typedef basic_json_options<char> json_serializing_options;
+typedef basic_json_options<wchar_t> wjson_serializing_options;
 #endif
 
 }

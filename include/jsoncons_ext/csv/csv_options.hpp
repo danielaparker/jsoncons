@@ -675,8 +675,8 @@ typedef basic_csv_options<wchar_t> wcsv_options;
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_csv_options<char> csv_parameters;
 typedef basic_csv_options<wchar_t> wcsv_parameters;
-typedef basic_csv_options<char> csv_options;
-typedef basic_csv_options<wchar_t> wcsv_options;
+typedef basic_csv_options<char> csv_serializing_options;
+typedef basic_csv_options<wchar_t> wcsv_serializing_options;
 #endif
 
 
