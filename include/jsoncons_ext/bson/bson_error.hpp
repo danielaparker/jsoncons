@@ -36,7 +36,7 @@ public:
         case bson_errc::source_error:
             return "Source error";
        default:
-            return "Unknown CBOR parser error";
+            return "Unknown BSON parser error";
         }
     }
 };

@@ -24,19 +24,78 @@ void check_decode_ubjson(const std::vector<uint8_t>& v, const json& expected)
 
 TEST_CASE("decode_number_ubjson_test")
 {
-    // positive fixint 0x00 - 0x7f
-    check_decode_ubjson({0x00},json(0U));
-    check_decode_ubjson({0x01},json(1U));
-    check_decode_ubjson({0x0a},json(10U));
-    check_decode_ubjson({0x17},json(23U));
-    check_decode_ubjson({0x18},json(24U));
-    check_decode_ubjson({0x7f},json(127U)); 
+    SECTION("null, true, false")
+    {
+        check_decode_ubjson({'Z'},json::null()); 
+        check_decode_ubjson({'T'},json(true)); 
+        check_decode_ubjson({'F'},json(false)); 
+    }
+    SECTION("uint8")
+    {
+        check_decode_ubjson({'U',0x00},json(0U));
+        check_decode_ubjson({'U',0x01},json(1U));
+        check_decode_ubjson({'U',0x0a},json(10U));
+        check_decode_ubjson({'U',0x17},json(23U));
+        check_decode_ubjson({'U',0x18},json(24U));
+        check_decode_ubjson({'U',0x7f},json(127U)); 
+        check_decode_ubjson({'U',0xff},json(255U));
+    }
+    SECTION("int8,int16,int32,int64")
+    {
+        check_decode_ubjson({'i',0xff},json(-1));
+        check_decode_ubjson({'I',0x01,0x00},json(256));
+        check_decode_ubjson({'l',0,0,0xff,0xff},json(65535));
+        check_decode_ubjson({'l',0,1,0x00,0x00},json(65536));
+        check_decode_ubjson({'L',0,0,0,0,0xff,0xff,0xff,0xff},json(4294967295));
+        check_decode_ubjson({'L',0,0,0,1,0,0,0,0},json(4294967296));
+        check_decode_ubjson({'L',0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
 
-    check_decode_ubjson({0xcc,0xff},json(255U));
-    check_decode_ubjson({0xcd,0x01,0x00},json(256U));
-    check_decode_ubjson({0xcd,0xff,0xff},json(65535U));
-    check_decode_ubjson({0xce,0,1,0x00,0x00},json(65536U));
-    check_decode_ubjson({0xce,0xff,0xff,0xff,0xff},json(4294967295U));
+        // negative integers
+        check_decode_ubjson({'I',0xff,0},json(-256));
+        check_decode_ubjson({'I',0xfe,0xff},json(-257));
+        check_decode_ubjson({'l',0xff,0xff,0,0},json(-65536));
+        check_decode_ubjson({'l',0xff,0xfe,0xff,0xff},json(-65537));
+        check_decode_ubjson({'L',0xff,0xff,0xff,0xff,0,0,0,0},json(-4294967296));
+        check_decode_ubjson({'L',0xff,0xff,0xff,0xfe,0xff,0xff,0xff,0xff},json(-4294967297));
+    }
+
+    SECTION("float32,float64")
+    {
+        check_decode_ubjson({'D',0,0,0,0,0,0,0,0},json(0.0));
+        check_decode_ubjson({'D',0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
+        check_decode_ubjson({'D',0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
+    }
+
+    SECTION("array")
+    {
+        check_decode_ubjson({'[',']'},json::parse("[]"));
+        check_decode_ubjson({'[', 'Z', 'T', 'F', ']'},json::parse("[null,true,false]"));
+        check_decode_ubjson({'[','#','i',0},json::parse("[]"));
+        check_decode_ubjson({'[','#','i',1,'I',0xff,0},json::parse("[-256]"));
+/*
+        check_decode_ubjson({0x90},json::array());
+        check_decode_ubjson({'[',']'},json::parse("[]"));
+        check_decode_ubjson({0x92,'\0','\0'},json::array({0,0}));
+        check_decode_ubjson({0x92,0x91,'\0','\0'}, json::parse("[[0],0]"));
+        check_decode_ubjson({0x91,0xa5,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
+
+        check_decode_ubjson({0x81,0xa2,'o','c',0x91,'\0'}, json::parse("{\"oc\": [0]}"));
+        check_decode_ubjson({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
+*/
+    }
+    SECTION("ubjson array optimized with type and count")
+    {
+        check_decode_ubjson({'[','$','I','#','i',2,
+                             0x01,0x00, // 256
+                             0xff,0}, // -256
+                             json::parse("[256,-256]"));
+    }
+
+#if 0
+    check_decode_ubjson({'I',0x01,0x00},json(256U));
+    check_decode_ubjson({'I',0xff,0xff},json(65535U));
+    check_decode_ubjson({'l',0,1,0x00,0x00},json(65536U));
+    check_decode_ubjson({'l',0xff,0xff,0xff,0xff},json(4294967295U));
     check_decode_ubjson({0xcf,0,0,0,1,0,0,0,0},json(4294967296U));
     check_decode_ubjson({0xcf,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<uint64_t>::max)()));
 
@@ -47,24 +106,24 @@ TEST_CASE("decode_number_ubjson_test")
     check_decode_ubjson({0x7f},json(127)); 
 
     check_decode_ubjson({0xcc,0xff},json(255));
-    check_decode_ubjson({0xcd,0x01,0x00},json(256));
-    check_decode_ubjson({0xcd,0xff,0xff},json(65535));
-    check_decode_ubjson({0xce,0,1,0x00,0x00},json(65536));
-    check_decode_ubjson({0xce,0xff,0xff,0xff,0xff},json(4294967295));
-    check_decode_ubjson({0xd3,0,0,0,1,0,0,0,0},json(4294967296));
-    check_decode_ubjson({0xd3,0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
+    check_decode_ubjson({'I',0x01,0x00},json(256));
+    check_decode_ubjson({'I',0xff,0xff},json(65535));
+    check_decode_ubjson({'l',0,1,0x00,0x00},json(65536));
+    check_decode_ubjson({'l',0xff,0xff,0xff,0xff},json(4294967295));
+    check_decode_ubjson({'L',0,0,0,1,0,0,0,0},json(4294967296));
+    check_decode_ubjson({'L',0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
 
     // negative fixint 0xe0 - 0xff
     check_decode_ubjson({0xe0},json(-32));
     check_decode_ubjson({0xff},json(-1)); //
 
     // negative integers
-    check_decode_ubjson({0xd1,0xff,0},json(-256));
-    check_decode_ubjson({0xd1,0xfe,0xff},json(-257));
-    check_decode_ubjson({0xd2,0xff,0xff,0,0},json(-65536));
-    check_decode_ubjson({0xd2,0xff,0xfe,0xff,0xff},json(-65537));
-    check_decode_ubjson({0xd3,0xff,0xff,0xff,0xff,0,0,0,0},json(-4294967296));
-    check_decode_ubjson({0xd3,0xff,0xff,0xff,0xfe,0xff,0xff,0xff,0xff},json(-4294967297));
+    check_decode_ubjson({'I',0xff,0},json(-256));
+    check_decode_ubjson({'I',0xfe,0xff},json(-257));
+    check_decode_ubjson({'l',0xff,0xff,0,0},json(-65536));
+    check_decode_ubjson({'l',0xff,0xfe,0xff,0xff},json(-65537));
+    check_decode_ubjson({'L',0xff,0xff,0xff,0xff,0,0,0,0},json(-4294967296));
+    check_decode_ubjson({'L',0xff,0xff,0xff,0xfe,0xff,0xff,0xff,0xff},json(-4294967297));
 
     // null, true, false
     check_decode_ubjson({0xc0},json::null()); // 
@@ -72,9 +131,9 @@ TEST_CASE("decode_number_ubjson_test")
     check_decode_ubjson({0xc2},json(false)); //
 
     // floating point
-    check_decode_ubjson({0xcb,0,0,0,0,0,0,0,0},json(0.0));
-    check_decode_ubjson({0xcb,0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
-    check_decode_ubjson({0xcb,0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
+    check_decode_ubjson({'D',0,0,0,0,0,0,0,0},json(0.0));
+    check_decode_ubjson({'D',0xbf,0xf0,0,0,0,0,0,0},json(-1.0));
+    check_decode_ubjson({'D',0xc1,0x6f,0xff,0xff,0xe0,0,0,0},json(-16777215.0));
 
     // string
     check_decode_ubjson({0xa0},json(""));
@@ -89,9 +148,9 @@ TEST_CASE("decode_number_ubjson_test")
                             '1','2','3','4','5','6','7','8','9','0',
                             '1','2'},
                  json("12345678901234567890123456789012"));
-
+#endif
 }
-
+#if 0
 TEST_CASE("decode_ubjson_arrays_and_maps")
 {
     // fixarray
@@ -106,24 +165,6 @@ TEST_CASE("decode_ubjson_arrays_and_maps")
     check_decode_ubjson({0x81,0xa2,'o','c',0x91,'\0'}, json::parse("{\"oc\": [0]}"));
     check_decode_ubjson({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }
+#endif 
 
-TEST_CASE("Compare ubjson packed item and jsoncons item")
-{
-    std::vector<uint8_t> bytes;
-    ubjson::ubjson_buffer_serializer writer(bytes);
-    writer.begin_array(2); // Must be definite length array
-    writer.string_value("foo");
-    writer.byte_string_value(byte_string{'b','a','r'});
-    writer.end_array();
-    writer.flush();
-
-    json expected = json::array();
-
-    expected.emplace_back("foo");
-    expected.emplace_back(byte_string{ 'b','a','r' });
-
-    json j = ubjson::decode_ubjson<json>(bytes);
-
-    REQUIRE(j == expected);
-}
 

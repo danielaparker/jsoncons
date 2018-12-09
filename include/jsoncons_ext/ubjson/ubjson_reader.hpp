@@ -47,436 +47,225 @@ public:
         //const uint8_t* pos = input_ptr_++;
 
         uint8_t type;
-        source_.get(type);
-
-        if (type <= 0xbf)
+        if (source_.get(type) == 0)
         {
-            if (type <= 0x7f) 
-            {
-                // positive fixint
-                handler_.uint64_value(type, semantic_tag_type::none, *this);
-            }
-            else if (type <= 0x8f) 
-            {
-                // fixmap
-                const size_t len = type & 0x0f;
-                handler_.begin_object(len, semantic_tag_type::none, *this);
-                ++nesting_depth_;
-                for (size_t i = 0; i < len; ++i)
-                {
-                    parse_name(ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                    read(ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                }
-                handler_.end_object(*this);
-                --nesting_depth_;
-            }
-            else if (type <= 0x9f) 
-            {
-                // fixarray
-                const size_t len = type & 0x0f;
-                handler_.begin_array(len, semantic_tag_type::none, *this);
-                ++nesting_depth_;
-                for (size_t i = 0; i < len; ++i)
-                {
-                    read(ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                }
-                handler_.end_array(*this);
-                --nesting_depth_;
-            }
-            else 
-            {
-                // fixstr
-                const size_t len = type & 0x1f;
-                //const uint8_t* first = input_ptr_;
-                //const uint8_t* last = first + len;
-                //input_ptr_ += len; 
+            ec = ubjson_errc::unexpected_eof;
+            return;
+        }
+        read_value(type, ec);
+    }
 
-                std::basic_string<char> s;
-                source_.read(len,std::back_inserter(s));
+    void read_value(uint8_t type, std::error_code& ec)
+    {
+        switch (type)
+        {
+            case ubjson_format::null_type: 
+            {
+                handler_.null_value(semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::no_op_type: 
+            {
+                break;
+            }
+            case ubjson_format::true_type:
+            {
+                handler_.bool_value(true, semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::false_type:
+            {
+                handler_.bool_value(false, semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::int8_type: 
+            {
+                uint8_t buf[sizeof(int8_t)];
+                source_.read(sizeof(int8_t), buf);
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
                     return;
                 }
-
-                //auto result = unicons::convert(
-                //    first, last, std::back_inserter(s), unicons::conv_flags::strict);
-                //if (result.ec != unicons::conv_errc())
-                //{
-                //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                //}
-                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                const uint8_t* endp;
+                int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
+                handler_.int64_value(val, semantic_tag_type::none, *this);
+                break;
             }
-        }
-        else if (type >= 0xe0) 
-        {
-            // negative fixint
-            handler_.int64_value(static_cast<int8_t>(type), semantic_tag_type::none, *this);
-        }
-        else
-        {
-            switch (type)
+            case ubjson_format::uint8_type: 
             {
-                case ubjson_format::nil_cd: 
+                uint8_t val;
+                if (source_.get(val) == 0)
                 {
-                    handler_.null_value(semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-                case ubjson_format::true_cd:
+                handler_.uint64_value(val, semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::int16_type: 
+            {
+                uint8_t buf[sizeof(int16_t)];
+                source_.read(sizeof(int16_t), buf);
+                if (source_.eof())
                 {
-                    handler_.bool_value(true, semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-                case ubjson_format::false_cd:
+                const uint8_t* endp;
+                int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                handler_.int64_value(val, semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::int32_type: 
+            {
+                uint8_t buf[sizeof(int32_t)];
+                source_.read(sizeof(int32_t), buf);
+                if (source_.eof())
                 {
-                    handler_.bool_value(false, semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-                case ubjson_format::float32_cd: 
+                const uint8_t* endp;
+                int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                handler_.int64_value(val, semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::int64_type: 
+            {
+                uint8_t buf[sizeof(int64_t)];
+                source_.read(sizeof(int64_t), buf);
+                if (source_.eof())
                 {
-                    uint8_t buf[sizeof(float)];
-                    source_.read(sizeof(float), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
-                    handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-
-                case ubjson_format::float64_cd: 
+                const uint8_t* endp;
+                int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
+                handler_.int64_value(val, semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::float32_type: 
+            {
+                uint8_t buf[sizeof(float)];
+                source_.read(sizeof(float), buf);
+                if (source_.eof())
                 {
-                    uint8_t buf[sizeof(double)];
-                    source_.read(sizeof(double), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
-                    handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-
-                case ubjson_format::uint8_cd: 
+                const uint8_t* endp;
+                float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
+                handler_.double_value(val, semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::float64_type: 
+            {
+                uint8_t buf[sizeof(double)];
+                source_.read(sizeof(double), buf);
+                if (source_.eof())
                 {
-                    uint8_t val;
-                    source_.get(val);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-
-                case ubjson_format::uint16_cd: 
+                const uint8_t* endp;
+                double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
+                handler_.double_value(val, semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::char_type: 
+            {
+                uint8_t buf[sizeof(char)];
+                source_.read(sizeof(char), buf);
+                if (source_.eof())
                 {
-                    uint8_t buf[sizeof(uint16_t)];
-                    source_.read(sizeof(uint16_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    uint16_t val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-
-                case ubjson_format::uint32_cd: 
+                const uint8_t* endp;
+                char c = jsoncons::detail::from_big_endian<char>(buf,buf+sizeof(buf),&endp);
+                handler_.string_value(basic_string_view<char>(&c,1), semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::string_type: 
+            {
+                size_t length = get_length(ec);
+                if (ec)
                 {
-                    uint8_t buf[sizeof(uint32_t)];
-                    source_.read(sizeof(uint32_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    uint32_t val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
-                    break;
+                    return;
                 }
-
-                case ubjson_format::uint64_cd: 
+                std::string s;
+                source_.read(length,std::back_inserter(s));
+                if (source_.eof())
                 {
-                    uint8_t buf[sizeof(uint64_t)];
-                    source_.read(sizeof(uint64_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    uint64_t val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-
-                case ubjson_format::int8_cd: 
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                break;
+            }
+            case ubjson_format::high_precision_number_type: 
+            {
+                size_t length = get_length(ec);
+                if (ec)
                 {
-                    uint8_t buf[sizeof(int8_t)];
-                    source_.read(sizeof(int8_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
-                    break;
+                    return;
                 }
-
-                case ubjson_format::int16_cd: 
+                std::string s;
+                source_.read(length,std::back_inserter(s));
+                if (source_.eof())
                 {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
-                    break;
+                    ec = ubjson_errc::unexpected_eof;
+                    return;
                 }
-
-                case ubjson_format::int32_cd: 
+                if (jsoncons::detail::is_integer(s.data(),s.length()))
                 {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
-                    break;
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::bignum, *this);
                 }
-
-                case ubjson_format::int64_cd: 
+                else
                 {
-                    uint8_t buf[sizeof(int64_t)];
-                    source_.read(sizeof(int64_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
-                    break;
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::decimal_fraction, *this);
                 }
-
-                case ubjson_format::str8_cd: 
+                break;
+            }
+            case ubjson_format::start_array_marker: 
+            {
+                if (source_.peek() == ubjson_format::type_marker)
                 {
-                    uint8_t buf[sizeof(int8_t)];
-                    source_.read(sizeof(int8_t), buf);
-                    if (source_.eof())
+                    source_.ignore(1);
+                    uint8_t type;
+                    if (source_.get(type) == 0)
                     {
                         ec = ubjson_errc::unexpected_eof;
                         return;
                     }
-                    const uint8_t* endp;
-                    int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
-                    if (source_.eof())
+                    if (source_.peek() == ubjson_format::count_marker)
                     {
-                        ec = ubjson_errc::unexpected_eof;
+                        source_.ignore(1);
+                        size_t length = get_length(ec);
+                        handler_.begin_array(length, semantic_tag_type::none, *this);
+                        for (size_t i = 0; i < length; ++i)
+                        {
+                            read_value(type, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                        }
+                        handler_.end_array(*this);
+                    }
+                    else
+                    {
+                        ec = ubjson_errc::count_required_after_type;
                         return;
                     }
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
-                    break;
                 }
-
-                case ubjson_format::str16_cd: 
+                else if (source_.peek() == ubjson_format::count_marker)
                 {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-
-                    //std::basic_string<char> s;
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
-                    break;
-                }
-
-                case ubjson_format::str32_cd: 
-                {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-
-                    //std::basic_string<char> s;
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
-                    break;
-                }
-
-                case ubjson_format::bin8_cd: 
-                {
-                    uint8_t buf[sizeof(int8_t)];
-                    source_.read(sizeof(int8_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(len, std::back_inserter(v));
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-
-                    handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               byte_string_chars_format::none, 
-                                               semantic_tag_type::none, 
-                                               *this);
-                    break;
-                }
-
-                case ubjson_format::bin16_cd: 
-                {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(len, std::back_inserter(v));
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-
-                    handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               byte_string_chars_format::none, 
-                                               semantic_tag_type::none, 
-                                               *this);
-                    break;
-                }
-
-                case ubjson_format::bin32_cd: 
-                {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(len, std::back_inserter(v));
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-
-                    handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               byte_string_chars_format::none, 
-                                               semantic_tag_type::none, 
-                                               *this);
-                    break;
-                }
-
-                case ubjson_format::array16_cd: 
-                {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    handler_.begin_array(len, semantic_tag_type::none, *this);
-                    ++nesting_depth_;
-                    for (int16_t i = 0; i < len; ++i)
+                    source_.ignore(1);
+                    size_t length = get_length(ec);
+                    handler_.begin_array(length, semantic_tag_type::none, *this);
+                    for (size_t i = 0; i < length; ++i)
                     {
                         read(ec);
                         if (ec)
@@ -485,25 +274,11 @@ public:
                         }
                     }
                     handler_.end_array(*this);
-                    --nesting_depth_;
-                    break;
                 }
-
-                case ubjson_format::array32_cd: 
+                else
                 {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    handler_.begin_array(len, semantic_tag_type::none, *this);
-                    ++nesting_depth_;
-                    for (int32_t i = 0; i < len; ++i)
+                    handler_.begin_array(semantic_tag_type::none, *this);
+                    while (source_.peek() != ubjson_format::end_array_marker)
                     {
                         read(ec);
                         if (ec)
@@ -512,78 +287,94 @@ public:
                         }
                     }
                     handler_.end_array(*this);
-                    --nesting_depth_;
-                    break;
+                    source_.ignore(1);
                 }
-
-                case ubjson_format::map16_cd : 
+                break;
+            }
+            case ubjson_format::start_object_marker: 
+            {
+                if (source_.peek() == ubjson_format::type_marker)
                 {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
-                    if (source_.eof())
+                    source_.ignore(1);
+                    uint8_t type;
+                    if (source_.get(type) == 0)
                     {
                         ec = ubjson_errc::unexpected_eof;
                         return;
                     }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    handler_.begin_object(len, semantic_tag_type::none, *this);
-                    ++nesting_depth_;
-                    for (int16_t i = 0; i < len; ++i)
+                    if (source_.peek() == ubjson_format::count_marker)
                     {
-                        parse_name(ec);
-                        if (ec)
+                        source_.ignore(1);
+                        size_t length = get_length(ec);
+                        handler_.begin_array(length, semantic_tag_type::none, *this);
+                        for (size_t i = 0; i < length; ++i)
                         {
-                            return;
+                            read_name(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            read_value(type, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
                         }
-                        read(ec);
-                        if (ec)
-                        {
-                            return;
-                        }
+                        handler_.end_array(*this);
                     }
-                    handler_.end_object(*this);
-                    --nesting_depth_;
-                    break;
-                }
-
-                case ubjson_format::map32_cd : 
-                {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
-                    if (source_.eof())
+                    else
                     {
-                        ec = ubjson_errc::unexpected_eof;
+                        ec = ubjson_errc::count_required_after_type;
                         return;
                     }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    handler_.begin_object(len, semantic_tag_type::none, *this);
-                    ++nesting_depth_;
-                    for (int32_t i = 0; i < len; ++i)
-                    {
-                        parse_name(ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                        read(ec);
-                        if (ec)
-                        {
-                            return;
-                        }
-                    }
-                    handler_.end_object(*this);
-                    --nesting_depth_;
-                    break;
                 }
-
-                default:
+                else
                 {
-                    //JSONCONS_THROW(ubjson_error(end_input_-pos));
+                    if (source_.peek() == ubjson_format::count_marker)
+                    {
+                        size_t length = get_length(ec);
+                        handler_.begin_object(length, semantic_tag_type::none, *this);
+                        for (size_t i = 0; i < length; ++i)
+                        {
+                            read_name(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            read(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                        }
+                        handler_.end_object(*this);
+                    }
+                    else
+                    {
+                        handler_.begin_object(semantic_tag_type::none, *this);
+                        while (source_.peek() != ubjson_format::end_array_marker)
+                        {
+                            read_name(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            read(ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                        }
+                        handler_.end_object(*this);
+                        source_.ignore(1);
+                    }
                 }
+                break;
+            }
+            default:
+            {
+                ec = ubjson_errc::unknown_type;
+                return;
             }
         }
     }
@@ -598,133 +389,146 @@ public:
         return column_;
     }
 private:
-    void parse_name(std::error_code& ec)
+
+    size_t get_length(std::error_code& ec)
     {
-        uint8_t type;
-        source_.get(type);
-
-        //const uint8_t* pos = input_ptr_++;
-        if (type >= 0xa0 && type <= 0xbf)
+        size_t length = 0;
+        if (JSONCONS_UNLIKELY(source_.eof()))
         {
-                    // fixstr
-                const size_t len = type & 0x1f;
-                //const uint8_t* first = input_ptr_;
-                //const uint8_t* last = first + len;
-                //input_ptr_ += len; 
-
-                std::basic_string<char> s;
-                source_.read(len, std::back_inserter(s));
+            ec = ubjson_errc::unexpected_eof;
+            return length;
+        }
+        uint8_t type;
+        if (source_.get(type) == 0)
+        {
+            ec = ubjson_errc::unexpected_eof;
+            return length;
+        }
+        switch (type)
+        {
+            case ubjson_format::int8_type: 
+            {
+                uint8_t buf[sizeof(int8_t)];
+                source_.read(sizeof(int8_t), buf);
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
-                    return;
+                    return length;
                 }
-                //auto result = unicons::convert(
-                //    first, last, std::back_inserter(s), unicons::conv_flags::strict);
-                //if (result.ec != unicons::conv_errc())
-                //{
-                //   JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                //}
-                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
-        }
-        else
-        {
-            switch (type)
-            {
-                case ubjson_format::str8_cd: 
+                const uint8_t* endp;
+                int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
+                if (val >= 0)
                 {
-                    uint8_t buf[sizeof(int8_t)];
-                    source_.read(sizeof(int8_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
-                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
-                    break;
+                    length = val;
                 }
-
-                case ubjson_format::str16_cd: 
+                else
                 {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-
-                    //std::basic_string<char> s;
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
-                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
-                    break;
+                    ec = ubjson_errc::length_cannot_be_negative;
+                    return length;
                 }
-
-                case ubjson_format::str32_cd: 
-                {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
-                    if (source_.eof())
-                    {
-                        ec = ubjson_errc::unexpected_eof;
-                        return;
-                    }
-
-                    //std::basic_string<char> s;
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
-                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
-                    break;
-                }
+                break;
             }
-
+            case ubjson_format::uint8_type: 
+            {
+                uint8_t val;
+                if (source_.get(val) == 0)
+                {
+                    ec = ubjson_errc::unexpected_eof;
+                    return length;
+                }
+                length = val;
+                break;
+            }
+            case ubjson_format::int16_type: 
+            {
+                uint8_t buf[sizeof(int16_t)];
+                source_.read(sizeof(int16_t), buf);
+                if (source_.eof())
+                {
+                    ec = ubjson_errc::unexpected_eof;
+                    return length;
+                }
+                const uint8_t* endp;
+                int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
+                if (val >= 0)
+                {
+                    length = val;
+                }
+                else
+                {
+                    ec = ubjson_errc::length_cannot_be_negative;
+                    return length;
+                }
+                break;
+            }
+            case ubjson_format::int32_type: 
+            {
+                uint8_t buf[sizeof(int32_t)];
+                source_.read(sizeof(int32_t), buf);
+                if (source_.eof())
+                {
+                    ec = ubjson_errc::unexpected_eof;
+                    return length;
+                }
+                const uint8_t* endp;
+                int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
+                if (val >= 0)
+                {
+                    length = val;
+                }
+                else
+                {
+                    ec = ubjson_errc::length_cannot_be_negative;
+                    return length;
+                }
+                break;
+            }
+            case ubjson_format::int64_type: 
+            {
+                uint8_t buf[sizeof(int64_t)];
+                source_.read(sizeof(int64_t), buf);
+                if (source_.eof())
+                {
+                    ec = ubjson_errc::unexpected_eof;
+                    return length;
+                }
+                const uint8_t* endp;
+                int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
+                if (val >= 0)
+                {
+                    length = val;
+                }
+                else
+                {
+                    ec = ubjson_errc::length_cannot_be_negative;
+                    return length;
+                }
+                break;
+            }
+            default:
+            {
+                ec = ubjson_errc::length_must_be_integer;
+                return length;
+            }
         }
+        return length;
+    }
+
+    void read_name(std::error_code& ec)
+    {
+        size_t length = get_length(ec);
+        if (ec)
+        {
+            return;
+        }
+        std::string s;
+        source_.read(length,std::back_inserter(s));
+        if (source_.eof())
+        {
+            ec = ubjson_errc::unexpected_eof;
+            return;
+        }
+        handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
     }
 };
 

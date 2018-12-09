@@ -16,8 +16,7 @@
 using namespace jsoncons;
 using namespace jsoncons::ubjson;
 
-void check_encode_ubjson(const std::vector<uint8_t>& expected, 
-                          const json& j)
+void check_encode_ubjson(const std::vector<uint8_t>& expected, const json& j)
 {
     std::vector<uint8_t> result;
     encode_ubjson(j, result);
@@ -43,13 +42,13 @@ void check_encode_ubjson(const std::vector<uint8_t>& expected,
 TEST_CASE("encode_ubjson_test")
 {
     // positive fixint 0x00 - 0x7f
-    check_encode_ubjson({0x00},json(0U));
-    check_encode_ubjson({0x01},json(1U));
-    check_encode_ubjson({0x0a},json(10U));
-    check_encode_ubjson({0x17},json(23U));
-    check_encode_ubjson({0x18},json(24U));
-    check_encode_ubjson({0x7f},json(127U)); 
-
+    check_encode_ubjson({'U',0x00},json(0U));
+    check_encode_ubjson({'U',0x01},json(1U));
+    check_encode_ubjson({'U',0x0a},json(10U));
+    check_encode_ubjson({'U',0x17},json(23U));
+    check_encode_ubjson({'U',0x18},json(24U));
+    check_encode_ubjson({'U',0x7f},json(127U)); 
+#if 0
     check_encode_ubjson({0xcc,0xff},json(255U));
     check_encode_ubjson({0xcd,0x01,0x00},json(256U));
     check_encode_ubjson({0xcd,0xff,0xff},json(65535U));
@@ -108,9 +107,9 @@ TEST_CASE("encode_ubjson_test")
                             '1','2'},
                  json("12345678901234567890123456789012"));
 
-
+#endif
 }
-
+#if 0
 TEST_CASE("encode_ubjson_arrays_and_maps")
 {
     // fixarray
@@ -125,4 +124,4 @@ TEST_CASE("encode_ubjson_arrays_and_maps")
     check_encode_ubjson({0x81,0xa2,'o','c',0x91,'\0'}, json::parse("{\"oc\": [0]}"));
     check_encode_ubjson({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }
-
+#endif

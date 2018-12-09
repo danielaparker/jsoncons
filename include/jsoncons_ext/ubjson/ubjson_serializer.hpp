@@ -66,14 +66,14 @@ private:
 
     };
     std::vector<stack_item> stack_;
-    Result writer_;
+    Result result_;
 
     // Noncopyable and nonmoveable
     basic_ubjson_serializer(const basic_ubjson_serializer&) = delete;
     basic_ubjson_serializer& operator=(const basic_ubjson_serializer&) = delete;
 public:
     basic_ubjson_serializer(output_type& os)
-       : writer_(os)
+       : result_(os)
     {
     }
 
@@ -81,7 +81,7 @@ public:
     {
         try
         {
-            writer_.flush();
+            result_.flush();
         }
         catch (...)
         {
@@ -93,41 +93,23 @@ private:
 
     void do_flush() override
     {
-        writer_.flush();
+        result_.flush();
     }
 
     bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
-        
-        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Indefinite object length not supported."));
+        stack_.push_back(stack_item(ubjson_structure_type::indefinite_length_object));
+        result_.push_back(ubjson_format::start_object_marker);
+
+        return true;
     }
 
     bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(ubjson_structure_type::object));
-
-        if (length <= 15)
-        {
-            // fixmap
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::fixmap_base_cd | (length & 0xf)), 
-                                  std::back_inserter(writer_));
-        }
-        else if (length <= 65535)
-        {
-            // map 16
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::map16_cd), 
-                                  std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), 
-                                  std::back_inserter(writer_));
-        }
-        else if (length <= 4294967295)
-        {
-            // map 32
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::map32_cd), 
-                                  std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length),
-                                  std::back_inserter(writer_));
-        }
+        result_.push_back(ubjson_format::start_object_marker);
+        result_.push_back(ubjson_format::count_marker);
+        put_length(length);
 
         return true;
     }
@@ -135,6 +117,10 @@ private:
     bool do_end_object(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        if (stack_.back().is_indefinite_length())
+        {
+            result_.push_back(ubjson_format::end_object_marker);
+        }
         stack_.pop_back();
         end_value();
         return true;
@@ -142,35 +128,29 @@ private:
 
     bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
-        JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Indefinite array length not supported."));
+        stack_.push_back(stack_item(ubjson_structure_type::indefinite_length_array));
+        result_.push_back(ubjson_format::start_array_marker);
+
+        return true;
     }
 
     bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(ubjson_structure_type::array));
-        if (length <= 15)
-        {
-            // fixarray
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::fixarray_base_cd | (length & 0xf)), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
-        {
-            // array 16
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::array16_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length),std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
-        {
-            // array 32
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::array32_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
-        }
+        result_.push_back(ubjson_format::start_array_marker);
+        result_.push_back(ubjson_format::count_marker);
+        put_length(length);
+
         return true;
     }
 
     bool do_end_array(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        if (stack_.back().is_indefinite_length())
+        {
+            result_.push_back(ubjson_format::end_array_marker);
+        }
         stack_.pop_back();
         end_value();
         return true;
@@ -185,13 +165,28 @@ private:
     bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         // nil
-        jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::nil_cd), std::back_inserter(writer_));
+        jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::null_type), std::back_inserter(result_));
         end_value();
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
     {
+        switch (tag)
+        {
+            case semantic_tag_type::bignum:
+            case semantic_tag_type::decimal_fraction:
+            {
+                result_.push_back(ubjson_format::high_precision_number_type);
+                break;
+            }
+            default:
+            {
+                result_.push_back(ubjson_format::string_type);
+                break;
+            }
+        }
+
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
             sv.begin(), sv.end(), std::back_inserter(target), 
@@ -201,38 +196,39 @@ private:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
         }
 
-        const size_t length = target.length();
-        if (length <= 31)
-        {
-            // fixstr stores a byte array whose length is upto 31 bytes
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::fixstr_base_cd | length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint8_t>::max)())
-        {
-            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::str8_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
-        {
-            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::str16_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
-        {
-            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::str32_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
-        }
+        put_length(sv.length());
 
         for (auto c : target)
         {
-            writer_.push_back(c);
+            result_.push_back(c);
         }
 
         end_value();
         return true;
+    }
+
+    void put_length(size_t length)
+    {
+        if (length <= (std::numeric_limits<uint8_t>::max)())
+        {
+            result_.push_back('U');
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(length), std::back_inserter(result_));
+        }
+        else if (length <= (std::numeric_limits<int16_t>::max)())
+        {
+            result_.push_back('I');
+            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), std::back_inserter(result_));
+        }
+        else if (length <= (std::numeric_limits<int32_t>::max)())
+        {
+            result_.push_back('l');
+            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(result_));
+        }
+        else if (length <= (uint64_t)(std::numeric_limits<int64_t>::max)())
+        {
+            result_.push_back('L');
+            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(result_));
+        }
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
@@ -242,28 +238,14 @@ private:
     {
 
         const size_t length = b.length();
-        if (length <= (std::numeric_limits<uint8_t>::max)())
-        {
-            // str 8 stores a byte array whose length is upto (2^8)-1 bytes
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::bin8_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint16_t>::max)())
-        {
-            // str 16 stores a byte array whose length is upto (2^16)-1 bytes
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::bin16_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint16_t>(length), std::back_inserter(writer_));
-        }
-        else if (length <= (std::numeric_limits<uint32_t>::max)())
-        {
-            // str 32 stores a byte array whose length is upto (2^32)-1 bytes
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::bin32_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint32_t>(length),std::back_inserter(writer_));
-        }
+        result_.push_back(ubjson_format::start_array_marker);
+        jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::type_marker), std::back_inserter(result_));
+        jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint8_type), std::back_inserter(result_));
+        put_length(length);
 
         for (auto c : b)
         {
-            writer_.push_back(c);
+            result_.push_back(c);
         }
 
         end_value();
@@ -279,14 +261,14 @@ private:
         if ((double)valf == val)
         {
             // float 32
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::float32_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(valf,std::back_inserter(writer_));
+            result_.push_back(static_cast<uint8_t>(ubjson_format::float32_type));
+            jsoncons::detail::to_big_endian(valf,std::back_inserter(result_));
         }
         else
         {
             // float 64
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::float64_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(val,std::back_inserter(writer_));
+            result_.push_back(static_cast<uint8_t>(ubjson_format::float64_type));
+            jsoncons::detail::to_big_endian(val,std::back_inserter(result_));
         }
 
         // write double
@@ -301,66 +283,66 @@ private:
     {
         if (val >= 0)
         {
-            if (val <= 0x7f)
+            if (val <= (std::numeric_limits<int8_t>::max)())
             {
                 // positive fixnum stores 7-bit positive integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::int8_type);
+                jsoncons::detail::to_big_endian(static_cast<int8_t>(val),std::back_inserter(result_));
             }
             else if (val <= (std::numeric_limits<uint8_t>::max)())
             {
                 // uint 8 stores a 8-bit unsigned integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint8_cd), std::back_inserter(writer_));
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::uint8_type);
+                jsoncons::detail::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(result_));
             }
-            else if (val <= (std::numeric_limits<uint16_t>::max)())
+            else if (val <= (std::numeric_limits<int16_t>::max)())
             {
                 // uint 16 stores a 16-bit big-endian unsigned integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint16_cd), std::back_inserter(writer_));
-                jsoncons::detail::to_big_endian(static_cast<uint16_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::int16_type);
+                jsoncons::detail::to_big_endian(static_cast<int16_t>(val),std::back_inserter(result_));
             }
-            else if (val <= (std::numeric_limits<uint32_t>::max)())
+            else if (val <= (std::numeric_limits<int32_t>::max)())
             {
                 // uint 32 stores a 32-bit big-endian unsigned integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint32_cd), std::back_inserter(writer_));
-                jsoncons::detail::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::int32_type);
+                jsoncons::detail::to_big_endian(static_cast<int32_t>(val),std::back_inserter(result_));
             }
             else if (val <= (std::numeric_limits<int64_t>::max)())
             {
                 // int 64 stores a 64-bit big-endian signed integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint64_cd), std::back_inserter(writer_));
-                jsoncons::detail::to_big_endian(static_cast<uint64_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::int64_type);
+                jsoncons::detail::to_big_endian(static_cast<int64_t>(val),std::back_inserter(result_));
+            }
+            else
+            {
+                // big integer
             }
         }
         else
         {
-            if (val >= -32)
-            {
-                // negative fixnum stores 5-bit negative integer
-                jsoncons::detail::to_big_endian(static_cast<int8_t>(val), std::back_inserter(writer_));
-            }
-            else if (val >= (std::numeric_limits<int8_t>::lowest)())
+            if (val >= (std::numeric_limits<int8_t>::lowest)())
             {
                 // int 8 stores a 8-bit signed integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::int8_cd), std::back_inserter(writer_));
-                jsoncons::detail::to_big_endian(static_cast<int8_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::int8_type);
+                jsoncons::detail::to_big_endian(static_cast<int8_t>(val),std::back_inserter(result_));
             }
             else if (val >= (std::numeric_limits<int16_t>::lowest)())
             {
                 // int 16 stores a 16-bit big-endian signed integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::int16_cd), std::back_inserter(writer_));
-                jsoncons::detail::to_big_endian(static_cast<int16_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::int16_type);
+                jsoncons::detail::to_big_endian(static_cast<int16_t>(val),std::back_inserter(result_));
             }
             else if (val >= (std::numeric_limits<int32_t>::lowest)())
             {
                 // int 32 stores a 32-bit big-endian signed integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::int32_cd), std::back_inserter(writer_));
-                jsoncons::detail::to_big_endian(static_cast<int32_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::int32_type);
+                jsoncons::detail::to_big_endian(static_cast<int32_t>(val),std::back_inserter(result_));
             }
             else if (val >= (std::numeric_limits<int64_t>::lowest)())
             {
                 // int 64 stores a 64-bit big-endian signed integer
-                jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::int64_cd), std::back_inserter(writer_));
-                jsoncons::detail::to_big_endian(static_cast<int64_t>(val),std::back_inserter(writer_));
+                result_.push_back(ubjson_format::int64_type);
+                jsoncons::detail::to_big_endian(static_cast<int64_t>(val),std::back_inserter(result_));
             }
         }
         end_value();
@@ -371,34 +353,29 @@ private:
                          semantic_tag_type, 
                          const serializing_context&) override
     {
-        if (val <= (std::numeric_limits<int8_t>::max)())
-        {
-            // positive fixnum stores 7-bit positive integer
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(val), std::back_inserter(writer_));
-        }
-        else if (val <= (std::numeric_limits<uint8_t>::max)())
+        if (val <= (std::numeric_limits<uint8_t>::max)())
         {
             // uint 8 stores a 8-bit unsigned integer
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint8_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(val), std::back_inserter(writer_));
+            result_.push_back(ubjson_format::uint8_type);
+            jsoncons::detail::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(result_));
         }
-        else if (val <= (std::numeric_limits<uint16_t>::max)())
+        else if (val <= (std::numeric_limits<int16_t>::max)())
         {
             // uint 16 stores a 16-bit big-endian unsigned integer
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint16_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint16_t>(val),std::back_inserter(writer_));
+            result_.push_back(ubjson_format::int16_type);
+            jsoncons::detail::to_big_endian(static_cast<int16_t>(val),std::back_inserter(result_));
         }
-        else if (val <= (std::numeric_limits<uint32_t>::max)())
+        else if (val <= (std::numeric_limits<int32_t>::max)())
         {
             // uint 32 stores a 32-bit big-endian unsigned integer
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint32_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint32_t>(val),std::back_inserter(writer_));
+            result_.push_back(ubjson_format::int32_type);
+            jsoncons::detail::to_big_endian(static_cast<int32_t>(val),std::back_inserter(result_));
         }
-        else if (val <= (std::numeric_limits<uint64_t>::max)())
+        else if (val <= (uint64_t)(std::numeric_limits<int64_t>::max)())
         {
-            // uint 64 stores a 64-bit big-endian unsigned integer
-            jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::uint64_cd), std::back_inserter(writer_));
-            jsoncons::detail::to_big_endian(static_cast<uint64_t>(val),std::back_inserter(writer_));
+            // int 64 stores a 64-bit big-endian signed integer
+            result_.push_back(ubjson_format::int64_type);
+            jsoncons::detail::to_big_endian(static_cast<int64_t>(val),std::back_inserter(result_));
         }
         end_value();
         return true;
@@ -407,8 +384,7 @@ private:
     bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
     {
         // true and false
-        writer_.push_back(static_cast<uint8_t>(val ? ubjson_format::true_cd : ubjson_format::false_cd));
-        //jsoncons::detail::to_big_endian(static_cast<uint8_t>(val ? ubjson_format::true_cd : ubjson_format::false_cd), std::back_inserter(writer_));
+        result_.push_back(static_cast<uint8_t>(val ? ubjson_format::true_type : ubjson_format::false_type));
 
         end_value();
         return true;
