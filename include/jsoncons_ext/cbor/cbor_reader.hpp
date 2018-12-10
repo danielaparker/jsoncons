@@ -50,7 +50,7 @@ public:
         if (get_major_type(source_.peek()) == cbor_major_type::semantic_tag)
         {
             has_cbor_tag = true;
-            uint8_t c;
+            uint8_t c{};
             if (source_.get(c) == 0)
             {
                 ec = cbor_errc::unexpected_eof;

@@ -44,7 +44,7 @@ public:
     {
         //const uint8_t* pos = input_ptr_++;
 
-        uint8_t type;
+        uint8_t type{};
         source_.get(type);
 
         if (type <= 0xbf)
@@ -171,7 +171,7 @@ public:
 
                 case msgpack_format::uint8_cd: 
                 {
-                    uint8_t val;
+                    uint8_t val{};
                     source_.get(val);
                     handler_.uint64_value(val, semantic_tag_type::none, *this);
                     break;
@@ -593,8 +593,13 @@ public:
 private:
     void parse_name(std::error_code& ec)
     {
-        uint8_t type;
+        uint8_t type{};
         source_.get(type);
+        if (source_.eof())
+        {
+            ec = msgpack_errc::unexpected_eof;
+            return;
+        }
 
         //const uint8_t* pos = input_ptr_++;
         if (type >= 0xa0 && type <= 0xbf)

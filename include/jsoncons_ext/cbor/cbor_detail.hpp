@@ -800,7 +800,7 @@ uint64_t get_uint64_value(Source& source, std::error_code& ec)
     }
     const uint8_t* endp = nullptr;
 
-    uint8_t type;
+    uint8_t type{};
     if (source.get(type) == 0)
     {
         ec = cbor_errc::unexpected_eof;
@@ -1196,7 +1196,7 @@ double get_double(Source& source, std::error_code& ec)
     }
     const uint8_t* endp = nullptr;
 
-    uint8_t type;
+    uint8_t type{};
     if (source.get(type) == 0)
     {
         ec = cbor_errc::unexpected_eof;

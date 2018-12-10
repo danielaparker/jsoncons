@@ -59,11 +59,11 @@ public:
 
     void parse_e_list(bson_structure_type type, std::error_code& ec)
     {
-        uint8_t t;
+        uint8_t t{};
         while (source_.get(t) > 0 && t != 0x00)
         {
             std::basic_string<char> s;
-            uint8_t c;
+            uint8_t c{};
             while (source_.get(c) > 0 && c != 0)
             {
                 s.push_back(c);
@@ -118,7 +118,7 @@ public:
                     ec = bson_errc::unexpected_eof;
                     return;
                 }
-                uint8_t c;
+                uint8_t c{};
                 source_.get(c); // discard 0
                 auto result = unicons::validate(s.begin(),s.end());
                 if (result.ec != unicons::conv_errc())
@@ -164,7 +164,7 @@ public:
             }
             case bson_format::bool_cd:
             {
-                uint8_t val;
+                uint8_t val{};
                 if (source_.get(val) == 0)
                 {
                     ec = bson_errc::unexpected_eof;

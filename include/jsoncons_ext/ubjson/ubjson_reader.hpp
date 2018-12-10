@@ -44,7 +44,7 @@ public:
     {
         //const uint8_t* pos = input_ptr_++;
 
-        uint8_t type;
+        uint8_t type{};
         if (source_.get(type) == 0)
         {
             ec = ubjson_errc::unexpected_eof;
@@ -92,7 +92,7 @@ public:
             }
             case ubjson_format::uint8_type: 
             {
-                uint8_t val;
+                uint8_t val{};
                 if (source_.get(val) == 0)
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -243,7 +243,7 @@ public:
                 if (source_.peek() == ubjson_format::type_marker)
                 {
                     source_.ignore(1);
-                    uint8_t type;
+                    uint8_t type{};
                     if (source_.get(type) == 0)
                     {
                         ec = ubjson_errc::unexpected_eof;
@@ -306,7 +306,7 @@ public:
                 if (source_.peek() == ubjson_format::type_marker)
                 {
                     source_.ignore(1);
-                    uint8_t type;
+                    uint8_t type{};
                     if (source_.get(type) == 0)
                     {
                         ec = ubjson_errc::unexpected_eof;
@@ -408,7 +408,7 @@ private:
             ec = ubjson_errc::unexpected_eof;
             return length;
         }
-        uint8_t type;
+        uint8_t type{};
         if (source_.get(type) == 0)
         {
             ec = ubjson_errc::unexpected_eof;
@@ -440,7 +440,7 @@ private:
             }
             case ubjson_format::uint8_type: 
             {
-                uint8_t val;
+                uint8_t val{};
                 if (source_.get(val) == 0)
                 {
                     ec = ubjson_errc::unexpected_eof;
