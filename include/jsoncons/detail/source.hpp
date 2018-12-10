@@ -42,7 +42,7 @@ private:
     std::streambuf* sbuf_;
     size_t position_;
 
-    // Noncopyable and nonmoveable
+    // Noncopyable 
     binary_stream_source(const binary_stream_source&) = delete;
     binary_stream_source& operator=(const binary_stream_source&) = delete;
 public:
@@ -159,7 +159,7 @@ private:
     const uint8_t* input_end_;
     bool eof_;
 
-    // Noncopyable and nonmoveable
+    // Noncopyable 
     buffer_source(const buffer_source&) = delete;
     buffer_source& operator=(const buffer_source&) = delete;
 public:
@@ -171,7 +171,7 @@ public:
     }
 
     buffer_source(const uint8_t* data, size_t size)
-        : input_ptr_(data), input_end_(data+size), eof_(size == 0)  
+        : data_(data), input_ptr_(data), input_end_(data+size), eof_(size == 0)  
     {
     }
 

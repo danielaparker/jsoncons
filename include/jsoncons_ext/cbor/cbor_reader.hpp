@@ -163,6 +163,12 @@ public:
                 }
                 else
                 {
+                    auto result = unicons::validate(s.begin(),s.end());
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        ec = cbor_errc::invalid_utf8_text_string;
+                        return;
+                    }
                     handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
                 }
                 break;
@@ -377,6 +383,12 @@ private:
                 {
                     return;
                 }
+                auto result = unicons::validate(s.begin(),s.end());
+                if (result.ec != unicons::conv_errc())
+                {
+                    ec = cbor_errc::invalid_utf8_text_string;
+                    return;
+                }
                 handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                 break;
             }
@@ -399,6 +411,13 @@ private:
                 basic_cbor_reader<Source> reader(std::move(source_), serializer);
                 reader.read(ec);
                 source_ = std::move(reader.source_);
+                auto result = unicons::validate(s.begin(),s.end());
+                if (result.ec != unicons::conv_errc())
+                {
+                    ec = cbor_errc::invalid_utf8_text_string;
+                    return;
+                }
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
             }
         }
     }

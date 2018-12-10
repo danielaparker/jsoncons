@@ -97,9 +97,6 @@ public:
             {
                 // fixstr
                 const size_t len = type & 0x1f;
-                //const uint8_t* first = input_ptr_;
-                //const uint8_t* last = first + len;
-                //input_ptr_ += len; 
 
                 std::basic_string<char> s;
                 source_.read(std::back_inserter(s), len);
@@ -109,12 +106,12 @@ public:
                     return;
                 }
 
-                //auto result = unicons::convert(
-                //    first, last, std::back_inserter(s), unicons::conv_flags::strict);
-                //if (result.ec != unicons::conv_errc())
-                //{
-                //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                //}
+                auto result = unicons::validate(s.begin(),s.end());
+                if (result.ec != unicons::conv_errc())
+                {
+                    ec = msgpack_errc::invalid_utf8_text_string;
+                    return;
+                }
                 handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
             }
         }
@@ -304,12 +301,12 @@ public:
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
+                    auto result = unicons::validate(s.begin(),s.end());
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        ec = msgpack_errc::invalid_utf8_text_string;
+                        return;
+                    }
                     handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
                     break;
                 }
@@ -334,13 +331,12 @@ public:
                         return;
                     }
 
-                    //std::basic_string<char> s;
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
+                    auto result = unicons::validate(s.begin(),s.end());
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        ec = msgpack_errc::invalid_utf8_text_string;
+                        return;
+                    }
                     handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
                     break;
                 }
@@ -365,13 +361,12 @@ public:
                         return;
                     }
 
-                    //std::basic_string<char> s;
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
+                    auto result = unicons::validate(s.begin(),s.end());
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        ec = msgpack_errc::invalid_utf8_text_string;
+                        return;
+                    }
                     handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
                     break;
                 }
@@ -604,26 +599,23 @@ private:
         //const uint8_t* pos = input_ptr_++;
         if (type >= 0xa0 && type <= 0xbf)
         {
-                    // fixstr
-                const size_t len = type & 0x1f;
-                //const uint8_t* first = input_ptr_;
-                //const uint8_t* last = first + len;
-                //input_ptr_ += len; 
+                // fixstr
+            const size_t len = type & 0x1f;
 
-                std::basic_string<char> s;
-                source_.read(std::back_inserter(s), len);
-                if (source_.eof())
-                {
-                    ec = msgpack_errc::unexpected_eof;
-                    return;
-                }
-                //auto result = unicons::convert(
-                //    first, last, std::back_inserter(s), unicons::conv_flags::strict);
-                //if (result.ec != unicons::conv_errc())
-                //{
-                //   JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                //}
-                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+            std::basic_string<char> s;
+            source_.read(std::back_inserter(s), len);
+            if (source_.eof())
+            {
+                ec = msgpack_errc::unexpected_eof;
+                return;
+            }
+            auto result = unicons::validate(s.begin(),s.end());
+            if (result.ec != unicons::conv_errc())
+            {
+                ec = msgpack_errc::invalid_utf8_text_string;
+                return;
+            }
+            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
         }
         else
         {
@@ -649,12 +641,12 @@ private:
                         return;
                     }
 
-                    //auto result = unicons::convert(
-                    //    first, last,std::back_inserter(s),unicons::conv_flags::strict);
-                    //if (result.ec != unicons::conv_errc())
-                    //{
-                    //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
-                    //}
+                    auto result = unicons::validate(s.begin(),s.end());
+                    if (result.ec != unicons::conv_errc())
+                    {
+                        ec = msgpack_errc::invalid_utf8_text_string;
+                        return;
+                    }
                     handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                     break;
                 }

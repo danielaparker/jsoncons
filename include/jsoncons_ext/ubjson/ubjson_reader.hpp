@@ -182,6 +182,12 @@ public:
                 }
                 const uint8_t* endp;
                 char c = jsoncons::detail::from_big_endian<char>(buf,buf+sizeof(buf),&endp);
+                auto result = unicons::validate(&c,&c+1);
+                if (result.ec != unicons::conv_errc())
+                {
+                    ec = ubjson_errc::invalid_utf8_text_string;
+                    return;
+                }
                 handler_.string_value(basic_string_view<char>(&c,1), semantic_tag_type::none, *this);
                 break;
             }
@@ -197,6 +203,12 @@ public:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    return;
+                }
+                auto result = unicons::validate(s.begin(),s.end());
+                if (result.ec != unicons::conv_errc())
+                {
+                    ec = ubjson_errc::invalid_utf8_text_string;
                     return;
                 }
                 handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
@@ -524,6 +536,12 @@ private:
         if (source_.eof())
         {
             ec = ubjson_errc::unexpected_eof;
+            return;
+        }
+        auto result = unicons::validate(s.begin(),s.end());
+        if (result.ec != unicons::conv_errc())
+        {
+            ec = ubjson_errc::invalid_utf8_text_string;
             return;
         }
         handler_.name(basic_string_view<char>(s.data(),s.length()), *this);

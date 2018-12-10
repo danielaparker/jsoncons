@@ -17,7 +17,8 @@ enum class cbor_errc
     ok = 0,
     unexpected_eof,
     source_error,
-    invalid_decimal
+    invalid_decimal,
+    invalid_utf8_text_string
 };
 
 class cbor_error_category_impl
@@ -32,14 +33,16 @@ public:
     {
         switch (static_cast<cbor_errc>(ev))
         {
-        case cbor_errc::unexpected_eof:
-            return "Unexpected end of file";
-        case cbor_errc::source_error:
-            return "Source error";
-       case cbor_errc::invalid_decimal:
-           return "Invalid decimal";
-       default:
-            return "Unknown CBOR parser error";
+            case cbor_errc::unexpected_eof:
+                return "Unexpected end of file";
+            case cbor_errc::source_error:
+                return "Source error";
+           case cbor_errc::invalid_decimal:
+               return "Invalid decimal";
+            case cbor_errc::invalid_utf8_text_string:
+                return "Illegal UTF-8 encoding in text string";
+           default:
+                return "Unknown CBOR parser error";
         }
     }
 };

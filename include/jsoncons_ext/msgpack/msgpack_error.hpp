@@ -16,7 +16,8 @@ enum class msgpack_errc
 {
     ok = 0,
     unexpected_eof = 1,
-    source_error
+    source_error,
+    invalid_utf8_text_string
 };
 
 class msgpack_error_category_impl
@@ -31,12 +32,14 @@ public:
     {
         switch (static_cast<msgpack_errc>(ev))
         {
-        case msgpack_errc::unexpected_eof:
-            return "Unexpected end of file";
-        case msgpack_errc::source_error:
-            return "Source error";
-       default:
-            return "Unknown MessagePack parser error";
+            case msgpack_errc::unexpected_eof:
+                return "Unexpected end of file";
+            case msgpack_errc::source_error:
+                return "Source error";
+            case msgpack_errc::invalid_utf8_text_string:
+                return "Illegal UTF-8 encoding in text string";
+            default:
+                return "Unknown MessagePack parser error";
         }
     }
 };

@@ -225,7 +225,7 @@ size_t get_length(Source& source, std::error_code& ec)
     }
     const uint8_t* endp = nullptr;
 
-    uint8_t type;
+    uint8_t type{};
     source.get(type);
     if (source.eof())
     {
