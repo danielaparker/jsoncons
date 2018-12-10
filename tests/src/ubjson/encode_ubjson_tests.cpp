@@ -89,37 +89,36 @@ TEST_CASE("encode_ubjson_test")
     check_encode_ubjson({'d',0,0,0,0},json(0.0));
     check_encode_ubjson({'d',0xbf,0x80,0,0},json(-1.0));
     check_encode_ubjson({'d',0xcb,0x7f,0xff,0xff},json(-16777215.0));
-#if 0
 
     // string
-    check_encode_ubjson({0xa0},json(""));
-    check_encode_ubjson({0xa1,' '},json(" "));
-    check_encode_ubjson({0xbf,'1','2','3','4','5','6','7','8','9','0',
+    check_encode_ubjson({'S','U',0x00},json(""));
+    check_encode_ubjson({'S','U',0x01,' '},json(" "));
+    check_encode_ubjson({'S','U',0x1f,'1','2','3','4','5','6','7','8','9','0',
                        '1','2','3','4','5','6','7','8','9','0',
                        '1','2','3','4','5','6','7','8','9','0',
                        '1'},
                  json("1234567890123456789012345678901"));
-    check_encode_ubjson({0xd9,0x20,'1','2','3','4','5','6','7','8','9','0',
+    check_encode_ubjson({'S','U',0x20,'1','2','3','4','5','6','7','8','9','0',
                             '1','2','3','4','5','6','7','8','9','0',
                             '1','2','3','4','5','6','7','8','9','0',
                             '1','2'},
                  json("12345678901234567890123456789012"));
-
-#endif
 }
-#if 0
 TEST_CASE("encode_ubjson_arrays_and_maps")
 {
-    // fixarray
-    check_encode_ubjson({0x90},json::array());
-    check_encode_ubjson({0x80},json::object());
+    check_encode_ubjson({'[','#','U',0x00},json::array());
+    check_encode_ubjson({'{','#','U',0x00},json::object());
+    check_encode_ubjson({'[','#','U',0x01,'U',0x00},json::parse("[0]"));
+    check_encode_ubjson({'[','#','U',0x02,'U',0x00,'U',0x00},json::parse("[0,0]"));
+    check_encode_ubjson({'[','#','U',0x02,
+                         '[','#','U',0x01,'U',0x00,
+                         'U',0x00},json::parse("[[0],0]"));
+#if 0
 
-    check_encode_ubjson({0x91,'\0'},json::parse("[0]"));
-    check_encode_ubjson({0x92,'\0','\0'},json::array({0,0}));
-    check_encode_ubjson({0x92,0x91,'\0','\0'}, json::parse("[[0],0]"));
     check_encode_ubjson({0x91,0xa5,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
     check_encode_ubjson({0x81,0xa2,'o','c',0x91,'\0'}, json::parse("{\"oc\": [0]}"));
     check_encode_ubjson({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
-}
 #endif
+}
+
