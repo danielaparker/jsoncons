@@ -30,14 +30,12 @@ class basic_msgpack_reader : public serializing_context
 {
     Source source_;
     json_content_handler& handler_;
-    size_t column_;
     size_t nesting_depth_;
     std::string buffer_;
 public:
     basic_msgpack_reader(Source&& source, json_content_handler& handler)
        : source_(std::move(source)),
          handler_(handler), 
-         column_(1),
          nesting_depth_(0)
     {
     }
@@ -590,12 +588,12 @@ public:
 
     size_t line_number() const override
     {
-        return 1;
+        return source_.line_number();
     }
 
     size_t column_number() const override
     {
-        return column_;
+        return source_.column_number();
     }
 private:
     void parse_name(std::error_code& ec)

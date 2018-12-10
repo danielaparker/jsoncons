@@ -32,22 +32,14 @@ class basic_cbor_reader : public serializing_context
 {
     Source source_;
     json_content_handler& handler_;
-    size_t column_;
     size_t nesting_depth_;
     std::string buffer_;
 public:
     basic_cbor_reader(Source&& source, json_content_handler& handler)
        : source_(std::move(source)),
          handler_(handler), 
-         column_(1),
          nesting_depth_(0)
     {
-    }
-
-    void reset()
-    {
-        column_ = 1;
-        nesting_depth_ = 0;
     }
 
     void read(std::error_code& ec)
@@ -366,12 +358,12 @@ public:
 
     size_t line_number() const override
     {
-        return 1;
+        return source_.line_number();
     }
 
     size_t column_number() const override
     {
-        return column_;
+        return source_.column_number();
     }
 private:
     void read_name(std::error_code& ec)

@@ -22,12 +22,14 @@ public:
           column_number_(0)
     {
     }
+    parse_error(std::error_code ec)
+        : error_code_(ec), line_number_(0), column_number_(0)
+    {
+    }
     parse_error(std::error_code ec,
                 size_t line,
                 size_t column)
-        : error_code_(ec),
-          line_number_(line),
-          column_number_(column)
+        : error_code_(ec), line_number_(line), column_number_(column)
     {
     }
     parse_error(const parse_error& other)
@@ -42,7 +44,15 @@ public:
         try
         {
             std::ostringstream os;
-            os << error_code_.message() << " at line " << line_number_ << " and column " << column_number_;
+            os << error_code_.message();
+            if (line_number_ != 0 && column_number_ != 0)
+            {
+                os << " at line " << line_number_ << " and column " << column_number_;
+            }
+            else if (column_number_ != 0)
+            {
+                os << " at position " << column_number_;
+            }
             const_cast<std::string&>(buffer_) = os.str();
             return buffer_.c_str();
         }

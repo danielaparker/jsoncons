@@ -40,6 +40,7 @@ public:
 private:
     std::istream* is_;
     std::streambuf* sbuf_;
+    size_t column_;
 
     // Noncopyable and nonmoveable
     binary_stream_source(const binary_stream_source&) = delete;
@@ -48,7 +49,7 @@ public:
     binary_stream_source(binary_stream_source&&) = default;
 
     binary_stream_source(std::istream& is)
-        : is_(std::addressof(is)), sbuf_(is.rdbuf())
+        : is_(std::addressof(is)), sbuf_(is.rdbuf()), column_(0)
     {
     }
 
@@ -63,12 +64,23 @@ public:
         return is_->eof();  
     }
 
+    size_t line_number() const
+    {
+        return 0;
+    }
+
+    size_t column_number() const
+    {
+        return column_;
+    }
+
     size_t get(value_type& c)
     {
         int val = sbuf_->sbumpc();
         if (!(val == traits_type::eof()))
         {
             c = (value_type)val;
+            ++column_;
             return 1;
         }
         else
@@ -85,6 +97,10 @@ public:
         {
             is_->clear(is_->rdstate() | std::ios::eofbit);
         }
+        else
+        {
+            ++column_;
+        }
         return c;
     }
 
@@ -97,6 +113,10 @@ public:
             {
                 is_->clear(is_->rdstate() | std::ios::eofbit);
                 return;
+            }
+            else
+            {
+                ++column_;
             }
         }
     }
@@ -123,6 +143,10 @@ public:
                 is_->clear(is_->rdstate() | std::ios::eofbit);
                 return count;
             }
+            else
+            {
+                ++column_;
+            }
             *p++ = (value_type)c;
         }
         return count;
@@ -135,6 +159,7 @@ public:
     typedef uint8_t value_type;
     typedef binary_traits traits_type;
 private:
+    const uint8_t* data_;
     const uint8_t* input_ptr_;
     const uint8_t* input_end_;
     bool eof_;
@@ -146,7 +171,7 @@ public:
     buffer_source(buffer_source&&) = default;
 
     buffer_source(const std::vector<uint8_t>& s)
-        : input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
+        : data_(s.data()), input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
     {
     }
 
@@ -160,6 +185,16 @@ public:
     bool eof() const
     {
         return eof_;  
+    }
+
+    size_t line_number() const
+    {
+        return 0;
+    }
+
+    size_t column_number() const
+    {
+        return input_ptr_ - data_ + 1;
     }
 
     size_t get(value_type& c)

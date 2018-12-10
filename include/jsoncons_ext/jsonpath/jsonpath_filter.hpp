@@ -144,120 +144,120 @@ public:
     }
     virtual bool accept_single_node() const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual Json evaluate_single_node() const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool exclaim() const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool eq_term(const term&) const 
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool eq(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool ne_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool ne(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool regex_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool regex2(const string_type&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool ampamp_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool ampamp(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool pipepipe_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool pipepipe(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool lt_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool lt(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool gt_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual bool gt(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json minus_term(const term&) const 
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual Json minus(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json left_minus(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json unary_minus() const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual Json plus_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual Json plus(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual Json mult_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual Json mult(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json div_term(const term&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
     virtual Json div(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
 
     virtual Json left_div(const Json&) const
     {
-        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator,1,1);
+        throw parse_error(jsonpath_parser_errc::invalid_filter_unsupported_operator);
     }
 };
 
