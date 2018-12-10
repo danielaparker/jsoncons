@@ -1,6 +1,6 @@
 ### jsoncons::cbor::encode_cbor
 
-Encodes a json value to the [cbor](http://cbor.io/) binary serialization format.
+Encodes a json value to the [Concise Binary Object Representation](http://cbor.io/) data format.
 
 #### Header
 ```c++
@@ -19,7 +19,7 @@ void encode_cbor(const Json& j, std::basic_ostream<typename Json::char_type>& os
 
 #### See also
 
-- [decode_cbor](decode_cbor) decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
+- [decode_cbor](decode_cbor) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
 
 ### Examples
 
@@ -169,5 +169,5 @@ Output:
 
 - [byte_string](../byte_string.md)
 - [cbor_view](cbor_view)
-- [decode_cbor](decode_cbor.md) decodes a [cbor](http://cbor.io/) binary serialization format to a json value.
+- [decode_cbor](decode_cbor.md) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
 

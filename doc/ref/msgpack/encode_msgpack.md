@@ -1,6 +1,6 @@
 ### jsoncons::msgpack::encode_msgpack
 
-Encodes a json value to the [MessagePack](http://msgpack.org/index.html) binary serialization format.
+Encodes a json value to the [MessagePack](http://msgpack.org/index.html) data format.
 
 #### Header
 ```c++
@@ -12,7 +12,7 @@ void encode_msgpack(const Json& jval, std::vector<uint8_t>& v)
 
 #### See also
 
-- [decode_msgpack](decode_msgpack) decodes a [MessagePack](http://msgpack.org/index.html) binary serialization format to a json value.
+- [decode_msgpack](decode_msgpack) decodes a [MessagePack](http://msgpack.org/index.html) data format to a json value.
 
 ### Examples
 

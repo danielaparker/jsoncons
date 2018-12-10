@@ -1,6 +1,6 @@
 ### jsoncons::bson::encode_bson
 
-Encodes a json value to the [Bin­ary JSON](http://bsonspec.org/) binary serialization format.
+Encodes a json value to the [Bin­ary JSON](http://bsonspec.org/) data format.
 
 #### Header
 ```c++
@@ -12,5 +12,5 @@ void encode_bson(const Json& jval, std::vector<uint8_t>& v)
 
 #### See also
 
-- [decode_bson](decode_bson) decodes a [Bin­ary JSON](http://bsonspec.org/) binary serialization format to a json value.
+- [decode_bson](decode_bson) decodes a [Bin­ary JSON](http://bsonspec.org/) data format to a json value.
 

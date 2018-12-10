@@ -59,7 +59,7 @@ template<class Json>
 typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 
 decode_ubjson(std::basic_istream<typename Json::char_type>& is)
 {
-    typedef typename Json::char_type char_type;
+    //typedef typename Json::char_type char_type;
 
     jsoncons::json_decoder<Json> decoder;
     ubjson_reader parser(is, decoder);
@@ -76,7 +76,7 @@ template<class Json>
 typename std::enable_if<!std::is_same<typename Json::char_type,char>::value,Json>::type 
 decode_ubjson(std::basic_istream<typename Json::char_type>& is)
 {
-    typedef typename Json::char_type char_type;
+    //typedef typename Json::char_type char_type;
 
     jsoncons::json_decoder<Json> decoder;
     basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);

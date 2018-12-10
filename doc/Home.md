@@ -44,7 +44,7 @@ All core jsoncons classes and functions are in namespace `jsoncons`.
 
 #### [msgpack](ref/msgpack/msgpack.md)
 
-#### [cbor](ref/cbor/cbor.md)
+#### [Concise Binary Object Representation](ref/cbor/cbor.md)
 
 ### Tutorials
 

@@ -32,7 +32,8 @@ Message Pack enhancements
 
 New features:
 
-- decode from and encode to the [bson](http://bsonspec.org/) binary serialization format
+- decode from and encode to the [Universal Binary JSON Specification (ubjson)](http://bsonspec.org/) data format
+- decode from and encode to the [Binary JSON (bson)](http://bsonspec.org/) data format
 
 version 0.113.0
 ---------------
