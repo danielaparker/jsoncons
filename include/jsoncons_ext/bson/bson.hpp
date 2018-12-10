@@ -52,7 +52,7 @@ template<class Json>
 void encode_bson(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_bson_serializer<char_type,jsoncons::detail::bytes_result> serializer(v);
+    basic_bson_serializer<char_type,jsoncons::detail::buffer_result> serializer(v);
     j.dump(serializer);
 }
   

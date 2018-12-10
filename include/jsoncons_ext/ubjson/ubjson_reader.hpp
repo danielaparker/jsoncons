@@ -81,7 +81,7 @@ public:
             case ubjson_format::int8_type: 
             {
                 uint8_t buf[sizeof(int8_t)];
-                source_.read(sizeof(int8_t), buf);
+                source_.read(buf, sizeof(int8_t));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -106,7 +106,7 @@ public:
             case ubjson_format::int16_type: 
             {
                 uint8_t buf[sizeof(int16_t)];
-                source_.read(sizeof(int16_t), buf);
+                source_.read(buf, sizeof(int16_t));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -120,7 +120,7 @@ public:
             case ubjson_format::int32_type: 
             {
                 uint8_t buf[sizeof(int32_t)];
-                source_.read(sizeof(int32_t), buf);
+                source_.read(buf, sizeof(int32_t));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -134,7 +134,7 @@ public:
             case ubjson_format::int64_type: 
             {
                 uint8_t buf[sizeof(int64_t)];
-                source_.read(sizeof(int64_t), buf);
+                source_.read(buf, sizeof(int64_t));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -148,7 +148,7 @@ public:
             case ubjson_format::float32_type: 
             {
                 uint8_t buf[sizeof(float)];
-                source_.read(sizeof(float), buf);
+                source_.read(buf, sizeof(float));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -162,7 +162,7 @@ public:
             case ubjson_format::float64_type: 
             {
                 uint8_t buf[sizeof(double)];
-                source_.read(sizeof(double), buf);
+                source_.read(buf, sizeof(double));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -176,7 +176,7 @@ public:
             case ubjson_format::char_type: 
             {
                 uint8_t buf[sizeof(char)];
-                source_.read(sizeof(char), buf);
+                source_.read(buf, sizeof(char));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -195,7 +195,7 @@ public:
                     return;
                 }
                 std::string s;
-                source_.read(length,std::back_inserter(s));
+                source_.read(std::back_inserter(s), length);
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -212,7 +212,7 @@ public:
                     return;
                 }
                 std::string s;
-                source_.read(length,std::back_inserter(s));
+                source_.read(std::back_inserter(s), length);
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -409,7 +409,7 @@ private:
             case ubjson_format::int8_type: 
             {
                 uint8_t buf[sizeof(int8_t)];
-                source_.read(sizeof(int8_t), buf);
+                source_.read(buf, sizeof(int8_t));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -442,7 +442,7 @@ private:
             case ubjson_format::int16_type: 
             {
                 uint8_t buf[sizeof(int16_t)];
-                source_.read(sizeof(int16_t), buf);
+                source_.read(buf, sizeof(int16_t));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -464,7 +464,7 @@ private:
             case ubjson_format::int32_type: 
             {
                 uint8_t buf[sizeof(int32_t)];
-                source_.read(sizeof(int32_t), buf);
+                source_.read(buf, sizeof(int32_t));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -486,7 +486,7 @@ private:
             case ubjson_format::int64_type: 
             {
                 uint8_t buf[sizeof(int64_t)];
-                source_.read(sizeof(int64_t), buf);
+                source_.read(buf, sizeof(int64_t));
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
@@ -522,7 +522,7 @@ private:
             return;
         }
         std::string s;
-        source_.read(length,std::back_inserter(s));
+        source_.read(std::back_inserter(s), length);
         if (source_.eof())
         {
             ec = ubjson_errc::unexpected_eof;
@@ -532,7 +532,9 @@ private:
     }
 };
 
-typedef basic_ubjson_reader<jsoncons::detail::buffer_source> ubjson_reader;
+typedef basic_ubjson_reader<jsoncons::detail::binary_stream_source> ubjson_reader;
+
+typedef basic_ubjson_reader<jsoncons::detail::buffer_source> ubjson_buffer_reader;
 
 }}
 

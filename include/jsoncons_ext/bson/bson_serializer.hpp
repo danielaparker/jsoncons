@@ -318,7 +318,7 @@ private:
 
 typedef basic_bson_serializer<char,jsoncons::detail::byte_stream_result> bson_serializer;
 
-typedef basic_bson_serializer<char,jsoncons::detail::bytes_result> bson_buffer_serializer;
+typedef basic_bson_serializer<char,jsoncons::detail::buffer_result> bson_buffer_serializer;
 
 }}
 #endif

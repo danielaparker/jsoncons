@@ -267,7 +267,7 @@ size_t get_length(Source& source, std::error_code& ec)
     case 0x19: // two-byte uint16_t for n follow
         {
             uint8_t buf[sizeof(uint16_t)];
-            source.read(sizeof(uint16_t),buf);
+            source.read(buf, sizeof(uint16_t));
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -279,7 +279,7 @@ size_t get_length(Source& source, std::error_code& ec)
     case 0x1a: // four-byte uint32_t for n follow
         {
             uint8_t buf[sizeof(uint32_t)];
-            source.read(sizeof(uint32_t),buf);
+            source.read(buf, sizeof(uint32_t));
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -291,7 +291,7 @@ size_t get_length(Source& source, std::error_code& ec)
     case 0x1b: // eight-byte uint64_t for n follow
         {
             uint8_t buf[sizeof(uint64_t)];
-            source.read(sizeof(uint64_t),buf);
+            source.read(buf, sizeof(uint64_t));
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -450,7 +450,7 @@ std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
                 return v;
             }
             v.reserve(length);
-            source.read(length,std::back_inserter(v));
+            source.read(std::back_inserter(v), length);
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -551,7 +551,7 @@ std::string get_text_string(Source& source, std::error_code& ec)
                 return s;
             }
             s.reserve(length);
-            source.read(length,std::back_inserter(s));
+            source.read(std::back_inserter(s), length);
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -831,7 +831,7 @@ uint64_t get_uint64_value(Source& source, std::error_code& ec)
         case 0x19: // Unsigned integer (two-byte uint16_t follows)
         {
             uint8_t buf[sizeof(uint16_t)];
-            source.read(sizeof(uint16_t),buf);
+            source.read(buf, sizeof(uint16_t));
             val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
             break;
         }
@@ -839,7 +839,7 @@ uint64_t get_uint64_value(Source& source, std::error_code& ec)
         case 0x1a: // Unsigned integer (four-byte uint32_t follows)
         {
             uint8_t buf[sizeof(uint32_t)];
-            source.read(sizeof(uint32_t),buf);
+            source.read(buf, sizeof(uint32_t));
             val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
             break;
         }
@@ -847,7 +847,7 @@ uint64_t get_uint64_value(Source& source, std::error_code& ec)
         case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
         {
             uint8_t buf[sizeof(uint64_t)];
-            source.read(sizeof(uint64_t),buf);
+            source.read(buf, sizeof(uint64_t));
             val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
             break;
         }
@@ -1066,7 +1066,7 @@ int64_t get_int64_value(Source& source, std::error_code& ec)
                 case 0x19: // Negative integer -1-n (two-byte uint16_t follows)
                     {
                         uint8_t buf[sizeof(uint16_t)];
-                        if (source.read(sizeof(uint16_t),buf) != sizeof(uint16_t))
+                        if (source.read(buf, sizeof(uint16_t)) != sizeof(uint16_t))
                         {
                             return val;
                         }
@@ -1078,7 +1078,7 @@ int64_t get_int64_value(Source& source, std::error_code& ec)
                 case 0x1a: // Negative integer -1-n (four-byte uint32_t follows)
                     {
                         uint8_t buf[sizeof(uint32_t)];
-                        if (source.read(sizeof(uint32_t),buf) != sizeof(uint32_t))
+                        if (source.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
                         {
                             return val;
                         }
@@ -1090,7 +1090,7 @@ int64_t get_int64_value(Source& source, std::error_code& ec)
                 case 0x1b: // Negative integer -1-n (eight-byte uint64_t follows)
                     {
                         uint8_t buf[sizeof(uint64_t)];
-                        if (source.read(sizeof(uint64_t),buf) != sizeof(uint64_t))
+                        if (source.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
                         {
                             return val;
                         }
@@ -1208,7 +1208,7 @@ double get_double(Source& source, std::error_code& ec)
     case 0x19: // Half-Precision Float (two-byte IEEE 754)
         {
             uint8_t buf[sizeof(uint16_t)];
-            source.read(sizeof(uint16_t),buf);
+            source.read(buf, sizeof(uint16_t));
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -1223,7 +1223,7 @@ double get_double(Source& source, std::error_code& ec)
     case 0x1a: // Single-Precision Float (four-byte IEEE 754)
         {
             uint8_t buf[sizeof(float)];
-            source.read(sizeof(float),buf);
+            source.read(buf, sizeof(float));
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -1236,7 +1236,7 @@ double get_double(Source& source, std::error_code& ec)
     case 0x1b: //  Double-Precision Float (eight-byte IEEE 754)
         {
             uint8_t buf[sizeof(double)];
-            source.read(sizeof(double),buf);
+            source.read(buf, sizeof(double));
             if (source.eof())
             {
                 ec = cbor_errc::unexpected_eof;
@@ -1470,21 +1470,21 @@ void walk(Source& source, std::error_code& ec)
                 {
                     source.ignore(1);
                     uint8_t buf[sizeof(uint16_t)];
-                    source.read(sizeof(uint16_t),buf);
+                    source.read(buf, sizeof(uint16_t));
                     break;
                 }
                 case 26: // Single-Precision Float (four-byte IEEE 754)
                 {
                     source.ignore(1);
                     uint8_t buf[sizeof(float)];
-                    source.read(sizeof(float),buf);
+                    source.read(buf, sizeof(float));
                     break;
                 }
                 case 27: // Double-Precision Float (eight-byte IEEE 754)
                 {
                     source.ignore(1);
                     uint8_t buf[sizeof(double)];
-                    source.read(sizeof(double),buf);
+                    source.read(buf, sizeof(double));
                     break;
                 }
                 default:

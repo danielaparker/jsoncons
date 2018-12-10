@@ -104,7 +104,7 @@ public:
                 //input_ptr_ += len; 
 
                 std::basic_string<char> s;
-                source_.read(len,std::back_inserter(s));
+                source_.read(std::back_inserter(s), len);
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
@@ -147,7 +147,7 @@ public:
                 case msgpack_format::float32_cd: 
                 {
                     uint8_t buf[sizeof(float)];
-                    source_.read(sizeof(float), buf);
+                    source_.read(buf, sizeof(float));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -162,7 +162,7 @@ public:
                 case msgpack_format::float64_cd: 
                 {
                     uint8_t buf[sizeof(double)];
-                    source_.read(sizeof(double), buf);
+                    source_.read(buf, sizeof(double));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -185,7 +185,7 @@ public:
                 case msgpack_format::uint16_cd: 
                 {
                     uint8_t buf[sizeof(uint16_t)];
-                    source_.read(sizeof(uint16_t), buf);
+                    source_.read(buf, sizeof(uint16_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -200,7 +200,7 @@ public:
                 case msgpack_format::uint32_cd: 
                 {
                     uint8_t buf[sizeof(uint32_t)];
-                    source_.read(sizeof(uint32_t), buf);
+                    source_.read(buf, sizeof(uint32_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -215,7 +215,7 @@ public:
                 case msgpack_format::uint64_cd: 
                 {
                     uint8_t buf[sizeof(uint64_t)];
-                    source_.read(sizeof(uint64_t), buf);
+                    source_.read(buf, sizeof(uint64_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -230,7 +230,7 @@ public:
                 case msgpack_format::int8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
-                    source_.read(sizeof(int8_t), buf);
+                    source_.read(buf, sizeof(int8_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -245,7 +245,7 @@ public:
                 case msgpack_format::int16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
+                    source_.read(buf, sizeof(int16_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -260,7 +260,7 @@ public:
                 case msgpack_format::int32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
+                    source_.read(buf, sizeof(int32_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -275,7 +275,7 @@ public:
                 case msgpack_format::int64_cd: 
                 {
                     uint8_t buf[sizeof(int64_t)];
-                    source_.read(sizeof(int64_t), buf);
+                    source_.read(buf, sizeof(int64_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -290,7 +290,7 @@ public:
                 case msgpack_format::str8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
-                    source_.read(sizeof(int8_t), buf);
+                    source_.read(buf, sizeof(int8_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -300,7 +300,7 @@ public:
                     int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
+                    source_.read(std::back_inserter(s), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -319,7 +319,7 @@ public:
                 case msgpack_format::str16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
+                    source_.read(buf, sizeof(int16_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -329,7 +329,7 @@ public:
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
+                    source_.read(std::back_inserter(s), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -350,7 +350,7 @@ public:
                 case msgpack_format::str32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
+                    source_.read(buf, sizeof(int32_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -360,7 +360,7 @@ public:
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
+                    source_.read(std::back_inserter(s), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -381,7 +381,7 @@ public:
                 case msgpack_format::bin8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
-                    source_.read(sizeof(int8_t), buf);
+                    source_.read(buf, sizeof(int8_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -392,7 +392,7 @@ public:
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
-                    source_.read(len, std::back_inserter(v));
+                    source_.read(std::back_inserter(v), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -409,7 +409,7 @@ public:
                 case msgpack_format::bin16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
+                    source_.read(buf, sizeof(int16_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -420,7 +420,7 @@ public:
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
-                    source_.read(len, std::back_inserter(v));
+                    source_.read(std::back_inserter(v), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -437,7 +437,7 @@ public:
                 case msgpack_format::bin32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
+                    source_.read(buf, sizeof(int32_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -448,7 +448,7 @@ public:
 
                     std::vector<uint8_t> v;
                     v.reserve(len);
-                    source_.read(len, std::back_inserter(v));
+                    source_.read(std::back_inserter(v), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -465,7 +465,7 @@ public:
                 case msgpack_format::array16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
+                    source_.read(buf, sizeof(int16_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -492,7 +492,7 @@ public:
                 case msgpack_format::array32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
+                    source_.read(buf, sizeof(int32_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -519,7 +519,7 @@ public:
                 case msgpack_format::map16_cd : 
                 {
                     uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
+                    source_.read(buf, sizeof(int16_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -551,7 +551,7 @@ public:
                 case msgpack_format::map32_cd : 
                 {
                     uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
+                    source_.read(buf, sizeof(int32_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -613,7 +613,7 @@ private:
                 //input_ptr_ += len; 
 
                 std::basic_string<char> s;
-                source_.read(len, std::back_inserter(s));
+                source_.read(std::back_inserter(s), len);
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
@@ -634,7 +634,7 @@ private:
                 case msgpack_format::str8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
-                    source_.read(sizeof(int8_t), buf);
+                    source_.read(buf, sizeof(int8_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -644,7 +644,7 @@ private:
                     int8_t len = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
+                    source_.read(std::back_inserter(s), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -664,7 +664,7 @@ private:
                 case msgpack_format::str16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
-                    source_.read(sizeof(int16_t), buf);
+                    source_.read(buf, sizeof(int16_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -674,7 +674,7 @@ private:
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
+                    source_.read(std::back_inserter(s), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -695,7 +695,7 @@ private:
                 case msgpack_format::str32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
-                    source_.read(sizeof(int32_t), buf);
+                    source_.read(buf, sizeof(int32_t));
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
@@ -705,7 +705,7 @@ private:
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     std::basic_string<char> s;
-                    source_.read(len, std::back_inserter(s));
+                    source_.read(std::back_inserter(s), len);
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;

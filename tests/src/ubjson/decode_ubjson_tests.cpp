@@ -18,8 +18,17 @@ using namespace jsoncons::ubjson;
 
 void check_decode_ubjson(const std::vector<uint8_t>& v, const json& expected)
 {
-    json result = decode_ubjson<json>(v);
-    REQUIRE(result == expected);
+    json j1 = decode_ubjson<json>(v);
+    REQUIRE(j1 == expected);
+
+    std::string s;
+    for (auto c : v)
+    {
+        s.push_back(c);
+    }
+    std::istringstream is(s);
+    json j2 = decode_ubjson<json>(is);
+    REQUIRE(j2 == expected);
 }
 
 TEST_CASE("decode_number_ubjson_test")
@@ -49,7 +58,6 @@ TEST_CASE("decode_number_ubjson_test")
         check_decode_ubjson({'L',0,0,0,0,0xff,0xff,0xff,0xff},json(4294967295));
         check_decode_ubjson({'L',0,0,0,1,0,0,0,0},json(4294967296));
         check_decode_ubjson({'L',0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
-
         // negative integers
         check_decode_ubjson({'I',0xff,0},json(-256));
         check_decode_ubjson({'I',0xfe,0xff},json(-257));
@@ -90,7 +98,6 @@ TEST_CASE("decode_number_ubjson_test")
                              0xff,0}, // -256
                              json::parse("[256,-256]"));
     }
-
 #if 0
     check_decode_ubjson({'I',0x01,0x00},json(256U));
     check_decode_ubjson({'I',0xff,0xff},json(65535U));

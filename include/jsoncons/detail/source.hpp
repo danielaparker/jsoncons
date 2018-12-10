@@ -32,6 +32,103 @@ struct binary_traits
     }
 };
 
+class binary_stream_source 
+{
+public:
+    typedef uint8_t value_type;
+    typedef binary_traits traits_type;
+private:
+    std::istream& is_;
+    std::streambuf* sbuf_;
+
+    // Noncopyable and nonmoveable
+    binary_stream_source(const binary_stream_source&) = delete;
+    binary_stream_source& operator=(const binary_stream_source&) = delete;
+public:
+    binary_stream_source(binary_stream_source&&) = default;
+
+    binary_stream_source(std::istream& is)
+        : is_(is), sbuf_(is.rdbuf())
+    {
+    }
+
+    ~binary_stream_source()
+    {
+    }
+
+    binary_stream_source& operator=(binary_stream_source&&) = default;
+
+    bool eof() const
+    {
+        return is_.eof();  
+    }
+
+    size_t get(value_type& c)
+    {
+        int val = sbuf_->sbumpc();
+        if (!(val == traits_type::eof()))
+        {
+            c = (value_type)val;
+            return 1;
+        }
+        else
+        {
+            is_.clear(is_.rdstate() | std::ios::eofbit);
+            return 0;
+        }
+    }
+
+    int get()
+    {
+        int c = sbuf_->sbumpc();
+        if (c == traits_type::eof())
+        {
+            is_.clear(is_.rdstate() | std::ios::eofbit);
+        }
+        return c;
+    }
+
+    void ignore(size_t count)
+    {
+        for (size_t i = 0; i < count; ++i)
+        {
+            int c = sbuf_->sbumpc();
+            if (c == traits_type::eof())
+            {
+                is_.clear(is_.rdstate() | std::ios::eofbit);
+                return;
+            }
+        }
+    }
+
+    int peek() 
+    {
+        int c = sbuf_->sgetc();
+        if (c == traits_type::eof())
+        {
+            is_.clear(is_.rdstate() | std::ios::eofbit);
+        }
+        return c;
+    }
+
+    template <class OutputIt>
+    size_t read(OutputIt p, size_t length)
+    {
+        size_t count = 0;
+        for (count = 0; count < length; ++count)
+        {
+            int c = sbuf_->sbumpc();
+            if (c == traits_type::eof())
+            {
+                is_.clear(is_.rdstate() | std::ios::eofbit);
+                return count;
+            }
+            *p++ = (value_type)c;
+        }
+        return count;
+    }
+};
+
 class buffer_source 
 {
 public:
@@ -109,12 +206,12 @@ public:
         input_ptr_ += len;
     }
 
-    int peek() const
+    int peek() 
     {
         return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
     }
 
-    size_t read(value_type* p, size_t length)
+    size_t read(uint8_t* p, size_t length)
     {
         size_t len;
         if ((size_t)(input_end_ - input_ptr_) < length)
@@ -132,7 +229,7 @@ public:
     }
 
     template <class OutputIt>
-    size_t read(size_t count, OutputIt d_first)
+    size_t read(OutputIt d_first, size_t count)
     {
         size_t len;
         if ((size_t)(input_end_ - input_ptr_) < count)

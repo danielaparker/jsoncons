@@ -355,25 +355,21 @@ private:
     {
         if (val <= (std::numeric_limits<uint8_t>::max)())
         {
-            // uint 8 stores a 8-bit unsigned integer
             result_.push_back(ubjson_format::uint8_type);
             jsoncons::detail::to_big_endian(static_cast<uint8_t>(val),std::back_inserter(result_));
         }
         else if (val <= (std::numeric_limits<int16_t>::max)())
         {
-            // uint 16 stores a 16-bit big-endian unsigned integer
             result_.push_back(ubjson_format::int16_type);
             jsoncons::detail::to_big_endian(static_cast<int16_t>(val),std::back_inserter(result_));
         }
         else if (val <= (std::numeric_limits<int32_t>::max)())
         {
-            // uint 32 stores a 32-bit big-endian unsigned integer
             result_.push_back(ubjson_format::int32_type);
             jsoncons::detail::to_big_endian(static_cast<int32_t>(val),std::back_inserter(result_));
         }
         else if (val <= (uint64_t)(std::numeric_limits<int64_t>::max)())
         {
-            // int 64 stores a 64-bit big-endian signed integer
             result_.push_back(ubjson_format::int64_type);
             jsoncons::detail::to_big_endian(static_cast<int64_t>(val),std::back_inserter(result_));
         }
@@ -401,11 +397,7 @@ private:
 
 typedef basic_ubjson_serializer<char,jsoncons::detail::byte_stream_result> ubjson_serializer;
 
-typedef basic_ubjson_serializer<char,jsoncons::detail::bytes_result> ubjson_buffer_serializer;
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_ubjson_serializer<char,jsoncons::detail::bytes_result> ubjson_bytes_serializer;
-#endif
+typedef basic_ubjson_serializer<char,jsoncons::detail::buffer_result> ubjson_buffer_serializer;
 
 }}
 #endif

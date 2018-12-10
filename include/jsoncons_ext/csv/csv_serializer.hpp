@@ -34,7 +34,7 @@ public:
     typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
 
-    using typename basic_json_content_handler<CharT>::string_view_type                                 ;
+    using typename basic_json_content_handler<CharT>::string_view_type                      ;
 private:
     struct stack_item
     {

@@ -36,7 +36,7 @@ template<class Json>
 void encode_ubjson(const Json& j, std::vector<uint8_t>& v)
 {
     typedef typename Json::char_type char_type;
-    basic_ubjson_serializer<char_type,jsoncons::detail::bytes_result> serializer(v);
+    basic_ubjson_serializer<char_type,jsoncons::detail::buffer_result> serializer(v);
     j.dump(serializer);
 }
 
@@ -46,7 +46,7 @@ template<class Json>
 Json decode_ubjson(const std::vector<uint8_t>& v)
 {
     jsoncons::json_decoder<Json> decoder;
-    ubjson_reader parser(v, decoder);
+    ubjson_buffer_reader parser(v, decoder);
     std::error_code ec;
     parser.read(ec);
     if (ec)
@@ -55,16 +55,20 @@ Json decode_ubjson(const std::vector<uint8_t>& v)
     }
     return decoder.get_result();
 }
-  
-#if !defined(JSONCONS_NO_DEPRECATED)
+
 template<class Json>
-std::vector<uint8_t> encode_ubjson(const Json& j)
+Json decode_ubjson(std::istream& is)
 {
-    std::vector<uint8_t> v;
-    encode_ubjson(j, v);
-    return v;
+    jsoncons::json_decoder<Json> decoder;
+    ubjson_reader parser(is, decoder);
+    std::error_code ec;
+    parser.read(ec);
+    if (ec)
+    {
+        throw parse_error(ec,parser.line_number(),parser.column_number());
+    }
+    return decoder.get_result();
 }
-#endif
 
 }}
 

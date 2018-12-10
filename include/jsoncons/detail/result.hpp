@@ -224,7 +224,7 @@ public:
     }
 };
 
-class bytes_result 
+class buffer_result 
 {
 public:
     typedef uint8_t value_type;
@@ -233,11 +233,11 @@ private:
     output_type& s_;
 
     // Noncopyable and nonmoveable
-    bytes_result(const bytes_result&) = delete;
-    bytes_result& operator=(const bytes_result&) = delete;
+    buffer_result(const buffer_result&) = delete;
+    buffer_result& operator=(const buffer_result&) = delete;
 public:
 
-    bytes_result(output_type& s)
+    buffer_result(output_type& s)
         : s_(s)
     {
     }
