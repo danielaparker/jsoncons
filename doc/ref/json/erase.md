@@ -1,13 +1,13 @@
 ### `jsoncons::json::erase`
 
 ```c++
-void erase(const_array_iterator pos); // (1)
+void erase(const_array_iterator_type pos); // (1)
 
-void erase(const_array_iterator first, const_array_iterator last); // (2)
+void erase(const_array_iterator_type first, const_array_iterator_type last); // (2)
 
-void erase(const_object_iterator pos); // (3)
+void erase(const_object_iterator_type pos); // (3)
 
-void erase(const_object_iterator first, const_object_iterator last); // (4)
+void erase(const_object_iterator_type first, const_object_iterator_type last); // (4)
 
 void erase(const string_view_type& name); // (5)
 ```

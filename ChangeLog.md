@@ -6,19 +6,27 @@ Name changes:
 The following names have been deprecated (still work) and renamed
 
 - `cbor_bytes_serializer` to `cbor_buffer_serializer`
-
 - `msgpack_bytes_serializer` to `msgpack_buffer_serializer`
 
 - `json_serializing_options` to `json_options`
-
 - `csv_serializing_options` to `csv_options`
 
-Bug fix
+- json::object_iterator to json::object_iterator_type
+- json::const_object_iterator to json::const_object_iterator_type
+- json::array_iterator to json::array_iterator_type
+- json::const_array_iterator to json::const_array_iterator_type
+
+- cbor_view::object_iterator to cbor_view::object_iterator_type
+- cbor_view::const_object_iterator to cbor_view::const_object_iterator_type
+- cbor_view::array_iterator to cbor_view::array_iterator_type
+- cbor_view::const_array_iterator to cbor_view::const_array_iterator_type
+
+Bug fixes:
 
 - On Windows platforms, fixed issue with macro expansion of max when 
-  including windows.h 
+  including windows.h  (also in 0.113.1)
 
-- Fixed compile issue with `j = json::make_array()`.
+- Fixed compile issue with `j = json::make_array()` (also in 0.113.2)
 
 Message Pack enhancements
 

@@ -103,7 +103,7 @@ TEST_CASE("cbor_view array as<> test")
         CHECK(v[7].as<double>() == 1431027667.5);
     }
 
-    SECTION("array_iterator is<T> test")
+    SECTION("array_iterator_type is<T> test")
     {
         auto it = v.array_range().begin();
         CHECK(it++->is<std::string>());

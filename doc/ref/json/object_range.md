@@ -1,8 +1,8 @@
 ### jsoncons::json::object_range
 
 ```c++
-range<object_iterator> object_range();
-range<const_object_iterator> object_range() const;
+range<object_iterator_type> object_range();
+range<const_object_iterator_type> object_range() const;
 ```
 Returns a "range" that supports a range-based for loop over the key-value pairs of a `json` object      
 Throws `std::runtime_error` if not an object.

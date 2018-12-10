@@ -17,7 +17,7 @@ The `jsoncons` library will always rebind the supplied allocator from the templa
 
 The interface is the same as [wjson](wjson.md), substituting wide character instantiations of classes - `std::wstring`, `std::wistream`, etc. - for utf8 character ones.
 
-- `wojson`, like `wjson`, supports object member `insert_or_assign` methods that take an `object_iterator` as the first parameter. But while with `wjson` that parameter is just a hint that allows optimization, with `wojson` it is the actual location where to insert the member.
+- `wojson`, like `wjson`, supports object member `insert_or_assign` methods that take an `object_iterator_type` as the first parameter. But while with `wjson` that parameter is just a hint that allows optimization, with `wojson` it is the actual location where to insert the member.
 
 - In `wojson`, the `insert_or_assign` members that just take a name and a value always insert the member at the end.
 

@@ -3,8 +3,8 @@
 ```c++
 void merge(const json& source); // (1)
 void merge(json&& source); // (2)
-void merge(object_iterator hint, const json& source); // (3)
-void merge(object_iterator hint, json&& source); // (4)
+void merge(object_iterator_type hint, const json& source); // (3)
+void merge(object_iterator_type hint, json&& source); // (4)
 ```
 
 Copies the key-value pairs in source json object into json object. If there is a member in source json object with key equivalent to the key of a member in json object, 

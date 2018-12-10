@@ -2,10 +2,10 @@
 
 ```c++
 template <class... Args>
-array_iterator emplace(Args&&... args);
+array_iterator_type emplace(Args&&... args);
 
 template <class... Args>
-array_iterator emplace(const_array_iterator pos, Args&&... args);
+array_iterator_type emplace(const_array_iterator_type pos, Args&&... args);
 ```
 
 Constructs a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.

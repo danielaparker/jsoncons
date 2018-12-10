@@ -106,7 +106,7 @@ template <class Json, class T>
 class json_array_input_iterator
 {
 public:
-    typedef typename Json::const_array_iterator iterator_base;
+    typedef typename Json::const_array_iterator_type iterator_base;
     typedef typename std::iterator_traits<iterator_base>::value_type value_type;
     typedef typename std::iterator_traits<iterator_base>::difference_type difference_type;
     typedef typename std::iterator_traits<iterator_base>::pointer pointer;
@@ -182,7 +182,7 @@ template <class Json, class T>
 class json_object_input_iterator
 {
 public:
-    typedef typename Json::const_object_iterator iterator_base;
+    typedef typename Json::const_object_iterator_type iterator_base;
     typedef typename std::iterator_traits<iterator_base>::value_type value_type;
     typedef typename std::iterator_traits<iterator_base>::difference_type difference_type;
     typedef typename std::iterator_traits<iterator_base>::pointer pointer;
