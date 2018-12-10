@@ -40,7 +40,7 @@ public:
 private:
     std::istream* is_;
     std::streambuf* sbuf_;
-    size_t column_;
+    size_t position_;
 
     // Noncopyable and nonmoveable
     binary_stream_source(const binary_stream_source&) = delete;
@@ -49,7 +49,7 @@ public:
     binary_stream_source(binary_stream_source&&) = default;
 
     binary_stream_source(std::istream& is)
-        : is_(std::addressof(is)), sbuf_(is.rdbuf()), column_(0)
+        : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
     {
     }
 
@@ -64,14 +64,9 @@ public:
         return is_->eof();  
     }
 
-    size_t line_number() const
+    size_t position() const
     {
-        return 0;
-    }
-
-    size_t column_number() const
-    {
-        return column_;
+        return position_;
     }
 
     size_t get(value_type& c)
@@ -80,7 +75,7 @@ public:
         if (!(val == traits_type::eof()))
         {
             c = (value_type)val;
-            ++column_;
+            ++position_;
             return 1;
         }
         else
@@ -99,7 +94,7 @@ public:
         }
         else
         {
-            ++column_;
+            ++position_;
         }
         return c;
     }
@@ -116,7 +111,7 @@ public:
             }
             else
             {
-                ++column_;
+                ++position_;
             }
         }
     }
@@ -145,7 +140,7 @@ public:
             }
             else
             {
-                ++column_;
+                ++position_;
             }
             *p++ = (value_type)c;
         }
@@ -187,12 +182,7 @@ public:
         return eof_;  
     }
 
-    size_t line_number() const
-    {
-        return 0;
-    }
-
-    size_t column_number() const
+    size_t position() const
     {
         return input_ptr_ - data_ + 1;
     }

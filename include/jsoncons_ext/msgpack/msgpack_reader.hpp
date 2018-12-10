@@ -588,12 +588,12 @@ public:
 
     size_t line_number() const override
     {
-        return source_.line_number();
+        return 0;
     }
 
     size_t column_number() const override
     {
-        return source_.column_number();
+        return source_.position();
     }
 private:
     void parse_name(std::error_code& ec)

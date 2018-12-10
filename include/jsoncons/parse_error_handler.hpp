@@ -26,9 +26,11 @@ public:
         : error_code_(ec), line_number_(0), column_number_(0)
     {
     }
-    parse_error(std::error_code ec,
-                size_t line,
-                size_t column)
+    parse_error(std::error_code ec, size_t position)
+        : error_code_(ec), line_number_(0), column_number_(position)
+    {
+    }
+    parse_error(std::error_code ec, size_t line, size_t column)
         : error_code_(ec), line_number_(line), column_number_(column)
     {
     }
