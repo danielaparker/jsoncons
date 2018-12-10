@@ -6,6 +6,10 @@ In the table, <em>&#x2713;</em> indicates that the old name is still supported.
 
 Component or location|Old name, now deprecated|<em>&#x2713;</em>|New name
 --------|-----------|--------------|------------------------
+class basic_json|`object_iterator`|<em>&#x2713;</em>|`object_iterator_type`
+class basic_json|`const_object_iterator`|<em>&#x2713;</em>|`const_object_iterator_type`
+class basic_json|`array_iterator`|<em>&#x2713;</em>|`array_iterator_type`
+class basic_json|`const_array_iterator`|<em>&#x2713;</em>|`const_array_iterator_type`
 class basic_json|add(size_t index, const json& val)|<em>&#x2713;</em>|`insert(array_iterator pos, const json& val)`
 class basic_json|add(size_t index, json&& val)|<em>&#x2713;</em>|`insert(array_iterator pos, json&& val)`
 class basic_json|dump_body|<em>&#x2713;</em>|`dump`
