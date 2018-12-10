@@ -306,7 +306,7 @@ public:
                     {
                         source_.ignore(1);
                         size_t length = get_length(ec);
-                        handler_.begin_array(length, semantic_tag_type::none, *this);
+                        handler_.begin_object(length, semantic_tag_type::none, *this);
                         for (size_t i = 0; i < length; ++i)
                         {
                             read_name(ec);
@@ -320,7 +320,7 @@ public:
                                 return;
                             }
                         }
-                        handler_.end_array(*this);
+                        handler_.end_object(*this);
                     }
                     else
                     {
@@ -352,7 +352,7 @@ public:
                     else
                     {
                         handler_.begin_object(semantic_tag_type::none, *this);
-                        while (source_.peek() != ubjson_format::end_array_marker)
+                        while (source_.peek() != ubjson_format::end_object_marker)
                         {
                             read_name(ec);
                             if (ec)

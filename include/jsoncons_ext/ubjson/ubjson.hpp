@@ -55,12 +55,32 @@ Json decode_ubjson(const std::vector<uint8_t>& v)
     }
     return decoder.get_result();
 }
-
 template<class Json>
-Json decode_ubjson(std::istream& is)
+typename std::enable_if<std::is_same<typename Json::char_type,char>::value,Json>::type 
+decode_ubjson(std::basic_istream<typename Json::char_type>& is)
 {
+    typedef typename Json::char_type char_type;
+
     jsoncons::json_decoder<Json> decoder;
     ubjson_reader parser(is, decoder);
+    std::error_code ec;
+    parser.read(ec);
+    if (ec)
+    {
+        throw parse_error(ec,parser.line_number(),parser.column_number());
+    }
+    return decoder.get_result();
+}
+
+template<class Json>
+typename std::enable_if<!std::is_same<typename Json::char_type,char>::value,Json>::type 
+decode_ubjson(std::basic_istream<typename Json::char_type>& is)
+{
+    typedef typename Json::char_type char_type;
+
+    jsoncons::json_decoder<Json> decoder;
+    basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
+    ubjson_reader parser(is, adaptor);
     std::error_code ec;
     parser.read(ec);
     if (ec)

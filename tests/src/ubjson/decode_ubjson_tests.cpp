@@ -98,6 +98,15 @@ TEST_CASE("decode_number_ubjson_test")
                              0xff,0}, // -256
                              json::parse("[256,-256]"));
     }
+    SECTION("ubjson object optimized with type and count")
+    {
+        check_decode_ubjson({'{','$','I','#','i',2,
+                             'i',5,'f','i','r','s','t',
+                             0x01,0x00, // 256
+                             'i',6,'s','e','c','o','n','d',
+                             0xff,0}, // -256
+                             json::parse("{\"first\":256,\"second\":-256}"));
+    }
 #if 0
     check_decode_ubjson({'I',0x01,0x00},json(256U));
     check_decode_ubjson({'I',0xff,0xff},json(65535U));

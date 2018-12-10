@@ -38,7 +38,7 @@ public:
     typedef uint8_t value_type;
     typedef binary_traits traits_type;
 private:
-    std::istream& is_;
+    std::istream* is_;
     std::streambuf* sbuf_;
 
     // Noncopyable and nonmoveable
@@ -48,7 +48,7 @@ public:
     binary_stream_source(binary_stream_source&&) = default;
 
     binary_stream_source(std::istream& is)
-        : is_(is), sbuf_(is.rdbuf())
+        : is_(std::addressof(is)), sbuf_(is.rdbuf())
     {
     }
 
@@ -60,7 +60,7 @@ public:
 
     bool eof() const
     {
-        return is_.eof();  
+        return is_->eof();  
     }
 
     size_t get(value_type& c)
@@ -73,7 +73,7 @@ public:
         }
         else
         {
-            is_.clear(is_.rdstate() | std::ios::eofbit);
+            is_->clear(is_->rdstate() | std::ios::eofbit);
             return 0;
         }
     }
@@ -83,7 +83,7 @@ public:
         int c = sbuf_->sbumpc();
         if (c == traits_type::eof())
         {
-            is_.clear(is_.rdstate() | std::ios::eofbit);
+            is_->clear(is_->rdstate() | std::ios::eofbit);
         }
         return c;
     }
@@ -95,7 +95,7 @@ public:
             int c = sbuf_->sbumpc();
             if (c == traits_type::eof())
             {
-                is_.clear(is_.rdstate() | std::ios::eofbit);
+                is_->clear(is_->rdstate() | std::ios::eofbit);
                 return;
             }
         }
@@ -106,7 +106,7 @@ public:
         int c = sbuf_->sgetc();
         if (c == traits_type::eof())
         {
-            is_.clear(is_.rdstate() | std::ios::eofbit);
+            is_->clear(is_->rdstate() | std::ios::eofbit);
         }
         return c;
     }
@@ -120,7 +120,7 @@ public:
             int c = sbuf_->sbumpc();
             if (c == traits_type::eof())
             {
-                is_.clear(is_.rdstate() | std::ios::eofbit);
+                is_->clear(is_->rdstate() | std::ios::eofbit);
                 return count;
             }
             *p++ = (value_type)c;

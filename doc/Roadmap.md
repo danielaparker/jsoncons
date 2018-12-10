@@ -17,7 +17,7 @@ MessagePack
 - New msgpack_serializer that supports Message Pack bin formats 
   (now on master)
 
-- New msgpack_reader that supports Message Pack bin formats 
+- New msgpack_buffer_reader that supports Message Pack bin formats 
   (now on master)
 
 - Add semantic tag types to accomodate Message Pack timestamp 32,

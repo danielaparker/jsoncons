@@ -244,7 +244,9 @@ public:
 private:
 };
 
-typedef basic_bson_reader<jsoncons::detail::buffer_source> bson_reader;
+typedef basic_bson_reader<jsoncons::detail::binary_stream_source> bson_reader;
+
+typedef basic_bson_reader<jsoncons::detail::buffer_source> bson_buffer_reader;
 
 }}
 

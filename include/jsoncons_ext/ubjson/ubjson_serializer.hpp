@@ -283,13 +283,7 @@ private:
     {
         if (val >= 0)
         {
-            if (val <= (std::numeric_limits<int8_t>::max)())
-            {
-                // positive fixnum stores 7-bit positive integer
-                result_.push_back(ubjson_format::int8_type);
-                jsoncons::detail::to_big_endian(static_cast<int8_t>(val),std::back_inserter(result_));
-            }
-            else if (val <= (std::numeric_limits<uint8_t>::max)())
+            if (val <= (std::numeric_limits<uint8_t>::max)())
             {
                 // uint 8 stores a 8-bit unsigned integer
                 result_.push_back(ubjson_format::uint8_type);

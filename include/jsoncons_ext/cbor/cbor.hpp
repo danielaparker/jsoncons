@@ -82,14 +82,8 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
 {
     typedef typename Json::char_type char_type;
 
-    std::vector<uint8_t> v;
-    is.seekg(0, std::ios::end);   
-    v.resize((size_t)is.tellg());
-    is.seekg(0, std::ios::beg);    
-    is.read((char_type*)&v[0],v.size());
-
     jsoncons::json_decoder<Json> decoder;
-    cbor_reader parser(v, decoder);
+    cbor_reader parser(is, decoder);
     std::error_code ec;
     parser.read(ec);
     if (ec)
@@ -105,15 +99,9 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
 {
     typedef typename Json::char_type char_type;
 
-    std::vector<uint8_t> v;
-    is.seekg(0, std::ios::end);   
-    v.resize(is.tellg());
-    is.seekg(0, std::ios::beg);    
-    is.read((char_type*)&v[0],v.size());
-
     jsoncons::json_decoder<Json> decoder;
     basic_utf8_adaptor<typename Json::char_type> adaptor(decoder);
-    cbor_reader parser(v, adaptor);
+    cbor_reader parser(is, adaptor);
     std::error_code ec;
     parser.read(ec);
     if (ec)

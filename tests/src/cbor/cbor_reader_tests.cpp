@@ -24,7 +24,7 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         std::error_code ec;
 
         jsoncons::json_decoder<json> decoder;
-        cbor_reader parser(v, decoder);
+        cbor_buffer_reader parser(v, decoder);
         parser.read(ec);
 
         json result = decoder.get_result();
@@ -43,6 +43,15 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
 
         REQUIRE(result == expected);
         CHECK(result.semantic_tag() == expected.semantic_tag());
+
+        std::string s;
+        for (auto c : v)
+        {
+            s.push_back(c);
+        }
+        std::istringstream is(s);
+        json j2 = decode_cbor<json>(is);
+        REQUIRE(j2 == expected);
     }
     catch (const std::exception& e)
     {

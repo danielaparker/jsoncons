@@ -412,7 +412,9 @@ private:
     }
 };
 
-typedef basic_cbor_reader<jsoncons::detail::buffer_source> cbor_reader;
+typedef basic_cbor_reader<jsoncons::detail::binary_stream_source> cbor_reader;
+
+typedef basic_cbor_reader<jsoncons::detail::buffer_source> cbor_buffer_reader;
 
 }}
 

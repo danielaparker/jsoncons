@@ -728,7 +728,9 @@ private:
     }
 };
 
-typedef basic_msgpack_reader<jsoncons::detail::buffer_source> msgpack_reader;
+typedef basic_msgpack_reader<jsoncons::detail::binary_stream_source> msgpack_reader;
+
+typedef basic_msgpack_reader<jsoncons::detail::buffer_source> msgpack_buffer_reader;
 
 }}
 

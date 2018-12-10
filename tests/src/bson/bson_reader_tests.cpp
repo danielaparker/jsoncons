@@ -17,7 +17,17 @@ void check_decode_bson(const std::vector<uint8_t>& v, const json& expected)
 {
     json result = decode_bson<json>(v);
     REQUIRE(result == expected);
+
+    std::string s;
+    for (auto c : v)
+    {
+        s.push_back(c);
+    }
+    std::istringstream is(s);
+    json j2 = decode_bson<json>(is);
+    REQUIRE(j2 == expected);
 }
+
 TEST_CASE("bson hello world")
 {
     check_decode_bson({0x16,0x00,0x00,0x00, // total document size
