@@ -3,8 +3,8 @@
 ```c++
 void merge_or_update(const json& source); // (1)
 void merge_or_update(json&& source); // (2)
-void merge_or_update(object_iterator_type hint, const json& source); // (3)
-void merge_or_update(object_iterator_type hint, json&& source); // (4)
+void merge_or_update(object_iterator hint, const json& source); // (3)
+void merge_or_update(object_iterator hint, json&& source); // (4)
 ```
 
 Inserts another json object's key-value pairs into a json object, or assigns them if they already exist.

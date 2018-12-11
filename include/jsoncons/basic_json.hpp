@@ -148,16 +148,10 @@ public:
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
 
-    typedef typename object::iterator object_iterator_type;
-    typedef typename object::const_iterator const_object_iterator_type;
-    typedef typename array::iterator array_iterator_type;
-    typedef typename array::const_iterator const_array_iterator_type;
-#if !defined(JSONCONS_NO_DEPRECATED)
     typedef typename object::iterator object_iterator;
     typedef typename object::const_iterator const_object_iterator;
     typedef typename array::iterator array_iterator;
     typedef typename array::const_iterator const_array_iterator;
-#endif
 
     struct variant
     {
@@ -1539,22 +1533,22 @@ public:
         friend class basic_json<CharT,ImplementationPolicy,Allocator>;
         typedef json_proxy<ParentT> proxy_type;
 
-        range<object_iterator_type> object_range()
+        range<object_iterator> object_range()
         {
             return evaluate().object_range();
         }
 
-        range<const_object_iterator_type> object_range() const
+        range<const_object_iterator> object_range() const
         {
             return evaluate().object_range();
         }
 
-        range<array_iterator_type> array_range()
+        range<array_iterator> array_range()
         {
             return evaluate().array_range();
         }
 
-        range<const_array_iterator_type> array_range() const
+        range<const_array_iterator> array_range() const
         {
             return evaluate().array_range();
         }
@@ -1815,12 +1809,12 @@ public:
             return evaluate().at(index);
         }
 
-        object_iterator_type find(const string_view_type& name)
+        object_iterator find(const string_view_type& name)
         {
             return evaluate().find(name);
         }
 
-        const_object_iterator_type find(const string_view_type& name) const
+        const_object_iterator find(const string_view_type& name) const
         {
             return evaluate().find(name);
         }
@@ -1848,13 +1842,13 @@ public:
         }
         // Remove all elements from an array or object
 
-        void erase(const_object_iterator_type pos)
+        void erase(const_object_iterator pos)
         {
             evaluate().erase(pos);
         }
         // Remove a range of elements from an object 
 
-        void erase(const_object_iterator_type first, const_object_iterator_type last)
+        void erase(const_object_iterator first, const_object_iterator last)
         {
             evaluate().erase(first, last);
         }
@@ -1865,13 +1859,13 @@ public:
             evaluate().erase(name);
         }
 
-        void erase(const_array_iterator_type pos)
+        void erase(const_array_iterator pos)
         {
             evaluate().erase(pos);
         }
         // Removes the element at pos 
 
-        void erase(const_array_iterator_type first, const_array_iterator_type last)
+        void erase(const_array_iterator first, const_array_iterator last)
         {
             evaluate().erase(first, last);
         }
@@ -1889,12 +1883,12 @@ public:
             return evaluate().merge(std::forward<basic_json>(source));
         }
 
-        void merge(object_iterator_type hint, const basic_json& source)
+        void merge(object_iterator hint, const basic_json& source)
         {
             return evaluate().merge(hint, source);
         }
 
-        void merge(object_iterator_type hint, basic_json&& source)
+        void merge(object_iterator hint, basic_json&& source)
         {
             return evaluate().merge(hint, std::forward<basic_json>(source));
         }
@@ -1911,18 +1905,18 @@ public:
             return evaluate().merge_or_update(std::forward<basic_json>(source));
         }
 
-        void merge_or_update(object_iterator_type hint, const basic_json& source)
+        void merge_or_update(object_iterator hint, const basic_json& source)
         {
             return evaluate().merge_or_update(hint, source);
         }
 
-        void merge_or_update(object_iterator_type hint, basic_json&& source)
+        void merge_or_update(object_iterator hint, basic_json&& source)
         {
             return evaluate().merge_or_update(hint, std::forward<basic_json>(source));
         }
 
         template <class T>
-        std::pair<object_iterator_type,bool> insert_or_assign(const string_view_type& name, T&& val)
+        std::pair<object_iterator,bool> insert_or_assign(const string_view_type& name, T&& val)
         {
             return evaluate().insert_or_assign(name,std::forward<T>(val));
         }
@@ -1930,25 +1924,25 @@ public:
        // emplace
 
         template <class ... Args>
-        std::pair<object_iterator_type,bool> try_emplace(const string_view_type& name, Args&&... args)
+        std::pair<object_iterator,bool> try_emplace(const string_view_type& name, Args&&... args)
         {
             return evaluate().try_emplace(name,std::forward<Args>(args)...);
         }
 
         template <class T>
-        object_iterator_type insert_or_assign(object_iterator_type hint, const string_view_type& name, T&& val)
+        object_iterator insert_or_assign(object_iterator hint, const string_view_type& name, T&& val)
         {
             return evaluate().insert_or_assign(hint, name, std::forward<T>(val));
         }
 
         template <class ... Args>
-        object_iterator_type try_emplace(object_iterator_type hint, const string_view_type& name, Args&&... args)
+        object_iterator try_emplace(object_iterator hint, const string_view_type& name, Args&&... args)
         {
             return evaluate().try_emplace(hint, name, std::forward<Args>(args)...);
         }
 
         template <class... Args> 
-        array_iterator_type emplace(const_array_iterator_type pos, Args&&... args)
+        array_iterator emplace(const_array_iterator pos, Args&&... args)
         {
             evaluate_with_default().emplace(pos, std::forward<Args>(args)...);
         }
@@ -1966,13 +1960,13 @@ public:
         }
 
         template <class T>
-        array_iterator_type insert(const_array_iterator_type pos, T&& val)
+        array_iterator insert(const_array_iterator pos, T&& val)
         {
             return evaluate_with_default().insert(pos, std::forward<T>(val));
         }
 
         template <class InputIt>
-        array_iterator_type insert(const_array_iterator_type pos, InputIt first, InputIt last)
+        array_iterator insert(const_array_iterator pos, InputIt first, InputIt last)
         {
             return evaluate_with_default().insert(pos, first, last);
         }
@@ -2048,7 +2042,7 @@ public:
         }
 
         template <class T>
-        array_iterator_type add(const_array_iterator_type pos, T&& val)
+        array_iterator add(const_array_iterator pos, T&& val)
         {
             return evaluate_with_default().add(pos, std::forward<T>(val));
         }
@@ -2056,13 +2050,13 @@ public:
        // set
 
         template <class T>
-        std::pair<object_iterator_type,bool> set(const string_view_type& name, T&& val)
+        std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
         {
             return evaluate().set(name,std::forward<T>(val));
         }
 
         template <class T>
-        object_iterator_type set(object_iterator_type hint, const string_view_type& name, T&& val)
+        object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
         {
             return evaluate().set(hint, name, std::forward<T>(val));
         }
@@ -2131,22 +2125,22 @@ public:
             return evaluate().to_string(options,allocator);
         }
 
-        range<object_iterator_type> members()
+        range<object_iterator> members()
         {
             return evaluate().members();
         }
 
-        range<const_object_iterator_type> members() const
+        range<const_object_iterator> members() const
         {
             return evaluate().members();
         }
 
-        range<array_iterator_type> elements()
+        range<array_iterator> elements()
         {
             return evaluate().elements();
         }
 
-        range<const_array_iterator_type> elements() const
+        range<const_array_iterator> elements() const
         {
             return evaluate().elements();
         }
@@ -2194,42 +2188,42 @@ public:
             evaluate().resize_array(n,val);
         }
 
-        object_iterator_type begin_members()
+        object_iterator begin_members()
         {
             return evaluate().begin_members();
         }
 
-        const_object_iterator_type begin_members() const
+        const_object_iterator begin_members() const
         {
             return evaluate().begin_members();
         }
 
-        object_iterator_type end_members()
+        object_iterator end_members()
         {
             return evaluate().end_members();
         }
 
-        const_object_iterator_type end_members() const
+        const_object_iterator end_members() const
         {
             return evaluate().end_members();
         }
 
-        array_iterator_type begin_elements()
+        array_iterator begin_elements()
         {
             return evaluate().begin_elements();
         }
 
-        const_array_iterator_type begin_elements() const
+        const_array_iterator begin_elements() const
         {
             return evaluate().begin_elements();
         }
 
-        array_iterator_type end_elements()
+        array_iterator end_elements()
         {
             return evaluate().end_elements();
         }
 
-        const_array_iterator_type end_elements() const
+        const_array_iterator end_elements() const
         {
             return evaluate().end_elements();
         }
@@ -2982,7 +2976,7 @@ public:
         {
         case structure_tag_type::object_tag:
             {
-                const_object_iterator_type it = object_value().find(name);
+                const_object_iterator it = object_value().find(name);
                 return it != object_range().end();
             }
             break;
@@ -3553,7 +3547,7 @@ public:
         }
     }
 
-    object_iterator_type find(const string_view_type& name)
+    object_iterator find(const string_view_type& name)
     {
         switch (var_.structure_tag())
         {
@@ -3568,7 +3562,7 @@ public:
         }
     }
 
-    const_object_iterator_type find(const string_view_type& name) const
+    const_object_iterator find(const string_view_type& name) const
     {
         switch (var_.structure_tag())
         {
@@ -3594,7 +3588,7 @@ public:
             }
         case structure_tag_type::object_tag:
             {
-                const_object_iterator_type it = object_value().find(name);
+                const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
                     return it->value().template as<T>();
@@ -3622,7 +3616,7 @@ public:
             }
         case structure_tag_type::object_tag:
             {
-                const_object_iterator_type it = object_value().find(name);
+                const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
                     return it->value().template as<T>();
@@ -3671,7 +3665,7 @@ public:
         }
     }
 
-    void erase(const_object_iterator_type pos)
+    void erase(const_object_iterator pos)
     {
         switch (var_.structure_tag())
         {
@@ -3686,7 +3680,7 @@ public:
         }
     }
 
-    void erase(const_object_iterator_type first, const_object_iterator_type last)
+    void erase(const_object_iterator first, const_object_iterator last)
     {
         switch (var_.structure_tag())
         {
@@ -3701,7 +3695,7 @@ public:
         }
     }
 
-    void erase(const_array_iterator_type pos)
+    void erase(const_array_iterator pos)
     {
         switch (var_.structure_tag())
         {
@@ -3714,7 +3708,7 @@ public:
         }
     }
 
-    void erase(const_array_iterator_type first, const_array_iterator_type last)
+    void erase(const_array_iterator first, const_array_iterator last)
     {
         switch (var_.structure_tag())
         {
@@ -3745,7 +3739,7 @@ public:
     }
 
     template <class T>
-    std::pair<object_iterator_type,bool> insert_or_assign(const string_view_type& name, T&& val)
+    std::pair<object_iterator,bool> insert_or_assign(const string_view_type& name, T&& val)
     {
         switch (var_.structure_tag())
         {
@@ -3762,7 +3756,7 @@ public:
     }
 
     template <class ... Args>
-    std::pair<object_iterator_type,bool> try_emplace(const string_view_type& name, Args&&... args)
+    std::pair<object_iterator,bool> try_emplace(const string_view_type& name, Args&&... args)
     {
         switch (var_.structure_tag())
         {
@@ -3812,7 +3806,7 @@ public:
         }
     }
 
-    void merge(object_iterator_type hint, const basic_json& source)
+    void merge(object_iterator hint, const basic_json& source)
     {
         switch (var_.structure_tag())
         {
@@ -3828,7 +3822,7 @@ public:
         }
     }
 
-    void merge(object_iterator_type hint, basic_json&& source)
+    void merge(object_iterator hint, basic_json&& source)
     {
         switch (var_.structure_tag())
         {
@@ -3878,7 +3872,7 @@ public:
         }
     }
 
-    void merge_or_update(object_iterator_type hint, const basic_json& source)
+    void merge_or_update(object_iterator hint, const basic_json& source)
     {
         switch (var_.structure_tag())
         {
@@ -3894,7 +3888,7 @@ public:
         }
     }
 
-    void merge_or_update(object_iterator_type hint, basic_json&& source)
+    void merge_or_update(object_iterator hint, basic_json&& source)
     {
         switch (var_.structure_tag())
         {
@@ -3911,7 +3905,7 @@ public:
     }
 
     template <class T>
-    object_iterator_type insert_or_assign(object_iterator_type hint, const string_view_type& name, T&& val)
+    object_iterator insert_or_assign(object_iterator hint, const string_view_type& name, T&& val)
     {
         switch (var_.structure_tag())
         {
@@ -3928,7 +3922,7 @@ public:
     }
 
     template <class ... Args>
-    object_iterator_type try_emplace(object_iterator_type hint, const string_view_type& name, Args&&... args)
+    object_iterator try_emplace(object_iterator hint, const string_view_type& name, Args&&... args)
     {
         switch (var_.structure_tag())
         {
@@ -3945,7 +3939,7 @@ public:
     }
 
     template <class T>
-    array_iterator_type insert(const_array_iterator_type pos, T&& val)
+    array_iterator insert(const_array_iterator pos, T&& val)
     {
         switch (var_.structure_tag())
         {
@@ -3960,7 +3954,7 @@ public:
     }
 
     template <class InputIt>
-    array_iterator_type insert(const_array_iterator_type pos, InputIt first, InputIt last)
+    array_iterator insert(const_array_iterator pos, InputIt first, InputIt last)
     {
         switch (var_.structure_tag())
         {
@@ -3975,7 +3969,7 @@ public:
     }
 
     template <class... Args> 
-    array_iterator_type emplace(const_array_iterator_type pos, Args&&... args)
+    array_iterator emplace(const_array_iterator pos, Args&&... args)
     {
         switch (var_.structure_tag())
         {
@@ -4047,13 +4041,13 @@ public:
     }
 
     template <class T>
-    array_iterator_type add(const_array_iterator_type pos, T&& val)
+    array_iterator add(const_array_iterator pos, T&& val)
     {
         return insert(pos, std::forward<T>(val));
     }
 
     template <class T>
-    std::pair<object_iterator_type,bool> set(const string_view_type& name, T&& val)
+    std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
     {
         return insert_or_assign(name, std::forward<T>(val));
     }
@@ -4061,7 +4055,7 @@ public:
     // set
 
     template <class T>
-    object_iterator_type set(object_iterator_type hint, const string_view_type& name, T&& val)
+    object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
     {
         return insert_or_assign(hint, name, std::forward<T>(val));
     }
@@ -4109,42 +4103,42 @@ public:
         resize(n,val);
     }
 
-    object_iterator_type begin_members()
+    object_iterator begin_members()
     {
         return object_range().begin();
     }
 
-    const_object_iterator_type begin_members() const
+    const_object_iterator begin_members() const
     {
         return object_range().begin();
     }
 
-    object_iterator_type end_members()
+    object_iterator end_members()
     {
         return object_range().end();
     }
 
-    const_object_iterator_type end_members() const
+    const_object_iterator end_members() const
     {
         return object_range().end();
     }
 
-    array_iterator_type begin_elements()
+    array_iterator begin_elements()
     {
         return array_range().begin();
     }
 
-    const_array_iterator_type begin_elements() const
+    const_array_iterator begin_elements() const
     {
         return array_range().begin();
     }
 
-    array_iterator_type end_elements()
+    array_iterator end_elements()
     {
         return array_range().end();
     }
 
-    const_array_iterator_type end_elements() const
+    const_array_iterator end_elements() const
     {
         return array_range().end();
     }
@@ -4160,7 +4154,7 @@ public:
             }
         case structure_tag_type::object_tag:
             {
-                const_object_iterator_type it = object_value().find(name);
+                const_object_iterator it = object_value().find(name);
                 if (it != object_range().end())
                 {
                     return it->value();
@@ -4187,7 +4181,7 @@ public:
             return a_null;
         case structure_tag_type::object_tag:
             {
-                const_object_iterator_type it = object_value().find(name);
+                const_object_iterator it = object_value().find(name);
                 return it != object_range().end() ? it->value() : a_null;
             }
         default:
@@ -4291,7 +4285,7 @@ public:
         {
         case structure_tag_type::object_tag:
             {
-                const_object_iterator_type it = object_value().find(name);
+                const_object_iterator it = object_value().find(name);
                 return it != object_range().end();
             }
             break;
@@ -4367,72 +4361,72 @@ public:
     {
         return make_array<3>(m, n, k, val);
     }
-    range<object_iterator_type> members()
+    range<object_iterator> members()
     {
         return object_range();
     }
 
-    range<const_object_iterator_type> members() const
+    range<const_object_iterator> members() const
     {
         return object_range();
     }
 
-    range<array_iterator_type> elements()
+    range<array_iterator> elements()
     {
         return array_range();
     }
 
-    range<const_array_iterator_type> elements() const
+    range<const_array_iterator> elements() const
     {
         return array_range();
     }
 #endif
 
-    range<object_iterator_type> object_range()
+    range<object_iterator> object_range()
     {
         static basic_json empty_object = object();
         switch (var_.structure_tag())
         {
         case structure_tag_type::empty_object_tag:
-            return range<object_iterator_type>(empty_object.object_range().begin(), empty_object.object_range().end());
+            return range<object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
         case structure_tag_type::object_tag:
-            return range<object_iterator_type>(object_value().begin(),object_value().end());
+            return range<object_iterator>(object_value().begin(),object_value().end());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an object"));
         }
     }
 
-    range<const_object_iterator_type> object_range() const
+    range<const_object_iterator> object_range() const
     {
         static const basic_json empty_object = object();
         switch (var_.structure_tag())
         {
         case structure_tag_type::empty_object_tag:
-            return range<const_object_iterator_type>(empty_object.object_range().begin(), empty_object.object_range().end());
+            return range<const_object_iterator>(empty_object.object_range().begin(), empty_object.object_range().end());
         case structure_tag_type::object_tag:
-            return range<const_object_iterator_type>(object_value().begin(),object_value().end());
+            return range<const_object_iterator>(object_value().begin(),object_value().end());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an object"));
         }
     }
 
-    range<array_iterator_type> array_range()
+    range<array_iterator> array_range()
     {
         switch (var_.structure_tag())
         {
         case structure_tag_type::array_tag:
-            return range<array_iterator_type>(array_value().begin(),array_value().end());
+            return range<array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an array"));
         }
     }
 
-    range<const_array_iterator_type> array_range() const
+    range<const_array_iterator> array_range() const
     {
         switch (var_.structure_tag())
         {
         case structure_tag_type::array_tag:
-            return range<const_array_iterator_type>(array_value().begin(),array_value().end());
+            return range<const_array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an array"));
         }
@@ -4531,7 +4525,7 @@ private:
                 {
                     handler.begin_object(size(), var_.semantic_tag());
                     const object& o = object_value();
-                    for (const_object_iterator_type it = o.begin(); it != o.end(); ++it)
+                    for (const_object_iterator it = o.begin(); it != o.end(); ++it)
                     {
                         handler.name(string_view_type((it->key()).data(),it->key().length()));
                         it->value().dump_noflush(handler);
@@ -4543,7 +4537,7 @@ private:
                 {
                     handler.begin_array(size(), var_.semantic_tag());
                     const array& o = array_value();
-                    for (const_array_iterator_type it = o.begin(); it != o.end(); ++it)
+                    for (const_array_iterator it = o.begin(); it != o.end(); ++it)
                     {
                         it->dump_noflush(handler);
                     }

@@ -1,7 +1,7 @@
 ### jsoncons::cbor::cbor_view::array_range
 
 ```c++
-range<const_array_iterator_type> array_range() const;
+range<const_array_iterator> array_range() const;
 ```
 Returns a "range" that supports a range-based for loop over the elements of a `cbor_view` array      
 Throws `std::runtime_error` if not an array.

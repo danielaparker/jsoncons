@@ -1503,7 +1503,7 @@ void walk(Source& source, std::error_code& ec)
 }
 
 template <class T>
-class const_array_iterator
+class cbor_array_iterator
 {
     const uint8_t* p_;
     const uint8_t* last_;
@@ -1516,42 +1516,42 @@ public:
     typedef typename T::const_pointer pointer;
     typedef std::forward_iterator_tag iterator_catagory;
 
-    const_array_iterator()
+    cbor_array_iterator()
         : p_(nullptr), last_(nullptr), base_relative_(nullptr)
     {
     }
 
-    const_array_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
+    cbor_array_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
         : p_(p), last_(last), base_relative_(base_relative)
     {
     }
 
-    const_array_iterator(const const_array_iterator& other) = default;
+    cbor_array_iterator(const cbor_array_iterator& other) = default;
 
-    friend bool operator==(const const_array_iterator& lhs, const const_array_iterator& rhs) 
+    friend bool operator==(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
     {
         return lhs.p_ == rhs.p_; 
     }
 
-    friend bool operator!=(const const_array_iterator& lhs, const const_array_iterator& rhs) 
+    friend bool operator!=(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
     {
         return lhs.p_ != rhs.p_; 
     }
 
-    friend bool operator<(const const_array_iterator& lhs, const const_array_iterator& rhs) 
+    friend bool operator<(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
     {
         return lhs.p_ == rhs.p_; 
     }
 
-    const_array_iterator& operator++()
+    cbor_array_iterator& operator++()
     {
         jsoncons::cbor::detail::walk(p_, last_, &p_);
         return *this;
     }
 
-    const_array_iterator operator++(int) // postfix increment
+    cbor_array_iterator operator++(int) // postfix increment
     {
-        const_array_iterator temp(*this);
+        cbor_array_iterator temp(*this);
         jsoncons::cbor::detail::walk(p_, last_, &p_);
         return temp;
     }
@@ -1578,7 +1578,7 @@ public:
 };
 
 template <class T>
-class const_object_iterator;
+class cbor_map_iterator;
 
 template <class T>
 class key_value_view
@@ -1590,7 +1590,7 @@ class key_value_view
     const uint8_t* base_relative_;
 
 public:
-    friend class const_object_iterator<T>;
+    friend class cbor_map_iterator<T>;
 
     key_value_view()
         : key_begin_(nullptr), key_end_(nullptr), val_begin_(nullptr), val_end_(nullptr)
@@ -1618,7 +1618,7 @@ public:
 };
 
 template <class T>
-class const_object_iterator
+class cbor_map_iterator
 {
     const uint8_t* p_;
     const uint8_t* last_;
@@ -1631,43 +1631,43 @@ public:
     typedef const key_value_view<T>* pointer;
     typedef std::forward_iterator_tag iterator_catagory;
 
-    const_object_iterator()
+    cbor_map_iterator()
         : p_(nullptr), last_(nullptr), base_relative_(nullptr)
     {
     }
 
-    const_object_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
+    cbor_map_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
         : p_(p), last_(last), base_relative_(base_relative)
     {
     }
 
-    const_object_iterator(const const_object_iterator& other) = default;
+    cbor_map_iterator(const cbor_map_iterator& other) = default;
 
-    friend bool operator==(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+    friend bool operator==(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
     {
         return lhs.p_ == rhs.p_; 
     }
 
-    friend bool operator!=(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+    friend bool operator!=(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
     {
         return lhs.p_ != rhs.p_; 
     }
 
-    friend bool operator<(const const_object_iterator& lhs, const const_object_iterator& rhs) 
+    friend bool operator<(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
     {
         return lhs.p_ == rhs.p_; 
     }
 
-    const_object_iterator& operator++()
+    cbor_map_iterator& operator++()
     {
         jsoncons::cbor::detail::walk(p_, last_, &p_);
         jsoncons::cbor::detail::walk(p_, last_, &p_);
         return *this;
     }
 
-    const_object_iterator operator++(int) // postfix increment
+    cbor_map_iterator operator++(int) // postfix increment
     {
-        const_object_iterator temp(*this);
+        cbor_map_iterator temp(*this);
         jsoncons::cbor::detail::walk(p_, last_, &p_);
         jsoncons::cbor::detail::walk(p_, last_, &p_);
         return temp;

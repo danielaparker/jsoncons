@@ -44,22 +44,16 @@ public:
     typedef char char_type;
     typedef std::char_traits<char_type> char_traits_type;
     typedef basic_string_view<char_type> string_view_type;
-    typedef jsoncons::cbor::detail::const_object_iterator<cbor_view> object_iterator_type;
-    typedef jsoncons::cbor::detail::const_object_iterator<cbor_view> const_object_iterator_type;
-    typedef jsoncons::cbor::detail::const_array_iterator<cbor_view> array_iterator_type;
-    typedef jsoncons::cbor::detail::const_array_iterator<cbor_view> const_array_iterator_type;
-#if !defined(JSONCONS_NO_DEPRECATED)
-    typedef jsoncons::cbor::detail::const_object_iterator<cbor_view> object_iterator;
-    typedef jsoncons::cbor::detail::const_object_iterator<cbor_view> const_object_iterator;
-    typedef jsoncons::cbor::detail::const_array_iterator<cbor_view> array_iterator;
-    typedef jsoncons::cbor::detail::const_array_iterator<cbor_view> const_array_iterator;
-#endif
+    typedef jsoncons::cbor::detail::cbor_map_iterator<cbor_view> object_iterator;
+    typedef jsoncons::cbor::detail::cbor_map_iterator<cbor_view> const_object_iterator;
+    typedef jsoncons::cbor::detail::cbor_array_iterator<cbor_view> array_iterator;
+    typedef jsoncons::cbor::detail::cbor_array_iterator<cbor_view> const_array_iterator;
     typedef jsoncons::cbor::detail::key_value_view<cbor_view> key_value_type;
 
-    friend class jsoncons::cbor::detail::const_array_iterator<cbor_view>;
-    friend class jsoncons::cbor::detail::const_object_iterator<cbor_view>;
+    friend class jsoncons::cbor::detail::cbor_array_iterator<cbor_view>;
+    friend class jsoncons::cbor::detail::cbor_map_iterator<cbor_view>;
 
-    range<const_object_iterator_type> object_range() const
+    range<const_object_iterator> object_range() const
     {
         const uint8_t* endp;
         const uint8_t* begin;
@@ -78,10 +72,10 @@ public:
         }
         jsoncons::cbor::detail::walk_object(first_,last_,&endp);
 
-        return range<const_object_iterator_type>(const_object_iterator_type(begin,endp,base_relative_), const_object_iterator_type(endp, endp, base_relative_));
+        return range<const_object_iterator>(const_object_iterator(begin,endp,base_relative_), const_object_iterator(endp, endp, base_relative_));
     }
 
-    range<const_array_iterator_type> array_range() const
+    range<const_array_iterator> array_range() const
     {
         const uint8_t* endp;
         const uint8_t* begin;
@@ -96,7 +90,7 @@ public:
         {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
         }
-        return range<const_array_iterator_type>(const_array_iterator_type(begin,endp,base_relative_), const_array_iterator_type(endp, endp, base_relative_));
+        return range<const_array_iterator>(const_array_iterator(begin,endp,base_relative_), const_array_iterator(endp, endp, base_relative_));
     }
 
     cbor_view()

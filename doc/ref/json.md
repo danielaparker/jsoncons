@@ -31,10 +31,10 @@ Member type                         |Definition
 `key_value_type`|[key_value_type](json/key_value_type.md) is a class that stores a name and a json value
 `object`|json object type
 `array`|json array type
-`object_iterator_type`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_type](json/key_value_type.md)
-`const_object_iterator_type`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](json/key_value_type.md)
-`array_iterator_type`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `json`
-`const_array_iterator_type`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const json`
+`object_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to [key_value_type](json/key_value_type.md)
+`const_object_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to const [key_value_type](json/key_value_type.md)
+`array_iterator`|A [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `json`
+`const_array_iterator`|A const [RandomAccessIterator](http://en.cppreference.com/w/cpp/concept/RandomAccessIterator) to `const json`
 
 ### Static member functions
 
@@ -154,8 +154,8 @@ If `name` matches the name of a member in the json object, returns a reference t
 Throws `std::runtime_error` if not an object.
 Throws `std::out_of_range` if the object does not have a member with the specified name.  
 
-    object_iterator_type find(const string_view_type& name)
-    const_object_iterator_type find(const string_view_type& name) const
+    object_iterator find(const string_view_type& name)
+    const_object_iterator find(const string_view_type& name) const
 Returns an object iterator to a member whose name compares equal to `name`. If there is no such member, returns `end_member()`.
 Throws `std::runtime_error` if not an object.
 

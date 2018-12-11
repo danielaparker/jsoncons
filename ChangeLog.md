@@ -11,16 +11,6 @@ The following names have been deprecated (still work) and renamed
 - `json_serializing_options` to `json_options`
 - `csv_serializing_options` to `csv_options`
 
-- json::object_iterator to json::object_iterator_type
-- json::const_object_iterator to json::const_object_iterator_type
-- json::array_iterator to json::array_iterator_type
-- json::const_array_iterator to json::const_array_iterator_type
-
-- cbor_view::object_iterator to cbor_view::object_iterator_type
-- cbor_view::const_object_iterator to cbor_view::const_object_iterator_type
-- cbor_view::array_iterator to cbor_view::array_iterator_type
-- cbor_view::const_array_iterator to cbor_view::const_array_iterator_type
-
 Bug fixes:
 
 - On Windows platforms, fixed issue with macro expansion of max when 

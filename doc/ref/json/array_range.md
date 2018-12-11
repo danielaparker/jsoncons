@@ -1,8 +1,8 @@
 ### jsoncons::json::array_range
 
 ```c++
-range<array_iterator_type> array_range();
-range<const_array_iterator_type> array_range() const;
+range<array_iterator> array_range();
+range<const_array_iterator> array_range() const;
 ```
 Returns a "range" that supports a range-based for loop over the elements of a `json` array      
 Throws `std::runtime_error` if not an array.
