@@ -12,7 +12,7 @@
 #include <sstream>
 #include <vector>
 #include <istream>
-#include <cstdlib>
+#include <cstring>
 #include <algorithm>
 #include <exception>
 #include <jsoncons/config/jsoncons_config.hpp>
