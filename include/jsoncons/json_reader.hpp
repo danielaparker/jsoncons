@@ -315,11 +315,11 @@ public:
             {
                 if (!source_.eof())
                 {
-                    //if (is_.fail())
-                    //{
-                    //    ec = json_errc::source_error;
-                    //    return;
-                    //}        
+                    if (is_.fail())
+                    {
+                        ec = json_errc::source_error;
+                        return;
+                    }        
                     read_buffer(ec);
                     if (ec) return;
                 }
@@ -339,11 +339,11 @@ public:
             {
                 if (!source_.eof())
                 {
-                    //if (is_.fail())
-                    //{
-                    //    ec = json_errc::source_error;
-                    //    return;
-                    //}        
+                    if (is_.fail())
+                    {
+                        ec = json_errc::source_error;
+                        return;
+                    }        
                     read_buffer(ec);
                     if (ec) return;
                 }
@@ -394,11 +394,11 @@ public:
                 {
                     if (!source_.eof())
                     {
-                        //if (is_.fail())
-                        //{
-                        //    ec = json_errc::source_error;
-                        //    return;
-                        //}   
+                        if (is_.fail())
+                        {
+                            ec = json_errc::source_error;
+                            return;
+                        }   
                         read_buffer(ec);     
                         if (ec) return;
                     }

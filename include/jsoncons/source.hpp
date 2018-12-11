@@ -55,6 +55,11 @@ public:
         return is_->eof();  
     }
 
+    bool fail() const
+    {
+        return is_->fail();  
+    }
+
     size_t position() const
     {
         return position_;
@@ -192,6 +197,11 @@ public:
         return eof_;  
     }
 
+    bool fail() const
+    {
+        return false;  
+    }
+
     size_t position() const
     {
         return (input_ptr_ - data_)/sizeof(value_type) + 1;
@@ -327,6 +337,11 @@ public:
         return is_->eof();  
     }
 
+    bool fail() const
+    {
+        return is_->fail();  
+    }
+
     size_t position() const
     {
         return position_;
@@ -443,6 +458,11 @@ public:
     bool eof() const
     {
         return eof_;  
+    }
+
+    bool fail() const
+    {
+        return false;  
     }
 
     size_t position() const
