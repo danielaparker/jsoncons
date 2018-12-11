@@ -12,7 +12,7 @@
 #include <sstream>
 #include <vector>
 #include <istream>
-#include <cstring>
+#include <cstring> // For std::memcpy
 #include <algorithm>
 #include <exception>
 #include <jsoncons/config/jsoncons_config.hpp>
@@ -258,7 +258,7 @@ public:
         {
             len = length;
         }
-        memcpy(p, input_ptr_, len*sizeof(value_type));
+        std::memcpy(p, input_ptr_, len*sizeof(value_type));
         input_ptr_  += len;
         return len;
     }
@@ -511,7 +511,7 @@ public:
         {
             len = length;
         }
-        memcpy(p, input_ptr_, len);
+        std::memcpy(p, input_ptr_, len);
         input_ptr_  += len;
         return len;
     }
