@@ -6,7 +6,7 @@ More binary support
 
 - BSON (now on master)
 
-- UBJSON
+- UBJSON (now on master)
 
 CBOR
 
