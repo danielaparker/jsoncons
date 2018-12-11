@@ -87,12 +87,16 @@ std::string s = R"(
     "MaturityDate" "2020-12-30"          
 }
 )";
-std::stringstream is(s);
 
-json_reader reader(is);
+json_string_reader reader(s);
+
+// or,
+// std::stringstream is(s);
+// json_reader reader(is);
 
 std::error_code ec;
 reader.read(ec);
+
 if (ec)
 {
     std::cout << ec.message() 

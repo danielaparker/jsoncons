@@ -1,7 +1,7 @@
 ### jsoncons::json_reader
 
 ```c++
-typedef basic_json_reader<char> json_reader
+typedef basic_json_reader<char,text_stream_source<char>> json_reader
 ```
 [json_reader](json_reader.md) uses the incremental parser [json_parser](json_parser.md) 
 to read arbitrarily large files in chunks.
@@ -16,105 +16,76 @@ which omits the check for unconsumed non-whitespace characters.
 ```
 #### Constructors
 
-    json_reader(std::istream& is); // (1)
+    json_reader(text_stream_source source); // (1)
 
-    json_reader(std::istream& is, 
+    json_reader(text_stream_source source, 
                 const json_read_options& options); // (2)
 
-    json_reader(std::istream& is, 
+    json_reader(text_stream_source source, 
                 parse_error_handler& err_handler); // (3)
 
-    json_reader(std::istream& is, 
+    json_reader(text_stream_source source, 
                 const json_read_options& options,
                 parse_error_handler& err_handler); // (4)
 
-    json_reader(std::istream& is, 
+    json_reader(text_stream_source source, 
                 basic_json_content_handler<CharT>& handler); // (5)
 
-    json_reader(std::istream& is, 
+    json_reader(text_stream_source source, 
                 json_content_handler& handler,
                 const json_read_options& options); // (6)
 
-    json_reader(std::istream& is,
+    json_reader(text_stream_source source,
                 json_content_handler& handler,
                 parse_error_handler& err_handler); // (7)
 
-    json_reader(std::istream& is,
+    json_reader(text_stream_source source,
                 json_content_handler& handler, 
                 const json_read_options& options,
                 parse_error_handler& err_handler); // (8)
 
 Constructors (1)-(4) use a default [json_content_handler](json_content_handler.md) that discards the JSON parse events, and are for validation only.
 
-(1) Constructs a `json_reader` that reads from an input stream `is` of 
+(1) Constructs a `json_reader` that reads from an `std::istream` of 
 JSON text, uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(2) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
+(2) Constructs a `json_reader` that reads from an `std::istream` of JSON text, 
 uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(3) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
+(3) Constructs a `json_reader` that reads from an `std::istream` of JSON text, 
 uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(4) Constructs a `json_reader` that reads from an input stream `is` of JSON text, 
+(4) Constructs a `json_reader` that reads from an `std::istream` of JSON text, 
 uses the specified [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 Constructors (5)-(8) take a user supplied [json_content_handler](json_content_handler.md) that receives JSON parse events, such as a [json_decoder](json_decoder). 
 
-(5) Constructs a `json_reader` that reads JSON text from an input stream `is`,
+(5) Constructs a `json_reader` that reads JSON text from an `std::istream`,
 emits JSON parse events to the specified 
 [json_content_handler](json_content_handler.md), and uses default [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(6) Constructs a `json_reader` that reads JSON text from an input stream `is`,
+(6) Constructs a `json_reader` that reads JSON text from an `std::istream`,
 emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
 and uses the specified [json_read_options](json_read_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
 
-(7) Constructs a `json_reader` that reads JSON text from an input stream `is`,
+(7) Constructs a `json_reader` that reads JSON text from an `std::istream`,
 emits JSON parse events to the specified [json_content_handler](json_content_handler.md) 
 and uses default [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-(8) Constructs a `json_reader` that reads JSON text from an input stream `is`,
+(8) Constructs a `json_reader` that reads JSON text from an `std::istream`,
 emits JSON parse events to the specified [json_content_handler](json_content_handler.md) and
 uses the specified [json_read_options](json_read_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-    json_reader(string_view_type& is); // (9)
-
-    json_reader(string_view_type& is, 
-                const json_read_options& options); // (10)
-
-    json_reader(string_view_type& is, 
-                parse_error_handler& err_handler); // (11)
-
-    json_reader(string_view_type& is, 
-                const json_read_options& options,
-                parse_error_handler& err_handler); // (12)
-
-    json_reader(string_view_type& is, 
-                basic_json_content_handler<CharT>& handler); // (13)
-
-    json_reader(string_view_type& is, 
-                json_content_handler& handler,
-                const json_read_options& options); // (14)
-
-    json_reader(string_view_type& is,
-                json_content_handler& handler,
-                parse_error_handler& err_handler); // (15)
-
-    json_reader(string_view_type& is,
-                json_content_handler& handler, 
-                const json_read_options& options,
-                parse_error_handler& err_handler); // (16)
-
-(9)-(16) Same as (8)-(16), except read from a string view instead of a stream.
-
-Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any input stream, content handler, and error handler passed in the constuctor.
+Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any input stream, 
+content handler, and error handler passed in the constuctor.
 
 #### Member functions
 

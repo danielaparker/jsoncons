@@ -155,8 +155,6 @@ class basic_json_reader
 
     basic_json_parser<CharT,Allocator> parser_;
 
-    basic_null_istream<CharT> null_is_;
-    //std::basic_istream<CharT>& is_;
     Source source_;
     bool eof_;
     std::vector<CharT,char_allocator_type> buffer_;
@@ -248,66 +246,7 @@ public:
     {
         buffer_.reserve(buffer_length_);
     }
-/*
-    explicit basic_json_reader(const string_view_type& s)
-        : basic_json_reader(s,default_content_handler_,basic_json_options<CharT>(),default_err_handler_)
-    {
-    }
 
-    basic_json_reader(const string_view_type& s, 
-                      const basic_json_read_options<CharT>& options)
-        : basic_json_reader(s,default_content_handler_,options,default_err_handler_)
-    {
-    }
-
-    basic_json_reader(const string_view_type& s,
-                      parse_error_handler& err_handler)
-        : basic_json_reader(s,default_content_handler_,basic_json_options<CharT>(),err_handler)
-    {
-    }
-
-    basic_json_reader(const string_view_type& s, 
-                      basic_json_content_handler<CharT>& handler)
-        : basic_json_reader(s,handler,basic_json_options<CharT>(),default_err_handler_)
-    {
-    }
-
-    basic_json_reader(const string_view_type& s, 
-                      basic_json_content_handler<CharT>& handler,
-                      const basic_json_read_options<CharT>& options)
-        : basic_json_reader(s,handler,options,default_err_handler_)
-    {
-    }
-
-    basic_json_reader(const string_view_type& s,
-                      basic_json_content_handler<CharT>& handler,
-                      parse_error_handler& err_handler)
-        : basic_json_reader(s,handler,basic_json_options<CharT>(),err_handler)
-    {
-    }
-
-    basic_json_reader(const string_view_type& s, 
-                      const basic_json_read_options<CharT>& options,
-                      parse_error_handler& err_handler)
-        : basic_json_reader(s,default_content_handler_,options,err_handler)
-    {
-    }
-
-    basic_json_reader(const string_view_type& s,
-                      basic_json_content_handler<CharT>& handler, 
-                      const basic_json_read_options<CharT>& options,
-                      parse_error_handler& err_handler)
-       : handler_(handler),
-         parser_(options,err_handler),
-         is_(null_is_),
-         eof_(false),
-         buffer_(s.begin(), s.end()),
-         buffer_length_(s.length()),
-         begin_(false)
-    {
-        parser_.update(buffer_.data(),buffer_.size());
-    }
-*/
     size_t buffer_length() const
     {
         return buffer_length_;

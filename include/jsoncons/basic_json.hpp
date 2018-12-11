@@ -4585,8 +4585,10 @@ void swap(typename Json::key_value_type& a, typename Json::key_value_type& b)
 template <class Json>
 std::basic_istream<typename Json::char_type>& operator>>(std::basic_istream<typename Json::char_type>& is, Json& o)
 {
+    typedef typename Json::char_type char_type;
+
     json_decoder<Json> handler;
-    basic_json_reader<typename Json::char_type> reader(is, handler);
+    basic_json_reader<char_type,text_stream_source<char_type>> reader(is, handler);
     reader.read_next();
     reader.check_done();
     if (!handler.is_valid())
