@@ -67,70 +67,109 @@ public:
 
     size_t get(value_type& c)
     {
-        int val = sbuf_->sbumpc();
-        if (!(val == traits_type::eof()))
+        try
         {
-            c = (value_type)val;
-            ++position_;
-            return 1;
+            int val = sbuf_->sbumpc();
+            if (!(val == traits_type::eof()))
+            {
+                c = (value_type)val;
+                ++position_;
+                return 1;
+            }
+            else
+            {
+                is_->clear(is_->rdstate() | std::ios::eofbit);
+                return 0;
+            }
         }
-        else
+        catch (const std::exception&)
         {
-            is_->clear(is_->rdstate() | std::ios::eofbit);
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return 0;
         }
     }
 
     int get()
     {
-        int c = sbuf_->sbumpc();
-        if (c == traits_type::eof())
-        {
-            is_->clear(is_->rdstate() | std::ios::eofbit);
-        }
-        else
-        {
-            ++position_;
-        }
-        return c;
-    }
-
-    void ignore(size_t count)
-    {
-        for (size_t i = 0; i < count; ++i)
+        try
         {
             int c = sbuf_->sbumpc();
             if (c == traits_type::eof())
             {
                 is_->clear(is_->rdstate() | std::ios::eofbit);
-                return;
             }
             else
             {
                 ++position_;
             }
+            return c;
+        }
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+            return traits_type::eof();
+        }
+    }
+
+    void ignore(size_t count)
+    {
+        try
+        {
+            for (size_t i = 0; i < count; ++i)
+            {
+                int c = sbuf_->sbumpc();
+                if (c == traits_type::eof())
+                {
+                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    return;
+                }
+                else
+                {
+                    ++position_;
+                }
+            }
+        }
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
         }
     }
 
     int peek() 
     {
-        int c = sbuf_->sgetc();
-        if (c == traits_type::eof())
+        try
         {
-            is_->clear(is_->rdstate() | std::ios::eofbit);
+            int c = sbuf_->sgetc();
+            if (c == traits_type::eof())
+            {
+                is_->clear(is_->rdstate() | std::ios::eofbit);
+            }
+            return c;
         }
-        return c;
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit);
+            return traits_type::eof();
+        }
     }
 
     size_t read(value_type* p, size_t length)
     {
-        size_t count = sbuf_->sgetn(p, length);
-        if (count < length)
+        try
         {
-            is_->clear(is_->rdstate() | std::ios::eofbit);
+            size_t count = sbuf_->sgetn(p, length);
+            if (count < length)
+            {
+                is_->clear(is_->rdstate() | std::ios::eofbit);
+            }
+            position_ += length;
+            return count;
         }
-        position_ += length;
-        return count;
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+            return 0;
+        }
     }
 
     template <class OutputIt>
@@ -138,21 +177,29 @@ public:
     read(OutputIt p, size_t length)
     {
         size_t count = 0;
-        for (count = 0; count < length; ++count)
+        try
         {
-            int c = sbuf_->sbumpc();
-            if (c == traits_type::eof())
+            for (count = 0; count < length; ++count)
             {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
-                return count;
+                int c = sbuf_->sbumpc();
+                if (c == traits_type::eof())
+                {
+                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    return count;
+                }
+                else
+                {
+                    ++position_;
+                }
+                *p++ = (value_type)c;
             }
-            else
-            {
-                ++position_;
-            }
-            *p++ = (value_type)c;
+            return count;
         }
-        return count;
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+            return count;
+        }
     }
 };
 
@@ -349,80 +396,119 @@ public:
 
     size_t get(value_type& c)
     {
-        int val = sbuf_->sbumpc();
-        if (!(val == traits_type::eof()))
+        try
         {
-            c = (value_type)val;
-            ++position_;
-            return 1;
+            int val = sbuf_->sbumpc();
+            if (!(val == traits_type::eof()))
+            {
+                c = (value_type)val;
+                ++position_;
+                return 1;
+            }
+            else
+            {
+                is_->clear(is_->rdstate() | std::ios::eofbit);
+                return 0;
+            }
         }
-        else
+        catch (const std::exception&)
         {
-            is_->clear(is_->rdstate() | std::ios::eofbit);
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
             return 0;
         }
     }
 
     int get()
     {
-        int c = sbuf_->sbumpc();
-        if (c == traits_type::eof())
-        {
-            is_->clear(is_->rdstate() | std::ios::eofbit);
-        }
-        else
-        {
-            ++position_;
-        }
-        return c;
-    }
-
-    void ignore(size_t count)
-    {
-        for (size_t i = 0; i < count; ++i)
+        try
         {
             int c = sbuf_->sbumpc();
             if (c == traits_type::eof())
             {
                 is_->clear(is_->rdstate() | std::ios::eofbit);
-                return;
             }
             else
             {
                 ++position_;
             }
+            return c;
+        }
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+            return traits_type::eof();
+        }
+    }
+
+    void ignore(size_t count)
+    {
+        try
+        {
+            for (size_t i = 0; i < count; ++i)
+            {
+                int c = sbuf_->sbumpc();
+                if (c == traits_type::eof())
+                {
+                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    return;
+                }
+                else
+                {
+                    ++position_;
+                }
+            }
+        }
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
         }
     }
 
     int peek() 
     {
-        int c = sbuf_->sgetc();
-        if (c == traits_type::eof())
+        try
         {
-            is_->clear(is_->rdstate() | std::ios::eofbit);
+            int c = sbuf_->sgetc();
+            if (c == traits_type::eof())
+            {
+                is_->clear(is_->rdstate() | std::ios::eofbit);
+            }
+            return c;
         }
-        return c;
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit);
+            return traits_type::eof();
+        }
     }
 
     template <class OutputIt>
     size_t read(OutputIt p, size_t length)
     {
         size_t count = 0;
-        for (count = 0; count < length; ++count)
+        try
         {
-            int c = sbuf_->sbumpc();
-            if (c == traits_type::eof())
+            for (count = 0; count < length; ++count)
             {
-                is_->clear(is_->rdstate() | std::ios::eofbit);
-                return count;
+                int c = sbuf_->sbumpc();
+                if (c == traits_type::eof())
+                {
+                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    return count;
+                }
+                else
+                {
+                    ++position_;
+                }
+                *p++ = (value_type)c;
             }
-            else
-            {
-                ++position_;
-            }
-            *p++ = (value_type)c;
+            return count;
         }
-        return count;
+        catch (const std::exception&)
+        {
+            is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+            return count;
+        }
     }
 };
 

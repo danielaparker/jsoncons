@@ -315,7 +315,7 @@ public:
             {
                 if (!source_.eof())
                 {
-                    if (is_.fail())
+                    if (source_.fail())
                     {
                         ec = json_errc::source_error;
                         return;
@@ -339,7 +339,7 @@ public:
             {
                 if (!source_.eof())
                 {
-                    if (is_.fail())
+                    if (source_.fail())
                     {
                         ec = json_errc::source_error;
                         return;
@@ -394,7 +394,7 @@ public:
                 {
                     if (!source_.eof())
                     {
-                        if (is_.fail())
+                        if (source_.fail())
                         {
                             ec = json_errc::source_error;
                             return;
