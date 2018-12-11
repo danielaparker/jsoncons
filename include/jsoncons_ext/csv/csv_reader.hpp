@@ -13,6 +13,7 @@
 #include <istream>
 #include <cstdlib>
 #include <stdexcept>
+#include <jsoncons/source.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
@@ -25,7 +26,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Allocator=std::allocator<char>>
+template<class CharT,class Source,class Allocator=std::allocator<char>>
 class basic_csv_reader 
 {
     struct stack_item
@@ -47,7 +48,7 @@ class basic_csv_reader
     default_parse_error_handler default_err_handler_;
 
     basic_csv_parser<CharT,Allocator> parser_;
-    std::basic_istream<CharT>& is_;
+    Source source_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
     size_t buffer_position_;
@@ -60,44 +61,44 @@ public:
       \param is The input stream to read from
     */
 
-    basic_csv_reader(std::basic_istream<CharT>& is,
+    basic_csv_reader(Source source,
                      basic_json_content_handler<CharT>& handler)
 
-       : basic_csv_reader(is, 
+       : basic_csv_reader(std::move(source), 
                           handler, 
                           basic_csv_options<CharT,Allocator>(), 
                           default_err_handler_)
     {
     }
 
-    basic_csv_reader(std::basic_istream<CharT>& is,
+    basic_csv_reader(Source source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_options<CharT,Allocator>& options)
 
-        : basic_csv_reader(is, 
+        : basic_csv_reader(std::move(source), 
                            handler, 
                            options, 
                            default_err_handler_)
     {
     }
 
-    basic_csv_reader(std::basic_istream<CharT>& is,
+    basic_csv_reader(Source source,
                      basic_json_content_handler<CharT>& handler,
                      parse_error_handler& err_handler)
-        : basic_csv_reader(is, 
+        : basic_csv_reader(std::move(source), 
                            handler, 
                            basic_csv_options<CharT,Allocator>(), 
                            err_handler)
     {
     }
 
-    basic_csv_reader(std::basic_istream<CharT>& is,
+    basic_csv_reader(Source source,
                      basic_json_content_handler<CharT>& handler,
                      basic_csv_options<CharT,Allocator> options,
                      parse_error_handler& err_handler)
        :
          parser_(handler, options, err_handler),
-         is_(is),
+         source_(std::move(source)),
          buffer_length_(default_max_buffer_length),
          buffer_position_(0),
          eof_(false)
@@ -126,12 +127,12 @@ public:
         {
             if (parser_.source_exhausted())
             {
-                if (!is_.eof())
+                if (!source_.eof())
                 {
                     buffer_.clear();
                     buffer_.resize(buffer_length_);
-                    is_.read(buffer_.data(), buffer_length_);
-                    buffer_.resize(static_cast<size_t>(is_.gcount()));
+                    size_t count = source_.read(buffer_.data(), buffer_length_);
+                    buffer_.resize(count);
                     if (buffer_.size() == 0)
                     {
                         eof_ = true;
@@ -206,27 +207,31 @@ Json decode_csv(typename Json::string_view_type s, const basic_csv_options<typen
 }
 
 template <class Json>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is)
+Json decode_csv(std::basic_istream<typename Json::char_type>& source)
 {
     json_decoder<Json> decoder;
 
-    basic_csv_reader<typename Json::char_type> reader(is,decoder);
+    basic_csv_reader<typename Json::char_type> reader(source,decoder);
     reader.read();
     return decoder.get_result();
 }
 
 template <class Json,class Allocator>
-Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_options<typename Json::char_type,Allocator>& options)
+Json decode_csv(std::basic_istream<typename Json::char_type>& source, const basic_csv_options<typename Json::char_type,Allocator>& options)
 {
+    typedef typename Json::char_type char_type;
+
     json_decoder<Json,Allocator> decoder;
 
-    basic_csv_reader<typename Json::char_type,Allocator> reader(is,decoder,options);
+    basic_csv_reader<typename Json::char_type,jsoncons::text_stream_source<char_type>,Allocator> reader(source,decoder,options);
     reader.read();
     return decoder.get_result();
 }
 
-typedef basic_csv_reader<char> csv_reader;
-typedef basic_csv_reader<wchar_t> wcsv_reader;
+typedef basic_csv_reader<char,jsoncons::text_stream_source<char>> csv_reader;
+typedef basic_csv_reader<char,jsoncons::string_source<char>> csv_string_reader;
+typedef basic_csv_reader<wchar_t,jsoncons::text_stream_source<wchar_t>> wcsv_reader;
+typedef basic_csv_reader<wchar_t,jsoncons::string_source<wchar_t>> wcsv_string_reader;
 
 }}
 

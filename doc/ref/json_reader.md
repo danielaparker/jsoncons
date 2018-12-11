@@ -3,7 +3,7 @@
 ```c++
 typedef basic_json_reader<char,text_stream_source<char>> json_reader
 ```
-[json_reader](json_reader.md) uses the incremental parser [json_parser](json_parser.md) 
+`json_reader` uses the incremental parser [json_parser](json_parser.md) 
 to read arbitrarily large files in chunks.
 A `json_reader` can read a sequence of JSON texts from a stream, using `read_next()`,
 which omits the check for unconsumed non-whitespace characters. 
