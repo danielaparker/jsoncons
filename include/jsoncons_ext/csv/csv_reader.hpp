@@ -184,46 +184,47 @@ public:
 template <class Json>
 Json decode_csv(typename Json::string_view_type s)
 {
+    typedef typename Json::char_type char_type;
+
     json_decoder<Json> decoder;
 
-    basic_csv_parser<typename Json::char_type> parser(decoder);
-    parser.reset();
-    parser.parse(s.data(), 0, s.size());
-    parser.finish_parse();
+    basic_csv_reader<char_type,jsoncons::string_source<char_type>> reader(s,decoder);
+    reader.read();
     return decoder.get_result();
 }
 
 template <class Json,class Allocator>
 Json decode_csv(typename Json::string_view_type s, const basic_csv_options<typename Json::char_type,Allocator>& options)
 {
-    json_decoder<Json,Allocator> decoder;
+    typedef typename Json::char_type char_type;
 
-    basic_csv_parser<typename Json::char_type,Allocator> parser(decoder, options);
-    parser.reset();
-    parser.update(s.data(), s.size());
-    parser.parse_some();
-    parser.finish_parse();
+    json_decoder<Json> decoder;
+
+    basic_csv_reader<char_type,jsoncons::string_source<char_type>> reader(s,decoder,options);
+    reader.read();
     return decoder.get_result();
 }
 
 template <class Json>
-Json decode_csv(std::basic_istream<typename Json::char_type>& source)
+Json decode_csv(std::basic_istream<typename Json::char_type>& is)
 {
+    typedef typename Json::char_type char_type;
+
     json_decoder<Json> decoder;
 
-    basic_csv_reader<typename Json::char_type> reader(source,decoder);
+    basic_csv_reader<char_type,jsoncons::text_stream_source<char_type>> reader(is,decoder);
     reader.read();
     return decoder.get_result();
 }
 
 template <class Json,class Allocator>
-Json decode_csv(std::basic_istream<typename Json::char_type>& source, const basic_csv_options<typename Json::char_type,Allocator>& options)
+Json decode_csv(std::basic_istream<typename Json::char_type>& is, const basic_csv_options<typename Json::char_type,Allocator>& options)
 {
     typedef typename Json::char_type char_type;
 
     json_decoder<Json,Allocator> decoder;
 
-    basic_csv_reader<typename Json::char_type,jsoncons::text_stream_source<char_type>,Allocator> reader(source,decoder,options);
+    basic_csv_reader<char_type,jsoncons::text_stream_source<char_type>,Allocator> reader(is,decoder,options);
     reader.read();
     return decoder.get_result();
 }
