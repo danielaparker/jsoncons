@@ -1,17 +1,15 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2018 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_RESULT_HPP
-#define JSONCONS_DETAIL_RESULT_HPP
+#ifndef JSONCONS_RESULT_HPP
+#define JSONCONS_RESULT_HPP
 
 #include <stdexcept>
 #include <string>
-#include <sstream>
 #include <vector>
-#include <istream>
 #include <ostream>
 #include <iomanip>
 #include <cstdlib>
@@ -25,10 +23,10 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
 
-namespace jsoncons { namespace detail {
+namespace jsoncons { 
 
 template <class CharT>
-class char_stream_result
+class text_stream_result
 {
 public:
     typedef CharT value_type;
@@ -44,19 +42,19 @@ private:
     CharT* p_;
 
     // Noncopyable and nonmoveable
-    char_stream_result(const char_stream_result&) = delete;
-    char_stream_result& operator=(const char_stream_result&) = delete;
+    text_stream_result(const text_stream_result&) = delete;
+    text_stream_result& operator=(const text_stream_result&) = delete;
 
 public:
-    char_stream_result(std::basic_ostream<CharT>& os)
+    text_stream_result(std::basic_ostream<CharT>& os)
         : os_(os), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    char_stream_result(std::basic_ostream<CharT>& os, size_t buflen)
+    text_stream_result(std::basic_ostream<CharT>& os, size_t buflen)
     : os_(os), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    ~char_stream_result()
+    ~text_stream_result()
     {
         os_.write(begin_buffer_, buffer_length());
         os_.flush();
@@ -106,7 +104,7 @@ private:
     }
 };
 
-class byte_stream_result
+class binary_stream_result
 {
 public:
     typedef uint8_t value_type;
@@ -121,11 +119,11 @@ private:
     uint8_t* p_;
 
     // Noncopyable and nonmoveable
-    byte_stream_result(const byte_stream_result&) = delete;
-    byte_stream_result& operator=(const byte_stream_result&) = delete;
+    binary_stream_result(const binary_stream_result&) = delete;
+    binary_stream_result& operator=(const binary_stream_result&) = delete;
 
 public:
-    byte_stream_result(std::basic_ostream<char>& os)
+    binary_stream_result(std::basic_ostream<char>& os)
         : os_(os), 
           buffer_(default_buffer_length), 
           begin_buffer_(buffer_.data()), 
@@ -133,7 +131,7 @@ public:
           p_(begin_buffer_)
     {
     }
-    byte_stream_result(std::basic_ostream<char>& os, size_t buflen)
+    binary_stream_result(std::basic_ostream<char>& os, size_t buflen)
         : os_(os), 
           buffer_(buflen), 
           begin_buffer_(buffer_.data()), 
@@ -141,7 +139,7 @@ public:
           p_(begin_buffer_)
     {
     }
-    ~byte_stream_result()
+    ~binary_stream_result()
     {
         os_.write((char*)begin_buffer_, buffer_length());
         os_.flush();
@@ -257,6 +255,6 @@ public:
     }
 };
 
-}}
+}
 
 #endif

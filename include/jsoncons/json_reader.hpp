@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <ios>
+#include <jsoncons/source.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/parse_error_handler.hpp>
@@ -138,7 +139,7 @@ private:
     }
 };
 
-template<class CharT,class Allocator=std::allocator<char>>
+template<class CharT,class Source,class Allocator=std::allocator<char>>
 class basic_json_reader 
 {
     typedef CharT char_type;
@@ -155,7 +156,8 @@ class basic_json_reader
     basic_json_parser<CharT,Allocator> parser_;
 
     basic_null_istream<CharT> null_is_;
-    std::basic_istream<CharT>& is_;
+    //std::basic_istream<CharT>& is_;
+    Source source_;
     bool eof_;
     std::vector<CharT,char_allocator_type> buffer_;
     size_t buffer_length_;
@@ -168,64 +170,85 @@ class basic_json_reader
 public:
     typedef basic_string_view<CharT> string_view_type;
 
-    explicit basic_json_reader(std::basic_istream<CharT>& is)
-        : basic_json_reader(is,default_content_handler_,basic_json_options<CharT>(),default_err_handler_)
+    explicit basic_json_reader(Source source)
+        : basic_json_reader(std::move(source),
+                            default_content_handler_,
+                            basic_json_options<CharT>(),
+                            default_err_handler_)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is, 
+    basic_json_reader(Source source, 
                       const basic_json_read_options<CharT>& options)
-        : basic_json_reader(is,default_content_handler_,options,default_err_handler_)
+        : basic_json_reader(std::move(source),
+                            default_content_handler_,
+                            options,
+                            default_err_handler_)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is,
+    basic_json_reader(Source source,
                       parse_error_handler& err_handler)
-        : basic_json_reader(is,default_content_handler_,basic_json_options<CharT>(),err_handler)
+        : basic_json_reader(std::move(source),
+                            default_content_handler_,
+                            basic_json_options<CharT>(),
+                            err_handler)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is, 
+    basic_json_reader(Source source, 
                       basic_json_content_handler<CharT>& handler)
-        : basic_json_reader(is,handler,basic_json_options<CharT>(),default_err_handler_)
+        : basic_json_reader(std::move(source),
+                            handler,
+                            basic_json_options<CharT>(),
+                            default_err_handler_)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is, 
+    basic_json_reader(Source source, 
                       basic_json_content_handler<CharT>& handler,
                       const basic_json_read_options<CharT>& options)
-        : basic_json_reader(is,handler,options,default_err_handler_)
+        : basic_json_reader(std::move(source),
+                            handler,
+                            options,
+                            default_err_handler_)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is,
+    basic_json_reader(Source source,
                       basic_json_content_handler<CharT>& handler,
                       parse_error_handler& err_handler)
-        : basic_json_reader(is,handler,basic_json_options<CharT>(),err_handler)
+        : basic_json_reader(std::move(source),
+                            handler,
+                            basic_json_options<CharT>(),
+                            err_handler)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is, 
+    basic_json_reader(Source source, 
                       const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
-        : basic_json_reader(is,default_content_handler_,options,err_handler)
+        : basic_json_reader(std::move(source),
+                            default_content_handler_,
+                            options,
+                            err_handler)
     {
     }
 
-    basic_json_reader(std::basic_istream<CharT>& is,
+    basic_json_reader(Source source,
                       basic_json_content_handler<CharT>& handler, 
                       const basic_json_read_options<CharT>& options,
                       parse_error_handler& err_handler)
        : handler_(handler),
          parser_(options,err_handler),
-         is_(is),
+         source_(std::move(source)),
          eof_(false),
          buffer_length_(default_max_buffer_length),
          begin_(true)
     {
         buffer_.reserve(buffer_length_);
     }
-
+/*
     explicit basic_json_reader(const string_view_type& s)
         : basic_json_reader(s,default_content_handler_,basic_json_options<CharT>(),default_err_handler_)
     {
@@ -284,7 +307,7 @@ public:
     {
         parser_.update(buffer_.data(),buffer_.size());
     }
-
+*/
     size_t buffer_length() const
     {
         return buffer_length_;
@@ -320,8 +343,8 @@ public:
     {
         buffer_.clear();
         buffer_.resize(buffer_length_);
-        is_.read(buffer_.data(), buffer_length_);
-        buffer_.resize(static_cast<size_t>(is_.gcount()));
+        size_t count = source_.read(buffer_.data(), buffer_length_);
+        buffer_.resize(static_cast<size_t>(count));
         if (buffer_.size() == 0)
         {
             eof_ = true;
@@ -351,13 +374,13 @@ public:
         {
             if (parser_.source_exhausted())
             {
-                if (!is_.eof())
+                if (!source_.eof())
                 {
-                    if (is_.fail())
-                    {
-                        ec = json_errc::source_error;
-                        return;
-                    }        
+                    //if (is_.fail())
+                    //{
+                    //    ec = json_errc::source_error;
+                    //    return;
+                    //}        
                     read_buffer(ec);
                     if (ec) return;
                 }
@@ -375,13 +398,13 @@ public:
             parser_.skip_whitespace();
             if (parser_.source_exhausted())
             {
-                if (!is_.eof())
+                if (!source_.eof())
                 {
-                    if (is_.fail())
-                    {
-                        ec = json_errc::source_error;
-                        return;
-                    }        
+                    //if (is_.fail())
+                    //{
+                    //    ec = json_errc::source_error;
+                    //    return;
+                    //}        
                     read_buffer(ec);
                     if (ec) return;
                 }
@@ -430,13 +453,13 @@ public:
             {
                 if (parser_.source_exhausted())
                 {
-                    if (!is_.eof())
+                    if (!source_.eof())
                     {
-                        if (is_.fail())
-                        {
-                            ec = json_errc::source_error;
-                            return;
-                        }   
+                        //if (is_.fail())
+                        //{
+                        //    ec = json_errc::source_error;
+                        //    return;
+                        //}   
                         read_buffer(ec);     
                         if (ec) return;
                     }
@@ -500,8 +523,10 @@ public:
 private:
 };
 
-typedef basic_json_reader<char> json_reader;
-typedef basic_json_reader<wchar_t> wjson_reader;
+typedef basic_json_reader<char,jsoncons::text_stream_source<char>> json_reader;
+typedef basic_json_reader<char,jsoncons::string_source<char>> json_string_reader;
+typedef basic_json_reader<wchar_t, jsoncons::text_stream_source<wchar_t>> wjson_reader;
+typedef basic_json_reader<wchar_t, jsoncons::string_source<wchar_t>> wjson_string_reader;
 
 }
 

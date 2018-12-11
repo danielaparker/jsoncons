@@ -176,7 +176,7 @@ public:
         else if (is_string() || is_byte_string())
         {
             std::error_code ec;
-            jsoncons::detail::buffer_source source(buffer(),buflen());
+            jsoncons::buffer_source source(buffer(),buflen());
             size_t length = jsoncons::cbor::detail::get_length(source, ec);
             if (ec)
             {
@@ -377,7 +377,7 @@ public:
                 //{
                 //    return false;
                 //}
-                jsoncons::detail::buffer_source source(buffer(),buflen());
+                jsoncons::buffer_source source(buffer(),buflen());
                 std::error_code ec;
                 uint64_t x = jsoncons::cbor::detail::get_uint64_value(source,ec);
                 if (ec)
@@ -432,7 +432,7 @@ public:
                 //len = jsoncons::cbor::detail::get_length(first_,last_,&endp);
                 //break;
                 std::error_code ec;
-                jsoncons::detail::buffer_source source(buffer(),buflen());
+                jsoncons::buffer_source source(buffer(),buflen());
                 len = jsoncons::cbor::detail::get_length(source,ec);
                 break;
             }
@@ -582,7 +582,7 @@ public:
                 //{
                 //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Not an integer"));
                 //}
-                jsoncons::detail::buffer_source source(buffer(),buflen());
+                jsoncons::buffer_source source(buffer(),buflen());
                 std::error_code ec;
                 int64_t val = jsoncons::cbor::detail::get_int64_value(source,ec);
                 if (ec)
@@ -611,7 +611,7 @@ public:
             case cbor_major_type::unsigned_integer:
             case cbor_major_type::negative_integer:
             {
-                jsoncons::detail::buffer_source source(buffer(),buflen());
+                jsoncons::buffer_source source(buffer(),buflen());
                 std::error_code ec;
                 uint64_t val = jsoncons::cbor::detail::get_uint64_value(source, ec);
                 if (ec)
@@ -660,7 +660,7 @@ public:
         {
             case cbor_major_type::unsigned_integer:
             {
-                jsoncons::detail::buffer_source source(buffer(),buflen());
+                jsoncons::buffer_source source(buffer(),buflen());
                 std::error_code ec;
                 uint64_t val = jsoncons::cbor::detail::get_uint64_value(source, ec);
                 if (ec)
@@ -671,7 +671,7 @@ public:
             }
             case cbor_major_type::negative_integer:
             {
-                jsoncons::detail::buffer_source source(buffer(),buflen());
+                jsoncons::buffer_source source(buffer(),buflen());
                 std::error_code ec;
                 int64_t val = jsoncons::cbor::detail::get_int64_value(source,ec);
                 if (ec)
@@ -688,7 +688,7 @@ public:
                     case 0x1a:
                     case 0x1b:
                     {
-                        jsoncons::detail::buffer_source source(buffer(),buflen());
+                        jsoncons::buffer_source source(buffer(),buflen());
                         std::error_code ec;
                         double val = jsoncons::cbor::detail::get_double(source, ec);
                         if (ec)
@@ -781,7 +781,7 @@ public:
                     case 21:
                     {
                         std::error_code ec;
-                        jsoncons::detail::buffer_source source(buffer()+1,buflen()-1);
+                        jsoncons::buffer_source source(buffer()+1,buflen()-1);
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
                         if (ec)
                         {
@@ -794,7 +794,7 @@ public:
                     case 22:
                     {
                         std::error_code ec;
-                        jsoncons::detail::buffer_source source(buffer()+1,buflen()-1);
+                        jsoncons::buffer_source source(buffer()+1,buflen()-1);
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
                         if (ec)
                         {
@@ -807,7 +807,7 @@ public:
                     case 23:
                     {
                         std::error_code ec;
-                        jsoncons::detail::buffer_source source(buffer()+1,buflen()-1);
+                        jsoncons::buffer_source source(buffer()+1,buflen()-1);
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
                         if (ec)
                         {
@@ -909,7 +909,7 @@ public:
     void dump(std::basic_string<char,Traits,SAllocator>& s) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_compressed_serializer<char,jsoncons::detail::string_result<string_type>> serializer(s);
+        basic_json_compressed_serializer<char,jsoncons::string_result<string_type>> serializer(s);
         dump(serializer);
     }
 
@@ -934,7 +934,7 @@ public:
               const json_options& options) const
     {
         typedef std::basic_string<char,Traits,SAllocator> string_type;
-        basic_json_compressed_serializer<char,jsoncons::detail::string_result<string_type>> serializer(s, options);
+        basic_json_compressed_serializer<char,jsoncons::string_result<string_type>> serializer(s, options);
         dump(serializer);
     }
 

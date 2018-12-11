@@ -20,7 +20,7 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons/detail/result.hpp>
+#include <jsoncons/result.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 
@@ -28,7 +28,7 @@ namespace jsoncons { namespace ubjson {
 
 enum class ubjson_structure_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class CharT,class Result=jsoncons::detail::byte_stream_result>
+template<class CharT,class Result=jsoncons::binary_stream_result>
 class basic_ubjson_serializer final : public basic_json_content_handler<CharT>
 {
 
@@ -389,9 +389,9 @@ private:
     }
 };
 
-typedef basic_ubjson_serializer<char,jsoncons::detail::byte_stream_result> ubjson_serializer;
+typedef basic_ubjson_serializer<char,jsoncons::binary_stream_result> ubjson_serializer;
 
-typedef basic_ubjson_serializer<char,jsoncons::detail::buffer_result> ubjson_buffer_serializer;
+typedef basic_ubjson_serializer<char,jsoncons::buffer_result> ubjson_buffer_serializer;
 
 }}
 #endif

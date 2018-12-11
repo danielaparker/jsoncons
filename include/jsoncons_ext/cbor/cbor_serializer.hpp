@@ -20,14 +20,14 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons/detail/result.hpp>
+#include <jsoncons/result.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 
 namespace jsoncons { namespace cbor {
 
 enum class cbor_structure_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class CharT,class Result=jsoncons::detail::byte_stream_result>
+template<class CharT,class Result=jsoncons::binary_stream_result>
 class basic_cbor_serializer final : public basic_json_content_handler<CharT>
 {
 
@@ -748,12 +748,12 @@ private:
     }
 };
 
-typedef basic_cbor_serializer<char,jsoncons::detail::byte_stream_result> cbor_serializer;
+typedef basic_cbor_serializer<char,jsoncons::binary_stream_result> cbor_serializer;
 
-typedef basic_cbor_serializer<char,jsoncons::detail::buffer_result> cbor_buffer_serializer;
+typedef basic_cbor_serializer<char,jsoncons::buffer_result> cbor_buffer_serializer;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_cbor_serializer<char,jsoncons::detail::buffer_result> cbor_bytes_serializer;
+typedef basic_cbor_serializer<char,jsoncons::buffer_result> cbor_bytes_serializer;
 #endif
 
 }}

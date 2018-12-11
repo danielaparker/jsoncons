@@ -1760,7 +1760,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
             {
                 return s;
             }
-            jsoncons::detail::string_result<std::string> writer(s);
+            jsoncons::string_result<std::string> writer(s);
             jsoncons::detail::print_uinteger(val, writer);
             p = *endpp;
             break;
@@ -1772,7 +1772,7 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
             {
                 return s;
             }
-            jsoncons::detail::string_result<std::string> writer(s);
+            jsoncons::string_result<std::string> writer(s);
             jsoncons::detail::print_integer(val, writer);
             p = *endpp;
             break;
@@ -1911,7 +1911,7 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
             {
                 return s;
             }
-            jsoncons::detail::string_result<std::string> writer(s);
+            jsoncons::string_result<std::string> writer(s);
             jsoncons::detail::print_uinteger(val, writer);
             break;
         }
@@ -1922,7 +1922,7 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
             {
                 return s;
             }
-            jsoncons::detail::string_result<std::string> writer(s);
+            jsoncons::string_result<std::string> writer(s);
             jsoncons::detail::print_integer(val, writer);
             break;
         }

@@ -309,7 +309,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(std::string("273.15") == s);
@@ -322,7 +322,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(std::string("0.27315e-1") == s);
@@ -335,7 +335,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(std::string("0.27315") == s);
@@ -348,7 +348,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(std::string("27315.0") == s);
@@ -361,7 +361,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(s == std::string("27315e2"));
@@ -374,7 +374,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(std::string("184467440737095516.16") == s);
@@ -387,7 +387,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(s == std::string("-655.37"));
@@ -400,7 +400,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(s == std::string("-0.65537"));
@@ -413,7 +413,7 @@ TEST_CASE("test_decimal_as_string")
                                   };
 
         std::error_code ec;;
-        jsoncons::detail::buffer_source source(v);
+        jsoncons::buffer_source source(v);
         std::string s = cbor::detail::get_array_as_decimal_string(source,ec);
         REQUIRE_FALSE(ec);
         CHECK(s == std::string("-0.65537e-1"));

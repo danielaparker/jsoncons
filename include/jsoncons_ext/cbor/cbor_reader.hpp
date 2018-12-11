@@ -17,7 +17,7 @@
 #include <cassert>
 #include <iterator>
 #include <jsoncons/json.hpp>
-#include <jsoncons/detail/source.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
@@ -35,7 +35,7 @@ class basic_cbor_reader : public serializing_context
     size_t nesting_depth_;
     std::string buffer_;
 public:
-    basic_cbor_reader(Source&& source, json_content_handler& handler)
+    basic_cbor_reader(Source source, json_content_handler& handler)
        : source_(std::move(source)),
          handler_(handler), 
          nesting_depth_(0)
@@ -423,9 +423,9 @@ private:
     }
 };
 
-typedef basic_cbor_reader<jsoncons::detail::binary_stream_source> cbor_reader;
+typedef basic_cbor_reader<jsoncons::binary_stream_source> cbor_reader;
 
-typedef basic_cbor_reader<jsoncons::detail::buffer_source> cbor_buffer_reader;
+typedef basic_cbor_reader<jsoncons::buffer_source> cbor_buffer_reader;
 
 }}
 

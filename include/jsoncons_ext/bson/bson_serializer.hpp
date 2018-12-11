@@ -20,13 +20,13 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons/detail/result.hpp>
+#include <jsoncons/result.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
 
 namespace jsoncons { namespace bson {
 
-template<class CharT,class Result=jsoncons::detail::byte_stream_result>
+template<class CharT,class Result=jsoncons::binary_stream_result>
 class basic_bson_serializer final : public basic_json_content_handler<CharT>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
@@ -316,9 +316,9 @@ private:
     }
 };
 
-typedef basic_bson_serializer<char,jsoncons::detail::byte_stream_result> bson_serializer;
+typedef basic_bson_serializer<char,jsoncons::binary_stream_result> bson_serializer;
 
-typedef basic_bson_serializer<char,jsoncons::detail::buffer_result> bson_buffer_serializer;
+typedef basic_bson_serializer<char,jsoncons::buffer_result> bson_buffer_serializer;
 
 }}
 #endif

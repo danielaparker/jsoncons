@@ -2319,7 +2319,7 @@ public:
     static basic_json parse(std::basic_istream<char_type>& is, parse_error_handler& err_handler)
     {
         json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
-        basic_json_reader<char_type> reader(is, handler, err_handler);
+        basic_json_reader<char_type,text_stream_source<char_type>> reader(is, handler, err_handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())
@@ -2390,7 +2390,7 @@ public:
     static basic_json parse(std::basic_istream<char_type>& is, const basic_json_options<CharT>& options, parse_error_handler& err_handler)
     {
         json_decoder<basic_json<CharT,ImplementationPolicy,Allocator>> handler;
-        basic_json_reader<char_type> reader(is, handler, options, err_handler);
+        basic_json_reader<char_type,text_stream_source<char_type>> reader(is, handler, options, err_handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())
@@ -2778,7 +2778,7 @@ public:
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_compressed_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s);
+        basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s);
         dump(serializer);
     }
 
@@ -2788,12 +2788,12 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s);
+            basic_json_serializer<char_type,jsoncons::string_result<string_type>> serializer(s);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s);
+            basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s);
             dump(serializer);
         }
     }
@@ -2803,7 +2803,7 @@ public:
               const basic_json_options<char_type>& options) const
     {
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
-        basic_json_compressed_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s, options);
+        basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s, options);
         dump(serializer);
     }
 
@@ -2815,12 +2815,12 @@ public:
         typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
         if (line_indent == indenting::indent)
         {
-            basic_json_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s, options);
+            basic_json_serializer<char_type,jsoncons::string_result<string_type>> serializer(s, options);
             dump(serializer);
         }
         else
         {
-            basic_json_compressed_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s, options);
+            basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s, options);
             dump(serializer);
         }
     }
@@ -2874,7 +2874,7 @@ public:
     string_type to_string(const char_allocator_type& allocator=char_allocator_type()) const noexcept
     {
         string_type s(allocator);
-        basic_json_compressed_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s);
+        basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s);
         dump(serializer);
         return s;
     }
@@ -2883,7 +2883,7 @@ public:
                           const char_allocator_type& allocator=char_allocator_type()) const
     {
         string_type s(allocator);
-        basic_json_compressed_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s,options);
+        basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s,options);
         dump(serializer);
         return s;
     }
@@ -3385,7 +3385,7 @@ public:
             default:
             {
                 string_type s(allocator);
-                basic_json_compressed_serializer<char_type,jsoncons::detail::string_result<string_type>> serializer(s,options);
+                basic_json_compressed_serializer<char_type,jsoncons::string_result<string_type>> serializer(s,options);
                 dump(serializer);
                 return s;
             }
@@ -4564,7 +4564,7 @@ private:
     friend std::basic_istream<char_type>& operator<<(std::basic_istream<char_type>& is, basic_json& o)
     {
         json_decoder<basic_json> handler;
-        basic_json_reader<char_type> reader(is, handler);
+        basic_json_reader<char_type,text_stream_source<char_type>> reader(is, handler);
         reader.read_next();
         reader.check_done();
         if (!handler.is_valid())

@@ -17,7 +17,7 @@
 #include <cassert>
 #include <iterator>
 #include <jsoncons/json.hpp>
-#include <jsoncons/detail/source.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
@@ -32,7 +32,7 @@ class basic_bson_reader : public serializing_context
     json_content_handler& handler_;
     size_t nesting_depth_;
 public:
-    basic_bson_reader(Source&& source, json_content_handler& handler)
+    basic_bson_reader(Source source, json_content_handler& handler)
        : source_(std::move(source)),
          handler_(handler), 
          nesting_depth_(0)
@@ -254,9 +254,9 @@ public:
 private:
 };
 
-typedef basic_bson_reader<jsoncons::detail::binary_stream_source> bson_reader;
+typedef basic_bson_reader<jsoncons::binary_stream_source> bson_reader;
 
-typedef basic_bson_reader<jsoncons::detail::buffer_source> bson_buffer_reader;
+typedef basic_bson_reader<jsoncons::buffer_source> bson_buffer_reader;
 
 }}
 

@@ -20,7 +20,7 @@
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
-#include <jsoncons/detail/result.hpp>
+#include <jsoncons/result.hpp>
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 
@@ -28,7 +28,7 @@ namespace jsoncons { namespace msgpack {
 
 enum class msgpack_structure_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class CharT,class Result=jsoncons::detail::byte_stream_result>
+template<class CharT,class Result=jsoncons::binary_stream_result>
 class basic_msgpack_serializer final : public basic_json_content_handler<CharT>
 {
 
@@ -423,12 +423,12 @@ private:
     }
 };
 
-typedef basic_msgpack_serializer<char,jsoncons::detail::byte_stream_result> msgpack_serializer;
+typedef basic_msgpack_serializer<char,jsoncons::binary_stream_result> msgpack_serializer;
 
-typedef basic_msgpack_serializer<char,jsoncons::detail::buffer_result> msgpack_buffer_serializer;
+typedef basic_msgpack_serializer<char,jsoncons::buffer_result> msgpack_buffer_serializer;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-typedef basic_msgpack_serializer<char,jsoncons::detail::buffer_result> msgpack_bytes_serializer;
+typedef basic_msgpack_serializer<char,jsoncons::buffer_result> msgpack_bytes_serializer;
 #endif
 
 }}

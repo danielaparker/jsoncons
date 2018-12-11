@@ -18,7 +18,7 @@ std::basic_string<CharT> float_to_string(double val, uint8_t precision)
     jsoncons::detail::print_double print(floating_point_options(chars_format::general,precision,0));
 
     std::basic_string<CharT> s;
-    jsoncons::detail::string_result<std::basic_string<CharT>> writer(s);
+    jsoncons::string_result<std::basic_string<CharT>> writer(s);
     print(val, floating_point_options(chars_format::general,precision,0), writer);
     writer.flush();
     return s;

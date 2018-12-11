@@ -17,7 +17,7 @@
 #include <cassert>
 #include <iterator>
 #include <jsoncons/json.hpp>
-#include <jsoncons/detail/source.hpp>
+#include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
@@ -33,7 +33,7 @@ class basic_msgpack_reader : public serializing_context
     size_t nesting_depth_;
     std::string buffer_;
 public:
-    basic_msgpack_reader(Source&& source, json_content_handler& handler)
+    basic_msgpack_reader(Source source, json_content_handler& handler)
        : source_(std::move(source)),
          handler_(handler), 
          nesting_depth_(0)
@@ -723,9 +723,9 @@ private:
     }
 };
 
-typedef basic_msgpack_reader<jsoncons::detail::binary_stream_source> msgpack_reader;
+typedef basic_msgpack_reader<jsoncons::binary_stream_source> msgpack_reader;
 
-typedef basic_msgpack_reader<jsoncons::detail::buffer_source> msgpack_buffer_reader;
+typedef basic_msgpack_reader<jsoncons::buffer_source> msgpack_buffer_reader;
 
 }}
 
