@@ -11,7 +11,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <istream>
 #include <cstdlib>
 #include <stdexcept>
 #include <system_error>

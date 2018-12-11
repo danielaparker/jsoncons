@@ -8,12 +8,10 @@
 #define JSONCONS_MSGPACK_MSGPACK_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include <limits>
 #include <cassert>
 #include <jsoncons/json.hpp>
 #include <jsoncons/config/binary_detail.hpp>

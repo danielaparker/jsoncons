@@ -8,7 +8,6 @@
 #define JSONCONS_CSV_CSV_READER_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include <istream>
 #include <cstdlib>

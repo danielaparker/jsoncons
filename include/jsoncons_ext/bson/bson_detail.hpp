@@ -8,12 +8,10 @@
 #define JSONCONS_BSON_BSON_DETAIL_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include <limits>
 #include <cassert>
 #include <jsoncons/config/binary_detail.hpp>
 

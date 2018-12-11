@@ -9,11 +9,7 @@
 
 #include <stdexcept>
 #include <string>
-#include <sstream>
 #include <vector>
-#include <istream>
-#include <ostream>
-#include <iomanip>
 #include <cstdlib>
 #include <cstdarg>
 #include <locale>

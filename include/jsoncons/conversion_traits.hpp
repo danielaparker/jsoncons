@@ -7,7 +7,6 @@
 #ifndef JSONCONS_CONVERSION_TRAITS_HPP
 #define JSONCONS_CONVERSION_TRAITS_HPP
 
-#include <iostream>
 #include <string>
 #include <tuple>
 #include <array>

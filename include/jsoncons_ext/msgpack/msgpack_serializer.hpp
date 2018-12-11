@@ -8,13 +8,9 @@
 #define JSONCONS_MSGPACK_MSGPACK_SERIALIZER_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
-#include <istream>
-#include <ostream>
 #include <cstdlib>
 #include <limits> // std::numeric_limits
-#include <fstream>
 #include <memory>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>

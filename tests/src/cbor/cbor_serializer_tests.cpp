@@ -13,6 +13,7 @@
 #include <utility>
 #include <ctime>
 #include <limits>
+#include <fstream>
 
 using namespace jsoncons;
 using namespace jsoncons::cbor;

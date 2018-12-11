@@ -8,7 +8,6 @@
 #define JSONCONS_CBOR_CBOR_VIEW_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include <istream>
 #include <cstdlib>

@@ -9,16 +9,10 @@
 
 #include <stdexcept>
 #include <string>
-#include <sstream>
-#include <vector>
-#include <istream>
-#include <ostream>
-#include <iomanip>
 #include <cstdlib>
 #include <cmath>
 #include <cstdarg>
 #include <exception>
-#include <limits> // std::numeric_limits
 
 // Uncomment the following line to suppress deprecated names (recommended for new code)
 //#define JSONCONS_NO_DEPRECATED

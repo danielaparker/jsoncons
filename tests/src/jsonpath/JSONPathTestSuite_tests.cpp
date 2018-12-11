@@ -14,6 +14,7 @@
 #include <new>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <fstream>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1900
 #include <filesystem>

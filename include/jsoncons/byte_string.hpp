@@ -7,8 +7,6 @@
 #ifndef JSONCONS_BYTE_STRING_HPP
 #define JSONCONS_BYTE_STRING_HPP
 
-#include <stdexcept>
-#include <string>
 #include <sstream>
 #include <vector>
 #include <istream>
@@ -18,7 +16,6 @@
 #include <cmath>
 #include <cstdarg>
 #include <locale>
-#include <limits> 
 #include <type_traits>
 #include <algorithm>
 #include <memory>

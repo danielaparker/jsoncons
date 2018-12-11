@@ -13,10 +13,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <istream>
-#include <limits>
 #include <memory>
-#include <sstream>
 #include <vector>
 
 #if defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))

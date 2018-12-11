@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <jsoncons/json.hpp>
+#include <fstream>
 
 using namespace jsoncons;
 

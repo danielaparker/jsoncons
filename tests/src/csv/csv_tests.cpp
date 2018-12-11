@@ -14,6 +14,7 @@
 #include <utility>
 #include <ctime>
 #include <iostream>
+#include <fstream>
 
 using namespace jsoncons;
 using namespace jsoncons::csv;

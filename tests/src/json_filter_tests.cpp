@@ -11,6 +11,7 @@
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json.hpp>
+#include <fstream>
 
 using namespace jsoncons;
 

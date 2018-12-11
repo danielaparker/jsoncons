@@ -8,6 +8,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <fstream>
 
 using namespace jsoncons;
 

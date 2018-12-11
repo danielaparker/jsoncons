@@ -10,6 +10,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <fstream>
 
 using namespace jsoncons;
 

@@ -7,6 +7,7 @@
 #include <codecvt>
 #endif
 #include <jsoncons/json.hpp>
+#include <fstream>
 
 using namespace jsoncons;
 

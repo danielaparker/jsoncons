@@ -8,11 +8,8 @@
 #define JSONCONS_CSV_CSV_SERIALIZING_OPTIONS_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include <unordered_map>
-#include <istream>
-#include <ostream>
 #include <cstdlib>
 #include <limits>
 #include <cwchar>

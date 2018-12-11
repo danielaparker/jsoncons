@@ -10,7 +10,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <istream>
 #include <cstdlib>
 #include <memory>
 #include <jsoncons/json.hpp>

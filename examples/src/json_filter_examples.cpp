@@ -5,6 +5,7 @@
 #include <sstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
+#include <fstream>
 
 using namespace jsoncons;
 

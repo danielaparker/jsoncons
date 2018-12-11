@@ -8,10 +8,6 @@
 #define JSONCONS_JSON_OPTIONS_HPP
 
 #include <string>
-#include <sstream>
-#include <vector>
-#include <istream>
-#include <ostream>
 #include <cstdlib>
 #include <limits>
 #include <cwchar>

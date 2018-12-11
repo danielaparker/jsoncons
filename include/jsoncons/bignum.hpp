@@ -8,6 +8,7 @@
 #define JSONCONS_BIGNUM_HPP
 
 #include <cstdint>
+#include <vector>
 #include <iostream>
 #include <climits>
 #include <limits>

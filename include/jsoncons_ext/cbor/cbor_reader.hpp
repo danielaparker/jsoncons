@@ -8,12 +8,9 @@
 #define JSONCONS_CBOR_CBOR_READER_HPP
 
 #include <string>
-#include <sstream>
 #include <vector>
-#include <istream>
 #include <cstdlib>
 #include <memory>
-#include <limits>
 #include <cassert>
 #include <iterator>
 #include <jsoncons/json.hpp>

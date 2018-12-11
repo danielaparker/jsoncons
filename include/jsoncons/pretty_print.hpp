@@ -7,9 +7,7 @@
 #ifndef JSONCONS_PRETTY_PRINT_HPP
 #define JSONCONS_PRETTY_PRINT_HPP
 
-#include <limits>
 #include <string>
-#include <vector>
 #include <exception>
 #include <cstdlib>
 #include <cstring>

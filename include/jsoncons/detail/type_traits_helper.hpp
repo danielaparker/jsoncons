@@ -9,16 +9,11 @@
 
 #include <stdexcept>
 #include <string>
-#include <sstream>
-#include <vector>
-#include <istream>
-#include <ostream>
 #include <iomanip>
 #include <cstdlib>
 #include <cmath>
 #include <cstdarg>
 #include <locale>
-#include <limits> 
 #include <type_traits>
 #include <algorithm>
 #include <memory>
