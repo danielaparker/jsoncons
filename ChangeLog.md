@@ -1,7 +1,14 @@
 master
 ------
 
-Name changes:
+Bug fixes:
+
+- On Windows platforms, fixed issue with macro expansion of max when 
+  including windows.h  (also in 0.113.1)
+
+- Fixed compile issue with `j = json::make_array()` (also in 0.113.2)
+
+Non-breaking name changes:
 
 The following names have been deprecated (still work) and renamed
 
@@ -17,13 +24,6 @@ The rationale for renaming `parse_error` to `serialization_error`
 is that we need to use error category codes for serializer 
 errors as well as parser errors, so we need a more general name
 for the exception type. 
-
-Bug fixes:
-
-- On Windows platforms, fixed issue with macro expansion of max when 
-  including windows.h  (also in 0.113.1)
-
-- Fixed compile issue with `j = json::make_array()` (also in 0.113.2)
 
 Message Pack enhancements
 
