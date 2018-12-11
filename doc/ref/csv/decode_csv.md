@@ -35,7 +35,7 @@ Returns a `Json` value
 
 #### Exceptions
 
-Throws [parse_error](parse_error.md) if parsing fails.
+Throws [serialization_error](serialization_error.md) if parsing fails.
 
 ### Examples
 

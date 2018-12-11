@@ -136,7 +136,7 @@ try
     strict_parse_error_handler err_handler;
     json j = json::parse(s, err_handler);
 }
-catch (const parse_error& e)
+catch (const serialization_error& e)
 {
     std::cout << "(2) " << e.what() << std::endl;
 }
@@ -160,7 +160,7 @@ try
     options.max_nesting_depth(20);
     json j = json::parse(s, options);
 }
-catch (const parse_error& e)
+catch (const serialization_error& e)
 {
      std::cout << e.what() << std::endl;
 }

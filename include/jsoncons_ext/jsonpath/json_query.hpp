@@ -488,7 +488,7 @@ public:
         evaluate(root, path, length, ec);
         if (ec)
         {
-            throw parse_error(ec,line_,column_);
+            throw serialization_error(ec,line_,column_);
         }
     }
 

@@ -95,7 +95,7 @@ Returns `true` when there are no more JSON texts to be read from the stream, `fa
     void read()
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
 Throws if there are any unconsumed non-whitespace characters left in the input.
-Throws [parse_error](parse_error.md) if parsing fails.
+Throws [serialization_error](serialization_error.md) if parsing fails.
 
     void read(std::error_code& ec)
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
@@ -103,7 +103,7 @@ Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails or if there 
 
     void read_next()
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
-Throws [parse_error](parse_error.md) if parsing fails.
+Throws [serialization_error](serialization_error.md) if parsing fails.
 
     void read_next(std::error_code& ec)
 Reads the next JSON text from the stream and reports JSON events to a [json_content_handler](json_content_handler.md), such as a [json_decoder](json_decoder.md).
@@ -140,7 +140,7 @@ try
     reader.read();
     json j = decoder.get_result();
 }
-catch (const parse_error& e)
+catch (const serialization_error& e)
 {
     std::cout << e.what() << std::endl;
 }

@@ -2361,7 +2361,7 @@ public:
         auto result = unicons::skip_bom(s.begin(), s.end());
         if (result.ec != unicons::encoding_errc())
         {
-            throw parse_error(result.ec);
+            throw serialization_error(result.ec);
         }
         size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
@@ -2408,7 +2408,7 @@ public:
         auto result = unicons::skip_bom(s.begin(), s.end());
         if (result.ec != unicons::encoding_errc())
         {
-            throw parse_error(result.ec);
+            throw serialization_error(result.ec);
         }
         size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);

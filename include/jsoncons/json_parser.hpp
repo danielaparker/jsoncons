@@ -482,7 +482,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw parse_error(ec,line_,column_);
+            throw serialization_error(ec,line_,column_);
         }
     }
 
@@ -533,7 +533,7 @@ public:
         parse_some(handler, ec);
         if (ec)
         {
-            throw parse_error(ec,line_,column_);
+            throw serialization_error(ec,line_,column_);
         }
     }
 
@@ -559,7 +559,7 @@ public:
         finish_parse(handler, ec);
         if (ec)
         {
-            throw parse_error(ec,line_,column_);
+            throw serialization_error(ec,line_,column_);
         }
     }
 
@@ -2606,7 +2606,7 @@ escape_u9:
         finish_parse(handler, ec);
         if (ec)
         {
-            throw parse_error(ec,line_,column_);
+            throw serialization_error(ec,line_,column_);
         }
     }
 

@@ -116,7 +116,7 @@ public:
         read(ec);
         if (ec)
         {
-            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 

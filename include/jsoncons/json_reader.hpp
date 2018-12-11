@@ -88,7 +88,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            throw parse_error(result.ec,context.line_number(),context.column_number());
+            throw serialization_error(result.ec,context.line_number(),context.column_number());
         }
         return other_handler_.name(target, context);
     }
@@ -101,7 +101,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            throw parse_error(result.ec,context.line_number(),context.column_number());
+            throw serialization_error(result.ec,context.line_number(),context.column_number());
         }
         return other_handler_.string_value(target, tag, context);
     }
@@ -274,7 +274,7 @@ public:
         read_next(ec);
         if (ec)
         {
-            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
@@ -365,7 +365,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 

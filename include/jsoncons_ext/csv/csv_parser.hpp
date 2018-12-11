@@ -354,7 +354,7 @@ public:
         parse_some(ec);
         if (ec)
         {
-            throw parse_error(ec,line_,column_);
+            throw serialization_error(ec,line_,column_);
         }
     }
 
@@ -660,7 +660,7 @@ all_csv_states:
         finish_parse(ec);
         if (ec)
         {
-            throw parse_error(ec,line_,column_);
+            throw serialization_error(ec,line_,column_);
         }
     }
 

@@ -72,7 +72,7 @@ void json_replace_example2()
 }]}}
 )");
     }
-    catch (const parse_error& e)
+    catch (const serialization_error& e)
     {
         std::cout << e.what() << std::endl;
     }

@@ -15,7 +15,7 @@ Json decode_ubjson(std::basic_istream<typename Json::char_type>& is); // (2)
 
 #### Exceptions
 
-Throws [parse_error](../parse_error.md) if parsing fails.
+Throws [serialization_error](../serialization_error.md) if parsing fails.
 
 #### See also
 

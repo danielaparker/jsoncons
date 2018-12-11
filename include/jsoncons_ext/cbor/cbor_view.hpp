@@ -174,7 +174,7 @@ public:
             size_t length = jsoncons::cbor::detail::get_length(source, ec);
             if (ec)
             {
-                throw parse_error(ec,source.position());
+                throw serialization_error(ec,source.position());
             }
             is_empty = (length == 0);
         }
@@ -581,7 +581,7 @@ public:
                 int64_t val = jsoncons::cbor::detail::get_int64_value(source,ec);
                 if (ec)
                 {
-                    throw parse_error(ec,source.position());
+                    throw serialization_error(ec,source.position());
                 }
 
                 return (T)val;
@@ -610,7 +610,7 @@ public:
                 uint64_t val = jsoncons::cbor::detail::get_uint64_value(source, ec);
                 if (ec)
                 {
-                    throw parse_error(ec,source.position());
+                    throw serialization_error(ec,source.position());
                 }
                 return (T)val;
             }
@@ -659,7 +659,7 @@ public:
                 uint64_t val = jsoncons::cbor::detail::get_uint64_value(source, ec);
                 if (ec)
                 {
-                    throw parse_error(ec,source.position());
+                    throw serialization_error(ec,source.position());
                 }
                 return static_cast<double>(val);
             }
@@ -670,7 +670,7 @@ public:
                 int64_t val = jsoncons::cbor::detail::get_int64_value(source,ec);
                 if (ec)
                 {
-                    throw parse_error(ec,source.position());
+                    throw serialization_error(ec,source.position());
                 }
                 return static_cast<double>(val);
             }
@@ -687,7 +687,7 @@ public:
                         double val = jsoncons::cbor::detail::get_double(source, ec);
                         if (ec)
                         {
-                            throw parse_error(ec,source.position());
+                            throw serialization_error(ec,source.position());
                         }
                         return val;
                     }
@@ -779,7 +779,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
                         if (ec)
                         {
-                            throw parse_error(ec,source.position()+1);
+                            throw serialization_error(ec,source.position()+1);
                         }
                         std::string s;
                         encode_base64url(v.data(),v.size(),s);
@@ -792,7 +792,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
                         if (ec)
                         {
-                            throw parse_error(ec,source.position()+1);
+                            throw serialization_error(ec,source.position()+1);
                         }
                         std::string s;
                         encode_base64(v.data(),v.size(),s);
@@ -805,7 +805,7 @@ public:
                         std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source, ec);
                         if (ec)
                         {
-                            throw parse_error(ec,source.position()+1);
+                            throw serialization_error(ec,source.position()+1);
                         }
                         std::string s;
                         encode_base16(v.data(),v.size(),s);

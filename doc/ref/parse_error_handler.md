@@ -20,12 +20,12 @@ will then report all warnings and errors through this interface.
 #### Public interface methods
 
     void error(std::error_code ec,
-               const serializing_context& context) throw (parse_error) = 0
-Called for recoverable errors. Calls `do_error`, if `do_error` returns `false`, throws a [parse_error](parse_error.md), otherwise an attempt is made to recover.
+               const serializing_context& context) throw (serialization_error) = 0
+Called for recoverable errors. Calls `do_error`, if `do_error` returns `false`, throws a [serialization_error](serialization_error.md), otherwise an attempt is made to recover.
 
     void fatal_error(std::error_code ec,
-                     const serializing_context& context) throw (parse_error) = 0
-Called for unrecoverable errors. Calls `do_fatal_error` and throws a [parse_error](parse_error.md).
+                     const serializing_context& context) throw (serialization_error) = 0
+Called for unrecoverable errors. Calls `do_fatal_error` and throws a [serialization_error](serialization_error.md).
 
 #### Private virtual implementation methods
 

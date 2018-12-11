@@ -35,7 +35,7 @@ void decode_stream(basic_staj_reader<CharT>& reader, T& val)
     decode_stream(reader, val, ec);
     if (ec)
     {
-        throw parse_error(ec, reader.context().line_number(), reader.context().column_number());
+        throw serialization_error(ec, reader.context().line_number(), reader.context().column_number());
     }
 }
 

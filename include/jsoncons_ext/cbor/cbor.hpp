@@ -55,7 +55,7 @@ decode_cbor(const cbor_view& v)
     parser.read(ec);
     if (ec)
     {
-        throw parse_error(ec,parser.line_number(),parser.column_number());
+        throw serialization_error(ec,parser.line_number(),parser.column_number());
     }
     return decoder.get_result();
 }
@@ -71,7 +71,7 @@ decode_cbor(const cbor_view& v)
     parser.read(ec);
     if (ec)
     {
-        throw parse_error(ec,parser.line_number(),parser.column_number());
+        throw serialization_error(ec,parser.line_number(),parser.column_number());
     }
     return decoder.get_result();
 }
@@ -88,7 +88,7 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
     parser.read(ec);
     if (ec)
     {
-        throw parse_error(ec,parser.line_number(),parser.column_number());
+        throw serialization_error(ec,parser.line_number(),parser.column_number());
     }
     return decoder.get_result();
 }
@@ -106,7 +106,7 @@ decode_cbor(std::basic_istream<typename Json::char_type>& is)
     parser.read(ec);
     if (ec)
     {
-        throw parse_error(ec,parser.line_number(),parser.column_number());
+        throw serialization_error(ec,parser.line_number(),parser.column_number());
     }
     return decoder.get_result();
 }

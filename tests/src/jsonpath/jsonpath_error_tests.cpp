@@ -51,12 +51,12 @@ struct jsonpath_fixture
 
 void test_error_code(const json& root, const std::string& path, int value, const std::error_category& category, size_t line, size_t column)
 {
-    REQUIRE_THROWS_AS(json_query(root,path),parse_error);
+    REQUIRE_THROWS_AS(json_query(root,path),serialization_error);
     try
     {
         json result = json_query(root,path);
     }
-    catch (const parse_error& e)
+    catch (const serialization_error& e)
     {
         CHECK((e.code().value() == value && e.code().category() == category));
         CHECK(e.line_number() == line);
@@ -66,12 +66,12 @@ void test_error_code(const json& root, const std::string& path, int value, const
 
 void test_error_code(const json& root, const std::string& path, std::error_code value, size_t line, size_t column)
 {
-    REQUIRE_THROWS_AS(json_query(root,path),parse_error);
+    REQUIRE_THROWS_AS(json_query(root,path),serialization_error);
     try
     {
         json result = json_query(root,path);
     }
-    catch (const parse_error& e)
+    catch (const serialization_error& e)
     {
         CHECK(e.code() == value);
         CHECK(e.line_number() == line);

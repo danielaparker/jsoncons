@@ -432,7 +432,7 @@ public:
         accept(handler, ec);
         if (ec)
         {
-            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
@@ -523,7 +523,7 @@ public:
         next(ec);
         if (ec)
         {
-            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
@@ -603,7 +603,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            throw parse_error(ec,parser_.line_number(),parser_.column_number());
+            throw serialization_error(ec,parser_.line_number(),parser_.column_number());
         }
     }
 
