@@ -35,7 +35,7 @@ public:
 
 private:
     bool do_name(const string_view_type& name,
-                 const serializing_context& context) override
+                 const serializing_context& context, std::error_code& ec) override
     {
         member_name_ = std::string(name);
         if (member_name_ != "name")
@@ -47,7 +47,7 @@ private:
 
     bool do_string_value(const string_view_type& s,
                          semantic_tag_type tag,
-                         const serializing_context& context) override
+                         const serializing_context& context, std::error_code& ec) override
     {
         if (member_name_ == "name")
         {

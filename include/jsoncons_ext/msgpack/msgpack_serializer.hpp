@@ -92,13 +92,13 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code& ec) override
     {
         
         JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Indefinite object length not supported."));
     }
 
-    bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&) override
+    bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&, std::error_code& ec) override
     {
         stack_.push_back(stack_item(msgpack_structure_type::object));
 
@@ -128,7 +128,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&) override
+    bool do_end_object(const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -136,12 +136,12 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Indefinite array length not supported."));
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
+    bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&, std::error_code& ec) override
     {
         stack_.push_back(stack_item(msgpack_structure_type::array));
         if (length <= 15)
@@ -164,7 +164,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&) override
+    bool do_end_array(const serializing_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -172,13 +172,13 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context& context) override
+    bool do_name(const string_view_type& name, const serializing_context& context, std::error_code& ec) override
     {
-        do_string_value(name, semantic_tag_type::none, context);
+        do_string_value(name, semantic_tag_type::none, context, ec);
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code& ec) override
     {
         // nil
         jsoncons::detail::to_big_endian(static_cast<uint8_t>(msgpack_format::nil_cd), std::back_inserter(result_));
@@ -186,7 +186,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&, std::error_code& ec) override
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
@@ -234,7 +234,7 @@ private:
     bool do_byte_string_value(const byte_string_view& b, 
                               byte_string_chars_format,
                               semantic_tag_type, 
-                              const serializing_context&) override
+                              const serializing_context&, std::error_code& ec) override
     {
 
         const size_t length = b.length();
@@ -269,7 +269,7 @@ private:
     bool do_double_value(double val, 
                          const floating_point_options&, 
                          semantic_tag_type,
-                         const serializing_context&) override
+                         const serializing_context&, std::error_code& ec) override
     {
         float valf = (float)val;
         if ((double)valf == val)
@@ -293,7 +293,7 @@ private:
 
     bool do_int64_value(int64_t val, 
                         semantic_tag_type, 
-                        const serializing_context&) override
+                        const serializing_context&, std::error_code& ec) override
     {
         if (val >= 0)
         {
@@ -365,7 +365,7 @@ private:
 
     bool do_uint64_value(uint64_t val, 
                          semantic_tag_type, 
-                         const serializing_context&) override
+                         const serializing_context&, std::error_code& ec) override
     {
         if (val <= (std::numeric_limits<int8_t>::max)())
         {
@@ -400,7 +400,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
+    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&, std::error_code& ec) override
     {
         // true and false
         result_.push_back(static_cast<uint8_t>(val ? msgpack_format::true_cd : msgpack_format::false_cd));

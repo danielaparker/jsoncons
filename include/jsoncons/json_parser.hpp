@@ -54,7 +54,7 @@ public:
     {
     }
 
-    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context& context) override
+    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
         if (tag == semantic_tag_type::none)
         {

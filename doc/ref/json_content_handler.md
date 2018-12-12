@@ -145,40 +145,40 @@ Flushes whatever is buffered to the destination.
 
 #### Private virtual consumer interface
 
-    virtual bool do_begin_object(semantic_tag_type tag, const serializing_context& context) = 0;
+    virtual bool do_begin_object(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) = 0;
 Handles the beginning of an object. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_end_object(const serializing_context& context) = 0;
+    virtual bool do_end_object(const serializing_context& context, std::error_code& ec) = 0;
 Handles the end of an object. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_begin_array(semantic_tag_type tag, const serializing_context& context) = 0;
+    virtual bool do_begin_array(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) = 0;
 Handles the beginning of an array. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_begin_array(size_t length, const serializing_context& context);
-Handles the beginning of an array of known length. Defaults to calling `do_begin_array(semantic_tag_type, const serializing_context& context)`. Contextual information including
+    virtual bool do_begin_array(size_t length, const serializing_context& context, std::error_code& ec);
+Handles the beginning of an array of known length. Defaults to calling `do_begin_array(semantic_tag_type, const serializing_context& context, std::error_code& ec)`. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_end_array(const serializing_context& context) = 0;
+    virtual bool do_end_array(const serializing_context& context, std::error_code& ec) = 0;
 Handles the end of an array. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual bool do_name(const string_view_type& name, 
-                         const serializing_context& context) = 0;
+                         const serializing_context& context, std::error_code& ec) = 0;
 Handles the name part of a name-value pair inside an object. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter.  
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual bool do_string_value(const string_view_type& val, 
                                  semantic_tag_type tag,
-                                 const serializing_context& context) = 0;
+                                 const serializing_context& context, std::error_code& ec) = 0;
 Handles a string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -186,21 +186,21 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
     virtual bool do_byte_string_value(const byte_string_view& b, 
                                       byte_string_chars_format encoding_hint,
                                       semantic_tag_type tag,
-                                      const serializing_context& context) = 0;
+                                      const serializing_context& context, std::error_code& ec) = 0;
 Handles a byte string value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual bool do_int64_value(int64_t value, 
                                 semantic_tag_type tag, 
-                                const serializing_context& context) = 0;
+                                const serializing_context& context, std::error_code& ec) = 0;
 Handles a signed integer value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
     virtual bool do_uint64_value(uint64_t value, 
                                  semantic_tag_type tag, 
-                             const serializing_context& context) = 0;
+                             const serializing_context& context, std::error_code& ec) = 0;
 Handles a non-negative integer value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
@@ -208,17 +208,17 @@ Returns `true` if the producer should continue streaming events, `false` otherwi
     virtual bool do_double_value(double value, 
                                  const floating_point_options& fmt, 
                                  semantic_tag_type tag, 
-                                 const serializing_context& context) = 0;
+                                 const serializing_context& context, std::error_code& ec) = 0;
 Handles a floating point value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context) = 0;
+    virtual bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) = 0;
 Handles a boolean value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 
-    virtual bool do_null_value(semantic_tag_type tag, const serializing_context& context) = 0;
+    virtual bool do_null_value(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) = 0;
 Handles a null value. Contextual information including
 line and column number is provided in the [context](serializing_context.md) parameter. 
 Returns `true` if the producer should continue streaming events, `false` otherwise.
