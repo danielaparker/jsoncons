@@ -54,28 +54,34 @@ public:
     {
     }
 
-    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
+    bool do_string_value(const string_view_type& s, 
+                         semantic_tag_type tag, 
+                         const serializing_context& context, 
+                         std::error_code& ec) override
     {
         if (tag == semantic_tag_type::none)
         {
             if (!nan_to_str_.empty() && s == nan_to_str_)
             {
-                this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context);
+                return this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context);
             }
             else if (!inf_to_str_.empty() && s == inf_to_str_)
             {
-                this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
+                return this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
             else if (!neginf_to_str_.empty() && s == neginf_to_str_)
             {
-                this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
+                return this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
             else
             {
-                this->destination_handler().string_value(s, tag, context);
+                return this->destination_handler().string_value(s, tag, context);
             }
         }
-        return true;
+        else
+        {
+            return this->destination_handler().string_value(s, tag, context);
+        }
     }
 };
 
