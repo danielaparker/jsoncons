@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <string> // std::string
 #include <cstring> // std::memcpy
+#include <cmath> // std::fmod
 #include <memory> // std::allocator
 #include <initializer_list> // std::initializer_list
 
@@ -281,7 +282,7 @@ public:
 
         while ( x >= 1 )
         {
-            basic_type u = (basic_type) fmod( x, values );
+            basic_type u = (basic_type) std::fmod( x, values );
             v = v + factor* basic_bignum<Allocator>(u);
             x /= values;
             factor = factor*(basic_bignum<Allocator>( max_basic_type ) + basic_bignum<Allocator>(1));
@@ -312,7 +313,7 @@ public:
 
         while ( x >= 1.0 )
         {
-            basic_type u = (basic_type) fmod( x, values );
+            basic_type u = (basic_type) std::fmod( x, values );
             v = v + factor* basic_bignum<Allocator>(u);
             x /= values;
             factor = factor*(basic_bignum<Allocator>( max_basic_type ) + basic_bignum<Allocator>(1));
