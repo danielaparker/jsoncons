@@ -66,29 +66,29 @@ private:
 
     bool do_end_object(const serializing_context& context, std::error_code& ec) override
     {
-        return destination_handler_.end_object(context);
+        return destination_handler_.end_object(context, ec);
     }
 
     bool do_begin_array(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
-        return destination_handler_.begin_array(tag, context);
+        return destination_handler_.begin_array(tag, context, ec);
     }
 
     bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
-        return destination_handler_.begin_array(length, tag, context);
+        return destination_handler_.begin_array(length, tag, context, ec);
     }
 
     bool do_end_array(const serializing_context& context, std::error_code& ec) override
     {
-        return destination_handler_.end_array(context);
+        return destination_handler_.end_array(context, ec);
     }
 
     bool do_name(const string_view_type& name,
                  const serializing_context& context, 
                  std::error_code& ec) override
     {
-        return destination_handler_.name(name,context);
+        return destination_handler_.name(name, context, ec);
     }
 
     bool do_string_value(const string_view_type& value,
@@ -96,7 +96,7 @@ private:
                          const serializing_context& context, 
                          std::error_code& ec) override
     {
-        return destination_handler_.string_value(value, tag, context);
+        return destination_handler_.string_value(value, tag, context, ec);
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
@@ -105,7 +105,7 @@ private:
                               const serializing_context& context, 
                               std::error_code& ec) override
     {
-        return destination_handler_.byte_string_value(b, encoding_hint, tag, context);
+        return destination_handler_.byte_string_value(b, encoding_hint, tag, context, ec);
     }
 
     bool do_double_value(double value, 
@@ -122,7 +122,7 @@ private:
                         const serializing_context& context, 
                         std::error_code& ec) override
     {
-        return destination_handler_.int64_value(value, tag, context);
+        return destination_handler_.int64_value(value, tag, context, ec);
     }
 
     bool do_uint64_value(uint64_t value,
@@ -130,17 +130,17 @@ private:
                          const serializing_context& context, 
                          std::error_code& ec) override
     {
-        return destination_handler_.uint64_value(value, tag, context);
+        return destination_handler_.uint64_value(value, tag, context, ec);
     }
 
     bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
-        return destination_handler_.bool_value(value, tag, context);
+        return destination_handler_.bool_value(value, tag, context, ec);
     }
 
     bool do_null_value(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
-        return destination_handler_.null_value(tag, context);
+        return destination_handler_.null_value(tag, context, ec);
     }
 
 };
@@ -187,11 +187,11 @@ private:
     {
         if (name == name_)
         {
-            return this->destination_handler().name(new_name_,context);
+            return this->destination_handler().name(new_name_,context, ec);
         }
         else
         {
-            return this->destination_handler().name(name,context);
+            return this->destination_handler().name(name,context, ec);
         }
     }
 };

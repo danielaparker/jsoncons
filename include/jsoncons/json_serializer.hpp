@@ -25,7 +25,7 @@ namespace jsoncons { namespace detail {
 template <class CharT, class Result>
 size_t escape_string(const CharT* s, size_t length,
                      bool escape_all_non_ascii, bool escape_solidus,
-                     Result& writer)
+                     Result& writer, std::error_code& ec)
 {
     size_t count = 0;
     const CharT* begin = s;
@@ -83,7 +83,8 @@ size_t escape_string(const CharT* s, size_t length,
                 unicons::sequence_generator<const CharT*> g(it, end, unicons::conv_flags::strict);
                 if (g.done() || g.status() != unicons::conv_errc())
                 {
-                    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Invalid codepoint"));
+                    ec = json_errc::illegal_codepoint;
+                    return count;
                 }
                 uint32_t cp = g.get().codepoint();
                 it += (g.get().length() - 1);
@@ -404,7 +405,7 @@ private:
         writer_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -472,7 +473,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code& ec) override
+    bool do_end_object(const serializing_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
@@ -488,7 +489,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -557,7 +558,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code& ec) override
+    bool do_end_array(const serializing_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
@@ -597,14 +598,18 @@ private:
             stack_.back().set_position(column_);
         }
         writer_.push_back('\"');
-        size_t length = jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_);
+        size_t length = jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_,ec);
+        if (ec)
+        {
+            return false;
+        }
         writer_.push_back('\"');
         writer_.insert(colon_str_.data(),colon_str_.length());
         column_ += (length+2+colon_str_.length());
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -646,8 +651,13 @@ private:
                 write_bignum_value(sv);
                 break;
             default:
-                write_string_value(sv);
+            {
+                writer_.push_back('\"');
+                size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,writer_,ec);
+                writer_.push_back('\"');
+                column_ += (length+2);
                 break;
+            }
         }
 
         end_value();
@@ -657,7 +667,7 @@ private:
     bool do_byte_string_value(const byte_string_view& b, 
                               byte_string_chars_format encoding_hint,
                               semantic_tag_type,
-                              const serializing_context&, std::error_code& ec) override
+                              const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -811,7 +821,7 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type, 
-                         const serializing_context&, std::error_code& ec) override
+                         const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -830,7 +840,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -874,14 +884,6 @@ private:
                 new_line();
             }
         }
-    }
-
-    void write_string_value(const string_view_type& sv)
-    {
-        writer_.push_back('\"');
-        size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,writer_);
-        writer_.push_back('\"');
-        column_ += (length+2);
     }
 
     void write_bignum_value(const string_view_type& sv)
@@ -1086,7 +1088,7 @@ private:
         writer_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1098,7 +1100,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code& ec) override
+    bool do_end_object(const serializing_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -1112,7 +1114,7 @@ private:
     }
 
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1123,7 +1125,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code& ec) override
+    bool do_end_array(const serializing_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -1143,13 +1145,13 @@ private:
         }
 
         writer_.push_back('\"');
-        jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_);
+        jsoncons::detail::escape_string(name.data(), name.length(),escape_all_non_ascii_,escape_solidus_,writer_,ec);
         writer_.push_back('\"');
         writer_.push_back(':');
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1164,13 +1166,6 @@ private:
             stack_.back().increment_count();
         }
         return true;
-    }
-
-    void write_string_value(const string_view_type& sv)
-    {
-        writer_.push_back('\"');
-        jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,writer_);
-        writer_.push_back('\"');
     }
 
     void write_bignum_value(const string_view_type& sv)
@@ -1237,8 +1232,12 @@ private:
                 write_bignum_value(sv);
                 break;
             default:
-                write_string_value(sv);
+            {
+                writer_.push_back('\"');
+                jsoncons::detail::escape_string(sv.data(), sv.length(),escape_all_non_ascii_,escape_solidus_,writer_,ec);
+                writer_.push_back('\"');
                 break;
+            }
         }
 
         if (!stack_.empty())
@@ -1251,7 +1250,7 @@ private:
     bool do_byte_string_value(const byte_string_view& b, 
                               byte_string_chars_format encoding_hint,
                               semantic_tag_type,
-                              const serializing_context&, std::error_code& ec) override
+                              const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1366,7 +1365,7 @@ private:
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type,
-                        const serializing_context&, std::error_code& ec) override
+                        const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1382,7 +1381,7 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type, 
-                         const serializing_context&, std::error_code& ec) override
+                         const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1396,7 +1395,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
