@@ -14,9 +14,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
-#include <iomanip>
 #include <utility>
 #include <initializer_list>
+#include <iterator> // std::iterator_traits
 #include <memory> // std::allocator
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>

@@ -9,15 +9,13 @@
 
 #include <stdexcept>
 #include <string>
-#include <iomanip>
 #include <cstdlib>
 #include <cmath>
 #include <cstdarg>
-#include <locale>
 #include <type_traits>
 #include <algorithm>
 #include <memory>
-#include <iterator>
+#include <iterator> // std::iterator_traits
 #include <exception>
 #include <array>
 #include <jsoncons/config/jsoncons_config.hpp>

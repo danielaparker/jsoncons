@@ -13,7 +13,6 @@
 #include <stdexcept>
 #include <system_error>
 #include <ios>
-#include <iterator>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/bignum.hpp>

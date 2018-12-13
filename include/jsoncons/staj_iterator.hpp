@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <ios>
-#include <iterator>
+#include <iterator> // std::input_iterator_tag
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/parse_error_handler.hpp>
 #include <jsoncons/staj_reader.hpp>

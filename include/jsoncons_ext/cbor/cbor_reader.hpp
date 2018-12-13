@@ -11,7 +11,6 @@
 #include <vector>
 #include <cstdlib>
 #include <memory>
-#include <iterator>
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_content_handler.hpp>

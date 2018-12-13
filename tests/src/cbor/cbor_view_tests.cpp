@@ -193,7 +193,6 @@ TEST_CASE("as_string_test")
     CHECK(std::string("\"-18446744073709551617\"") == s9);
     CHECK(std::string("-18446744073709551617") == bv[9].as_string());
 }
-
 TEST_CASE("test_dump_to_string")
 {
     std::vector<uint8_t> b;
@@ -280,24 +279,16 @@ TEST_CASE("test_dump_to_stream")
 
 TEST_CASE("test_indefinite_length_object_iterator")
 {
-    std::vector<uint8_t> b1;
-    cbor::cbor_buffer_serializer serializer1(b1);
-    serializer1.begin_object(); // indefinite length object
-    serializer1.end_object(); 
-    serializer1.flush();
-    cbor_view bv1 = b1;
-    CHECK(bv1.object_range().begin() == bv1.object_range().end());
-
-    std::vector<uint8_t> b2;
-    cbor::cbor_buffer_serializer serializer2(b2);
-    serializer2.begin_object(); // indefinite length object
-    serializer2.name("City");
-    serializer2.string_value("Toronto");
-    serializer2.name("Province");
-    serializer2.string_value("Ontario");
-    serializer2.end_object(); 
-    serializer2.flush();
-    cbor_view bv2 = b2;
+    std::vector<uint8_t> b;
+    cbor::cbor_buffer_serializer serializer(b);
+    serializer.begin_object(); // indefinite length object
+    serializer.name("City");
+    serializer.string_value("Toronto");
+    serializer.name("Province");
+    serializer.string_value("Ontario");
+    serializer.end_object(); 
+    serializer.flush();
+    cbor_view bv2 = b;
 
     auto it2 = bv2.object_range().begin();
     CHECK_FALSE((it2 == bv2.object_range().end()));
@@ -307,23 +298,14 @@ TEST_CASE("test_indefinite_length_object_iterator")
 
 TEST_CASE("test_indefinite_length_array_iterator")
 {
-
-    std::vector<uint8_t> b1;
-    cbor::cbor_buffer_serializer serializer1(b1);
-    serializer1.begin_array(); // indefinite length array
-    serializer1.end_array(); 
-    serializer1.flush();
-    cbor_view bv1 = b1;
-    CHECK(bv1.array_range().begin() == bv1.array_range().end());
-
-    std::vector<uint8_t> b2;
-    cbor::cbor_buffer_serializer serializer2(b2);
-    serializer2.begin_array(); // indefinite length array
-    serializer2.string_value("Toronto");
-    serializer2.string_value("Ontario");
-    serializer2.end_array(); 
-    serializer2.flush();
-    cbor_view bv2 = b2;
+    std::vector<uint8_t> b;
+    cbor::cbor_buffer_serializer serializer(b);
+    serializer.begin_array(); // indefinite length array
+    serializer.string_value("Toronto");
+    serializer.string_value("Ontario");
+    serializer.end_array(); 
+    serializer.flush();
+    cbor_view bv2 = b;
 
     CHECK(bv2.size() == 2);
 
@@ -511,4 +493,3 @@ TEST_CASE("cbor_view member tests")
         CHECK(view.size() == 7);
     }
 }
-

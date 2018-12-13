@@ -11,11 +11,9 @@
 #include <string>
 #include <vector>
 #include <ostream>
-#include <iomanip>
 #include <cstdlib>
 #include <cmath>
 #include <cstdarg>
-#include <locale>
 #include <type_traits>
 #include <algorithm>
 #include <exception>

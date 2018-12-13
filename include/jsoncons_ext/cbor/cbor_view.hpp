@@ -53,40 +53,74 @@ public:
 
     range<const_object_iterator> object_range() const
     {
-        const uint8_t* endp;
-        const uint8_t* begin;
-
+        if (empty())
+        {
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an object"));
+        }
+        std::error_code ec;
         if (major_type() == cbor_major_type::map)
         {
-            jsoncons::cbor::detail::get_length(first_,last_,&begin);
-            if (begin == first_)
+            const uint8_t* begin = first_ + 1;
+            if (get_additional_information_value(*first_) != additional_info::indefinite_length)
             {
-                JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Failed finding size"));
+                jsoncons::buffer_source source1(buffer(),buflen());
+                jsoncons::cbor::detail::get_length(source1,ec);
+                if (ec)
+                {
+                    throw serialization_error(ec);
+                }
+                begin = first_ + source1.position() - 1;
             }
+
+            jsoncons::buffer_source source(buffer(),buflen());
+            jsoncons::cbor::detail::walk_object_items(source, ec);
+            if (ec)
+            {
+                throw serialization_error(ec);
+            }
+            const uint8_t* endp = first_ + source.position() - 1;
+            if (get_additional_information_value(*first_) == additional_info::indefinite_length)
+            {
+                --endp;
+            }
+            return range<const_object_iterator>(const_object_iterator(begin,endp,base_relative_), const_object_iterator(endp, endp, base_relative_));
         }
         else
         {
             JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an object"));
         }
-        jsoncons::cbor::detail::walk_object(first_,last_,&endp);
-
-        return range<const_object_iterator>(const_object_iterator(begin,endp,base_relative_), const_object_iterator(endp, endp, base_relative_));
     }
 
     range<const_array_iterator> array_range() const
     {
-        const uint8_t* endp;
-        const uint8_t* begin;
-
-        jsoncons::cbor::detail::get_length(first_, last_, &begin);
-        if (begin == first_)
+        if (empty())
         {
-            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
+            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Not an array"));
         }
-        jsoncons::cbor::detail::walk_array(first_,last_,&endp);
-        if (endp == first_)
+
+        std::error_code ec;
+        const uint8_t* begin = first_ + 1;
+        if (get_additional_information_value(*first_) != additional_info::indefinite_length)
         {
-            JSONCONS_THROW(json_exception_impl<std::invalid_argument>("Invalid CBOR"));
+            jsoncons::buffer_source source1(buffer(),buflen());
+            jsoncons::cbor::detail::get_length(source1,ec);
+            if (ec)
+            {
+                throw serialization_error(ec);
+            }
+            begin = first_ + source1.position() - 1;
+        }
+
+        jsoncons::buffer_source source(buffer(),buflen());
+        jsoncons::cbor::detail::walk_array_items(source, ec);
+        if (ec)
+        {
+            throw serialization_error(ec);
+        }
+        const uint8_t* endp = first_ + source.position() - 1;
+        if (get_additional_information_value(*first_) == additional_info::indefinite_length)
+        {
+            --endp;
         }
         return range<const_array_iterator>(const_array_iterator(begin,endp,base_relative_), const_array_iterator(endp, endp, base_relative_));
     }

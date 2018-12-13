@@ -529,12 +529,18 @@ public:
     buffer_source(buffer_source&&) = default;
 
     buffer_source(const std::vector<value_type>& s)
-        : data_(s.data()), input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
+        : data_(s.data()), 
+          input_ptr_(s.data()), 
+          input_end_(s.data()+s.size()), 
+          eof_(s.size() == 0)
     {
     }
 
     buffer_source(const value_type* data, size_t size)
-        : data_(data), input_ptr_(data), input_end_(data+size), eof_(size == 0)  
+        : data_(data), 
+          input_ptr_(data), 
+          input_end_(data+size), 
+          eof_(size == 0)  
     {
     }
 

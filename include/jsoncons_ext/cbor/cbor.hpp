@@ -12,7 +12,6 @@
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include <iterator>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/config/binary_detail.hpp>

@@ -11,6 +11,7 @@
 #include <vector>
 #include <cstdlib>
 #include <memory> // std::allocator
+#include <iterator> // std::make_move_iterator
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 

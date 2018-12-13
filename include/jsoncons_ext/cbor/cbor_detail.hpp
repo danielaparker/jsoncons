@@ -11,7 +11,7 @@
 #include <vector>
 #include <cstdlib>
 #include <memory>
-#include <iterator>
+#include <iterator> // std::forward_iterator_tag
 #include <limits> // std::numeric_limits
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_content_handler.hpp>
@@ -89,6 +89,7 @@ void walk(const uint8_t* first, const uint8_t* last, const uint8_t** endp);
 template <class Source>
 void walk(Source& source, std::error_code& ec);
 
+//#if 0
 inline 
 size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
@@ -211,160 +212,6 @@ size_t get_length(const uint8_t* first, const uint8_t* last, const uint8_t** end
     return length;
 }
 
-template <class Source>
-size_t get_length(Source& source, std::error_code& ec)
-{
-    size_t length = 0;
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return length;
-    }
-    const uint8_t* endp = nullptr;
-
-    uint8_t type{};
-    source.get(type);
-    if (source.eof())
-    {
-        ec = cbor_errc::unexpected_eof;
-        return 0;
-    }
-
-    switch (get_major_type(type))
-    {
-        case cbor_major_type::byte_string:
-        case cbor_major_type::text_string:
-        case cbor_major_type::array:
-        case cbor_major_type::map:
-            break;
-        default:
-            return length;
-    }
-
-    uint8_t info = get_additional_information_value(type);
-    switch (info)
-    {
-        case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
-        {
-            length = info;
-            break;
-        }
-    case 0x18: // one-byte uint8_t for n follows
-        {
-            uint8_t c{};
-            source.get(c);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return length;
-            }
-            length = c;
-            break;
-        }
-    case 0x19: // two-byte uint16_t for n follow
-        {
-            uint8_t buf[sizeof(uint16_t)];
-            source.read(buf, sizeof(uint16_t));
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            length = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-    case 0x1a: // four-byte uint32_t for n follow
-        {
-            uint8_t buf[sizeof(uint32_t)];
-            source.read(buf, sizeof(uint32_t));
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            length = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-    case 0x1b: // eight-byte uint64_t for n follow
-        {
-            uint8_t buf[sizeof(uint64_t)];
-            source.read(buf, sizeof(uint64_t));
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            length = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-        case additional_info::indefinite_length: 
-        {
-            switch (get_major_type(type))
-            {
-                case cbor_major_type::array:
-                {
-                    length = 0;
-                    while (source.peek() != 0xff)
-                    {
-                        walk(source, ec);
-                        if (ec)
-                        {
-                            ec = cbor_errc::unexpected_eof;
-                            return 0;
-                        }
-                        ++length;
-                    }
-                    source.ignore(1);
-                    break;
-                }
-                case cbor_major_type::map:
-                {
-                    length = 0;
-                    while (source.peek() != 0xff)
-                    {
-                        walk(source, ec);
-                        if (ec)
-                        {
-                            return 0;
-                        }
-                        walk(source, ec);
-                        if (ec)
-                        {
-                            return 0;
-                        }
-                        ++length;
-                    }
-                    source.ignore(1);
-                    break;
-                }
-                case cbor_major_type::text_string:
-                case cbor_major_type::byte_string:
-                {
-                    length = 0;
-                    while (source.peek() != 0xff)
-                    {
-                        size_t len = jsoncons::cbor::detail::get_length(source, ec);
-                        if (ec)
-                        {
-                            return 0;
-                        }
-                        length += len;
-                    }
-                    source.ignore(1);
-                    break;
-                }
-                default:
-                    break;
-            }
-            break;
-        }
-        default: 
-            break;
-    }
-    
-    return length;
-}
-
 inline 
 std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last, 
                                      const uint8_t** endp)
@@ -405,54 +252,6 @@ std::vector<uint8_t> get_byte_string(const uint8_t* first, const uint8_t* last,
             const uint8_t* p = *endp;
             *endp = p + length;
             v = std::vector<uint8_t>(p, *endp);
-            break;
-        }
-    }
-    
-    return v;
-}
-
-template <class Source>
-std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
-{
-    std::vector<uint8_t> v;
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return v;
-    }
-
-    switch (get_additional_information_value(source.peek()))
-    {
-        case additional_info::indefinite_length: 
-        {
-            source.ignore(1);
-            while (source.peek() != 0xff)
-            {
-                std::vector<uint8_t> ss = jsoncons::cbor::detail::get_byte_string(source, ec);
-                if (ec)
-                {
-                    return v;
-                }
-                v.insert(v.end(),ss.begin(),ss.end());
-            }
-            source.ignore(1);
-            break;
-        }
-    default: 
-        {
-            size_t length = get_length(source, ec);
-            if (ec)
-            {
-                return v;
-            }
-            v.reserve(length);
-            source.read(std::back_inserter(v), length);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return v;
-            }
             break;
         }
     }
@@ -510,59 +309,8 @@ std::string get_text_string(const uint8_t* first, const uint8_t* last,
     
     return s;
 }
-
-template <class Source>
-std::string get_text_string(Source& source, std::error_code& ec)
-{
-    std::string s;
-
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return s;
-    }
-    JSONCONS_ASSERT(get_major_type(source.peek()) == cbor_major_type::text_string);
-
-    switch (get_additional_information_value(source.peek()))
-    {
-        case additional_info::indefinite_length:
-        {
-            source.ignore(1);
-            while (source.peek() != 0xff)
-            {
-                std::string ss = jsoncons::cbor::detail::get_text_string(source, ec);
-                if (ec)
-                {
-                    return s;
-                }
-                s.append(std::move(ss));
-            }
-            source.ignore(1);
-            break;
-        }
-        default: // definite length
-        {
-            size_t length = get_length(source, ec);
-            if (ec)
-            {
-                return s;
-            }
-            s.reserve(length);
-            source.read(std::back_inserter(s), length);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return s;
-            }
-            break;
-        }
-    }
-    
-    return s;
-}
-
 inline
-void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+void walk_object_items(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::map))
     {
@@ -627,68 +375,8 @@ void walk_object(const uint8_t* first, const uint8_t* last, const uint8_t** endp
     }    
 }
 
-template <class Source>
-void walk_object(Source& source, std::error_code& ec)
-{
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return;
-    }
-    uint8_t info = get_additional_information_value(source.peek());
-    switch (info)
-    {
-    case additional_info::indefinite_length: 
-        {
-            source.ignore(1);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return;
-            }
-            while (source.peek() != 0xff)
-            {
-                walk(source, ec);
-                if (ec)
-                {
-                    return;
-                }
-                walk(source, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            source.ignore(1);
-            break;
-        }
-        default: // definite length
-        {
-            size_t size = jsoncons::cbor::detail::get_length(source, ec);
-            if (ec)
-            {
-                return;
-            }
-            for (size_t i = 0; i < size; ++i)
-            {
-                walk(source, ec);
-                if (ec)
-                {
-                    return;
-                }
-                walk(source, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-        }
-    }    
-}
-
 inline
-void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+void walk_array_items(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
     if (JSONCONS_UNLIKELY(last <= first || get_major_type(*first) != cbor_major_type::array))
     {
@@ -739,119 +427,6 @@ void walk_array(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
             break;
         } 
     }
-}
-
-template <class Source>
-void walk_array(Source& source, std::error_code& ec)
-{
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return;
-    }
-    uint8_t info = get_additional_information_value(source.peek());
-    switch (info)
-    {
-        case additional_info::indefinite_length: 
-        {
-            source.ignore(1);
-            while (source.peek() != 0xff)
-            {
-                walk(source, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            source.ignore(1);
-            break;
-        }
-        default: // definite length
-        {
-            size_t size = jsoncons::cbor::detail::get_length(source, ec);
-            if (ec)
-            {
-                return;
-            }
-            for (size_t i = 0; i < size; ++i)
-            {
-                walk(source, ec);
-                if (ec)
-                {
-                    return;
-                }
-            }
-            break;
-        } 
-    }
-}
-
-template <class Source>
-uint64_t get_uint64_value(Source& source, std::error_code& ec)
-{
-    uint64_t val = 0;
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return val;
-    }
-    const uint8_t* endp = nullptr;
-
-    uint8_t type{};
-    if (source.get(type) == 0)
-    {
-        ec = cbor_errc::unexpected_eof;
-        return 0;
-    }
-    uint8_t info = get_additional_information_value(type);
-    switch (info)
-    {
-        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
-        {
-            val = info;
-            break;
-        }
-
-        case 0x18: // Unsigned integer (one-byte uint8_t follows)
-        {
-            uint8_t c{};
-            source.get(c);
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return val;
-            }
-            val = c;
-            break;
-        }
-
-        case 0x19: // Unsigned integer (two-byte uint16_t follows)
-        {
-            uint8_t buf[sizeof(uint16_t)];
-            source.read(buf, sizeof(uint16_t));
-            val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-
-        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
-        {
-            uint8_t buf[sizeof(uint32_t)];
-            source.read(buf, sizeof(uint32_t));
-            val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-
-        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
-        {
-            uint8_t buf[sizeof(uint64_t)];
-            source.read(buf, sizeof(uint64_t));
-            val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-        default:
-            break;
-    }
-    return val;
 }
 
 inline
@@ -1024,106 +599,6 @@ int64_t get_int64_value(const uint8_t* first, const uint8_t* last, const uint8_t
     return val;
 }
 
-template <class Source>
-int64_t get_int64_value(Source& source, std::error_code& ec)
-{
-    int64_t val = 0;
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return val;
-    }
-    const uint8_t* endp = nullptr;
-
-    uint8_t info = get_additional_information_value(source.peek());
-    switch (get_major_type(source.peek()))
-    {
-        case cbor_major_type::negative_integer:
-            source.ignore(1);
-            switch (info)
-            {
-                case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
-                {
-                    val = static_cast<int8_t>(- 1 - info);
-                    break;
-                }
-                case 0x18: // Negative integer (one-byte uint8_t follows)
-                    {
-                        uint8_t c{};
-                        source.get(c);
-                        if (source.eof())
-                        {
-                            ec = cbor_errc::unexpected_eof;
-                            return val;
-                        }
-                        val = static_cast<int64_t>(-1)- c;
-                        break;
-                    }
-
-                case 0x19: // Negative integer -1-n (two-byte uint16_t follows)
-                    {
-                        uint8_t buf[sizeof(uint16_t)];
-                        if (source.read(buf, sizeof(uint16_t)) != sizeof(uint16_t))
-                        {
-                            return val;
-                        }
-                        auto x = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-                        val = static_cast<int64_t>(-1)- x;
-                        break;
-                    }
-
-                case 0x1a: // Negative integer -1-n (four-byte uint32_t follows)
-                    {
-                        uint8_t buf[sizeof(uint32_t)];
-                        if (source.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
-                        {
-                            return val;
-                        }
-                        auto x = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
-                        val = static_cast<int64_t>(-1)- x;
-                        break;
-                    }
-
-                case 0x1b: // Negative integer -1-n (eight-byte uint64_t follows)
-                    {
-                        uint8_t buf[sizeof(uint64_t)];
-                        if (source.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
-                        {
-                            return val;
-                        }
-                        auto x = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
-                        val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
-                        break;
-                    }
-            }
-            break;
-
-            case cbor_major_type::unsigned_integer:
-            {
-                uint64_t x = jsoncons::cbor::detail::get_uint64_value(source, ec);
-                if (ec)
-                {
-                    return 0;
-                }
-                if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
-                {
-                    val = x;
-                }
-                else
-                {
-                    // error;
-                }
-                
-                break;
-            }
-            break;
-        default:
-            break;
-    }
-
-    return val;
-}
-
 inline
 double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
 {
@@ -1177,73 +652,6 @@ double get_double(const uint8_t* first, const uint8_t* last, const uint8_t** end
         {
             *endp = first; 
         }
-    }
-    
-    return val;
-}
-
-template <class Source>
-double get_double(Source& source, std::error_code& ec)
-{
-    double val = 0;
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return val;
-    }
-    const uint8_t* endp = nullptr;
-
-    uint8_t type{};
-    if (source.get(type) == 0)
-    {
-        ec = cbor_errc::unexpected_eof;
-        return 0;
-    }
-    uint8_t info = get_additional_information_value(type);
-    switch (info)
-    {
-    case 0x19: // Half-Precision Float (two-byte IEEE 754)
-        {
-            uint8_t buf[sizeof(uint16_t)];
-            source.read(buf, sizeof(uint16_t));
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            uint16_t x = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-            val = jsoncons::detail::decode_half(x);
-            break;
-        }
-
-
-    case 0x1a: // Single-Precision Float (four-byte IEEE 754)
-        {
-            uint8_t buf[sizeof(float)];
-            source.read(buf, sizeof(float));
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-
-    case 0x1b: //  Double-Precision Float (eight-byte IEEE 754)
-        {
-            uint8_t buf[sizeof(double)];
-            source.read(buf, sizeof(double));
-            if (source.eof())
-            {
-                ec = cbor_errc::unexpected_eof;
-                return 0;
-            }
-            val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
-            break;
-        }
-        default:
-            break;
     }
     
     return val;
@@ -1327,12 +735,12 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
         }
         case cbor_major_type::array:
         {
-            walk_array(first, last, endp);
+            walk_array_items(first, last, endp);
             break;
         }
         case cbor_major_type::map:
         {
-            walk_object(first, last, endp);
+            walk_object_items(first, last, endp);
             break;
         }
         case cbor_major_type::semantic_tag:
@@ -1386,320 +794,6 @@ void walk(const uint8_t *first, const uint8_t *last, const uint8_t **endp)
     }
 
 }
-
-template <class Source>
-void walk(Source& source, std::error_code& ec)
-{
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return;
-    }
-    uint8_t info = get_additional_information_value(source.peek());
-    switch (get_major_type(source.peek()))
-    {
-        case cbor_major_type::unsigned_integer:
-        {
-            get_uint64_value(source, ec);
-            break;
-        }
-        case cbor_major_type::negative_integer:
-        {
-            get_int64_value(source, ec);
-            break;
-        }
-        case cbor_major_type::byte_string:
-        case cbor_major_type::text_string:
-        {
-            if (info == additional_info::indefinite_length)
-            {
-                source.ignore(1);
-                while (source.peek() != 0xff)
-                {
-                    walk(source, ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                }
-                source.ignore(1);
-            } 
-            else
-            {
-                size_t len = get_length(source, ec);
-                if (ec)
-                {
-                    return;
-                }
-                source.ignore(len);
-            }
-            break;
-        }
-        case cbor_major_type::array:
-        {
-            walk_array(source, ec);
-            break;
-        }
-        case cbor_major_type::map:
-        {
-            walk_object(source, ec);
-            break;
-        }
-        case cbor_major_type::semantic_tag:
-        {
-            source.ignore(1);
-            walk(source, ec);
-            break;
-        }
-        case cbor_major_type::simple:
-        {
-            switch (info)
-            {
-                case 20: // False
-                case 21: // True
-                case 22: // Null
-                case 23: // Undefined
-                {
-                    source.ignore(1);
-                    break;
-                }
-                case 25: // Half-Precision Float (two-byte IEEE 754)
-                {
-                    source.ignore(1);
-                    uint8_t buf[sizeof(uint16_t)];
-                    source.read(buf, sizeof(uint16_t));
-                    break;
-                }
-                case 26: // Single-Precision Float (four-byte IEEE 754)
-                {
-                    source.ignore(1);
-                    uint8_t buf[sizeof(float)];
-                    source.read(buf, sizeof(float));
-                    break;
-                }
-                case 27: // Double-Precision Float (eight-byte IEEE 754)
-                {
-                    source.ignore(1);
-                    uint8_t buf[sizeof(double)];
-                    source.read(buf, sizeof(double));
-                    break;
-                }
-                default:
-                {
-                    source.ignore(1);
-                    break;
-                }
-            }
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-}
-
-template <class T>
-class cbor_array_iterator
-{
-    const uint8_t* p_;
-    const uint8_t* last_;
-    const uint8_t* base_relative_;
-    T current_;
-public:
-    typedef typename T::difference_type difference_type;
-    typedef typename T::value_type value_type;
-    typedef typename T::const_reference reference;
-    typedef typename T::const_pointer pointer;
-    typedef std::forward_iterator_tag iterator_catagory;
-
-    cbor_array_iterator()
-        : p_(nullptr), last_(nullptr), base_relative_(nullptr)
-    {
-    }
-
-    cbor_array_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
-        : p_(p), last_(last), base_relative_(base_relative)
-    {
-    }
-
-    cbor_array_iterator(const cbor_array_iterator& other) = default;
-
-    friend bool operator==(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
-    {
-        return lhs.p_ == rhs.p_; 
-    }
-
-    friend bool operator!=(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
-    {
-        return lhs.p_ != rhs.p_; 
-    }
-
-    friend bool operator<(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
-    {
-        return lhs.p_ == rhs.p_; 
-    }
-
-    cbor_array_iterator& operator++()
-    {
-        jsoncons::cbor::detail::walk(p_, last_, &p_);
-        return *this;
-    }
-
-    cbor_array_iterator operator++(int) // postfix increment
-    {
-        cbor_array_iterator temp(*this);
-        jsoncons::cbor::detail::walk(p_, last_, &p_);
-        return temp;
-    }
-
-    reference operator*() const
-    {
-        const uint8_t* endp;
-        jsoncons::cbor::detail::walk(p_, last_, &endp);
-        const_cast<T*>(&current_)->first_ = p_;
-        const_cast<T*>(&current_)->last_ = endp;
-        const_cast<T*>(&current_)->base_relative_ = base_relative_;
-        return current_;
-    }
-
-    pointer operator->() const
-    {
-        const uint8_t* endp;
-        jsoncons::cbor::detail::walk(p_, last_, &endp);
-        const_cast<T*>(&current_)->first_ = p_;
-        const_cast<T*>(&current_)->last_ = endp;
-        const_cast<T*>(&current_)->base_relative_ = base_relative_;
-        return &current_;
-    }
-};
-
-template <class T>
-class cbor_map_iterator;
-
-template <class T>
-class key_value_view
-{
-    const uint8_t* key_begin_;
-    const uint8_t* key_end_;
-    const uint8_t* val_begin_;
-    const uint8_t* val_end_;
-    const uint8_t* base_relative_;
-
-public:
-    friend class cbor_map_iterator<T>;
-
-    key_value_view()
-        : key_begin_(nullptr), key_end_(nullptr), val_begin_(nullptr), val_end_(nullptr)
-    {
-    }
-    key_value_view(const uint8_t* key_begin, const uint8_t* key_end, 
-                        const uint8_t* val_begin, const uint8_t* val_end, 
-                        const uint8_t* base_relative)
-        : key_begin_(key_begin), key_end_(key_end), val_begin_(val_begin), val_end_(val_end), 
-          base_relative_(base_relative)
-    {
-    }
-    key_value_view(const key_value_view& other) = default;
-
-    std::string key() const
-    {
-        const uint8_t* endp;
-        return get_text_string(key_begin_, key_end_, &endp);
-    }
-
-    T value() const
-    {
-        return T(val_begin_, val_end_ - val_begin_, base_relative_);
-    }
-};
-
-template <class T>
-class cbor_map_iterator
-{
-    const uint8_t* p_;
-    const uint8_t* last_;
-    const uint8_t* base_relative_;
-    key_value_view<T> kvpair_;
-public:
-    typedef typename T::difference_type difference_type;
-    typedef key_value_view<T> value_type;
-    typedef const key_value_view<T>& reference;
-    typedef const key_value_view<T>* pointer;
-    typedef std::forward_iterator_tag iterator_catagory;
-
-    cbor_map_iterator()
-        : p_(nullptr), last_(nullptr), base_relative_(nullptr)
-    {
-    }
-
-    cbor_map_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
-        : p_(p), last_(last), base_relative_(base_relative)
-    {
-    }
-
-    cbor_map_iterator(const cbor_map_iterator& other) = default;
-
-    friend bool operator==(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
-    {
-        return lhs.p_ == rhs.p_; 
-    }
-
-    friend bool operator!=(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
-    {
-        return lhs.p_ != rhs.p_; 
-    }
-
-    friend bool operator<(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
-    {
-        return lhs.p_ == rhs.p_; 
-    }
-
-    cbor_map_iterator& operator++()
-    {
-        jsoncons::cbor::detail::walk(p_, last_, &p_);
-        jsoncons::cbor::detail::walk(p_, last_, &p_);
-        return *this;
-    }
-
-    cbor_map_iterator operator++(int) // postfix increment
-    {
-        cbor_map_iterator temp(*this);
-        jsoncons::cbor::detail::walk(p_, last_, &p_);
-        jsoncons::cbor::detail::walk(p_, last_, &p_);
-        return temp;
-    }
-
-    reference operator*() const
-    {
-        const uint8_t* endp;
-
-        const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
-        jsoncons::cbor::detail::walk(kvpair_.key_begin_, last_, &endp);
-        const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endp;
-        const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
-        jsoncons::cbor::detail::walk(kvpair_.val_begin_, last_, &endp);
-        const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endp;
-        const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
-
-        return kvpair_;
-    }
-
-    pointer operator->() const
-    {
-        const uint8_t* endp;
-
-        const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
-        jsoncons::cbor::detail::walk(kvpair_.key_begin_, last_, &endp);
-        const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endp;
-        const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
-        jsoncons::cbor::detail::walk(kvpair_.val_begin_, last_, &endp);
-        const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endp;
-        const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
-
-        return &kvpair_;
-    }
-};
 
 inline
 std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* last, 
@@ -1849,6 +943,712 @@ std::string get_array_as_decimal_string(const uint8_t* first, const uint8_t* las
         while (exponent /= 10);
     }
     return s;
+}
+//#endif
+
+template <class Source>
+size_t get_length(Source& source, std::error_code& ec)
+{
+    size_t length = 0;
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return length;
+    }
+    const uint8_t* endp = nullptr;
+
+    uint8_t type{};
+    source.get(type);
+    if (source.eof())
+    {
+        ec = cbor_errc::unexpected_eof;
+        return 0;
+    }
+
+    switch (get_major_type(type))
+    {
+        case cbor_major_type::byte_string:
+        case cbor_major_type::text_string:
+        case cbor_major_type::array:
+        case cbor_major_type::map:
+            break;
+        default:
+            return length;
+    }
+
+    uint8_t info = get_additional_information_value(type);
+    switch (info)
+    {
+        case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
+        {
+            length = info & 0x1f;
+            break;
+        }
+    case 0x18: // one-byte uint8_t for n follows
+        {
+            uint8_t c{};
+            source.get(c);
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return length;
+            }
+            length = c;
+            break;
+        }
+    case 0x19: // two-byte uint16_t for n follow
+        {
+            uint8_t buf[sizeof(uint16_t)];
+            source.read(buf, sizeof(uint16_t));
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return 0;
+            }
+            length = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
+            break;
+        }
+    case 0x1a: // four-byte uint32_t for n follow
+        {
+            uint8_t buf[sizeof(uint32_t)];
+            source.read(buf, sizeof(uint32_t));
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return 0;
+            }
+            length = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
+            break;
+        }
+    case 0x1b: // eight-byte uint64_t for n follow
+        {
+            uint8_t buf[sizeof(uint64_t)];
+            source.read(buf, sizeof(uint64_t));
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return 0;
+            }
+            length = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
+            break;
+        }
+        case additional_info::indefinite_length: 
+        {
+            switch (get_major_type(type))
+            {
+                case cbor_major_type::array:
+                {
+                    length = 0;
+                    while (source.peek() != 0xff)
+                    {
+                        walk(source, ec);
+                        if (ec)
+                        {
+                            ec = cbor_errc::unexpected_eof;
+                            return 0;
+                        }
+                        ++length;
+                    }
+                    source.ignore(1);
+                    break;
+                }
+                case cbor_major_type::map:
+                {
+                    length = 0;
+                    while (source.peek() != 0xff)
+                    {
+                        walk(source, ec);
+                        if (ec)
+                        {
+                            return 0;
+                        }
+                        walk(source, ec);
+                        if (ec)
+                        {
+                            return 0;
+                        }
+                        ++length;
+                    }
+                    source.ignore(1);
+                    break;
+                }
+                case cbor_major_type::text_string:
+                case cbor_major_type::byte_string:
+                {
+                    length = 0;
+                    while (source.peek() != 0xff)
+                    {
+                        size_t len = jsoncons::cbor::detail::get_length(source, ec);
+                        if (ec)
+                        {
+                            return 0;
+                        }
+                        length += len;
+                    }
+                    source.ignore(1);
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        default: 
+            break;
+    }
+    
+    return length;
+}
+
+template <class Source>
+std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
+{
+    std::vector<uint8_t> v;
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return v;
+    }
+
+    switch (get_additional_information_value(source.peek()))
+    {
+        case additional_info::indefinite_length: 
+        {
+            source.ignore(1);
+            while (source.peek() != 0xff)
+            {
+                std::vector<uint8_t> ss = jsoncons::cbor::detail::get_byte_string(source, ec);
+                if (ec)
+                {
+                    return v;
+                }
+                v.insert(v.end(),ss.begin(),ss.end());
+            }
+            source.ignore(1);
+            break;
+        }
+    default: 
+        {
+            size_t length = get_length(source, ec);
+            if (ec)
+            {
+                return v;
+            }
+            v.reserve(length);
+            source.read(std::back_inserter(v), length);
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return v;
+            }
+            break;
+        }
+    }
+    
+    return v;
+}
+
+template <class Source>
+std::string get_text_string(Source& source, std::error_code& ec)
+{
+    std::string s;
+
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return s;
+    }
+    JSONCONS_ASSERT(get_major_type(source.peek()) == cbor_major_type::text_string);
+
+    switch (get_additional_information_value(source.peek()))
+    {
+        case additional_info::indefinite_length:
+        {
+            source.ignore(1);
+            while (source.peek() != 0xff)
+            {
+                std::string ss = jsoncons::cbor::detail::get_text_string(source, ec);
+                if (ec)
+                {
+                    return s;
+                }
+                s.append(std::move(ss));
+            }
+            source.ignore(1);
+            break;
+        }
+        default: // definite length
+        {
+            size_t length = get_length(source, ec);
+            if (ec)
+            {
+                return s;
+            }
+            s.reserve(length);
+            source.read(std::back_inserter(s), length);
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return s;
+            }
+            break;
+        }
+    }
+    
+    return s;
+}
+
+
+template <class Source>
+void walk_object_items(Source& source, std::error_code& ec)
+{
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return;
+    }
+    uint8_t info = get_additional_information_value(source.peek());
+    switch (info)
+    {
+    case additional_info::indefinite_length: 
+        {
+            source.ignore(1);
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return;
+            }
+            while (source.peek() != 0xff)
+            {
+                walk(source, ec);
+                if (ec)
+                {
+                    return;
+                }
+                walk(source, ec);
+                if (ec)
+                {
+                    return;
+                }
+            }
+            source.ignore(1);
+            break;
+        }
+        default: // definite length
+        {
+            size_t size = jsoncons::cbor::detail::get_length(source, ec);
+            if (ec)
+            {
+                return;
+            }
+            for (size_t i = 0; i < size; ++i)
+            {
+                walk(source, ec);
+                if (ec)
+                {
+                    return;
+                }
+                walk(source, ec);
+                if (ec)
+                {
+                    return;
+                }
+            }
+            break;
+        }
+    }    
+}
+
+template <class Source>
+void walk_array_items(Source& source, std::error_code& ec)
+{
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return;
+    }
+    uint8_t info = get_additional_information_value(source.peek());
+    switch (info)
+    {
+        case additional_info::indefinite_length: 
+        {
+            source.ignore(1);
+            while (source.peek() != 0xff)
+            {
+                walk(source, ec);
+                if (ec)
+                {
+                    return;
+                }
+            }
+            source.ignore(1);
+            break;
+        }
+        default: // definite length
+        {
+            size_t size = jsoncons::cbor::detail::get_length(source, ec);
+            if (ec)
+            {
+                return;
+            }
+            for (size_t i = 0; i < size; ++i)
+            {
+                walk(source, ec);
+                if (ec)
+                {
+                    return;
+                }
+            }
+            break;
+        } 
+    }
+}
+
+template <class Source>
+uint64_t get_uint64_value(Source& source, std::error_code& ec)
+{
+    uint64_t val = 0;
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return val;
+    }
+    const uint8_t* endp = nullptr;
+
+    uint8_t type{};
+    if (source.get(type) == 0)
+    {
+        ec = cbor_errc::unexpected_eof;
+        return 0;
+    }
+    uint8_t info = get_additional_information_value(type);
+    switch (info)
+    {
+        case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
+        {
+            val = info;
+            break;
+        }
+
+        case 0x18: // Unsigned integer (one-byte uint8_t follows)
+        {
+            uint8_t c{};
+            source.get(c);
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return val;
+            }
+            val = c;
+            break;
+        }
+
+        case 0x19: // Unsigned integer (two-byte uint16_t follows)
+        {
+            uint8_t buf[sizeof(uint16_t)];
+            source.read(buf, sizeof(uint16_t));
+            val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
+            break;
+        }
+
+        case 0x1a: // Unsigned integer (four-byte uint32_t follows)
+        {
+            uint8_t buf[sizeof(uint32_t)];
+            source.read(buf, sizeof(uint32_t));
+            val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
+            break;
+        }
+
+        case 0x1b: // Unsigned integer (eight-byte uint64_t follows)
+        {
+            uint8_t buf[sizeof(uint64_t)];
+            source.read(buf, sizeof(uint64_t));
+            val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
+            break;
+        }
+        default:
+            break;
+    }
+    return val;
+}
+
+template <class Source>
+int64_t get_int64_value(Source& source, std::error_code& ec)
+{
+    int64_t val = 0;
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return val;
+    }
+    const uint8_t* endp = nullptr;
+
+    uint8_t info = get_additional_information_value(source.peek());
+    switch (get_major_type(source.peek()))
+    {
+        case cbor_major_type::negative_integer:
+            source.ignore(1);
+            switch (info)
+            {
+                case JSONCONS_CBOR_0x00_0x17: // 0x00..0x17 (0..23)
+                {
+                    val = static_cast<int8_t>(- 1 - info);
+                    break;
+                }
+                case 0x18: // Negative integer (one-byte uint8_t follows)
+                    {
+                        uint8_t c{};
+                        source.get(c);
+                        if (source.eof())
+                        {
+                            ec = cbor_errc::unexpected_eof;
+                            return val;
+                        }
+                        val = static_cast<int64_t>(-1)- c;
+                        break;
+                    }
+
+                case 0x19: // Negative integer -1-n (two-byte uint16_t follows)
+                    {
+                        uint8_t buf[sizeof(uint16_t)];
+                        if (source.read(buf, sizeof(uint16_t)) != sizeof(uint16_t))
+                        {
+                            return val;
+                        }
+                        auto x = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
+                        val = static_cast<int64_t>(-1)- x;
+                        break;
+                    }
+
+                case 0x1a: // Negative integer -1-n (four-byte uint32_t follows)
+                    {
+                        uint8_t buf[sizeof(uint32_t)];
+                        if (source.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
+                        {
+                            return val;
+                        }
+                        auto x = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
+                        val = static_cast<int64_t>(-1)- x;
+                        break;
+                    }
+
+                case 0x1b: // Negative integer -1-n (eight-byte uint64_t follows)
+                    {
+                        uint8_t buf[sizeof(uint64_t)];
+                        if (source.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
+                        {
+                            return val;
+                        }
+                        auto x = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
+                        val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
+                        break;
+                    }
+            }
+            break;
+
+            case cbor_major_type::unsigned_integer:
+            {
+                uint64_t x = jsoncons::cbor::detail::get_uint64_value(source, ec);
+                if (ec)
+                {
+                    return 0;
+                }
+                if (x <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
+                {
+                    val = x;
+                }
+                else
+                {
+                    // error;
+                }
+                
+                break;
+            }
+            break;
+        default:
+            break;
+    }
+
+    return val;
+}
+
+template <class Source>
+double get_double(Source& source, std::error_code& ec)
+{
+    double val = 0;
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return val;
+    }
+    const uint8_t* endp = nullptr;
+
+    uint8_t type{};
+    if (source.get(type) == 0)
+    {
+        ec = cbor_errc::unexpected_eof;
+        return 0;
+    }
+    uint8_t info = get_additional_information_value(type);
+    switch (info)
+    {
+    case 0x19: // Half-Precision Float (two-byte IEEE 754)
+        {
+            uint8_t buf[sizeof(uint16_t)];
+            source.read(buf, sizeof(uint16_t));
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return 0;
+            }
+            uint16_t x = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
+            val = jsoncons::detail::decode_half(x);
+            break;
+        }
+
+
+    case 0x1a: // Single-Precision Float (four-byte IEEE 754)
+        {
+            uint8_t buf[sizeof(float)];
+            source.read(buf, sizeof(float));
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return 0;
+            }
+            val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
+            break;
+        }
+
+    case 0x1b: //  Double-Precision Float (eight-byte IEEE 754)
+        {
+            uint8_t buf[sizeof(double)];
+            source.read(buf, sizeof(double));
+            if (source.eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return 0;
+            }
+            val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
+            break;
+        }
+        default:
+            break;
+    }
+    
+    return val;
+}
+
+template <class Source>
+void walk(Source& source, std::error_code& ec)
+{
+    if (JSONCONS_UNLIKELY(source.eof()))
+    {
+        ec = cbor_errc::unexpected_eof;
+        return;
+    }
+    uint8_t info = get_additional_information_value(source.peek());
+    switch (get_major_type(source.peek()))
+    {
+        case cbor_major_type::unsigned_integer:
+        {
+            get_uint64_value(source, ec);
+            break;
+        }
+        case cbor_major_type::negative_integer:
+        {
+            get_int64_value(source, ec);
+            break;
+        }
+        case cbor_major_type::byte_string:
+        case cbor_major_type::text_string:
+        {
+            if (info == additional_info::indefinite_length)
+            {
+                source.ignore(1);
+                while (source.peek() != 0xff)
+                {
+                    walk(source, ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                }
+                source.ignore(1);
+            } 
+            else
+            {
+                size_t len = get_length(source, ec);
+                if (ec)
+                {
+                    return;
+                }
+                source.ignore(len);
+            }
+            break;
+        }
+        case cbor_major_type::array:
+        {
+            walk_array_items(source, ec);
+            break;
+        }
+        case cbor_major_type::map:
+        {
+            walk_object_items(source, ec);
+            break;
+        }
+        case cbor_major_type::semantic_tag:
+        {
+            source.ignore(1);
+            walk(source, ec);
+            break;
+        }
+        case cbor_major_type::simple:
+        {
+            switch (info)
+            {
+                case 20: // False
+                case 21: // True
+                case 22: // Null
+                case 23: // Undefined
+                {
+                    source.ignore(1);
+                    break;
+                }
+                case 25: // Half-Precision Float (two-byte IEEE 754)
+                {
+                    source.ignore(1);
+                    uint8_t buf[sizeof(uint16_t)];
+                    source.read(buf, sizeof(uint16_t));
+                    break;
+                }
+                case 26: // Single-Precision Float (four-byte IEEE 754)
+                {
+                    source.ignore(1);
+                    uint8_t buf[sizeof(float)];
+                    source.read(buf, sizeof(float));
+                    break;
+                }
+                case 27: // Double-Precision Float (eight-byte IEEE 754)
+                {
+                    source.ignore(1);
+                    uint8_t buf[sizeof(double)];
+                    source.read(buf, sizeof(double));
+                    break;
+                }
+                default:
+                {
+                    source.ignore(1);
+                    break;
+                }
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
 }
 
 template <class Source>
@@ -2008,6 +1808,305 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
     }
     return s;
 }
+
+template <class T>
+class cbor_array_iterator
+{
+    const uint8_t* p_;
+    const uint8_t* last_;
+    const uint8_t* base_relative_;
+    T current_;
+public:
+    typedef typename T::difference_type difference_type;
+    typedef typename T::value_type value_type;
+    typedef typename T::const_reference reference;
+    typedef typename T::const_pointer pointer;
+    typedef std::forward_iterator_tag iterator_catagory;
+
+    cbor_array_iterator()
+        : p_(nullptr), last_(nullptr), base_relative_(nullptr)
+    {
+    }
+
+    cbor_array_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
+        : p_(p), last_(last), base_relative_(base_relative)
+    {
+    }
+
+    cbor_array_iterator(const cbor_array_iterator& other) = default;
+
+    friend bool operator==(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
+    {
+        return lhs.p_ == rhs.p_; 
+    }
+
+    friend bool operator!=(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
+    {
+        return lhs.p_ != rhs.p_; 
+    }
+
+    friend bool operator<(const cbor_array_iterator& lhs, const cbor_array_iterator& rhs) 
+    {
+        return lhs.p_ == rhs.p_; 
+    }
+
+    cbor_array_iterator& operator++()
+    {
+        jsoncons::buffer_source source(p_,last_-p_);
+        std::error_code ec;
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        p_ = p_ + source.position() - 1;
+        return *this;
+    }
+
+    cbor_array_iterator operator++(int) // postfix increment
+    {
+        cbor_array_iterator temp(*this);
+        jsoncons::buffer_source source(p_,last_-p_);
+        std::error_code ec;
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        p_ = p_ + source.position() - 1;
+        return temp;
+    }
+
+    reference operator*() const
+    {
+        jsoncons::buffer_source source(p_,last_-p_);
+        std::error_code ec;
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        const uint8_t* endp = p_ + source.position() - 1;
+
+        //const uint8_t* endp;
+        //jsoncons::cbor::detail::walk(p_, last_, &endp);
+        const_cast<T*>(&current_)->first_ = p_;
+        const_cast<T*>(&current_)->last_ = endp;
+        const_cast<T*>(&current_)->base_relative_ = base_relative_;
+        return current_;
+    }
+
+    pointer operator->() const
+    {
+        jsoncons::buffer_source source(p_,last_-p_);
+        std::error_code ec;
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        const uint8_t* endp = p_ + source.position() - 1;
+
+        //const uint8_t* endp;
+        //jsoncons::cbor::detail::walk(p_, last_, &endp);
+        const_cast<T*>(&current_)->first_ = p_;
+        const_cast<T*>(&current_)->last_ = endp;
+        const_cast<T*>(&current_)->base_relative_ = base_relative_;
+        return &current_;
+    }
+};
+
+template <class T>
+class cbor_map_iterator;
+
+template <class T>
+class key_value_view
+{
+    const uint8_t* key_begin_;
+    const uint8_t* key_end_;
+    const uint8_t* val_begin_;
+    const uint8_t* val_end_;
+    const uint8_t* base_relative_;
+
+public:
+    friend class cbor_map_iterator<T>;
+
+    key_value_view()
+        : key_begin_(nullptr), key_end_(nullptr), val_begin_(nullptr), val_end_(nullptr)
+    {
+    }
+    key_value_view(const uint8_t* key_begin, const uint8_t* key_end, 
+                        const uint8_t* val_begin, const uint8_t* val_end, 
+                        const uint8_t* base_relative)
+        : key_begin_(key_begin), key_end_(key_end), val_begin_(val_begin), val_end_(val_end), 
+          base_relative_(base_relative)
+    {
+    }
+    key_value_view(const key_value_view& other) = default;
+
+    std::string key() const
+    {
+        jsoncons::buffer_source source(key_begin_, key_end_ - key_begin_);
+        std::error_code ec;
+        std::string s = get_text_string(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        //const uint8_t* endp = p_ + source.position() - 1;
+        //const uint8_t* endp;
+        //return get_text_string(key_begin_, key_end_, &endp);
+        return s;
+    }
+
+    T value() const
+    {
+        return T(val_begin_, val_end_ - val_begin_, base_relative_);
+    }
+};
+
+template <class T>
+class cbor_map_iterator
+{
+    const uint8_t* p_;
+    const uint8_t* last_;
+    const uint8_t* base_relative_;
+    key_value_view<T> kvpair_;
+public:
+    typedef typename T::difference_type difference_type;
+    typedef key_value_view<T> value_type;
+    typedef const key_value_view<T>& reference;
+    typedef const key_value_view<T>* pointer;
+    typedef std::forward_iterator_tag iterator_catagory;
+
+    cbor_map_iterator()
+        : p_(nullptr), last_(nullptr), base_relative_(nullptr)
+    {
+    }
+
+    cbor_map_iterator(const uint8_t* p, const uint8_t* last, const uint8_t* base_relative)
+        : p_(p), last_(last), base_relative_(base_relative)
+    {
+    }
+
+    cbor_map_iterator(const cbor_map_iterator& other) = default;
+
+    friend bool operator==(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
+    {
+        return lhs.p_ == rhs.p_; 
+    }
+
+    friend bool operator!=(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
+    {
+        return lhs.p_ != rhs.p_; 
+    }
+
+    friend bool operator<(const cbor_map_iterator& lhs, const cbor_map_iterator& rhs) 
+    {
+        return lhs.p_ == rhs.p_; 
+    }
+
+    cbor_map_iterator& operator++()
+    {
+        jsoncons::buffer_source source(p_,last_-p_);
+        std::error_code ec;
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        p_ = p_ + source.position() - 1;
+        return *this;
+    }
+
+    cbor_map_iterator operator++(int) // postfix increment
+    {
+        cbor_map_iterator temp(*this);
+        jsoncons::buffer_source source(p_,last_-p_);
+        std::error_code ec;
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        p_ = p_ + source.position() - 1;
+        return temp;
+    }
+
+    reference operator*() const
+    {
+        const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
+
+        jsoncons::buffer_source source(p_,last_-p_);
+        std::error_code ec;
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        const uint8_t* endk = p_ + source.position() - 1;
+
+        //jsoncons::cbor::detail::walk(kvpair_.key_begin_, last_, &endp);
+        const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endk;
+        const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
+
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        const uint8_t* endv = p_ + source.position() - 1;
+        //jsoncons::cbor::detail::walk(kvpair_.val_begin_, last_, &endp);
+        const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endv;
+        const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
+
+        return kvpair_;
+    }
+
+    pointer operator->() const
+    {
+        //const uint8_t* endp;
+
+        jsoncons::buffer_source source(p_,last_-p_);
+        std::error_code ec;
+
+        const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
+
+        //jsoncons::cbor::detail::walk(kvpair_.key_begin_, last_, &endp);
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        const uint8_t* endk = p_ + source.position() - 1;
+
+        const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endk;
+        const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
+
+        //jsoncons::cbor::detail::walk(kvpair_.val_begin_, last_, &endp);
+        walk(source,ec);
+        if (ec)
+        {
+            throw serialization_error(ec,source.position());
+        }
+        const uint8_t* endv = p_ + source.position() - 1;
+
+        const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endv;
+        const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
+
+        return &kvpair_;
+    }
+};
 
 } // namespace detail
 
