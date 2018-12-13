@@ -23,7 +23,6 @@
 #include <iterator>
 #include <exception>
 #include <array>
-#include <initializer_list>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_exception.hpp>

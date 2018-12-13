@@ -18,7 +18,7 @@
 #include <locale>
 #include <type_traits>
 #include <algorithm>
-#include <memory>
+#include <memory> // std::allocator
 #include <iterator>
 #include <exception>
 #include <array>

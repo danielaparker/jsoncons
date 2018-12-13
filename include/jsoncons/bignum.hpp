@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <string> // std::string
 #include <cstring> // std::memcpy
+#include <memory> // std::allocator
+#include <initializer_list> // std::initializer_list
 
 namespace jsoncons {
 

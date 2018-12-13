@@ -11,9 +11,8 @@
 #include <vector>
 #include <istream>
 #include <cstdlib>
-#include <memory>
+#include <memory> // std::allocator
 #include <limits>
-#include <cassert>
 #include <iterator>
 #include <jsoncons/json.hpp>
 #include <jsoncons/pretty_print.hpp>

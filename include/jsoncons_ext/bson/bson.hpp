@@ -12,7 +12,6 @@
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include <cassert>
 #include <jsoncons/json.hpp>
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons_ext/bson/bson_serializer.hpp>

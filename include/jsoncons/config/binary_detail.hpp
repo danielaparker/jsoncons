@@ -7,7 +7,6 @@
 #ifndef JSONCONS_CONFIG_BINARY_DETAIL_HPP
 #define JSONCONS_CONFIG_BINARY_DETAIL_HPP
 
-#include <assert.h>
 #include <cfloat>
 #include <cstddef>
 #include <cstdint>

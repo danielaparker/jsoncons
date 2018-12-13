@@ -7,7 +7,7 @@
 #ifndef JSONCONS_CSV_CSV_PARSER_HPP
 #define JSONCONS_CSV_CSV_PARSER_HPP
 
-#include <memory>
+#include <memory> // std::allocator
 #include <string>
 #include <sstream>
 #include <vector>

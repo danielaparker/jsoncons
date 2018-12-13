@@ -13,6 +13,7 @@
 #include <exception>
 #include <ostream>
 #include <cstring> // std::memcpy
+#include <memory> // std::allocator
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace detail {

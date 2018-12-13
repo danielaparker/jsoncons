@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSON_PARSER_HPP
 #define JSONCONS_JSON_PARSER_HPP
 
-#include <memory>
+#include <memory> // std::allocator
 #include <string>
 #include <vector>
 #include <cstdlib>

@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSON_FWD_HPP
 #define JSONCONS_JSON_FWD_HPP
 
-#include <memory>
+#include <memory> // std::allocator
 
 namespace jsoncons {
 

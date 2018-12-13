@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CSV_CSV_SERIALIZING_OPTIONS_HPP
-#define JSONCONS_CSV_CSV_SERIALIZING_OPTIONS_HPP
+#ifndef JSONCONS_CSV_CSV_OPTIONS_HPP
+#define JSONCONS_CSV_CSV_OPTIONS_HPP
 
 #include <jsoncons_ext/csv/csv_options.hpp>
 

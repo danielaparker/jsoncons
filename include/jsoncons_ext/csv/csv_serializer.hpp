@@ -12,8 +12,8 @@
 #include <vector>
 #include <ostream>
 #include <cstdlib>
-#include <unordered_map>
-#include <memory>
+#include <unordered_map> // std::unordered_map
+#include <memory> // std::allocator
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>

@@ -12,6 +12,7 @@
 #include <istream>
 #include <cstdlib>
 #include <stdexcept>
+#include <memory> // std::allocator
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>

@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <memory>
+#include <memory> // std::allocator
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 

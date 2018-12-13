@@ -14,9 +14,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <ostream>
-#include <memory>
+#include <memory> // std::allocator
 #include <typeinfo>
 #include <cstring> // std::memcpy
+#include <initializer_list> // std::initializer_list
 #include <jsoncons/json_fwd.hpp>
 #include <jsoncons/config/version.hpp>
 #include <jsoncons/json_exception.hpp>

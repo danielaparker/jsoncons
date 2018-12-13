@@ -12,7 +12,6 @@
 #include <istream>
 #include <cstdlib>
 #include <memory>
-#include <cassert>
 #include <jsoncons/config/binary_detail.hpp>
 
 namespace jsoncons { namespace bson {

@@ -8,7 +8,7 @@
 #define JSONCONS_JSONPATH_FILTER_HPP
 
 #include <string>
-#include <map>
+#include <map> // std::map
 #include <vector>
 #include <cstdlib>
 #include <memory>
