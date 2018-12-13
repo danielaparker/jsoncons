@@ -13,7 +13,7 @@
 #include <cmath>
 #include <cstdarg>
 #include <locale>
-#include <limits> 
+#include <limits> // std::numeric_limits
 #include <algorithm>
 #include <exception>
 #include <jsoncons/config/jsoncons_config.hpp>

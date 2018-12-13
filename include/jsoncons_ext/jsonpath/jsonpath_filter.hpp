@@ -16,6 +16,7 @@
 #include <functional>
 #include <cmath> 
 #include <jsoncons/json.hpp>
+#include <limits> // std::numeric_limits
 #include "jsonpath_error.hpp"
 
 namespace jsoncons { namespace jsonpath { namespace detail {

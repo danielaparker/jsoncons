@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <memory>
 #include <jsoncons/json.hpp>
+#include <limits> // std::numeric_limits
 #include "jsonpath_filter.hpp"
 #include "jsonpath_error.hpp"
 

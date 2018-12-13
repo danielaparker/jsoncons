@@ -16,7 +16,7 @@
 #include <cstring>
 #include <utility>
 #include <algorithm>
-#include <limits>
+#include <limits> // std::numeric_limits
 #include <type_traits>
 #include <jsoncons/jsoncons_utilities.hpp>
 #include <jsoncons/bignum.hpp>

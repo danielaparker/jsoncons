@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <system_error>
+#include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json_options.hpp>

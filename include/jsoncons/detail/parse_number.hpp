@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <locale>
-#include <limits> 
+#include <limits> // std::numeric_limits
 #include <type_traits>
 #include <algorithm>
 #include <exception>

@@ -7,7 +7,7 @@
 #ifndef JSONCONS_BASIC_JSON_HPP
 #define JSONCONS_BASIC_JSON_HPP
 
-#include <limits>
+#include <limits> // std::numeric_limits
 #include <string>
 #include <vector>
 #include <exception>

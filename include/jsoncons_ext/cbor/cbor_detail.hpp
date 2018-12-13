@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <memory>
 #include <iterator>
+#include <limits> // std::numeric_limits
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/config/binary_detail.hpp>

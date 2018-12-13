@@ -9,7 +9,7 @@
 
 #include <string>
 #include <cstdlib>
-#include <limits>
+#include <limits> // std::numeric_limits
 #include <cwchar>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/jsoncons_utilities.hpp>

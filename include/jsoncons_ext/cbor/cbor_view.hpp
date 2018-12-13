@@ -12,7 +12,7 @@
 #include <istream>
 #include <cstdlib>
 #include <memory> // std::allocator
-#include <limits>
+#include <limits> // std::numeric_limits
 #include <iterator>
 #include <jsoncons/json.hpp>
 #include <jsoncons/pretty_print.hpp>
