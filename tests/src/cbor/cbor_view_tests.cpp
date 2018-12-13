@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::cbor;
-
+#if 0
 TEST_CASE("cbor_view_test")
 {
     ojson j1 = ojson::parse(R"(
@@ -493,3 +493,41 @@ TEST_CASE("cbor_view member tests")
         CHECK(view.size() == 7);
     }
 }
+#endif
+TEST_CASE("cbor conversion tests")
+{
+    std::vector<uint8_t> b;
+    cbor::cbor_buffer_serializer writer(b);
+    writer.begin_array(); // indefinite length outer array
+    writer.begin_array(4); // a fixed length array
+    writer.string_value("foo");
+    writer.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
+    writer.big_integer_value("-18446744073709551617");
+    writer.big_decimal_value("273.15");
+    writer.end_array();
+    writer.end_array();
+    writer.flush();
+
+    cbor_view bv = b;
+    REQUIRE(bv.size() == 1);
+
+    auto range1 = bv.array_range();
+    auto it = range1.begin();
+    cbor_view inner_array = *it++;
+    REQUIRE(inner_array.size() == 4);
+    REQUIRE(it == range1.end());
+
+    auto range2 = inner_array.array_range();
+    auto it2 = range2.begin();
+    CHECK(it2->as_string() == "foo");
+    it2++;
+    CHECK(it2->as_byte_string() == byte_string{'P','u','s','s'});
+    it2++;
+    CHECK(it2->as_bignum() == bignum{"-18446744073709551617"});
+    it2++;
+    CHECK(it2->as_string() == bignum{"273.15"});
+    it2++;
+    CHECK(it2 == range2.end());
+
+}
+

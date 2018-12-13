@@ -1028,8 +1028,6 @@ public:
         }
         const uint8_t* endp = p_ + source.position() - 1;
 
-        //const uint8_t* endp;
-        //jsoncons::cbor::detail::walk(p_, last_, &endp);
         const_cast<T*>(&current_)->first_ = p_;
         const_cast<T*>(&current_)->last_ = endp;
         const_cast<T*>(&current_)->base_relative_ = base_relative_;
@@ -1047,8 +1045,6 @@ public:
         }
         const uint8_t* endp = p_ + source.position() - 1;
 
-        //const uint8_t* endp;
-        //jsoncons::cbor::detail::walk(p_, last_, &endp);
         const_cast<T*>(&current_)->first_ = p_;
         const_cast<T*>(&current_)->last_ = endp;
         const_cast<T*>(&current_)->base_relative_ = base_relative_;
@@ -1093,9 +1089,6 @@ public:
         {
             throw serialization_error(ec,source.position());
         }
-        //const uint8_t* endp = p_ + source.position() - 1;
-        //const uint8_t* endp;
-        //return get_text_string(key_begin_, key_end_, &endp);
         return s;
     }
 
@@ -1196,7 +1189,6 @@ public:
         }
         const uint8_t* endk = p_ + source.position() - 1;
 
-        //jsoncons::cbor::detail::walk(kvpair_.key_begin_, last_, &endp);
         const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endk;
         const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
 
@@ -1206,7 +1198,6 @@ public:
             throw serialization_error(ec,source.position());
         }
         const uint8_t* endv = p_ + source.position() - 1;
-        //jsoncons::cbor::detail::walk(kvpair_.val_begin_, last_, &endp);
         const_cast<key_value_view<T>*>(&kvpair_)->val_end_ = endv;
         const_cast<key_value_view<T>*>(&kvpair_)->base_relative_ = base_relative_;
 
@@ -1215,14 +1206,11 @@ public:
 
     pointer operator->() const
     {
-        //const uint8_t* endp;
-
         jsoncons::buffer_source source(p_,last_-p_);
         std::error_code ec;
 
         const_cast<key_value_view<T>*>(&kvpair_)->key_begin_ = p_;
 
-        //jsoncons::cbor::detail::walk(kvpair_.key_begin_, last_, &endp);
         walk(source,ec);
         if (ec)
         {
@@ -1233,7 +1221,6 @@ public:
         const_cast<key_value_view<T>*>(&kvpair_)->key_end_ = endk;
         const_cast<key_value_view<T>*>(&kvpair_)->val_begin_ = kvpair_.key_end_;
 
-        //jsoncons::cbor::detail::walk(kvpair_.val_begin_, last_, &endp);
         walk(source,ec);
         if (ec)
         {
