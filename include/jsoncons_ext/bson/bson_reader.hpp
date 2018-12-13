@@ -38,6 +38,11 @@ public:
 
     void read(std::error_code& ec)
     {
+        if (source_.is_error())
+        {
+            ec = bson_errc::source_error;
+            return;
+        }   
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
         {

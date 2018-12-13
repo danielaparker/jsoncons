@@ -306,6 +306,11 @@ public:
 
     void read_next(std::error_code& ec)
     {
+        if (source_.is_error())
+        {
+            ec = json_errc::source_error;
+            return;
+        }        
         parser_.reset();
         while (!parser_.finished())
         {
@@ -313,11 +318,6 @@ public:
             {
                 if (!source_.eof())
                 {
-                    if (source_.fail())
-                    {
-                        ec = json_errc::source_error;
-                        return;
-                    }        
                     read_buffer(ec);
                     if (ec) return;
                 }
@@ -337,11 +337,6 @@ public:
             {
                 if (!source_.eof())
                 {
-                    if (source_.fail())
-                    {
-                        ec = json_errc::source_error;
-                        return;
-                    }        
                     read_buffer(ec);
                     if (ec) return;
                 }
@@ -379,6 +374,11 @@ public:
 
     void check_done(std::error_code& ec)
     {
+        if (source_.is_error())
+        {
+            ec = json_errc::source_error;
+            return;
+        }   
         if (eof_)
         {
             parser_.check_done(ec);
@@ -392,11 +392,6 @@ public:
                 {
                     if (!source_.eof())
                     {
-                        if (source_.fail())
-                        {
-                            ec = json_errc::source_error;
-                            return;
-                        }   
                         read_buffer(ec);     
                         if (ec) return;
                     }

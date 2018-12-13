@@ -54,9 +54,9 @@ public:
         return is_->eof();  
     }
 
-    bool fail() const
+    bool is_error() const
     {
-        return is_->fail();  
+        return is_->bad();  
     }
 
     size_t position() const
@@ -243,7 +243,7 @@ public:
         return eof_;  
     }
 
-    bool fail() const
+    bool is_error() const
     {
         return false;  
     }
@@ -383,9 +383,9 @@ public:
         return is_->eof();  
     }
 
-    bool fail() const
+    bool is_error() const
     {
-        return is_->fail();  
+        return is_->bad();  
     }
 
     size_t position() const
@@ -545,7 +545,7 @@ public:
         return eof_;  
     }
 
-    bool fail() const
+    bool is_error() const
     {
         return false;  
     }

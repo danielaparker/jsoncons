@@ -41,6 +41,12 @@ public:
 
     void read(std::error_code& ec)
     {
+        if (source_.is_error())
+        {
+            ec = cbor_errc::source_error;
+            return;
+        }   
+
         bool has_cbor_tag = false;
         uint8_t cbor_tag = 0;
 

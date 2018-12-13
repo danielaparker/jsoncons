@@ -16,6 +16,7 @@ enum class ubjson_errc
 {
     ok = 0,
     unexpected_eof = 1,
+    source_error,
     count_required_after_type,
     length_cannot_be_negative,
     length_must_be_integer,
@@ -37,6 +38,8 @@ public:
         {
             case ubjson_errc::unexpected_eof:
                 return "Unexpected end of file";
+            case ubjson_errc::source_error:
+                return "Source error";
             case ubjson_errc::count_required_after_type:
                 return "Type is specified for container, but count is not specified";
             case ubjson_errc::length_cannot_be_negative:

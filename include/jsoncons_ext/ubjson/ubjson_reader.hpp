@@ -38,6 +38,11 @@ public:
 
     void read(std::error_code& ec)
     {
+        if (source_.is_error())
+        {
+            ec = ubjson_errc::source_error;
+            return;
+        }   
         //const uint8_t* pos = input_ptr_++;
 
         uint8_t type{};

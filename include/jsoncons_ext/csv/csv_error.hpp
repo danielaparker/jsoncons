@@ -16,9 +16,10 @@ namespace jsoncons { namespace csv {
     {
         ok = 0,
         unexpected_eof = 1,
-        expected_quote = 2,
-        invalid_csv_text = 3,
-        invalid_state = 4
+        source_error,
+        expected_quote,
+        invalid_csv_text,
+        invalid_state
     };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -37,14 +38,16 @@ public:
     {
         switch (static_cast<csv_errc>(ev))
         {
-        case csv_errc::unexpected_eof:
-            return "Unexpected end of file";
-        case csv_errc::expected_quote:
-            return "Expected quote character";
-        case csv_errc::invalid_csv_text:
-            return "Invalid CSV text";
-        default:
-            return "Unknown JSON parser error";
+            case csv_errc::unexpected_eof:
+                return "Unexpected end of file";
+            case csv_errc::source_error:
+                return "Source error";
+            case csv_errc::expected_quote:
+                return "Expected quote character";
+            case csv_errc::invalid_csv_text:
+                return "Invalid CSV text";
+            default:
+                return "Unknown JSON parser error";
         }
     }
 };

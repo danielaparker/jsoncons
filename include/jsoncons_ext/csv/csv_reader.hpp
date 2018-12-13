@@ -121,6 +121,11 @@ public:
 
     void read(std::error_code& ec)
     {
+        if (source_.is_error())
+        {
+            ec = csv_errc::source_error;
+            return;
+        }   
         parser_.reset(ec);
         if (ec)
         {
