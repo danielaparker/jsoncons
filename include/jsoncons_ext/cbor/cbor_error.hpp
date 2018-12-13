@@ -25,11 +25,11 @@ class cbor_error_category_impl
    : public std::error_category
 {
 public:
-    virtual const char* name() const noexcept
+    const char* name() const noexcept override
     {
-        return "cbor";
+        return "jsoncons/cbor";
     }
-    virtual std::string message(int ev) const
+    std::string message(int ev) const override
     {
         switch (static_cast<cbor_errc>(ev))
         {

@@ -24,11 +24,11 @@ class bson_error_category_impl
    : public std::error_category
 {
 public:
-    virtual const char* name() const noexcept
+    const char* name() const noexcept override
     {
-        return "bson";
+        return "jsoncons/bson";
     }
-    virtual std::string message(int ev) const
+    std::string message(int ev) const override
     {
         switch (static_cast<bson_errc>(ev))
         {

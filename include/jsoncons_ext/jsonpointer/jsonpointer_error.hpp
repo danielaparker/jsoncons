@@ -30,11 +30,11 @@ class jsonpointer_error_category_impl
    : public std::error_category
 {
 public:
-    virtual const char* name() const noexcept
+    const char* name() const noexcept override
     {
-        return "jsoncons.jsonpointer";
+        return "jsoncons/jsonpointer";
     }
-    virtual std::string message(int ev) const
+    std::string message(int ev) const override
     {
         switch (static_cast<jsonpointer_errc>(ev))
         {

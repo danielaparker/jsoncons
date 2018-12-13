@@ -30,11 +30,11 @@ class csv_error_category_impl
    : public std::error_category
 {
 public:
-    virtual const char* name() const noexcept
+    const char* name() const noexcept override
     {
-        return "csv";
+        return "jsoncons/csv";
     }
-    virtual std::string message(int ev) const
+    std::string message(int ev) const override
     {
         switch (static_cast<csv_errc>(ev))
         {

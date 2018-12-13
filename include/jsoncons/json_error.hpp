@@ -50,11 +50,11 @@ class json_error_category_impl
    : public std::error_category
 {
 public:
-    virtual const char* name() const noexcept
+    const char* name() const noexcept override
     {
-        return "jsoncons";
+        return "jsoncons/json";
     }
-    virtual std::string message(int ev) const
+    std::string message(int ev) const override
     {
         switch (static_cast<json_errc>(ev))
         {
