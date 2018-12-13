@@ -114,7 +114,7 @@ private:
                          const serializing_context& context, 
                          std::error_code& ec) override
     {
-        return destination_handler_.double_value(value, fmt, tag, context);
+        return destination_handler_.double_value(value, fmt, tag, context, ec);
     }
 
     bool do_int64_value(int64_t value,

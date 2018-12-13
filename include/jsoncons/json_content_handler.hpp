@@ -339,20 +339,6 @@ public:
         return do_uint64_value(value, tag, context, ec);
     }
 
-    bool double_value(double value, uint8_t precision, const serializing_context& context = null_serializing_context())
-    {
-        std::error_code ec;
-        bool res = do_double_value(value, 
-                               floating_point_options(chars_format::general, precision), 
-                               semantic_tag_type::none,
-                               context);
-        if (ec)
-        {
-            throw serialization_error(ec, context.line_number(), context.column_number());
-        }
-        return res;
-    }
-
     bool double_value(double value, 
                       semantic_tag_type tag = semantic_tag_type::none, 
                       const serializing_context& context=null_serializing_context())
@@ -474,6 +460,20 @@ public:
     void uinteger_value(uint64_t value, const serializing_context& context)
     {
         uint64_value(value,context);
+    }
+
+    bool double_value(double value, uint8_t precision, const serializing_context& context = null_serializing_context())
+    {
+        std::error_code ec;
+        bool res = do_double_value(value, 
+                               floating_point_options(chars_format::general, precision), 
+                               semantic_tag_type::none,
+                               context);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
 #endif

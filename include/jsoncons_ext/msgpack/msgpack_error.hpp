@@ -17,7 +17,9 @@ enum class msgpack_errc
     ok = 0,
     unexpected_eof = 1,
     source_error,
-    invalid_utf8_text_string
+    invalid_utf8_text_string,
+    array_length_required,
+    object_length_required
 };
 
 class msgpack_error_category_impl
@@ -38,6 +40,10 @@ public:
                 return "Source error";
             case msgpack_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
+            case msgpack_errc::array_length_required:
+                return "MessagePack serializer requires array length";
+            case msgpack_errc::object_length_required:
+                return "MessagePack serializer requires object length";
             default:
                 return "Unknown MessagePack parser error";
         }

@@ -49,13 +49,13 @@ public:
             if (type <= 0x7f) 
             {
                 // positive fixint
-                handler_.uint64_value(type, semantic_tag_type::none, *this);
+                handler_.uint64_value(type, semantic_tag_type::none, *this, ec);
             }
             else if (type <= 0x8f) 
             {
                 // fixmap
                 const size_t len = type & 0x0f;
-                handler_.begin_object(len, semantic_tag_type::none, *this);
+                handler_.begin_object(len, semantic_tag_type::none, *this, ec);
                 ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
@@ -70,14 +70,14 @@ public:
                         return;
                     }
                 }
-                handler_.end_object(*this);
+                handler_.end_object(*this, ec);
                 --nesting_depth_;
             }
             else if (type <= 0x9f) 
             {
                 // fixarray
                 const size_t len = type & 0x0f;
-                handler_.begin_array(len, semantic_tag_type::none, *this);
+                handler_.begin_array(len, semantic_tag_type::none, *this, ec);
                 ++nesting_depth_;
                 for (size_t i = 0; i < len; ++i)
                 {
@@ -87,7 +87,7 @@ public:
                         return;
                     }
                 }
-                handler_.end_array(*this);
+                handler_.end_array(*this, ec);
                 --nesting_depth_;
             }
             else 
@@ -109,13 +109,13 @@ public:
                     ec = msgpack_errc::invalid_utf8_text_string;
                     return;
                 }
-                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this, ec);
             }
         }
         else if (type >= 0xe0) 
         {
             // negative fixint
-            handler_.int64_value(static_cast<int8_t>(type), semantic_tag_type::none, *this);
+            handler_.int64_value(static_cast<int8_t>(type), semantic_tag_type::none, *this, ec);
         }
         else
         {
@@ -123,17 +123,17 @@ public:
             {
                 case msgpack_format::nil_cd: 
                 {
-                    handler_.null_value(semantic_tag_type::none, *this);
+                    handler_.null_value(semantic_tag_type::none, *this, ec);
                     break;
                 }
                 case msgpack_format::true_cd:
                 {
-                    handler_.bool_value(true, semantic_tag_type::none, *this);
+                    handler_.bool_value(true, semantic_tag_type::none, *this, ec);
                     break;
                 }
                 case msgpack_format::false_cd:
                 {
-                    handler_.bool_value(false, semantic_tag_type::none, *this);
+                    handler_.bool_value(false, semantic_tag_type::none, *this, ec);
                     break;
                 }
                 case msgpack_format::float32_cd: 
@@ -147,7 +147,7 @@ public:
                     }
                     const uint8_t* endp;
                     float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
-                    handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
+                    handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -162,7 +162,7 @@ public:
                     }
                     const uint8_t* endp;
                     double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
-                    handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
+                    handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -170,7 +170,7 @@ public:
                 {
                     uint8_t val{};
                     source_.get(val);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -185,7 +185,7 @@ public:
                     }
                     const uint8_t* endp;
                     uint16_t val = jsoncons::detail::from_big_endian<uint16_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -200,7 +200,7 @@ public:
                     }
                     const uint8_t* endp;
                     uint32_t val = jsoncons::detail::from_big_endian<uint32_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -215,7 +215,7 @@ public:
                     }
                     const uint8_t* endp;
                     uint64_t val = jsoncons::detail::from_big_endian<uint64_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.uint64_value(val, semantic_tag_type::none, *this);
+                    handler_.uint64_value(val, semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -230,7 +230,7 @@ public:
                     }
                     const uint8_t* endp;
                     int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -245,7 +245,7 @@ public:
                     }
                     const uint8_t* endp;
                     int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -260,7 +260,7 @@ public:
                     }
                     const uint8_t* endp;
                     int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -275,7 +275,7 @@ public:
                     }
                     const uint8_t* endp;
                     int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
-                    handler_.int64_value(val, semantic_tag_type::none, *this);
+                    handler_.int64_value(val, semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -304,7 +304,7 @@ public:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -334,7 +334,7 @@ public:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -364,7 +364,7 @@ public:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this, ec);
                     break;
                 }
 
@@ -392,7 +392,7 @@ public:
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                byte_string_chars_format::none, 
                                                semantic_tag_type::none, 
-                                               *this);
+                                               *this, ec);
                     break;
                 }
 
@@ -420,7 +420,7 @@ public:
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                byte_string_chars_format::none, 
                                                semantic_tag_type::none, 
-                                               *this);
+                                               *this, ec);
                     break;
                 }
 
@@ -448,7 +448,7 @@ public:
                     handler_.byte_string_value(byte_string_view(v.data(),v.size()), 
                                                byte_string_chars_format::none, 
                                                semantic_tag_type::none, 
-                                               *this);
+                                               *this, ec);
                     break;
                 }
 
@@ -464,7 +464,7 @@ public:
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
-                    handler_.begin_array(len, semantic_tag_type::none, *this);
+                    handler_.begin_array(len, semantic_tag_type::none, *this, ec);
                     ++nesting_depth_;
                     for (int16_t i = 0; i < len; ++i)
                     {
@@ -474,7 +474,7 @@ public:
                             return;
                         }
                     }
-                    handler_.end_array(*this);
+                    handler_.end_array(*this, ec);
                     --nesting_depth_;
                     break;
                 }
@@ -491,7 +491,7 @@ public:
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
-                    handler_.begin_array(len, semantic_tag_type::none, *this);
+                    handler_.begin_array(len, semantic_tag_type::none, *this, ec);
                     ++nesting_depth_;
                     for (int32_t i = 0; i < len; ++i)
                     {
@@ -501,7 +501,7 @@ public:
                             return;
                         }
                     }
-                    handler_.end_array(*this);
+                    handler_.end_array(*this, ec);
                     --nesting_depth_;
                     break;
                 }
@@ -518,7 +518,7 @@ public:
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
 
-                    handler_.begin_object(len, semantic_tag_type::none, *this);
+                    handler_.begin_object(len, semantic_tag_type::none, *this, ec);
                     ++nesting_depth_;
                     for (int16_t i = 0; i < len; ++i)
                     {
@@ -533,7 +533,7 @@ public:
                             return;
                         }
                     }
-                    handler_.end_object(*this);
+                    handler_.end_object(*this, ec);
                     --nesting_depth_;
                     break;
                 }
@@ -550,7 +550,7 @@ public:
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
 
-                    handler_.begin_object(len, semantic_tag_type::none, *this);
+                    handler_.begin_object(len, semantic_tag_type::none, *this, ec);
                     ++nesting_depth_;
                     for (int32_t i = 0; i < len; ++i)
                     {
@@ -565,7 +565,7 @@ public:
                             return;
                         }
                     }
-                    handler_.end_object(*this);
+                    handler_.end_object(*this, ec);
                     --nesting_depth_;
                     break;
                 }
@@ -617,7 +617,7 @@ private:
                 ec = msgpack_errc::invalid_utf8_text_string;
                 return;
             }
-            handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+            handler_.name(basic_string_view<char>(s.data(),s.length()), *this, ec);
         }
         else
         {
@@ -649,7 +649,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this, ec);
                     break;
                 }
 
@@ -680,7 +680,7 @@ private:
                     //{
                     //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                     //}
-                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this, ec);
                     break;
                 }
 
@@ -711,7 +711,7 @@ private:
                     //{
                     //    JSONCONS_THROW(json_exception_impl<std::runtime_error>("Illegal unicode"));
                     //}
-                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
+                    handler_.name(basic_string_view<char>(s.data(),s.length()), *this, ec);
                     break;
                 }
             }

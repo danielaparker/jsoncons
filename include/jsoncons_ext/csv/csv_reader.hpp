@@ -121,7 +121,11 @@ public:
 
     void read(std::error_code& ec)
     {
-        parser_.reset();
+        parser_.reset(ec);
+        if (ec)
+        {
+            return;
+        }
         while (!parser_.stopped())
         {
             if (parser_.source_exhausted())

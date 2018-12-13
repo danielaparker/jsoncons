@@ -104,7 +104,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (buffer_.size() > 0)
         {
@@ -116,7 +116,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code& ec) override
+    bool do_end_object(const serializing_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -136,7 +136,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (buffer_.size() > 0)
         {
@@ -147,7 +147,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code& ec) override
+    bool do_end_array(const serializing_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -167,7 +167,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&, std::error_code& ec) override
+    bool do_name(const string_view_type& name, const serializing_context&, std::error_code&) override
     {
         stack_.back().member_offset(buffer_.size());
         buffer_.push_back(0x00); // reserve space for code
@@ -179,13 +179,13 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         before_value(bson_format::null_cd);
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         before_value(bson_format::bool_cd);
         if (val)
@@ -200,7 +200,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         before_value(bson_format::string_cd);
 
@@ -224,7 +224,7 @@ private:
     bool do_byte_string_value(const byte_string_view& b, 
                               byte_string_chars_format,
                               semantic_tag_type, 
-                              const serializing_context&, std::error_code& ec) override
+                              const serializing_context&, std::error_code&) override
     {
         before_value(bson_format::binary_cd);
 
@@ -244,7 +244,7 @@ private:
 
     bool do_int64_value(int64_t val, 
                         semantic_tag_type, 
-                        const serializing_context&, std::error_code& ec) override
+                        const serializing_context&, std::error_code&) override
     {
         before_value(bson_format::int64_cd);
         if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
@@ -265,7 +265,7 @@ private:
 
     bool do_uint64_value(uint64_t val, 
                          semantic_tag_type, 
-                         const serializing_context&, std::error_code& ec) override
+                         const serializing_context&, std::error_code&) override
     {
         before_value(bson_format::int64_cd);
         if (val <= (std::numeric_limits<int32_t>::max)())
@@ -287,7 +287,7 @@ private:
     bool do_double_value(double val, 
                          const floating_point_options&, 
                          semantic_tag_type,
-                         const serializing_context&, std::error_code& ec) override
+                         const serializing_context&, std::error_code&) override
     {
         before_value(bson_format::double_cd);
 
