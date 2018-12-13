@@ -236,7 +236,7 @@ private:
         return true;
     }
 
-    void write_string_value(const string_view_type& sv, std::error_code& ec)
+    void write_string_value(const string_view_type& sv, std::error_code&)
     {
         std::vector<uint8_t> target;
         auto result = unicons::convert(
@@ -289,7 +289,7 @@ private:
         }
     }
 
-    void write_bignum_value(const string_view_type& sv, std::error_code& ec)
+    void write_bignum_value(const string_view_type& sv, std::error_code&)
     {
         bignum n(sv.data(), sv.length());
         int signum;

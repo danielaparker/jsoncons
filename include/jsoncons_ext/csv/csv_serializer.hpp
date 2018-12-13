@@ -123,13 +123,13 @@ private:
         writer_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(true));
         return true;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code& ec) override
+    bool do_end_object(const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -168,7 +168,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(false));
         if (stack_.size() == 2)
@@ -193,7 +193,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code& ec) override
+    bool do_end_array(const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -206,7 +206,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&, std::error_code& ec) override
+    bool do_name(const string_view_type& name, const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -240,7 +240,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -264,7 +264,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -328,7 +328,7 @@ private:
     bool do_double_value(double val, 
                          const floating_point_options& fmt, 
                          semantic_tag_type, 
-                         const serializing_context&, std::error_code& ec) override
+                         const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -354,7 +354,7 @@ private:
 
     bool do_int64_value(int64_t val, 
                         semantic_tag_type, 
-                        const serializing_context&, std::error_code& ec) override
+                        const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -380,7 +380,7 @@ private:
 
     bool do_uint64_value(uint64_t val, 
                          semantic_tag_type, 
-                         const serializing_context&, std::error_code& ec) override
+                         const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
@@ -404,7 +404,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&, std::error_code& ec) override
+    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&, std::error_code&) override
     {
         if (stack_.size() == 2)
         {
