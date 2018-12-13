@@ -56,7 +56,12 @@ public:
                       const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_begin_object(tag, context, ec);
+        bool res = do_begin_object(tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool begin_object(semantic_tag_type tag,
@@ -71,7 +76,12 @@ public:
                       const serializing_context& context = null_serializing_context())
     {
         std::error_code ec;
-        return do_begin_object(length, tag, context, ec);
+        bool res = do_begin_object(length, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool begin_object(size_t length, 
@@ -85,7 +95,12 @@ public:
     bool end_object(const serializing_context& context = null_serializing_context())
     {
         std::error_code ec;
-        return do_end_object(context, ec);
+        bool res = do_end_object(context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool end_object(const serializing_context& context, std::error_code& ec)
@@ -97,7 +112,12 @@ public:
                      const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_begin_array(tag, context, ec);
+        bool res = do_begin_array(tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool begin_array(semantic_tag_type tag, const serializing_context& context, std::error_code& ec)
@@ -110,7 +130,12 @@ public:
                      const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_begin_array(length, tag, context, ec);
+        bool res = do_begin_array(length, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool begin_array(size_t length, semantic_tag_type tag, const serializing_context& context, std::error_code& ec)
@@ -121,7 +146,12 @@ public:
     bool end_array(const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_end_array(context, ec);
+        bool res = do_end_array(context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool end_array(const serializing_context& context, std::error_code& ec)
@@ -132,7 +162,12 @@ public:
     bool name(const string_view_type& name, const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_name(name, context, ec);
+        bool res = do_name(name, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool name(const string_view_type& name, const serializing_context& context, std::error_code& ec)
@@ -145,7 +180,12 @@ public:
                       const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        return do_string_value(value, tag, context, ec);
+        bool res = do_string_value(value, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool string_value(const string_view_type& value, 
@@ -162,7 +202,12 @@ public:
                            const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_byte_string_value(b, encoding_hint, tag, context, ec);
+        bool res = do_byte_string_value(b, encoding_hint, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool byte_string_value(const uint8_t* p, size_t size, 
@@ -171,7 +216,12 @@ public:
                            const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_byte_string_value(byte_string(p, size), encoding_hint, tag, context, ec);
+        bool res = do_byte_string_value(byte_string(p, size), encoding_hint, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool byte_string_value(const byte_string_view& b, 
@@ -186,7 +236,12 @@ public:
     bool bignum_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        return do_string_value(s, semantic_tag_type::bignum, context, ec);
+        bool res = do_string_value(s, semantic_tag_type::bignum, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool bignum_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
@@ -197,7 +252,12 @@ public:
     bool decimal_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        return do_string_value(s, semantic_tag_type::decimal_fraction, context, ec);
+        bool res = do_string_value(s, semantic_tag_type::decimal_fraction, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool decimal_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
@@ -208,7 +268,12 @@ public:
     bool date_time_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        return do_string_value(s, semantic_tag_type::date_time, context, ec);
+        bool res = do_string_value(s, semantic_tag_type::date_time, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool date_time_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
@@ -219,7 +284,12 @@ public:
     bool epoch_time_value(int64_t val, const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        return do_int64_value(val, semantic_tag_type::epoch_time, context, ec);
+        bool res = do_int64_value(val, semantic_tag_type::epoch_time, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool epoch_time_value(int64_t val, const serializing_context& context, std::error_code& ec) 
@@ -232,7 +302,12 @@ public:
                      const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_int64_value(value, tag, context, ec);
+        bool res = do_int64_value(value, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool int64_value(int64_t value, 
@@ -248,7 +323,12 @@ public:
                       const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_uint64_value(value, tag, context, ec);
+        bool res = do_uint64_value(value, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool uint64_value(uint64_t value, 
@@ -259,22 +339,18 @@ public:
         return do_uint64_value(value, tag, context, ec);
     }
 
-    bool double_value(double value, uint8_t precision)
+    bool double_value(double value, uint8_t precision, const serializing_context& context = null_serializing_context())
     {
         std::error_code ec;
-        return do_double_value(value, 
+        bool res = do_double_value(value, 
                                floating_point_options(chars_format::general, precision), 
                                semantic_tag_type::none,
-                               null_serializing_context());
-    }
-
-    bool double_value(double value, uint8_t precision, const serializing_context& context)
-    {
-        std::error_code ec;
-        return do_double_value(value, 
-                               floating_point_options(chars_format::general, precision), 
-                               semantic_tag_type::none,
-                               context, ec);
+                               context);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool double_value(double value, 
@@ -282,7 +358,12 @@ public:
                       const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_double_value(value, floating_point_options(), tag, context, ec);
+        bool res = do_double_value(value, floating_point_options(), tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool double_value(double value, 
@@ -291,7 +372,12 @@ public:
                       const serializing_context& context=null_serializing_context())
     {
         std::error_code ec;
-        return do_double_value(value, fmt, tag, context, ec);
+        bool res = do_double_value(value, fmt, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool double_value(double value, 
@@ -308,7 +394,12 @@ public:
                     const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        return do_bool_value(value, tag, context, ec);
+        bool res = do_bool_value(value, tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool bool_value(bool value, 
@@ -323,7 +414,12 @@ public:
                     const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        return do_null_value(tag, context, ec);
+        bool res = do_null_value(tag, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
     }
 
     bool null_value(semantic_tag_type tag,

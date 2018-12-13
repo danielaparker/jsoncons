@@ -17,6 +17,7 @@
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_options.hpp>
+#include <jsoncons/json_error.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/result.hpp>
 #include <jsoncons/detail/print_number.hpp>
