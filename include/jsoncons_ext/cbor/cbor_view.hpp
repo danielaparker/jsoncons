@@ -1092,7 +1092,7 @@ public:
                         bignum n(1, v.data(), v.size());
                         std::string s;
                         n.dump(s);
-                        handler.bignum_value(s);
+                        handler.big_integer_value(s);
                         break;
                     }
                     case 3:
@@ -1106,7 +1106,7 @@ public:
                         bignum n(-1, v.data(), v.size());
                         std::string s;
                         n.dump(s);
-                        handler.bignum_value(s);
+                        handler.big_integer_value(s);
                         break;
                     }
                     case 4:
@@ -1117,7 +1117,7 @@ public:
                         {
                             JSONCONS_THROW(cbor_error(0));
                         }
-                        handler.string_value(s, semantic_tag_type::decimal_fraction);
+                        handler.string_value(s, semantic_tag_type::big_decimal);
                         break;
                     }
                     case 21:

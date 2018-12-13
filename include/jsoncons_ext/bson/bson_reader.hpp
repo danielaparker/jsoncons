@@ -199,7 +199,7 @@ public:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::from_little_endian<uint64_t>(buf, buf+sizeof(uint64_t),&endp);
-                handler_.uint64_value(val, semantic_tag_type::epoch_time, *this, ec);
+                handler_.uint64_value(val, semantic_tag_type::timestamp, *this, ec);
                 break;
             }
 

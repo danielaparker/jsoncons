@@ -162,7 +162,7 @@ private:
 
     bool do_begin_array(size_t length, semantic_tag_type tag, const serializing_context&, std::error_code&) override
     {
-        if (length == 2 && tag == semantic_tag_type::bigfloat)
+        if (length == 2 && tag == semantic_tag_type::big_float)
         {
             result_.push_back(0xc5);
         }
@@ -470,12 +470,12 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag_type::bignum:
+            case semantic_tag_type::big_integer:
             {
                 write_bignum_value(sv, ec);
                 break;
             }
-            case semantic_tag_type::decimal_fraction:
+            case semantic_tag_type::big_decimal:
             {
                 write_decimal_value(sv, context, ec);
                 break;
@@ -565,7 +565,7 @@ private:
                          semantic_tag_type tag,
                          const serializing_context&, std::error_code&) override
     {
-        if (tag == semantic_tag_type::epoch_time)
+        if (tag == semantic_tag_type::timestamp)
         {
             result_.push_back(0xc1);
         }
@@ -594,7 +594,7 @@ private:
                         semantic_tag_type tag, 
                         const serializing_context&, std::error_code&) override
     {
-        if (tag == semantic_tag_type::epoch_time)
+        if (tag == semantic_tag_type::timestamp)
         {
             result_.push_back(0xc1);
         }
@@ -678,7 +678,7 @@ private:
                          semantic_tag_type tag, 
                          const serializing_context&, std::error_code&) override
     {
-        if (tag == semantic_tag_type::epoch_time)
+        if (tag == semantic_tag_type::timestamp)
         {
             result_.push_back(0xc1);
         }

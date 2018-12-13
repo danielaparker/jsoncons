@@ -760,11 +760,11 @@ public:
 
             if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::big_integer, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum, s.data(), s.length(), char_allocator_type());
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::big_integer, s.data(), s.length(), char_allocator_type());
             }
         }
 
@@ -775,11 +775,11 @@ public:
 
             if (s.length() <= short_string_data::max_length)
             {
-                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::bignum, s.data(), static_cast<uint8_t>(s.length()));
+                new(reinterpret_cast<void*>(&data_))short_string_data(semantic_tag_type::big_integer, s.data(), static_cast<uint8_t>(s.length()));
             }
             else
             {
-                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::bignum, s.data(), s.length(), char_allocator_type(allocator));
+                new(reinterpret_cast<void*>(&data_))long_string_data(semantic_tag_type::big_integer, s.data(), s.length(), char_allocator_type(allocator));
             }
         }
         variant(const object& val, semantic_tag_type tag)
@@ -3192,7 +3192,7 @@ public:
         {
         case structure_tag_type::short_string_tag:
         case structure_tag_type::long_string_tag:
-            if (var_.semantic_tag() == semantic_tag_type::bignum)
+            if (var_.semantic_tag() == semantic_tag_type::big_integer)
             {
                 return static_cast<bool>(var_.as_bignum());
             }
@@ -3408,7 +3408,7 @@ public:
 
     bool is_epoch_time() const noexcept
     {
-        return var_.semantic_tag() == semantic_tag_type::epoch_time;
+        return var_.semantic_tag() == semantic_tag_type::timestamp;
     }
 
     bool has_key(const string_view_type& name) const

@@ -74,7 +74,7 @@ public:
 
                 if (has_cbor_tag && cbor_tag == 1)
                 {
-                    handler_.uint64_value(val, semantic_tag_type::epoch_time, *this, ec);
+                    handler_.uint64_value(val, semantic_tag_type::timestamp, *this, ec);
                 }
                 else
                 {
@@ -91,7 +91,7 @@ public:
                 }
                 if (has_cbor_tag && cbor_tag == 1)
                 {
-                    handler_.int64_value(val, semantic_tag_type::epoch_time, *this, ec);
+                    handler_.int64_value(val, semantic_tag_type::timestamp, *this, ec);
                 }
                 else 
                 {
@@ -116,7 +116,7 @@ public:
                                 bignum n(1, v.data(), v.size());
                                 buffer_.clear();
                                 n.dump(buffer_);
-                                handler_.bignum_value(buffer_, *this, ec);
+                                handler_.big_integer_value(buffer_, *this, ec);
                                 break;
                             }
                         case 0x3:
@@ -124,7 +124,7 @@ public:
                                 bignum n(-1, v.data(), v.size());
                                 buffer_.clear();
                                 n.dump(buffer_);
-                                handler_.bignum_value(buffer_, *this, ec);
+                                handler_.big_integer_value(buffer_, *this, ec);
                                 break;
                             }
                         case 0x15:
@@ -186,23 +186,23 @@ public:
                     switch (cbor_tag)
                     {
                         case 0x04:
-                            tag = semantic_tag_type::decimal_fraction;
+                            tag = semantic_tag_type::big_decimal;
                             break;
                         case 0x05:
-                            tag = semantic_tag_type::bigfloat;
+                            tag = semantic_tag_type::big_float;
                             break;
                         default:
                             break;
                     }
                 }
-                if (tag == semantic_tag_type::decimal_fraction)
+                if (tag == semantic_tag_type::big_decimal)
                 {
                     std::string s = jsoncons::cbor::detail::get_array_as_decimal_string(source_, ec);
                     if (ec)
                     {
                         return;
                     }
-                    handler_.string_value(s, semantic_tag_type::decimal_fraction);
+                    handler_.string_value(s, semantic_tag_type::big_decimal);
                 }
                 else
                 {
@@ -348,7 +348,7 @@ public:
                         }
                         if (has_cbor_tag && cbor_tag == 1)
                         {
-                            handler_.double_value(val, floating_point_options(), semantic_tag_type::epoch_time, *this, ec);
+                            handler_.double_value(val, floating_point_options(), semantic_tag_type::timestamp, *this, ec);
                         }
                         else
                         {

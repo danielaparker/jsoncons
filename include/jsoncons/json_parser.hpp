@@ -2662,7 +2662,7 @@ private:
         }
         else
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag_type::bignum, *this, ec);
+            continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_integer, *this, ec);
         }
         after_value(ec);
     }
@@ -2676,7 +2676,7 @@ private:
         }
         else
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag_type::bignum, *this, ec);
+            continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_integer, *this, ec);
         }
         after_value(ec);
     }

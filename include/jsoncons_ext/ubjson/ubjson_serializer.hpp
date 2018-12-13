@@ -170,8 +170,8 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag_type::bignum:
-            case semantic_tag_type::decimal_fraction:
+            case semantic_tag_type::big_integer:
+            case semantic_tag_type::big_decimal:
             {
                 result_.push_back(ubjson_format::high_precision_number_type);
                 break;

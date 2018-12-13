@@ -114,9 +114,9 @@ line and column number is provided in the [context](serializing_context.md) para
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Overload (1) throws a [serialization_error](serialization_error.md) to indicate an error. Overload (2) sets the error code `ec` to indicate an error.
 
-    bool bignum_value(const string_view_type& s, 
+    bool big_integer_value(const string_view_type& s, 
                       const serializing_context& context=null_serializing_context()); // (1) 
-    bool bignum_value(const string_view_type& s, 
+    bool big_integer_value(const string_view_type& s, 
                       const serializing_context& context, 
                       std::error_code& ec); // (2) 
 Writes a bignum using the decimal string representation of a bignum. Contextual information including
@@ -124,9 +124,9 @@ line and column number is provided in the [context](serializing_context.md) para
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Overload (1) throws a [serialization_error](serialization_error.md) to indicate an error. Overload (2) sets the error code `ec` to indicate an error.
 
-    bool decimal_value(const string_view_type& s, 
+    bool big_decimal_value(const string_view_type& s, 
                        const serializing_context& context=null_serializing_context()); // (1) 
-    bool decimal_value(const string_view_type& s, 
+    bool big_decimal_value(const string_view_type& s, 
                        const serializing_context& context, 
                        std::error_code& ec); // (2) 
 Writes a decimal value using the decimal string representation. Contextual information including
@@ -144,9 +144,9 @@ line and column number is provided in the [context](serializing_context.md) para
 Returns `true` if the producer should continue streaming events, `false` otherwise.
 Overload (1) throws a [serialization_error](serialization_error.md) to indicate an error. Overload (2) sets the error code `ec` to indicate an error.
 
-    bool epoch_time_value(int64_t val, 
+    bool timestamp_value(int64_t val, 
                           const serializing_context& context=null_serializing_context()); // (1) 
-    bool epoch_time_value(int64_t val, 
+    bool timestamp_value(int64_t val, 
                           const serializing_context& context, 
                           std::error_code& ec); // (2) 
 Writes an epoch time value using the integer representation. Contextual information including

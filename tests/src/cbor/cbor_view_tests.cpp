@@ -128,9 +128,9 @@ TEST_CASE("as_string_test")
     serializer.byte_string_value(byte_string{'H','e','l','l','o'});
     serializer.int64_value(-100);
     serializer.uint64_value(100);
-    serializer.bignum_value("18446744073709551616");
+    serializer.big_integer_value("18446744073709551616");
     serializer.double_value(10.5);
-    serializer.bignum_value("-18446744073709551617");
+    serializer.big_integer_value("-18446744073709551617");
     serializer.end_array();
     serializer.flush();
 
@@ -203,7 +203,7 @@ TEST_CASE("test_dump_to_string")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    serializer.bignum_value(s);
+    serializer.big_integer_value(s);
     serializer.end_array();
     serializer.flush();
 
@@ -245,7 +245,7 @@ TEST_CASE("test_dump_to_stream")
     bignum n(-1, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
-    serializer.bignum_value(s);
+    serializer.big_integer_value(s);
     serializer.end_array();
     serializer.flush();
 
@@ -390,7 +390,7 @@ TEST_CASE("cbor_view object comparison")
     serializer1.name("City");
     serializer1.string_value("Montreal");
     serializer1.name("Amount");
-    serializer1.decimal_value("273.15");
+    serializer1.big_decimal_value("273.15");
     serializer1.name("Date");
     serializer1.date_time_value("2018-05-07 12:41:07-07:00");
     serializer1.end_object(); 
@@ -405,7 +405,7 @@ TEST_CASE("cbor_view object comparison")
     serializer2.name("City");
     serializer2.string_value("Toronto");
     serializer2.name("Amount");
-    serializer2.decimal_value("273.15");
+    serializer2.big_decimal_value("273.15");
     serializer2.name("Date");
     serializer2.date_time_value("2018-10-18 12:41:07-07:00");
     serializer2.end_object(); 
@@ -481,7 +481,7 @@ TEST_CASE("cbor_view member tests")
     serializer.name("City");
     serializer.string_value("Montreal");
     serializer.name("Amount");
-    serializer.decimal_value("273.15");
+    serializer.big_decimal_value("273.15");
     serializer.name("Date");
     serializer.date_time_value("2018-05-07 12:41:07-07:00");
 

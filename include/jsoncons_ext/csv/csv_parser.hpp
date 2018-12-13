@@ -1264,7 +1264,7 @@ private:
                     }
                     else
                     {
-                        handler.string_value(value, semantic_tag_type::bignum, *this, ec);
+                        handler.string_value(value, semantic_tag_type::big_integer, *this, ec);
                     }
                 }
                 else
@@ -1276,7 +1276,7 @@ private:
                     }
                     else
                     {
-                        handler.string_value(value, semantic_tag_type::bignum, *this, ec);
+                        handler.string_value(value, semantic_tag_type::big_integer, *this, ec);
                     }
                 }
                 break;

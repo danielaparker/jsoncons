@@ -12,12 +12,12 @@ void data_model_example1()
 
     j.emplace_back("foo");
     j.emplace_back(byte_string{ 'b','a','r' });
-    j.emplace_back("-18446744073709551617", semantic_tag_type::bignum);
-    j.emplace_back("273.15", semantic_tag_type::decimal_fraction);
+    j.emplace_back("-18446744073709551617", semantic_tag_type::big_integer);
+    j.emplace_back("273.15", semantic_tag_type::big_decimal);
     j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag_type::date_time);
-    j.emplace_back(1431027667, semantic_tag_type::epoch_time);
-    j.emplace_back(-1431027667, semantic_tag_type::epoch_time);
-    j.emplace_back(1431027667.5, semantic_tag_type::epoch_time);
+    j.emplace_back(1431027667, semantic_tag_type::timestamp);
+    j.emplace_back(-1431027667, semantic_tag_type::timestamp);
+    j.emplace_back(1431027667.5, semantic_tag_type::timestamp);
 
     std::cout << "(1)\n" << pretty_print(j) << "\n\n";
 
@@ -65,12 +65,12 @@ void data_model_example2()
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string{'b','a','r'});
-    writer.bignum_value("-18446744073709551617");
-    writer.decimal_value("273.15");
+    writer.big_integer_value("-18446744073709551617");
+    writer.big_decimal_value("273.15");
     writer.date_time_value("2018-10-19 12:41:07-07:00");
-    writer.epoch_time_value(1431027667);
-    writer.int64_value(-1431027667, semantic_tag_type::epoch_time);
-    writer.double_value(1431027667.5, semantic_tag_type::epoch_time);
+    writer.timestamp_value(1431027667);
+    writer.int64_value(-1431027667, semantic_tag_type::timestamp);
+    writer.double_value(1431027667.5, semantic_tag_type::timestamp);
     writer.end_array();
     writer.flush();
 

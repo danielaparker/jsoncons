@@ -27,10 +27,10 @@ enum class semantic_tag_type : uint8_t
     none = 0,
     undefined,
     date_time,
-    epoch_time,
-    bignum,
-    decimal_fraction,
-    bigfloat
+    timestamp,
+    big_integer,
+    big_decimal,
+    big_float
 };
 
 template <class CharT>
@@ -233,10 +233,10 @@ public:
         return res;
     }
 
-    bool bignum_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
+    bool big_integer_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        bool res = do_string_value(s, semantic_tag_type::bignum, context, ec);
+        bool res = do_string_value(s, semantic_tag_type::big_integer, context, ec);
         if (ec)
         {
             throw serialization_error(ec, context.line_number(), context.column_number());
@@ -244,15 +244,15 @@ public:
         return res;
     }
 
-    bool bignum_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
+    bool big_integer_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
     {
-        return do_string_value(s, semantic_tag_type::bignum, context, ec);
+        return do_string_value(s, semantic_tag_type::big_integer, context, ec);
     }
 
-    bool decimal_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
+    bool big_decimal_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        bool res = do_string_value(s, semantic_tag_type::decimal_fraction, context, ec);
+        bool res = do_string_value(s, semantic_tag_type::big_decimal, context, ec);
         if (ec)
         {
             throw serialization_error(ec, context.line_number(), context.column_number());
@@ -260,9 +260,9 @@ public:
         return res;
     }
 
-    bool decimal_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
+    bool big_decimal_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
     {
-        return do_string_value(s, semantic_tag_type::decimal_fraction, context, ec);
+        return do_string_value(s, semantic_tag_type::big_decimal, context, ec);
     }
 
     bool date_time_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
@@ -281,10 +281,10 @@ public:
         return do_string_value(s, semantic_tag_type::date_time, context, ec);
     }
 
-    bool epoch_time_value(int64_t val, const serializing_context& context=null_serializing_context()) 
+    bool timestamp_value(int64_t val, const serializing_context& context=null_serializing_context()) 
     {
         std::error_code ec;
-        bool res = do_int64_value(val, semantic_tag_type::epoch_time, context, ec);
+        bool res = do_int64_value(val, semantic_tag_type::timestamp, context, ec);
         if (ec)
         {
             throw serialization_error(ec, context.line_number(), context.column_number());
@@ -292,9 +292,9 @@ public:
         return res;
     }
 
-    bool epoch_time_value(int64_t val, const serializing_context& context, std::error_code& ec) 
+    bool timestamp_value(int64_t val, const serializing_context& context, std::error_code& ec) 
     {
-        return do_int64_value(val, semantic_tag_type::epoch_time, context, ec);
+        return do_int64_value(val, semantic_tag_type::timestamp, context, ec);
     }
 
     bool int64_value(int64_t value, 
@@ -474,6 +474,54 @@ public:
             throw serialization_error(ec, context.line_number(), context.column_number());
         }
         return res;
+    }
+
+    bool bignum_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
+    {
+        std::error_code ec;
+        bool res = do_string_value(s, semantic_tag_type::big_integer, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
+    }
+
+    bool bignum_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
+    {
+        return do_string_value(s, semantic_tag_type::big_integer, context, ec);
+    }
+
+    bool decimal_value(const string_view_type& s, const serializing_context& context=null_serializing_context()) 
+    {
+        std::error_code ec;
+        bool res = do_string_value(s, semantic_tag_type::big_decimal, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
+    }
+
+    bool decimal_value(const string_view_type& s, const serializing_context& context, std::error_code& ec) 
+    {
+        return do_string_value(s, semantic_tag_type::big_decimal, context, ec);
+    }
+
+    bool epoch_time_value(int64_t val, const serializing_context& context=null_serializing_context()) 
+    {
+        std::error_code ec;
+        bool res = do_int64_value(val, semantic_tag_type::timestamp, context, ec);
+        if (ec)
+        {
+            throw serialization_error(ec, context.line_number(), context.column_number());
+        }
+        return res;
+    }
+
+    bool epoch_time_value(int64_t val, const serializing_context& context, std::error_code& ec) 
+    {
+        return do_int64_value(val, semantic_tag_type::timestamp, context, ec);
     }
 
 #endif

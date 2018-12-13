@@ -24,12 +24,12 @@ TEST_CASE("cbor_view array as<> test")
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string({'b','a','r'}));
-    writer.bignum_value("-18446744073709551617");
-    writer.decimal_value("273.15");
+    writer.big_integer_value("-18446744073709551617");
+    writer.big_decimal_value("273.15");
     writer.date_time_value("2015-05-07 12:41:07-07:00");
-    writer.epoch_time_value(1431027667);
-    writer.int64_value(-1431027667, semantic_tag_type::epoch_time);
-    writer.double_value(1431027667.5, jsoncons::floating_point_options(), semantic_tag_type::epoch_time);
+    writer.timestamp_value(1431027667);
+    writer.int64_value(-1431027667, semantic_tag_type::timestamp);
+    writer.double_value(1431027667.5, jsoncons::floating_point_options(), semantic_tag_type::timestamp);
     writer.end_array();
     writer.flush();
 

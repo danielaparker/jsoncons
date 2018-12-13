@@ -231,11 +231,11 @@ public:
                 }
                 if (jsoncons::detail::is_integer(s.data(),s.length()))
                 {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::bignum, *this, ec);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::big_integer, *this, ec);
                 }
                 else
                 {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::decimal_fraction, *this, ec);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::big_decimal, *this, ec);
                 }
                 break;
             }

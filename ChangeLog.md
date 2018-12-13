@@ -8,9 +8,19 @@ Bug fixes:
 
 - Fixed compile issue with `j = json::make_array()` (also in 0.113.2)
 
+Breaking name changes:
+
+- semantic_tag_type::bignum to semantic_tag_type::big_integer
+- semantic_tag_type::decimal_fraction to semantic_tag_type::big_decimal
+- semantic_tag_type::epoch_time to semantic_tag_type::timestamp
+
 Non-breaking name changes:
 
-The following names have been deprecated (still work) and renamed
+The following names have been deprecated and renamed (old names still work)
+
+- `bignum_value` to `big_integer_value` in `json_content_handler`
+- `decimal_value` to `big_decimal_value` in `json_content_handler`
+- `epoch_time_value` to `timestamp_value` in `json_content_handler`
 
 - `cbor_bytes_serializer` to `cbor_buffer_serializer`
 - `msgpack_bytes_serializer` to `msgpack_buffer_serializer`

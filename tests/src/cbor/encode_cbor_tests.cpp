@@ -124,19 +124,19 @@ TEST_CASE("cbor_arrays_and_maps")
     check_encode_cbor({0x81,0x65,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
     // big float
-    json j(json::array({-2,27315}),semantic_tag_type::bigfloat);
-    CHECK(j.semantic_tag() == semantic_tag_type::bigfloat);
+    json j(json::array({-2,27315}),semantic_tag_type::big_float);
+    CHECK(j.semantic_tag() == semantic_tag_type::big_float);
     json j2 = j;
-    CHECK(j2.semantic_tag() == semantic_tag_type::bigfloat);
+    CHECK(j2.semantic_tag() == semantic_tag_type::big_float);
     json j3;
     j3 = j;
-    CHECK(j3.semantic_tag() == semantic_tag_type::bigfloat);
+    CHECK(j3.semantic_tag() == semantic_tag_type::big_float);
 
     check_encode_cbor({0xc5, // Tag 5 
                          0x82, // Array of length 2
                            0x21, // -2 
                              0x19, 0x6a, 0xb3 // 27315 
-                  },json(json::array({-2,27315}),semantic_tag_type::bigfloat));
+                  },json(json::array({-2,27315}),semantic_tag_type::big_float));
     check_encode_cbor({0xa1,0x62,'o','c',0x81,'\0'}, json::parse("{\"oc\": [0]}"));
     check_encode_cbor({0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }

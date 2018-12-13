@@ -200,7 +200,7 @@ TEST_CASE("test_cbor_parsing")
                      0x82, // Array of length 2
                        0x21, // -2 
                          0x19, 0x6a, 0xb3 // 27315 
-                  },json(json::array({-2,27315}),semantic_tag_type::bigfloat));
+                  },json(json::array({-2,27315}),semantic_tag_type::big_float));
 
     SECTION("maps with definite length")
     {
@@ -255,7 +255,7 @@ TEST_CASE("test_cbor_parsing")
 
     // epoch_time
     check_parse_cbor({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
-                  json(1431027667, semantic_tag_type::epoch_time));
+                  json(1431027667, semantic_tag_type::timestamp));
 }
 
 TEST_CASE("cbor decimal fraction")
@@ -265,38 +265,38 @@ TEST_CASE("cbor decimal fraction")
                    0x21, // -2
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("273.15", semantic_tag_type::decimal_fraction));
+                  json("273.15", semantic_tag_type::big_decimal));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x22, // -3
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("27.315", semantic_tag_type::decimal_fraction));
+                  json("27.315", semantic_tag_type::big_decimal));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x23, // -4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("2.7315", semantic_tag_type::decimal_fraction));
+                  json("2.7315", semantic_tag_type::big_decimal));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x24, // -5
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.27315", semantic_tag_type::decimal_fraction));
+                  json("0.27315", semantic_tag_type::big_decimal));
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x25, // -6
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("0.27315e-1", semantic_tag_type::decimal_fraction));
+                  json("0.27315e-1", semantic_tag_type::big_decimal));
 
     check_parse_cbor({0xc4, // Tag 4
                    0x82, // Array of length 2
                    0x04, // 4
                    0x19,0x6a,0xb3 // 27315
                    },
-                  json("27315e4", semantic_tag_type::decimal_fraction));
+                  json("27315e4", semantic_tag_type::big_decimal));
 }
 
 TEST_CASE("test_decimal_as_string")
@@ -427,12 +427,12 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string{'b','a','r'});
-    writer.bignum_value("-18446744073709551617");
-    writer.decimal_value("273.15");
+    writer.big_integer_value("-18446744073709551617");
+    writer.big_decimal_value("273.15");
     writer.date_time_value("2018-10-19 12:41:07-07:00");
-    writer.epoch_time_value(1431027667);
-    writer.int64_value(-1431027667, semantic_tag_type::epoch_time);
-    writer.double_value(1431027667.5, jsoncons::floating_point_options(), semantic_tag_type::epoch_time);
+    writer.timestamp_value(1431027667);
+    writer.int64_value(-1431027667, semantic_tag_type::timestamp);
+    writer.double_value(1431027667.5, jsoncons::floating_point_options(), semantic_tag_type::timestamp);
     writer.end_array();
     writer.flush();
 
@@ -476,12 +476,12 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
 
     expected.emplace_back("foo");
     expected.emplace_back(byte_string{ 'b','a','r' });
-    expected.emplace_back("-18446744073709551617", semantic_tag_type::bignum);
-    expected.emplace_back("273.15", semantic_tag_type::decimal_fraction);
+    expected.emplace_back("-18446744073709551617", semantic_tag_type::big_integer);
+    expected.emplace_back("273.15", semantic_tag_type::big_decimal);
     expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag_type::date_time);
-    expected.emplace_back(1431027667, semantic_tag_type::epoch_time);
-    expected.emplace_back(-1431027667, semantic_tag_type::epoch_time);
-    expected.emplace_back(1431027667.5, semantic_tag_type::epoch_time);
+    expected.emplace_back(1431027667, semantic_tag_type::timestamp);
+    expected.emplace_back(-1431027667, semantic_tag_type::timestamp);
+    expected.emplace_back(1431027667.5, semantic_tag_type::timestamp);
 
     json j = cbor::decode_cbor<json>(bytes);
 

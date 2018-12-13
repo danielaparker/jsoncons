@@ -14,16 +14,16 @@ The jsoncons data model consists of the following fundumental types:
 
 It also allows optional semantic tagging of the major types:
 
- Type       | Semantic tag     | CBOR mapping
+ Type       | jsoncons semantic tag     | CBOR mapping
 ------------|------------------|---------------
- null       | undefined        | Maps to CBOR undefined
- int64      | epoch_time       | Maps to CBOR epoch time (unsigned or negative integer)
- uint64     | epoch_time       | Maps to CBOR epoch time (unsigned integer)
- double     | epoch_time       | Maps to CBOR epoch time (double)
- string     | bignum           | Maps to CBOR bignum 
- &#160;     | decimal_fraction | Maps to CBOR decimal fraction 
- &#160;     | date_time        | Maps to CBOR date/time
- array      | bigfloat         | Maps to CBOR bigfloat
+ null       | undefined        | CBOR undefined
+ int64      | timestamp        | CBOR epoch time (unsigned or negative integer)
+ uint64     | timestamp        | CBOR epoch time (unsigned integer)
+ double     | timestamp        | CBOR epoch time (double)
+ string     | big_integer      | CBOR bignum 
+ &#160;     | big_decimal      | CBOR decimal fraction 
+ &#160;     | date_time        | CBOR date/time
+ array      | big_float        | CBOR bigfloat
 
 ### Examples
 
@@ -41,12 +41,12 @@ int main()
 
     j.emplace_back("foo");
     j.emplace_back(byte_string{ 'b','a','r' });
-    j.emplace_back("-18446744073709551617", semantic_tag_type::bignum);
-    j.emplace_back("273.15", semantic_tag_type::decimal_fraction);
+    j.emplace_back("-18446744073709551617", semantic_tag_type::big_integer);
+    j.emplace_back("273.15", semantic_tag_type::big_decimal);
     j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag_type::date_time);
-    j.emplace_back(1431027667, semantic_tag_type::epoch_time);
-    j.emplace_back(-1431027667, semantic_tag_type::epoch_time);
-    j.emplace_back(1431027667.5, semantic_tag_type::epoch_time);
+    j.emplace_back(1431027667, semantic_tag_type::timestamp);
+    j.emplace_back(-1431027667, semantic_tag_type::timestamp);
+    j.emplace_back(1431027667.5, semantic_tag_type::timestamp);
 
     std::cout << "(1)\n" << pretty_print(j) << "\n\n";
 
@@ -124,8 +124,8 @@ void main()
     writer.decimal_value("273.15");
     writer.date_time_value("2018-10-19 12:41:07-07:00");
     writer.epoch_time_value(1431027667);
-    writer.int64_value(-1431027667, semantic_tag_type::epoch_time);
-    writer.double_value(1431027667.5, semantic_tag_type::epoch_time);
+    writer.int64_value(-1431027667, semantic_tag_type::timestamp);
+    writer.double_value(1431027667.5, semantic_tag_type::timestamp);
     writer.end_array();
     writer.flush();
 
