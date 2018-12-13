@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::cbor;
-#if 0
+
 TEST_CASE("cbor_view_test")
 {
     ojson j1 = ojson::parse(R"(
@@ -493,7 +493,7 @@ TEST_CASE("cbor_view member tests")
         CHECK(view.size() == 7);
     }
 }
-#endif
+
 TEST_CASE("cbor conversion tests")
 {
     std::vector<uint8_t> b;
@@ -528,6 +528,5 @@ TEST_CASE("cbor conversion tests")
     CHECK(it2->as_string() == bignum{"273.15"});
     it2++;
     CHECK(it2 == range2.end());
-
 }
 
