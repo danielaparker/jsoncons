@@ -4,7 +4,6 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
 #include <jsoncons/json_staj_reader.hpp>
@@ -13,6 +12,7 @@
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

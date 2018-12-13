@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <istream>
-#include <cstdlib>
 #include <memory>
 #include <jsoncons/config/binary_detail.hpp>
 

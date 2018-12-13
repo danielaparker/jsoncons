@@ -1,16 +1,16 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#include <jsoncons/json_serializer.hpp>
+#include <jsoncons/json_filter.hpp>
+#include <jsoncons/json_reader.hpp>
+#include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <new>
-#include <jsoncons/json_serializer.hpp>
-#include <jsoncons/json_filter.hpp>
-#include <jsoncons/json_reader.hpp>
-#include <jsoncons/json.hpp>
 #include <fstream>
 
 using namespace jsoncons;

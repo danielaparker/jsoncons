@@ -10,7 +10,6 @@
 #include <memory> // std::allocator
 #include <string>
 #include <vector>
-#include <cstdlib>
 #include <stdexcept>
 #include <system_error>
 #include <limits> // std::numeric_limits

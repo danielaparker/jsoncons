@@ -9,7 +9,6 @@
 
 #include <stdexcept>
 #include <string>
-#include <cstdlib>
 #include <exception>
 #include <ostream>
 #include <cstring> // std::memcpy

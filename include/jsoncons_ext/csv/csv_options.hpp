@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <unordered_map> // std::unordered_map
-#include <cstdlib>
 #include <limits> // std::numeric_limits
 #include <cwchar>
 #include <memory> // std::allocator

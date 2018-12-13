@@ -12,7 +12,6 @@
 #include <vector>
 #include <valarray>
 #include <exception>
-#include <cstdlib>
 #include <cstring>
 #include <utility>
 #include <algorithm>

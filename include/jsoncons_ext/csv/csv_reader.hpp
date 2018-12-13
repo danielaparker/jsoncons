@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <istream>
-#include <cstdlib>
 #include <stdexcept>
 #include <memory> // std::allocator
 #include <jsoncons/source.hpp>

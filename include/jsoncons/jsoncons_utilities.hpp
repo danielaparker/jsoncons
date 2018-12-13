@@ -12,7 +12,6 @@
 #include <vector>
 #include <istream>
 #include <ostream>
-#include <cstdlib>
 #include <cmath>
 #include <cstdarg>
 #include <type_traits>

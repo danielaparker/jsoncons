@@ -10,7 +10,6 @@
 #include <cfloat>
 #include <cstddef>
 #include <cstdint>
-#include <cstdlib>
 #include <cstring> // std::memcpy
 #include <memory>
 

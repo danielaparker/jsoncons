@@ -4,7 +4,6 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <catch/catch.hpp>
 //#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv_reader.hpp>
 #include <jsoncons_ext/csv/csv_serializer.hpp>
@@ -15,6 +14,7 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::csv;

@@ -4,7 +4,6 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <sstream>
@@ -12,6 +11,7 @@
 #include <utility>
 #include <ctime>
 #include <limits>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::msgpack;

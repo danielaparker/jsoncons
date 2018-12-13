@@ -4,14 +4,14 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <new>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;

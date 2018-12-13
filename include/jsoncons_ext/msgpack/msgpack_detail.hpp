@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <cstdlib>
 #include <memory>
 #include <jsoncons/config/binary_detail.hpp>
 

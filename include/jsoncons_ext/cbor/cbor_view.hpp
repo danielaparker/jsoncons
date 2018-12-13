@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <istream>
-#include <cstdlib>
 #include <memory> // std::allocator
 #include <limits> // std::numeric_limits
 #include <iterator>

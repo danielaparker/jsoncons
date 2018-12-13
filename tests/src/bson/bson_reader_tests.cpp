@@ -1,7 +1,6 @@
 // Copyright 2016 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <sstream>
@@ -9,6 +8,7 @@
 #include <utility>
 #include <ctime>
 #include <limits>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::bson;

@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <cstdlib>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <jsoncons/json_exception.hpp>

@@ -4,10 +4,10 @@
 #if defined(_MSC_VER)
 #include "windows.h"
 #endif
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
+#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>

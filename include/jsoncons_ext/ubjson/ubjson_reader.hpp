@@ -8,7 +8,6 @@
 #define JSONCONS_UBJSON_UBJSON_READER_HPP
 
 #include <string>
-#include <cstdlib>
 #include <memory>
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>

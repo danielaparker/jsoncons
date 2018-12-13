@@ -1,15 +1,15 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
+#include <jsoncons/detail/parse_number.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <cwchar>
-#include <jsoncons/detail/parse_number.hpp>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <cstdlib>
 #include <cstdarg>
 #include <locale>
 #include <limits> // std::numeric_limits

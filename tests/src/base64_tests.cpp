@@ -1,7 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
+#include <jsoncons/json.hpp>
+#include <jsoncons/jsoncons_utilities.hpp>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -9,8 +10,7 @@
 #include <utility>
 #include <ctime>
 #include <new>
-#include <jsoncons/json.hpp>
-#include <jsoncons/jsoncons_utilities.hpp>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

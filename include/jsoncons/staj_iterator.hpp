@@ -9,7 +9,6 @@
 
 #include <memory>
 #include <string>
-#include <cstdlib>
 #include <stdexcept>
 #include <system_error>
 #include <ios>

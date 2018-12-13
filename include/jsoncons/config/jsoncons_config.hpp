@@ -9,7 +9,6 @@
 
 #include <stdexcept>
 #include <string>
-#include <cstdlib>
 #include <cmath>
 #include <cstdarg>
 #include <exception>

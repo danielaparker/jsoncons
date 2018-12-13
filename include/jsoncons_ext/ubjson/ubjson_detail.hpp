@@ -8,7 +8,6 @@
 #define JSONCONS_UBJSON_UBJSON_DETAIL_HPP
 
 #include <string>
-#include <cstdlib>
 #include <memory>
 #include <jsoncons/config/binary_detail.hpp>
 

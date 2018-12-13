@@ -4,6 +4,8 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 #include <sstream>
@@ -12,8 +14,6 @@
 #include <utility>
 #include <ctime>
 #include <new>
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 using namespace jsoncons;
 

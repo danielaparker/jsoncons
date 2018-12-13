@@ -1,9 +1,9 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_serializer.hpp>
+#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <map>

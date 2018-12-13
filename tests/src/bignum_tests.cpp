@@ -4,13 +4,13 @@
 #if defined(_MSC_VER)
 #include "windows.h"
 #endif
-#include <catch/catch.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 

@@ -11,7 +11,6 @@
 #include <string>
 #include <vector>
 #include <exception>
-#include <cstdlib>
 #include <cstring>
 #include <ostream>
 #include <memory> // std::allocator

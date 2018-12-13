@@ -8,7 +8,6 @@
 #define JSONCONS_JSON_OPTIONS_HPP
 
 #include <string>
-#include <cstdlib>
 #include <limits> // std::numeric_limits
 #include <cwchar>
 #include <jsoncons/json_exception.hpp>

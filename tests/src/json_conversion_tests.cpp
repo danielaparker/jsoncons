@@ -1,8 +1,8 @@
 // Copyright 2017 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
+#include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <map>

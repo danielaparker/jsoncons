@@ -4,7 +4,6 @@
 #if defined(_MSC_VER)
 #include "windows.h"
 #endif
-#include <catch/catch.hpp>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/cbor/cbor_serializer.hpp>
@@ -14,6 +13,7 @@
 #include <ctime>
 #include <limits>
 #include <fstream>
+#include <catch/catch.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::cbor;
