@@ -801,7 +801,7 @@ private:
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type,
-                        const serializing_context&, std::error_code& ec) override
+                        const serializing_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {

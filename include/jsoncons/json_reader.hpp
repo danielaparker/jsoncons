@@ -60,22 +60,22 @@ private:
 
     bool do_begin_object(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.begin_object(tag, context);
+        return other_handler_.begin_object(tag, context, ec);
     }
 
     bool do_end_object(const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.end_object(context);
+        return other_handler_.end_object(context, ec);
     }
 
     bool do_begin_array(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.begin_array(tag, context);
+        return other_handler_.begin_array(tag, context, ec);
     }
 
     bool do_end_array(const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.end_array(context);
+        return other_handler_.end_array(context, ec);
     }
 
     bool do_name(const string_view_type& name, const serializing_context& context, std::error_code& ec) override
@@ -88,7 +88,7 @@ private:
         {
             throw serialization_error(result.ec,context.line_number(),context.column_number());
         }
-        return other_handler_.name(target, context);
+        return other_handler_.name(target, context, ec);
     }
 
     bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
@@ -101,21 +101,21 @@ private:
         {
             throw serialization_error(result.ec,context.line_number(),context.column_number());
         }
-        return other_handler_.string_value(target, tag, context);
+        return other_handler_.string_value(target, tag, context, ec);
     }
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type tag, 
                         const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.int64_value(value, tag, context);
+        return other_handler_.int64_value(value, tag, context, ec);
     }
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type tag, 
                          const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.uint64_value(value, tag, context);
+        return other_handler_.uint64_value(value, tag, context, ec);
     }
 
     bool do_double_value(double value, 
@@ -123,17 +123,17 @@ private:
                          semantic_tag_type tag,
                          const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.double_value(value, fmt, tag, context);
+        return other_handler_.double_value(value, fmt, tag, context, ec);
     }
 
     bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.bool_value(value, tag, context);
+        return other_handler_.bool_value(value, tag, context, ec);
     }
 
     bool do_null_value(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
     {
-        return other_handler_.null_value(tag, context);
+        return other_handler_.null_value(tag, context, ec);
     }
 };
 

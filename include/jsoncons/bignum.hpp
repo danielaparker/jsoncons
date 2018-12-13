@@ -8,13 +8,13 @@
 #define JSONCONS_BIGNUM_HPP
 
 #include <cstdint>
-#include <vector>
+#include <vector> // std::vector
 #include <iostream>
 #include <climits>
 #include <limits>
 #include <algorithm>
-#include <string>
-#include <cstring>
+#include <string> // std::string
+#include <cstring> // std::memcpy
 
 namespace jsoncons {
 
@@ -105,7 +105,7 @@ public:
             capacity_ = n.capacity_;
             data_ = allocator().allocate(capacity_);
             dynamic_ = true;
-            memcpy( data_, n.data_, n.length_*sizeof(basic_type) );
+            std::memcpy( data_, n.data_, n.length_*sizeof(basic_type) );
         }
     }
 
@@ -386,7 +386,7 @@ public:
             neg_ = y.neg_;
             if ( y.length() > 0 )
             {
-                memcpy( data_, y.data_, y.length()*sizeof(basic_type) );
+                std::memcpy( data_, y.data_, y.length()*sizeof(basic_type) );
             }
         }
         return *this;
@@ -1402,7 +1402,7 @@ public:
             dynamic_ = true;
             if ( length_ > 0 )
             {
-                memcpy( data_, n.data_, length_*sizeof(basic_type) );
+                std::memcpy( data_, n.data_, length_*sizeof(basic_type) );
             }
             reduce();
         }
@@ -1442,7 +1442,7 @@ public:
 
             if ( len_old > 0 )
             {
-                memcpy( data_, data_old, len_old*sizeof(basic_type) );
+                std::memcpy( data_, data_old, len_old*sizeof(basic_type) );
             }
             if ( dynamic_ )
             {

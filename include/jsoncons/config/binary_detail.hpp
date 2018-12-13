@@ -12,9 +12,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <cstring>
+#include <cstring> // std::memcpy
 #include <memory>
-#include <vector>
 
 #if defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))
 #define APPLE_MISSING_INTRINSICS 1
@@ -165,7 +164,7 @@ uint16_t encode_half(double val)
     return _cvtss_sh((float)val, 3);
 #else
     uint64_t v;
-    memcpy(&v, &val, sizeof(v));
+    std::memcpy(&v, &val, sizeof(v));
     int sign = v >> 63 << 15;
     int exp = (v >> 52) & 0x7ff;
     int mant = v << 12 >> 12 >> (53-11);    /* keep only the 11 most significant bits of the mantissa */
@@ -240,7 +239,7 @@ to_big_endian(T val, OutputIt d_first)
     T x = JSONCONS_H_TO_BE16(val);
 
     uint8_t where[sizeof(T)];
-    memcpy(where, &x, sizeof(T));
+    std::memcpy(where, &x, sizeof(T));
 
     *d_first++ = where[0];
     *d_first++ = where[1];
@@ -254,7 +253,7 @@ to_big_endian(T val, OutputIt d_first)
     T x = JSONCONS_H_TO_BE32(val);
 
     uint8_t where[sizeof(T)];
-    memcpy(where, &x, sizeof(T));
+    std::memcpy(where, &x, sizeof(T));
 
     *d_first++ = where[0];
     *d_first++ = where[1];
@@ -270,7 +269,7 @@ to_big_endian(T val, OutputIt d_first)
     T x = JSONCONS_H_TO_BE64(val);
 
     uint8_t where[sizeof(T)];
-    memcpy(where, &x, sizeof(T));
+    std::memcpy(where, &x, sizeof(T));
 
     *d_first++ = where[0];
     *d_first++ = where[1];
@@ -308,7 +307,7 @@ to_little_endian(T val, OutputIt d_first)
     T x = JSONCONS_H_TO_LE32(val);
 
     uint8_t where[sizeof(T)];
-    memcpy(where, &x, sizeof(T));
+    std::memcpy(where, &x, sizeof(T));
 
     *d_first++ = where[0];
     *d_first++ = where[1];
@@ -324,7 +323,7 @@ to_little_endian(T val, OutputIt d_first)
     T x = JSONCONS_H_TO_LE64(val);
 
     uint8_t where[sizeof(T)];
-    memcpy(where, &x, sizeof(T));
+    std::memcpy(where, &x, sizeof(T));
 
     *d_first++ = where[0];
     *d_first++ = where[1];

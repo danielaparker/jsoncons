@@ -19,6 +19,7 @@
 #include <type_traits>
 #include <algorithm>
 #include <exception>
+#include <cstring> // std::memcpy
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
 

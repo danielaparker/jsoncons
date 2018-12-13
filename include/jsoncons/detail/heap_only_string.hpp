@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <exception>
 #include <ostream>
+#include <cstring> // std::memcpy
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace detail {
@@ -132,7 +133,7 @@ public:
         auto psa = reinterpret_cast<string_storage*>(storage); 
 
         CharT* p = new(&psa->c)char_type[length + 1];
-        memcpy(p, s, length*sizeof(char_type));
+        std::memcpy(p, s, length*sizeof(char_type));
         p[length] = 0;
         ps->p_ = std::pointer_traits<pointer>::pointer_to(*p);
         ps->length_ = length;

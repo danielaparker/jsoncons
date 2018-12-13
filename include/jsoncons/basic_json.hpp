@@ -16,7 +16,7 @@
 #include <ostream>
 #include <memory>
 #include <typeinfo>
-#include <cstring>
+#include <cstring> // std::memcpy
 #include <jsoncons/json_fwd.hpp>
 #include <jsoncons/config/version.hpp>
 #include <jsoncons/json_exception.hpp>
