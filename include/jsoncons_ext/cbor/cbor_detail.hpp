@@ -280,25 +280,48 @@ template <class Source>
 std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
 {
     std::vector<uint8_t> v;
-    if (JSONCONS_UNLIKELY(source.eof()))
-    {
-        ec = cbor_errc::unexpected_eof;
-        return v;
-    }
 
-    switch (get_additional_information_value((uint8_t)source.peek()))
+    cbor_major_type major_type;
+    uint8_t info;
+    int c = source.peek();
+    switch (c)
+    {
+        case Source::traits_type::eof():
+            ec = cbor_errc::unexpected_eof;
+            return v;
+        default:
+            major_type = get_major_type((uint8_t)c);
+            info = get_additional_information_value((uint8_t)c);
+            break;
+    }
+    JSONCONS_ASSERT(major_type == cbor_major_type::byte_string);
+
+    switch (info)
     {
         case additional_info::indefinite_length: 
         {
             source.ignore(1);
-            while (source.peek() != 0xff)
+            bool done = false;
+            while (!done)
             {
-                std::vector<uint8_t> ss = jsoncons::cbor::detail::get_byte_string(source, ec);
-                if (ec)
+                int test = source.peek();
+                switch (test)
                 {
-                    return v;
+                    case Source::traits_type::eof():
+                        ec = cbor_errc::unexpected_eof;
+                        return v;
+                    case 0xff:
+                        done = true;
+                        break;
+                    default:
+                        std::vector<uint8_t> ss = jsoncons::cbor::detail::get_byte_string(source, ec);
+                        if (ec)
+                        {
+                            return v;
+                        }
+                        v.insert(v.end(),ss.begin(),ss.end());
+                        break;
                 }
-                v.insert(v.end(),ss.begin(),ss.end());
             }
             source.ignore(1);
             break;
@@ -329,26 +352,47 @@ std::string get_text_string(Source& source, std::error_code& ec)
 {
     std::string s;
 
-    if (JSONCONS_UNLIKELY(source.eof()))
+    cbor_major_type major_type;
+    uint8_t info;
+    int c = source.peek();
+    switch (c)
     {
-        ec = cbor_errc::unexpected_eof;
-        return s;
+        case Source::traits_type::eof():
+            ec = cbor_errc::unexpected_eof;
+            return s;
+        default:
+            major_type = get_major_type((uint8_t)c);
+            info = get_additional_information_value((uint8_t)c);
+            break;
     }
-    JSONCONS_ASSERT(get_major_type((uint8_t)source.peek()) == cbor_major_type::text_string);
+    JSONCONS_ASSERT(major_type == cbor_major_type::text_string);
 
-    switch (get_additional_information_value((uint8_t)source.peek()))
+    switch (info)
     {
         case additional_info::indefinite_length:
         {
             source.ignore(1);
-            while (source.peek() != 0xff)
+            bool done = false;
+            while (!done)
             {
-                std::string ss = jsoncons::cbor::detail::get_text_string(source, ec);
-                if (ec)
+                int test = source.peek();
+                switch (test)
                 {
-                    return s;
+                    case Source::traits_type::eof():
+                        ec = cbor_errc::unexpected_eof;
+                        return s;
+                    case 0xff:
+                        done = true;
+                        break;
+                    default:
+                        std::string ss = jsoncons::cbor::detail::get_text_string(source, ec);
+                        if (ec)
+                        {
+                            return s;
+                        }
+                        s.append(std::move(ss));
+                        break;
                 }
-                s.append(std::move(ss));
             }
             source.ignore(1);
             break;
@@ -376,14 +420,23 @@ std::string get_text_string(Source& source, std::error_code& ec)
 
 
 template <class Source>
-void walk_object_items(Source& source, std::error_code& ec)
+void walk_object(Source& source, std::error_code& ec)
 {
-    if (JSONCONS_UNLIKELY(source.eof()))
+    cbor_major_type major_type;
+    uint8_t info;
+    int c = source.peek();
+    switch (c)
     {
-        ec = cbor_errc::unexpected_eof;
-        return;
+        case Source::traits_type::eof():
+            ec = cbor_errc::unexpected_eof;
+            return;
+        default:
+            major_type = get_major_type((uint8_t)c);
+            info = get_additional_information_value((uint8_t)c);
+            break;
     }
-    uint8_t info = get_additional_information_value((uint8_t)source.peek());
+    JSONCONS_ASSERT(major_type == cbor_major_type::map);
+
     switch (info)
     {
     case additional_info::indefinite_length: 
@@ -394,17 +447,30 @@ void walk_object_items(Source& source, std::error_code& ec)
                 ec = cbor_errc::unexpected_eof;
                 return;
             }
-            while (source.peek() != 0xff)
+            bool done = false;
+            while (!done)
             {
-                walk(source, ec);
-                if (ec)
+                int test = source.peek();
+                switch (test)
                 {
-                    return;
-                }
-                walk(source, ec);
-                if (ec)
-                {
-                    return;
+                    case Source::traits_type::eof():
+                        ec = cbor_errc::unexpected_eof;
+                        return;
+                    case 0xff:
+                        done = true;
+                        break;
+                    default:
+                        walk(source, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        walk(source, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
                 }
             }
             source.ignore(1);
@@ -436,25 +502,46 @@ void walk_object_items(Source& source, std::error_code& ec)
 }
 
 template <class Source>
-void walk_array_items(Source& source, std::error_code& ec)
+void walk_array(Source& source, std::error_code& ec)
 {
-    if (JSONCONS_UNLIKELY(source.eof()))
+    cbor_major_type major_type;
+    uint8_t info;
+    int c = source.peek();
+    switch (c)
     {
-        ec = cbor_errc::unexpected_eof;
-        return;
+        case Source::traits_type::eof():
+            ec = cbor_errc::unexpected_eof;
+            return;
+        default:
+            major_type = get_major_type((uint8_t)c);
+            info = get_additional_information_value((uint8_t)c);
+            break;
     }
-    uint8_t info = get_additional_information_value((uint8_t)source.peek());
+    JSONCONS_ASSERT(major_type == cbor_major_type::array);
     switch (info)
     {
         case additional_info::indefinite_length: 
         {
             source.ignore(1);
-            while (source.peek() != 0xff)
+            bool done = false;
+            while (!done)
             {
-                walk(source, ec);
-                if (ec)
+                int test = source.peek();
+                switch (test)
                 {
-                    return;
+                    case Source::traits_type::eof():
+                        ec = cbor_errc::unexpected_eof;
+                        return;
+                    case 0xff:
+                        done = true;
+                        break;
+                    default:
+                        walk(source, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        break;
                 }
             }
             source.ignore(1);
@@ -765,12 +852,12 @@ void walk(Source& source, std::error_code& ec)
         }
         case cbor_major_type::array:
         {
-            walk_array_items(source, ec);
+            walk_array(source, ec);
             break;
         }
         case cbor_major_type::map:
         {
-            walk_object_items(source, ec);
+            walk_object(source, ec);
             break;
         }
         case cbor_major_type::semantic_tag:
@@ -830,7 +917,7 @@ void walk(Source& source, std::error_code& ec)
 template <class Source>
 std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
 {
-    std::string s;
+std::string s;
     if (JSONCONS_UNLIKELY(source.eof()))
     {
         ec = cbor_errc::unexpected_eof;

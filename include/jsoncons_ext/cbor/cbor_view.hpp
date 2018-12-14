@@ -72,7 +72,7 @@ public:
             }
 
             jsoncons::buffer_source source(buffer(),buflen());
-            jsoncons::cbor::detail::walk_object_items(source, ec);
+            jsoncons::cbor::detail::walk_object(source, ec);
             if (ec)
             {
                 throw serialization_error(ec);
@@ -111,7 +111,7 @@ public:
         }
 
         jsoncons::buffer_source source(buffer(),buflen());
-        jsoncons::cbor::detail::walk_array_items(source, ec);
+        jsoncons::cbor::detail::walk_array(source, ec);
         if (ec)
         {
             throw serialization_error(ec);
