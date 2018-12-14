@@ -17,6 +17,7 @@
 #include <jsoncons/config/binary_detail.hpp>
 #include <jsoncons/result.hpp>
 #include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons_ext/cbor/cbor_error.hpp>
 
 namespace jsoncons { namespace cbor {
 
