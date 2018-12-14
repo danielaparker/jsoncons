@@ -43,7 +43,7 @@ Compared to other JSON libraries, jsoncons has been designed to handle very larg
 SAX style parsers and serializers. Its [json parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_parser.md) is an 
 incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
 Its unpacked in-memory representation of JSON is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_stream_reader.md),
+allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_staj_reader.md),
 built on top of its incremental parser.  
 
 The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
@@ -357,7 +357,7 @@ int main()
 {
     std::ifstream is("input/tasks.csv");
 
-    csv_serializing_options options;
+    csv_options options;
     params.assume_header(true)
           .trim(true)
           .ignore_empty_values(true) 
@@ -436,11 +436,11 @@ produces
 ```
 By default, within objects, arrays of scalar values are displayed on the same line.
 
-The `pretty_print` function takes an optional second parameter, [json_serializing_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_serializing_options.md), that allows custom formatting of output.
-To display the array scalar values on a new line, set the `object_array_split_lines` property to `line_split_kind::new_line`. The code
+The `pretty_print` function takes an optional second parameter, [json_options](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_options.md), that allows custom formatting of output.
+To display the array scalar values on a new line, set the `object_array_line_splits` property to `line_split_kind::new_line`. The code
 ```c++
-json_serializing_options options;
-format.object_array_split_lines(line_split_kind::new_line);
+json_options options;
+format.object_array_line_splits(line_split_kind::new_line);
 std::cout << pretty_print(val,options) << std::endl;
 ```
 produces
@@ -457,10 +457,10 @@ produces
     ]
 }
 ```
-To display the elements of array values on multiple lines, set the `object_array_split_lines` property to `line_split_kind::multi_line`. The code
+To display the elements of array values on multiple lines, set the `object_array_line_splits` property to `line_split_kind::multi_line`. The code
 ```c++
-json_serializing_options options;
-format.object_array_split_lines(line_split_kind::multi_line);
+json_options options;
+format.object_array_line_splits(line_split_kind::multi_line);
 std::cout << pretty_print(val,options) << std::endl;
 ```
 produces
