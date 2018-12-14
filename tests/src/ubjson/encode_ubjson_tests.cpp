@@ -134,7 +134,7 @@ TEST_CASE("encode_ubjson_arrays_and_maps")
     check_encode_ubjson({'{','#','U',0x01,'U',0x02,'o','c','[','#','U',0x04,'U',0x00,'U',0x01,'U',0x02,'U',0x03}, json::parse("{\"oc\": [0,1,2,3]}"));
 }
 
-TEST_CASE("indefinite length ubjson arrays and maps")
+TEST_CASE("encode indefinite length ubjson arrays and maps")
 {
     std::vector<uint8_t> v;
     ubjson_buffer_serializer serializer(v);
