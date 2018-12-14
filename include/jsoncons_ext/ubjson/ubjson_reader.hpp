@@ -340,6 +340,7 @@ public:
                 {
                     if (source_.peek() == ubjson_format::count_marker)
                     {
+                        source_.ignore(1);
                         size_t length = get_length(ec);
                         handler_.begin_object(length, semantic_tag_type::none, *this, ec);
                         for (size_t i = 0; i < length; ++i)

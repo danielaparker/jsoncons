@@ -39,6 +39,27 @@ void check_encode_ubjson(const std::vector<uint8_t>& expected, const json& j)
     }
 }
 
+void check_encode_ubjson(const std::vector<uint8_t>& expected, const std::vector<uint8_t>& result)
+{
+    if (result.size() != expected.size())
+    {
+        std::cout << std::hex << (int)expected[0] << " " << std::hex << (int)result[0] << std::endl;
+    }
+    REQUIRE(result.size() == expected.size());
+    for (size_t i = 0; i < expected.size(); ++i)
+    {
+        if (expected[i] != result[i])
+        {
+            std::cout << "Different " << i << "\n"; 
+            for (size_t k = 0; k < expected.size(); ++k)
+            {
+                std::cout << std::hex << (int)expected[k] << " " << std::hex << (int)result[k] << std::endl;
+            }
+        }
+        REQUIRE(result[i] == expected[i]);
+    }
+}
+
 TEST_CASE("encode_ubjson_test")
 {
     check_encode_ubjson({'U',0x00},json(0U));
@@ -49,11 +70,8 @@ TEST_CASE("encode_ubjson_test")
     check_encode_ubjson({'U',0x7f},json(127U)); 
     check_encode_ubjson({'U',0xff},json(255U));
     check_encode_ubjson({'I',0x01,0x00},json(256U));
-    //check_encode_ubjson({0xcd,0xff,0xff},json(65535U));
     check_encode_ubjson({'l',0,1,0x00,0x00},json(65536U));
-    //check_encode_ubjson({0xce,0xff,0xff,0xff,0xff},json(4294967295U));
     check_encode_ubjson({'L',0,0,0,1,0,0,0,0},json(4294967296U));
-    //check_encode_ubjson({0xcf,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<uint64_t>::max)()));
 
     check_encode_ubjson({'U',0x01},json(1));
     check_encode_ubjson({'U',0x0a},json(10));
@@ -63,9 +81,7 @@ TEST_CASE("encode_ubjson_test")
 
     check_encode_ubjson({'U',0xff},json(255));
     check_encode_ubjson({'I',0x01,0x00},json(256));
-    //check_encode_ubjson({0xcd,0xff,0xff},json(65535));
     check_encode_ubjson({'l',0,1,0x00,0x00},json(65536));
-    //check_encode_ubjson({0xce,0xff,0xff,0xff,0xff},json(4294967295));
     check_encode_ubjson({'L',0,0,0,1,0,0,0,0},json(4294967296));
     check_encode_ubjson({'L',0x7f,0xff,0xff,0xff,0xff,0xff,0xff,0xff},json((std::numeric_limits<int64_t>::max)()));
 
@@ -113,12 +129,50 @@ TEST_CASE("encode_ubjson_arrays_and_maps")
     check_encode_ubjson({'[','#','U',0x02,
                          '[','#','U',0x01,'U',0x00,
                          'U',0x00},json::parse("[[0],0]"));
-#if 0
+    check_encode_ubjson({'[','#','U',0x01,'S','U',0x05,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
+    check_encode_ubjson({'{','#','U',0x01,'U',0x02,'o','c','[','#','U',0x01,'U',0x00}, json::parse("{\"oc\": [0]}"));
+    check_encode_ubjson({'{','#','U',0x01,'U',0x02,'o','c','[','#','U',0x04,'U',0x00,'U',0x01,'U',0x02,'U',0x03}, json::parse("{\"oc\": [0,1,2,3]}"));
+}
 
-    check_encode_ubjson({0x91,0xa5,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
+TEST_CASE("indefinite length ubjson arrays and maps")
+{
+    std::vector<uint8_t> v;
+    ubjson_buffer_serializer serializer(v);
 
-    check_encode_ubjson({0x81,0xa2,'o','c',0x91,'\0'}, json::parse("{\"oc\": [0]}"));
-    check_encode_ubjson({0x81,0xa2,'o','c',0x94,'\0','\1','\2','\3'}, json::parse("{\"oc\": [0, 1, 2, 3]}"));
-#endif
+    SECTION("[\"Hello\"]")
+    {
+        serializer.begin_array();
+        serializer.string_value("Hello");
+        serializer.end_array();
+
+        check_encode_ubjson({'[','S','U',0x05,'H','e','l','l','o',']'}, v);
+    }
+
+    SECTION("{\"oc\": [0]}")
+    {
+        serializer.begin_object();
+        serializer.name("oc");
+        serializer.begin_array();
+        serializer.uint64_value(0);
+        serializer.end_array();
+        serializer.end_object();
+
+        check_encode_ubjson({'{','U',0x02,'o','c','[','U',0x00,']','}'}, v);
+    }
+
+    SECTION("{\"oc\": [0,1,2,3]}")
+    {
+        serializer.begin_object();
+        serializer.name("oc");
+        serializer.begin_array();
+        serializer.uint64_value(0);
+        serializer.uint64_value(1);
+        serializer.uint64_value(2);
+        serializer.uint64_value(3);
+        serializer.end_array();
+        serializer.end_object();
+
+        check_encode_ubjson({'{','U',0x02,'o','c','[','U',0x00,'U',0x01,'U',0x02,'U',0x03,']','}'}, v);
+    }
 }
 

@@ -1,5 +1,5 @@
-master
-------
+v0.114.0
+--------
 
 Bug fixes:
 
@@ -49,6 +49,9 @@ New features:
 
 - decode from and encode to the [Universal Binary JSON Specification (ubjson)](http://bsonspec.org/) data format
 - decode from and encode to the [Binary JSON (bson)](http://bsonspec.org/) data format
+
+- The cbor, msgpack and ubjson streaming serializers now validate that the expected number of
+  items have been supplied in an object or array of pre-determined length.
 
 version 0.113.0
 ---------------

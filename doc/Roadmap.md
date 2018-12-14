@@ -1,30 +1,5 @@
 # Roadmap
 
-### For release 0.114.0
-
-More binary support
-
-- BSON (now on master)
-
-- UBJSON (now on master)
-
-CBOR
-
-- Improve error codes
-
-MessagePack 
-
-- New msgpack_serializer that supports Message Pack bin formats 
-  (now on master)
-
-- New msgpack_buffer_reader that supports Message Pack bin formats 
-  (now on master)
-
-- Add semantic tag types to accomodate Message Pack timestamp 32,
-  64 and 96, and support conversion with CBOR epoch time.
-
-- Improve error code for cbor and msgpack parsing.
-
 ### For later releases
 
 - Support pull parsing for cbor, msgpack, and CSV.
