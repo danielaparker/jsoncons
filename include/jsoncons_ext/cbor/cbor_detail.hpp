@@ -917,25 +917,28 @@ void walk(Source& source, std::error_code& ec)
 template <class Source>
 std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
 {
-std::string s;
-    if (JSONCONS_UNLIKELY(source.eof()))
+    std::string s;
+    cbor_major_type major_type;
+    uint8_t info;
+
+    int c;
+    if ((c=source.get()) == Source::traits_type::eof())
     {
         ec = cbor_errc::unexpected_eof;
         return s;
     }
+    major_type = get_major_type((uint8_t)c);
+    info = get_additional_information_value((uint8_t)c);
+    JSONCONS_ASSERT(major_type == cbor_major_type::array);
+    JSONCONS_ASSERT(info == 2);
 
-    JSONCONS_ASSERT(get_major_type((uint8_t)source.peek()) == cbor_major_type::array);
-    JSONCONS_ASSERT(get_additional_information_value((uint8_t)source.peek()) == 2);
-
-    source.ignore(1);
-    if (source.eof())
+    if ((c=source.peek()) == Source::traits_type::eof())
     {
         ec = cbor_errc::unexpected_eof;
         return s;
     }
-
     int64_t exponent = 0;
-    switch (get_major_type((uint8_t)source.peek()))
+    switch (get_major_type((uint8_t)c))
     {
         case cbor_major_type::unsigned_integer:
         {
@@ -988,16 +991,19 @@ std::string s;
         }
         case cbor_major_type::semantic_tag:
         {
-            uint8_t c{};
-            source.get(c);
-            if (source.eof())
+            if ((c=source.get()) == Source::traits_type::eof())
             {
                 ec = cbor_errc::unexpected_eof;
                 return s;
             }
-            uint8_t tag = get_additional_information_value(c);
+            uint8_t tag = get_additional_information_value((uint8_t)c);
+            if ((c=source.peek()) == Source::traits_type::eof())
+            {
+                ec = cbor_errc::unexpected_eof;
+                return s;
+            }
 
-            if (get_major_type((uint8_t)source.peek()) == cbor_major_type::byte_string)
+            if (get_major_type((uint8_t)c) == cbor_major_type::byte_string)
             {
                 std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source,ec);
                 if (ec)
