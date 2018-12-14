@@ -42,77 +42,72 @@ TEST_CASE("serialize array to msgpack")
 
 TEST_CASE("Too many and too few items in MessagePack object or array")
 {
-    bool result;
     std::error_code ec{};
     std::vector<uint8_t> v;
     msgpack_buffer_serializer serializer(v);
 
     SECTION("Too many items in array")
     {
-        serializer.begin_array(3);
-        serializer.bool_value(true);
-        serializer.bool_value(false);
-        serializer.null_value();
-        serializer.begin_array(2);
-        serializer.string_value("cat");
-        serializer.string_value("feline");
-        serializer.end_array();
-        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(serializer.begin_array(3));
+        CHECK(serializer.bool_value(true));
+        CHECK(serializer.bool_value(false));
+        CHECK(serializer.null_value());
+        CHECK(serializer.begin_array(2));
+        CHECK(serializer.string_value("cat"));
+        CHECK(serializer.string_value("feline"));
+        CHECK(serializer.end_array());
+        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
         CHECK(ec == msgpack_errc::too_many_items);
-        CHECK_FALSE(result);
         serializer.flush();
     }
     SECTION("Too few items in array")
     {
-        serializer.begin_array(5);
-        serializer.bool_value(true);
-        serializer.bool_value(false);
-        serializer.null_value();
-        serializer.begin_array(2);
-        serializer.string_value("cat");
-        serializer.string_value("feline");
-        serializer.end_array();
-        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(serializer.begin_array(5));
+        CHECK(serializer.bool_value(true));
+        CHECK(serializer.bool_value(false));
+        CHECK(serializer.null_value());
+        CHECK(serializer.begin_array(2));
+        CHECK(serializer.string_value("cat"));
+        CHECK(serializer.string_value("feline"));
+        CHECK(serializer.end_array());
+        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
         CHECK(ec == msgpack_errc::too_few_items);
-        CHECK_FALSE(result);
         serializer.flush();
     }
     SECTION("Too many items in object")
     {
-        serializer.begin_object(3);
-        serializer.name("a");
-        serializer.bool_value(true);
-        serializer.name("b");
-        serializer.bool_value(false);
-        serializer.name("c");
-        serializer.null_value();
-        serializer.name("d");
-        serializer.begin_array(2);
-        serializer.string_value("cat");
-        serializer.string_value("feline");
-        serializer.end_array();
-        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(serializer.begin_object(3));
+        CHECK(serializer.name("a"));
+        CHECK(serializer.bool_value(true));
+        CHECK(serializer.name("b"));
+        CHECK(serializer.bool_value(false));
+        CHECK(serializer.name("c"));
+        CHECK(serializer.null_value());
+        CHECK(serializer.name("d"));
+        CHECK(serializer.begin_array(2));
+        CHECK(serializer.string_value("cat"));
+        CHECK(serializer.string_value("feline"));
+        CHECK(serializer.end_array());
+        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
         CHECK(ec == msgpack_errc::too_many_items);
-        CHECK_FALSE(result);
         serializer.flush();
     }
     SECTION("Too few items in object")
     {
-        serializer.begin_object(5);
-        serializer.name("a");
-        serializer.bool_value(true);
-        serializer.name("b");
-        serializer.bool_value(false);
-        serializer.name("c");
-        serializer.null_value();
-        serializer.name("d");
-        serializer.begin_array(2);
-        serializer.string_value("cat");
-        serializer.string_value("feline");
-        serializer.end_array();
-        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(serializer.begin_object(5));
+        CHECK(serializer.name("a"));
+        CHECK(serializer.bool_value(true));
+        CHECK(serializer.name("b"));
+        CHECK(serializer.bool_value(false));
+        CHECK(serializer.name("c"));
+        CHECK(serializer.null_value());
+        CHECK(serializer.name("d"));
+        CHECK(serializer.begin_array(2));
+        CHECK(serializer.string_value("cat"));
+        CHECK(serializer.string_value("feline"));
+        CHECK(serializer.end_array());
+        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
         CHECK(ec == msgpack_errc::too_few_items);
-        CHECK_FALSE(result);
         serializer.flush();
     }
 }

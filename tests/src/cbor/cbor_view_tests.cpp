@@ -448,7 +448,7 @@ TEST_CASE("cbor_view member tests")
 {
     std::vector<uint8_t> buf;
     cbor::cbor_buffer_serializer serializer(buf);
-    serializer.begin_object(); // indefinite length array
+    serializer.begin_object(); // indefinite length object
     serializer.name("empty-object");
     serializer.begin_object(0);
     serializer.end_object();

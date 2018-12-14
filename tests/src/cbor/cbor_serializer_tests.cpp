@@ -276,77 +276,83 @@ TEST_CASE("serialize big_decimal to cbor")
 
 TEST_CASE("Too many and too few items in CBOR map or array")
 {
-    bool result;
     std::error_code ec{};
     std::vector<uint8_t> v;
     cbor_buffer_serializer serializer(v);
 
     SECTION("Too many items in array")
     {
-        serializer.begin_array(3);
-        serializer.bool_value(true);
-        serializer.bool_value(false);
-        serializer.null_value();
-        serializer.begin_array(2);
-        serializer.string_value("cat");
-        serializer.string_value("feline");
-        serializer.end_array();
-        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(serializer.begin_array(3));
+        CHECK(serializer.bool_value(true));
+        CHECK(serializer.bool_value(false));
+        CHECK(serializer.null_value());
+        CHECK(serializer.begin_array(2));
+        CHECK(serializer.string_value("cat"));
+        CHECK(serializer.string_value("feline"));
+        CHECK(serializer.end_array());
+        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
         CHECK(ec == cbor_errc::too_many_items);
-        CHECK_FALSE(result);
         serializer.flush();
     }
     SECTION("Too few items in array")
     {
-        serializer.begin_array(5);
-        serializer.bool_value(true);
-        serializer.bool_value(false);
-        serializer.null_value();
-        serializer.begin_array(2);
-        serializer.string_value("cat");
-        serializer.string_value("feline");
-        serializer.end_array();
-        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(serializer.begin_array(5));
+        CHECK(serializer.bool_value(true));
+        CHECK(serializer.bool_value(false));
+        CHECK(serializer.null_value());
+        CHECK(serializer.begin_array(2));
+        CHECK(serializer.string_value("cat"));
+        CHECK(serializer.string_value("feline"));
+        CHECK(serializer.end_array());
+        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
         CHECK(ec == cbor_errc::too_few_items);
-        CHECK_FALSE(result);
         serializer.flush();
     }
     SECTION("Too many items in map")
     {
-        serializer.begin_object(3);
-        serializer.name("a");
-        serializer.bool_value(true);
-        serializer.name("b");
-        serializer.bool_value(false);
-        serializer.name("c");
-        serializer.null_value();
-        serializer.name("d");
-        serializer.begin_array(2);
-        serializer.string_value("cat");
-        serializer.string_value("feline");
-        serializer.end_array();
-        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(serializer.begin_object(3));
+        CHECK(serializer.name("a"));
+        CHECK(serializer.bool_value(true));
+        CHECK(serializer.name("b"));
+        CHECK(serializer.bool_value(false));
+        CHECK(serializer.name("c"));
+        CHECK(serializer.null_value());
+        CHECK(serializer.name("d"));
+        CHECK(serializer.begin_array(2));
+        CHECK(serializer.string_value("cat"));
+        CHECK(serializer.string_value("feline"));
+        CHECK(serializer.end_array());
+        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
         CHECK(ec == cbor_errc::too_many_items);
-        CHECK_FALSE(result);
         serializer.flush();
     }
     SECTION("Too few items in map")
     {
-        serializer.begin_object(5);
-        serializer.name("a");
-        serializer.bool_value(true);
-        serializer.name("b");
-        serializer.bool_value(false);
-        serializer.name("c");
-        serializer.null_value();
-        serializer.name("d");
-        serializer.begin_array(2);
-        serializer.string_value("cat");
-        serializer.string_value("feline");
-        serializer.end_array();
-        result = serializer.end_array(null_serializing_context(), ec);
+        CHECK(serializer.begin_object(5));
+        CHECK(serializer.name("a"));
+        CHECK(serializer.bool_value(true));
+        CHECK(serializer.name("b"));
+        CHECK(serializer.bool_value(false));
+        CHECK(serializer.name("c"));
+        CHECK(serializer.null_value());
+        CHECK(serializer.name("d"));
+        CHECK(serializer.begin_array(2));
+        CHECK(serializer.string_value("cat"));
+        CHECK(serializer.string_value("feline"));
+        CHECK(serializer.end_array());
+        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
         CHECK(ec == cbor_errc::too_few_items);
-        CHECK_FALSE(result);
+        serializer.flush();
+    }
+    SECTION("Just enough items")
+    {
+        CHECK(serializer.begin_array(4)); // a fixed length array
+        CHECK(serializer.string_value("foo"));
+        CHECK(serializer.byte_string_value(byte_string{'P','u','s','s'})); // no suggested conversion
+        CHECK(serializer.big_integer_value("-18446744073709551617"));
+        CHECK(serializer.big_decimal_value("273.15"));
+        CHECK(serializer.end_array(null_serializing_context(), ec));
+        CHECK_FALSE(ec);
         serializer.flush();
     }
 }

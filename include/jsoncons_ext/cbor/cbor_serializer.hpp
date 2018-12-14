@@ -253,7 +253,11 @@ private:
 
     bool do_name(const string_view_type& name, const serializing_context& context, std::error_code& ec) override
     {
-        write_string_value(name, ec);
+        write_string(name, ec);
+        if (ec)
+        {
+            return false;
+        }
         return true;
     }
 
@@ -272,7 +276,7 @@ private:
         return true;
     }
 
-    void write_string_value(const string_view_type& sv, std::error_code&)
+    void write_string(const string_view_type& sv, std::error_code&)
     {
         std::vector<uint8_t> target;
         auto result = unicons::convert(
@@ -325,7 +329,7 @@ private:
         }
     }
 
-    void write_bignum_value(const string_view_type& sv, std::error_code&)
+    void write_bignum(const string_view_type& sv, std::error_code&)
     {
         bignum n(sv.data(), sv.length());
         int signum;
@@ -497,7 +501,7 @@ private:
         }
         else
         {
-            write_bignum_value(s, ec);
+            write_bignum(s, ec);
             end_value();
         }
         do_end_array(context, ec);
@@ -509,7 +513,8 @@ private:
         {
             case semantic_tag_type::big_integer:
             {
-                write_bignum_value(sv, ec);
+                write_bignum(sv, ec);
+                end_value();
                 break;
             }
             case semantic_tag_type::big_decimal:
@@ -520,17 +525,18 @@ private:
             case semantic_tag_type::date_time:
             {
                 result_.push_back(0xc0);
-                write_string_value(sv, ec);
+                write_string(sv, ec);
+                end_value();
                 break;
             }
             default:
             {
-                write_string_value(sv, ec);
+                write_string(sv, ec);
+                end_value();
                 break;
             }
         }
-        end_value();
-        return true;
+        return ec ? false : true;
     }
 
     bool do_byte_string_value(const byte_string_view& b, 
