@@ -219,7 +219,7 @@ int main()
     writer.begin_array(3); // a fixed length array
     writer.string_value("foo");
     writer.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
-    writer.bignum_value("-18446744073709551617");
+    writer.big_integer_value("-18446744073709551617");
     writer.end_array();
     writer.end_array();
     writer.flush();

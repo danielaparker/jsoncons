@@ -120,7 +120,7 @@ void main()
     writer.begin_array(); // indefinite length outer array
     writer.string_value("foo");
     writer.byte_string_value(byte_string({'b','a','r'}));
-    writer.bignum_value("-18446744073709551617");
+    writer.big_integer_value("-18446744073709551617");
     writer.decimal_value("273.15");
     writer.date_time_value("2018-10-19 12:41:07-07:00");
     writer.epoch_time_value(1431027667);
