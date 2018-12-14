@@ -98,7 +98,7 @@ private:
         result_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_object));
         result_.push_back(ubjson_format::start_object_marker);
@@ -106,7 +106,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_begin_object(size_t length, semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::object, length));
         result_.push_back(ubjson_format::start_object_marker);
@@ -116,7 +116,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code& ec) override
+    bool do_end_object(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -127,13 +127,11 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                ec = ubjson_errc::too_few_items;
-                return false;
+                throw serialization_error(ubjson_errc::too_few_items);
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                ec = ubjson_errc::too_many_items;
-                return false;
+                throw serialization_error(ubjson_errc::too_many_items);
             }
         }
         stack_.pop_back();
@@ -141,7 +139,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_array));
         result_.push_back(ubjson_format::start_array_marker);
@@ -149,7 +147,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_begin_array(size_t length, semantic_tag_type, const serializing_context&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::array, length));
         result_.push_back(ubjson_format::start_array_marker);
@@ -159,7 +157,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code& ec) override
+    bool do_end_array(const serializing_context&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -170,13 +168,11 @@ private:
         {
             if (stack_.back().count() < stack_.back().length())
             {
-                ec = ubjson_errc::too_few_items;
-                return false;
+                throw serialization_error(ubjson_errc::too_few_items);
             }
             if (stack_.back().count() > stack_.back().length())
             {
-                ec = ubjson_errc::too_many_items;
-                return false;
+                throw serialization_error(ubjson_errc::too_many_items);
             }
         }
         stack_.pop_back();
@@ -184,7 +180,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&, std::error_code& ec) override
+    bool do_name(const string_view_type& name, const serializing_context&) override
     {
         std::basic_string<uint8_t> target;
         auto result = unicons::convert(
@@ -192,8 +188,7 @@ private:
             unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            ec = ubjson_errc::invalid_utf8_text_string;
-            return false;
+            throw serialization_error(ubjson_errc::invalid_utf8_text_string);
         }
 
         put_length(target.length());
@@ -205,7 +200,7 @@ private:
         return true;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         // nil
         jsoncons::detail::to_big_endian(static_cast<uint8_t>(ubjson_format::null_type), std::back_inserter(result_));
@@ -213,7 +208,7 @@ private:
         return true;
     }
 
-    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&, std::error_code&) override
+    bool do_string_value(const string_view_type& sv, semantic_tag_type tag, const serializing_context&) override
     {
         switch (tag)
         {
@@ -277,7 +272,7 @@ private:
     bool do_byte_string_value(const byte_string_view& b, 
                               byte_string_chars_format,
                               semantic_tag_type, 
-                              const serializing_context&, std::error_code&) override
+                              const serializing_context&) override
     {
 
         const size_t length = b.length();
@@ -298,7 +293,7 @@ private:
     bool do_double_value(double val, 
                          const floating_point_options&, 
                          semantic_tag_type,
-                         const serializing_context&, std::error_code&) override
+                         const serializing_context&) override
     {
         float valf = (float)val;
         if ((double)valf == val)
@@ -322,7 +317,7 @@ private:
 
     bool do_int64_value(int64_t val, 
                         semantic_tag_type, 
-                        const serializing_context&, std::error_code&) override
+                        const serializing_context&) override
     {
         if (val >= 0)
         {
@@ -388,7 +383,7 @@ private:
 
     bool do_uint64_value(uint64_t val, 
                          semantic_tag_type, 
-                         const serializing_context&, std::error_code&) override
+                         const serializing_context&) override
     {
         if (val <= (std::numeric_limits<uint8_t>::max)())
         {
@@ -414,7 +409,7 @@ private:
         return true;
     }
 
-    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_bool_value(bool val, semantic_tag_type, const serializing_context&) override
     {
         // true and false
         result_.push_back(static_cast<uint8_t>(val ? ubjson_format::true_type : ubjson_format::false_type));

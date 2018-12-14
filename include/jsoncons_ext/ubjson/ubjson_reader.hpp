@@ -57,7 +57,7 @@ public:
         {
             case ubjson_format::null_type: 
             {
-                handler_.null_value(semantic_tag_type::none, *this, ec);
+                handler_.null_value(semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::no_op_type: 
@@ -66,12 +66,12 @@ public:
             }
             case ubjson_format::true_type:
             {
-                handler_.bool_value(true, semantic_tag_type::none, *this, ec);
+                handler_.bool_value(true, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::false_type:
             {
-                handler_.bool_value(false, semantic_tag_type::none, *this, ec);
+                handler_.bool_value(false, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::int8_type: 
@@ -85,7 +85,7 @@ public:
                 }
                 const uint8_t* endp;
                 int8_t val = jsoncons::detail::from_big_endian<int8_t>(buf,buf+sizeof(buf),&endp);
-                handler_.int64_value(val, semantic_tag_type::none, *this, ec);
+                handler_.int64_value(val, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::uint8_type: 
@@ -96,7 +96,7 @@ public:
                     ec = ubjson_errc::unexpected_eof;
                     return;
                 }
-                handler_.uint64_value(val, semantic_tag_type::none, *this, ec);
+                handler_.uint64_value(val, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::int16_type: 
@@ -110,7 +110,7 @@ public:
                 }
                 const uint8_t* endp;
                 int16_t val = jsoncons::detail::from_big_endian<int16_t>(buf,buf+sizeof(buf),&endp);
-                handler_.int64_value(val, semantic_tag_type::none, *this, ec);
+                handler_.int64_value(val, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::int32_type: 
@@ -124,7 +124,7 @@ public:
                 }
                 const uint8_t* endp;
                 int32_t val = jsoncons::detail::from_big_endian<int32_t>(buf,buf+sizeof(buf),&endp);
-                handler_.int64_value(val, semantic_tag_type::none, *this, ec);
+                handler_.int64_value(val, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::int64_type: 
@@ -138,7 +138,7 @@ public:
                 }
                 const uint8_t* endp;
                 int64_t val = jsoncons::detail::from_big_endian<int64_t>(buf,buf+sizeof(buf),&endp);
-                handler_.int64_value(val, semantic_tag_type::none, *this, ec);
+                handler_.int64_value(val, semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::float32_type: 
@@ -152,7 +152,7 @@ public:
                 }
                 const uint8_t* endp;
                 float val = jsoncons::detail::from_big_endian<float>(buf,buf+sizeof(buf),&endp);
-                handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this, ec);
+                handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::float64_type: 
@@ -166,7 +166,7 @@ public:
                 }
                 const uint8_t* endp;
                 double val = jsoncons::detail::from_big_endian<double>(buf,buf+sizeof(buf),&endp);
-                handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this, ec);
+                handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::char_type: 
@@ -186,7 +186,7 @@ public:
                     ec = ubjson_errc::invalid_utf8_text_string;
                     return;
                 }
-                handler_.string_value(basic_string_view<char>(&c,1), semantic_tag_type::none, *this, ec);
+                handler_.string_value(basic_string_view<char>(&c,1), semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::string_type: 
@@ -209,7 +209,7 @@ public:
                     ec = ubjson_errc::invalid_utf8_text_string;
                     return;
                 }
-                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this, ec);
+                handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
                 break;
             }
             case ubjson_format::high_precision_number_type: 
@@ -228,11 +228,11 @@ public:
                 }
                 if (jsoncons::detail::is_integer(s.data(),s.length()))
                 {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::big_integer, *this, ec);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::big_integer, *this);
                 }
                 else
                 {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::big_decimal, *this, ec);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::big_decimal, *this);
                 }
                 break;
             }
@@ -251,7 +251,7 @@ public:
                     {
                         source_.ignore(1);
                         size_t length = get_length(ec);
-                        handler_.begin_array(length, semantic_tag_type::none, *this, ec);
+                        handler_.begin_array(length, semantic_tag_type::none, *this);
                         for (size_t i = 0; i < length; ++i)
                         {
                             read_value(item_type, ec);
@@ -260,7 +260,7 @@ public:
                                 return;
                             }
                         }
-                        handler_.end_array(*this, ec);
+                        handler_.end_array(*this);
                     }
                     else
                     {
@@ -272,7 +272,7 @@ public:
                 {
                     source_.ignore(1);
                     size_t length = get_length(ec);
-                    handler_.begin_array(length, semantic_tag_type::none, *this, ec);
+                    handler_.begin_array(length, semantic_tag_type::none, *this);
                     for (size_t i = 0; i < length; ++i)
                     {
                         read(ec);
@@ -281,11 +281,11 @@ public:
                             return;
                         }
                     }
-                    handler_.end_array(*this, ec);
+                    handler_.end_array(*this);
                 }
                 else
                 {
-                    handler_.begin_array(semantic_tag_type::none, *this, ec);
+                    handler_.begin_array(semantic_tag_type::none, *this);
                     while (source_.peek() != ubjson_format::end_array_marker)
                     {
                         read(ec);
@@ -294,7 +294,7 @@ public:
                             return;
                         }
                     }
-                    handler_.end_array(*this, ec);
+                    handler_.end_array(*this);
                     source_.ignore(1);
                 }
                 break;
@@ -314,7 +314,7 @@ public:
                     {
                         source_.ignore(1);
                         size_t length = get_length(ec);
-                        handler_.begin_object(length, semantic_tag_type::none, *this, ec);
+                        handler_.begin_object(length, semantic_tag_type::none, *this);
                         for (size_t i = 0; i < length; ++i)
                         {
                             read_name(ec);
@@ -328,7 +328,7 @@ public:
                                 return;
                             }
                         }
-                        handler_.end_object(*this, ec);
+                        handler_.end_object(*this);
                     }
                     else
                     {
@@ -342,7 +342,7 @@ public:
                     {
                         source_.ignore(1);
                         size_t length = get_length(ec);
-                        handler_.begin_object(length, semantic_tag_type::none, *this, ec);
+                        handler_.begin_object(length, semantic_tag_type::none, *this);
                         for (size_t i = 0; i < length; ++i)
                         {
                             read_name(ec);
@@ -356,11 +356,11 @@ public:
                                 return;
                             }
                         }
-                        handler_.end_object(*this, ec);
+                        handler_.end_object(*this);
                     }
                     else
                     {
-                        handler_.begin_object(semantic_tag_type::none, *this, ec);
+                        handler_.begin_object(semantic_tag_type::none, *this);
                         while (source_.peek() != ubjson_format::end_object_marker)
                         {
                             read_name(ec);
@@ -374,7 +374,7 @@ public:
                                 return;
                             }
                         }
-                        handler_.end_object(*this, ec);
+                        handler_.end_object(*this);
                         source_.ignore(1);
                     }
                 }
@@ -543,7 +543,7 @@ private:
             ec = ubjson_errc::invalid_utf8_text_string;
             return;
         }
-        handler_.name(basic_string_view<char>(s.data(),s.length()), *this, ec);
+        handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
     }
 };
 

@@ -57,27 +57,27 @@ private:
         other_handler_.flush();
     }
 
-    bool do_begin_object(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
+    bool do_begin_object(semantic_tag_type tag, const serializing_context& context) override
     {
-        return other_handler_.begin_object(tag, context, ec);
+        return other_handler_.begin_object(tag, context);
     }
 
-    bool do_end_object(const serializing_context& context, std::error_code& ec) override
+    bool do_end_object(const serializing_context& context) override
     {
-        return other_handler_.end_object(context, ec);
+        return other_handler_.end_object(context);
     }
 
-    bool do_begin_array(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
+    bool do_begin_array(semantic_tag_type tag, const serializing_context& context) override
     {
-        return other_handler_.begin_array(tag, context, ec);
+        return other_handler_.begin_array(tag, context);
     }
 
-    bool do_end_array(const serializing_context& context, std::error_code& ec) override
+    bool do_end_array(const serializing_context& context) override
     {
-        return other_handler_.end_array(context, ec);
+        return other_handler_.end_array(context);
     }
 
-    bool do_name(const string_view_type& name, const serializing_context& context, std::error_code& ec) override
+    bool do_name(const string_view_type& name, const serializing_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -87,10 +87,10 @@ private:
         {
             throw serialization_error(result.ec,context.line_number(),context.column_number());
         }
-        return other_handler_.name(target, context, ec);
+        return other_handler_.name(target, context);
     }
 
-    bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
+    bool do_string_value(const string_view_type& value, semantic_tag_type tag, const serializing_context& context) override
     {
         std::basic_string<CharT> target;
         auto result = unicons::convert(
@@ -100,39 +100,39 @@ private:
         {
             throw serialization_error(result.ec,context.line_number(),context.column_number());
         }
-        return other_handler_.string_value(target, tag, context, ec);
+        return other_handler_.string_value(target, tag, context);
     }
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type tag, 
-                        const serializing_context& context, std::error_code& ec) override
+                        const serializing_context& context) override
     {
-        return other_handler_.int64_value(value, tag, context, ec);
+        return other_handler_.int64_value(value, tag, context);
     }
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type tag, 
-                         const serializing_context& context, std::error_code& ec) override
+                         const serializing_context& context) override
     {
-        return other_handler_.uint64_value(value, tag, context, ec);
+        return other_handler_.uint64_value(value, tag, context);
     }
 
     bool do_double_value(double value, 
                          const floating_point_options& fmt, 
                          semantic_tag_type tag,
-                         const serializing_context& context, std::error_code& ec) override
+                         const serializing_context& context) override
     {
-        return other_handler_.double_value(value, fmt, tag, context, ec);
+        return other_handler_.double_value(value, fmt, tag, context);
     }
 
-    bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
+    bool do_bool_value(bool value, semantic_tag_type tag, const serializing_context& context) override
     {
-        return other_handler_.bool_value(value, tag, context, ec);
+        return other_handler_.bool_value(value, tag, context);
     }
 
-    bool do_null_value(semantic_tag_type tag, const serializing_context& context, std::error_code& ec) override
+    bool do_null_value(semantic_tag_type tag, const serializing_context& context) override
     {
-        return other_handler_.null_value(tag, context, ec);
+        return other_handler_.null_value(tag, context);
     }
 };
 

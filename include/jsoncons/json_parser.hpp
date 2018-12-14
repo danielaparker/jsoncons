@@ -56,31 +56,30 @@ public:
 
     bool do_string_value(const string_view_type& s, 
                          semantic_tag_type tag, 
-                         const serializing_context& context, 
-                         std::error_code& ec) override
+                         const serializing_context& context) override
     {
         if (tag == semantic_tag_type::none)
         {
             if (!nan_to_str_.empty() && s == nan_to_str_)
             {
-                return this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context, ec);
+                return this->destination_handler().double_value(std::nan(""), floating_point_options(), tag, context);
             }
             else if (!inf_to_str_.empty() && s == inf_to_str_)
             {
-                return this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context, ec);
+                return this->destination_handler().double_value(std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
             else if (!neginf_to_str_.empty() && s == neginf_to_str_)
             {
-                return this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context, ec);
+                return this->destination_handler().double_value(-std::numeric_limits<double>::infinity(), floating_point_options(), tag, context);
             }
             else
             {
-                return this->destination_handler().string_value(s, tag, context, ec);
+                return this->destination_handler().string_value(s, tag, context);
             }
         }
         else
         {
-            return this->destination_handler().string_value(s, tag, context, ec);
+            return this->destination_handler().string_value(s, tag, context);
         }
     }
 };
@@ -364,7 +363,7 @@ public:
         } 
         push_state(json_parse_state::object);
         state_ = json_parse_state::expect_member_name_or_end;
-        continue_ = handler.begin_object(semantic_tag_type::none, *this, ec);
+        continue_ = handler.begin_object(semantic_tag_type::none, *this);
     }
 
     void end_object(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -380,7 +379,7 @@ public:
         state_ = pop_state();
         if (state_ == json_parse_state::object)
         {
-            continue_ = handler.end_object(*this, ec);
+            continue_ = handler.end_object(*this);
         }
         else if (state_ == json_parse_state::array)
         {
@@ -420,7 +419,7 @@ public:
         }
         push_state(json_parse_state::array);
         state_ = json_parse_state::expect_value_or_end;
-        continue_ = handler.begin_array(semantic_tag_type::none, *this, ec);
+        continue_ = handler.begin_array(semantic_tag_type::none, *this);
     }
 
     void end_array(basic_json_content_handler<CharT>& handler, std::error_code& ec)
@@ -436,7 +435,7 @@ public:
         state_ = pop_state();
         if (state_ == json_parse_state::array)
         {
-            continue_ = handler.end_array(*this, ec);
+            continue_ = handler.end_array(*this);
         }
         else if (state_ == json_parse_state::object)
         {
@@ -1382,7 +1381,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'e':
-                    continue_ = handler.bool_value(true,  semantic_tag_type::none, *this, ec);
+                    continue_ = handler.bool_value(true,  semantic_tag_type::none, *this);
                     if (parent() == json_parse_state::root)
                     {
                         state_ = json_parse_state::before_done;
@@ -1450,7 +1449,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'e':
-                    continue_ = handler.bool_value(false, semantic_tag_type::none, *this, ec);
+                    continue_ = handler.bool_value(false, semantic_tag_type::none, *this);
                     if (parent() == json_parse_state::root)
                     {
                         state_ = json_parse_state::before_done;
@@ -1503,7 +1502,7 @@ public:
                 switch (*input_ptr_)
                 {
                 case 'l':
-                    continue_ = handler.null_value(semantic_tag_type::none, *this, ec);
+                    continue_ = handler.null_value(semantic_tag_type::none, *this);
                     if (parent() == json_parse_state::root)
                     {
                         state_ = json_parse_state::before_done;
@@ -1621,7 +1620,7 @@ public:
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
             {
-                continue_ = handler.bool_value(true, semantic_tag_type::none, *this, ec);
+                continue_ = handler.bool_value(true, semantic_tag_type::none, *this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == json_parse_state::root)
@@ -1655,7 +1654,7 @@ public:
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
             {
-                continue_ = handler.null_value(semantic_tag_type::none, *this, ec);
+                continue_ = handler.null_value(semantic_tag_type::none, *this);
                 input_ptr_ += 4;
                 column_ += 4;
                 if (parent() == json_parse_state::root)
@@ -1689,7 +1688,7 @@ public:
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
             {
-                continue_ = handler.bool_value(false, semantic_tag_type::none, *this, ec);
+                continue_ = handler.bool_value(false, semantic_tag_type::none, *this);
                 input_ptr_ += 5;
                 column_ += 5;
                 if (parent() == json_parse_state::root)
@@ -2658,11 +2657,11 @@ private:
         auto result = jsoncons::detail::to_integer<int64_t>(string_buffer_.data(), string_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler.int64_value(result.value, semantic_tag_type::none, *this, ec);
+            continue_ = handler.int64_value(result.value, semantic_tag_type::none, *this);
         }
         else
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_integer, *this, ec);
+            continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_integer, *this);
         }
         after_value(ec);
     }
@@ -2672,11 +2671,11 @@ private:
         auto result = jsoncons::detail::to_integer<uint64_t>(string_buffer_.data(), string_buffer_.length());
         if (!result.overflow)
         {
-            continue_ = handler.uint64_value(result.value, semantic_tag_type::none, *this, ec);
+            continue_ = handler.uint64_value(result.value, semantic_tag_type::none, *this);
         }
         else
         {
-            continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_integer, *this, ec);
+            continue_ = handler.string_value(string_buffer_, semantic_tag_type::big_integer, *this);
         }
         after_value(ec);
     }
@@ -2690,11 +2689,11 @@ private:
             if (precision_ > std::numeric_limits<double>::max_digits10)
             {
                 continue_ = handler.double_value(d, floating_point_options(format,std::numeric_limits<double>::max_digits10, decimal_places_), 
-                                                  semantic_tag_type::none, *this, ec);            }
+                                                  semantic_tag_type::none, *this);            }
             else
             {
                 continue_ = handler.double_value(d, floating_point_options(format,static_cast<uint8_t>(precision_), decimal_places_), 
-                                                  semantic_tag_type::none, *this, ec);
+                                                  semantic_tag_type::none, *this);
             }
         }
         catch (...)
@@ -2705,7 +2704,7 @@ private:
                 ec = json_errc::invalid_number;
                 return;
             }
-            continue_ = handler.null_value(semantic_tag_type::none, *this, ec); // recovery
+            continue_ = handler.null_value(semantic_tag_type::none, *this); // recovery
         }
 
         after_value(ec);
@@ -2766,17 +2765,17 @@ private:
         switch (parent())
         {
         case json_parse_state::member_name:
-            continue_ = handler.name(string_view_type(s, length), *this, ec);
+            continue_ = handler.name(string_view_type(s, length), *this);
             state_ = pop_state();
             state_ = json_parse_state::expect_colon;
             break;
         case json_parse_state::object:
         case json_parse_state::array:
-            continue_ = handler.string_value(string_view_type(s, length), semantic_tag_type::none, *this, ec);
+            continue_ = handler.string_value(string_view_type(s, length), semantic_tag_type::none, *this);
             state_ = json_parse_state::expect_comma_or_end;
             break;
         case json_parse_state::root:
-            continue_ = handler.string_value(string_view_type(s, length), semantic_tag_type::none, *this, ec);
+            continue_ = handler.string_value(string_view_type(s, length), semantic_tag_type::none, *this);
             state_ = json_parse_state::before_done;
             break;
         default:

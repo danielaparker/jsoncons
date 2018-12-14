@@ -91,11 +91,11 @@ public:
 
                 if (has_cbor_tag && cbor_tag == 1)
                 {
-                    handler_.uint64_value(val, semantic_tag_type::timestamp, *this, ec);
+                    handler_.uint64_value(val, semantic_tag_type::timestamp, *this);
                 }
                 else
                 {
-                    handler_.uint64_value(val, semantic_tag_type::none, *this, ec);
+                    handler_.uint64_value(val, semantic_tag_type::none, *this);
                 }
                 break;
             }
@@ -108,11 +108,11 @@ public:
                 }
                 if (has_cbor_tag && cbor_tag == 1)
                 {
-                    handler_.int64_value(val, semantic_tag_type::timestamp, *this, ec);
+                    handler_.int64_value(val, semantic_tag_type::timestamp, *this);
                 }
                 else 
                 {
-                    handler_.int64_value(val, semantic_tag_type::none, *this, ec);
+                    handler_.int64_value(val, semantic_tag_type::none, *this);
                 }
                 break;
             }
@@ -133,7 +133,7 @@ public:
                                 bignum n(1, v.data(), v.size());
                                 buffer_.clear();
                                 n.dump(buffer_);
-                                handler_.big_integer_value(buffer_, *this, ec);
+                                handler_.big_integer_value(buffer_, *this);
                                 break;
                             }
                         case 0x3:
@@ -141,32 +141,32 @@ public:
                                 bignum n(-1, v.data(), v.size());
                                 buffer_.clear();
                                 n.dump(buffer_);
-                                handler_.big_integer_value(buffer_, *this, ec);
+                                handler_.big_integer_value(buffer_, *this);
                                 break;
                             }
                         case 0x15:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64url, semantic_tag_type::none, *this, ec);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64url, semantic_tag_type::none, *this);
                                 break;
                             }
                         case 0x16:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64, semantic_tag_type::none, *this, ec);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base64, semantic_tag_type::none, *this);
                                 break;
                             }
                         case 0x17:
                             {
-                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base16, semantic_tag_type::none, *this, ec);
+                                handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::base16, semantic_tag_type::none, *this);
                                 break;
                             }
                         default:
-                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this, ec);
+                            handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this);
                             break;
                     }
                 }
                 else
                 {
-                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this, ec);
+                    handler_.byte_string_value(byte_string_view(v.data(), v.size()), byte_string_chars_format::none, semantic_tag_type::none, *this);
                 }
                 break;
             }
@@ -179,7 +179,7 @@ public:
                 }
                 if (has_cbor_tag && cbor_tag == 0)
                 {
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time, *this, ec);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::date_time, *this);
                 }
                 else
                 {
@@ -189,7 +189,7 @@ public:
                         ec = cbor_errc::invalid_utf8_text_string;
                         return;
                     }
-                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this, ec);
+                    handler_.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag_type::none, *this);
                 }
                 break;
             }
@@ -226,7 +226,7 @@ public:
                         case additional_info::indefinite_length:
                         {
                             ++nesting_depth_;
-                            handler_.begin_array(tag, *this, ec);
+                            handler_.begin_array(tag, *this);
                             source_.ignore(1);
                             bool done = false;
                             while (!done)
@@ -250,7 +250,7 @@ public:
                                 }
                             }
                             source_.ignore(1);
-                            handler_.end_array(*this, ec);
+                            handler_.end_array(*this);
                             --nesting_depth_;
                             break;
                         }
@@ -262,7 +262,7 @@ public:
                                 return;
                             }
                             ++nesting_depth_;
-                            handler_.begin_array(len, tag, *this, ec);
+                            handler_.begin_array(len, tag, *this);
                             for (size_t i = 0; i < len; ++i)
                             {
                                 read(ec);
@@ -271,7 +271,7 @@ public:
                                     return;
                                 }
                             }
-                            handler_.end_array(*this, ec);
+                            handler_.end_array(*this);
                             --nesting_depth_;
                             break;
                         }
@@ -286,7 +286,7 @@ public:
                     case additional_info::indefinite_length: 
                     {
                         ++nesting_depth_;
-                        handler_.begin_object(semantic_tag_type::none, *this, ec);
+                        handler_.begin_object(semantic_tag_type::none, *this);
                         source_.ignore(1);
                         bool done = false;
                         while (!done)
@@ -315,7 +315,7 @@ public:
                             }
                         }
                         source_.ignore(1);
-                        handler_.end_object(*this, ec);
+                        handler_.end_object(*this);
                         --nesting_depth_;
                         break;
                     }
@@ -327,7 +327,7 @@ public:
                             return;
                         }
                         ++nesting_depth_;
-                        handler_.begin_object(len, semantic_tag_type::none, *this, ec);
+                        handler_.begin_object(len, semantic_tag_type::none, *this);
                         for (size_t i = 0; i < len; ++i)
                         {
                             read_name(ec);
@@ -341,7 +341,7 @@ public:
                                 return;
                             }
                         }
-                        handler_.end_object(*this, ec);
+                        handler_.end_object(*this);
                         --nesting_depth_;
                         break;
                     }
@@ -357,19 +357,19 @@ public:
                 switch (info)
                 {
                     case 0x14:
-                        handler_.bool_value(false, semantic_tag_type::none, *this, ec);
+                        handler_.bool_value(false, semantic_tag_type::none, *this);
                         source_.ignore(1);
                         break;
                     case 0x15:
-                        handler_.bool_value(true, semantic_tag_type::none, *this, ec);
+                        handler_.bool_value(true, semantic_tag_type::none, *this);
                         source_.ignore(1);
                         break;
                     case 0x16:
-                        handler_.null_value(semantic_tag_type::none, *this, ec);
+                        handler_.null_value(semantic_tag_type::none, *this);
                         source_.ignore(1);
                         break;
                     case 0x17:
-                        handler_.null_value(semantic_tag_type::undefined, *this, ec);
+                        handler_.null_value(semantic_tag_type::undefined, *this);
                         source_.ignore(1);
                         break;
                     case 0x19: // Half-Precision Float (two-byte IEEE 754)
@@ -382,11 +382,11 @@ public:
                         }
                         if (has_cbor_tag && cbor_tag == 1)
                         {
-                            handler_.double_value(val, floating_point_options(), semantic_tag_type::timestamp, *this, ec);
+                            handler_.double_value(val, floating_point_options(), semantic_tag_type::timestamp, *this);
                         }
                         else
                         {
-                            handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this, ec);
+                            handler_.double_value(val, floating_point_options(), semantic_tag_type::none, *this);
                         }
                         break;
                 }
@@ -437,7 +437,7 @@ private:
                     ec = cbor_errc::invalid_utf8_text_string;
                     return;
                 }
-                handler_.name(basic_string_view<char>(s.data(),s.length()), *this, ec);
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                 break;
             }
             case cbor_major_type::byte_string:
@@ -449,7 +449,7 @@ private:
                 }
                 std::string s;
                 encode_base64url(v.data(),v.size(),s);
-                handler_.name(basic_string_view<char>(s.data(),s.length()), *this, ec);
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
                 break;
             }
             default:
@@ -465,7 +465,7 @@ private:
                     ec = cbor_errc::invalid_utf8_text_string;
                     return;
                 }
-                handler_.name(basic_string_view<char>(s.data(),s.length()), *this, ec);
+                handler_.name(basic_string_view<char>(s.data(),s.length()), *this);
             }
         }
     }

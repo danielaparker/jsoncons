@@ -45,49 +45,49 @@ public:
     }
 private:
 
-    bool do_begin_object(semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_begin_object(semantic_tag_type, const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_object);
         return false;
     }
 
-    bool do_end_object(const serializing_context&, std::error_code&) override
+    bool do_end_object(const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_object);
         return false;
     }
 
-    bool do_begin_array(semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_begin_array(semantic_tag_type, const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_array);
         return false;
     }
 
-    bool do_end_array(const serializing_context&, std::error_code&) override
+    bool do_end_array(const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_array);
         return false;
     }
 
-    bool do_name(const string_view_type& name, const serializing_context&, std::error_code&) override
+    bool do_name(const string_view_type& name, const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(name.data(), name.length(), staj_event_type::name);
         return false;
     }
 
-    bool do_null_value(semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_null_value(semantic_tag_type, const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::null_value);
         return false;
     }
 
-    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&, std::error_code&) override
+    bool do_bool_value(bool value, semantic_tag_type, const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(value);
         return false;
     }
 
-    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context&, std::error_code&) override
+    bool do_string_value(const string_view_type& s, semantic_tag_type tag, const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(s.data(), s.length(), staj_event_type::string_value, tag);
         return false;
@@ -96,14 +96,14 @@ private:
     bool do_byte_string_value(const byte_string_view&, 
                               byte_string_chars_format,
                               semantic_tag_type,
-                              const serializing_context&, std::error_code&) override
+                              const serializing_context&) override
     {
         JSONCONS_UNREACHABLE();
     }
 
     bool do_int64_value(int64_t value, 
                         semantic_tag_type tag,
-                        const serializing_context&, std::error_code&) override
+                        const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return false;
@@ -111,7 +111,7 @@ private:
 
     bool do_uint64_value(uint64_t value, 
                          semantic_tag_type tag, 
-                         const serializing_context&, std::error_code&) override
+                         const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return false;
@@ -120,7 +120,7 @@ private:
     bool do_double_value(double value, 
                          const floating_point_options& fmt, 
                          semantic_tag_type tag, 
-                         const serializing_context&, std::error_code&) override
+                         const serializing_context&) override
     {
         event_ = basic_staj_event<CharT>(value, fmt, tag);
         return false;

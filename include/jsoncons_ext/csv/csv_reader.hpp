@@ -126,7 +126,7 @@ public:
             ec = csv_errc::source_error;
             return;
         }   
-        parser_.reset(ec);
+        parser_.reset();
         if (ec)
         {
             return;

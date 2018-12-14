@@ -290,8 +290,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
-        CHECK(ec == cbor_errc::too_many_items);
+        REQUIRE_THROWS_WITH(serializer.end_array(), cbor_error_category_impl().message((int)cbor_errc::too_many_items).c_str());
         serializer.flush();
     }
     SECTION("Too few items in array")
@@ -304,8 +303,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
-        CHECK(ec == cbor_errc::too_few_items);
+        REQUIRE_THROWS_WITH(serializer.end_array(), cbor_error_category_impl().message((int)cbor_errc::too_few_items).c_str());
         serializer.flush();
     }
     SECTION("Too many items in map")
@@ -322,8 +320,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
-        CHECK(ec == cbor_errc::too_many_items);
+        REQUIRE_THROWS_WITH(serializer.end_object(), cbor_error_category_impl().message((int)cbor_errc::too_many_items).c_str());
         serializer.flush();
     }
     SECTION("Too few items in map")
@@ -340,8 +337,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
-        CHECK(ec == cbor_errc::too_few_items);
+        REQUIRE_THROWS_WITH(serializer.end_object(), cbor_error_category_impl().message((int)cbor_errc::too_few_items).c_str());
         serializer.flush();
     }
     SECTION("Just enough items")
@@ -351,7 +347,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
         CHECK(serializer.byte_string_value(byte_string{'P','u','s','s'})); // no suggested conversion
         CHECK(serializer.big_integer_value("-18446744073709551617"));
         CHECK(serializer.big_decimal_value("273.15"));
-        CHECK(serializer.end_array(null_serializing_context(), ec));
+        CHECK(serializer.end_array());
         CHECK_FALSE(ec);
         serializer.flush();
     }

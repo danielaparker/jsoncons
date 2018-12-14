@@ -56,8 +56,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
-        CHECK(ec == msgpack_errc::too_many_items);
+        REQUIRE_THROWS_WITH(serializer.end_array(), msgpack_error_category_impl().message((int)msgpack_errc::too_many_items).c_str());
         serializer.flush();
     }
     SECTION("Too few items in array")
@@ -70,8 +69,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
-        CHECK(ec == msgpack_errc::too_few_items);
+        REQUIRE_THROWS_WITH(serializer.end_array(), msgpack_error_category_impl().message((int)msgpack_errc::too_few_items).c_str());
         serializer.flush();
     }
     SECTION("Too many items in object")
@@ -88,8 +86,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
-        CHECK(ec == msgpack_errc::too_many_items);
+        REQUIRE_THROWS_WITH(serializer.end_object(), msgpack_error_category_impl().message((int)msgpack_errc::too_many_items).c_str());
         serializer.flush();
     }
     SECTION("Too few items in object")
@@ -106,8 +103,7 @@ TEST_CASE("Too many and too few items in MessagePack object or array")
         CHECK(serializer.string_value("cat"));
         CHECK(serializer.string_value("feline"));
         CHECK(serializer.end_array());
-        CHECK_FALSE(serializer.end_array(null_serializing_context(), ec));
-        CHECK(ec == msgpack_errc::too_few_items);
+        REQUIRE_THROWS_WITH(serializer.end_object(), msgpack_error_category_impl().message((int)msgpack_errc::too_few_items).c_str());
         serializer.flush();
     }
 }
