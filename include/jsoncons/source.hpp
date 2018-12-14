@@ -11,7 +11,8 @@
 #include <string>
 #include <vector>
 #include <istream>
-#include <cstring> // For std::memcpy
+#include <memory> // std::addressof
+#include <cstring> // std::memcpy
 #include <algorithm>
 #include <exception>
 #include <jsoncons/config/jsoncons_config.hpp>
@@ -201,6 +202,8 @@ public:
         }
     }
 };
+
+// string_source
 
 template <class CharT>
 class string_source 

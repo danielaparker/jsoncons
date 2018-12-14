@@ -29,9 +29,9 @@ class basic_cbor_serializer final : public basic_json_content_handler<CharT>
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
-    using typename basic_json_content_handler<CharT>::string_view_type;
+    typedef CharT char_type;
     typedef Result result_type;
-    typedef typename Result::output_type output_type;
+    using typename basic_json_content_handler<CharT>::string_view_type;
 
 private:
     struct stack_item
@@ -73,8 +73,8 @@ private:
     basic_cbor_serializer(const basic_cbor_serializer&) = delete;
     basic_cbor_serializer& operator=(const basic_cbor_serializer&) = delete;
 public:
-    basic_cbor_serializer(output_type& os)
-       : result_(os)
+    explicit basic_cbor_serializer(result_type result)
+       : result_(std::move(result))
     {
     }
 
@@ -779,8 +779,10 @@ private:
 };
 
 typedef basic_cbor_serializer<char,jsoncons::binary_stream_result> cbor_serializer;
-
 typedef basic_cbor_serializer<char,jsoncons::buffer_result> cbor_buffer_serializer;
+
+typedef basic_cbor_serializer<wchar_t,jsoncons::binary_stream_result> wcbor_serializer;
+typedef basic_cbor_serializer<wchar_t,jsoncons::buffer_result> wcbor_buffer_serializer;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 typedef basic_cbor_serializer<char,jsoncons::buffer_result> cbor_bytes_serializer;

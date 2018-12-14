@@ -16,11 +16,14 @@
 #include <type_traits>
 #include <algorithm>
 #include <exception>
+#include <memory> // std::addressof
 #include <cstring> // std::memcpy
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/type_traits_helper.hpp>
 
 namespace jsoncons { 
+
+// text_stream_result
 
 template <class CharT>
 class text_stream_result
@@ -32,35 +35,39 @@ public:
 private:
     static const size_t default_buffer_length = 16384;
 
-    std::basic_ostream<CharT>& os_;
+    std::basic_ostream<CharT>* os_;
     std::vector<CharT> buffer_;
     CharT * begin_buffer_;
     const CharT* end_buffer_;
     CharT* p_;
 
-    // Noncopyable and nonmoveable
+    // Noncopyable
     text_stream_result(const text_stream_result&) = delete;
     text_stream_result& operator=(const text_stream_result&) = delete;
 
 public:
+    text_stream_result(text_stream_result&&) = default;
+
     text_stream_result(std::basic_ostream<CharT>& os)
-        : os_(os), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
+        : os_(std::addressof(os)), buffer_(default_buffer_length), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
     text_stream_result(std::basic_ostream<CharT>& os, size_t buflen)
-    : os_(os), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
+    : os_(std::addressof(os)), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
     ~text_stream_result()
     {
-        os_.write(begin_buffer_, buffer_length());
-        os_.flush();
+        os_->write(begin_buffer_, buffer_length());
+        os_->flush();
     }
+
+    text_stream_result& operator=(text_stream_result&&) = default;
 
     void flush()
     {
-        os_.write(begin_buffer_, buffer_length());
-        os_.flush();
+        os_->write(begin_buffer_, buffer_length());
+        os_->flush();
         p_ = buffer_.data();
     }
 
@@ -74,8 +81,8 @@ public:
         }
         else
         {
-            os_.write(begin_buffer_, buffer_length());
-            os_.write(s,length);
+            os_->write(begin_buffer_, buffer_length());
+            os_->write(s,length);
             p_ = begin_buffer_;
         }
     }
@@ -88,7 +95,7 @@ public:
         }
         else
         {
-            os_.write(begin_buffer_, buffer_length());
+            os_->write(begin_buffer_, buffer_length());
             p_ = begin_buffer_;
             push_back(ch);
         }
@@ -101,6 +108,8 @@ private:
     }
 };
 
+// binary_stream_result
+
 class binary_stream_result
 {
 public:
@@ -109,19 +118,21 @@ public:
 private:
     static const size_t default_buffer_length = 16384;
 
-    std::basic_ostream<char>& os_;
+    std::basic_ostream<char>* os_;
     std::vector<uint8_t> buffer_;
     uint8_t * begin_buffer_;
     const uint8_t* end_buffer_;
     uint8_t* p_;
 
-    // Noncopyable and nonmoveable
+    // Noncopyable
     binary_stream_result(const binary_stream_result&) = delete;
     binary_stream_result& operator=(const binary_stream_result&) = delete;
 
 public:
+    binary_stream_result(binary_stream_result&&) = default;
+
     binary_stream_result(std::basic_ostream<char>& os)
-        : os_(os), 
+        : os_(std::addressof(os)), 
           buffer_(default_buffer_length), 
           begin_buffer_(buffer_.data()), 
           end_buffer_(begin_buffer_+buffer_.size()), 
@@ -129,7 +140,7 @@ public:
     {
     }
     binary_stream_result(std::basic_ostream<char>& os, size_t buflen)
-        : os_(os), 
+        : os_(std::addressof(os)), 
           buffer_(buflen), 
           begin_buffer_(buffer_.data()), 
           end_buffer_(begin_buffer_+buffer_.size()), 
@@ -138,13 +149,15 @@ public:
     }
     ~binary_stream_result()
     {
-        os_.write((char*)begin_buffer_, buffer_length());
-        os_.flush();
+        os_->write((char*)begin_buffer_, buffer_length());
+        os_->flush();
     }
+
+    binary_stream_result& operator=(binary_stream_result&&) = default;
 
     void flush()
     {
-        os_.write((char*)begin_buffer_, buffer_length());
+        os_->write((char*)begin_buffer_, buffer_length());
         p_ = buffer_.data();
     }
 
@@ -158,8 +171,8 @@ public:
         }
         else
         {
-            os_.write((char*)begin_buffer_, buffer_length());
-            os_.write((char*)s,length);
+            os_->write((char*)begin_buffer_, buffer_length());
+            os_->write((char*)s,length);
             p_ = begin_buffer_;
         }
     }
@@ -172,7 +185,7 @@ public:
         }
         else
         {
-            os_.write((char*)begin_buffer_, buffer_length());
+            os_->write((char*)begin_buffer_, buffer_length());
             p_ = begin_buffer_;
             push_back(ch);
         }
@@ -185,6 +198,8 @@ private:
     }
 };
 
+// string_result
+
 template <class StringT>
 class string_result 
 {
@@ -194,15 +209,18 @@ public:
 private:
     output_type& s_;
 
-    // Noncopyable and nonmoveable
+    // Noncopyable
     string_result(const string_result&) = delete;
     string_result& operator=(const string_result&) = delete;
 public:
+    string_result(string_result&&) = default;
 
     string_result(output_type& s)
         : s_(s)
     {
     }
+
+    string_result& operator=(string_result&&) = default;
 
     void flush()
     {
@@ -219,6 +237,8 @@ public:
     }
 };
 
+// buffer_result
+
 class buffer_result 
 {
 public:
@@ -227,15 +247,18 @@ public:
 private:
     output_type& s_;
 
-    // Noncopyable and nonmoveable
+    // Noncopyable
     buffer_result(const buffer_result&) = delete;
     buffer_result& operator=(const buffer_result&) = delete;
 public:
+    buffer_result(buffer_result&&) = default;
 
     buffer_result(output_type& s)
         : s_(s)
     {
     }
+
+    buffer_result& operator=(buffer_result&&) = default;
 
     void flush()
     {
