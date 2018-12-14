@@ -250,7 +250,7 @@ std::vector<uint8_t> get_byte_string(Source& source, std::error_code& ec)
         return v;
     }
 
-    switch (get_additional_information_value(source.peek()))
+    switch (get_additional_information_value((uint8_t)source.peek()))
     {
         case additional_info::indefinite_length: 
         {
@@ -298,9 +298,9 @@ std::string get_text_string(Source& source, std::error_code& ec)
         ec = cbor_errc::unexpected_eof;
         return s;
     }
-    JSONCONS_ASSERT(get_major_type(source.peek()) == cbor_major_type::text_string);
+    JSONCONS_ASSERT(get_major_type((uint8_t)source.peek()) == cbor_major_type::text_string);
 
-    switch (get_additional_information_value(source.peek()))
+    switch (get_additional_information_value((uint8_t)source.peek()))
     {
         case additional_info::indefinite_length:
         {
@@ -347,7 +347,7 @@ void walk_object_items(Source& source, std::error_code& ec)
         ec = cbor_errc::unexpected_eof;
         return;
     }
-    uint8_t info = get_additional_information_value(source.peek());
+    uint8_t info = get_additional_information_value((uint8_t)source.peek());
     switch (info)
     {
     case additional_info::indefinite_length: 
@@ -407,7 +407,7 @@ void walk_array_items(Source& source, std::error_code& ec)
         ec = cbor_errc::unexpected_eof;
         return;
     }
-    uint8_t info = get_additional_information_value(source.peek());
+    uint8_t info = get_additional_information_value((uint8_t)source.peek());
     switch (info)
     {
         case additional_info::indefinite_length: 
@@ -523,8 +523,8 @@ int64_t get_int64_value(Source& source, std::error_code& ec)
     }
     const uint8_t* endp = nullptr;
 
-    uint8_t info = get_additional_information_value(source.peek());
-    switch (get_major_type(source.peek()))
+    uint8_t info = get_additional_information_value((uint8_t)source.peek());
+    switch (get_major_type((uint8_t)source.peek()))
     {
         case cbor_major_type::negative_integer:
             source.ignore(1);
@@ -687,8 +687,8 @@ void walk(Source& source, std::error_code& ec)
         ec = cbor_errc::unexpected_eof;
         return;
     }
-    uint8_t info = get_additional_information_value(source.peek());
-    switch (get_major_type(source.peek()))
+    uint8_t info = get_additional_information_value((uint8_t)source.peek());
+    switch (get_major_type((uint8_t)source.peek()))
     {
         case cbor_major_type::unsigned_integer:
         {
@@ -801,8 +801,8 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
         return s;
     }
 
-    JSONCONS_ASSERT(get_major_type(source.peek()) == cbor_major_type::array);
-    JSONCONS_ASSERT(get_additional_information_value(source.peek()) == 2);
+    JSONCONS_ASSERT(get_major_type((uint8_t)source.peek()) == cbor_major_type::array);
+    JSONCONS_ASSERT(get_additional_information_value((uint8_t)source.peek()) == 2);
 
     source.ignore(1);
     if (source.eof())
@@ -812,7 +812,7 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
     }
 
     int64_t exponent = 0;
-    switch (get_major_type(source.peek()))
+    switch (get_major_type((uint8_t)source.peek()))
     {
         case cbor_major_type::unsigned_integer:
         {
@@ -839,7 +839,7 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
         }
     }
 
-    switch (get_major_type(source.peek()))
+    switch (get_major_type((uint8_t)source.peek()))
     {
         case cbor_major_type::unsigned_integer:
         {
@@ -874,7 +874,7 @@ std::string get_array_as_decimal_string(Source& source, std::error_code& ec)
             }
             uint8_t tag = get_additional_information_value(c);
 
-            if (get_major_type(source.peek()) == cbor_major_type::byte_string)
+            if (get_major_type((uint8_t)source.peek()) == cbor_major_type::byte_string)
             {
                 std::vector<uint8_t> v = jsoncons::cbor::detail::get_byte_string(source,ec);
                 if (ec)

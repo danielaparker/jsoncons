@@ -156,13 +156,13 @@ public:
     {
         try
         {
-            size_t count = sbuf_->sgetn(p, length);
-            if (count < length)
+            std::streamsize count = sbuf_->sgetn(p, length); // never negative
+            if (static_cast<size_t>(count) < length)
             {
                 is_->clear(is_->rdstate() | std::ios::eofbit);
             }
             position_ += length;
-            return count;
+            return static_cast<size_t>(count);
         }
         catch (const std::exception&)
         {

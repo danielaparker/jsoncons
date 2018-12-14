@@ -241,8 +241,8 @@ public:
                 if (source_.peek() == ubjson_format::type_marker)
                 {
                     source_.ignore(1);
-                    uint8_t type{};
-                    if (source_.get(type) == 0)
+                    uint8_t item_type{};
+                    if (source_.get(item_type) == 0)
                     {
                         ec = ubjson_errc::unexpected_eof;
                         return;
@@ -254,7 +254,7 @@ public:
                         handler_.begin_array(length, semantic_tag_type::none, *this, ec);
                         for (size_t i = 0; i < length; ++i)
                         {
-                            read_value(type, ec);
+                            read_value(item_type, ec);
                             if (ec)
                             {
                                 return;
@@ -304,8 +304,8 @@ public:
                 if (source_.peek() == ubjson_format::type_marker)
                 {
                     source_.ignore(1);
-                    uint8_t type{};
-                    if (source_.get(type) == 0)
+                    uint8_t item_type{};
+                    if (source_.get(item_type) == 0)
                     {
                         ec = ubjson_errc::unexpected_eof;
                         return;
@@ -322,7 +322,7 @@ public:
                             {
                                 return;
                             }
-                            read_value(type, ec);
+                            read_value(item_type, ec);
                             if (ec)
                             {
                                 return;

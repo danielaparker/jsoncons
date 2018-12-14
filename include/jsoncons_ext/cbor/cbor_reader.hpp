@@ -47,7 +47,7 @@ public:
         bool has_cbor_tag = false;
         uint8_t cbor_tag = 0;
 
-        if (get_major_type(source_.peek()) == cbor_major_type::semantic_tag)
+        if (get_major_type((uint8_t)source_.peek()) == cbor_major_type::semantic_tag)
         {
             has_cbor_tag = true;
             uint8_t c{};
@@ -59,7 +59,7 @@ public:
             cbor_tag = get_additional_information_value(c);
         }
 
-        switch (get_major_type(source_.peek()))
+        switch (get_major_type((uint8_t)source_.peek()))
         {
             case cbor_major_type::unsigned_integer:
             {
@@ -175,7 +175,7 @@ public:
             }
             case cbor_major_type::array:
             {
-                size_t info = get_additional_information_value(source_.peek());
+                size_t info = get_additional_information_value((uint8_t)source_.peek());
 
                 semantic_tag_type tag = semantic_tag_type::none;
                 if (has_cbor_tag)
@@ -255,7 +255,7 @@ public:
             }
             case cbor_major_type::map:
             {
-                size_t info = get_additional_information_value(source_.peek());
+                size_t info = get_additional_information_value((uint8_t)source_.peek());
                 switch (info)
                 {
                     case additional_info::indefinite_length: 
@@ -316,7 +316,7 @@ public:
             }
             case cbor_major_type::simple:
             {
-                size_t info = get_additional_information_value(source_.peek());
+                size_t info = get_additional_information_value((uint8_t)source_.peek());
                 switch (info)
                 {
                     case 0x14:
@@ -374,7 +374,7 @@ public:
 private:
     void read_name(std::error_code& ec)
     {
-        switch (get_major_type(source_.peek()))
+        switch (get_major_type((uint8_t)source_.peek()))
         {
             case cbor_major_type::text_string:
             {
